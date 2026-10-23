@@ -1,6 +1,16 @@
 # Agent-attached change canvas: system design
 
-Date: 2026-10-23. Status: accepted architecture direction with Astra medium review corrections incorporated. These contracts remain unimplemented. Current runtime: React 19.2 / Vite / Three.js.
+**Date:** 2026-10-23
+
+**Design status:** Accepted direction; Astra medium review corrections incorporated.
+
+**Implementation status:** Architecture contracts remain unimplemented.
+
+**Current frontend:** React 19.2
+
+**Current build tooling:** Vite
+
+**Current graph renderer:** Three.js
 
 ## Intent and accepted canvas
 
@@ -13,14 +23,28 @@ Help reviewers understand the whole PR/MR, enter at any behavior/source node, fo
 - Semantic zoom and manual expansion preserve stable selection and anchors. No API/Helpers orientation control.
 - Graph leads plain-English storytelling: brief why, actual behavior/how and concrete example. UI synchronizes step number and evidence across graph/explanation/diff; narration does not instruct readers to locate changes. Removal red, addition green and modification yellow need labels beyond color. Minimal icons for operations; text for information.
 - Preserve one-row draggable bottom-center player (drag, previous, replay/pause, next, step count/chapter selector), accessible labels/tooltips, mobile synchronized Flow/Diff, reading pause and exploration/resume. Rejected oversized player and verbose narration are not design targets.
-- Role (helper/wrapper/template), test technique (mock/stub), and risk are separate evidence-backed, correctable dimensions.
+- Role, test technique (mock/stub), and risk are separate evidence-backed, correctable dimensions. Prefer request/response adapter or contract mapping when that is what “template” means; use generated only with generator evidence. Helpers and wrappers are not inherently low-risk.
 - UI/MCP/CLI share commands and read model. Viewport/hover remain private; explicitly shared focus is durable.
 
 Observed gap: the imported prototype has curated Flow #32 and Surface #70 examples, a GitHub importer and ephemeral SSE focus. It has no durable queue, SQLite backend, MCP attachment, host wakeup, React Flow canvas or durable test jobs. Connection-count delivery is not UI adoption. See [transfer and validation](project-transfer.md).
 
 ## Accepted system shape
 
-React 19 + React Flow frontend; Node.js/TypeScript backend; SQLite durable state plus referenced evidence artifact files. Domain contracts are independent of renderer and transport. Framework/backend migration is future work.
+**Frontend:** React 19
+
+**Canvas:** React Flow
+
+**Frontend tooling:** Vite
+
+**Backend runtime:** Node.js
+
+**Backend language:** TypeScript
+
+**Durable database:** SQLite
+
+**Evidence storage:** Referenced artifact files for source snapshots, patches and execution logs.
+
+Domain contracts are independent of renderer and transport. Framework/backend migration is future work.
 
 ```mermaid
 flowchart TB
@@ -119,6 +143,8 @@ Show saved, pending/degraded, delivered, started/processing and answered separat
 | Event / Outbox / Inbox | Addressed recipient, cause/correlation, durable cursor, attempts and item consumption. |
 | Job / Invocation / Run | Configured targets/argv, authorization, invocationId/epoch, actual content digest/dirty state, environment, process/exit evidence and artifact digests. |
 | Layout / ViewState / SharedFocus | Layout separate from semantic anchors, private viewport/hover, explicit durable versioned shared focus. |
+
+Prepare a pinned-head worktree plus a read-only baseline source view using the recorded diff-base strategy. Inspect callers and callees from both source sides, including deleted callers and unchanged dependencies. A baseline execution worktree is needed only when actually running a comparison.
 
 A new head creates a new snapshot. Old-head comments and runs remain historical, never silently rebased to current layout/head. Renames/symbol mappings need explicit evidence. Zoom/layout never rewrite anchors or graph meaning. Binary/large unavailable patches remain explicit. Record source-change status, test relevance and run result independently; a definition is not a run and unchanged tests do not prove validity. Base/head comparison retains separate environment-qualified results. Importing never executes installation hooks.
 

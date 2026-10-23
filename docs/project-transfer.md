@@ -18,9 +18,9 @@ Date: 2026-10-23. Owner: existing receiver chat 01a16901-c036-7f81-9207-ff58bd33
 - Private packet retained under ignored .decompozr/flow/run/transfer/packet.md; no private fixture copies required for import.
 - Original README, AGENTS, design QA, source licenses, design-system provenance and Sites adapters retained. Root .gitignore excludes local dependencies/build/runtime/credentials.
 
-## Execution contract (request revision 2)
+## Execution contract (request revision 3)
 
-Endpoint: isolated local import, revised accepted architecture incorporating all seven Astra medium fixes, passing imported-project checks, local commit and revised system graph shown in chat. No remote publication, merge, archive, preview replacement, model/settings change or runtime migration authorized by this transfer.
+Endpoint: isolated local import, revised accepted architecture incorporating all seven Astra medium fixes, passing imported-project checks, local commit and revised system graph shown in chat. No remote publication, archive, preview replacement, model/settings change or runtime migration. Later user instruction explicitly authorizes local merge into the primary repository and removal of the extra task worktree, retaining docs.
 
 1. Verify source/destination and import only pinned tracked subtree (completed).
 2. Revise system-design and reconcile obsolete README/framework references and historical evidence paths (completed).
@@ -40,3 +40,9 @@ Same-agent checks: frozen-lockfile install passed with existing Bun 1.4.2; Vite/
 Read original transfer packet and context-supplement.md; own-words readback written to source private receiver-context-readback.md and copied to destination ignored runtime. Return message queued once to source thread 01a1280a-3618-7c41-b70d-71d40fafd60f (queue receipt 01a1690f-193c-7011-85c5-e22daafb387d). Queued does not establish consumption or source agreement. Source remains read-only; receiver remains sole product writer.
 
 Reconciled slim one-row player, step/evidence synchronization, accessible diff colors, mobile reading/exploration state and future left/right graph versus current unified diff. Reference attachment directories exist; contents were not inspected. Historical shared URL, original preview, native host loop and physical-device/comprehension acceptance remain unverified. Do not call the full historical context independently complete until source feedback is reconciled. Original private references remain in retained readback/supplement, outside Git.
+
+## Final context and repository consolidation
+
+The receiver fully read the private original source-conversation-history.md export and updated the private readback. Source read-only review found no blocking omission. Packet differences: identity/wakeup findings numbering swapped; historical ChatGPT share URL mislabeled GitHub; tentative template terminology clarified as request/response adapter or contract mapping. No architecture-invalidating final correction found. Full export and private readback remain ignored, not published. External attachments/share contents and native host remain unverified. No further source queue messages requested.
+
+Latest user correction: keep docs, separate date/status labels and each technology layer, merge into primary main and remove the temporary worktree. Durable code/design will live at /Users/scottchu/projects/personal/pr-reviewer. Private recovery records relocate into its ignored .decompozr/flow/run/transfer directory. Source Playground remains untouched except authorized private context readback.
