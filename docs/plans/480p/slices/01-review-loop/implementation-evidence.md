@@ -23,7 +23,7 @@ Environment: macOS, Bun 1.4.2, Node 24.21.0 from the ChatGPT app, Chrome from `/
 | Check | Observed result | Scope |
 |---|---|---|
 | `bun run check` | Passed strict TypeScript and subsystem import checks | Application, tests, scripts and allowed subsystem interfaces |
-| `bun run test` | Passed 17 tests: 4 Bun domain/registry and 13 Node application/storage/gateway/delivery/runtime tests | Anchors, canonical fingerprint/text bounds, duplicate lines, route disposal/reconnect, retry identity, read/answer versus unknown state, own-turn command progress, pairing/replay/expiry/revoke, content hash, owned process stop/occupied-port preservation Claude interface refusal, idempotent preparation/export recovery, definitive rejection/readback recovery and same-session re-pair inbox recovery |
+| `bun run test` | Passed 19 tests: 4 Bun domain/registry and 15 Node application/storage/gateway/delivery/runtime tests | Anchors, canonical fingerprint/text bounds, duplicate lines, route disposal/reconnect, retry identity, read/answer versus unknown state, own-turn command progress, pairing/replay/expiry/revoke, content hash, owned process stop/occupied-port preservation, Claude interface refusal, idempotent preparation/export recovery, definitive rejection/readback recovery and same-session re-pair inbox recovery, blob/UTF-8 validation and foreign-Git data-root rejection |
 | `bun run test:e2e` | Passed two actual Chrome/React journeys | Real PR 14 source → UI keyboard save → controlled CLI argv process → actual stdio MCP attach/inbox/question/reply → receipt/readback → rendered answer/evidence link → restart/no replay → revoke; explicit manual PR 19 source/path/span save |
 | Screenshot self-check | Inspected generated full-page output | Neutral hierarchy, before/after source, selected range, question/answer/evidence/limits visible; separate from automated checks |
 
@@ -35,7 +35,7 @@ Controlled-host screenshot: `/Users/scottchu/.codex-workspaces/artifacts/pr-revi
 
 Reviewed target: [PR 14](https://github.com/scottchu/pr-reviewer/pull/14). Actual baseline `a6d63c1e46424cb979ee912aa993ad964835c287`; head `fd6c5fb26a325c8318087c0f058de247a55e6c07`; path `docs/README.md`; anchor head lines 5–13. Manual Git-object acquisition executes no target code. Snapshot ID is content-derived and recorded in `snapshot.json` and authoritative review queries; candidate source identity is separate.
 
-The browser asked the predeclared bootstrap question. The controlled MCP participant read the exact pinned source and submitted a persisted answer identifying durable product knowledge outside plans, prior documentation authority and the limit that no rebuild was demonstrated. The browser displayed that answer with source attribution; receipt retries returned the original receipt, restart retained it and no second notification launched. This validates the real own-PR source and controlled adapter path, not real Codex/Claude dogfood acceptance. The task's implementation PR must also receive its actual own-PR use when root publishes it; no PR URL is fabricated here.
+The browser asked the predeclared bootstrap question. The controlled MCP participant read the exact pinned source and submitted a persisted answer identifying durable product knowledge outside plans, prior documentation authority and the limit that no rebuild was demonstrated. The browser displayed that answer with source attribution; receipt retries returned the original receipt, restart retained it and no second notification launched. This validates the real own-PR source and controlled adapter path, not real Codex/Claude dogfood acceptance. The separate implementation PR 19 task below pins its actual base/head; controlled preparation/question save and owner-operated source reads do not satisfy full native-host dogfood.
 
 ## Acceptance disposition
 
@@ -47,7 +47,7 @@ The browser asked the predeclared bootstrap question. The controlled MCP partici
 | 01-D | Anchor/hash, actor/generation and bootstrap/pairing negative checks passed. Native provisioning responsibility remains explicit. |
 | 01-E | Unknown notification remains unknown after read/reply; no replay or reply-triggered wake passed. Provider-side exactly-once is neither required nor claimed. |
 | 01-F | Keyboard/source-link React checks and screenshot self-review passed. Unfamiliar-reviewer comprehension remains unrun. |
-| 01-G | PR 14 controlled-host source task passed. Actual native-host own-PR use and the implementation PR task remain unmet. |
+| 01-G | PR 14 controlled-host task and PR 19 manual source/question save passed. Root independently paired/read PR 19 via owner-operated stdio MCP. Actual native-host UI/CLI/question/reply dogfood remains unmet. |
 
 Claude interface/argument/refusal tests passed; actual Claude executable, trusted metadata setup, existing-owner delivery and MCP product journey are unrun. No Codex proof is reused for Claude.
 
@@ -76,3 +76,13 @@ Expected account: preserve original question/event IDs and attempt history, expo
 The owner can now select this exact local source with `REVIEW_SOURCE_SPEC` and a fresh data root. Manual-source and React tests verify immutable preparation, retained target input, target-derived UI path/title/selection and saved question attribution for PR 19. General import, native-host browser dogfood and owner-operated actual MCP task remain separate. The later application candidate and this reviewed target head are intentionally distinct. The initial independent review receipt is [recorded separately](reviews/implementation-4dae178.md); the new source-selection delta requires focused review.
 
 The explicit-source delta passed strict checks, all 17 domain/interface/process tests and both Chrome journeys. PR 14 retains the complete controlled-host reply/restart path; PR 19 separately verifies the manual source and question save path. Neither browser test invokes the actual native host.
+
+## Source/data boundary repair
+
+The [independent manual-source review](reviews/manual-source-98e0032.md) of `98e00325e5fd55f3d6c146c76cfc1055fb63cb73` reproduced accepting a tree listing as text and a runtime data root inside another Git checkout. Both regressions were observed failing before correction. Preparation now requires commit/path blobs and strict UTF-8, with an isolated malformed-byte Git fixture confirming no persisted review; data-root checks reject any Git worktree/metadata ancestor before creation. Strict checks, all 19 tests and both Chrome journeys passed after the repair. Root supplies the focused commit for independent revalidation.
+
+## Root owner-operated protocol observation
+
+Root ran clean candidate `98e00325e5fd55f3d6c146c76cfc1055fb63cb73` with `sourceDirty: false`, a genuine external PR 19 data root and gateway health 200. Owner pairing independently compared its native process context to existing session metadata, then the actual stdio SDK client called session_attach and review_get. Attachment generation 1, the durable receipt and initial inbox cursor zero were returned without a model-visible capability. The source query returned PR 19 base `cf179ac1eeb9073c08e4e82c950cb53bdc681c72`, head `4dae178a4302bfdd161fca5be78144c63f562c30`, snapshot `4be4da3b32375e25cef6756841c0f7dac707e4cb9f6d770240b87e47c5fab363` and line 99 supporting the predeclared recovery account. Root stopped the verified owned runtime cleanly and retained its accepted data for recovery.
+
+Five noncredential raw evidence files are SHA-verified in `/Users/scottchu/.codex-workspaces/artifacts/pr-reviewer-slice01-implementation-2026-10-23`, prefixed `root-98e-` with manifest `root-98e.sha256.json`. Native thread IDs and owner metadata remain outside Git. This observation establishes trusted local-owner pairing and an actual MCP source read. It does **not** establish native dynamically registered tools, CLI wake, a UI loop, a persisted question/reply or full dogfood. The native Code Mode negotiation and browser-policy limits remain unchanged. It is historical evidence for 98e, not an unperformed run of the repaired candidate.

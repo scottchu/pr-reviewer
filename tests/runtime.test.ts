@@ -181,3 +181,94 @@ test("explicit owner manual PR19 specification pins one source and survives rest
     rmSync(root, { recursive: true, force: true });
   }
 });
+
+test("manual source rejects directory objects and malformed UTF8 before persistence", async () => {
+  const { prepareSource } = await import("../scripts/prepare.ts");
+  const { mkdirSync } = await import("node:fs");
+  const previousSpec = process.env.REVIEW_SOURCE_SPEC,
+    previousGit = process.env.GIT_DIR;
+  const root = mkdtempSync(join(tmpdir(), "pr-reviewer-source-rejection-"));
+  const fixture = mkdtempSync(join(tmpdir(), "pr-reviewer-invalid-utf8-git-"));
+  try {
+    const directory = join(root, "tree-case");
+    mkdirSync(directory);
+    const spec = join(root, "selection.json");
+    writeFileSync(
+      spec,
+      JSON.stringify({
+        prNumber: 19,
+        prUrl: "https://github.com/scottchu/pr-reviewer/pull/19",
+        baseSha: "cf179ac1eeb9073c08e4e82c950cb53bdc681c72",
+        headSha: "4dae178a4302bfdd161fca5be78144c63f562c30",
+        path: "docs/product/review-loop",
+      }),
+    );
+    process.env.REVIEW_SOURCE_SPEC = spec;
+    assert.throws(() => prepareSource(directory), /source_unavailable/);
+    assert.equal(existsSync(join(directory, "review.sqlite")), false);
+    execFileSync("git", ["init", fixture], { stdio: "pipe" });
+    writeFileSync(join(fixture, "bad.txt"), Buffer.from([0xc3, 0x28]));
+    execFileSync("git", ["-C", fixture, "add", "bad.txt"]);
+    execFileSync(
+      "git",
+      [
+        "-C",
+        fixture,
+        "-c",
+        "user.name=Fixture",
+        "-c",
+        "user.email=fixture@example.invalid",
+        "commit",
+        "-m",
+        "Invalid UTF8 fixture",
+      ],
+      { stdio: "pipe" },
+    );
+    const sha = execFileSync("git", ["-C", fixture, "rev-parse", "HEAD"], {
+      encoding: "utf8",
+    }).trim();
+    process.env.GIT_DIR = join(fixture, ".git");
+    const invalid = join(root, "utf8-case");
+    mkdirSync(invalid);
+    writeFileSync(
+      spec,
+      JSON.stringify({
+        prNumber: 19,
+        prUrl: "https://github.com/scottchu/pr-reviewer/pull/19",
+        baseSha: sha,
+        headSha: sha,
+        path: "bad.txt",
+      }),
+    );
+    assert.throws(() => prepareSource(invalid), /source_unavailable/);
+    assert.equal(existsSync(join(invalid, "review.sqlite")), false);
+  } finally {
+    if (previousSpec === undefined) delete process.env.REVIEW_SOURCE_SPEC;
+    else process.env.REVIEW_SOURCE_SPEC = previousSpec;
+    if (previousGit === undefined) delete process.env.GIT_DIR;
+    else process.env.GIT_DIR = previousGit;
+    rmSync(root, { recursive: true, force: true });
+    rmSync(fixture, { recursive: true, force: true });
+  }
+});
+
+test("data root rejects another Git worktree and its metadata before creation", async () => {
+  const { dataRoot } = await import("../scripts/local.ts");
+  const root = mkdtempSync(join(tmpdir(), "pr-reviewer-foreign-git-"));
+  const previous = process.env.REVIEW_DATA_DIR;
+  try {
+    execFileSync("git", ["init", root], { stdio: "pipe" });
+    for (const path of [
+      join(root, "runtime-data"),
+      join(root, ".git", "runtime-data"),
+    ]) {
+      process.env.REVIEW_DATA_DIR = path;
+      assert.throws(() => dataRoot(), /outside.*Git|Git repository/);
+      assert.equal(existsSync(path), false);
+    }
+  } finally {
+    if (previous === undefined) delete process.env.REVIEW_DATA_DIR;
+    else process.env.REVIEW_DATA_DIR = previous;
+    rmSync(root, { recursive: true, force: true });
+  }
+});

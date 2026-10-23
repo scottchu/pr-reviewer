@@ -32,6 +32,16 @@ const bootstrap: z.infer<typeof inputSchema> = {
   headSha: "fd6c5fb26a325c8318087c0f058de247a55e6c07",
   path: "docs/README.md",
 };
+const readGit = (args: string[]): Buffer => {
+  try {
+    return execFileSync("git", args, {
+      maxBuffer: 1048576,
+      stdio: ["ignore", "pipe", "pipe"],
+    });
+  } catch {
+    throw new Error("source_unavailable: pinned Git object cannot be read");
+  }
+};
 export const prepareSource = (root: string) => {
   const paths = files(root);
   let retained: z.infer<typeof inputSchema> | null = null;
@@ -80,16 +90,21 @@ export const prepareSource = (root: string) => {
   const { baseSha, headSha, path } = spec;
   const sources = (["base", "head"] as const).map((side) => {
     const sha = side === "base" ? baseSha : headSha;
-    if (
-      execFileSync("git", ["cat-file", "-t", sha], {
-        encoding: "utf8",
-      }).trim() !== "commit"
-    )
+    if (readGit(["cat-file", "-t", sha]).toString("utf8").trim() !== "commit")
       throw new Error("source_unavailable: pinned object must be a commit");
-    const content = execFileSync("git", ["show", `${sha}:${path}`], {
-      encoding: "utf8",
-      maxBuffer: 1048576,
-    });
+    const object = `${sha}:${path}`;
+    if (readGit(["cat-file", "-t", object]).toString("utf8").trim() !== "blob")
+      throw new Error("source_unavailable: selected path must be a blob");
+    const bytes = readGit(["cat-file", "blob", object]);
+    let content: string;
+    try {
+      content = new TextDecoder("utf-8", {
+        fatal: true,
+        ignoreBOM: true,
+      }).decode(bytes);
+    } catch {
+      throw new Error("source_unavailable: selected blob is not valid UTF-8");
+    }
     if (content.includes("\0"))
       throw new Error("source_unavailable: binary content");
     const lineCount = content.endsWith("\n")

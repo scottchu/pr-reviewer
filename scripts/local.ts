@@ -8,8 +8,45 @@ import {
   closeSync,
   readFileSync,
   unlinkSync,
+  existsSync,
 } from "node:fs";
-import { resolve, sep, join } from "node:path";
+import { execFileSync } from "node:child_process";
+import { resolve, sep, join, dirname } from "node:path";
+const rejectGitRoot = (path: string) => {
+  let parent = path;
+  while (!existsSync(parent)) {
+    const next = dirname(parent);
+    if (next === parent) break;
+    parent = next;
+  }
+  parent = realpathSync(parent);
+  const env = { ...process.env };
+  for (const key of [
+    "GIT_DIR",
+    "GIT_WORK_TREE",
+    "GIT_COMMON_DIR",
+    "GIT_CEILING_DIRECTORIES",
+    "GIT_DISCOVERY_ACROSS_FILESYSTEM",
+  ])
+    delete env[key];
+  let inside = false;
+  try {
+    execFileSync("git", ["-C", parent, "rev-parse", "--absolute-git-dir"], {
+      env,
+      stdio: ["ignore", "pipe", "pipe"],
+    });
+    inside = true;
+  } catch (error) {
+    if (
+      !(error instanceof Error) ||
+      !("status" in error) ||
+      error.status !== 128
+    )
+      throw error;
+  }
+  if (inside)
+    throw new Error("REVIEW_DATA_DIR must be outside every Git repository");
+};
 export const dataRoot = () => {
   const value = process.env.REVIEW_DATA_DIR;
   if (!value)
@@ -24,6 +61,7 @@ export const dataRoot = () => {
     root.split(sep).includes(".decompozr")
   )
     throw new Error("REVIEW_DATA_DIR must be outside Git and .decompozr");
+  rejectGitRoot(root);
   mkdirSync(root, { recursive: true, mode: 0o700 });
   const real = realpathSync(root);
   if (
@@ -32,6 +70,7 @@ export const dataRoot = () => {
     real.split(sep).includes(".decompozr")
   )
     throw new Error("unsafe data root");
+  rejectGitRoot(real);
   if ((statSync(root).mode & 0o077) !== 0)
     throw new Error("data root must be private to its owner (mode 0700)");
   if (statSync(root).uid !== process.getuid?.())
