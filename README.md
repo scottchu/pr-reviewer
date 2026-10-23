@@ -4,4 +4,6 @@ Help reviewers understand what a PR changes, why it matters, and what evidence s
 
 This repository is starting with product intent and documentation. Start with the [product vision](docs/vision.md): why the product exists and what understanding a PR should feel like.
 
+Continue with the [high-level design](docs/architecture.md) and [product roadmap](docs/plans/roadmap.md).
+
 The earlier prototype remains in Playground as a reference. No application or development environment is included here yet.

@@ -7,3 +7,5 @@ For each plan, record its goal, scope, decisions, sequence and current status. F
 All code must be tested; prefer TDD. Include end-to-end coverage for implemented user journeys. UI work uses decompozr/design-system, and its actual integration belongs in that coverage. Distinguish planned tests from executed tests and record unresolved acceptance explicitly.
 
 Create plans and slices as their scope is established, following the product vision. This directory is the durable planning location; .decompozr/ and chat are not substitutes.
+
+Start with the [product roadmap](roadmap.md). Its first detailed slice is [one real review loop](slices/01-review-loop.md).
