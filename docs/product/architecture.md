@@ -24,7 +24,7 @@ Preserve the slim, draggable bottom-center player: drag, previous, replay/pause,
 
 **Frontend tooling:** Vite
 
-**UI foundations:** decompozr/design-system
+**UI guidelines and principles:** decompozr/design-system; React implementation only, no Svelte dependency
 
 **Backend runtime:** Node.js
 
@@ -121,10 +121,10 @@ Test source changes, relevance and execution results are different claims. Resul
 
 ## Delivery and validation
 
-Follow the [progressive roadmap](../plans/roadmap.md), with testable vertical slices inside each round. Before the first product loop, use the bounded [host contract probe](../plans/480p/probes/00-host-contract.md) to establish host feasibility without building the UI/comment path. Define the [comprehension task and source-backed expected account](../rules/comprehension.md) before presentation implementation. The first product slice then proves the actual anchored question/reply journey. All code is tested, preferably through TDD. End-to-end checks exercise the real user journey and actual design-system integration; fixtures do not establish native host delivery, physical-device behavior or comprehension.
+Follow the [progressive roadmap](../plans/roadmap.md), with testable vertical slices inside each round. Use established CLI session delivery and the [scoped integration checks](../plans/480p/probes/00-host-contract.md); App notifies the agent through CLI and the agent reads/replies through MCP. A generic host-feasibility experiment is not a prerequisite to product code. Define the [comprehension task and source-backed expected account](../rules/comprehension.md) before presentation implementation. The first product slice then proves the actual anchored question/reply journey. All code is tested, preferably through TDD. End-to-end checks exercise the real user journey and React UI behavior and design-guideline conformance; fixtures do not establish native host delivery, physical-device behavior or comprehension.
 
 Every product slice must be [dogfoodable using our own real PR](../rules/own-pr-dogfood.md), with the candidate source/build identified separately from the reviewed baseline/head and source anchors. The first runnable slice may use explicitly manual pinned-source acquisition; it does not claim a general importer or unsupported analysis/execution. Fixes and target-head changes require relevant revalidation. Same-agent dogfood is separate from unfamiliar-reviewer comprehension; the host feasibility probe is not product dogfood.
 
-The first material unknown is the exact external conversation host: authenticated attachment, supported MCP transport, wakeup, deduplication and outcome-query capabilities must be proven. The first supported source language and configured repository test runner also need explicit selection before their respective analysis and execution slices; neither is required for the host-only probe. Real independent-job acceptance begins with whole-PR import, and graph CAS acceptance begins with graph-writing behavior, as scoped in the roadmap. These deferrals do not weaken the architectural contracts. The earlier Playground prototype is a reference, not a running implementation in this repository.
+The [first review-loop design](review-loop/README.md) defines concrete interfaces, state and CLI/MCP direction. Verify exact attachment, authorization, notification and MCP reply in the implementation; reuse earlier CLI/Playground knowledge instead of classifying the basic mechanism as unknown. The first supported source language and configured repository test runner also need explicit selection before their respective analysis and execution slices; neither is required for the host-only probe. Real independent-job acceptance begins with whole-PR import, and graph CAS acceptance begins with graph-writing behavior, as scoped in the roadmap. These deferrals do not weaken the architectural contracts. The earlier Playground prototype is a reference, not a running implementation in this repository.
 
 Hosted agent runtime, Decisions integration, generalized multi-agent ownership, remote workers and automatic external PR posting are deferred. This document defines a design-only endpoint; it does not authorize runtime implementation, installation or deployment.

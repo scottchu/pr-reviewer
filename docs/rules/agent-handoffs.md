@@ -19,7 +19,7 @@ Before product implementation, the slice owner fills:
 | Intent and traceability | User outcome, parent round, authoritative product-specification revisions, accepted decisions, exclusions and acceptance IDs. |
 | Inputs and readiness | Predecessor packet/source revisions, delivered public interfaces and evidence, unresolved choices with owners, and explicit ready/blocked status per dependency or host variant. |
 | Assignment | Named executor, task branch/worktree, allowed writes, execution/run-target authority and boundaries shared with other writers. |
-| Delivery approach | Bounded steps through public subsystem interfaces, TDD/test strategy, actual design-system E2E, own-PR task and stop conditions. |
+| Delivery approach | Bounded steps through public subsystem interfaces, TDD/test strategy, actual React E2E and design-principle review, own-PR task and stop conditions. |
 | Required return | Candidate commit/PR and environment, acceptance-to-test results, actual evidence and limitations, changed contracts, recovery notes, promoted durable specification updates and contributions to each direct successor plan. |
 
 Resolve material inputs before dependent code. Update docs before changing derived artifacts. An implementer returns observed results, including failures and unknowns, rather than only a completion claim.

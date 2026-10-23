@@ -31,7 +31,7 @@ Both Codex and Claude continuation paths require their own observed evidence. Th
 - **02-A:** Save an addressed question, restart before delivery, recover it once, reply, reopen and follow up. Domain/adapter tests and actual per-host E2E demonstrate no lost inbox item, duplicate mutation or blind relaunch of an uncertain invocation.
 - **02-B:** Select a new pinned head and inspect the old answer labeled with its original snapshot; open historical source and ask on the new span. No silent re-anchoring or source identity substitution.
 - **02-C:** Replaced/revoked attachments cannot write via stale generation; queries expose authoritative persisted results or explicit projection-pending state. Managed subscriptions tear down and ignore late emissions.
-- **02-D:** Actual design-system controls support keyboard access and truthful pending/history labels. The agreed reviewer evaluation distinguishes which source each answer describes.
+- **02-D:** React controls following the design guidelines and principles support keyboard access and truthful pending/history labels. The agreed reviewer evaluation distinguishes which source each answer describes.
 - **02-E:** [Own-PR dogfood](../../../../rules/own-pr-dogfood.md) performs the continuation/new-head task on this slice's real PR, recording candidate identity separately from reviewed baseline/head and rerunning affected checks after fixes.
 
 Derive TDD steps, exact commands and evidence locations after the inputs are reconciled. None of these checks has run.

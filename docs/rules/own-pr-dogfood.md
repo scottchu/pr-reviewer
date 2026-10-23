@@ -14,7 +14,7 @@ Each product slice must expose its new user action in a runnable candidate and e
 
 Every roadmap row has an own-PR task. Before implementing that slice, refine the task against an identified existing PR or the planned task branch/PR, and state what actual change will exercise it. The final acceptance run requires a real PR URL and immutable base/head objects. If the needed condition is absent, record the prerequisite as unmet and select a suitable own PR or revise the slice scope with the maintainer. Do not claim an exception, manufacture fake provenance or accept the slice without the task.
 
-The candidate must complete the task through its real UI and supported adapters, using actual decompozr/design-system integration. Record observations, evidence, failures and unresolved gaps. A passing same-agent run establishes scoped self-use; it does not establish unfamiliar-reviewer comprehension, native/device acceptance outside the exercised environment or broad reliability.
+The candidate must complete the task through its real UI and supported adapters, using decompozr/design-system guideline and design-principle conformance. Record observations, evidence, failures and unresolved gaps. A passing same-agent run establishes scoped self-use; it does not establish unfamiliar-reviewer comprehension, native/device acceptance outside the exercised environment or broad reliability.
 
 ## Bootstrap and source identity
 

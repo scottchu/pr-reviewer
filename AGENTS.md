@@ -8,7 +8,7 @@
 - Prefer arrow functions. Use function declarations only when required.
 - Prefer functional patterns over classes; classes are allowed when justified by their responsibility. Follow the implementation conventions in docs/rules/development.md.
 - Design specifically for React with clear subsystem boundaries. There is no framework-agnostic core, reusable SDK or alternate-framework support requirement; do not add abstraction layers or package splits solely for hypothetical portability.
-- Choose React patterns according to the actual requirement; no particular component customization pattern is prescribed. Preserve accessibility, decompozr/design-system integration and subsystem boundaries.
+- Choose React patterns according to the actual requirement; no particular component customization pattern is prescribed. Preserve accessibility, decompozr/design-system guidelines and design principles and subsystem boundaries.
 - Prefer a functional core with explicit immutable inputs and reactive coordination at effect boundaries; keep business policy out of UI and stream operators. Follow docs/product/reactive-design.md; no reactive library is selected yet.
 - Route all cross-subsystem streams through the declared integration layer and managed subscription registry. Never directly subscribe to another subsystem’s internal modules/streams. Centralize wiring, ownership, teardown and diagnostics; keep routes scoped, authorized, bounded and independently observable.
 - Support Codex and Claude participants from their existing work sessions. The session initiating attachment is THE attached session; never silently create, fork or replace it. Follow docs/product/participant-adapters.md for independent host evidence and ownership boundaries.
@@ -16,7 +16,7 @@
 - Dogfood every product slice using our own real PR before accepting it. Follow docs/rules/own-pr-dogfood.md: record the task, candidate build/source identity, pinned reviewed base/head, observed evidence and gaps; rerun affected checks after fixes. Same-agent dogfood does not establish unfamiliar-reviewer comprehension.
 - Isolate each subsystem with clear responsibilities and explicit public interfaces. Access other subsystems through those interfaces rather than their internal implementation.
 - Keep business logic in the responsible domain or application layer. UI components present state, collect user intent and delegate operations through those boundaries; do not concentrate business rules in UI components.
-- Include end-to-end tests for implemented user journeys. Use decompozr/design-system for UI and include its actual integration in end-to-end coverage.
+- Include end-to-end tests for implemented user journeys. Use decompozr/design-system guidelines and design principles to guide React UI. Do not use Svelte or its component package. End-to-end tests cover the actual React user journey; visual review checks the guidelines separately.
 - Name new branches descriptively without a `codex/` prefix. Do not rename existing branches solely for this preference.
 - Make changes and commits on task branches in isolated worktrees. Never commit directly to main or push directly to main.
 - Every change must enter main through a GitHub pull request. Do not merge task branches directly into local main. After the PR is merged, refresh clean local main only by fast-forwarding from origin/main.

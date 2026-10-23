@@ -10,7 +10,7 @@
 
 The [vision](../product/vision.md) asks whether a reviewer understands changed behavior and the basis for a decision. Before implementing a slice's presentation, record its representative task, source-backed expected account and pass/fail criterion. Defining success after seeing the UI would allow the presentation to redefine the goal.
 
-The following defaults are concrete proposals, not accepted user choices. Resolve them for slice 01 before its implementation. The host-only probe needs no UI or comprehension evaluation and can proceed independently once authorized. Later slices extend the same protocol with their new outcome before dependent presentation work; they do not retroactively change an earlier result.
+The following defaults are proposals until selected in a round/slice packet. The [480p packet](../plans/480p/evaluation.md) now selects the first source task and prospective criterion during authorized readiness design. Actual human observation follows implementation; do not block coding on a not-yet-run human session. Later slices extend the same protocol with their new outcome before dependent presentation work; they do not retroactively change an earlier result.
 
 ## Proposed first task and evidence packet
 

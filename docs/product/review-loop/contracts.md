@@ -12,6 +12,7 @@ Use opaque application IDs, UUIDs where generated locally. Caller-supplied actor
 |---|---|
 | Snapshot | snapshotId, repository identity, real PR URL/number, actual baseSha/headSha, source manifest with path, side (base/head), UTF-8 content hash, line count and prepared content. Pin source before question creation; retained content is immutable. Reject unsupported/binary selections explicitly. |
 | Anchor | snapshotId, side, path, startLine/endLine (one-based inclusive). Nonempty bounded range in the selected source object; no mutable graph or viewport coordinates. |
+| Pairing challenge | challengeId, reviewId, expected host/session destination and authorized local user, expiry (five minutes), challenge hash, pending/consumed state and expected credential/connection binding. Single-use; no review source access from bootstrap credentials. |
 | Attachment | attachmentId, reviewId, server-derived actorId, host (codex/claude), exact sessionId and local owner/connection identity, generation, capabilities and active/revoked state. Session ID comes from the initiating session and authenticated pairing, not arbitrary browser attribution. Replacement advances generation. |
 | Question | questionId, reviewId, immutable anchor, trimmed nonempty text (at most 16 KiB UTF-8), user actorId, created revision/time. Persist before notification. |
 | Reply | replyId, questionId, snapshotId, agent actorId, attachmentId/generation, nonempty body (at most 64 KiB UTF-8), source evidence anchors and explicitly stated limitations, created revision/time. Evidence references the pinned snapshot; wrong-side/path/span rejects. |
@@ -39,17 +40,34 @@ Canonical fingerprints use normalized validated payloads with deterministic fiel
 
 Errors are typed: invalid_request, unauthorized, stale_attachment, invalid_anchor, source_unavailable, command_conflict, projection_pending and delivery_unknown. They do not echo tokens or unrestricted conversation history. Unknown external effects are retained and reconciled, not relabeled failed merely on timeout.
 
+## Attachment bootstrap
+
+The authenticated local app user creates a one-use pairing challenge for a review and intended host/session destination. Bootstrap access is narrowly scoped to session_attach only and reaches the initiating session through its supported MCP registration/launch setup; it grants no question, inbox, reply or general app access. Do not write bootstrap/attachment tokens into chat, source files, screenshots or CLI notification arguments.
+
+session_attach receives challengeId/proof plus the session's routing claim. The server separately corroborates the exact session against trusted native MCP-client/launch context and the existing owner's metadata; MCP transport session ID is not assumed to equal the agent thread ID. A model argument, environment string provided by the model, thread-name match or challenge possession alone cannot establish the destination. Unsupported corroboration leaves attachment pending with the precise missing proof; the adapter may not silently create/resume a substitute owner.
+
+Validate expiry, authorized review/user, expected host/session and the corroborated connection. In one short command transaction, consume the challenge once, create the attachment/generation, bind a newly generated attachment capability and record its receipt. Concurrent/replayed consumes cannot create a second binding. Wrong-session attempts reject and never gain review access.
+
+Provision the attachment capability to the trusted MCP connection/server session, not as model-visible tool text. The stdio adapter retains it in process memory; reconnect uses a restrictive local credential reference (mode 0600) or repeats authorized pairing, and the app stores its verifier. Activate normal tools only for that binding. Revocation invalidates credentials and advances generation. Tests include challenge expiry/replay, concurrent consume, wrong session, bootstrap denial of read/reply, reconnect and revoked capabilities.
+
 ## MCP surface: agent to app
 
 Use a supported local MCP transport with attachment-scoped credentials: stdio is the initial transport; any HTTP bridge remains loopback with explicit authentication. A separate stdio process forwards to the same app-owned gateway/database owner, not its own competing review store.
 
+- session_attach (bootstrap only): challenge proof plus routing claim → pending or verified attachment metadata; credential provisioning stays out of model-visible output.
 - review_get: reviewId → scoped source manifest and review state.
 - question_get: questionId → exact question, before/after source and evidence limits.
 - inbox_read: cursor/limit → eligible requests for this authenticated attachment.
 - reply_submit: commandId, questionId, generation, body, evidence and limitations → authoritative command receipt.
 
-No MCP tool accepts trusted actorId/sessionId from model arguments. Schema validation, authorization and generation checks precede mutation. The server may expose its app-issued attachment identity through a read-only self/context result. A CLI message carries only IDs and instructions to use these tools; source text and bearer credentials are not command-line prompt content.
+No MCP tool accepts trusted actorId/sessionId from model arguments. Schema validation, authorization and generation checks precede mutation. The server may expose its app-issued attachment identity through a read-only self/context result. A CLI message carries notification invocationId plus event/question IDs and instructions to use these tools; source text and bearer credentials are not command-line prompt content.
 
 ## Managed integration routes
 
 Declare only review-committed → authorized view-store snapshots, addressed-question-committed → delivery scheduler, and attachment-revoked → route teardown/fencing. Register route ID, review/attachment scope, owner, cursor and teardown in one registry. UI uses the view-store bridge; neither components nor business modules subscribe to another subsystem's internals. Slow view updates may coalesce; accepted questions/inbox items never drop. Remounting/subscribing must not create another CLI notification.
+
+## Local transport and process boundaries
+
+The Node app owns the SQLite connection and command dispatcher. Bind HTTP to 127.0.0.1 only. Use POST /api/commands for authorized domain writes, GET /api/reviews/:id and /api/questions/:id for scoped queries, and GET /api/inbox with cursor/limit for an attached participant. Local UI authentication and MCP attachment capabilities have separate scopes. The stdio MCP process forwards to that same loopback gateway with its scoped credential; it never opens a competing writable database.
+
+Start/stop instructions create task-local state and a restrictive runtime manifest containing app/gateway addresses and credential file references. No production network exposure, global MCP settings overwrite or shared user database is required. Source preparation only reads pinned Git objects. Retain user content and unknown attempts until explicitly reconciled; shutdown removes listeners and closes owned processes, not unrelated sessions.

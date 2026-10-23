@@ -1,46 +1,30 @@
 # Slice 01 readiness
 
-**Status:** Preparation may proceed; product implementation handoff is not ready
+**Status:** Ready for bounded implementation; independently reviewed source design; product implementation and acceptance not run
 
-**Parent:** [Slice 01 plan](plan.md)
+**Parent:** [Slice plan](plan.md)
 
-**Basis:** Repository documentation at main commit `80c36b59aa827580e56d2461afe8811b1edf48e5`; no product or host execution
+## Resolved inputs
 
-**Scope:** Identify and prepare missing inputs; no application scaffold, dependencies, session changes or probe execution
+- The app notifies the existing session through CLI; the agent reads/submits replies through MCP. [Delivery](../../../../product/review-loop/delivery.md) reuses known CLI and Playground mechanisms instead of treating session-targeted messaging as an unknown invention.
+- [Our PR 14](bootstrap-task.md) is selected with actual immutable base/head and source account. Own-PR selection belongs to the implementing agent, not a new user approval gate.
+- [Durable product design](../../../../product/review-loop/README.md) now specifies behavior, public interfaces, data, pairing, authorization, status, recovery and managed routes.
+- [Execution](execution.md) identifies local Node/Bun/Chrome, dependency/test choices, task-local start/data/stop and 01-A–G mapping. [Experiment results](experiments.md) retain observed scope and failures.
+- UI is React only, guided by design-system guidelines and design principles. No Svelte, component bridge, Biome requirement, prescribed render props or framework portability work.
+- [Evaluation](../../evaluation.md) fixes the prospective criterion; actual human comprehension is a later acceptance observation, not a reason to block coding.
 
-## Already established
+## Dispatch
 
-The [slice plan](plan.md) defines one real before/after span → anchored question → exact originating session → MCP read/reply → authoritative UI answer, with acceptance 01-A through 01-G. Scope excludes general import, semantic canvas and repository execution. React, strict TypeScript, domain/effect separation, managed stream integration, actual design-system E2E, own-PR dogfood, independent review and durable specification updates are established requirements. Codex and Claude are independently verified variants; both are required for full slice acceptance.
+Give an implementer [this packet](handoffs/implementation.md) at the exact committed source revision. It defines the task workspace creation, scope, tests, returns and stop conditions. Routine tooling/design choices have been resolved. Record assigned agent/worktree when dispatch occurs; do not create an idle worktree solely to fill a field.
 
-These are enough to assign bounded preparation, not enough to claim host feasibility or delegate an unspecified full implementation.
+After code exists, supply its exact candidate/PR/evidence to a different reviewer using [the review packet](handoffs/review.md). Missing future candidate/results today is normal. The reviewer inspects actual changes and source contracts; passing preparation does not pass the product.
 
-## Missing before implementation dispatch
+## What remains acceptance work
 
-| Gap | Concrete deliverable | Owner / consequence |
-|---|---|---|
-| Actual host capability | Name each exact existing host/version/session surface and allowed probe target; run [probe 00](../../probes/00-host-contract.md), recording binding, actual MCP, safe duplicate suppression and lost-ack reconciliation per host. | Maintainer supplies actual session/access; probe executor records results. Unrun, failed or inconclusive blocks that host integration. One passing host may proceed without claiming the other passed. |
-| Real source task and answer key | Select a real own PR with actual baseline/head and before/after path/span, one concrete question, evidence-backed expected answer and explicit limits. [PR 14 is a verified proposal](bootstrap-task.md), not a selected or executed target. | Slice owner prepares; maintainer resolves material selection. No UI work against an undefined expected account. |
-| Concrete product specification | Add the bounded question/reply story and design under docs/product/, linked from its index: visible states/interactions, public command/query/MCP and host ports, identities, minimum persisted state, atomic transition boundaries, error/retry/reconnect semantics, and the few declared stream routes. Include decisions and observable acceptance. | Slice owner derives the smallest design from accepted architecture and probe findings. Plans alone must not become the only product specification; do not prebuild unrelated subsystems or invent unproven host APIs. |
-| Runnable scope and test approach | Name local start/stop/run target, data/artifact location and cleanup, existing-session connection scope, package manager/test tools, actual design-system package/source revision and exports, and mapping from 01-A–G to unit/interface, real-host E2E and evaluation checks. Confirm current execution authority when assigning work. | Slice owner resolves routine tooling from actual project integration; maintainer resolves material destination/access choices. Existing technology direction is not an installed scaffold. No Biome, prescribed render-prop pattern or reactive-library adoption is required. |
-| Prospective comprehension evaluation | Fill the [480p evaluation packet](../../evaluation.md): source-informed answer-key check, selected rubric/threshold, evaluator and permitted assistance/time. The shared numerical rubric/session remain proposals. | Slice owner prepares; maintainer resolves outstanding criteria/evaluator choices. Required real evaluation happens after a candidate exists; no unfamiliar reviewer is silently invented. |
-| Concrete implementation assignment | Record the committed product-spec/plan revisions, executor and host variant, task branch/worktree, allowed writes/run scope, delivery steps, stop conditions and required return under the [handoff contract](../../../../rules/agent-handoffs.md). | Slice owner dispatches only the ready bounded assignment. A generic template is not a packet ready for implementation. |
+Implement and test the actual app/SQLite/MCP/CLI/UI path; exercise Codex and Claude independently in the actual supported environments; run real own-PR product dogfood; obtain unfamiliar-human evaluation; resolve findings; update durable product knowledge and [slice 02](../02-review-continuation/plan.md). Known unsupported exact-session proof or uncertain external effects must remain visible rather than inventing a pass or launching another session.
 
-A design-system integration choice and test strategy are preparation tasks, not reasons to ask the user to choose every library. The review owner may be planned now; a review candidate cannot exist before implementation.
+The earlier audit incorrectly turned basic CLI mechanics and own-PR selection into prerequisite research/user choices. This revision corrects that classification. Concrete environment failures in experiments remain recorded; they do not erase prior working mechanisms or justify a new generic host gate.
 
-## Review readiness is a later gate
+## Source review
 
-An independent reviewer can review the source design before code exists. Implementation review additionally needs the exact candidate commit/build, real PR and diff base/head, environment/run instructions, acceptance-to-test mapping, actual results/artifacts and known gaps. The reviewer must differ from the implementer and inspect actual changes. Record its assignment and findings under this slice's directory, using the [handoff contract](../../../../rules/agent-handoffs.md).
-
-A missing candidate or passing product test today is expected, not a reason to require completed implementation before assigning implementation. Conversely, defining the review procedure does not mean review passed. Host-probe evidence is a pre-integration gate; integrated host E2E, product dogfood and reviewer comprehension are post-implementation acceptance.
-
-## Bounded preparation order
-
-1. Prepare supported-host contracts and the concrete probe assignment. Proposed first delivery: Codex in the existing initiating session; this is sequencing advice, not verified attachment or permission to replace a session. Claude retains its independent gate and full-slice requirement.
-2. In parallel with host preparation, choose the source task/answer key and prospective evaluation criteria. PR 14 avoids relying on a not-yet-written product PR, while explicitly testing a documentation claim rather than code behavior.
-3. Incorporate host results into the minimum durable product specification and concrete test/run design; reconcile scope before dispatching the ready host variant.
-4. Commit the exact implementation packet, deliver via task-worktree PR, then supply the actual candidate/evidence packet to an independent reviewer. Fixes require affected rechecks.
-5. Before acceptance, promote learned behavior/design to product docs and contribute actual interfaces, evidence and gaps to [slice 02](../02-review-continuation/plan.md).
-
-## Evidence and current disposition
-
-Read the current slice, probe, evaluation, architecture, adapter and handoff documents. Verified PR 14 metadata and its merge parents, and read the proposed source spans from both immutable Git objects. This establishes source availability and documentation gaps only. No host probe, scaffold, runtime test, product dogfood, independent review of an implementation, comprehension session or reimplementation was performed. The current handoff remains blocked on the table above; preparation can progress without claiming those outcomes.
+[Independent design-readiness review](reviews/design-readiness.md) checked the contracts, source task and handoffs; bounded findings were corrected. [Experiment evidence](experiments.md) separately records actual passed checks and the fresh-process CLI tool-discovery failure without inflating either into product acceptance.

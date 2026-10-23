@@ -45,3 +45,7 @@ A subsequent user clarification requires both Codex and Claude adapters for curr
 The user also selected functional patterns plus reactive coordination as a design direction. The [functional/reactive contract](../../../product/reactive-design.md) keeps pure domain transitions separate from fresh dispatcher checks, atomic commits and scoped external effects. Library choice remains unselected; RxJS and Effect are candidates, and subscription teardown is not proof of external cancellation.
 
 An Astra medium independent reviewer accepted this delta at bf3218fdc1936223d1af3835586bf67606b839ab with no material defects. The review confirmed exact-session ownership, per-host gates, preserved durable/authorization/unknown boundaries and the functional/effect separation. Vendor interfaces and library choices remain evidence-gated candidates. No host, runtime, adapter or reactive implementation was executed or validated.
+
+## Later source correction
+
+The current [slice 01 readiness](../slices/01-review-loop/readiness.md) supersedes this historical review’s generic pre-code host-probe and unselected-own-PR assumptions. Established CLI delivery is reused; PR 14 is selected; concrete product design and implementation/review packets now exist. The user also clarified React-only UI using design guidelines/principles, not Svelte/package-component integration. Earlier review results remain bounded to their named commits.

@@ -2,13 +2,13 @@
 
 **Parent:** [Review-loop behavior](README.md)
 
-## React and the actual design system
+## React and design principles
 
-React owns the review shell, source selection and view-store subscription. The current @decompozr/design-system package is Svelte 5, not a React component package. Do not import Svelte component exports as React components or substitute lookalikes while claiming actual integration.
+Implement the UI in React only. Do not add Svelte, Svelte components or a React/Svelte adapter. The user selected decompozr/design-system as a source of guidelines and design principles, not a component dependency. The reference package's component-installation instructions do not override that decision.
 
-Use a small UI-only Svelte island, mounted through a React lifecycle adapter, for actual design-system controls: labeled TextArea, Button and status feedback as supported by the pinned package. Mount into an adapter-owned DOM root, update its presentation props/callbacks, and unmount on React cleanup. React does not reconcile inside the island; the island never owns domain state, authentication or stream routing. Pin the design-system source/package identity and a compatible Svelte runtime. Do not modify the shared design-system repo to build the first slice.
+Apply the reference guidelines: restrained neutral hierarchy, meaningful limited color, related controls close together, readable Inter/monospace roles, visible keyboard focus, text alongside status colors, consistent spacing, clear loading/error/recovery states and at least 44px coarse-pointer targets. Own domain meaning and behavior in this product. Record the guideline source revision and check actual React output against it; do not claim package-component integration.
 
-Keep the interop adapter narrow. Its public props are view data, draft text, disabled/busy state and callbacks for intent. Input callbacks update the React presentation/application bridge; submission delegates AskQuestion. Authoritative question/reply state comes from the approved view store. Do not use a general multi-framework plugin layer.
+React components consume view data and collect user intent. Application/domain interfaces own submission, persisted state and validation. Selection/draft are local presentation state; cross-subsystem stream wiring remains centralized. Choose the appropriate React pattern by need without prescribing render props.
 
 ## Screen and states
 
@@ -18,6 +18,6 @@ Keyboard users can select or specify an exact source span, reach the labeled com
 
 ## Integration acceptance
 
-Test actual compiled design-system components in a real browser under React: labeled input, click and keyboard submission, disabled/busy behavior, props updates, repeated mount/unmount and listener cleanup. Inspect that only one application intent is emitted and no duplicate notification is caused by rendering. A CSS-token-only mock is not actual integration.
+Test the actual React controls in a real browser: labeled input, click and keyboard submission, disabled/busy behavior, props updates, repeated mount/unmount and listener cleanup. Inspect that only one application intent is emitted and no duplicate notification is caused by rendering. Review visual output against the guidelines and principles separately from automated behavior checks.
 
 The product E2E starts the real app with task-local data, prepares pinned own-PR source, attaches the responsible session, asks through real controls, observes CLI notification/MCP reply and reads authoritative UI state. Independently test stale attachment, wrong anchors, duplicate commands, unknown notification and restart. Browser interaction, real CLI/MCP delivery and unfamiliar-reviewer comprehension are separate evidence.
