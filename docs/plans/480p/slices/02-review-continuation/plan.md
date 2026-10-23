@@ -53,3 +53,15 @@ Then create/refine slice 03's bounded provisional page from its [roadmap invento
 Slice 01 preparation now supplies maintained [question/reply contracts](../../../../product/review-loop/contracts.md), [CLI/MCP delivery and uncertainty](../../../../product/review-loop/delivery.md) and an [independently reviewed design](../01-review-loop/reviews/design-readiness.md). Use these as the provisional continuation baseline; actual predecessor code, per-host product evidence and operational limitations still arrive after implementation.
 
 Carry forward two reviewed details: pairing consumes a challenge and creates a generation-bound attachment atomically; an answered question does not by itself resolve which CLI notification caused it. Continuation/restart must preserve both reply existence and independently unknown notification state. Reconcile delivered interfaces and tests against this design before implementing slice 02; do not mistake source readiness for predecessor product acceptance.
+
+## Slice 01 implementation contribution
+
+**Status:** Implemented interfaces and controlled-host checks available; predecessor acceptance still pending
+
+Use the maintained [runtime](../../../../product/review-loop/runtime.md), [contracts](../../../../product/review-loop/contracts.md) and [delivery](../../../../product/review-loop/delivery.md) as the operational baseline. The candidate adds strict TypeScript React, Node-owned SQLite aggregate/receipts, generation-scoped credentials, one-use connection-bound pairing, durable addressed inbox/cursors and notification attempts, minimum-revision reads, managed routes and task-owned start/stop.
+
+Reusable checks are in `tests/storage.test.ts`, `tests/delivery.test.ts`, `tests/application.test.ts`, `tests/runtime.test.ts` and `tests/review.e2e.ts`. The controlled-host browser journey proves basic restart with retained source/question/reply and no duplicate notification. It does not prove the full slice 02 reopen/new-head interaction, actual Codex/Claude continuation or human comprehension.
+
+Preserve two independent facts in future read models: reply existence and the original notification outcome. An unknown claim never becomes notified merely because manual polling yielded a reply. A stopped process preserves unknown external effects. Attachment replacement/revoke advances generation and stale writes reject at apply; new-head source identity must be separately designed rather than mutating historical anchors. The current bounded preparation supports only pinned PR 14; general import remains deferred.
+
+The owner will bind the actual reviewed candidate commit and review/native-host evidence in the predecessor packet. Reconcile remaining exact-session tool provisioning, Claude environment and unfamiliar-reviewer gates before implementing dependent behavior; predecessor implementation is not acceptance or successor readiness.

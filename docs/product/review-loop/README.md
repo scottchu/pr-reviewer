@@ -2,7 +2,7 @@
 
 **Direction:** Accepted first 480p product behavior
 
-**Implementation:** Not started
+**Implementation:** Local test candidate implemented; controlled-host React/MCP journey tested; native-host and human acceptance pending
 
 **Architecture:** [Subsystem responsibilities](../architecture.md)
 
@@ -23,7 +23,7 @@ The first task uses [PR 14](../../plans/480p/slices/01-review-loop/bootstrap-tas
 
 ## Public interfaces and ownership
 
-[Contracts](contracts.md) define IDs, data, commands, MCP and error semantics. [Delivery](delivery.md) defines CLI notification and recovery. [Presentation](presentation.md) defines React UI and design-guideline conformance. UI owns local selection and draft; domain owns validation and durable review state; command processing owns atomic receipts/events; delivery owns CLI effects; the MCP adapter validates credentials and delegates domain operations. Managed integration routes own subscriptions and teardown. No adapter writes around ingress.
+[Contracts](contracts.md) define IDs, data, commands, MCP and error semantics. [Delivery](delivery.md) defines CLI notification and recovery. [Local runtime](runtime.md) defines operational setup and evidence limits. [Presentation](presentation.md) defines React UI and design-guideline conformance. UI owns local selection and draft; domain owns validation and durable review state; command processing owns atomic receipts/events; delivery owns CLI effects; the MCP adapter validates credentials and delegates domain operations. Managed integration routes own subscriptions and teardown. No adapter writes around ingress.
 
 ## Observable acceptance
 

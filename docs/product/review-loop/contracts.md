@@ -2,7 +2,7 @@
 
 **Parent:** [Question/reply behavior](README.md)
 
-**Status:** First-slice design; derived schemas and implementation remain to be built
+**Status:** Derived local implementation and controlled-host tests exist; native binding and acceptance limits are explicit below
 
 ## Identities and persisted records
 
@@ -46,7 +46,7 @@ The authenticated local app user creates a one-use pairing challenge for a revie
 
 session_attach receives challengeId/proof plus the session's routing claim. The server separately corroborates the exact session against trusted native MCP-client/launch context and the existing owner's metadata; MCP transport session ID is not assumed to equal the agent thread ID. A model argument, environment string provided by the model, thread-name match or challenge possession alone cannot establish the destination. Unsupported corroboration leaves attachment pending with the precise missing proof; the adapter may not silently create/resume a substitute owner.
 
-Validate expiry, authorized review/user, expected host/session and the corroborated connection. In one short command transaction, consume the challenge once, create the attachment/generation, bind a newly generated attachment capability and record its receipt. Concurrent/replayed consumes cannot create a second binding. Wrong-session attempts reject and never gain review access.
+Validate expiry, authorized review/user, expected host/session, exact expected connectionId and the corroborated connection. In one short command transaction, consume the challenge once, create the attachment/generation, bind a newly generated attachment capability and record its receipt. Concurrent/replayed consumes cannot create a second binding. Wrong-session attempts reject and never gain review access.
 
 Provision the attachment capability to the trusted MCP connection/server session, not as model-visible tool text. The stdio adapter retains it in process memory; reconnect uses a restrictive local credential reference (mode 0600) or repeats authorized pairing, and the app stores its verifier. Activate normal tools only for that binding. Revocation invalidates credentials and advances generation. Tests include challenge expiry/replay, concurrent consume, wrong session, bootstrap denial of read/reply, reconnect and revoked capabilities.
 
@@ -71,3 +71,21 @@ Declare only review-committed → authorized view-store snapshots, addressed-que
 The Node app owns the SQLite connection and command dispatcher. Bind HTTP to 127.0.0.1 only. Use POST /api/commands for authorized domain writes, GET /api/reviews/:id and /api/questions/:id for scoped queries, and GET /api/inbox with cursor/limit for an attached participant. Local UI authentication and MCP attachment capabilities have separate scopes. The stdio MCP process forwards to that same loopback gateway with its scoped credential; it never opens a competing writable database.
 
 Start/stop instructions create task-local state and a restrictive runtime manifest containing app/gateway addresses and credential file references. No production network exposure, global MCP settings overwrite or shared user database is required. Source preparation only reads pinned Git objects. Retain user content and unknown attempts until explicitly reconciled; shutdown removes listeners and closes owned processes, not unrelated sessions.
+
+## Derived local implementation decisions
+
+**Status:** Implementation in progress; native-host acceptance remains separate
+
+The bounded implementation uses one SQLite-owned JSON aggregate per review plus normalized receipts and credentials. All aggregate, revision, inbox and notification mutations share a synchronous `BEGIN IMMEDIATE` transaction; the transaction returns before external delivery. This keeps atomic recovery simple without introducing a second writer or event projection. Queries read authoritative aggregates and report `projection_pending` for a requested revision greater than the committed revision.
+
+The gateway issues a local-user bearer credential to a mode-0600 file. The Vite origin exchanges that credential through an explicit login field; no credential is built into source or notification arguments. Native MCP connection evidence is provisioned separately by the authenticated owner: a host/session/connection tuple, native owner metadata corroboration and a restrictive launch credential reference. This is a transport binding, not proof inferred from a model's routing claim. Until trusted native launch evidence is provided, attachment remains pending. Tests provision controlled trusted launch evidence and are explicitly not native-host acceptance.
+
+MCP stdio launches with a bootstrap credential reference, connects to the loopback gateway, and retains the resulting attachment capability in process memory. A reconnect can repeat pairing; no attachment token is included in tool results. User revocation advances generation and invalidates existing capabilities. The server checks host/session/connection against the registered launch binding, independently of tool arguments.
+
+The UI uses authenticated bounded polling through its application bridge and a managed route registry. Polling coalesces view snapshots only; delivery is scheduled from committed inbox state at the gateway, independently of React lifetimes. Source files are retrieved from pinned Git objects during local preparation, SHA-256 hashed, persisted in the aggregate and exported to restrictive task-local snapshot files. This is manual preparation, not general PR import.
+
+**Runtime correction:** The bundled Node 24 executable enforces native-addon library validation and rejected Vite 8's Rolldown binding. The gateway and SQLite remain under Node 24. The owned supervisor starts Vite 8 under the already-installed Bun runtime as a separate child and verifies both listeners before publishing runtime readiness. No signature, security or global setting is changed. Shutdown closes the gateway and only that owned UI child. The existing Vite requirements support this Node generation; the observed issue is its signed host's addon loading policy, not package absence.
+
+**Source presentation:** A pure domain longest-common-subsequence comparison assigns exact line identities, including repeated lines. Contiguous replacement blocks are labeled modified on both sides; pure removals/additions retain their own labels. The application builds this presentation model; React only displays the statuses. This bounded prepared-document comparator rejects oversized comparisons rather than introducing a general importer/diff engine.
+
+**Native binding provenance:** Codex owner setup reads only `session_meta` from the supplied existing rollout, verifies its exact ID against the owner process's native `CODEX_THREAD_ID`, and checks explicit `REVIEW_SESSION_CWD`. The attached session's cwd may be the primary repository while app code runs in its isolated worktree. Owner setup, its native context and restrictive launch reference are trusted within the same OS-user boundary; this is not remote attestation. The MCP child need not inherit native thread variables. The owner must register/provision the generated launch capability to that exact existing session's transport. Claude cannot receive this Codex proof; its trusted setup remains unrun in the absent Claude environment.
