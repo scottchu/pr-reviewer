@@ -3,6 +3,8 @@
 - Keep repository content in English.
 - Prefer arrow functions. Use function declarations only when required.
 - All code must be tested. Prefer test-driven development (TDD).
+- Isolate each subsystem with clear responsibilities and explicit public interfaces. Access other subsystems through those interfaces rather than their internal implementation.
+- Keep business logic in the responsible domain or application layer. UI components present state, collect user intent and delegate operations through those boundaries; do not concentrate business rules in UI components.
 - Include end-to-end tests for implemented user journeys. Use decompozr/design-system for UI and include its actual integration in end-to-end coverage.
 - Name new branches descriptively without a `codex/` prefix. Do not rename existing branches solely for this preference.
 - Make changes and commits on task branches in isolated worktrees. Never commit directly to main or push directly to main.
