@@ -44,6 +44,8 @@ These inputs can be prepared in documentation without a scaffold. Source selecti
 
 Persist basic inbox items, cursors, consumption and causal references so restart cannot lose accepted questions. Own replies and delivery receipts are ineligible wake triggers. Ordinary graph updates and subscribed terminal jobs are not implemented here; their wake policy remains governed by the architecture when introduced. Product labels distinguish saved, pending/delivered, turn started/completed and answered. Turn completion alone does not mean a reply exists.
 
+Cross-subsystem updates between the review read model, view-store and participant delivery use declared public-port routes in the managed integration layer. Keep registration, scoped ownership, teardown and diagnostics together; no component or business module subscribes directly to another subsystem’s internals. The first slice tests duplicate registration, dispose/reconnect, revoked scope and late emissions alongside its real journey. Start with the few routes this path needs, not a generic stream platform.
+
 ## Acceptance and verification
 
 Use domain and adapter tests, preferably TDD, then the actual user journey. All code must be tested. Record the source version, host/environment, test commands, artifact references, observations and limits in this document as evidence arrives.

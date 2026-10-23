@@ -74,6 +74,7 @@ flowchart TB
 | Source analysis | Pinned source facts, diff coverage and candidate relationships | Returns evidence-backed results; cannot declare agent interpretation as parsed fact. |
 | Execution and evidence | Configured test targets, durable jobs, process outcomes and artifacts | Returns result commands; cannot equate request acceptance with a passing test. |
 | Participant delivery | Attachments, durable inbox and conversation-turn scheduling | A host adapter proves actual conversation delivery and reconciles uncertain wakeups. |
+| Reactive integration | Declared public-port routes, managed subscriptions, scoped teardown and diagnostics | All cross-subsystem streams pass here; no direct internal-module subscriptions, hidden reciprocal wiring or replacement for durable command processing. |
 | Persistence adapters | Transactions, projections and artifact storage | Expose contracts to the responsible subsystem; no UI, agent or worker writes around domain ingress. |
 
 These are logical boundaries, not a requirement for separate services. A subsystem exposes a narrow public interface; consumers do not reach into its internals. Domain policy is tested independently of UI and transport adapters.
@@ -82,7 +83,7 @@ These are logical boundaries, not a requirement for separate services. A subsyst
 
 Support [Codex and Claude participant adapters](participant-adapters.md). The session initiating attachment in the current project is the exact responsible session; preserve its host owner, work and permissions. Both integrations are part of 480p, with independent probe and real own-PR evidence. A clone on another machine does not imply shared runtime state or access to a session on this machine.
 
-Use a [functional core with reactive coordination](reactive-design.md): pure domain transitions, isolated effects, explicit lifecycle ownership and UI snapshot subscriptions. Reactive-library selection remains open; no stream library replaces durable commands or makes external effects exactly once.
+Use a [functional core with reactive coordination](reactive-design.md): pure domain transitions, isolated effects, explicit lifecycle ownership and UI snapshot subscriptions. Reactive-library selection remains open; no stream library replaces durable commands or makes external effects exactly once. Cross-subsystem wiring is centralized in a declared integration layer and monitored subscription registry. Routes remain scoped, authorized and fault-isolated; central control does not mean one global serial worker.
 
 ## Commands, jobs and conversation turns
 
