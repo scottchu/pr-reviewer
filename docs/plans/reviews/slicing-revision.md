@@ -37,3 +37,11 @@ An Astra medium independent reviewer accepted the revised documentation at commi
 The reviewer also found the own-PR contract workable: manual verified bootstrap avoids requiring a merged product, candidate and target identities stay distinct, each slice has an actual own-PR task, and evidence-only commits do not force an endless latest-head retest loop. Required real target conditions remain visible prerequisites. No material remaining documentation findings were reported. The additional AGENTS reminder restates the same reviewed dogfood requirement.
 
 This is acceptance of the plan, not implementation or product acceptance. Host, product, device, dogfood and comprehension tests remain unrun. The next bounded action is to resolve the concrete host/conversation, probe target/scope and first qualifying PR/evaluation packet in the relevant source documents. Probe execution and product implementation still require their documented readiness inputs and task scope.
+
+## Existing-session and functional/reactive refinement
+
+A subsequent user clarification requires both Codex and Claude adapters for current work: the existing session initiating attachment in a local clone is THE attached session. The [adapter contract](../../participant-adapters.md) makes 01-Codex and 01-Claude independently testable first-round deliveries, with separate host probes and actual own-PR evidence. Neither stored-session resume nor a self-reported ID establishes safe attachment to a live owner.
+
+The user also selected functional patterns plus reactive coordination as a design direction. The [functional/reactive contract](../../reactive-design.md) keeps pure domain transitions separate from fresh dispatcher checks, atomic commits and scoped external effects. Library choice remains unselected; RxJS and Effect are candidates, and subscription teardown is not proof of external cancellation.
+
+An Astra medium independent reviewer accepted this delta at bf3218fdc1936223d1af3835586bf67606b839ab with no material defects. The review confirmed exact-session ownership, per-host gates, preserved durable/authorization/unknown boundaries and the functional/effect separation. Vendor interfaces and library choices remain evidence-gated candidates. No host, runtime, adapter or reactive implementation was executed or validated.

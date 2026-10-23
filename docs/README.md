@@ -18,6 +18,8 @@ Documents state intent and preserve knowledge; observed behavior and test eviden
 
 - [Product vision](vision.md): purpose and the experience of understanding a PR.
 - [High-level design](architecture.md): system responsibilities, relationships and boundaries.
+- [Participant adapters](participant-adapters.md): attach the originating Codex or Claude session to current work.
+- [Functional/reactive design](reactive-design.md): pure domain decisions, effect boundaries and stream-library selection.
 - [Product roadmap](plans/roadmap.md): progressively useful rounds and acceptance gates.
 - [Plans and slices](plans/README.md): bounded work, tests, progress and evidence.
 

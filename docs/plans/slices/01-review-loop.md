@@ -16,6 +16,12 @@ A reviewer sees one pinned real before/after behavior change, posts a question o
 
 There is no application or observed host/product behavior in this repository. The [host contract probe](../probes/00-host-contract.md) establishes capability before this product path is built; it is not the comment/reply acceptance test. The [comprehension protocol](../comprehension.md) establishes the task and expected account before presentation implementation.
 
+## Two independently testable host deliveries
+
+Deliver **01-Codex** and **01-Claude** as bounded variants of this same end-to-end contract, following the [participant adapter plan](../../participant-adapters.md). The initiating existing session is THE attached session; neither path may silently create or fork a replacement. Each gets its own passing probe, own-PR dogfood record, candidate/target/session identity and 01-A through 01-G evidence. Shared domain/UI checks can be reused; real-host evidence cannot. Either may go first when ready. Both are required before calling the dual-host slice complete, and slice 02 repeats continuation per host. Supporting both types does not allow simultaneous owners of one attachment.
+
+The [functional/reactive design](../../reactive-design.md) governs domain/effect boundaries. Library evaluation must not become a prerequisite for the host-only probe.
+
 ## Readiness inputs
 
 | Required input | Current status | Owner / next action |

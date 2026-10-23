@@ -1,0 +1,69 @@
+# Participant adapters for existing work
+
+**Requirement:** Support Codex and Claude participants in existing project work
+
+**Session rule:** The session initiating attachment is the attached session
+
+**Status:** Design specified; adapters and host capabilities not implemented or live-verified
+
+## Start from the current session
+
+Clone this project on the machine where the work happens. From the existing Codex or Claude session, connect to the local review operation surface and initiate attachment to a review. That originating session becomes THE attached conversation. The reviewer can then ask a question in the canvas and the same responsible session reads the context and replies through the shared MCP/domain contract.
+
+The product must not require starting a new agent conversation, copying a transcript into another runtime or moving the work to a hosted model service. The user has clarified that session initiation defines the intended destination; selecting a brand-specific UI is not a prerequisite for this product flow. Actual session identity, connection capabilities and supported delivery routes still require verification.
+
+This is local-first per clone. A copied repository does not imply synchronized SQLite state, artifact files, credentials or cross-machine conversation access. Resolve the local service/artifact location in the implementation slice; no new machine, network exposure or settings change is inferred by this design.
+
+## One contract, two integrations
+
+| Layer | Owns | Must not own |
+|---|---|---|
+| Codex participant adapter | Codex-origin attachment context and supported session delivery/query bridge | Review business policy or a second conversation owner |
+| Claude participant adapter | Claude-origin attachment context and supported session delivery/query bridge | An implicit replacement session or unverified session identity |
+| Shared MCP operation adapter | Authenticated bounded reads and durable command submission | Separate vendor-specific review actions or direct database writes |
+| Participant delivery subsystem | Durable inbox, turn ordering, binding generation, invocation intent and reconciliation | Global participant locks held while a turn calls MCP |
+| Review domain | Permissions, anchors, graph/resource revisions, comments and receipts | Host lifecycle or model-specific prompts as policy |
+
+Codex and Claude are host integration choices, not participant permissions. Their actors use the same authorized domain commands. Independent jobs retain their own scoped identities. One conversation is responsible for a given attachment at a time; supporting two host types does not introduce collaborative multi-agent ownership. Replacing an attachment is an explicit durable command and advances generation; it never silently redirects existing replies.
+
+## Attachment and capability handshake
+
+1. The already-running session initiates attachment through its supported connection. It identifies the local project/review/snapshot and intended session. Server derives the actor from authenticated connection context.
+2. Bind host type and version, actual host/owner instance, opaque session ID, project/working-directory identity and attachment generation. A caller-supplied ID is a routing claim until verified; a model repeating it is not identity evidence.
+3. Use a supported authenticated host/connection handshake and scoped challenge/readback to corroborate that the initiating session can actually invoke the review tools. Record how that proof maps to the host's identity surface. If it cannot establish the required binding, attachment remains pending rather than inventing verification.
+4. Negotiate tool access, event delivery, busy/idle observation, invocation deduplication/query, reconnect and outcome evidence independently. Record capability states as supported, unsupported or unverified for the exact host/version/session surface.
+5. Commit the verified attachment through common ingress. Subsequent commands recheck actor authorization and generation at apply. Persist inbox/receipts before delivery attempts; preserve causation/correlation and stable invocationId distinct from commandId.
+
+A supported MCP read is not evidence that an idle session can be woken. A queued delivery is not a started turn, and a completed turn is not a persisted reply. Unsupported push delivery may expose durable pending work for explicit reads; it does not pass automatic comment-to-conversation acceptance. Unknown invocation outcomes are reconciled or retained as unknown, never blindly resumed/launched again.
+
+## Official integration candidates and limits
+
+These sources were inspected on 2026-10-23. They identify candidate interfaces, not a successful attachment or cross-client ownership guarantee.
+
+| Host | Documented candidate surface | Required local proof |
+|---|---|---|
+| Codex | MCP tools and app-server thread resume/read/turn operations. | Reuse the existing host owner for the originating session. Prove binding, actual MCP use, delivery and uncertain-invocation reconciliation. Do not launch another app-server to seize an active Desktop thread. Stored-thread continuation is not proof of safe attachment to a currently owned session. |
+| Claude | MCP tools; Claude Code documents session-targeted resume and opt-in channel delivery. | Discover the initiating session's actual supported surface. A resumed process is not automatically the same live owner; a channel capability must actually be enabled and usable. Neither implies verified idempotent external delivery or permission to modify a running session's settings. Other Claude surfaces require their own capability evidence. |
+
+Sources: [Codex MCP](https://learn.chatgpt.com/docs/extend/mcp?surface=cli), [Codex app-server](https://learn.chatgpt.com/docs/app-server), [Claude MCP and channel delivery](https://code.claude.com/docs/en/mcp#push-messages-with-channels), [Claude session continuation](https://code.claude.com/docs/en/headless#continue-conversations).
+
+## Delivery and acceptance
+
+Both adapters are required in the 480p round, rather than deferred as an additional host in 4K. Slice 01 has two independently testable host deliveries: **01-Codex** and **01-Claude**. Each implements the same bounded source → anchored question → originating session → MCP read/reply → authoritative UI answer journey on our own real PR. Either may be implemented first after its probe passes; one passing adapter does not claim the other works. These are variants of the existing capability slice, not horizontal adapter scaffolds.
+
+Run [probe 00](plans/probes/00-host-contract.md) independently for each actual host. Capability evidence is keyed by host/version/surface and binding; a failed host probe blocks that host's integration, not independently authorized work on the other. Both host deliveries and slice 02's continuation checks are required before claiming the full dual-host 480p outcome. Shared UI/domain tests can be reused; actual host-path acceptance cannot.
+
+| Conformance check | Codex | Claude |
+|---|---|---|
+| Originating session initiates verified attach in its current project | Unrun | Unrun |
+| Real own-PR question reaches that exact session and MCP reply appears in UI | Unrun | Unrun |
+| Commands progress during own turn; no self-deadlock | Unrun | Unrun |
+| Duplicate/changed payload, wrong actor/session and stale generation handled correctly | Unrun | Unrun |
+| Disconnect/restart and uncertain invocation reconcile without a second owner or blind replay | Unrun | Unrun |
+| Existing work, permissions, configuration and session history preserved | Unrun | Unrun |
+
+Record own-PR and candidate provenance, session/attachment identity, capability evidence and missing results per delivery. Do not store credentials or raw unrelated conversation history in docs. Later slices identify affected host regression checks; changed host paths require actual own-PR revalidation. Shared presentation improvements do not require duplicating every unit test, but support claims remain bounded to exercised integrations.
+
+## Current next step
+
+No server, plugin, session or configuration was changed. The next preparation is to record each initiating host's supported connection and probe target, then run only an authorized bounded probe. Implementation remains subject to the slice's real source, testing and comprehension inputs. The product workflow is accepted; live adapter capability is still unknown.

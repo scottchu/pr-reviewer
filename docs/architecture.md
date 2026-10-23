@@ -41,7 +41,10 @@ These choices retain the earlier agreed direction. No dependencies or applicatio
 ```mermaid
 flowchart TB
   User[User participant] --> UI[React UI / React Flow]
-  Agent[Agent participant] --> MCP[MCP adapter]
+  Agent[Originating agent participant] --> Codex[Codex participant adapter]
+  Agent --> Claude[Claude participant adapter]
+  Codex --> MCP[Shared MCP operations]
+  Claude --> MCP
   CLI[CLI] --> Gateway[Authenticated gateway]
   UI --> Gateway
   MCP --> Gateway
@@ -56,7 +59,7 @@ flowchart TB
   Workers --> Artifacts[Isolated worktrees / evidence files]
   Workers -->|Authenticated result commands| Queue
   DB -->|Eligible addressed events| Inbox[Durable participant inbox]
-  Inbox --> Scheduler[Turn scheduler / host adapter]
+  Inbox --> Scheduler[Turn scheduler / Codex or Claude host bridge]
   Scheduler -->|Verified binding / invocationId| Conversation[Exact attached conversation]
   Conversation -->|Executes a turn| Agent
 ```
@@ -74,6 +77,12 @@ flowchart TB
 | Persistence adapters | Transactions, projections and artifact storage | Expose contracts to the responsible subsystem; no UI, agent or worker writes around domain ingress. |
 
 These are logical boundaries, not a requirement for separate services. A subsystem exposes a narrow public interface; consumers do not reach into its internals. Domain policy is tested independently of UI and transport adapters.
+
+## Existing-session and functional boundaries
+
+Support [Codex and Claude participant adapters](participant-adapters.md). The session initiating attachment in the current project is the exact responsible session; preserve its host owner, work and permissions. Both integrations are part of 480p, with independent probe and real own-PR evidence. A clone on another machine does not imply shared runtime state or access to a session on this machine.
+
+Use a [functional core with reactive coordination](reactive-design.md): pure domain transitions, isolated effects, explicit lifecycle ownership and UI snapshot subscriptions. Reactive-library selection remains open; no stream library replaces durable commands or makes external effects exactly once.
 
 ## Commands, jobs and conversation turns
 
