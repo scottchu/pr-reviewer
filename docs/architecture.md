@@ -30,19 +30,19 @@ Preserve the slim, draggable bottom-center player: drag, previous, replay/pause,
 
 **Application language:** TypeScript with strict mode for frontend and backend
 
-**Linting and formatting:** Biome
+**Linting and formatting:** Tool selection deferred; Biome is not required
 
 **Durable data:** SQLite
 
 **Evidence storage:** Referenced source snapshots, patches and execution artifact files
 
-These are accepted technology directions. Biome configuration and strict TypeScript compiler settings will be derived when an implementation slice establishes the scaffold. No dependencies or application scaffold are introduced by this document.
+These are accepted technology directions. Strict TypeScript compiler settings will be derived when an implementation slice establishes the scaffold. No dependencies or application scaffold are introduced by this document.
 
 ## Implementation conventions
 
 Design specifically for React. There is no framework-agnostic core, reusable SDK or alternate-framework support requirement. Use React-specific components, hooks and bindings where they serve the product; do not add abstraction layers or separate packages solely for hypothetical framework portability. Logical subsystem boundaries still apply: React UI delegates business operations through public application interfaces rather than embedding domain rules or reaching into other subsystems' internals.
 
-Use strict TypeScript for application code and tests, and Biome for linting and formatting. Prefer functional patterns with explicit immutable inputs and isolated effects. This is a preference over classes, not a class ban; a class is acceptable when its responsibility warrants it. Keep the existing arrow-function preference; use function declarations only when required.
+Use strict TypeScript for application code and tests. No lint/format tool is selected or required yet. Prefer functional patterns with explicit immutable inputs and isolated effects. This is a preference over classes, not a class ban; a class is acceptable when its responsibility warrants it. Keep the existing arrow-function preference; use function declarations only when required.
 
 Use render props where a caller needs to customize presentation while reusing component-owned behavior or state. They are an option, not a requirement for every component. Ordinary props, composition and hooks remain appropriate. Customization must retain accessibility, actual decompozr/design-system integration and the separation of business rules from UI. Render callbacks do not become another place for cross-subsystem stream wiring.
 
@@ -52,7 +52,7 @@ The [functional/reactive contract](reactive-design.md) defines effect and subscr
 
 These selected conventions were informed by the public Runway Avatar SDK at commit `917342729c1f23de20ba0238775dd003276c25b8`: [contribution guidance](https://github.com/runwayml/avatars-sdk-react/blob/917342729c1f23de20ba0238775dd003276c25b8/CONTRIBUTING.md#L74-L79) and [architecture guidance](https://github.com/runwayml/avatars-sdk-react/blob/917342729c1f23de20ba0238775dd003276c25b8/AGENTS.md#L21-L93). They are conventions of that public SDK, not established company-wide standards or interview requirements. PR Reviewer adopts the conventions above by project decision, not the external repository's instructions as a whole.
 
-That SDK's documented design places LiveKit behind core and has React consume core events without direct LiveKit imports. Its pinned [React manifest](https://github.com/runwayml/avatars-sdk-react/blob/917342729c1f23de20ba0238775dd003276c25b8/packages/react/package.json) and [session component](https://github.com/runwayml/avatars-sdk-react/blob/917342729c1f23de20ba0238775dd003276c25b8/packages/react/src/components/AvatarSession.tsx#L18-L25) still directly depend on/import LiveKit. This is an observed implementation divergence, not proof that the documented isolation is complete. Neither its framework-agnostic package split nor LiveKit is adopted here; PR Reviewer's own subsystem and managed-stream contracts remain authoritative.
+That SDK's documented design places LiveKit behind core and has React consume core events without direct LiveKit imports. Its pinned [React manifest](https://github.com/runwayml/avatars-sdk-react/blob/917342729c1f23de20ba0238775dd003276c25b8/packages/react/package.json) and [session component](https://github.com/runwayml/avatars-sdk-react/blob/917342729c1f23de20ba0238775dd003276c25b8/packages/react/src/components/AvatarSession.tsx#L18-L25) still directly depend on/import LiveKit. This is an observed implementation divergence, not proof that the documented isolation is complete. Its Biome choice, framework-agnostic package split and LiveKit dependency are not adopted here; PR Reviewer's own subsystem and managed-stream contracts remain authoritative.
 
 ## System diagram
 
