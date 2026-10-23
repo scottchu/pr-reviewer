@@ -10,4 +10,10 @@ All code must be tested; prefer TDD. Include end-to-end coverage for implemented
 
 Create plans and slices as their scope is established, following the product vision. This directory is the durable planning location; .decompozr/ and chat are not substitutes.
 
-Start with the [product roadmap](roadmap.md). Its first detailed slice is [one real review loop](slices/01-review-loop.md).
+Start with the [product roadmap](roadmap.md). It contains ordered, provisional vertical-slice inventories within every round, with outcome, predecessor, scope/exclusions and observable checks. Detail later individual slices only when their prerequisites establish the scope.
+
+The next feasibility gate is the [host contract probe](probes/00-host-contract.md), which requires no product UI or comment domain and is not itself a user slice. Establish the [comprehension task and expected account](comprehension.md) before presentation implementation. The first detailed product slice is [one real question/reply loop](slices/01-review-loop.md). The [current planning review reconciliation](reviews/slicing-revision.md) records why these boundaries changed.
+
+Every product slice must be [dogfoodable on our own real PR](own-pr-dogfood.md), with a task, separately identified candidate and pinned target, observations, gaps and pass condition. This applies from the first runnable slice. Same-agent dogfood and unfamiliar-reviewer comprehension are separate evidence.
+
+Current authority is documentation only. A proposed inventory, experiment or test is not implementation authorization or observed acceptance. Keep planned, executed, failed, inconclusive and unrun evidence explicit.
