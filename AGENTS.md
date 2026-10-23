@@ -7,7 +7,7 @@
 - Prefer arrow functions. Use function declarations only when required.
 - Prefer functional patterns over classes; classes are allowed when justified by their responsibility. Follow the implementation conventions in docs/architecture.md.
 - Design specifically for React with clear subsystem boundaries. There is no framework-agnostic core, reusable SDK or alternate-framework support requirement; do not add abstraction layers or package splits solely for hypothetical portability.
-- Use render props where useful for presentation customization, not as a blanket component requirement. Preserve accessibility and decompozr/design-system integration; keep domain policy and cross-subsystem stream wiring out of render callbacks.
+- Choose React patterns according to the actual requirement; no particular component customization pattern is prescribed. Preserve accessibility, decompozr/design-system integration and subsystem boundaries.
 - Prefer a functional core with explicit immutable inputs and reactive coordination at effect boundaries; keep business policy out of UI and stream operators. Follow docs/reactive-design.md; no reactive library is selected yet.
 - Route all cross-subsystem streams through the declared integration layer and managed subscription registry. Never directly subscribe to another subsystem’s internal modules/streams. Centralize wiring, ownership, teardown and diagnostics; keep routes scoped, authorized, bounded and independently observable.
 - Support Codex and Claude participants from their existing work sessions. The session initiating attachment is THE attached session; never silently create, fork or replace it. Follow docs/participant-adapters.md for independent host evidence and ownership boundaries.

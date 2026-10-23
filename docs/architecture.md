@@ -44,7 +44,7 @@ Design specifically for React. There is no framework-agnostic core, reusable SDK
 
 Use strict TypeScript for application code and tests. No lint/format tool is selected or required yet. Prefer functional patterns with explicit immutable inputs and isolated effects. This is a preference over classes, not a class ban; a class is acceptable when its responsibility warrants it. Keep the existing arrow-function preference; use function declarations only when required.
 
-Use render props where a caller needs to customize presentation while reusing component-owned behavior or state. They are an option, not a requirement for every component. Ordinary props, composition and hooks remain appropriate. Customization must retain accessibility, actual decompozr/design-system integration and the separation of business rules from UI. Render callbacks do not become another place for cross-subsystem stream wiring.
+Choose React patterns according to the actual requirement; no particular component customization pattern is prescribed. Keep the design proportionate to the behavior being delivered. UI composition must retain accessibility, actual decompozr/design-system integration and the separation of business rules from UI. It must not create another path for cross-subsystem stream wiring.
 
 The [functional/reactive contract](reactive-design.md) defines effect and subscription ownership. All code remains tested, preferably through TDD; implemented user journeys include actual design-system E2E coverage and own-PR dogfood. A convention documented here is an implementation requirement, not evidence that a configuration, build or user journey has passed.
 
