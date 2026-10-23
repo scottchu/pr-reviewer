@@ -2,9 +2,9 @@
 
 **Status:** Planned; blocked on named readiness inputs; implementation not started
 
-**Parent:** [480p round plan](../rounds/480p.md)
+**Parent:** [480p round plan](../../plan.md)
 
-**Design:** [High-level design](../../architecture.md)
+**Design:** [High-level design](../../../../product/architecture.md)
 
 **Owner:** Implementing agent owns the slice; maintainer resolves material product, host and execution-scope decisions
 
@@ -12,15 +12,15 @@
 
 ## Outcome and gap
 
-A reviewer sees one pinned real before/after behavior change, posts a question on its exact source context, and receives a source-backed reply from the responsible agent in the exact attached conversation. The reviewer can explain the difference, a relevant consequence and the evidence and uncertainty behind the answer. This first runnable slice must be dogfoodable on our own real PR under the [per-slice dogfood contract](../own-pr-dogfood.md).
+A reviewer sees one pinned real before/after behavior change, posts a question on its exact source context, and receives a source-backed reply from the responsible agent in the exact attached conversation. The reviewer can explain the difference, a relevant consequence and the evidence and uncertainty behind the answer. This first runnable slice must be dogfoodable on our own real PR under the [per-slice dogfood contract](../../../../rules/own-pr-dogfood.md).
 
-There is no application or observed host/product behavior in this repository. The [host contract probe](../probes/00-host-contract.md) establishes capability before this product path is built; it is not the comment/reply acceptance test. The [comprehension protocol](../comprehension.md) establishes the task and expected account before presentation implementation.
+There is no application or observed host/product behavior in this repository. The [host contract probe](../../probes/00-host-contract.md) establishes capability before this product path is built; it is not the comment/reply acceptance test. The [comprehension protocol](../../../../rules/comprehension.md) establishes the task and expected account before presentation implementation.
 
 ## Two independently testable host deliveries
 
-Deliver **01-Codex** and **01-Claude** as bounded variants of this same end-to-end contract, following the [participant adapter plan](../../participant-adapters.md). The initiating existing session is THE attached session; neither path may silently create or fork a replacement. Each gets its own passing probe, own-PR dogfood record, candidate/target/session identity and 01-A through 01-G evidence. Shared domain/UI checks can be reused; real-host evidence cannot. Either may go first when ready. Both are required before calling the dual-host slice complete, and slice 02 repeats continuation per host. Supporting both types does not allow simultaneous owners of one attachment.
+Deliver **01-Codex** and **01-Claude** as bounded variants of this same end-to-end contract, following the [participant adapter plan](../../../../product/participant-adapters.md). The initiating existing session is THE attached session; neither path may silently create or fork a replacement. Each gets its own passing probe, own-PR dogfood record, candidate/target/session identity and 01-A through 01-G evidence. Shared domain/UI checks can be reused; real-host evidence cannot. Either may go first when ready. Both are required before calling the dual-host slice complete, and slice 02 repeats continuation per host. Supporting both types does not allow simultaneous owners of one attachment.
 
-The [functional/reactive design](../../reactive-design.md) governs domain/effect boundaries. Library evaluation must not become a prerequisite for the host-only probe.
+The [functional/reactive design](../../../../product/reactive-design.md) governs domain/effect boundaries. Library evaluation must not become a prerequisite for the host-only probe.
 
 ## Readiness inputs
 
@@ -28,7 +28,7 @@ The [functional/reactive design](../../reactive-design.md) governs domain/effect
 |---|---|---|
 | Probe evidence for real binding, MCP, invocation deduplication and uncertain-outcome reconciliation | Unrun; blocks product integration | Executor runs only after host/target and probe scope are established; fail/inconclusive does not unlock this slice. |
 | Own real PR/task, baseline/head, one source span and input/trigger | Unselected; planned slice PR may be named before it exists, but acceptance needs a real PR | Maintainer selects task; agent verifies source access and records candidate identity separately from target baseline/head. No fake PR or unsupported source identity. |
-| Expected account, evaluator and comprehension threshold | Proposed protocol; packet absent | Complete and accept the [evaluation packet](../comprehension.md) before implementation. |
+| Expected account, evaluator and comprehension threshold | Proposed protocol; packet absent | Complete and accept the [evaluation packet](../../evaluation.md) before implementation. |
 | Bounded local run target, host access and implementation scope | Unselected / not authorized | Maintainer establishes destination and scope. Existing technology direction alone is not runtime authority. |
 
 These inputs can be prepared in documentation without a scaffold. Source selection does not require a general language analyzer or configured repository test runner; those belong to later slices. Product tests for this slice still need an explicit test strategy before code is derived.
@@ -57,8 +57,8 @@ Use domain and adapter tests, preferably TDD, then the actual user journey. All 
 | **01-C — Retry and restart preserve one accepted mutation and every eligible item.** Identical command retry returns the original receipt; changed-payload commandId reuse is rejected. | Domain/adapter tests and persisted restart readback around comment/reply commit and inbox consumption. Recover cursors and coalesced addressed items without duplicate writes or lost questions. Slice 02 later expands this into the complete reopen/new-head user journey. |
 | **01-D — Invalid identity, generation and anchors cannot mutate the review.** Revoke permission or replace attachment while a write is queued; the old write fails at apply time. Wrong snapshot/side/path/span is rejected. | Negative domain/interface tests and authenticated boundary checks; reply remains attributed to the verified actor and original source. Rejections leave no partial state. Comments use anchor validation, not an unrelated graph-wide revision. |
 | **01-E — Uncertain wakeups remain honest.** Lost acknowledgement is queried/reconciled by invocationId or shown as unknown/pending, never blindly relaunched. Replies/receipts do not wake the agent again. | Product adapter fault tests using the proven host contract, real-host reconciliation evidence from the probe plus the integrated invocation/readback, and inbox eligibility tests. A fixture cannot establish missing host capabilities. |
-| **01-F — The reviewer can inspect and explain the result.** Keyboard navigation reaches source, question and answer; diff labels work without color alone; evidence links reach the original source. | Actual browser/design-system E2E for interaction plus the separately recorded unfamiliar-reviewer session against the predeclared [rubric](../comprehension.md). Unsupported/wrong substantive claims fail. Implementer self-check is separate evidence. |
-| **01-G — We can use the candidate to review our own PR.** Ask about one implemented behavior or source-backed changed-document claim in our actual slice PR and inspect the persisted answer and its source. | Record the real PR URL and exact baseline/head, candidate source/build/runtime identity, acquisition method, observed question/reply/readback, pass condition and gaps using the [dogfood record](../own-pr-dogfood.md). Manual pinned-source preparation is allowed; it proves neither a general importer nor unsupported code analysis/test execution. Fixes or head changes require relevant revalidation. Same-agent dogfood does not satisfy 01-F's unfamiliar-reviewer evidence. |
+| **01-F — The reviewer can inspect and explain the result.** Keyboard navigation reaches source, question and answer; diff labels work without color alone; evidence links reach the original source. | Actual browser/design-system E2E for interaction plus the separately recorded unfamiliar-reviewer session against the predeclared [rubric](../../../../rules/comprehension.md). Unsupported/wrong substantive claims fail. Implementer self-check is separate evidence. |
+| **01-G — We can use the candidate to review our own PR.** Ask about one implemented behavior or source-backed changed-document claim in our actual slice PR and inspect the persisted answer and its source. | Record the real PR URL and exact baseline/head, candidate source/build/runtime identity, acquisition method, observed question/reply/readback, pass condition and gaps using the [dogfood record](../../../../rules/own-pr-dogfood.md). Manual pinned-source preparation is allowed; it proves neither a general importer nor unsupported code analysis/test execution. Fixes or head changes require relevant revalidation. Same-agent dogfood does not satisfy 01-F's unfamiliar-reviewer evidence. |
 
 ## Deferred acceptance and exclusions
 
@@ -68,7 +68,7 @@ Use domain and adapter tests, preferably TDD, then the actual user journey. All 
 - **Slice 06:** Configured repository tests, real process execution, job cancellation and terminal-outcome evidence. Slice 01 does not need a fake long-running job or a repository runner to prove the question/reply path.
 - **Later slices:** Whole-PR narration/player, enrichment, advanced zoom/mobile refinement, additional hosts/languages and mature performance. No production deployment, hosted agent runtime or external PR posting.
 
-These are feature deferrals, not architecture exceptions. Short atomic dispatch, independent jobs when introduced, action-specific CAS, turn-only serialization, apply-time authorization, stable external invocation identities and explicit unknowns remain required by the [design](../../architecture.md).
+These are feature deferrals, not architecture exceptions. Short atomic dispatch, independent jobs when introduced, action-specific CAS, turn-only serialization, apply-time authorization, stable external invocation identities and explicit unknowns remain required by the [design](../../../../product/architecture.md).
 
 ## Delivery order, evidence and stop conditions
 
@@ -80,10 +80,10 @@ All 01-A through 01-G evidence is currently **unrun/unmet**. No UI, MCP integrat
 
 ## Agent handoffs and successor contribution
 
-Follow the [implementation and independent-review packet contract](../agent-handoffs.md). This slice plan and acceptance 01-A through 01-G are the source packet, linked to the 480p round. Implementation assignment is **blocked**: readiness inputs above remain unresolved; no executor/worktree/run target or product implementation scope is assigned. At dispatch, record the committed plan revision, role, allowed writes and exact task workspace, then derive bounded TDD steps from the included path.
+Follow the [implementation and independent-review packet contract](../../../../rules/agent-handoffs.md). This slice plan and acceptance 01-A through 01-G are the source packet, linked to the 480p round. Implementation assignment is **blocked**: readiness inputs above remain unresolved; no executor/worktree/run target or product implementation scope is assigned. At dispatch, record the committed plan revision, role, allowed writes and exact task workspace, then derive bounded TDD steps from the included path.
 
 Independent review is **not assigned / not ready**: no candidate commit, PR, build or executed product evidence exists. Once available, supply its exact identity/diff, acceptance mapping and evidence with limitations to a reviewer other than the implementer. Return concrete findings and checks performed; do not infer acceptance from this plan or earlier architecture review.
 
 Before acceptance, promote the actual question/reply user story, source/attachment/receipt/inbox interfaces, state transitions, authorization/failure/recovery semantics and relevant design rationale into durable product docs outside plans. Record the specification updates and evidence here; the source must support reimplementation without this execution plan or prior application. This promotion is currently **pending**.
 
-Then update [slice 02](02-review-continuation.md) with the actual snapshot/anchor and attachment-generation contracts, receipt-aware reads, persistence/inbox/cursor interfaces, per-host probe/product results, reusable tests and recovery gaps. Record the delivered commit and where each finding changed slice 02's scope or tests. This contribution is currently **pending**; slice 02 must reconcile it before implementation.
+Then update [slice 02](../02-review-continuation/plan.md) with the actual snapshot/anchor and attachment-generation contracts, receipt-aware reads, persistence/inbox/cursor interfaces, per-host probe/product results, reusable tests and recovery gaps. Record the delivered commit and where each finding changed slice 02's scope or tests. This contribution is currently **pending**; slice 02 must reconcile it before implementation.

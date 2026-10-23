@@ -4,7 +4,7 @@
 
 **Execution status:** No product slice or dogfood session has run
 
-**Parent:** [Product roadmap](roadmap.md)
+**Parent:** [Shared rules](README.md)
 
 **Owner:** Implementing agent runs and records dogfood; maintainer resolves missing product inputs and acceptance gaps
 
@@ -18,7 +18,7 @@ The candidate must complete the task through its real UI and supported adapters,
 
 ## Bootstrap and source identity
 
-The repository is documentation-only today. [Probe 00](probes/00-host-contract.md) is host feasibility, not product delivery or product dogfood, and needs no PR. There is no claim that the current repository can review itself yet.
+The repository is documentation-only today. [Probe 00](../plans/480p/probes/00-host-contract.md) is host feasibility, not product delivery or product dogfood, and needs no PR. There is no claim that the current repository can review itself yet.
 
 Slice 01 introduces the first runnable candidate. It may consume a manually acquired, verified snapshot of its own actual PR, including a changed-document passage that explains the implemented behavior if that is the selected question. Pin the actual comparison baseline/head, preserve before/after content and make the question answerable from those sources. Manual acquisition is an explicit bootstrap input, not an implemented importer. Changed documentation cannot establish unsupported code analysis or repository test execution. Slice 03 replaces manual acquisition with the product import journey.
 
@@ -47,6 +47,6 @@ Pass requires the new user action to succeed on the recorded real own PR with th
 
 If a fix changes the candidate source or reviewed PR head, record a new identity/snapshot and rerun the affected own-PR task and relevant regression checks before accepting that candidate. Earlier evidence remains historical. A later documentation-only commit recording evidence must also be identified as a different head: either keep the acceptance explicitly bounded to the previously pinned product candidate or perform the relevant checks on the new target; never silently label old evidence as a run against the latest head.
 
-## Current gaps and next action
+## Round-specific readiness
 
-No own-PR target, candidate build, source snapshot or dogfood evidence is selected for slice 01. Resolve its planned PR/task and provenance inputs alongside the [comprehension packet](comprehension.md). Later slices must establish their own qualifying PR/task before implementation; extra representative datasets may supplement, but cannot replace, each slice's own-PR run.
+Keep selected own-PR tasks, candidate identities, provenance gaps and run results beside the owning slice plan. The [480p plan](../plans/480p/plan.md) records initial-round readiness. Later slices establish their own qualifying PR/task before implementation; supplemental datasets do not replace own-PR acceptance.

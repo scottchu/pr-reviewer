@@ -38,21 +38,9 @@ Preserve the slim, draggable bottom-center player: drag, previous, replay/pause,
 
 These are accepted technology directions. Strict TypeScript compiler settings will be derived when an implementation slice establishes the scaffold. No dependencies or application scaffold are introduced by this document.
 
-## Implementation conventions
+## Development rules
 
-Design specifically for React. There is no framework-agnostic core, reusable SDK or alternate-framework support requirement. Use React-specific components, hooks and bindings where they serve the product; do not add abstraction layers or separate packages solely for hypothetical framework portability. Logical subsystem boundaries still apply: React UI delegates business operations through public application interfaces rather than embedding domain rules or reaching into other subsystems' internals.
-
-Use strict TypeScript for application code and tests. No lint/format tool is selected or required yet. Prefer functional patterns with explicit immutable inputs and isolated effects. This is a preference over classes, not a class ban; a class is acceptable when its responsibility warrants it. Keep the existing arrow-function preference; use function declarations only when required.
-
-Choose React patterns according to the actual requirement; no particular component customization pattern is prescribed. Keep the design proportionate to the behavior being delivered. UI composition must retain accessibility, actual decompozr/design-system integration and the separation of business rules from UI. It must not create another path for cross-subsystem stream wiring.
-
-The [functional/reactive contract](reactive-design.md) defines effect and subscription ownership. All code remains tested, preferably through TDD; implemented user journeys include actual design-system E2E coverage and own-PR dogfood. A convention documented here is an implementation requirement, not evidence that a configuration, build or user journey has passed.
-
-### External reference and adoption boundary
-
-These selected conventions were informed by the public Runway Avatar SDK at commit `917342729c1f23de20ba0238775dd003276c25b8`: [contribution guidance](https://github.com/runwayml/avatars-sdk-react/blob/917342729c1f23de20ba0238775dd003276c25b8/CONTRIBUTING.md#L74-L79) and [architecture guidance](https://github.com/runwayml/avatars-sdk-react/blob/917342729c1f23de20ba0238775dd003276c25b8/AGENTS.md#L21-L93). They are conventions of that public SDK, not established company-wide standards or interview requirements. PR Reviewer adopts the conventions above by project decision, not the external repository's instructions as a whole.
-
-That SDK's documented design places LiveKit behind core and has React consume core events without direct LiveKit imports. Its pinned [React manifest](https://github.com/runwayml/avatars-sdk-react/blob/917342729c1f23de20ba0238775dd003276c25b8/packages/react/package.json) and [session component](https://github.com/runwayml/avatars-sdk-react/blob/917342729c1f23de20ba0238775dd003276c25b8/packages/react/src/components/AvatarSession.tsx#L18-L25) still directly depend on/import LiveKit. This is an observed implementation divergence, not proof that the documented isolation is complete. Its Biome choice, framework-agnostic package split and LiveKit dependency are not adopted here; PR Reviewer's own subsystem and managed-stream contracts remain authoritative.
+Follow the [implementation conventions](../rules/development.md) for strict TypeScript, functional preferences and React pattern selection. This document owns the product architecture; shared development rules have one home.
 
 ## System diagram
 
@@ -133,9 +121,9 @@ Test source changes, relevance and execution results are different claims. Resul
 
 ## Delivery and validation
 
-Follow the [progressive roadmap](plans/roadmap.md), with testable vertical slices inside each round. Before the first product loop, use the bounded [host contract probe](plans/probes/00-host-contract.md) to establish host feasibility without building the UI/comment path. Define the [comprehension task and source-backed expected account](plans/comprehension.md) before presentation implementation. The first product slice then proves the actual anchored question/reply journey. All code is tested, preferably through TDD. End-to-end checks exercise the real user journey and actual design-system integration; fixtures do not establish native host delivery, physical-device behavior or comprehension.
+Follow the [progressive roadmap](../plans/roadmap.md), with testable vertical slices inside each round. Before the first product loop, use the bounded [host contract probe](../plans/480p/probes/00-host-contract.md) to establish host feasibility without building the UI/comment path. Define the [comprehension task and source-backed expected account](../rules/comprehension.md) before presentation implementation. The first product slice then proves the actual anchored question/reply journey. All code is tested, preferably through TDD. End-to-end checks exercise the real user journey and actual design-system integration; fixtures do not establish native host delivery, physical-device behavior or comprehension.
 
-Every product slice must be [dogfoodable using our own real PR](plans/own-pr-dogfood.md), with the candidate source/build identified separately from the reviewed baseline/head and source anchors. The first runnable slice may use explicitly manual pinned-source acquisition; it does not claim a general importer or unsupported analysis/execution. Fixes and target-head changes require relevant revalidation. Same-agent dogfood is separate from unfamiliar-reviewer comprehension; the host feasibility probe is not product dogfood.
+Every product slice must be [dogfoodable using our own real PR](../rules/own-pr-dogfood.md), with the candidate source/build identified separately from the reviewed baseline/head and source anchors. The first runnable slice may use explicitly manual pinned-source acquisition; it does not claim a general importer or unsupported analysis/execution. Fixes and target-head changes require relevant revalidation. Same-agent dogfood is separate from unfamiliar-reviewer comprehension; the host feasibility probe is not product dogfood.
 
 The first material unknown is the exact external conversation host: authenticated attachment, supported MCP transport, wakeup, deduplication and outcome-query capabilities must be proven. The first supported source language and configured repository test runner also need explicit selection before their respective analysis and execution slices; neither is required for the host-only probe. Real independent-job acceptance begins with whole-PR import, and graph CAS acceptance begins with graph-writing behavior, as scoped in the roadmap. These deferrals do not weaken the architectural contracts. The earlier Playground prototype is a reference, not a running implementation in this repository.
 
