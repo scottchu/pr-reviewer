@@ -1,0 +1,403 @@
+:root {
+  font-family:
+    Inter,
+    -apple-system,
+    BlinkMacSystemFont,
+    "Segoe UI",
+    sans-serif;
+  color: #24282b;
+  background: #f4f4f2;
+  font-synthesis: none;
+  line-height: 1.5;
+  font-size: 14px;
+}
+* {
+  box-sizing: border-box;
+}
+body {
+  margin: 0;
+}
+button,
+input,
+textarea,
+select {
+  font: inherit;
+}
+button,
+a,
+input,
+select,
+textarea {
+  touch-action: manipulation;
+}
+button {
+  cursor: pointer;
+  min-height: 36px;
+  padding: 8px 16px;
+  border: 1px solid #30383d;
+  background: #30383d;
+  color: #fff;
+  border-radius: 5px;
+  font-weight: 600;
+}
+button:hover {
+  background: #465058;
+}
+button:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+a {
+  color: #295b83;
+  text-underline-offset: 3px;
+}
+button:focus-visible,
+a:focus-visible,
+input:focus-visible,
+textarea:focus-visible,
+select:focus-visible {
+  outline: 2px solid #246baf;
+  outline-offset: 3px;
+}
+input,
+textarea,
+select {
+  border: 1px solid #a5a9aa;
+  border-radius: 4px;
+  padding: 8px;
+  background: #fff;
+  color: inherit;
+}
+textarea {
+  width: 100%;
+  resize: vertical;
+}
+label {
+  display: block;
+  font-weight: 600;
+  margin-bottom: 6px;
+}
+h1,
+h2,
+p {
+  margin: 0;
+}
+h1 {
+  font-size: 24px;
+  letter-spacing: -0.5px;
+}
+h1 span {
+  font-weight: 500;
+  margin-left: 8px;
+}
+h2 {
+  font-size: 16px;
+  font-weight: 600;
+}
+main {
+  max-width: 1800px;
+  margin: auto;
+  padding: 32px;
+}
+.eyebrow {
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  font-size: 10px;
+  font-weight: 700;
+  color: #60676c;
+  margin-bottom: 8px;
+}
+.identity {
+  display: flex;
+  justify-content: space-between;
+  gap: 32px;
+  padding-bottom: 24px;
+  border-bottom: 1px solid #d4d7d6;
+}
+.sha {
+  font-family: ui-monospace, monospace;
+  font-size: 11px;
+  overflow-wrap: anywhere;
+  color: #5b6266;
+  margin-top: 8px;
+}
+.attachment {
+  flex-shrink: 0;
+  max-width: 310px;
+  font-size: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+.quiet {
+  background: transparent;
+  color: #30383d;
+  border-color: #b7bcbc;
+  align-self: start;
+  margin-top: 5px;
+}
+.quiet:hover {
+  background: #e5e8e8;
+}
+.source-identity {
+  padding: 20px 0 14px;
+  display: flex;
+  align-items: baseline;
+  gap: 20px;
+}
+.source-identity p {
+  font-size: 12px;
+  color: #60676c;
+}
+.source-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  border: 1px solid #cbd0cf;
+  background: #fff;
+}
+.source-pane {
+  min-width: 0;
+}
+.source-pane + section {
+  border-left: 1px solid #cbd0cf;
+}
+.source-pane header {
+  display: flex;
+  justify-content: space-between;
+  padding: 10px 14px;
+  background: #eef0ef;
+  border-bottom: 1px solid #d7dada;
+}
+.source-pane header span {
+  font-size: 11px;
+  color: #58625d;
+}
+.source-scroll {
+  height: 330px;
+  overflow: auto;
+  scroll-padding: 15px;
+}
+.source-scroll ol {
+  list-style: none;
+  margin: 0;
+  padding: 10px 0;
+}
+.source-scroll li {
+  display: flex;
+  align-items: baseline;
+  min-height: 25px;
+  scroll-margin: 50px;
+}
+.source-scroll li button {
+  min-height: 25px;
+  min-width: 40px;
+  padding: 2px 8px;
+  color: #656d70;
+  border: 0;
+  background: transparent;
+  border-radius: 0;
+  font:
+    11px ui-monospace,
+    monospace;
+}
+.change-marker {
+  font:
+    11px ui-monospace,
+    monospace;
+  width: 16px;
+  flex-shrink: 0;
+}
+.source-scroll code {
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  font:
+    12px/1.7 ui-monospace,
+    SFMono-Regular,
+    monospace;
+  padding-right: 12px;
+}
+.source-pane .removed {
+  background: #faf0ed;
+}
+.source-pane .added {
+  background: #edf5ef;
+}
+.source-pane .modified {
+  background: #faf4e5;
+}
+.source-scroll li.selected {
+  box-shadow: inset 3px 0 #46759a;
+  background: #e9f1fa;
+}
+.conversation {
+  display: grid;
+  grid-template-columns: minmax(280px, 0.85fr) minmax(350px, 1.15fr);
+  gap: 48px;
+  margin-top: 30px;
+}
+.composer h2 {
+  font-size: 20px;
+  margin-bottom: 20px;
+}
+.range {
+  display: flex;
+  gap: 12px;
+}
+.range label {
+  font-size: 11px;
+  flex: 1;
+}
+.range input,
+.range select {
+  display: block;
+  width: 100%;
+  margin-top: 5px;
+}
+.selection,
+#question-help {
+  font-size: 11px;
+  color: #596269;
+  margin: 8px 0 14px;
+}
+.discussion > h2 {
+  margin-bottom: 6px;
+}
+.status-summary {
+  font-size: 12px;
+  color: #62696b;
+  margin-bottom: 16px;
+}
+.discussion article {
+  padding: 18px 0;
+  border-top: 1px solid #ccd1d0;
+  overflow-wrap: anywhere;
+}
+.message-heading {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  font-size: 12px;
+}
+.status {
+  font-size: 11px;
+  background: #e5e9e8;
+  padding: 2px 7px;
+  border-radius: 3px;
+}
+.body {
+  white-space: pre-wrap;
+  margin: 10px 0;
+  line-height: 1.65;
+}
+.discussion a {
+  font-size: 12px;
+}
+.reply {
+  border-left: 2px solid #a6b6c0;
+  padding-left: 18px;
+  margin-top: 24px;
+  font-size: 13px;
+}
+.reply strong {
+  font-size: 12px;
+}
+.evidence {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+.limits {
+  color: #5d6569;
+  font-size: 12px;
+  margin: 12px 0;
+}
+small {
+  color: #646d71;
+  font-size: 10px;
+}
+details {
+  font-size: 11px;
+  margin-top: 10px;
+  color: #62696d;
+}
+details code {
+  word-break: break-all;
+}
+.empty {
+  color: #6c7478;
+  padding: 24px 0;
+}
+.login {
+  max-width: 520px;
+  margin: 10vh auto;
+}
+.login p {
+  margin: 12px 0;
+}
+.login input {
+  width: 100%;
+  margin-bottom: 12px;
+}
+footer {
+  margin-top: 40px;
+  border-top: 1px solid #d4d7d6;
+  padding-top: 16px;
+  color: #6a7376;
+  font-size: 11px;
+}
+[role="alert"] {
+  color: #96392d;
+  margin-top: 12px;
+}
+@media (max-width: 900px) {
+  main {
+    padding: 20px;
+  }
+  .identity {
+    flex-direction: column;
+  }
+  .source-grid,
+  .conversation {
+    grid-template-columns: 1fr;
+  }
+  .source-pane + section {
+    border-left: 0;
+    border-top: 1px solid #cbd0cf;
+  }
+  .source-identity {
+    display: block;
+  }
+  .source-scroll {
+    height: 260px;
+  }
+  .conversation {
+    gap: 32px;
+  }
+  h1 span {
+    display: block;
+    margin: 4px 0;
+  }
+}
+@media (pointer: coarse) {
+  button,
+  input,
+  select {
+    min-height: 44px;
+  }
+  .source-scroll li button {
+    min-height: 44px;
+    min-width: 44px;
+  }
+}
+@media (forced-colors: active) {
+  .source-pane .modified {
+    background: #faf4e5;
+  }
+  .source-scroll li.selected {
+    outline: 2px solid Highlight;
+    outline-offset: -2px;
+  }
+  .source-scroll li:not(.unchanged) {
+    border-left: 2px dashed CanvasText;
+  }
+}

@@ -1,6 +1,6 @@
 # Slice 01: ask about one real behavior (480p)
 
-**Status:** Ready for bounded implementation; independent source design review complete; product implementation not started
+**Status:** Runnable code delivery independently accepted at e24ce7c; full native-host, dogfood and human slice acceptance pending
 
 **Parent:** [480p round plan](../../plan.md)
 
@@ -8,7 +8,7 @@
 
 **Owner:** Implementing agent owns the slice; maintainer resolves material product, host and execution-scope decisions
 
-**Authorization:** Source design and isolated preparation experiments authorized. Product implementation starts when dispatched under the bounded handoff; no production deployment.
+**Authorization:** Dispatched bounded local implementation, dependencies, tests and loopback runtime authorized; PR-only delivery; no production deployment.
 
 ## Readiness and preparation
 
@@ -18,7 +18,7 @@ Use the [readiness audit](readiness.md) for missing pre-implementation inputs ve
 
 A reviewer sees one pinned real before/after behavior change, posts a question on its exact source context, and receives a source-backed reply from the responsible agent in the exact attached conversation. The reviewer can explain the difference, a relevant consequence and the evidence and uncertainty behind the answer. This first runnable slice must be dogfoodable on our own real PR under the [per-slice dogfood contract](../../../../rules/own-pr-dogfood.md).
 
-There is no application or observed host/product behavior in this repository. The [existing-session integration checks](../../probes/00-host-contract.md) reuse known CLI/MCP mechanisms and verify the product adapter as it is built. The [comprehension protocol](../../../../rules/comprehension.md) establishes the task and expected account before presentation implementation.
+The local React/SQLite/MCP candidate now exists; [implementation evidence](implementation-evidence.md) distinguishes controlled-host checks from native-host and human acceptance. The [existing-session integration checks](../../probes/00-host-contract.md) reuse known CLI/MCP mechanisms and verify the product adapter as it is built. The [comprehension protocol](../../../../rules/comprehension.md) establishes the task and expected account before presentation implementation.
 
 ## Two independently testable host deliveries
 
@@ -82,12 +82,30 @@ At implementation dispatch, follow the execution and handoff packets: (1) derive
 
 The effort boundary is one behavior, one snapshot, one responsible conversation and one complete question/reply journey. Stop dependent work and revise the source contract if host behavior contradicts the probe, identity/source evidence cannot be verified, or the agreed expected account is wrong or incomplete. Preserve accepted questions and unknown invocation references for reconciliation; do not broaden into a new host, analyzer, runner or permissions workaround to finish the slice.
 
-All 01-A through 01-G evidence is currently **unrun/unmet**. No UI, MCP integration, database or runtime has started. No product own-PR dogfood or comprehension session has passed. The next action is bounded implementation from the maintained design and prepared handoff; reuse historical mechanisms and preserve fresh experiment limits. Deployment is N/A for the current documentation endpoint; any later implementation contract must name its authorized target and actual live acceptance.
+The [implementation evidence](implementation-evidence.md) records passing strict checks, domain/interface/process tests and a controlled-host React/stdio MCP journey against PR 14. Full 01-A through 01-G acceptance remains unmet: actual native-host tool integration, real-host own-PR dogfood and unfamiliar-reviewer comprehension remain explicit gates. Independent code delivery is accepted for `e24ce7c465857f5f277f3926b01342628b7ddee7` in the [final review receipt](reviews/implementation-e24ce7c.md). This is a task-branch test candidate, not a deployed release.
 
 ## Agent handoffs and successor contribution
 
 The [implementation packet](handoffs/implementation.md) and [independent-review packet](handoffs/review.md) follow the [shared handoff contract](../../../../rules/agent-handoffs.md). The dispatcher supplies the exact committed packet and assigned task workspace. Candidate identity and executed product results are furnished after implementation, before review; they are not prerequisites to writing code.
 
-Before acceptance, promote the actual question/reply user story, source/attachment/receipt/inbox interfaces, state transitions, authorization/failure/recovery semantics and relevant design rationale into durable product docs outside plans. Record the specification updates and evidence here; the source must support reimplementation without this execution plan or prior application. This promotion is currently **pending**.
+Before acceptance, promote the actual question/reply user story, source/attachment/receipt/inbox interfaces, state transitions, authorization/failure/recovery semantics and relevant design rationale into durable product docs outside plans. Record the specification updates and evidence here; the source must support reimplementation without this execution plan or prior application. Derived decisions, observable behavior, interfaces, runtime/recovery semantics and verified limits are now promoted to the maintained review-loop product documents; acceptance remains pending.
 
-Then update [slice 02](../02-review-continuation/plan.md) with the actual snapshot/anchor and attachment-generation contracts, receipt-aware reads, persistence/inbox/cursor interfaces, per-host probe/product results, reusable tests and recovery gaps. Record the delivered commit and where each finding changed slice 02's scope or tests. This contribution is currently **pending**; slice 02 must reconcile it before implementation.
+Then update [slice 02](../02-review-continuation/plan.md) with the actual snapshot/anchor and attachment-generation contracts, receipt-aware reads, persistence/inbox/cursor interfaces, per-host probe/product results, reusable tests and recovery gaps. Record the delivered commit and where each finding changed slice 02's scope or tests. The implementation contribution is now recorded in slice 02; its owner must reconcile the actual reviewed candidate and remaining host/review gates before implementation.
+
+## Current implementation assignment
+
+**Authorization:** User requested implementation and independent review after preparation. Local task-scoped code, dependencies, configuration, tests and loopback app operation are in scope; preserve global settings and existing user sessions.
+
+**Owner:** Root coordinates delivery; one assigned implementation agent writes product artifacts. Independent reviewer remains read-only.
+
+**Source baseline:** cf179ac1eeb9073c08e4e82c950cb53bdc681c72
+
+**Branch:** implement-480p-slice01-review-loop
+
+**Task worktree:** /var/folders/7q/rjwxsm_s54s17s8mn083p71h0000gn/T/pr-reviewer-slice01-u3qgyrnv/worktree
+
+**Model selection:** gpt-6.1-sol, high effort, fresh context; cohesive full-stack slice with explicit source contracts. Escalate concrete contract/security defects to owner; do not invent weaker acceptance.
+
+## Writer handback and milestone disposition
+
+The assigned implementer releases sole product/code writer ownership to root after the documentation-only final review receipt. The exact independently reviewed code candidate is `e24ce7c465857f5f277f3926b01342628b7ddee7`; 19 domain/interface/process tests, strict checks and both Chrome journeys independently passed. Root owns PR 19 delivery, the authorized runnable milestone/local pilot and remaining acceptance. No full slice acceptance or slice 02 readiness is granted.

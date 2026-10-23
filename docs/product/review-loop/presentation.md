@@ -21,3 +21,11 @@ Keyboard users can select or specify an exact source span, reach the labeled com
 Test the actual React controls in a real browser: labeled input, click and keyboard submission, disabled/busy behavior, props updates, repeated mount/unmount and listener cleanup. Inspect that only one application intent is emitted and no duplicate notification is caused by rendering. Review visual output against the guidelines and principles separately from automated behavior checks.
 
 The product E2E starts the real app with task-local data, prepares pinned own-PR source, attaches the responsible session, asks through real controls, observes CLI notification/MCP reply and reads authoritative UI state. Independently test stale attachment, wrong anchors, duplicate commands, unknown notification and restart. Browser interaction, real CLI/MCP delivery and unfamiliar-reviewer comprehension are separate evidence.
+
+## Implemented presentation decisions
+
+The first view presents complete prepared documents in two independently scrolling panes. Pure source comparison assigns unchanged, removed, added and modified statuses; line markers and accessible labels accompany neutral/red/green/amber paint. The application view model carries these statuses into React. A line button selects one line; labeled side/start/end controls select an inclusive range. Source links retain immutable identity and update the selected span without moving an existing question.
+
+Submission uses one application-owned command identity. An interrupted acknowledgement retains it for an unchanged retry; changing the unresolved submission is rejected until reconciled. The bridge reads at the accepted receipt's revision before clearing the draft. React Strict Mode remount and bridge route tests verify teardown/reconnect; rendering never schedules CLI work. Polling changes only view snapshots, while durable inbox delivery remains gateway-owned.
+
+The controlled-host screenshot was inspected against design-system guideline revision `6cfe720df1a981e8ce8bb053927aea20d12f105d`: neutral hierarchy, readable source/discussion, explicit status/limits, text change markers, visible source attribution and focus treatment. Automated keyboard/source-link interaction passed. This is implementer visual review, not human comprehension or physical touch/screen-reader acceptance.

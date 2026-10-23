@@ -1,6 +1,6 @@
 # Slice 02: continue the same review (480p)
 
-**Status:** Provisional; awaiting slice 01 evidence; implementation not started
+**Status:** Blocked for implementation on remaining slice 01 acceptance; code interfaces available
 
 **Parent:** [480p round plan](../../plan.md)
 
@@ -53,3 +53,17 @@ Then create/refine slice 03's bounded provisional page from its [roadmap invento
 Slice 01 preparation now supplies maintained [question/reply contracts](../../../../product/review-loop/contracts.md), [CLI/MCP delivery and uncertainty](../../../../product/review-loop/delivery.md) and an [independently reviewed design](../01-review-loop/reviews/design-readiness.md). Use these as the provisional continuation baseline; actual predecessor code, per-host product evidence and operational limitations still arrive after implementation.
 
 Carry forward two reviewed details: pairing consumes a challenge and creates a generation-bound attachment atomically; an answered question does not by itself resolve which CLI notification caused it. Continuation/restart must preserve both reply existence and independently unknown notification state. Reconcile delivered interfaces and tests against this design before implementing slice 02; do not mistake source readiness for predecessor product acceptance.
+
+## Slice 01 implementation contribution
+
+**Status:** Implemented interfaces and controlled-host checks available; predecessor acceptance still pending
+
+Use the maintained [runtime](../../../../product/review-loop/runtime.md), [contracts](../../../../product/review-loop/contracts.md) and [delivery](../../../../product/review-loop/delivery.md) as the operational baseline. The candidate adds strict TypeScript React, Node-owned SQLite aggregate/receipts, generation-scoped credentials, one-use connection-bound pairing, durable addressed inbox/cursors and notification attempts, minimum-revision reads, managed routes and task-owned start/stop.
+
+Reusable checks are in `tests/storage.test.ts`, `tests/delivery.test.ts`, `tests/application.test.ts`, `tests/runtime.test.ts` and `tests/review.e2e.ts`. The controlled-host browser journey proves basic restart with retained source/question/reply and no duplicate notification. It does not prove the full slice 02 reopen/new-head interaction, actual Codex/Claude continuation or human comprehension.
+
+Preserve two independent facts in future read models: reply existence and the original notification outcome. An unknown claim never becomes notified merely because manual polling yielded a reply. A stopped process preserves unknown external effects. Attachment replacement/revoke advances generation and stale writes reject at apply; new-head source identity must be separately designed rather than mutating historical anchors. The bounded preparation defaults to pinned PR 14 and also accepts an explicit owner-supplied one-path immutable specification for another real PR in this same repository; use a fresh data root. Discovery and general import remain deferred.
+
+The independently accepted predecessor code candidate is `e24ce7c465857f5f277f3926b01342628b7ddee7`; see its [final review receipt](../01-review-loop/reviews/implementation-e24ce7c.md). Reconcile remaining exact-session tool provisioning, Claude environment and unfamiliar-reviewer gates before implementing dependent behavior; predecessor implementation is not acceptance or successor readiness.
+
+The code milestone is independently accepted, but full predecessor native-host/dogfood/human acceptance remains open. This successor stays blocked for implementation; do not infer readiness from merged code or the 19 passing engineering tests and two controlled-host Chrome journeys.

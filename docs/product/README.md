@@ -10,4 +10,4 @@ This is the durable product specification: what PR Reviewer does, why, and how i
 
 Add user stories, detailed interaction rules, interfaces and low-level design decisions beside their owning subsystem as evidence and accepted scope establish them. After every slice, reconcile learning here before acceptance. Keep execution assignments and historical checklists in [plans](../plans/README.md), and shared workflow requirements in [rules](../rules/README.md).
 
-These documents distinguish accepted direction from unimplemented or unverified behavior; no running product or successful reimplementation is claimed.
+These documents distinguish accepted direction from unimplemented or unverified behavior; the bounded local review-loop candidate and controlled-host tests are documented, while native-host acceptance and successful reimplementation remain unproven.

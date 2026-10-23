@@ -1,6 +1,6 @@
 # Slice 01 independent-review handoff
 
-**Status:** Procedure ready; bind the actual candidate and reviewer at review dispatch
+**Status:** Independent code delivery accepted at e24ce7c; remaining native-host/dogfood/human acceptance open
 
 **Role:** Reviewer other than the implementer; read-only by default
 
@@ -24,3 +24,23 @@ Read the [product story](../../../../../product/review-loop/README.md), [public/
 - Is durable product knowledge complete enough to rederive accepted behavior without the old execution plan, and did slice 02 receive predecessor findings?
 
 Inspect actual changes and reproduce appropriate checks within authorized scope, not merely the implementer's report. Return findings with source/evidence, severity and affected acceptance, checks performed, residual limits and accept/changes-needed/blocked disposition. Fixes change the candidate; require affected checks/review again. No historical architecture review or preparation experiment passes the new product candidate automatically.
+
+## Implemented candidate packet
+
+**Status:** Implementation milestone ready for owner-dispatched independent code review; full slice acceptance remains pending
+
+**Diff base:** `cf179ac1eeb9073c08e4e82c950cb53bdc681c72`
+
+**Candidate:** Root supplies the exact committed milestone containing [implementation evidence](../implementation-evidence.md), its PR and current head at dispatch. Do not review an unpinned evolving working tree.
+
+Run instructions are in the maintained [runtime guide](../../../../../product/review-loop/runtime.md). The evidence record maps the actual strict check, 19 domain/interface/process tests and one controlled-host React/MCP browser journey to 01-A through 01-G. The screenshot and native diagnostics have durable external archive paths and hashes. Native Codex tool registration/own-turn product evidence, real Claude path, real-host own-PR dogfood and unfamiliar-reviewer comprehension remain open. Root browser-policy rejection is preserved rather than bypassed.
+
+Prioritize command/receipt rejection atomicity, source/anchor immutability, connection-bound challenge consume, owner metadata trust/provisioning, stale capability fences, unknown attempts without replay, same-turn MCP progress, managed route lifetimes and owned process shutdown. Check that no fixture result is described as native or human acceptance. Reviewer is read-only; return concrete findings and their acceptance impact to root. Root owns all Git publication/merge and final acceptance decisions.
+
+The independent review of the initial implementation and recovery candidate is [recorded here](../reviews/implementation-4dae178.md). The subsequent explicit manual-source option must be reviewed as its own delta, especially source-spec pinning/restart and target-derived UI/pairing scope.
+
+The manual-source delta review and boundary findings are [recorded separately](../reviews/manual-source-98e0032.md). The focused blob/UTF-8 and foreign-Git data-root fixes require final independent revalidation against the owner-dispatched exact commit. Root owner-operated actual MCP source-read evidence is recorded in the implementation evidence without promoting it to native tool/UI/CLI acceptance.
+
+## Final independent disposition
+
+Independent Astra review accepts code delivery at `e24ce7c465857f5f277f3926b01342628b7ddee7`, with no unresolved blocking engineering findings. Strict checks, all 19 tests and both Chrome journeys independently passed; source-byte and foreign-Git/metadata/symlink boundary cases were independently reproduced. The [final receipt](../reviews/implementation-e24ce7c.md) preserves scope and limits. Later documentation-only recording does not change the code/test candidate. Root now owns the product writer role and Git/local-pilot delivery; full slice acceptance and slice 02 remain blocked on the explicitly open native-host/dogfood/comprehension gates.
