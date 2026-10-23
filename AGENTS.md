@@ -1,6 +1,7 @@
 # Working in PR Reviewer
 
 - Keep repository content in English.
+- Prefer arrow functions. Use function declarations only when required.
 - Name new branches descriptively without a `codex/` prefix. Do not rename existing branches solely for this preference.
 - Make changes and commits on task branches in isolated worktrees. Never commit directly to main or push directly to main.
 - Every change must enter main through a GitHub pull request. Do not merge task branches directly into local main. After the PR is merged, refresh clean local main only by fast-forwarding from origin/main.
