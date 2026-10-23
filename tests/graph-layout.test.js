@@ -1,0 +1,6 @@
+import {test,expect} from 'bun:test';
+import {layoutGraph,graphBounds} from '../src/graph-layout';
+const nodes=['run','stop','decide','verify'].map(id=>({id}));
+test('horizontal call edges connect exact node ports',()=>{const model=layoutGraph(nodes,true,false);expect(model.edges).toHaveLength(3);for(const [i,e] of model.edges.entries()){expect(e.start.x).toBe(model.nodes[i].x+model.nodes[i].width/2);expect(e.end.x).toBe(model.nodes[i+1].x-model.nodes[i+1].width/2);expect(e.start.y).toBe(e.end.y);expect(e.end.x).toBeGreaterThan(e.start.x);}});
+test('mobile call edges connect bottom to next top',()=>{const model=layoutGraph(nodes,true,true);for(const [i,e] of model.edges.entries()){expect(e.start.y).toBe(model.nodes[i].y-model.nodes[i].height/2);expect(e.end.y).toBe(model.nodes[i+1].y+model.nodes[i+1].height/2);expect(e.start.x).toBe(e.end.x);expect(e.start.y).toBeGreaterThan(e.end.y);}});
+test('generic imported files do not invent call edges',()=>{const model=layoutGraph(nodes,false,false);expect(model.edges).toEqual([]);const b=graphBounds(model.nodes);for(const n of model.nodes){expect(n.x-n.width/2).toBeGreaterThanOrEqual(b.left);expect(n.y+n.height/2).toBeLessThanOrEqual(b.top);}});
