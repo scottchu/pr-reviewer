@@ -1,0 +1,20 @@
+{
+  "name": "slice01-preparation-experiment",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "test": "bun test",
+    "check": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "1.32.2",
+    "@types/bun": "1.4.4",
+    "@types/react": "19.3.0",
+    "@types/react-dom": "19.3.0",
+    "playwright": "1.64.1",
+    "react": "19",
+    "react-dom": "19",
+    "typescript": "7.0.2",
+    "zod": "4.6.7"
+  }
+}
