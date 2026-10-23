@@ -10,7 +10,7 @@
 
 The product targets React; this contract does not require a framework-agnostic core or separate core/React packages. Pure domain functions and public subsystem interfaces keep responsibilities testable and effects controlled; they do not commit the product to supporting another framework. React-specific presentation hooks and bindings are appropriate within these boundaries.
 
-Prefer functional patterns over classes, without banning classes where justified. Choose React patterns according to the actual requirement; no particular component customization pattern is prescribed. UI composition must not own domain policy or bypass managed subscription routes. Strict TypeScript is an accepted implementation convention; lint/format tool selection is deferred. For the remaining conventions, see the [architecture conventions](architecture.md#implementation-conventions). No compiler/linter configuration or runtime implementation exists yet.
+Prefer functional patterns over classes, without banning classes where justified. Choose React patterns according to the actual requirement; no particular component customization pattern is prescribed. UI composition must not own domain policy or bypass managed subscription routes. Strict TypeScript is an accepted implementation convention; lint/format tool selection is deferred. For the remaining conventions, see the [architecture conventions](../rules/development.md#implementation-conventions). No compiler/linter configuration or runtime implementation exists yet.
 
 ## Responsibility before library choice
 

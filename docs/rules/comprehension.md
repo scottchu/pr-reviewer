@@ -1,14 +1,14 @@
 # Comprehension acceptance before presentation
 
-**Status:** Protocol proposed; real change, expected account, evaluator and threshold unresolved
+**Status:** Evaluation guidance; default task profile, rubric, session and thresholds remain proposals
 
-**Parent:** [Product roadmap](roadmap.md)
+**Parent:** [Shared rules](README.md)
 
 **Owner:** Maintainer selects the evaluation scope and accepts the criterion; implementing agent prepares source evidence; an unfamiliar reviewer supplies human-use evidence
 
 ## Gate and purpose
 
-The [vision](../vision.md) asks whether a reviewer understands changed behavior and the basis for a decision. Before implementing a slice's presentation, record its representative task, source-backed expected account and pass/fail criterion. Defining success after seeing the UI would allow the presentation to redefine the goal.
+The [vision](../product/vision.md) asks whether a reviewer understands changed behavior and the basis for a decision. Before implementing a slice's presentation, record its representative task, source-backed expected account and pass/fail criterion. Defining success after seeing the UI would allow the presentation to redefine the goal.
 
 The following defaults are concrete proposals, not accepted user choices. Resolve them for slice 01 before its implementation. The host-only probe needs no UI or comprehension evaluation and can proceed independently once authorized. Later slices extend the same protocol with their new outcome before dependent presentation work; they do not retroactively change an earlier result.
 
@@ -26,7 +26,7 @@ Before implementation, populate a small packet in the slice document or a linked
 4. At least one limitation the reviewer should recognize, such as an unresolved relationship or an unexecuted test; the account must not invent certainty.
 5. The exact reviewer task, permitted context, time budget, rubric, chosen threshold and evaluator. A source-informed maintainer/reviewer checks the expected account before it becomes the answer key; the agent's generated explanation is not its own ground truth.
 
-The exact expected account is currently **absent because no PR/trigger is selected**. That is an explicit pre-implementation gap, not a passing generic answer key.
+An absent selected PR/trigger or expected account is an explicit pre-implementation gap, not a passing generic answer key.
 
 Avoid making the first implementation depend on its own not-yet-existing final PR head: select an existing own PR, including a source-backed documentation change, for the pre-implementation packet. The eventual own-PR dogfood run may use that same qualifying PR or the new slice PR. For a new target, record its exact expected account before the run and before any presentation revision driven by it; do not grade against an answer invented after observing the result.
 
@@ -57,14 +57,6 @@ Run an implementer self-check first to catch broken presentation and a faulty an
 | 1080p / 06–08 | Challenge one claim using execution/comparison evidence and explain what a retained correction changes. | Actual source/environment/result provenance; expected evidence limits and correction history. |
 | 4K / 09–12 | Complete the same reasoning task on a denser PR, phone/assistive setup, after interruption or in one selected additional context. | Predeclared task, accessibility, recovery and latency budgets for the selected conditions; separate human/device/engineering evidence. |
 
-## Decisions required and impact
+## Round-specific evaluation packets
 
-| Decision / current status | Owner | Blocks |
-|---|---|---|
-| Exact PR, baseline/head, source span and input/trigger: unselected | Maintainer, with agent evidence preparation | First expected account and slice 01 implementation. |
-| Evidence-backed answer key: unwritten/unreviewed | Implementing agent drafts; source-informed maintainer/reviewer checks | Meaningful grading and presentation implementation. |
-| Unfamiliar reviewer, permitted assistance and session conditions: proposed only | Maintainer | Evaluation plan readiness; no human acceptance can be claimed without the session. |
-| Rubric threshold and time budget: proposed only | Maintainer | Slice 01 implementation readiness; later changes require an explicit prospective revision. |
-| Later dataset/device/budgets and extension target: unselected | Maintainer | Only the relevant later slice; not the host probe. |
-
-No comprehension session or product E2E has run. The next ready action is to select the first change and complete this packet in source docs; do not implement a presentation against an undefined expected account.
+Keep selected PRs, answer keys, evaluator decisions, conditions and actual results with their owning round or slice. The initial [480p evaluation packet](../plans/480p/evaluation.md) records unresolved first-round inputs. Later slices extend this protocol prospectively and keep their own evidence beside their plans.

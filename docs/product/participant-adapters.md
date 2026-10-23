@@ -51,7 +51,7 @@ Sources: [Codex MCP](https://learn.chatgpt.com/docs/extend/mcp?surface=cli), [Co
 
 Both adapters are required in the 480p round, rather than deferred as an additional host in 4K. Slice 01 has two independently testable host deliveries: **01-Codex** and **01-Claude**. Each implements the same bounded source → anchored question → originating session → MCP read/reply → authoritative UI answer journey on our own real PR. Either may be implemented first after its probe passes; one passing adapter does not claim the other works. These are variants of the existing capability slice, not horizontal adapter scaffolds.
 
-Run [probe 00](plans/probes/00-host-contract.md) independently for each actual host. Capability evidence is keyed by host/version/surface and binding; a failed host probe blocks that host's integration, not independently authorized work on the other. Both host deliveries and slice 02's continuation checks are required before claiming the full dual-host 480p outcome. Shared UI/domain tests can be reused; actual host-path acceptance cannot.
+Run [probe 00](../plans/480p/probes/00-host-contract.md) independently for each actual host. Capability evidence is keyed by host/version/surface and binding; a failed host probe blocks that host's integration, not independently authorized work on the other. Both host deliveries and slice 02's continuation checks are required before claiming the full dual-host 480p outcome. Shared UI/domain tests can be reused; actual host-path acceptance cannot.
 
 | Conformance check | Codex | Claude |
 |---|---|---|

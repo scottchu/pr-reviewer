@@ -2,11 +2,11 @@
 
 **Applies to:** Every product slice in every delivery round
 
-**Parent:** [Plans and slices](README.md)
+**Parent:** [Plans and slices](../plans/README.md)
 
 ## One authoritative plan, role-specific assignments
 
-Each slice page is the Git-tracked execution handoff packet. The maintained product docs outside plans are the durable specification; a packet coordinates work against them and does not replace them. Keep implementation and independent-review sections in that page, linking shared architecture, protocols and its parent round rather than copying them. Track packet revisions with Git; the dispatch identifies the exact committed plan revision, assigned role and permitted work. Refresh the packet when decisions, dependencies or candidate evidence change. A template or unresolved field is not a ready assignment.
+Each slice page is the Git-tracked execution handoff packet. Keep it at `docs/plans/<round>/slices/<slice>/plan.md`; if separate handoff or review files become useful, keep them in that same slice directory (for example handoffs/implementation.md and reviews/<candidate>.md) and link them from the plan. Round-wide review records stay under the owning round’s reviews/ directory. The maintained product docs outside plans are the durable specification; a packet coordinates work against them and does not replace them. Keep implementation and independent-review sections in that page, linking shared architecture, protocols and its parent round rather than copying them. Track packet revisions with Git; the dispatch identifies the exact committed plan revision, assigned role and permitted work. Refresh the packet when decisions, dependencies or candidate evidence change. A template or unresolved field is not a ready assignment.
 
 For each assigned agent, identify its owner/role, repository and exact task worktree/branch, permitted writes or read-only scope, required source documents, dependencies, observable outcome, stop conditions and required return. Do not rely on access to the original chat. No packet grants broader runtime, session, merge or installation authority than the current task. Do not put credentials or private conversation content in Git.
 
