@@ -12,6 +12,54 @@ Keep domain decisions in small deterministic functions over explicit immutable i
 
 A scoped application/adapter layer owns effects: transactions, streams, host delivery, process supervision and cleanup. Reactive coordination combines committed updates, manages subscriptions and connection lifecycle, and delivers view snapshots. UI subscribes to those snapshots and submits intent. It does not hide domain rules in stream operators or component hooks. Use explicit public subsystem interfaces; do not leak a particular reactive library through every domain type.
 
+## Bundle cross-subsystem streams at a controlled boundary
+
+Cross-subsystem streams must pass through a declared stream integration layer. Keep the wiring together at the application composition boundary, with typed routes, a subscription registry and scoped lifecycle ownership. Do not scatter subscriptions between another subsystem's internal modules.
+
+A module in subsystem A must not directly subscribe to a module, Subject, Observable or internal store in subsystem B, and vice versa. Export library-neutral public event/query ports; compose them only through the integration layer. Business modules neither import each other's reactive internals nor create hidden cross-subsystem subscriptions in constructors, hooks or helpers. Private streams may remain within a subsystem, but cannot become an alternate integration path. Components consume the approved view-store bridge rather than assembling their own cross-system pipelines.
+
+```mermaid
+flowchart LR
+  A[Subsystem A public output] --> Routes[Declared integration routes]
+  B[Subsystem B public output] --> Routes
+  Routes --> Views[Authorized view-store adapters]
+  Routes --> Reactions[Owned application reactions]
+  Reactions --> Commands[Unified durable command ingress]
+  Routes --> Registry[Subscription lifecycle / diagnostics]
+```
+
+The integration layer owns connection topology and lifecycle, not domain decisions. Domain writes still use durable command ingress, and host/process effects stay with their existing responsible adapters. This is one controlled composition policy with bounded routes per scope, not one global Subject, one serial subscription, or a new distributed message broker. Independent review/job channels retain concurrency and fault isolation.
+
+## Registration, ownership and monitoring
+
+Keep route declarations together and make every cross-subsystem subscription visible in the registry before activation. A registration records:
+
+| Field | Required contract |
+|---|---|
+| Route and identity | Stable route/subscription ID, producer/consumer public ports, typed event/query contract and supported version. |
+| Scope and access | Owning application lifecycle, review/project/participant scope and authorization filtering. A shared stream must not broadcast another review's private data. Revocation/replacement stops access and fences late emissions. |
+| Lifetime | Creation/activation, explicit owner, reconnect behavior, teardown and terminal/disposed state. No orphan or duplicate active registration for the same logical connection. |
+| Delivery policy | Ordering boundary, bounded buffer/slow-consumer policy, safe read retry limits and durable cursor/reconciliation source where applicable. |
+| Diagnostics | Active/created/disposed counts, reconnect/error counts, lag/buffer pressure, terminal reason and causation/correlation references. |
+
+Use one managed entry point for registration and teardown; keep the allowed producer→consumer graph inspectable. An undeclared route is rejected, not silently activated. Scope disposal removes its listeners and prevents later emissions from updating a replaced attachment or view. Repeated UI mounts or subscribers cannot launch another process or agent turn.
+
+Monitor the connection graph and lifecycle centrally, while isolating failures to the affected route. Log identifiers and bounded diagnostics rather than credentials, raw conversation contents or unrestricted cross-review payloads. Diagnostic counts establish subscription state, not external job success. Failures of durable delivery remain recorded/recoverable; monitoring must not swallow them or turn them into silent data loss.
+
+Do not create automatic cross-subsystem feedback loops. Any intentional event→command→event workflow is explicitly declared, has causation/deduplication and termination conditions, and is validated as a domain workflow. Reactive operators do not invent implicit reciprocal subscriptions or wake loops.
+
+## Test the wiring as a first-class boundary
+
+From the first cross-subsystem stream, the responsible slice includes:
+
+- Import/dependency checks reject direct imports of another subsystem's reactive internals; unit tests use public-port test doubles without bypassing the production integration route.
+- Route tests reject undeclared wiring and unauthorized project/review subscriptions. Both directions of any permitted interaction are visible in the topology.
+- Lifecycle tests exercise mount/unmount, scope disposal, attachment replacement, disconnect/reconnect and repeated subscriptions. Active counts return to the expected baseline; disposed scopes ignore late emissions and create no duplicate external effects.
+- Fault/slow-consumer tests prove bounded buffering, observable errors and independent-channel progress. Only replaceable presentation updates may coalesce/drop; accepted commands, inbox items and evidence remain durably recoverable.
+- Actual own-PR E2E exercises the slice through the managed routes and inspects subscription diagnostics before/after teardown. Virtual-time tests supplement, not replace, real-host/process evidence.
+
+Implement the smallest registry and route declarations needed by the current slice. This rule does not justify building a generic observability console or stream platform before the first useful journey. Library choice must preserve this contract whether it is RxJS, Effect or native streams.
+
 ## Where reactive behavior belongs
 
 - Present committed review updates and job progress without conflating receipt, delivery, start and completion.
