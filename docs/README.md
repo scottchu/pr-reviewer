@@ -17,7 +17,7 @@ Documents state intent and preserve knowledge; observed behavior and test eviden
 ## Current source documents
 
 - [Product vision](vision.md): purpose and the experience of understanding a PR.
-- [High-level design](architecture.md): system responsibilities, relationships and boundaries.
+- [High-level design](architecture.md): system responsibilities, relationships and boundaries, plus accepted strict TypeScript, functional, Biome and React-specific implementation conventions; render props where useful, with no framework-agnostic requirement.
 - [Participant adapters](participant-adapters.md): attach the originating Codex or Claude session to current work.
 - [Functional/reactive design](reactive-design.md): pure domain decisions, effect boundaries and stream-library selection.
 - [Product roadmap](plans/roadmap.md): progressively useful rounds and acceptance gates.
