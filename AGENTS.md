@@ -3,10 +3,12 @@
 - Keep repository content in English.
 - Prefer arrow functions. Use function declarations only when required.
 - All code must be tested. Prefer test-driven development (TDD).
+- Include end-to-end tests for implemented user journeys. Use decompozr/design-system for UI and include its actual integration in end-to-end coverage.
 - Name new branches descriptively without a `codex/` prefix. Do not rename existing branches solely for this preference.
 - Make changes and commits on task branches in isolated worktrees. Never commit directly to main or push directly to main.
 - Every change must enter main through a GitHub pull request. Do not merge task branches directly into local main. After the PR is merged, refresh clean local main only by fast-forwarding from origin/main.
 - Build the project from the top down: vision, product goals and user experience, requirements, system design, then implementation. Develop and commit each meaningful step as it is discussed; do not generate the whole documentation hierarchy in advance.
+- Keep all project plans and individual slices in Git-tracked docs/plans/. Link slices to their parent plan and record scope, acceptance, testing, progress, evidence and unresolved gaps. Do not keep plans or slices in .decompozr/ or only in chat.
 - Start with README.md and AGENTS.md. Add documents under docs/ gradually, beginning with the vision. Keep README user-facing and put agent workflow rules here.
 - Separate dates, statuses, and technology layers into clearly labeled entries. Do not compress them into one sentence.
 - Carry prior user decisions as context, while distinguishing accepted direction, proposals, observed evidence, and unknowns. Later user corrections take precedence.
