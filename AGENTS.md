@@ -18,6 +18,7 @@
 - Separate dates, statuses, and technology layers into clearly labeled entries. Do not compress them into one sentence.
 - Carry prior user decisions as context, while distinguishing accepted direction, proposals, observed evidence, and unknowns. Later user corrections take precedence.
 - Do not restore the previous application or introduce dependencies, build output, or a technical scaffold before its implementation scope is established.
-- The earlier prototype is available at /Users/scottchu/.codex-workspaces/worktrees/ios-e7be5006-595e-43b0-8489-86257dc88f00/playground/experiments/pr-diff-teacher, pinned at Playground commit 223073c353e45969e189504648d522f2f096147b. Consult it when useful; preserve that source and its runtime artifacts.
+- The retained prototype reference is /Users/scottchu/projects/decompozr/playground/experiments/pr-diff-teacher. Its original pinned source snapshot is Playground commit 223073c353e45969e189504648d522f2f096147b; do not assume the evolving main checkout is identical to that snapshot.
+- Private source evidence and handoff history are retained at /Users/scottchu/.codex-workspaces/artifacts/pr-diff-teacher-2026-10-23, including receiver-context-readback.md and source-conversation-history.md. Use this archive for any additional historical readback. Do not read or write the retired source worktree or its former handoff location. PR Reviewer and Playground have separate product writers.
 - Keep .decompozr/ ignored and untracked. Its local contents have been cleared; do not assume old handoff files are available there or recreate them without a current need.
 - Preserve unrelated work and credentials. Keep generated files, secrets and local runtime state out of Git.
