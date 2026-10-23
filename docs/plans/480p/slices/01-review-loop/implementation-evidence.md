@@ -2,13 +2,13 @@
 
 **Date:** 2026-10-23
 
-**Status:** Local implementation milestone; slice acceptance pending
+**Status:** Code delivery independently accepted at e24ce7c; full slice acceptance pending
 
 **Owner:** Assigned implementation worker; root owns independent review and Git delivery
 
 **Source packet:** `cf179ac1eeb9073c08e4e82c950cb53bdc681c72`
 
-**Candidate:** The committed milestone containing this record; root supplies its exact Git object in review dispatch. Worktree and branch are recorded in the [plan](plan.md). The development checks ran against the then-uncommitted task tree; root must verify the pinned committed candidate for publication. Runtime manifests record `sourceCommit` and `sourceDirty` separately. This is a task-branch test build, not a deployed release.
+**Code candidate:** `e24ce7c465857f5f277f3926b01342628b7ddee7`, independently accepted. This final record is a documentation-only followup; runtime/code checks remain attributed to that exact candidate. Worktree and branch are recorded in the [plan](plan.md). The development checks ran against the then-uncommitted task tree; root must verify the pinned committed candidate for publication. Runtime manifests record `sourceCommit` and `sourceDirty` separately. This is a task-branch test build, not a deployed release.
 
 ## Delivered behavior
 
@@ -86,3 +86,9 @@ The [independent manual-source review](reviews/manual-source-98e0032.md) of `98e
 Root ran clean candidate `98e00325e5fd55f3d6c146c76cfc1055fb63cb73` with `sourceDirty: false`, a genuine external PR 19 data root and gateway health 200. Owner pairing independently compared its native process context to existing session metadata, then the actual stdio SDK client called session_attach and review_get. Attachment generation 1, the durable receipt and initial inbox cursor zero were returned without a model-visible capability. The source query returned PR 19 base `cf179ac1eeb9073c08e4e82c950cb53bdc681c72`, head `4dae178a4302bfdd161fca5be78144c63f562c30`, snapshot `4be4da3b32375e25cef6756841c0f7dac707e4cb9f6d770240b87e47c5fab363` and line 99 supporting the predeclared recovery account. Root stopped the verified owned runtime cleanly and retained its accepted data for recovery.
 
 Five noncredential raw evidence files are SHA-verified in `/Users/scottchu/.codex-workspaces/artifacts/pr-reviewer-slice01-implementation-2026-10-23`, prefixed `root-98e-` with manifest `root-98e.sha256.json`. Native thread IDs and owner metadata remain outside Git. This observation establishes trusted local-owner pairing and an actual MCP source read. It does **not** establish native dynamically registered tools, CLI wake, a UI loop, a persisted question/reply or full dogfood. The native Code Mode negotiation and browser-policy limits remain unchanged. It is historical evidence for 98e, not an unperformed run of the repaired candidate.
+
+## Final independent code acceptance and handback
+
+Independent Astra review accepted code delivery at `e24ce7c465857f5f277f3926b01342628b7ddee7` with no remaining blocking engineering findings. The reviewer independently passed strict checks, all 19 tests and both Chrome journeys and reproduced blob/strict-UTF-8 and other-repository/metadata/symlink data-root boundaries. The exact disposition and limits are in the [final review receipt](reviews/implementation-e24ce7c.md). This final documentation-only commit adds no code/test changes and does not claim a new runtime run.
+
+The implementer releases sole product writer ownership to root. Root owns PR 19 publication/merge and the authorized runnable milestone/local pilot. All full native Codex/Claude integration, complete native implementation-PR dogfood and unfamiliar-reviewer gates remain open. Slice 02 remains blocked. Accepted code delivery is not full slice acceptance.

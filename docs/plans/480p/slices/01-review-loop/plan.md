@@ -1,6 +1,6 @@
 # Slice 01: ask about one real behavior (480p)
 
-**Status:** Local implementation milestone and controlled-host checks complete; independent code review and full product acceptance pending
+**Status:** Runnable code delivery independently accepted at e24ce7c; full native-host, dogfood and human slice acceptance pending
 
 **Parent:** [480p round plan](../../plan.md)
 
@@ -82,7 +82,7 @@ At implementation dispatch, follow the execution and handoff packets: (1) derive
 
 The effort boundary is one behavior, one snapshot, one responsible conversation and one complete question/reply journey. Stop dependent work and revise the source contract if host behavior contradicts the probe, identity/source evidence cannot be verified, or the agreed expected account is wrong or incomplete. Preserve accepted questions and unknown invocation references for reconciliation; do not broaden into a new host, analyzer, runner or permissions workaround to finish the slice.
 
-The [implementation evidence](implementation-evidence.md) records passing strict checks, domain/interface/process tests and a controlled-host React/stdio MCP journey against PR 14. Full 01-A through 01-G acceptance remains unmet: actual native-host tool integration, real-host own-PR dogfood, unfamiliar-reviewer comprehension and independent code review remain explicit gates. This is a task-branch test candidate, not a deployed release.
+The [implementation evidence](implementation-evidence.md) records passing strict checks, domain/interface/process tests and a controlled-host React/stdio MCP journey against PR 14. Full 01-A through 01-G acceptance remains unmet: actual native-host tool integration, real-host own-PR dogfood and unfamiliar-reviewer comprehension remain explicit gates. Independent code delivery is accepted for `e24ce7c465857f5f277f3926b01342628b7ddee7` in the [final review receipt](reviews/implementation-e24ce7c.md). This is a task-branch test candidate, not a deployed release.
 
 ## Agent handoffs and successor contribution
 
@@ -105,3 +105,7 @@ Then update [slice 02](../02-review-continuation/plan.md) with the actual snapsh
 **Task worktree:** /var/folders/7q/rjwxsm_s54s17s8mn083p71h0000gn/T/pr-reviewer-slice01-u3qgyrnv/worktree
 
 **Model selection:** gpt-6.1-sol, high effort, fresh context; cohesive full-stack slice with explicit source contracts. Escalate concrete contract/security defects to owner; do not invent weaker acceptance.
+
+## Writer handback and milestone disposition
+
+The assigned implementer releases sole product/code writer ownership to root after the documentation-only final review receipt. The exact independently reviewed code candidate is `e24ce7c465857f5f277f3926b01342628b7ddee7`; 19 domain/interface/process tests, strict checks and both Chrome journeys independently passed. Root owns PR 19 delivery, the authorized runnable milestone/local pilot and remaining acceptance. No full slice acceptance or slice 02 readiness is granted.

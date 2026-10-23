@@ -1,6 +1,6 @@
 # Slice 01 independent-review handoff
 
-**Status:** Procedure ready; bind the actual candidate and reviewer at review dispatch
+**Status:** Independent code delivery accepted at e24ce7c; remaining native-host/dogfood/human acceptance open
 
 **Role:** Reviewer other than the implementer; read-only by default
 
@@ -40,3 +40,7 @@ Prioritize command/receipt rejection atomicity, source/anchor immutability, conn
 The independent review of the initial implementation and recovery candidate is [recorded here](../reviews/implementation-4dae178.md). The subsequent explicit manual-source option must be reviewed as its own delta, especially source-spec pinning/restart and target-derived UI/pairing scope.
 
 The manual-source delta review and boundary findings are [recorded separately](../reviews/manual-source-98e0032.md). The focused blob/UTF-8 and foreign-Git data-root fixes require final independent revalidation against the owner-dispatched exact commit. Root owner-operated actual MCP source-read evidence is recorded in the implementation evidence without promoting it to native tool/UI/CLI acceptance.
+
+## Final independent disposition
+
+Independent Astra review accepts code delivery at `e24ce7c465857f5f277f3926b01342628b7ddee7`, with no unresolved blocking engineering findings. Strict checks, all 19 tests and both Chrome journeys independently passed; source-byte and foreign-Git/metadata/symlink boundary cases were independently reproduced. The [final receipt](../reviews/implementation-e24ce7c.md) preserves scope and limits. Later documentation-only recording does not change the code/test candidate. Root now owns the product writer role and Git/local-pilot delivery; full slice acceptance and slice 02 remain blocked on the explicitly open native-host/dogfood/comprehension gates.

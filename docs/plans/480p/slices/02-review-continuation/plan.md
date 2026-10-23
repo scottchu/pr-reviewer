@@ -1,6 +1,6 @@
 # Slice 02: continue the same review (480p)
 
-**Status:** Provisional; awaiting slice 01 evidence; implementation not started
+**Status:** Blocked for implementation on remaining slice 01 acceptance; code interfaces available
 
 **Parent:** [480p round plan](../../plan.md)
 
@@ -64,4 +64,6 @@ Reusable checks are in `tests/storage.test.ts`, `tests/delivery.test.ts`, `tests
 
 Preserve two independent facts in future read models: reply existence and the original notification outcome. An unknown claim never becomes notified merely because manual polling yielded a reply. A stopped process preserves unknown external effects. Attachment replacement/revoke advances generation and stale writes reject at apply; new-head source identity must be separately designed rather than mutating historical anchors. The bounded preparation defaults to pinned PR 14 and also accepts an explicit owner-supplied one-path immutable specification for another real PR in this same repository; use a fresh data root. Discovery and general import remain deferred.
 
-The owner will bind the actual reviewed candidate commit and review/native-host evidence in the predecessor packet. Reconcile remaining exact-session tool provisioning, Claude environment and unfamiliar-reviewer gates before implementing dependent behavior; predecessor implementation is not acceptance or successor readiness.
+The independently accepted predecessor code candidate is `e24ce7c465857f5f277f3926b01342628b7ddee7`; see its [final review receipt](../01-review-loop/reviews/implementation-e24ce7c.md). Reconcile remaining exact-session tool provisioning, Claude environment and unfamiliar-reviewer gates before implementing dependent behavior; predecessor implementation is not acceptance or successor readiness.
+
+The code milestone is independently accepted, but full predecessor native-host/dogfood/human acceptance remains open. This successor stays blocked for implementation; do not infer readiness from merged code or the 19 passing engineering tests and two controlled-host Chrome journeys.
