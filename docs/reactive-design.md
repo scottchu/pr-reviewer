@@ -6,6 +6,12 @@
 
 **Implementation:** Not started
 
+## React-specific design and functional preference
+
+The product targets React; this contract does not require a framework-agnostic core or separate core/React packages. Pure domain functions and public subsystem interfaces keep responsibilities testable and effects controlled; they do not commit the product to supporting another framework. React-specific presentation hooks and bindings are appropriate within these boundaries.
+
+Prefer functional patterns over classes, without banning classes where justified. Render props may customize presentation when useful, but do not own domain policy or bypass managed subscription routes. Strict TypeScript and Biome are accepted implementation conventions; see the [architecture conventions](architecture.md#implementation-conventions). No compiler/linter configuration or runtime implementation exists yet.
+
 ## Responsibility before library choice
 
 Keep domain decisions in small deterministic functions over explicit immutable inputs. A transition produces the next state and declared event/job intent, or a typed rejection. The dispatcher performs fresh authorization/revision checks and commits the transition and receipts atomically. Time, identity, external observations and randomness are explicit inputs; pure functions do not read a database, launch a process or call a host.
