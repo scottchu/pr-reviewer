@@ -1,6 +1,8 @@
 # Working in PR Reviewer
 
 - Keep repository content in English.
+- Treat docs/ as the repository source code and authoritative specification. The agent derives and compiles all other project artifacts from it, including application code, tests, schemas and configuration. Follow docs/README.md for the documentation-to-delivery contract.
+- Before changing derived artifacts, update the relevant docs with accepted intent, decisions and slice acceptance. Trace implementation and tests to those docs; return findings, evidence and corrections to docs as work proceeds. Do not let chat or implementation become a competing source of truth.
 - Prefer arrow functions. Use function declarations only when required.
 - All code must be tested. Prefer test-driven development (TDD).
 - Isolate each subsystem with clear responsibilities and explicit public interfaces. Access other subsystems through those interfaces rather than their internal implementation.

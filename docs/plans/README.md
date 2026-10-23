@@ -1,5 +1,7 @@
 # Plans and slices
 
+Follow the [documentation-as-source contract](../README.md). Plans and slices are part of the source from which the agent derives implementation and tests.
+
 Keep all project plans and individual slices here, tracked in Git. Plans connect the product intent to a bounded sequence of work. Individual slice documents link back to their plan and make each piece independently understandable and verifiable.
 
 For each plan, record its goal, scope, decisions, sequence and current status. For each slice, record its intended outcome, dependencies, acceptance criteria, test approach, progress, verification evidence and remaining gaps. Update the existing documents as decisions and results change. Retain completed plans and slices as project history.
