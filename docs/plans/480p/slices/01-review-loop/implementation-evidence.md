@@ -92,3 +92,15 @@ Five noncredential raw evidence files are SHA-verified in `/Users/scottchu/.code
 Independent Astra review accepted code delivery at `e24ce7c465857f5f277f3926b01342628b7ddee7` with no remaining blocking engineering findings. The reviewer independently passed strict checks, all 19 tests and both Chrome journeys and reproduced blob/strict-UTF-8 and other-repository/metadata/symlink data-root boundaries. The exact disposition and limits are in the [final review receipt](reviews/implementation-e24ce7c.md). This final documentation-only commit adds no code/test changes and does not claim a new runtime run.
 
 The implementer releases sole product writer ownership to root. Root owns PR 19 publication/merge and the authorized runnable milestone/local pilot. All full native Codex/Claude integration, complete native implementation-PR dogfood and unfamiliar-reviewer gates remain open. Slice 02 remains blocked. Accepted code delivery is not full slice acceptance.
+
+## Private tailnet access followup
+
+**Verification date:** 2026-10-23
+
+**Status:** Host-side HTTPS and authentication verified; another-device browser use unverified
+
+At the user's request, the existing main-source pilot was exposed through the device's private Tailscale Serve HTTPS port 8472, proxying only loopback UI 5184. The exact MagicDNS hostname is allowlisted using Vite's documented environment option. Existing Serve handlers and Funnel configuration were compared with a retained baseline and remained unchanged; the new mapping has no Funnel access. The rollback removes only port 8472.
+
+Host-side HTTPS checks returned 200 for the app and JavaScript resources, 401 for an unauthenticated review query and 200 with the existing local-user credential for pinned PR 19 source. An unrelated Host header remained rejected with 403. Credentials were neither logged nor placed in URLs. The accepted runtime instructions are in [private tailnet preview](../../../../product/review-loop/runtime.md#optional-private-tailnet-preview). Private configuration/readback evidence is retained with the active pilot's runtime record and in the task artifact archive; it is not product source.
+
+This is network-access verification, not native participant, complete own-PR journey or unfamiliar-reviewer acceptance. The repository-path PR/MR entry requirement is captured in [the product story](../../../../product/review-loop/README.md#repository-path-entry); no new path/provider lookup or in-app discovery implementation is claimed.

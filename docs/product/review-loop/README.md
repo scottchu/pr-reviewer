@@ -14,6 +14,18 @@ The first task uses [PR 14](../../plans/480p/slices/01-review-loop/bootstrap-tas
 
 ## Interaction
 
+### Repository-path entry
+
+**Direction:** Accepted agent-assisted entry contract
+
+A reviewer can give the agent a local repository or worktree path instead of locating a PR/MR URL or assembling a source specification. Resolve that path to its actual Git worktree, current branch, upstream and remotes without switching branches or changing files. Use existing authenticated provider tools to find the corresponding GitHub pull request or GitLab merge request, including the correct source project/branch and target repository for forks. Do not assume every remote is GitHub or that every GitLab instance uses gitlab.com.
+
+Return the matched provider, project, PR/MR identity, URL, state and verified comparison base/head. Preserve the distinction between a current provider head and an already pinned review snapshot. Multiple plausible matches require presenting candidates; no match, a detached/default branch without a unique association, inaccessible metadata or unavailable authentication remains an explicit unresolved result. Never select the latest PR/MR merely because it exists, install a global tool silently, or print credentials embedded in remotes.
+
+This is the agent's source-acquisition responsibility; the reviewer should not have to supply an identifier when the path already resolves uniquely. The current application's derived preparation utility still accepts an explicit, manually verified pinned source specification. Automated in-app discovery and GitLab source import are not implemented or established by this entry contract. Once a path is supplied, verify provider metadata before claiming an actual match or preparing source; no path lookup has been exercised by this documentation change.
+
+### Anchored review
+
 1. Open the local app and the prepared review. Show PR identity, comparison base/head, both source sides and labeled additions/removals/modifications. Missing baseline context is visible, not invented.
 2. Attach from the already-running responsible session using the app's MCP operation surface. The local connection and one-use pairing challenge establish the actor/session binding; a browser cannot assign an arbitrary actor by submitting a string. Confirm the attached session before delivery.
 3. Select a nonempty exact source span. The composer states its side/path/line span and snapshot; editing or changing selection does not silently move an already-saved question.
