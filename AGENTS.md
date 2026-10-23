@@ -5,6 +5,7 @@
 - Before changing derived artifacts, update the relevant docs with accepted intent, decisions and slice acceptance. Trace implementation and tests to those docs; return findings, evidence and corrections to docs as work proceeds. Do not let chat or implementation become a competing source of truth.
 - Prefer arrow functions. Use function declarations only when required.
 - All code must be tested. Prefer test-driven development (TDD).
+- Dogfood every product slice using our own real PR before accepting it. Follow docs/plans/own-pr-dogfood.md: record the task, candidate build/source identity, pinned reviewed base/head, observed evidence and gaps; rerun affected checks after fixes. Same-agent dogfood does not establish unfamiliar-reviewer comprehension.
 - Isolate each subsystem with clear responsibilities and explicit public interfaces. Access other subsystems through those interfaces rather than their internal implementation.
 - Keep business logic in the responsible domain or application layer. UI components present state, collect user intent and delegate operations through those boundaries; do not concentrate business rules in UI components.
 - Include end-to-end tests for implemented user journeys. Use decompozr/design-system for UI and include its actual integration in end-to-end coverage.

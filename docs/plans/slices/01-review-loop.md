@@ -1,43 +1,71 @@
-# Slice 01: one real review loop (480p)
+# Slice 01: ask about one real behavior (480p)
 
-**Status:** Planned; implementation not started
+**Status:** Planned; blocked on named readiness inputs; implementation not started
 
-**Parent:** [Product roadmap](../roadmap.md)
+**Parent:** [Product roadmap — 480p](../roadmap.md#480p-understand-and-discuss-one-real-behavior)
 
 **Design:** [High-level design](../../architecture.md)
 
-**Owner:** Implementing agent; maintainer resolves product scope and host authorization gaps
+**Owner:** Implementing agent owns the slice; maintainer resolves material product, host and execution-scope decisions
 
-## Outcome
+**Authorization:** Documentation only. This contract does not start implementation, installation or deployment.
 
-A reviewer sees one pinned real behavior change, posts a question on its exact source context, and receives a source-backed reply from the responsible agent in the exact attached conversation. The reviewer can explain what changed and identify the evidence behind the answer.
+## Outcome and gap
 
-## Inputs and scope
+A reviewer sees one pinned real before/after behavior change, posts a question on its exact source context, and receives a source-backed reply from the responsible agent in the exact attached conversation. The reviewer can explain the difference, a relevant consequence and the evidence and uncertainty behind the answer. This first runnable slice must be dogfoodable on our own real PR under the [per-slice dogfood contract](../own-pr-dogfood.md).
 
-Before implementation, select one representative PR/snapshot and a minimal exact source span, verify repository access, identify the existing conversation host and its supported attachment/MCP/wakeup/reconciliation capabilities, and agree the local run target. No new host or permission is inferred from this plan.
+There is no application or observed host/product behavior in this repository. The [host contract probe](../probes/00-host-contract.md) establishes capability before this product path is built; it is not the comment/reply acceptance test. The [comprehension protocol](../comprehension.md) establishes the task and expected account before presentation implementation.
 
-Build only the minimum vertical path: readable source/context with actual design-system controls, stable authenticated participant/attachment, durable command/receipt and inbox, exact host adapter, bounded MCP reads/reply and authoritative UI readback. Use one behavior and a simple presentation; a full semantic canvas or general analyzer is unnecessary here. UI delegates domain operations through explicit subsystem interfaces.
+## Readiness inputs
 
-## Feasibility gate
+| Required input | Current status | Owner / next action |
+|---|---|---|
+| Probe evidence for real binding, MCP, invocation deduplication and uncertain-outcome reconciliation | Unrun; blocks product integration | Executor runs only after host/target and probe scope are established; fail/inconclusive does not unlock this slice. |
+| Own real PR/task, baseline/head, one source span and input/trigger | Unselected; planned slice PR may be named before it exists, but acceptance needs a real PR | Maintainer selects task; agent verifies source access and records candidate identity separately from target baseline/head. No fake PR or unsupported source identity. |
+| Expected account, evaluator and comprehension threshold | Proposed protocol; packet absent | Complete and accept the [evaluation packet](../comprehension.md) before implementation. |
+| Bounded local run target, host access and implementation scope | Unselected / not authorized | Maintainer establishes destination and scope. Existing technology direction alone is not runtime authority. |
 
-Bound the initial host-capability experiment to one local development session, recording actual identity, capability and invocation evidence before expanding scope.
+These inputs can be prepared in documentation without a scaffold. Source selection does not require a general language analyzer or configured repository test runner; those belong to later slices. Product tests for this slice still need an explicit test strategy before code is derived.
 
-- Pass: a real anchored comment causes the verified exact host turn to read that context via MCP, persist its reply through command ingress, and display the same reply in the UI.
-- Fail: wrong conversation, duplicate external execution, unauthorized/stale writes or evidence incorrectly labeled as delivered/answered. Repair the affected boundary before continuing.
-- Inconclusive: unavailable/unsupported host capability or uncertain launch outcome. Keep events pending/degraded or unknown; reconcile by invocation identity. Do not blindly resend or unlock direct-delivery acceptance.
+## Included path and boundaries
 
-## Acceptance and test approach
+1. Load one bounded real source snapshot prepared from verified baseline/head objects: enough before/after context for the chosen behavior and consequence, with immutable snapshot/side/path/span anchors. Show both sides, labeled additions/removals/modifications and explicit missing context. General PR import and semantic graph analysis are excluded.
+2. Present readable source and a question/reply surface using actual decompozr/design-system controls. Include basic keyboard access, focus and readable labels. UI collects intent and renders queries; review rules live in domain/application interfaces.
+3. Bind the authenticated user and responsible agent to the verified host conversation and attachment generation. Persist the anchored question through durable command ingress; atomically commit state, receipt and addressed event/outbox. Attachment, inbox and reply mutations use the same domain-write boundary. Reads use the authorized read model.
+4. Deliver only the eligible addressed request through a durable inbox and the verified host adapter. Persist a stable invocationId distinct from commandId before the external effect. Release the dispatcher transaction before host work; serialize conversation turns only. The turn must be able to issue MCP queries and commands without waiting on a lock it holds.
+5. Let that exact conversation read the pinned source/question through supported MCP and submit a source-backed reply through the same permitted domain actions. Recheck identity, permissions and attachment generation when the queued write applies. Do not trust caller-supplied actor strings.
+6. Read the reply from authoritative persisted state and display it with its source evidence and limitations. A receipt/query must meet the resulting revision/cursor or explicitly expose projection pending. A local optimistic echo or host transcript alone is not reply acceptance.
 
-Use TDD for domain transitions and adapter contracts, followed by end-to-end verification with the real host and real design-system integration. Record actual commands, source version, environment, artifacts and observed outcome; planned tests are not passing evidence.
+Persist basic inbox items, cursors, consumption and causal references so restart cannot lose accepted questions. Own replies and delivery receipts are ineligible wake triggers. Ordinary graph updates and subscribed terminal jobs are not implemented here; their wake policy remains governed by the architecture when introduced. Product labels distinguish saved, pending/delivered, turn started/completed and answered. Turn completion alone does not mean a reply exists.
 
-1. UI save, event delivery, turn start/completion, durable reply and browser adoption are distinguishable and evidenced.
-2. Identical command retry and crash/restart do not duplicate domain writes; changed-payload commandId reuse is rejected. Cursor recovery/coalescing retains every addressed item.
-3. Agent MCP commands can apply during its own turn; no domain lock or participant-wide lock is held across waits. A controlled independent long job does not block comments.
-4. Apply-time authorization and generation reject stale/revoked writes. Participant, turn, job and invocation identities remain distinct.
-5. Lost wakeup acknowledgement becomes reconciled or unknown, never blind replay. Own replies/graph updates/receipts do not trigger wake loops.
-6. Comment creation does not conflict with unrelated graph edits; relevant resource/graph CAS rejects genuine conflicts atomically. Queries meet receipt revisions or explicitly report projection pending.
-7. A reviewer can read the colored diff with labels and keyboard controls, ask a grounded question, inspect the answer and explain the behavior in their own words. Record gaps rather than claiming comprehension from successful transport.
+## Acceptance and verification
 
-## Exclusions and current evidence
+Use domain and adapter tests, preferably TDD, then the actual user journey. All code must be tested. Record the source version, host/environment, test commands, artifact references, observations and limits in this document as evidence arrives.
 
-No general PR analysis, selected repository test runner, production deployment, hosting, API enrichment service or full visual polish. Source and evidence anchors must still be truthful. No implementation checks have run for this slice; all acceptance above remains unmet. After the feasibility gate, reconcile results here and refine the next slice before expanding scope.
+| Acceptance | Required evidence |
+|---|---|
+| **01-A — A real anchored question gets an authoritative reply.** UI save → exact host turn → MCP source/question read → reply command → persisted query → browser display all refer to the same immutable anchor and attachment. | E2E with the actual design-system integration and real selected host; inspect the saved receipt and readback, not only rendered text. Separately identify accepted command, delivery, turn and answered states. |
+| **01-B — The agent can make progress during its own turn.** A real MCP read/reply command completes while that same host turn is active. | Real-turn evidence plus transaction/locking tests show no transaction or participant-wide command lock spans the host/MCP wait. A controlled slow adapter can test local lock behavior only; it cannot prove real-host progress or independent long-job behavior. |
+| **01-C — Retry and restart preserve one accepted mutation and every eligible item.** Identical command retry returns the original receipt; changed-payload commandId reuse is rejected. | Domain/adapter tests and persisted restart readback around comment/reply commit and inbox consumption. Recover cursors and coalesced addressed items without duplicate writes or lost questions. Slice 02 later expands this into the complete reopen/new-head user journey. |
+| **01-D — Invalid identity, generation and anchors cannot mutate the review.** Revoke permission or replace attachment while a write is queued; the old write fails at apply time. Wrong snapshot/side/path/span is rejected. | Negative domain/interface tests and authenticated boundary checks; reply remains attributed to the verified actor and original source. Rejections leave no partial state. Comments use anchor validation, not an unrelated graph-wide revision. |
+| **01-E — Uncertain wakeups remain honest.** Lost acknowledgement is queried/reconciled by invocationId or shown as unknown/pending, never blindly relaunched. Replies/receipts do not wake the agent again. | Product adapter fault tests using the proven host contract, real-host reconciliation evidence from the probe plus the integrated invocation/readback, and inbox eligibility tests. A fixture cannot establish missing host capabilities. |
+| **01-F — The reviewer can inspect and explain the result.** Keyboard navigation reaches source, question and answer; diff labels work without color alone; evidence links reach the original source. | Actual browser/design-system E2E for interaction plus the separately recorded unfamiliar-reviewer session against the predeclared [rubric](../comprehension.md). Unsupported/wrong substantive claims fail. Implementer self-check is separate evidence. |
+| **01-G — We can use the candidate to review our own PR.** Ask about one implemented behavior or source-backed changed-document claim in our actual slice PR and inspect the persisted answer and its source. | Record the real PR URL and exact baseline/head, candidate source/build/runtime identity, acquisition method, observed question/reply/readback, pass condition and gaps using the [dogfood record](../own-pr-dogfood.md). Manual pinned-source preparation is allowed; it proves neither a general importer nor unsupported code analysis/test execution. Fixes or head changes require relevant revalidation. Same-agent dogfood does not satisfy 01-F's unfamiliar-reviewer evidence. |
+
+## Deferred acceptance and exclusions
+
+- **Slice 02:** Full user-facing reopen/follow-up and a new pinned head, with old discussions retained historically. Basic persistence/restart correctness of this slice remains required now.
+- **Slice 03:** General PR import, whole-change coverage and the first real independent background job. Prove comments progress during that real job there. A simulated delay here is no substitute.
+- **Slice 04:** Semantic relationships, React Flow, shared graph annotations and atomic graph CAS/conflict behavior. No graph mutation exists here to claim tested; source anchors and comment concurrency remain required.
+- **Slice 06:** Configured repository tests, real process execution, job cancellation and terminal-outcome evidence. Slice 01 does not need a fake long-running job or a repository runner to prove the question/reply path.
+- **Later slices:** Whole-PR narration/player, enrichment, advanced zoom/mobile refinement, additional hosts/languages and mature performance. No production deployment, hosted agent runtime or external PR posting.
+
+These are feature deferrals, not architecture exceptions. Short atomic dispatch, independent jobs when introduced, action-specific CAS, turn-only serialization, apply-time authorization, stable external invocation identities and explicit unknowns remain required by the [design](../../architecture.md).
+
+## Delivery order, evidence and stop conditions
+
+After readiness and implementation authorization: (1) derive failing tests for the bounded source/command/attachment interfaces; (2) implement the minimum source-to-question-to-reply path through those public interfaces; (3) exercise the real host and design-system E2E, then the comprehension session; (4) reconcile observed gaps here before expanding into slice 02. Tests cover the responsible domain and application policies independently of UI adapters. The internal build steps are not separate horizontal product slices.
+
+The effort boundary is one behavior, one snapshot, one responsible conversation and one complete question/reply journey. Stop dependent work and revise the source contract if host behavior contradicts the probe, identity/source evidence cannot be verified, or the agreed expected account is wrong or incomplete. Preserve accepted questions and unknown invocation references for reconciliation; do not broaden into a new host, analyzer, runner or permissions workaround to finish the slice.
+
+All 01-A through 01-G evidence is currently **unrun/unmet**. No UI, MCP integration, database or runtime has started. No host probe, own-PR dogfood or comprehension session has passed. The next ready action is documentation of the required inputs, not application scaffolding. Deployment is N/A for the current documentation endpoint; any later implementation contract must name its authorized target and actual live acceptance.
