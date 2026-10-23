@@ -10,6 +10,10 @@
 
 **Authorization:** Documentation only. This contract does not start implementation, installation or deployment.
 
+## Readiness and preparation
+
+Use the [readiness audit](readiness.md) for missing pre-implementation inputs versus later review/acceptance evidence. The [proposed bootstrap task](bootstrap-task.md) pins an available real own PR and a draft source-backed account; it is not yet selected or accepted.
+
 ## Outcome and gap
 
 A reviewer sees one pinned real before/after behavior change, posts a question on its exact source context, and receives a source-backed reply from the responsible agent in the exact attached conversation. The reviewer can explain the difference, a relevant consequence and the evidence and uncertainty behind the answer. This first runnable slice must be dogfoodable on our own real PR under the [per-slice dogfood contract](../../../../rules/own-pr-dogfood.md).

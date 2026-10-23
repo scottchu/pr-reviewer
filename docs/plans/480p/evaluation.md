@@ -19,3 +19,7 @@
 | Later dataset/device/budgets and extension target: unselected | Maintainer | Only the relevant later slice; not the host probe. |
 
 No comprehension session or product E2E has run. The next ready action is to select the first change and complete this packet in source docs; do not implement a presentation against an undefined expected account.
+
+## Prepared candidate task
+
+The [slice 01 bootstrap proposal](slices/01-review-loop/bootstrap-task.md) verifies PR 14 baseline/head and source spans and drafts a bounded before/after account. Task selection, answer-key acceptance and evaluator/rubric decisions remain unresolved; this proposal does not change the gates above.
