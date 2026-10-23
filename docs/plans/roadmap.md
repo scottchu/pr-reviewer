@@ -2,7 +2,7 @@
 
 **Direction:** Accepted progressive delivery: 480p → 720p → 1080p → 4K
 
-**Plan status:** Revised slice sequence independently reviewed; later contracts remain provisional; no implementation started
+**Plan status:** Core slicing independently reviewed; new dual-host/reactive refinement pending targeted review; no implementation started
 
 **Owner:** Project maintainer owns product decisions; implementing agent owns delivery and evidence
 
@@ -18,6 +18,12 @@ Every product slice must be dogfoodable using our own real PR; the [mandatory do
 
 Each round contains independently testable vertical slices. Each slice adds a useful action to the running review journey and verifies its own outcome without waiting for later slices. “480p → 720p → 1080p → 4K” describes increasing fidelity and maturity, not screen resolution. Early breadth and polish may be limited; identity, immutable source provenance, permissions, durable outcomes and explicit unknowns may not be simulated away.
 
+## Existing-work adapter requirement
+
+[Codex and Claude](../participant-adapters.md) are both required participants for 480p. Attach from the already-running session in the current clone; that initiating session is the destination. Slice 01 has independently testable **01-Codex** and **01-Claude** deliveries with the same own-PR task. Each requires its own passing host probe and actual session evidence. One integration may proceed independently while the other remains pending, but full 480p completion requires both and slice 02 continuation for each. This does not introduce simultaneous multi-agent ownership.
+
+The [functional/reactive direction](../reactive-design.md) is accepted; library selection is a later bounded implementation decision and does not enlarge the host probe.
+
 ## Gates before product delivery
 
 1. Resolve the host/run-target inputs in the [host contract probe](probes/00-host-contract.md). After separate execution authorization, use the probe to establish actual binding, supported MCP, invocation deduplication and uncertain-outcome reconciliation. This is a feasibility experiment, not a product slice; it requires no product UI, graph, PR importer or comment domain.
@@ -28,14 +34,14 @@ The following inventories establish order, scope boundaries and observable check
 
 ## 480p: understand and discuss one real behavior
 
-Round outcome: complete a rough real review, then continue it without losing the question, answer or source identity. A full semantic canvas and general analyzer are unnecessary.
+Round outcome: complete a rough real review in both originating Codex and Claude sessions, then continue it without losing the question, answer or source identity. A full semantic canvas and general analyzer are unnecessary.
 
 | Slice and reviewer outcome | Predecessor / required input | Included scope and exclusions | Observable acceptance and test strategy |
 |---|---|---|---|
 | **01 — Ask about one behavior.** Read a real before/after span, ask an anchored question, inspect the responsible agent's answer. | Passing host probe; selected snapshot/span, run target and comprehension packet; implementation scope authorized. | Minimum source/context presentation, actual design-system controls, authenticated attachment, durable comment/inbox/receipt path, supported MCP read/reply. Excludes general import, graph edits and repository jobs. | **Own-PR task:** Ask about one real behavior or changed-document claim in our slice PR and inspect the persisted source-backed answer. [Detailed contract](slices/01-review-loop.md): real UI → exact host turn → MCP read/write → authoritative UI answer; own-turn commands progress; dedup/stale/unknown cases are honest. Domain/adapter tests plus real-host E2E and separate reviewer comprehension evidence. |
 | **02 — Continue the same review.** Reopen the discussion after restart and inspect a new pinned head without misattributing the old answer. | Slice 01; a second head for the same selected PR; explicit snapshot-switch behavior. | Reopen and follow up, durable inbox/cursor recovery, historical source/reply access, explicit new snapshot choice. Uses the same bounded source preparation as 01. Excludes general importer and automatic anchor migration. | **Own-PR task:** Reopen our PR discussion after restart, then compare the retained answer with a newer pinned head of that PR. E2E: save an addressed question, restart before delivery, recover it once, reply and reopen; switch to the new head and see the old discussion labeled with its original snapshot, then ask on the new span. Assert no lost/coalesced-away item or silent re-anchoring; stale attachment generation cannot write. Reviewer explains which source the old answer describes. |
 
-Exit evidence: both slices pass their scoped checks, the real conversation round trip is proven, and the agreed comprehension rubric passes for the selected behavior. Restart tests in 01 protect its basic durability; 02 adds a user-facing continuation and source-update journey.
+Exit evidence: 01-Codex and 01-Claude pass their scoped checks, slice 02 continuation is proven separately for each supported host, and the agreed comprehension rubric passes for the selected behavior. Restart tests in 01 protect its basic durability; 02 adds a user-facing continuation and source-update journey.
 
 ## 720p: understand the whole PR
 

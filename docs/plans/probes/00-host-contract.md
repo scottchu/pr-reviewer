@@ -12,6 +12,10 @@
 
 **Authorization:** Documentation only. Resolve inputs and authorize this probe's execution separately before writing a harness, connecting a tool or invoking a conversation.
 
+## Host-specific runs
+
+Apply this same bounded probe independently to Codex and Claude, as required by the [participant adapter contract](../../participant-adapters.md). The already-running initiating session in the current clone is the intended destination; corroborate it through the supported owner/connection rather than starting a replacement session. Specific UI branding does not select a new conversation. Record version/surface and capability evidence per host. A pass for one does not establish the other; fail/inconclusive blocks that host delivery while independent authorized preparation can continue. Both are required for the dual-host 480p outcome.
+
 ## Question and scope
 
 Can the actual selected host bind an authenticated participant to the exact intended conversation, expose a supported MCP tool to its real turn, and deduplicate/query external invocations well enough to reconcile a lost acknowledgement without blindly starting another turn?
@@ -50,4 +54,4 @@ If a small disposable harness is needed, authorize its exact location and host a
 
 ## Progress and next step
 
-No host inspection, invocation, harness, transport test or runtime execution has occurred under this plan. All capability criteria are unmet. The ready documentation action is to name the host/conversation and allowed probe target, then resolve the supported contract and execution scope. [Comprehension preparation](../comprehension.md) can proceed independently. Preserve the earlier Playground source/runtime; this probe neither uses it as delivery evidence nor changes it.
+Official host documentation has been inspected for candidate surfaces; no live host inspection, invocation, harness, transport test or runtime execution has occurred under this plan. All capability criteria are unmet. The ready documentation action is to name the host/conversation and allowed probe target, then resolve the supported contract and execution scope. [Comprehension preparation](../comprehension.md) can proceed independently. Preserve the earlier Playground source/runtime; this probe neither uses it as delivery evidence nor changes it.
