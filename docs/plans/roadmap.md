@@ -2,7 +2,7 @@
 
 **Direction:** Accepted progressive delivery: 480p → 720p → 1080p → 4K
 
-**Plan status:** Core slicing independently reviewed; new dual-host/reactive refinement pending targeted review; no implementation started
+**Plan status:** Slice sequence and dual-host/reactive refinement independently reviewed; later contracts remain provisional; no implementation started
 
 **Owner:** Project maintainer owns product decisions; implementing agent owns delivery and evidence
 
