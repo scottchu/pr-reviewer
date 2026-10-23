@@ -30,9 +30,11 @@ The [functional/reactive direction](../reactive-design.md) is accepted; library 
 2. Before presentation implementation, select the real change and record the evidence-backed expected account and evaluation criteria in the [comprehension protocol](comprehension.md). Its proposed PR profile, evaluator and threshold are not user selections. Resolve the listed material choices before dependent work.
 3. Refine and authorize [slice 01](slices/01-review-loop.md) using the probe evidence and evaluation packet. Host and comprehension preparation are independent documentation work; product delivery needs both. A failed or inconclusive probe does not unlock the responsible-agent loop. Independently authorized source work may continue, but cannot be called completion of that loop.
 
-The following inventories establish order, scope boundaries and observable checks. All entries are **planned, unimplemented and unverified**. Slices 02–12 remain provisional until their predecessors supply evidence; create their individual documents before implementation, not an entire speculative hierarchy now. Every row inherits the architecture constraints, mandatory own-PR dogfood gate and common test contract below. Supplemental representative PRs cannot replace the own-PR run.
+The following inventories establish order, scope boundaries and observable checks. All entries are **planned, unimplemented and unverified**. Slices 02–12 remain provisional until their predecessors supply evidence; create their individual documents before implementation, not an entire speculative hierarchy now. Slice 02 now has a [provisional continuation plan](slices/02-review-continuation.md) to receive slice 01 findings; this does not make its inputs ready. Every row inherits the architecture constraints, mandatory own-PR dogfood gate and common test contract below. Supplemental representative PRs cannot replace the own-PR run.
 
 ## 480p: understand and discuss one real behavior
+
+The [480p round plan](rounds/480p.md) coordinates this round and its individual slice plans. All rounds follow the [planning and agent handoff contract](README.md#planning-hierarchy-and-agent-handoffs). Completed slices promote learning into durable product docs and contribute evidence to dependent plans.
 
 Round outcome: complete a rough real review in both originating Codex and Claude sessions, then continue it without losing the question, answer or source identity. A full semantic canvas and general analyzer are unnecessary.
 

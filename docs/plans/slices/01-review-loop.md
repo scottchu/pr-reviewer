@@ -2,7 +2,7 @@
 
 **Status:** Planned; blocked on named readiness inputs; implementation not started
 
-**Parent:** [Product roadmap — 480p](../roadmap.md#480p-understand-and-discuss-one-real-behavior)
+**Parent:** [480p round plan](../rounds/480p.md)
 
 **Design:** [High-level design](../../architecture.md)
 
@@ -77,3 +77,13 @@ After readiness and implementation authorization: (1) derive failing tests for t
 The effort boundary is one behavior, one snapshot, one responsible conversation and one complete question/reply journey. Stop dependent work and revise the source contract if host behavior contradicts the probe, identity/source evidence cannot be verified, or the agreed expected account is wrong or incomplete. Preserve accepted questions and unknown invocation references for reconciliation; do not broaden into a new host, analyzer, runner or permissions workaround to finish the slice.
 
 All 01-A through 01-G evidence is currently **unrun/unmet**. No UI, MCP integration, database or runtime has started. No host probe, own-PR dogfood or comprehension session has passed. The next ready action is documentation of the required inputs, not application scaffolding. Deployment is N/A for the current documentation endpoint; any later implementation contract must name its authorized target and actual live acceptance.
+
+## Agent handoffs and successor contribution
+
+Follow the [implementation and independent-review packet contract](../agent-handoffs.md). This slice plan and acceptance 01-A through 01-G are the source packet, linked to the 480p round. Implementation assignment is **blocked**: readiness inputs above remain unresolved; no executor/worktree/run target or product implementation scope is assigned. At dispatch, record the committed plan revision, role, allowed writes and exact task workspace, then derive bounded TDD steps from the included path.
+
+Independent review is **not assigned / not ready**: no candidate commit, PR, build or executed product evidence exists. Once available, supply its exact identity/diff, acceptance mapping and evidence with limitations to a reviewer other than the implementer. Return concrete findings and checks performed; do not infer acceptance from this plan or earlier architecture review.
+
+Before acceptance, promote the actual question/reply user story, source/attachment/receipt/inbox interfaces, state transitions, authorization/failure/recovery semantics and relevant design rationale into durable product docs outside plans. Record the specification updates and evidence here; the source must support reimplementation without this execution plan or prior application. This promotion is currently **pending**.
+
+Then update [slice 02](02-review-continuation.md) with the actual snapshot/anchor and attachment-generation contracts, receipt-aware reads, persistence/inbox/cursor interfaces, per-host probe/product results, reusable tests and recovery gaps. Record the delivered commit and where each finding changed slice 02's scope or tests. This contribution is currently **pending**; slice 02 must reconcile it before implementation.
