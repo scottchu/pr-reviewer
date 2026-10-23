@@ -86,3 +86,48 @@ test(
     }
   },
 );
+
+test("preparation recovers database-commit/export failure and ignores orphan export", async () => {
+  const { prepareSource } = await import("../scripts/prepare.ts");
+  const { createStore } = await import("../src/storage/public.ts");
+  const { mkdirSync } = await import("node:fs");
+  const root = mkdtempSync(join(tmpdir(), "pr-reviewer-prepare-crash-"));
+  try {
+    mkdirSync(join(root, "snapshot.json"));
+    assert.throws(() => prepareSource(root));
+    const store = createStore(join(root, "review.sqlite"));
+    const user = { kind: "user" as const, actorId: "local-user" };
+    const before = store.review(user, "pr-14");
+    const question = store.command(user, {
+      type: "AskQuestion",
+      commandId: "retained-question",
+      reviewId: "pr-14",
+      anchor: {
+        snapshotId: before.snapshot.snapshotId,
+        side: "head",
+        path: "docs/README.md",
+        startLine: 5,
+        endLine: 13,
+      },
+      text: "Retain this across export repair",
+    });
+    assert.equal(question.state, "applied");
+    store.close();
+    rmSync(join(root, "snapshot.json"), { recursive: true });
+    const snapshot = prepareSource(root);
+    assert.equal(snapshot.snapshotId, before.snapshot.snapshotId);
+    const reopened = createStore(join(root, "review.sqlite"));
+    assert.equal(reopened.review(user, "pr-14").questions.length, 1);
+    reopened.close();
+    const orphan = mkdtempSync(join(tmpdir(), "pr-reviewer-orphan-export-"));
+    try {
+      writeFileSync(join(orphan, "snapshot.json"), "{}");
+      prepareSource(orphan);
+      assert.ok(existsSync(join(orphan, "review.sqlite")));
+    } finally {
+      rmSync(orphan, { recursive: true, force: true });
+    }
+  } finally {
+    rmSync(root, { recursive: true, force: true });
+  }
+});

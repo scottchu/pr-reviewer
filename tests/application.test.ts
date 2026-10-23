@@ -145,3 +145,52 @@ test("presentation separates answered/read state from unknown notification histo
   );
   assert.equal(r.attempts[0]?.state, "unknown");
 });
+
+test("definitive HTTP rejection allows corrected submission; pending readback retains retry", async () => {
+  const original = globalThis.fetch;
+  let reject = true,
+    blockReadback = false;
+  const ids: string[] = [];
+  globalThis.fetch = (async (
+    _input: Parameters<typeof fetch>[0],
+    init?: Parameters<typeof fetch>[1],
+  ) => {
+    if (init?.method === "POST") {
+      const body = JSON.parse(String(init.body)) as { commandId: string };
+      ids.push(body.commandId);
+      if (reject) {
+        reject = false;
+        return Response.json({ error: "invalid_request" }, { status: 400 });
+      }
+      return Response.json({
+        commandId: body.commandId,
+        state: "applied",
+        revision: 2,
+        result: {},
+      });
+    }
+    if (blockReadback)
+      return Response.json({ error: "projection_pending" }, { status: 409 });
+    return Response.json({ ...review, revision: 2 });
+  }) as typeof fetch;
+  try {
+    const bridge = createReviewBridge("r");
+    await bridge.login("token");
+    await assert.rejects(
+      bridge.ask(anchor, "Invalid envelope"),
+      /invalid_request/,
+    );
+    await bridge.ask(anchor, "Corrected");
+    assert.notEqual(ids[0], ids[1]);
+    blockReadback = true;
+    await assert.rejects(
+      bridge.ask(anchor, "Wait for accepted readback"),
+      /readback_pending/,
+    );
+    blockReadback = false;
+    await bridge.ask(anchor, "Wait for accepted readback");
+    assert.equal(ids[2], ids[3]);
+  } finally {
+    globalThis.fetch = original;
+  }
+});

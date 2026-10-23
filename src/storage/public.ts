@@ -166,8 +166,11 @@ export const createStore = (filename: string) => {
           )
             throw new Error("source_unavailable");
         }
-        if (db.prepare("SELECT id FROM reviews WHERE id=?").get(reviewId))
-          throw new Error("command_conflict");
+        if (db.prepare("SELECT id FROM reviews WHERE id=?").get(reviewId)) {
+          if (canonical(load(reviewId).snapshot) !== canonical(snapshot))
+            throw new Error("command_conflict");
+          return;
+        }
         save({
           reviewId,
           snapshot,
@@ -277,8 +280,27 @@ export const createStore = (filename: string) => {
           (q) => !review.inbox.some((i) => i.questionId === q.questionId),
         );
         let cursor = review.revision + 1;
+        const unanswered = new Set(
+          review.questions
+            .filter(
+              (q) =>
+                !review.replies.some(
+                  (reply) => reply.questionId === q.questionId,
+                ),
+            )
+            .map((q) => q.questionId),
+        );
         const inbox = [
-          ...review.inbox,
+          ...review.inbox.map((item) =>
+            unanswered.has(item.questionId)
+              ? {
+                  ...item,
+                  attachmentId: attachment.attachmentId,
+                  generation: attachment.generation,
+                  read: false,
+                }
+              : item,
+          ),
           ...unaddressed.map((q) => ({
             eventId: randomUUID(),
             questionId: q.questionId,
@@ -288,7 +310,15 @@ export const createStore = (filename: string) => {
             read: false,
           })),
         ];
-        save({ ...review, revision: cursor, attachment, inbox });
+        save({
+          ...review,
+          revision: cursor,
+          attachment,
+          inbox,
+          questions: review.questions.map((q) =>
+            unanswered.has(q.questionId) ? { ...q, working: false } : q,
+          ),
+        });
         db.prepare("UPDATE challenges SET body=? WHERE id=?").run(
           JSON.stringify({ ...c, consumed: true }),
           challengeId,

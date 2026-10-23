@@ -1,13 +1,10 @@
 import { execFileSync } from "node:child_process";
 import { createHash } from "node:crypto";
-import { existsSync, readFileSync } from "node:fs";
 import { createStore } from "../src/storage/public.ts";
 import { dataRoot, files, writePrivate } from "./local.ts";
 import type { Snapshot } from "../src/domain/public.ts";
 export const prepareSource = (root: string) => {
   const paths = files(root);
-  if (existsSync(paths.snapshot))
-    return JSON.parse(readFileSync(paths.snapshot, "utf8")) as Snapshot;
   const baseSha = "a6d63c1e46424cb979ee912aa993ad964835c287",
     headSha = "fd6c5fb26a325c8318087c0f058de247a55e6c07",
     path = "docs/README.md";

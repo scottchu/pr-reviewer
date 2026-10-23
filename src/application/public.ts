@@ -57,8 +57,11 @@ export const createReviewBridge = (reviewId: string) => {
     });
     const value = (await response.json()) as unknown;
     if (!response.ok)
-      throw new Error(
-        String((value as { error?: string }).error ?? "request_failed"),
+      throw Object.assign(
+        new Error(
+          String((value as { error?: string }).error ?? "request_failed"),
+        ),
+        { definitive: [400, 401, 403].includes(response.status) },
       );
     return value;
   };
@@ -84,6 +87,7 @@ export const createReviewBridge = (reviewId: string) => {
           error: "",
           authenticated: true,
         });
+      if (expected === generation && !controller.signal.aborted) return review;
     } catch (error) {
       if (expected === generation && !controller.signal.aborted)
         publish({
@@ -98,7 +102,7 @@ export const createReviewBridge = (reviewId: string) => {
     const route = registry.register(
       "review-committed-to-view",
       reviewId,
-      () => Boolean(token),
+      () => Boolean(token) && !state.busy,
       () => {
         void refresh();
       },
@@ -145,10 +149,20 @@ export const createReviewBridge = (reviewId: string) => {
           pending = null;
           throw new Error(receipt.error ?? "rejected");
         }
-        await refresh(receipt.revision);
+        const readback = await refresh(receipt.revision);
+        if (!readback || readback.revision < receipt.revision)
+          throw new Error(
+            "readback_pending: retry unchanged question to confirm accepted revision",
+          );
         pending = null;
         return receipt;
       } catch (error) {
+        if (
+          error instanceof Error &&
+          "definitive" in error &&
+          error.definitive === true
+        )
+          pending = null;
         publish({
           ...state,
           error: error instanceof Error ? error.message : "request_failed",

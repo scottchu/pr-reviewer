@@ -135,6 +135,7 @@ test.beforeAll(async () => {
   expect(denied.isError).toBe(true);
   const attached = await tool("session_attach");
   expect(attached.status).toBe("attached");
+  expect(attached.inboxCursor).toBe(0);
   expect(JSON.stringify(attached)).not.toContain(launch.bootstrapToken);
 });
 test.afterAll(async () => {

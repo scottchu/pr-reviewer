@@ -51,6 +51,7 @@ export const createMcp = (launch: LaunchBinding) => {
       attached = true;
       return output({
         status: "attached",
+        inboxCursor: 0,
         attachment: value.attachment,
         receipt: value.receipt,
       });

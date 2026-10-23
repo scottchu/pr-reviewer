@@ -173,3 +173,55 @@ test("01-D source preparation rejects tampered hash without creating a review", 
     rmSync(dir, { recursive: true, force: true });
   }
 });
+
+test("reconnect transfers outstanding inbox visibility without replaying unknown notification", () => {
+  const { dir, store } = setup();
+  try {
+    const connection = store.registerConnection(owner, {
+      host: "codex",
+      sessionId: "exact",
+      connectionId: "native",
+      corroborated: true,
+    });
+    const firstChallenge = store.challenge(
+      owner,
+      "r",
+      "codex",
+      "exact",
+      "native",
+    );
+    const first = store.attach(
+      connection.principal,
+      firstChallenge.challengeId,
+      firstChallenge.proof,
+    );
+    const oldAgent = store.authenticate(first.token);
+    store.command(owner, ask);
+    const original = store.inbox(oldAgent).items[0]!;
+    const attempt = store.claim("r")!;
+    store.finish("r", attempt.invocationId, "unknown", "lost acknowledgment");
+    const secondChallenge = store.challenge(
+      owner,
+      "r",
+      "codex",
+      "exact",
+      "native",
+    );
+    const second = store.attach(
+      connection.principal,
+      secondChallenge.challengeId,
+      secondChallenge.proof,
+    );
+    const newAgent = store.authenticate(second.token);
+    assert.throws(() => store.inbox(oldAgent), /stale_attachment/);
+    const pending = store.inbox(newAgent).items;
+    assert.equal(pending.length, 1);
+    assert.equal(pending[0]!.eventId, original.eventId);
+    assert.equal(pending[0]!.generation, 2);
+    assert.equal(store.claim("r"), null);
+    assert.equal(store.review(newAgent, "r").attempts[0]?.state, "unknown");
+  } finally {
+    store.close();
+    rmSync(dir, { recursive: true, force: true });
+  }
+});
