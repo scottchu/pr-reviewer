@@ -29,6 +29,21 @@ bun run stop
 
 Stop checks PID/start time and the supervisor command before signaling it. The supervisor closes its own gateway and UI child, marks the runtime stopped, and preserves accepted questions, replies and unknown external effects. No global service or production installation exists. Restart uses the same data root.
 
+## Optional private tailnet preview
+
+The owner may explicitly request access through the existing Tailscale tailnet. Keep both application listeners on loopback and proxy only the UI origin with Tailscale Serve; the UI already forwards authenticated `/api` requests to the gateway. Preserve the app's local-user login and all unrelated Serve routes. Do not enable Funnel or expose the gateway separately.
+
+Before changing routing, retain the current Serve configuration, select an unused HTTPS port and record the exact task-owned handler and rollback command in private runtime evidence. The current pilot selects HTTPS 8472 forwarding to `http://127.0.0.1:5184`. The device's verified MagicDNS hostname is `mac-mini.duckbill-ionian.ts.net`; this is an operational endpoint, not an application identity or participant-session proof.
+
+Vite must allow only that exact hostname. Start the existing runtime with `__VITE_ADDITIONAL_SERVER_ALLOWED_HOSTS=mac-mini.duckbill-ionian.ts.net`, using the [documented Vite environment option](https://vite.dev/config/server-options#server-allowedhosts). Do not allow all hosts or widen the loopback bind. Preserve the existing data root and prepared source across restart.
+
+```sh
+tailscale serve --bg --https=8472 http://127.0.0.1:5184
+tailscale serve status --json
+```
+
+Verify HTTPS, application assets, unauthenticated API rejection and an authenticated source query through this endpoint, then compare existing handlers and Funnel configuration with the retained baseline. Keep credentials out of URLs and logs. Host-side HTTPS checks do not prove access from another device or a completed browser/participant journey. Remove only this mapping with `tailscale serve --https=8472 off` when retiring the preview; stopping the app does not remove Serve automatically.
+
 ## Attach the exact existing Codex session
 
 The local owner authorizes a review/session through a separate control plane. MCP model arguments cannot choose actor, session or connection identity. Owner setup reads only the first bounded `session_meta` record of an existing Codex rollout. Its ID must equal the native owner process's `CODEX_THREAD_ID`; its cwd must equal explicit `REVIEW_SESSION_CWD`. The app worktree and attached session cwd may differ.
