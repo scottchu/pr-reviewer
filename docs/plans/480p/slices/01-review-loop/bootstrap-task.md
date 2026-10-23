@@ -1,6 +1,6 @@
-# Proposed bootstrap review task
+# Selected bootstrap review task
 
-**Status:** Source verified; task proposal only; not selected or executed
+**Status:** Selected by the implementing agent under user direction; source verified; product run pending
 
 **Parent:** [Slice 01 readiness](readiness.md)
 
@@ -22,11 +22,11 @@
 
 Verified the GitHub PR head and merged state, then checked merge commit `36aced38af008f4d51c4de901fd4bccb46b2445e` has the baseline and reviewed head above as its parents. Read both source spans directly from the immutable objects. The future candidate build identity is separate and does not yet exist.
 
-## Proposed question and expected account
+## Question and source-backed expected account
 
 Question: What did this PR make explicit about where a completed slice's knowledge belongs, and can a future agent depend on old execution plans to rebuild the product?
 
-Expected account, for source-informed checking before adoption:
+Expected account for implementation and prospective evaluation; independent source review checks its accuracy:
 
 - Before: docs were already authoritative and discrepancy/evidence reconciliation was required. Do not claim that documentation-as-source was first introduced by this PR.
 - After: durable product knowledge is explicitly separated from transient delivery plans/history; user stories, behavior, architecture, interfaces and detailed decisions must survive outside plans.
@@ -34,8 +34,8 @@ Expected account, for source-informed checking before adoption:
 - Consequence: a fresh agent can derive accepted delivered behavior and tests without reconstructing old plans, chat or the previous application. It may derive a new execution plan.
 - Limit: these are documented requirements. The PR does not demonstrate a successful product rebuild, host integration or running application.
 
-The before/after source supports these claims. No repository code behavior, general import or test execution is established. Manual pinned-source preparation is allowed by slice 01's bootstrap contract. This question is a candidate for both actual own-PR dogfood and the separate unfamiliar-reviewer task, with their evidence kept distinct.
+The before/after source supports these claims. No repository code behavior, general import or test execution is established. Manual pinned-source preparation is allowed by slice 01's bootstrap contract. This is the selected bootstrap question for actual own-PR dogfood and the separate unfamiliar-reviewer task, with their evidence kept distinct.
 
-## Still unresolved
+## Execution evidence still required
 
-Task adoption, immutable snapshot/anchor assignment in the future implementation, accepted answer-key review, evaluator/rubric/session criteria, candidate identity and all actual product results remain pending. Complete the evaluation packet and implementation design before using this proposal as acceptance input. If selecting another target, record its own source-grounded account prospectively.
+The future candidate identity, persisted snapshot/anchor IDs and actual product results do not exist yet. Record them when the implementation runs. Source selection and the expected account are prepared, not maintainer-choice blockers. The later implementation PR must also exercise its new product behavior; the selected immutable bootstrap target remains a valid initial task and cannot establish unsupported code analysis or execution. If the reviewed target changes, declare its expected account before the new run.

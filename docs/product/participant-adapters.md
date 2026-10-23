@@ -4,7 +4,7 @@
 
 **Session rule:** The session initiating attachment is the attached session
 
-**Status:** Design specified; adapters and host capabilities not implemented or live-verified
+**Status:** CLI mechanisms and earlier Playground bridge evidence established; PR Reviewer adapters not implemented or product-verified
 
 ## Start from the current session
 
@@ -49,9 +49,9 @@ Sources: [Codex MCP](https://learn.chatgpt.com/docs/extend/mcp?surface=cli), [Co
 
 ## Delivery and acceptance
 
-Both adapters are required in the 480p round, rather than deferred as an additional host in 4K. Slice 01 has two independently testable host deliveries: **01-Codex** and **01-Claude**. Each implements the same bounded source → anchored question → originating session → MCP read/reply → authoritative UI answer journey on our own real PR. Either may be implemented first after its probe passes; one passing adapter does not claim the other works. These are variants of the existing capability slice, not horizontal adapter scaffolds.
+Both adapters are required in the 480p round, rather than deferred as an additional host in 4K. Slice 01 has two independently testable host deliveries: **01-Codex** and **01-Claude**. Each implements the same bounded source → anchored question → originating session → MCP read/reply → authoritative UI answer journey on our own real PR. Either may be implemented first using the established CLI route and scoped integration checks; one passing adapter does not claim the other works. These are variants of the existing capability slice, not horizontal adapter scaffolds.
 
-Run [probe 00](../plans/480p/probes/00-host-contract.md) independently for each actual host. Capability evidence is keyed by host/version/surface and binding; a failed host probe blocks that host's integration, not independently authorized work on the other. Both host deliveries and slice 02's continuation checks are required before claiming the full dual-host 480p outcome. Shared UI/domain tests can be reused; actual host-path acceptance cannot.
+Use the [existing-session integration checks](../plans/480p/probes/00-host-contract.md) independently for each actual host. Capability evidence is keyed by host/version/surface and binding; a concrete incompatible route blocks that route, not independently ready domain/UI work or the other host. Both host deliveries and slice 02's continuation checks are required before claiming the full dual-host 480p outcome. Shared UI/domain tests can be reused; actual host-path acceptance cannot.
 
 | Conformance check | Codex | Claude |
 |---|---|---|
@@ -66,4 +66,4 @@ Record own-PR and candidate provenance, session/attachment identity, capability 
 
 ## Current next step
 
-No server, plugin, session or configuration was changed. The next preparation is to record each initiating host's supported connection and probe target, then run only an authorized bounded probe. Implementation remains subject to the slice's real source, testing and comprehension inputs. The product workflow is accepted; live adapter capability is still unknown.
+No server, plugin, session or configuration was changed. Implement the [first review-loop contracts](review-loop/README.md), reusing CLI notification and MCP read/reply. Test actual session routing as integration work, without inventing a generic host-feasibility prerequisite. Implementation remains subject to the slice's real source, testing and comprehension inputs. The product workflow is accepted; live adapter capability is still unknown.
