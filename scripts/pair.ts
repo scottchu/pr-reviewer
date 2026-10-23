@@ -78,7 +78,7 @@ const connection = await request("/api/connections", {
   corroborated: true,
 });
 const challenge = await request("/api/challenges", {
-  reviewId: "pr-14",
+  reviewId: runtime.reviewId,
   host,
   sessionId: evidence.sessionId,
   connectionId,
@@ -89,7 +89,7 @@ writePrivate(launchRef, {
   bootstrapToken: connection.token,
   challengeId: challenge.challengeId,
   proof: challenge.proof,
-  reviewId: "pr-14",
+  reviewId: runtime.reviewId,
   host,
   sessionId: evidence.sessionId,
   connectionId,

@@ -11,7 +11,8 @@ import { prepareSource } from "./prepare.ts";
 const root = dataRoot(),
   paths = files(root);
 const releaseRuntime = acquireRuntime(root);
-prepareSource(root);
+const snapshot = prepareSource(root);
+const reviewId = `pr-${snapshot.prNumber}`;
 const port = (name: string, fallback: number) => {
   const value = Number(process.env[name] ?? fallback);
   if (!Number.isInteger(value) || value < 1024 || value > 65535)
@@ -54,7 +55,8 @@ const manifest: Runtime = {
   ).trim(),
   instanceId,
   gatewayUrl: `http://127.0.0.1:${gatewayPort}`,
-  uiUrl: `http://127.0.0.1:${uiPort}`,
+  uiUrl: `http://127.0.0.1:${uiPort}/?reviewId=${reviewId}`,
+  reviewId,
   userCredentialRef: paths.user,
   sourceCommit: execFileSync("git", ["rev-parse", "HEAD"], {
     encoding: "utf8",

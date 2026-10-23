@@ -17,6 +17,7 @@ export type Source = {
   lineCount: number;
 };
 export type Snapshot = {
+  title?: string;
   snapshotId: string;
   repository: string;
   prUrl: string;

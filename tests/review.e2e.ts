@@ -242,3 +242,67 @@ test("01-A/C/F/G controlled host: real React + PR14 → queue → MCP source/rea
     page.getByText("Session revoked", { exact: true }),
   ).toBeVisible();
 });
+
+test("explicit manual PR19 target renders its own path and saves the declared recovery span", async ({
+  page,
+}) => {
+  await stop();
+  rmSync(root, { recursive: true, force: true });
+  root = mkdtempSync(join(tmpdir(), "pr-reviewer-pr19-browser-"));
+  const spec = join(root, "owner-selection.json");
+  writeFileSync(
+    spec,
+    JSON.stringify({
+      prNumber: 19,
+      prUrl: "https://github.com/scottchu/pr-reviewer/pull/19",
+      title: "Recovery contract",
+      baseSha: "cf179ac1eeb9073c08e4e82c950cb53bdc681c72",
+      headSha: "4dae178a4302bfdd161fca5be78144c63f562c30",
+      path: "docs/product/review-loop/contracts.md",
+    }),
+  );
+  const previous = process.env.REVIEW_SOURCE_SPEC;
+  process.env.REVIEW_SOURCE_SPEC = spec;
+  try {
+    await start();
+  } finally {
+    if (previous === undefined) delete process.env.REVIEW_SOURCE_SPEC;
+    else process.env.REVIEW_SOURCE_SPEC = previous;
+  }
+  await page.goto(uiUrl);
+  await page.getByLabel("Local access token").fill(token);
+  await page.getByRole("button", { name: "Open review" }).click();
+  await expect(
+    page.getByRole("link", { name: "PR 19", exact: true }),
+  ).toBeVisible();
+  await expect(
+    page.getByRole("heading", {
+      name: "docs/product/review-loop/contracts.md",
+      exact: true,
+    }),
+  ).toBeVisible();
+  await page.getByLabel("Start line").fill("93");
+  await page.getByLabel("End line").fill("99");
+  await page
+    .getByLabel("Your question")
+    .fill(
+      "After same-session re-pair, how do outstanding questions remain accessible, and does a new attachment generation make an earlier unknown notification delivered or safe to replay?",
+    );
+  await page.getByRole("button", { name: "Save question" }).click();
+  await expect(page.getByText("1 saved question · 0 answers")).toBeVisible();
+  await expect(
+    page.getByText("Saved · attach a session to enable delivery", {
+      exact: true,
+    }),
+  ).toBeVisible();
+  const persisted = (await api("/api/reviews/pr-19")) as unknown as Review;
+  expect(persisted.snapshot.headSha).toBe(
+    "4dae178a4302bfdd161fca5be78144c63f562c30",
+  );
+  expect(persisted.questions[0]?.anchor).toMatchObject({
+    path: "docs/product/review-loop/contracts.md",
+    startLine: 93,
+    endLine: 99,
+  });
+  expect(persisted.attempts).toHaveLength(0);
+});

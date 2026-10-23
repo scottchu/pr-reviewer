@@ -131,3 +131,53 @@ test("preparation recovers database-commit/export failure and ignores orphan exp
     rmSync(root, { recursive: true, force: true });
   }
 });
+
+test("explicit owner manual PR19 specification pins one source and survives restart without its env reference", async () => {
+  const { prepareSource } = await import("../scripts/prepare.ts");
+  const root = mkdtempSync(join(tmpdir(), "pr-reviewer-manual-source-"));
+  const previous = process.env.REVIEW_SOURCE_SPEC;
+  try {
+    const spec = join(root, "owner-selection.json");
+    writeFileSync(
+      spec,
+      JSON.stringify({
+        prNumber: 19,
+        prUrl: "https://github.com/scottchu/pr-reviewer/pull/19",
+        title: "Recovery review",
+        baseSha: "cf179ac1eeb9073c08e4e82c950cb53bdc681c72",
+        headSha: "4dae178a4302bfdd161fca5be78144c63f562c30",
+        path: "docs/product/review-loop/contracts.md",
+      }),
+    );
+    process.env.REVIEW_SOURCE_SPEC = spec;
+    const snapshot = prepareSource(root);
+    assert.equal(snapshot.prNumber, 19);
+    assert.equal(
+      snapshot.sources[1]?.path,
+      "docs/product/review-loop/contracts.md",
+    );
+    assert.ok(
+      snapshot.sources[1]?.content.includes(
+        "new generation begins inbox reading at cursor zero",
+      ),
+    );
+    delete process.env.REVIEW_SOURCE_SPEC;
+    assert.deepEqual(prepareSource(root), snapshot);
+    writeFileSync(
+      spec,
+      JSON.stringify({
+        prNumber: 19,
+        prUrl: "https://github.com/scottchu/pr-reviewer/pull/19",
+        baseSha: "cf179ac1eeb9073c08e4e82c950cb53bdc681c72",
+        headSha: "4dae178a4302bfdd161fca5be78144c63f562c30",
+        path: "AGENTS.md",
+      }),
+    );
+    process.env.REVIEW_SOURCE_SPEC = spec;
+    assert.throws(() => prepareSource(root), /command_conflict/);
+  } finally {
+    if (previous === undefined) delete process.env.REVIEW_SOURCE_SPEC;
+    else process.env.REVIEW_SOURCE_SPEC = previous;
+    rmSync(root, { recursive: true, force: true });
+  }
+});

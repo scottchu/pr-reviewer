@@ -48,6 +48,7 @@ export const files = (root: string) => ({
   runtime: join(root, "runtime.json"),
   user: join(root, "local-user.json"),
   snapshot: join(root, "snapshot.json"),
+  input: join(root, "source-input.json"),
 });
 export type Runtime = {
   pid: number;
@@ -58,6 +59,7 @@ export type Runtime = {
   userCredentialRef: string;
   sourceCommit: string;
   sourceDirty: boolean;
+  reviewId: string;
   startedAt: string;
   status: "running" | "stopped";
 };

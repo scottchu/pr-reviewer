@@ -59,4 +59,12 @@ bun run test
 bun run test:e2e
 ```
 
-`check` runs strict TypeScript and subsystem import constraints. `test` covers domain, transactional storage/restart, attachment failures, notification uncertainty, route lifecycle, application retry and owned process behavior. `test:e2e` uses existing Chrome with isolated temporary data. `REVIEW_E2E_ARTIFACT_DIR` optionally selects a task-owned screenshot/artifact destination outside Git. Tests do not invoke real user sessions.
+`check` runs strict TypeScript and subsystem import constraints. `test` covers domain, transactional storage/restart, attachment failures, notification uncertainty, route lifecycle, application retry and owned process behavior. `test:e2e` uses existing Chrome with isolated temporary data for the complete controlled PR 14 reply path and a separate explicit PR 19 source/question path. `REVIEW_E2E_ARTIFACT_DIR` optionally selects a task-owned screenshot/artifact destination outside Git. Tests do not invoke real user sessions.
+
+## Explicit manual source for the implementation PR
+
+The owner may prepare another real PR in this same repository using an explicit local JSON specification and a fresh data root. `REVIEW_SOURCE_SPEC` names a private task-owned JSON file with `prNumber`, exact matching `prUrl`, full immutable `baseSha`/`headSha`, one `path` and optional `title`. The owner separately verifies real GitHub PR provenance and declares the question/expected account before the run. Preparation reads only those local commit objects and one UTF-8 path; no network discovery, fetching, hooks, code execution or general import UI exists.
+
+The validated specification is retained as `source-input.json` under the task data root so restart can reconstruct the same target even when the environment reference is absent. A different prepared target in that data root rejects; choose a fresh root for another task. SQLite remains authoritative and exports remain regenerable. The manifest records `reviewId` and a target-specific UI URL; owner pairing and MCP reuse that review ID. React derives source path/default selection/title from the prepared read model. Use its side/start/end controls to select the declared evidence span.
+
+For the implementation task, PR 19's independently pinned recovery target can remain at `4dae178a4302bfdd161fca5be78144c63f562c30` while a later application candidate runs it. These are separate identities. Manual preparation and owner-operated protocol use do not establish a working general importer or native-host browser journey.

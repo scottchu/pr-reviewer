@@ -4,6 +4,7 @@ import type { Anchor, Receipt, Review } from "../domain/public.ts";
 import { createRegistry } from "../integration/registry.ts";
 export type View = {
   sources: SourceView[];
+  initialSelection: Anchor | null;
   review: Review | null;
   error: string;
   busy: boolean;
@@ -28,6 +29,7 @@ export const createReviewBridge = (reviewId: string) => {
   let token = "";
   let state: View = {
     sources: [],
+    initialSelection: null,
     review: null,
     error: "",
     busy: false,
@@ -85,6 +87,13 @@ export const createReviewBridge = (reviewId: string) => {
             review.snapshot.sources.find((s) => s.side === "head")!,
           ),
           error: "",
+          initialSelection: {
+            snapshotId: review.snapshot.snapshotId,
+            side: "head",
+            path: review.snapshot.sources.find((s) => s.side === "head")!.path,
+            startLine: 1,
+            endLine: 1,
+          },
           authenticated: true,
         });
       if (expected === generation && !controller.signal.aborted) return review;

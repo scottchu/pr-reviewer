@@ -3,7 +3,9 @@ import { createRoot } from "react-dom/client";
 import { createReviewBridge, questionStatus } from "../application/public.ts";
 import type { Anchor, Review, SourceView } from "../domain/public.ts";
 import "./style.css";
-const bridge = createReviewBridge("pr-14");
+const bridge = createReviewBridge(
+  new URLSearchParams(window.location.search).get("reviewId") ?? "pr-14",
+);
 const SourcePane = ({
   source,
   review,
@@ -83,15 +85,9 @@ const App = () => {
     [selected, setSelected] = useState<Anchor | null>(null);
   useEffect(() => bridge.connect(), []);
   useEffect(() => {
-    if (state.review && !selected)
-      setSelected({
-        snapshotId: state.review.snapshot.snapshotId,
-        side: "head",
-        path: "docs/README.md",
-        startLine: 5,
-        endLine: 13,
-      });
-  }, [state.review, selected]);
+    if (state.initialSelection && !selected)
+      setSelected(state.initialSelection);
+  }, [state.initialSelection, selected]);
   const review = state.review;
   if (!state.authenticated || !review)
     return (
@@ -131,7 +127,7 @@ const App = () => {
             <a href={review.snapshot.prUrl} target="_blank" rel="noreferrer">
               PR {review.snapshot.prNumber}
             </a>{" "}
-            <span>Slice knowledge that lasts</span>
+            <span>{review.snapshot.title ?? "Pinned source review"}</span>
           </h1>
           <p className="sha">
             Base {review.snapshot.baseSha} → Head {review.snapshot.headSha}
@@ -170,7 +166,7 @@ const App = () => {
         </div>
       </header>
       <section className="source-identity">
-        <h2>docs/README.md</h2>
+        <h2>{selected?.path ?? state.sources[0]?.path}</h2>
         <p>
           Read the fixed before and after. Select a line or specify an inclusive
           range below.
