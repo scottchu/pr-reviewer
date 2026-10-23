@@ -47,3 +47,9 @@ The independent-review packet is **not ready**: no candidate, diff or product ev
 Before acceptance, promote implemented user behavior, snapshot/history semantics, public interfaces, recovery decisions and verified limits into the appropriate durable product docs outside plans. Link those source updates and their verification here. This promotion is **pending**.
 
 Then create/refine slice 03's bounded provisional page from its [roadmap inventory](../../../roadmap.md#720p-understand-the-whole-pr), linking a 720p round plan when that round is activated. Contribute actual source-preparation, immutable-history and recovery contracts, test assets, evidence and gaps to the importer plan. Do not claim general import or background-job acceptance from continuation evidence. Downstream contribution is **pending**; the successor must reconcile it before implementation.
+
+## Predecessor design contribution
+
+Slice 01 preparation now supplies maintained [question/reply contracts](../../../../product/review-loop/contracts.md), [CLI/MCP delivery and uncertainty](../../../../product/review-loop/delivery.md) and an [independently reviewed design](../01-review-loop/reviews/design-readiness.md). Use these as the provisional continuation baseline; actual predecessor code, per-host product evidence and operational limitations still arrive after implementation.
+
+Carry forward two reviewed details: pairing consumes a challenge and creates a generation-bound attachment atomically; an answered question does not by itself resolve which CLI notification caused it. Continuation/restart must preserve both reply existence and independently unknown notification state. Reconcile delivered interfaces and tests against this design before implementing slice 02; do not mistake source readiness for predecessor product acceptance.
