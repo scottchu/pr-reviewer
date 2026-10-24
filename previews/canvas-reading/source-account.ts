@@ -114,3 +114,118 @@ export const sourceAccount = {
   ],
   "provenance": "Fixture-backed layout of actual own-PR source; manual explicit comparison, not live product review/analysis."
 } as const;
+export const earlierSourceAccount = {
+  "schema": "canvas-preview-source-v1",
+  "repository": "scottchu/pr-reviewer",
+  "prNumber": 25,
+  "prUrl": "https://github.com/scottchu/pr-reviewer/pull/25",
+  "base": "1f1aad1f21e5b71bf121d0416d95c1710e70592f",
+  "head": "5cf0bc67f2db4d17c4653a55cc66493445e4b03a",
+  "baseTree": "645c1007d26b09e60db49203127cf07ccea7bf0c",
+  "headTree": "0cad0cd6816729b2e21352b53e22ebf3a9976449",
+  "request": {
+    "base": {
+      "commit": "1f1aad1f21e5b71bf121d0416d95c1710e70592f",
+      "path": "src/application/review.ts",
+      "startLine": 24,
+      "endLine": 32,
+      "text": " const request=async(captured:string,path:string,body?:unknown,signal?:AbortSignal)=>{\n  const controller=body===undefined?new AbortController():null;if(controller)readControllers.add(controller);\n  const ownedSignal=controller?(signal?AbortSignal.any([signal,controller.signal]):controller.signal):signal;\n  try{\n   if(ownedSignal?.aborted)throw new Error('selection_superseded');\n   const response=await fetch(path,{headers:{Authorization:`Bearer ${captured}`,'Content-Type':'application/json'},...(body===undefined?{}:{method:'POST',body:typeof body==='string'?body:JSON.stringify(body)}),...(ownedSignal?{signal:ownedSignal}:{})});\n   const value=await response.json() as unknown;if(ownedSignal?.aborted)throw new Error('selection_superseded');if(!response.ok)throw new Error(String((value as {error?:string}).error??'request_failed'));return value;\n  }finally{if(controller)readControllers.delete(controller);}\n };\n",
+      "blobId": "9da077b77bc0571d46a3805e5304f80bb56a442d",
+      "sha256": "93889a9efaf33226fd940ac5e0e1bc5936e847af7399b97120dc068a4f09166a"
+    },
+    "head": {
+      "commit": "5cf0bc67f2db4d17c4653a55cc66493445e4b03a",
+      "path": "src/application/review.ts",
+      "startLine": 25,
+      "endLine": 33,
+      "text": " const request=async(captured:string,path:string,body?:unknown,signal?:AbortSignal)=>{\n  const controller=body===undefined?new AbortController():null;if(controller)readControllers.add(controller);\n  const ownedSignal=controller?(signal?AbortSignal.any([signal,controller.signal]):controller.signal):signal;\n  try{\n   if(ownedSignal?.aborted)throw new Error('selection_superseded');\n   const response=await fetch(path,{headers:{...accessHeaders(captured),'Content-Type':'application/json'},...(body===undefined?{}:{method:'POST',body:typeof body==='string'?body:JSON.stringify(body)}),...(ownedSignal?{signal:ownedSignal}:{})});\n   const value=await response.json() as unknown;if(ownedSignal?.aborted)throw new Error('selection_superseded');if(!response.ok)throw new Error(String((value as {error?:string}).error??'request_failed'));return value;\n  }finally{if(controller)readControllers.delete(controller);}\n };\n",
+      "blobId": "44b1953f925827b492fecace0925e5fe4eec87cd",
+      "sha256": "465e7063233bcda473d6d4c1af94ae3152294344ddd67b5cdad2b0be55281029"
+    }
+  },
+  "requestContext": {
+    "base": {
+      "commit": "1f1aad1f21e5b71bf121d0416d95c1710e70592f",
+      "path": "src/application/review.ts",
+      "startLine": 22,
+      "endLine": 33,
+      "text": " const publish=(next:View)=>{state={...next};state={...state,recovery:recovery()};for(const listener of listeners)listener();};\n const owns=(expected:number,captured:string,op?:object)=>generation===expected&&token===captured&&(!op||operation===op);\n const request=async(captured:string,path:string,body?:unknown,signal?:AbortSignal)=>{\n  const controller=body===undefined?new AbortController():null;if(controller)readControllers.add(controller);\n  const ownedSignal=controller?(signal?AbortSignal.any([signal,controller.signal]):controller.signal):signal;\n  try{\n   if(ownedSignal?.aborted)throw new Error('selection_superseded');\n   const response=await fetch(path,{headers:{Authorization:`Bearer ${captured}`,'Content-Type':'application/json'},...(body===undefined?{}:{method:'POST',body:typeof body==='string'?body:JSON.stringify(body)}),...(ownedSignal?{signal:ownedSignal}:{})});\n   const value=await response.json() as unknown;if(ownedSignal?.aborted)throw new Error('selection_superseded');if(!response.ok)throw new Error(String((value as {error?:string}).error??'request_failed'));return value;\n  }finally{if(controller)readControllers.delete(controller);}\n };\n const interruptSelection=()=>{if(state.selecting){selectedSnapshotId=state.review?.snapshot.snapshotId??selectedSnapshotId;publish({...state,selecting:false});}};\n",
+      "blobId": "9da077b77bc0571d46a3805e5304f80bb56a442d",
+      "sha256": "6c002f3836e7313dbc229cb880de929969d7dea2488c252f8fe7edf4c63ab6ec"
+    },
+    "head": {
+      "commit": "5cf0bc67f2db4d17c4653a55cc66493445e4b03a",
+      "path": "src/application/review.ts",
+      "startLine": 23,
+      "endLine": 34,
+      "text": " const publish=(next:View)=>{state={...next};state={...state,recovery:recovery()};for(const listener of listeners)listener();};\n const owns=(expected:number,captured:string,op?:object)=>generation===expected&&token===captured&&(!op||operation===op);\n const request=async(captured:string,path:string,body?:unknown,signal?:AbortSignal)=>{\n  const controller=body===undefined?new AbortController():null;if(controller)readControllers.add(controller);\n  const ownedSignal=controller?(signal?AbortSignal.any([signal,controller.signal]):controller.signal):signal;\n  try{\n   if(ownedSignal?.aborted)throw new Error('selection_superseded');\n   const response=await fetch(path,{headers:{...accessHeaders(captured),'Content-Type':'application/json'},...(body===undefined?{}:{method:'POST',body:typeof body==='string'?body:JSON.stringify(body)}),...(ownedSignal?{signal:ownedSignal}:{})});\n   const value=await response.json() as unknown;if(ownedSignal?.aborted)throw new Error('selection_superseded');if(!response.ok)throw new Error(String((value as {error?:string}).error??'request_failed'));return value;\n  }finally{if(controller)readControllers.delete(controller);}\n };\n const interruptSelection=()=>{if(state.selecting){selectedSnapshotId=state.review?.snapshot.snapshotId??selectedSnapshotId;publish({...state,selecting:false});}};\n",
+      "blobId": "44b1953f925827b492fecace0925e5fe4eec87cd",
+      "sha256": "22a152791377508ed014859c32a960827bf426e89554172a36b82477f68d9ed1"
+    }
+  },
+  "refresh": {
+    "base": {
+      "commit": "1f1aad1f21e5b71bf121d0416d95c1710e70592f",
+      "path": "src/application/review.ts",
+      "startLine": 34,
+      "endLine": 44,
+      "text": " const refresh=async(minimumRevision=0)=>{\n  const expected=generation,captured=token;inflight?.abort();const controller=new AbortController();inflight=controller;\n  try{\n   const review=await request(captured,`/api/reviews/${encodeURIComponent(reviewId)}?minimumRevision=${minimumRevision}${selectedSnapshotId?`&snapshotId=${encodeURIComponent(selectedSnapshotId)}`:''}`,undefined,controller.signal) as Review;\n   if(owns(expected,captured)&&!controller.signal.aborted){if(review.reviewId!==reviewId||selectedSnapshotId&&review.snapshot.snapshotId!==selectedSnapshotId)throw new Error('selection_mismatch');selectedSnapshotId??=review.snapshot.snapshotId;\n    const source=review.snapshot.sources.find(source=>source.side==='head'&&source.lineCount>0)??review.snapshot.sources.find(source=>source.lineCount>0);\n    publish({...state,review,sources:state.review?.snapshot.snapshotId===review.snapshot.snapshotId?state.sources:sourceViews(review.snapshot),graph:state.review?.snapshot.snapshotId===review.snapshot.snapshotId?state.graph:projectGraph(review.snapshot),error:'',initialSelection:source?{snapshotId:review.snapshot.snapshotId,side:source.side,path:source.path,startLine:1,endLine:1}:null,authenticated:true});return review;\n   }\n  }catch(error){if(owns(expected,captured)&&!controller.signal.aborted)publish({...state,error:error instanceof Error?error.message:'request_failed'});}\n  finally{if(inflight===controller)inflight=null;}\n };\n",
+      "blobId": "9da077b77bc0571d46a3805e5304f80bb56a442d",
+      "sha256": "685f01c9a7986ed14801ae113ec0acb577119ac8b70bdc2009fbab7baff3a132"
+    },
+    "head": {
+      "commit": "5cf0bc67f2db4d17c4653a55cc66493445e4b03a",
+      "path": "src/application/review.ts",
+      "startLine": 35,
+      "endLine": 45,
+      "text": " const refresh=async(minimumRevision=0)=>{\n  const expected=generation,captured=token;inflight?.abort();const controller=new AbortController();inflight=controller;\n  try{\n   const review=await request(captured,`/api/reviews/${encodeURIComponent(reviewId)}?minimumRevision=${minimumRevision}${selectedSnapshotId?`&snapshotId=${encodeURIComponent(selectedSnapshotId)}`:''}`,undefined,controller.signal) as Review;\n   if(owns(expected,captured)&&!controller.signal.aborted){if(review.reviewId!==reviewId||selectedSnapshotId&&review.snapshot.snapshotId!==selectedSnapshotId)throw new Error('selection_mismatch');selectedSnapshotId??=review.snapshot.snapshotId;\n    const source=review.snapshot.sources.find(source=>source.side==='head'&&source.lineCount>0)??review.snapshot.sources.find(source=>source.lineCount>0);\n    publish({...state,review,sources:state.review?.snapshot.snapshotId===review.snapshot.snapshotId?state.sources:sourceViews(review.snapshot),graph:state.review?.snapshot.snapshotId===review.snapshot.snapshotId?state.graph:projectGraph(review.snapshot),error:'',initialSelection:source?{snapshotId:review.snapshot.snapshotId,side:source.side,path:source.path,startLine:1,endLine:1}:null,authenticated:true});return review;\n   }\n  }catch(error){if(owns(expected,captured)&&!controller.signal.aborted)publish({...state,error:error instanceof Error?error.message:'request_failed'});}\n  finally{if(inflight===controller)inflight=null;}\n };\n",
+      "blobId": "44b1953f925827b492fecace0925e5fe4eec87cd",
+      "sha256": "685f01c9a7986ed14801ae113ec0acb577119ac8b70bdc2009fbab7baff3a132"
+    }
+  },
+  "gatewayTest": {
+    "commit": "5cf0bc67f2db4d17c4653a55cc66493445e4b03a",
+    "path": "tests/gateway.test.ts",
+    "startLine": 90,
+    "endLine": 114,
+    "text": "test('single local owner reads and writes without a Bearer while explicit invalid credentials never escalate',async()=>{\n const root=mkdtempSync(join(tmpdir(),'pr-reviewer-local-owner-')),store=createStore(join(root,'db'));\n const content='export const value = 1;\\n',snapshot={snapshotId:'local-source',repository:'local',prUrl:'https://github.com/scottchu/pr-reviewer/pull/14',prNumber:14,baseSha:'a',headSha:'b',sources:[{side:'head' as const,path:'value.ts',content,hash:createHash('sha256').update(content).digest('hex'),lineCount:1}]};\n store.prepare('r',snapshot);const oldToken=store.issueUser();\n store.imports.command(oldToken,{type:'RequestImport',commandId:'old-owner-import',path:'/retained/locator'});\n const {createImportArtifacts}=await import('../src/import-artifacts/public.ts');\n const gateway=createGateway(store,async()=>({state:'unknown',reason:'controlled'}),{importArtifacts:createImportArtifacts(root)}),port=await gateway.listen(0);\n const call=async(path:string,body?:unknown,authorization?:string)=>{const response=await fetch(`http://127.0.0.1:${port}${path}`,{headers:{'Content-Type':'application/json',...(authorization?{Authorization:authorization}:{})},...(body?{method:'POST',body:JSON.stringify(body)}:{})});return {status:response.status,body:await response.json() as Record<string,unknown>};};\n try{\n  assert.deepEqual((await call('/api/self')).body,{kind:'user',actorId:'local-user'});\n  assert.equal((await call('/api/reviews')).status,200);assert.equal((await call('/api/reviews/r')).status,200);\n  assert.equal((await call('/api/analysis?reviewId=r&snapshotId=local-source')).status,200);\n  assert.equal((await call('/api/story?reviewId=r&snapshotId=local-source')).status,200);\n  assert.equal((await call('/api/story/context?reviewId=r&snapshotId=local-source')).status,200);\n  const jobs=await call('/api/imports');assert.equal(jobs.status,200);const job=(jobs.body as unknown as {jobId:string}[])[0]!;assert.ok(job.jobId);\n  assert.equal((await call('/api/imports/commands',{type:'RequestImport',commandId:'new-owner-import',path:'/local/locator'})).body.state,'applied');\n  const command={type:'AskQuestion',commandId:'local-owner-question',reviewId:'r',anchor:{snapshotId:'local-source',path:'value.ts',side:'head',startLine:1,endLine:1},text:'Saved without a login'};\n  const receipt=await call('/api/commands',command);assert.equal(receipt.status,200);assert.equal(receipt.body.state,'applied');assert.equal(receipt.body.actorId,'local-user');\n  assert.deepEqual((await call('/api/commands',command)).body,receipt.body);\n  const readback=await call('/api/reviews/r');assert.equal((readback.body.questions as {text:string}[])[0]?.text,command.text);\n  for(const authorization of ['Bearer wrong','Basic anything','Bearer '])assert.equal((await call('/api/reviews/r',undefined,authorization)).status,401);\n  const connection=store.registerConnection({kind:'user',actorId:'local-user'},{host:'codex',sessionId:'original',connectionId:'original-connection',corroborated:true});\n  assert.equal((await call('/api/reviews/r',undefined,`Bearer ${connection.token}`)).status,401);\n }finally{await gateway.close();store.close();rmSync(root,{recursive:true,force:true});}\n});\n",
+    "blobId": "22f79df9411da14d219f2ee72626334a1c2be400",
+    "sha256": "fd24ff39238617a91f64410c13e194e6f5bb07f31d1cc7acecc3ade56f674c3c"
+  },
+  "helper": {
+    "commit": "5cf0bc67f2db4d17c4653a55cc66493445e4b03a",
+    "path": "src/application/local-access.ts",
+    "startLine": 1,
+    "endLine": 3,
+    "text": "// Nonsecret lifecycle/recovery scope for the single local owner. Never a Bearer.\nexport const localOwnerSession='local-owner:v1';\nexport const accessHeaders=(session:string):Record<string,string>=>session===localOwnerSession?{}:{Authorization:`Bearer ${session}`};\n",
+    "blobId": "99533c827fb57c291757dd27b54367ddb6185082",
+    "sha256": "811735e3599292c54af870134345249deed32f1d9b9705f8ca18fd086225d59d"
+  },
+  "helperBase": "file_absent_at_pinned_base",
+  "relations": [
+    {
+      "id": "refresh-head-calls-request-head",
+      "kind": "source_observed_call",
+      "caller": "refresh.head",
+      "callee": "request.head",
+      "commit": "5cf0bc67f2db4d17c4653a55cc66493445e4b03a",
+      "path": "src/application/review.ts",
+      "line": 38,
+      "evidence": "const review=await request(captured,",
+      "limit": "Direct lexical call manually inspected; no admitted analyzer/runtime result."
+    },
+    {
+      "id": "request-head-calls-access-head",
+      "kind": "source_observed_call",
+      "caller": "request.head",
+      "callee": "access.head",
+      "commit": "5cf0bc67f2db4d17c4653a55cc66493445e4b03a",
+      "path": "src/application/review.ts",
+      "line": 30,
+      "evidence": "...accessHeaders(captured)",
+      "importLine": 1,
+      "limit": "Exact named import and call in pinned source; no execution claim."
+    }
+  ],
+  "provenance": "Fixture-backed layout of actual own-PR source; manual explicit comparison, not live product review/analysis."
+} as const;

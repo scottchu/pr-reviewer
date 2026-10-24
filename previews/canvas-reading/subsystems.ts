@@ -41,3 +41,15 @@ export const testsTransition=(state:TestsPreview,action:{type:'enable'}|{type:'r
  }
  return {...state,jobs:state.jobs.map(job=>{if(job.jobId!==state.selected||['passed','failed','cancelled'].includes(job.state))return job;const terminal=['passed','failed','cancelled'].includes(action.state),result=action.state==='passed'||action.state==='failed';return {...job,jobRevision:job.jobRevision+1,state:action.state,effectDisposition:terminal?'quiescent':action.state==='queued'?'none':'unresolved',resultId:result?`mock-result-${job.jobId}`:null,counts:result?{passed:action.state==='passed'?3:2,failed:action.state==='failed'?1:0}:null};})};
 };
+
+export const importCandidates=[{id:'pr24',number:24,title:'Retained behavior neighborhood',head:'b096826e31c0927190806de91ed70b8b64aa93d8',prepared:false},{id:'pr25',number:25,title:'Single-owner workspace without manual credentials',head:'e3b270e5f49a9215452b0b86702946043e979059',prepared:true}] as const;
+export type ImportPreview=Readonly<{path:string;phase:'empty'|'choosing'|'acquiring'|'ready'|'unavailable'|'failed'|'unknown';candidate:'pr24'|'pr25'|null;jobId:string|null;reason:string}>;
+export const initialImport=():ImportPreview=>({path:'',phase:'empty',candidate:null,jobId:null,reason:''});
+export type ImportAction={type:'path';path:string}|{type:'discover'}|{type:'choose';candidate:'pr24'|'pr25'}|{type:'observe';phase:'ready'|'unavailable'|'failed'|'unknown'};
+export const importTransition=(state:ImportPreview,action:ImportAction):ImportPreview=>{
+ if(action.type==='path')return {...state,path:action.path};
+ if(action.type==='discover')return state.path.trim()?{...state,phase:'choosing',candidate:null,jobId:'mock-import-request',reason:'Two example candidates; no actual path or provider discovery.'}:state;
+ if(action.type==='choose'){if(state.phase!=='choosing')return state;return {...state,candidate:action.candidate,phase:action.candidate==='pr24'?'unavailable':'acquiring',reason:action.candidate==='pr24'?'PR24 exists, but its source account is not prepared in this preview.':'Simulated acquisition; the displayed review stays usable.'};}
+ if(state.phase!=='acquiring')return state;
+ return {...state,phase:action.phase,reason:action.phase==='ready'?'Mock result ready; explicit Open is required.':action.phase==='unknown'?'Outcome unknown; no automatic replay or invented source result.':action.phase==='failed'?'Simulated source verification failure; old review retained.':'Simulated source unavailable; old review retained.'};
+};
