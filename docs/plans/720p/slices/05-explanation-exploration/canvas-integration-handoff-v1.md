@@ -1,7 +1,7 @@
 # Structural canvas integration review handoff v1
 
 Date: 2026-10-24
-Status: inspectable partial preproduction candidate; two independent renderer P2 findings pending correction
+Status: inspectable partial preproduction candidate; both independent renderer P2 findings author-corrected, independent recheck pending
 Implementation source:5edd337d4de46f2d5085d7e8c3f15a335654a41f
 Parent: [implementation packet and evidence](canvas-integration-v1.md)
 Durable intent: [canvas reading](../../../../product/review-loop/canvas-reading.md), [architecture](../../../../product/architecture.md), [presentation](../../../../product/review-loop/presentation.md), [private compatibility](../../../../product/review-loop/persistence-compatibility.md), [Story recovery](../../../../product/review-loop/story-and-exploration.md)
@@ -15,3 +15,7 @@ Author evidence:47 Bun+411 Node through normal entry;3 canvas and5 B2 Chrome jou
 The original independent reader's browser-policy denial remains unchanged. Do not bypass it or re-label source inspection as frozen UI-first understanding. A fresh reviewer must form/freeze an actual UI account before source comparison when permitted; otherwise mark that phase unrun and keep source engineering separate. No merge/deploy/layout adoption is authorized here.
 
 Known divergence: semantic and other subsystem presentations remain separate; inherited browser suites contain standalone-inspector selectors awaiting bounded reconciliation. Long lines/source/question content require internal scroll/pan; counterpart context is file-level and not synchronized/matched-function evidence; existing player can cross narrow reading. Two source-review P2 findings at5edd require latest-reference intent reservation and valid primary-origin navigation. Their bounded RED/PASS correction and exact replacement source/runtime receipt will append here before final candidate handoff.
+
+## Bounded renderer correction receipt
+
+The correction commit reserves latest authored-reference intent before awaiting and routes the primary-origin card through exact primary source inspection. Both retained RED regressions now pass:35 affected application cases and4 actual Chrome canvas journeys, with strict/boundaries. Raw reference-review-red.log/origin-review-red.log and renderer-review-{application,chrome}-green.log are in the evidence root. The original3 canvas cases were rerun after the correction. Independent recheck must inspect this new source pin;5edd remains the earlier reviewed source and is not relabeled fixed. The normal47+411/B2 Chrome evidence remains exactly its earlier source; no unchanged broad-test claim is advanced by the focused repair.
