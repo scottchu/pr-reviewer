@@ -20,7 +20,7 @@ export const SemanticPanel=({bridge,onGraphState,graphRestore}:{bridge:AnalysisB
  const skipCapture=useRef(false);
  useEffect(()=>{if(graphRestore?.id){skipCapture.current=true;setGraphViewport(graphRestore.frame.viewport);setFullSource(graphRestore.frame.fullSource);}},[graphRestore?.id]);
  const captureViewport=useCallback((viewport:{x:number;y:number;zoom:number})=>setGraphViewport(viewport),[]);
- useEffect(()=>{if(skipCapture.current){skipCapture.current=false;return;}onGraphState?.({analysisId:view?.analysis?.analysisId??null,focus:state.focus,viewport:graphViewport,fullSource,sourceAnchor:state.sourceAnchor,corpusId:state.source?.corpusId??null},view?.snapshotId??null);},[view?.snapshotId,view?.analysis?.analysisId,state.focus,graphViewport,fullSource,state.sourceAnchor,state.source?.corpusId,onGraphState]);
+ useEffect(()=>{if(skipCapture.current){skipCapture.current=false;return;}onGraphState?.({analysisId:bridge.captureAnalysisId(),focus:state.focus,viewport:graphViewport,fullSource,sourceAnchor:state.sourceAnchor,corpusId:state.source?.corpusId??null},view?.snapshotId??null);},[view?.snapshotId,view?.analysis?.analysisId,state.focus,graphViewport,fullSource,state.sourceAnchor,state.source?.corpusId,onGraphState]);
  useEffect(()=>{if(!graphRestore?.id||state.sourceNavigation!=='restore')setFullSource(false);},[state.sourceAnchor]);
  const sourceReturn=useRef<{scroll:number;element:HTMLElement|null}>({scroll:0,element:null});
  useEffect(()=>{if(state.source&&state.sourceAnchor&&state.sourceNavigation==='inspect')requestAnimationFrame(()=>{document.getElementById('semantic-source-title')?.focus();document.getElementById('semantic-source')?.scrollIntoView({block:'start'});});},[state.source,state.sourceAnchor,state.sourceNavigation]);

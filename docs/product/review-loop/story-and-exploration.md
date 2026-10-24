@@ -323,3 +323,12 @@ The 2026-10-24 access correction supersedes product login/logout and credential 
 Current private scope is SHA256 of UTF-8 domain `pr-reviewer-local-owner-scope-v1`, NUL, decimal UTF-8 origin byte length, colon and exact browser-facing origin. A nonsecret in-memory local-owner marker selects that scope and is explicitly omitted from request headers. Generation/controller/fingerprint fences, write-ahead storage and explicit exact-command recovery remain unchanged. A new open invalidates older effects independently of the stable owner scope. Older credential-scoped pending or private-view records remain preserved and locked when incompatible; explain legacy reconciliation without requesting the original token or silently replaying. Authoritative retained history still loads.
 
 Story evidence and story store public calls accept either trusted in-process local-owner access or retained participant/user credentials. Gateway owner calls use the object, never a manufactured browser token; explicit agent credentials retain attachment and generation checks.
+
+
+## Unavailable semantic result recovery
+
+A failed compute result is diagnostic evidence, not an admitted historical analysis. Capture and source-inspection pinning use an analysis identity only for an analyzed result. Explicit selection commits only after a successful exact read; failure restores the prior valid selection and view, with epoch/abort fencing retained so later polls cannot repeat an invalid selection.
+
+For an old private frame, normalize only its analysis pin when the current authorized view for the exact snapshot shows that exact unavailable result, with the matching retained unavailable job and no selected admitted analysis. Preserve drafts, viewport, focus, source anchors and return frame fields, validating them normally; expose a recovery diagnostic. Missing identities, authorization failures, mismatched/newer results and invalid source/focus remain failures, never broad fallback. Storage's admitted-only explicit query rule is unchanged. Inventory failure with no compute result remains distinct.
+
+Normalization additionally requires a fresh successful current-owner semantic read at restoration time. Cached unavailable diagnostics, including a view retained after an authorization/network error, are not authority. Failed or superseded revalidation leaves the saved return frame and both drafts intact; it cannot consume the frame or rewrite its pin.
