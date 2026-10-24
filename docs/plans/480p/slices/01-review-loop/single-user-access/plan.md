@@ -2,7 +2,7 @@
 
 **Date:** 2026-10-24
 
-**Status:** Accepted intent; implementation and verification pending
+**Status:** Implemented and verified candidate; independent review, own-PR and live deployment remain coordinator gates
 
 **Parent:** [Review-loop slice](../plan.md)
 
@@ -41,3 +41,13 @@ Stop affected work for a concrete conflicting requirement, network permission re
 **Scope:** Read-only candidate against the exact base above; review SU-A–E, durable [runtime specification](../../../../../product/review-loop/runtime.md), gateway principal derivation, storage authority, recovery/lifecycle fences and actual React journey. Root supplies candidate commit/build and implementer checks. Form and freeze the account through actual UI/graph before inspecting diff, following graph-first-review.
 
 **Required return:** Findings with severity/source/evidence, reproduced checks and limits; pass/changes-needed/blocked. Own-PR dogfood, independent review, PR delivery and live deployment remain root-owned gates; implementer checks do not establish those gates.
+
+## Version 2 candidate and review input
+
+**Implementation source:** 5cf0bc67f2db4d17c4653a55cc66493445e4b03a, against b096826e31c0927190806de91ed70b8b64aa93d8. The preceding docs-first packet is1f1aad1. Subsequent evidence-only documentation does not change the tested app/tests.
+
+**Observed checks:** Strict TypeScript/subsystem boundaries passed; normal entrypoint47Bun+306Node tests passed; full actual Chrome/React25E2E passed on the frozen clean candidate. See [evidence and limitations](evidence.md).
+
+**Independent review assignment input:** Use the exact candidate/base above and SU-A–E. Root supplies its PR head and actual graph-first task, assigns a fresh reviewer and freezes the UI account before source inspection. Read source docs runtime/contracts/import/semantic-storage/story/persistence policies and inspect changed public gateway/storage/application interfaces, source tests and actual clean-browser opening. Check preserved old jobs/credentials, explicit Bearer no-fallback, object-identity access checks, lifecycle/recovery fencing and network constraints. Reproduce with isolated ports/data, never the pilot. Report findings and actual limits.
+
+**Successor reconciliation:** Updated480p02 and720p03/04/05 packets with the delivered owner-access interface, legacy-job semantics and remaining gates. Roadmap/round/current-delivery summaries now carry the accepted correction instead of scheduling a replacement login. These updates do not accept those slices.

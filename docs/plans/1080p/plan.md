@@ -28,7 +28,7 @@ An external06 readiness proposal is retained at `/tmp/pr-reviewer-720p-reflectio
 
 Exit requires 06–08 source/environment/result identity, cancellation/unknown recovery, comparison honesty, retained correction and no wake loops; independent review and actual own-PR graph-first critique must pass. Earlier 480p/720p native/human acceptance gaps remain open until actually resolved. Record implemented/tested/merged/pilot-verified status separately; do not call 1080p fully accepted solely because these three slices pass engineering tests.
 
-Passkey is a known issue deferred to the final follow-up after this endpoint's engineering delivery. Preserve the current login and all credentials/data; no authentication change, public deployment, new host or external posting is part of these slices. If only external human/access decisions remain, record precise morning actions while finishing all independent authorized work.
+The accepted 2026-10-24 single-owner access correction supersedes the former passkey/login follow-up. Normal owner calls need no manual credential; preserve all credentials/data, exact-session participant checks and the existing network boundary. No public deployment, new host or external posting is part of these slices. If only external human/access decisions remain, record precise morning actions while finishing all independent authorized work.
 
 ## Mandatory round reflection and rebuild-readiness gate
 
