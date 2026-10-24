@@ -390,3 +390,4 @@ export {analysisCommandSchema,analysisQuerySchema,semanticSourceQuerySchema,sema
 export type {AnalysisCommand,AnalysisReceipt,AnalysisView,AnalysisQuery,AnalysisJobView,AnalysisState,AnalysisPhase,AnalysisInvocation,AnalysisProcess,GraphClarification,SemanticAnchor,SemanticSourceQuery,SemanticSource,CorpusAccount} from './semantic.ts';
 export {semanticCanonical} from './semantic.ts';
 export type {SemanticFunctionNode,SemanticCallEdge,SemanticNeighborhood,SemanticDeclaration,SemanticAnalysisResult,SemanticInventoryResult} from './semantic.ts';
+export {analysisDiagnosticCode} from './semantic.ts';

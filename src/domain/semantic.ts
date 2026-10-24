@@ -119,3 +119,20 @@ export const semanticCanonical = (value: unknown): string => {
     return JSON.stringify(value) ?? "null";
 };
 export type {FunctionNode as SemanticFunctionNode,CallEdge as SemanticCallEdge,Neighborhood as SemanticNeighborhood,NeighborhoodDeclaration as SemanticDeclaration,AnalysisResult as SemanticAnalysisResult,DeclarationInventoryResult as SemanticInventoryResult} from '../source-analysis/public.ts';
+
+const analysisDiagnosticCodes = new Set([
+    "analysis_failed", "unauthorized", "stale_attachment", "stale_execution_owner", "stale_analysis_runner",
+    "analysis_cancelled", "analysis_superseded", "new_analysis_generation", "interrupted_invocation", "interrupted_invocation_not_replayed",
+    "source_unavailable", "source_identity_conflict", "source_project_required", "source_locator_required",
+    "analysis_phase_conflict", "analysis_process_limit", "analysis_process_unresolved", "analysis_identity_conflict",
+    "analysis_record_unavailable", "analysis_job_unavailable", "analysis_declaration_conflict", "retained_semantic_limit",
+    "invalid_analysis_observation", "unresolved_process_observation", "context_unavailable", "phase_limit", "termination_unknown",
+    "tool_missing", "authentication", "command_failed", "output_limit", "timeout", "invalid_input", "invalid_metadata",
+    "inventory_limit", "missing_object", "stale_candidate", "required_source_unavailable", "binary", "invalid_utf8",
+    "symlink", "submodule", "object_type", "hash_mismatch", "tree_limit", "tree_byte_limit", "inventory_metadata_limit",
+    "invalid_tree", "file_limit", "total_byte_limit", "source_limit",
+    "analysis_worker_frame", "analysis_worker_input_limit", "analysis_worker_json", "analysis_worker_output_limit",
+    "analysis_worker_request", "analysis_worker_schema", "analysis_worker_validation", "analysis_worker_limit",
+    "analysis_worker_owner_option", "analysis_worker_observation", "analysis_worker_cancelled", "analysis_worker_failed", "analysis_worker_timeout",
+]);
+export const analysisDiagnosticCode = (value: string | null): string | null => value === null ? null : analysisDiagnosticCodes.has(value) ? value : "analysis_failed";

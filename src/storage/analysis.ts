@@ -1,6 +1,6 @@
 import { createHash, randomUUID } from "node:crypto";
 import type { DatabaseSync } from "node:sqlite";
-import { analysisCommandSchema, analysisQuerySchema, semanticSourceQuerySchema, semanticCanonical, snapshotFor } from "../domain/public.ts";
+import { analysisCommandSchema, analysisQuerySchema, semanticSourceQuerySchema, semanticCanonical, snapshotFor, analysisDiagnosticCode } from "../domain/public.ts";
 import type { AnalysisCommand, AnalysisReceipt, AnalysisView, AnalysisQuery, AnalysisJobView, AnalysisInvocation, AnalysisProcess, GraphClarification, SemanticAnchor, SemanticSourceQuery, SemanticSource, Principal, Review, CorpusAccount } from "../domain/public.ts";
 import { contextIdentity, contextAnalysisInput, isPreparedContextWitness } from "../source-preparation/public.ts";
 import type { PreparedContextWitness } from "../source-preparation/public.ts";
@@ -435,7 +435,7 @@ export const createAnalysisStore = ({ db, tx, load, authorize, execution, limits
             const latest=db.prepare("SELECT body FROM analysis_jobs ORDER BY rowid DESC LIMIT 1").get() as {body:string}|undefined;
             const effect=db.prepare("SELECT body FROM analysis_jobs WHERE json_extract(body,'$.state')='unknown' OR json_extract(body,'$.invocations[#-1].state')='running' ORDER BY rowid DESC LIMIT 1").get() as {body:string}|undefined;
             const jobs=new Map([effect,latest].flatMap(row=>row?[JSON.parse(row.body) as Job]:[]).map(job=>[job.jobId,job]));
-            return [...jobs.values()].map(job=>({reviewId:job.reviewId,snapshotId:job.snapshotId,jobId:job.jobId,invocationId:job.invocations.at(-1)?.invocationId??null,analysisGeneration:job.generation,jobRevision:job.jobRevision,graphRevision:graph(job.reviewId,job.snapshotId).graphRevision,phase:job.invocations.at(-1)?.phase??null,state:job.state,reason:job.reason===null?null:/^[a-z][a-z0-9_]{0,63}$/.test(job.reason)?job.reason:"analysis_failed"}));
+            return [...jobs.values()].map(job=>({reviewId:job.reviewId,snapshotId:job.snapshotId,jobId:job.jobId,invocationId:job.invocations.at(-1)?.invocationId??null,analysisGeneration:job.generation,jobRevision:job.jobRevision,graphRevision:graph(job.reviewId,job.snapshotId).graphRevision,phase:job.invocations.at(-1)?.phase??null,state:job.state,reason:analysisDiagnosticCode(job.reason)}));
         },
         unknown: (value: AnalysisOwner) => { owner(value); return all().filter(job => job.state === "unknown").map(publicJob); },
         confirmQuiescent: (value: AnalysisOwner, jobId: string) => tx(() => { owner(value); const job = get(jobId), invocation = job.invocations.at(-1); if (job.state !== "unknown" || !invocation)

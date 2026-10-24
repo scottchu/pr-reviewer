@@ -1,3 +1,4 @@
+import {analysisDiagnosticCode} from "../domain/public.ts";
 import type { Store, AnalysisGrant } from "../storage/public.ts";
 import { acquirePreparedContext } from "../source-preparation/public.ts";
 import type { AcquisitionEffects } from "../source-acquisition/public.ts";
@@ -17,7 +18,7 @@ export const createAnalysisRunner = (store: Store, options: AnalysisRunnerOption
     let active = false, stopped = false, current: Promise<void> | null = null, abort: AbortController | null = null;
     let fenced=false,failure:string|null=null;
     let lastJobs:ReturnType<typeof analysis.diagnostics>=[];
-    const noteFailure=(error:unknown)=>{const raw=error instanceof Error?error.message:"analysis_failed";failure=/^[a-z][a-z0-9_]{0,63}$/.test(raw)?raw:"analysis_failed";if(raw==="stale_execution_owner"||raw==="stale_analysis_runner")fenced=true;};
+    const noteFailure=(error:unknown)=>{const raw=error instanceof Error?error.message:"analysis_failed";failure=analysisDiagnosticCode(raw);if(raw==="stale_execution_owner"||raw==="stale_analysis_runner")fenced=true;};
     const diagnosticSnapshot=()=>{
         if(!fenced)try{lastJobs=analysis.diagnostics(owner);}catch(error){noteFailure(error);}
         return {cursorMeaning:"route_publications" as const,disposition:fenced?"fenced" as const:"active" as const,failure,jobs:structuredClone(lastJobs)};

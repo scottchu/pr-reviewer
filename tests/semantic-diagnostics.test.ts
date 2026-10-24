@@ -21,6 +21,10 @@ test("fenced diagnostics retain bounded last-known context and a sanitized failu
 
 test("owner diagnostic projection keeps current uncertain effect plus latest queued job bounded and sanitized",()=>{
  const f=semanticFixture();try{
-  f.store.analysis.command(f.token,f.request);const owner=f.store.analysis.beginOwner(),claim=f.store.analysis.claim(owner)!;f.store.analysis.fail(claim.grant,`private source export const secret at ${f.root}`,false);f.store.analysis.command(f.token,{...f.request,commandId:"new-generation",expectedAnalysisGeneration:1});const rows=f.store.analysis.diagnostics(owner);assert.equal(rows.length,2);assert.equal(rows[0]!.state,"unknown");assert.equal(rows[0]!.reason,"analysis_failed");assert.equal(rows[1]!.state,"context_queued");assert.equal(rows[1]!.analysisGeneration,2);assert.equal(JSON.stringify(rows).includes(f.root),false);assert.equal(JSON.stringify(rows).includes("export const"),false);
+  f.store.analysis.command(f.token,f.request);const owner=f.store.analysis.beginOwner(),claim=f.store.analysis.claim(owner)!;f.store.analysis.fail(claim.grant,"private_source_identifier",false);f.store.analysis.command(f.token,{...f.request,commandId:"new-generation",expectedAnalysisGeneration:1});const rows=f.store.analysis.diagnostics(owner);assert.equal(rows.length,2);assert.equal(rows[0]!.state,"unknown");assert.equal(rows[0]!.reason,"analysis_failed");assert.equal(rows[1]!.state,"context_queued");assert.equal(rows[1]!.analysisGeneration,2);assert.equal(JSON.stringify(rows).includes(f.root),false);assert.equal(JSON.stringify(rows).includes("export const"),false);
  }finally{f.cleanup();}
+});
+
+for(const marker of ["private_source_identifier","analysis_worker_private_identifier"])test(`arbitrary identifier-like owner errors are sanitized in route failures: ${marker}`,async()=>{
+ const f=semanticFixture(),runner=createAnalysisRunner(f.store);try{f.store.analysis.claim=()=>{throw new Error(marker);};runner.wake();await runner.idle().catch(()=>{});const diagnostics=runner.diagnostics();assert.ok(diagnostics.length);assert.equal(diagnostics[0]!.failure,"analysis_failed");assert.equal(JSON.stringify(diagnostics).includes(marker),false);}finally{await runner.stop();f.cleanup();}
 });
