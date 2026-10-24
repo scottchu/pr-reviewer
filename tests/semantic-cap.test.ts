@@ -5,13 +5,14 @@ import { join } from "node:path";
 import { createHash } from "node:crypto";
 import { analysisCommandSchema } from "../src/domain/public.ts";
 import { createStore } from "../src/storage/public.ts";
-import { acquirePreparedContext, contextAnalysisInput } from "../src/source-preparation/public.ts";
+import { acquirePreparedContext, contextAnalysisInput, isPreparedContextWitness } from "../src/source-preparation/public.ts";
 import { createNodeEffects } from "../src/source-acquisition/public.ts";
 import type { ContextLedgerEntry } from "../src/source-acquisition/public.ts";
 import { semanticFixture } from "./semantic-fixture.ts";
 import { eventually } from "./semantic-fixture.ts";
 import { createAnalysisRunner } from "../src/analysis-jobs/public.ts";
 import { createGateway } from "../src/server/public.ts";
+import { createOwnedAcquisitionEffects } from "../src/import-jobs/public.ts";
 
 test("context cap is strict, defaults by absence and counts unique required paths without normalizing retry input", () => {
   const f = semanticFixture();
@@ -95,6 +96,44 @@ test("actual HTTP validates cap before effects, preserves owner-only context aut
   } finally { await gateway.close(); f.cleanup(); }
 });
 
+for (const mismatch of ["cap", "priorities"] as const) test(`genuine tracked context witness cannot override the job's ${mismatch} intent`, async () => {
+  const f = semanticFixture();
+  try {
+    const request = { ...f.request, contextFilesPerSide: mismatch === "cap" ? 1 : 2, priorityPaths: { base: ["callee.ts"], head: mismatch === "cap" ? ["callee.ts"] : ["caller.ts", "callee.ts", "caller.ts"] } };
+    f.store.analysis.command(f.token, request);
+    const owner = f.store.analysis.beginOwner(), claim = f.store.analysis.claim(owner)!, input = f.store.analysis.contextInput(claim.grant);
+    const effects = createOwnedAcquisitionEffects({ observations: { launchLimit: () => f.store.analysis.launchLimit(claim.grant), cancelled: () => f.store.analysis.cancelled(claim.grant), recordProcess: observation => f.store.analysis.recordProcess(claim.grant, { ...observation, executable: "git" }) } });
+    const wrong = await acquirePreparedContext({ ...input, ...(mismatch === "cap" ? { contextFilesPerSide: 2 } : { priorityPaths: { base: ["callee.ts"], head: ["caller.ts"] } }) }, effects);
+    assert.equal(wrong.kind, "prepared"); assert.equal(effects.terminationConfirmed(), true); if (wrong.kind !== "prepared") throw Error("fixture_context_unavailable");
+    const before = f.store.analysis.query(f.token, { reviewId: "r", snapshotId: f.snapshot.snapshotId });
+    assert.throws(() => f.store.analysis.finishContext(claim.grant, { corpus: wrong.corpus, issues: wrong.issues }, wrong.witness), /source_identity_conflict/);
+    const rejected = f.store.analysis.query(f.token, { reviewId: "r", snapshotId: f.snapshot.snapshotId });
+    assert.equal(rejected.jobs[0]!.state, "context_running"); assert.equal(rejected.jobs[0]!.jobRevision, before.jobs[0]!.jobRevision); assert.equal(rejected.preparation!.corpus, null); assert.equal(rejected.graphRevision, 0);
+    f.store.imports.command(f.token, { type: "RequestImport", commandId: "cap-conflict-does-not-release", path: f.root });
+    assert.equal(f.store.imports.claim(f.store.imports.beginOwner()), null);
+    const matching = await acquirePreparedContext({ ...input, priorityPaths: { base: ["callee.ts"], head: mismatch === "cap" ? ["callee.ts"] : ["callee.ts", "caller.ts"] } }, effects);
+    assert.equal(matching.kind, "prepared"); assert.equal(effects.terminationConfirmed(), true); if (matching.kind !== "prepared") throw Error("matching_context_unavailable");
+    f.store.analysis.finishContext(claim.grant, { corpus: matching.corpus, issues: matching.issues }, matching.witness);
+    const admitted = f.store.analysis.query(f.token, { reviewId: "r", snapshotId: f.snapshot.snapshotId });
+    assert.equal(admitted.jobs[0]!.state, "inventory_queued"); assert.equal(admitted.preparation!.corpus!.budgets.filesPerSide, request.contextFilesPerSide);
+    assert.equal(admitted.preparation!.corpus!.corpusId, matching.corpus.corpusId);
+  } finally { f.cleanup(); }
+});
+
+for (const cap of [undefined, 128]) test(`matching genuine context preserves ${cap === undefined ? "omitted legacy" : "explicit128"} default admission`, async () => {
+  const f = semanticFixture();
+  try {
+    f.store.analysis.command(f.token, { ...f.request, ...(cap === undefined ? {} : { contextFilesPerSide: cap }) });
+    const owner = f.store.analysis.beginOwner(), claim = f.store.analysis.claim(owner)!;
+    const effects = createOwnedAcquisitionEffects({ observations: { launchLimit: () => f.store.analysis.launchLimit(claim.grant), cancelled: () => f.store.analysis.cancelled(claim.grant), recordProcess: observation => f.store.analysis.recordProcess(claim.grant, { ...observation, executable: "git" }) } });
+    const prepared = await acquirePreparedContext(f.store.analysis.contextInput(claim.grant), effects);
+    assert.equal(prepared.kind, "prepared"); assert.equal(effects.terminationConfirmed(), true); if (prepared.kind !== "prepared") throw Error("default_context_unavailable");
+    f.store.analysis.finishContext(claim.grant, { corpus: prepared.corpus, issues: prepared.issues }, prepared.witness);
+    const view = f.store.analysis.query(f.token, { reviewId: "r", snapshotId: f.snapshot.snapshotId });
+    assert.equal(view.jobs[0]!.state, "inventory_queued"); assert.equal(view.preparation!.corpus!.budgets.filesPerSide, 128); assert.equal(view.jobs[0]!.contextFilesPerSide, cap);
+  } finally { f.cleanup(); }
+});
+
 test("cap validation precedes intent effects; exact retry, changed cap/order and queued restart preserve identity", () => {
   const f = semanticFixture(); let reopened: ReturnType<typeof createStore> | undefined;
   try {
@@ -150,6 +189,14 @@ test("trusted lower cap retains full known ledger, exact required priorities and
     assert.equal(input.sources.length, 6);
     assert.equal(input.budgets.filesPerSide, 128); assert.equal(input.budgets.invocationSites, 10000);
     assert.equal(input.sources.find(row => row.path === "unknown.ts")!.exclusion, "excluded");
+    const originalSourceExcluded = await acquirePreparedContext({ ...common, contextFilesPerSide: 1, priorityPaths: { base: ["caller.ts"], head: ["caller.ts"] } }, createNodeEffects());
+    assert.equal(originalSourceExcluded.kind, "prepared"); if (originalSourceExcluded.kind !== "prepared") throw Error("unexpected_required_snapshot_source");
+    assert.equal(isPreparedContextWitness(originalSourceExcluded.witness, common.jobId, "r", review.snapshot, originalSourceExcluded.corpus, originalSourceExcluded.issues), true);
+    for (const originalSource of review.snapshot.sources) {
+      assert.equal(originalSourceExcluded.corpus.sources.some(source => source.side === originalSource.side && source.path === originalSource.path), false);
+      const row: ContextLedgerEntry = originalSourceExcluded.corpus.ledger.find(row => row.side === originalSource.side && row.path === originalSource.path)!;
+      assert.equal(row.change, "changed"); assert.equal(row.preparation, "excluded"); assert.equal(row.reason, "source_limit");
+    }
     assert.equal(JSON.stringify(review.snapshot), original);
     let effects = 0;
     const invalid = await acquirePreparedContext({ ...common, contextFilesPerSide: 1, priorityPaths: { head: ["callee.ts", "caller.ts"] } }, { run: async () => { effects++; throw Error("unexpected_effect"); } });

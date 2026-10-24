@@ -117,6 +117,10 @@ export const createAnalysisStore = ({ db, tx, load, authorize, execution, limits
     const publicJob = (job: Job): AnalysisJobView => { const { credentialReference, actorId, worktree, sourceProject, priorityPaths, failureAccount, ...value } = job; return value; };
     const corpus = (job: Job) => { if (!job.corpusId)
         throw new Error("analysis_record_unavailable"); return record<CorpusRecord>(job.reviewId, "corpus", job.corpusId); };
+    const matchesContextIntent = (job: Job, corpus: ContextCorpus) => corpus.budgets.filesPerSide === (job.contextFilesPerSide ?? 128) && (["base", "head"] as const).every(side => {
+        const required = [...new Set(job.priorityPaths[side] ?? [])].sort();
+        return required.length === corpus.priorityPaths[side].length && required.every((path, index) => path === corpus.priorityPaths[side][index]);
+    });
     const workerRequest = (value: AnalysisGrant): WorkerRequest => {
         const { job, invocation } = grant(value);
         if (invocation.phase === "context")
@@ -380,7 +384,7 @@ export const createAnalysisStore = ({ db, tx, load, authorize, execution, limits
         finishContext: (value: AnalysisGrant, body: CorpusRecord, witness: PreparedContextWitness) => {
             const observed = grant(value), snapshot = snapshotFor(load(observed.job.reviewId), observed.job.snapshotId);
             const verified = snapshot && isPreparedContextWitness(witness, observed.job.jobId, observed.job.reviewId, snapshot, body.corpus, body.issues), prepared=prepareRecord(body);
-            return tx(() => { const { job, invocation } = grant(value); if (invocation.phase !== "context" || !verified || body.corpus.snapshotId !== job.snapshotId)
+            return tx(() => { const { job, invocation } = grant(value); if (invocation.phase !== "context" || !verified || body.corpus.snapshotId !== job.snapshotId || !matchesContextIntent(job, body.corpus))
                 throw new Error("source_identity_conflict"); ended(invocation); active(job); retain(job, "corpus", body.corpus.corpusId, prepared); release(job, invocation); invocation.state = "completed"; job.corpusId = body.corpus.corpusId; job.contextIssues = body.issues; job.state = "inventory_queued"; update(job); });
         },
         finishWorker: (value: AnalysisGrant, envelope: WorkerEnvelope, witness: AnalysisWorkerWitness) => {
