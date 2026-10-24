@@ -1,0 +1,29 @@
+# Exact-head tests in the review workspace
+
+Status: accepted B2 consumer design; implementation and independent acceptance pending
+Technology: React presentation over the managed application bridge
+Authority: [test execution](test-execution.md) owns command/job/result/artifact semantics
+
+## User experience
+
+A reviewer can see which fixed test target is configured for the displayed immutable snapshot, its full head, target revision and availability reason. An unavailable target remains unavailable until owner qualification; the panel cannot qualify source or accept executable inputs. Run captures the displayed scope and target revision. A durable receipt identifies one job and its minimum read revision, followed by progress and history. Fixture provenance is visibly labeled and never presented as a production pass.
+
+Jobs preserve their original review, snapshot, base/head and target. History selection cannot relabel an old result with a new head. Cancellation is an intent: requested, observed stopped/quiescent and unknown are separate facts. Results show stored result identity, outcome/reason, collection counts when present, raw output accounting and cleanup state. Missing counts or cleanup evidence remain absent. Unknown effects are never retried automatically.
+
+Saved questions, private drafts, story playback and navigation retain their existing owners and can proceed independently of test transport. No test action asks or wakes a participant. The panel is an ordinary keyboard-operable section with visible focus, explicit button labels, polite progress and readable wrapping at narrow widths. Output uses a bounded scroll region and plain text; command-looking and HTML-like text cannot become controls.
+
+## Application coordination and recovery
+
+The application test bridge owns separate bounded catalog/history, selected-job, mutation and artifact slots. All have abort controllers and generation fences. The subscription registry declares polling and workspace scope routes; disconnect removes routes/timers and aborts transport. Observers and remounts cause reads only. Scope replacement resets visible reads and cannot mutate the captured identity of an existing intent. Safe read errors remain visible and retryable; failures do not erase question/story persistence.
+
+Persist each exact command before sending. Retain uncertain commands across reload in a test-specific private record keyed by review and local-owner lifecycle scope. Persist a validated receipt before clearing its command; then read the original scope/job at or above the receipt revision. A storage failure fails closed before dispatch or retains recovery after dispatch. Only explicit retry resends an uncertain command, unchanged. No new command ID or revised expected revision is substituted. A pending command from another snapshot is labeled with its original source, and cannot be retargeted by navigation. A definitive rejection may clear the pending command only through successful persistence.
+
+Shared public response codecs validate gateway values. Application additionally checks requested review/snapshot/job/target and minimum revision against captured intent before publication. Malformed or mismatched successful responses are uncertain for mutations; they never release an unsafely assumed command. No browser credential is created: use the existing local-owner gateway boundary.
+
+## Artifact presentation
+
+Artifact descriptor and response identities must agree. Offsets count bytes. Decode base64 into bytes and feed one streaming UTF-8 decoder per selected artifact; retain decoder state between pages so split CJK/emoji survive. Check offset, bytes, nextOffset, total size/hash and complete before appending. Display at most 1MiB, with explicit next-page intent and byte progress. A failed page preserves already read text and historical result identity; changing selection/disposal invalidates old reads. UTF-8 replacement for invalid byte sequences is presentation only; retained artifact hash always refers to original bytes. No HTML rendering, terminal escape interpretation, shell input or path access exists.
+
+## Verification boundary
+
+Focused lifecycle/recovery/byte tests and actual React fixture journeys establish engineering behavior only. Actual own-PR execution, exact-source production qualification, CLI same-job evidence, unfamiliar-reviewer comprehension, visual acceptance and deployment have separate receipts. The initial panel does not add generic terminal access, target configuration, scheduling, automatic test runs or automatic agent feedback.
