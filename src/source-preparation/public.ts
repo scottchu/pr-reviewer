@@ -1,7 +1,9 @@
+import {importChange} from "../source-acquisition/public.ts";
+import type {Candidate,AcquisitionEffects} from "../source-acquisition/public.ts";
 import {execFileSync} from "node:child_process";
 import {createHash} from "node:crypto";
 import {z} from "zod";
-import {canonical,inlineDocumentLinks,resolveDocumentDestination,documentHeadingLine} from "../domain/public.ts";
+import {canonical,snapshotSchema,inlineDocumentLinks,resolveDocumentDestination,documentHeadingLine} from "../domain/public.ts";
 import type {Snapshot,Source,ChangedFile,DocumentReference} from "../domain/public.ts";
 export const manualSourceInputSchema = z
   .object({
@@ -93,14 +95,14 @@ export const buildSnapshot = (input: unknown): Snapshot => {
   return {snapshotId,repository:"scottchu/pr-reviewer",prUrl:spec.prUrl,prNumber:spec.prNumber,baseSha,headSha,sources,...(spec.title?{title:spec.title}:{}),...(changedFiles?{changedFiles,documentReferences:documentReferences??[]}: {})};
 };
 
-const witnesses = new WeakMap<object,{reviewId:string;fingerprint:string}>();
+const witnesses = new WeakMap<object,{reviewId:string;fingerprint:string;jobId?:string}>();
 declare const witnessBrand:unique symbol;
 export type PreparedSnapshotWitness={readonly [witnessBrand]:true};
 export const manualInputFor=(snapshot:Snapshot):z.infer<typeof manualSourceInputSchema>=>{
   const paths=snapshot.changedFiles?[...new Set(snapshot.changedFiles.flatMap(file=>file.dispositions).filter(item=>item.state==='unsupported'||item.state==='missing'||item.state==='prepared'&&item.reason==='verified Git blob').map(item=>item.path))]:null;
   return manualSourceInputSchema.parse({prNumber:snapshot.prNumber,prUrl:snapshot.prUrl,baseSha:snapshot.baseSha,headSha:snapshot.headSha,...(paths?{paths}:{path:snapshot.sources[0]?.path}),...(snapshot.title?{title:snapshot.title}:{})});
 };
-export const verifyPreparedSnapshot=(reviewId:string,snapshot:Snapshot,identityScheme:'manual_git_v1'):PreparedSnapshotWitness=>{
+export const verifyPreparedSnapshot=(reviewId:string,snapshot:Snapshot,identityScheme:'manual_git_v1'|'acquisition_v1'):PreparedSnapshotWitness=>{
   if(identityScheme!=='manual_git_v1')throw new Error('source_unavailable');
   const expected=buildSnapshot(manualInputFor(snapshot));
   if(canonical(expected)!==canonical(snapshot))throw new Error('source_unavailable');
@@ -108,8 +110,61 @@ export const verifyPreparedSnapshot=(reviewId:string,snapshot:Snapshot,identityS
   witnesses.set(witness,{reviewId,fingerprint:canonical(snapshot)});
   return witness;
 };
-export const isPreparedSnapshotWitness=(value:unknown,reviewId:string,snapshot:Snapshot):value is PreparedSnapshotWitness=>{
+export const isPreparedSnapshotWitness=(value:unknown,reviewId:string,snapshot:Snapshot,jobId?:string):value is PreparedSnapshotWitness=>{
   if(typeof value!=='object'||value===null)return false;
   const recorded=witnesses.get(value);
-  return Boolean(recorded&&recorded.reviewId===reviewId&&recorded.fingerprint===canonical(snapshot));
+  return Boolean(recorded&&recorded.reviewId===reviewId&&recorded.fingerprint===canonical(snapshot)&&(jobId===undefined||recorded.jobId===jobId));
+};
+
+
+/** Provider admission is issued only from this trusted call, never parsed artifact JSON. */
+export const acquirePreparedSnapshot=async(input:{jobId:string;reviewId:string;worktree:string;candidate:Candidate},effects:AcquisitionEffects)=>{
+ const result=await importChange({worktree:input.worktree,candidate:input.candidate},effects);
+ if(result.kind!=="imported")return result;
+ const value=result.value,candidate=value.candidate;
+ const snapshot:Snapshot={snapshotId:value.snapshotId,repository:candidate.targetProject,prUrl:candidate.url,prNumber:candidate.number,baseSha:candidate.baseSha,headSha:candidate.headSha,title:candidate.title,candidate:structuredClone(candidate),sources:structuredClone(value.sources) as Snapshot["sources"],changedFiles:structuredClone(value.changedFiles) as NonNullable<Snapshot["changedFiles"]>,counts:structuredClone(value.counts)};
+ validateProviderSnapshot(snapshot);
+ const witness=Object.freeze({}) as PreparedSnapshotWitness;
+ witnesses.set(witness,{reviewId:input.reviewId,jobId:input.jobId,fingerprint:canonical(snapshot)});
+ return {kind:"prepared" as const,snapshot,witness,value};
+};
+/** Structural/content checks are reusable, but do not confer acquisition trust. */
+export const validateProviderSnapshot=(snapshot:Snapshot):void=>{
+ const fail=()=>{throw new Error("source_unavailable");};
+ if(!snapshotSchema.safeParse(snapshot).success||!snapshot.candidate||!snapshot.changedFiles||!snapshot.counts)fail();
+ const candidate=snapshot.candidate!,files=snapshot.changedFiles!,counts=snapshot.counts!;
+ const url=new URL(snapshot.prUrl);
+ if(url.username||url.password||url.host!==candidate.host||snapshot.repository!==candidate.targetProject||snapshot.prNumber!==candidate.number||snapshot.prUrl!==candidate.url||snapshot.baseSha!==candidate.baseSha||snapshot.headSha!==candidate.headSha)fail();
+ const keys=new Map<string,string>();
+ for(const source of snapshot.sources){
+  const bytes=Buffer.from(source.content,"utf8"),key=JSON.stringify([source.side,source.path]),value=canonical(source);
+  if(keys.has(key)&&keys.get(key)!==value)fail();keys.set(key,value);
+  const lines=source.content.length===0?0:source.content.split("\n").length-(source.content.endsWith("\n")?1:0);
+  if(createHash("sha256").update(bytes).digest("hex")!==source.hash||source.lineCount!==lines||source.content.includes("\0")||new TextDecoder("utf-8",{fatal:true,ignoreBOM:true}).decode(bytes)!==source.content||!source.objectId)fail();
+  const objectHash=createHash(source.objectId!.length===40?"sha1":"sha256").update(Buffer.from(`blob ${bytes.length}\0`)).update(bytes).digest("hex");
+  if(objectHash!==source.objectId)fail();
+ }
+ const dispositions=files.flatMap(file=>file.dispositions);
+ if(files.length>512||counts.changedPaths!==files.length||counts.preparedSides!==dispositions.filter(d=>d.state==="prepared").length||counts.unsupportedSides!==dispositions.filter(d=>d.state==="unsupported").length||counts.missingSides!==dispositions.filter(d=>d.state==="missing").length||counts.hunks!==files.reduce((n,f)=>n+(f.hunks?.length??0),0)||counts.bytes>8*1024*1024||counts.bytes<snapshot.sources.reduce((n,s)=>n+Buffer.byteLength(s.content,"utf8"),0))fail();
+ const consumed=new Map<string,number>();
+ for(const file of files){
+  if(!file.hunks||!file.coverage||file.dispositions.length!==Number(file.oldPath!==null)+Number(file.newPath!==null))fail();
+  for(const side of ["base","head"] as const){const path=side==="base"?file.oldPath:file.newPath;if(path===null){if(file.dispositions.some(d=>d.side===side))fail();continue;}
+   const members=file.dispositions.filter(d=>d.side===side&&d.path===path);if(members.length!==1)fail();const disposition=members[0]!;
+   if(disposition.state==="prepared"){
+    const source=snapshot.sources.find(s=>s.side===side&&s.path===path);if(!source||source.objectId!==disposition.objectId)fail();
+    const key=JSON.stringify([side,path]);consumed.set(key,(consumed.get(key)??0)+1);
+    for(const hunk of file.hunks!){const start=side==="base"?hunk.oldStart:hunk.newStart,length=side==="base"?hunk.oldLines:hunk.newLines;if(length>0&&(start<1||start+length-1>source!.lineCount)||length===0&&start>source!.lineCount)fail();}
+   }
+  }
+  if(file.coverage==="unsupported"&&file.hunks!.length)fail();
+ }
+ for(const [key,count] of consumed)if(snapshot.sources.filter(s=>JSON.stringify([s.side,s.path])===key).length!==count)fail();
+ for(const key of keys.keys())if(!consumed.has(key))fail();
+};
+
+export const bindPreparedSnapshotToReview=(witness:PreparedSnapshotWitness,jobId:string,reviewId:string,snapshot:Snapshot):PreparedSnapshotWitness=>{
+ const recorded=witnesses.get(witness);
+ if(!recorded||recorded.jobId!==jobId||recorded.fingerprint!==canonical(snapshot))throw new Error('source_unavailable');
+ const bound=Object.freeze({}) as PreparedSnapshotWitness;witnesses.set(bound,{jobId,reviewId,fingerprint:recorded.fingerprint});return bound;
 };

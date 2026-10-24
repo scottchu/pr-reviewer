@@ -2,7 +2,7 @@
 
 **Contract:** Documentation version 1. These names describe delivered formats; they are not new persisted schema/version fields.
 
-**Parents:** [Review contracts](contracts.md), [continuation and preparation](evolution.md)
+**Parents:** [Review contracts](contracts.md), [continuation and preparation](evolution.md), [additive import job/identity formats](import-jobs.md#persisted-job-representation-and-public-ports)
 
 Rebuilding the current product includes opening a copy of its supported earlier SQLite store, not merely inventing equivalent fresh data. Preserve source IDs, saved discussion, capabilities, receipts, inbox cursors and notification uncertainty. Never repair incompatibility by resetting data or generating replacement source/participant identities.
 
@@ -31,6 +31,8 @@ Pre-history review bodies contain reviewId, snapshot, revision, attachment (obje
 | Receipt body | commandId, actorId, state (`applied` or `rejected`), revision, cursor, result (opaque result object), optional error. Preserve body and actor/fingerprint columns, including rejected outcomes. |
 
 Credential body discrimination is by kind: user has actorId (issued local owner is `local-user`); agent has actorId, reviewId, attachmentId, generation; bootstrap has actorId, host, sessionId, connectionId, corroborated (boolean). The issuer generates 32 random bytes represented as 64 lowercase hex characters for tokens; imported existing tokens need not be regenerated. Authentication derives the principal from the verifier row and rechecks current attachment/generation for agent access. A stored bootstrap claim is not general source access.
+
+Provider/import additions retain their exact physical/job/receipt/reference formats in import-jobs.md; they add tables and a derived review identity lookup without rewriting these legacy rows.
 
 The migration discriminator is missing history members, not an absent version number: use an existing snapshots array if present, otherwise the original snapshot as a one-element array; use existing currentSnapshotId if present, otherwise original snapshot.snapshotId. Require a nonempty array, unique snapshot IDs and a pointer found in that array. If either history member was absent, save the additive result. Preserve revision and every other aggregate value, array order, other table row and credential verifier. Perform all review conversions in one transaction; malformed JSON or failed history integrity aborts and rolls back earlier conversions. Reopen is idempotent. This is a compatibility reader for the described family, not a universal corrupt-store repair or future-version converter; unsupported structure must not be guessed/reset. Initialization may create missing declared tables; failure does not erase recoverable original bodies.
 

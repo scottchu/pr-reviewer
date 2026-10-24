@@ -1,3 +1,4 @@
+import {createImportArtifacts} from "../src/import-artifacts/public.ts";
 import { execFileSync, spawn } from "node:child_process";
 import type { ChildProcess } from "node:child_process";
 import { readFileSync, existsSync } from "node:fs";
@@ -43,6 +44,7 @@ const gateway = createGateway(
       ? { claude: process.env.REVIEW_CLAUDE_BIN }
       : {}),
   }),
+  {importArtifacts:createImportArtifacts(root)},
 );
 let ui: ChildProcess | undefined;
 const instanceId = randomUUID();

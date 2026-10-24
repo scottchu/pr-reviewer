@@ -1,0 +1,58 @@
+# Bounded slice03 delivery and review receipt
+
+**Date:** 2026-10-24 UTC
+
+**Disposition:** Bounded03 engineering and representative own-PR import/continuation/navigation accepted. Root publication, merge and separately assigned pilot delivery follow this receipt. Full720p semantic understanding, native automatic delivery/catalog, Claude and unfamiliar-human acceptance remain open.
+
+**Implemented/reviewed candidate:** 4f1862547e3d9c04188eed7674f9720edfc328b5, branch import-pinned-review-from-repository, isolated /tmp/pr-reviewer-02-graph-history, from main a5043c5f8a5c6ceeaceca42937f3c1aa6b12b263. This later receipt changes documentation only; its commit is not relabeled as the runtime/tested candidate. No dependency/lock, pilot, credential configuration or global route changes belong to this receipt.
+
+## Delivered boundary
+
+The authenticated owner enters a repository path, resolves candidate/existing-review ambiguity explicitly, observes durable progress/recovery and opens a verified complete ledger. One existing SQLite owner retains jobs, immutable receipts, generation-bound private grants and process journals; one bounded async runner releases transactions before provider/Git/artifact effects. Source preparation alone mints job/review/manifest-bound acquisition witnesses. Artifacts are integrity-checked unknown JSON, never authority. Atomic create/continue admission preserves retained sources, current CAS, credentials and old discussion without an import-triggered agent wake.
+
+Provider identity, actual comparison baseline/head, source object/hash/order and repeated identical copy occurrences, complete paths/modes/dispositions/hunks/counts survive unchanged. Unique lookup is separate from the retained manifest. Copy/rename comparisons use private ledger keys; in-pane line selection preserves its displayed pair. Empty/all-unsupported/zero-source cases remain useful ledgers without invented anchors. The graph is readable source structure, not a semantic workflow/call graph or target execution result. [Durable import knowledge](../../../../product/review-loop/import-jobs.md) and [exact acquisition compatibility](../../../../product/review-loop/acquisition-compatibility.md) own the reimplementation contract.
+
+## Immutable source and runtime identities
+
+Actual PR: https://github.com/scottchu/pr-reviewer/pull/23. Comparison base throughout: a5043c5f8a5c6ceeaceca42937f3c1aa6b12b263.
+
+| Candidate / reviewed head | Actual observation |
+|---|---|
+| Clean0a86a755bb6606fcb504ee8f56bdacec0a562ecc / same published head | Public UI import failed truthfully at256 acquisition launches, no artifact/admission. Preserved failure, not retroactive success. |
+| Cleand75c1c2f6f1b4ae127c66018fb20d694d2031d07 / original0a86 head | Actual public UI import admitted snapshot7624deafb7a5a0d2cbb6e5e26c758145c33b657b9e6dec3489c22adcf374022d:49 paths,69 prepared-side occurrences,127 hunks,709416 acquired bytes;8 discovery and263 acquisition processes. |
+| Clean4f1862547e3d9c04188eed7674f9720edfc328b5 / same published4f head | Same review continuation admitted snapshotef3573d391a334c7b9899023fc1d21f68a4dd85f4a2b579b55f0a30ff8b7526a:55 paths,76 prepared-side occurrences,139 hunks,806443 acquired bytes;8 discovery and290 acquisition processes. |
+
+The same review is592a41ed-9176-4e53-8b94-417d0163d66c. I16 questiona08e0dcf-193e-4d37-aa43-b64a49efad17 committed at04:35:47.389Z within actual gh process60443 interval04:35:47.368Z–.717Z, and was read while discovery still ran. Its immutable anchor is original-head coordinator lines1–63. The subsequent same-head import acknowledged retained source. This is live GitHub/local pinned Git via the public UI, not a seeded manifest or provider helper.
+
+For I18, controlled SDK reply02441736-c78c-4413-b08a-6b0e4d18cbf5 retains that original snapshot/evidence. The newer public import preserved old question/reply/attempt/attachment identity and held the old source/UNSENT draft; explicit old evidence reopened correctly after awaited navigation. Follow-up7ca7bdd8-9901-4e9e-ae81-bfce0be272dc names the original parent and anchors new-head coordinator lines40–45. Gateway/UI restart preserved the exact aggregate and owner historical-source readback. The original d75 data was closed and copied for this journey; its raw evidence DB remains unchanged.
+
+The participant is an explicitly controlled SDK protocol fixture on this disposable candidate, generation1, distinct from the native pilot owner. Its reply exercises persistence and evidence identity; it does **not** answer the original question about discussion/acquisition behavior and establishes no answer quality or comprehension. The SDK transport closed during a harness interruption; restart continuity is UI/owner readback, not retained SDK transport. A follow-up's Notified state does not establish delivery/consumption by a connected participant. Import did not replace the attachment or replay notification.
+
+## Independent review and verification
+
+- Cumulative engineering PASS at exact4f: /tmp/pr-reviewer-03-independent-review/final-4f18625/review.md. Strict/boundaries,42 affected tests, original credential-race correction, affected actual Chrome import/copy/continuation/restart, queue8/overflow/cancel/expired phase and two simultaneous actual owner claims passed. Prior accepted acquisition/artifact/panel/foundation/runner reviews keep their original scopes.
+- Owner combined checks: strict/boundaries,11 Bun+114 Node tests and all11 actual installed Chrome journeys passed. Precommit executions retain HEAD766da82/dirty metadata; they are not falsely clean4f runtime captures. Chrome artifacts: /tmp/pr-reviewer-03-combined-chrome.pDMvBF. No unchanged code suite was rerun for this documentation receipt.
+- Actual SIGKILL tests cover queued, claimed, requested, spawned-before-PID, registered-result and post-admission boundaries; uncertain effects do not replay/free the slot. Explicit re-verification, lost-commit readback and both cancellation/admission orders pass. These are controlled-provider/real-Git/process/artifact fixtures, not a live-provider crash campaign or exhaustive schedules.
+- Encoded quota tests use actual tracked Git/provider helpers and10.8MiB artifacts: six escaped heads admit, seventh rejects the64MiB encoded-source limit with original source/question/receipts intact. Exact/lowered launch and encoded-byte boundaries, []=2 bytes and no-extra-spawn/cancel controls pass. Independent tracked Git safety/corrupt/foreign/valid artifact-ingress evidence carries forward.
+- Whole-current-product docs-only audit initially found acquisition/recovery representation gaps at0a86. Durable exact enums/nulls/order/hash vectors and persisted readers closed them at aaf5791; an independent reader recomputed the2942-byte f83c2d27 vector from docs alone. Cumulative narrow4f qualified YES: /tmp/pr-reviewer-03-docs-rebuild-audit/recheck-4f18625.md. This is sufficient maintained knowledge, not an actual rebuild/runtime pass.
+- Fresh Astra graph-first PhaseA is frozen at /tmp/pr-reviewer-semantic-review-pr23/phase-a.md (SHA2566fba2845b74ef91e52bc9813b0508c0dd2e1a652406b90860c4073306acf1f11); original-source PhaseB is frozen at phase-b.md (SHA2566496a575027d7972469736174ee07a33ca009d2ae2133f6a7baf0243cfda53bd). Targeted4f source/journey bounded acceptance is final-recheck-4f18625.md (SHA2564194a9584bac9257fa24c4e3fccdbb9fae785b86b6fbaf48b25dcbd5fa9cd39b). This mediated agent review is not a human study or a second blind account.
+
+I18 teardown is separately measured, not inferred from process exit: an actual Chrome/React fixture mounted the unchanged public review/import bridges and actual Imports component against a real gateway and closed own-PR store copy. Both diagnostics were[] before mount, one route each mounted,[] after each of two unmounts, with no further GET polls during850ms after each unmount; actual gateway diagnostics were[] after close and notification calls0. This is a scoped React lifecycle fixture, not an in-product diagnostics display or direct measurement of the original main UI's hidden instances.
+
+## Retained evidence and cleanup
+
+- Original0a failure: /private/tmp/pr-reviewer-03-pr23-0a86.xcWSuI/private-source/0a86-import-phase-limit.{json,png,aria.txt}.
+- Actual d75/original0a evidence: /private/tmp/pr-reviewer-03-pr23-d75c.PHv0aH. graph-only and graph-only-extra exclude source panes/private expected account; phase-b-original-source and phase-b-original-source-rest contain requested actual original UI sources, not substituted4f code. private-source/actual-pr23-I16.json retains actual overlap. Extra captures used a separate clean detached /tmp/pr-reviewer-03-capture-d75.
+- Actual4f continuation: /private/tmp/pr-reviewer-03-pr23-4f18625.SJi7bu. phase-b-corrected-source contains actual corrected UI code; phase-b-journey/identity-and-journey.json binds source, reply, follow-up, draft and restart; managed-teardown.json binds the separate lifecycle fixture. Private expected manifests/accounts, credentials and harness files remain outside reviewer bundles/Git.
+- Harness mistakes remain labeled: missing refilled path caused a disabled-action timeout before mutation; connection-only corroborated was correctly rejected by strict challenge input; a hardcoded1–1 locator disagreed with actual saved1–63; an immediate selector assertion preceded async source-read settlement. The failed controlled-range DB is retained. The successful newer-head DB/session was resumed after awaited snapshot/source checks, without repeating import/attachment. None required a product code fix.
+- Owned runtimes6284/6285 and6384/6385 were gracefully stopped; original/copy data remains private. The separate teardown fixture browser/gateway/store closed normally. No pilot/native owner/auth/global routes were changed.
+
+## Reconciled matrix and remaining limits
+
+I01–I15 have bounded module, integrated negative/forgery/collision/CAS, actual process/fault/artifact/budget/Git-protection evidence, with precise scopes above. I16 is actual d75/original0a overlap. I17 is actual registered React journeys; I18 is actual published4f continuation plus separate managed teardown. I19 is frozen graph-first, original-source critique and corrected-head bounded recheck. I20 is actual-structure reflection plus cumulative whole-product docs-only sufficiency. Representative evidence does not establish every timing schedule, maximum-size120-second performance or a live-provider crash campaign.
+
+The graph helps locate complete immutable paths/hunks and investigate exact source. Its duplicate import-header excerpts, structural edges and dense source formatting still require burdensome manual lifecycle/policy synthesis; the reviewer did not find a self-explanatory whole PR. Preserve this as04/05 input, together with answer relevance/quality as a separate gate. Zero unresolved on imported source means no prepared reference analysis, not no dependencies. No target programs/tests execute. Live GitLab/glab, automatic native queued-turn/catalog, Claude, unfamiliar-human and full480p/720p/1080p acceptance remain open. Earlier native pilot MCP/UI/transport evidence keeps its own historical scope.
+
+## Successor04 contribution
+
+[The successor plan](../04-behavior-neighborhood/plan.md) records accepted4f public inputs and merge-pending readiness. It references exact reconciled packet7f96644 without overwriting its two unincorporated planner files. No context/analyzer/semantic-job code, dependency alias or lock change is included here. Root supplies the verified merge base and isolated04 owner before full integration.

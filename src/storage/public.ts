@@ -1,4 +1,6 @@
-import {isPreparedSnapshotWitness} from "../source-preparation/public.ts";
+import type {ImportLimits} from "./imports.ts";
+import {createImportStore} from "./imports.ts";
+import {isPreparedSnapshotWitness,validateProviderSnapshot} from "../source-preparation/public.ts";
 import type {PreparedSnapshotWitness} from "../source-preparation/public.ts";
 import { DatabaseSync } from "node:sqlite";
 import {
@@ -28,10 +30,10 @@ type Connection = {
   connectionId: string;
   corroborated: boolean;
 };
-export const createStore = (filename: string) => {
+export const createStore = (filename: string,options:{importLimits?:ImportLimits}={}) => {
   const db = new DatabaseSync(filename);
   db.exec(
-    "PRAGMA busy_timeout=3000; PRAGMA foreign_keys=ON; PRAGMA journal_mode=WAL; CREATE TABLE IF NOT EXISTS reviews(id TEXT PRIMARY KEY, body TEXT NOT NULL); CREATE TABLE IF NOT EXISTS receipts(id TEXT PRIMARY KEY, actor TEXT NOT NULL, fingerprint TEXT NOT NULL, body TEXT NOT NULL); CREATE TABLE IF NOT EXISTS credentials(hash TEXT PRIMARY KEY, body TEXT NOT NULL); CREATE TABLE IF NOT EXISTS challenges(id TEXT PRIMARY KEY, body TEXT NOT NULL); CREATE TABLE IF NOT EXISTS preparation_inputs(review_id TEXT PRIMARY KEY REFERENCES reviews(id), body TEXT NOT NULL);",
+    "PRAGMA busy_timeout=3000; PRAGMA foreign_keys=ON; PRAGMA journal_mode=WAL; CREATE TABLE IF NOT EXISTS reviews(id TEXT PRIMARY KEY, body TEXT NOT NULL); CREATE TABLE IF NOT EXISTS receipts(id TEXT PRIMARY KEY, actor TEXT NOT NULL, fingerprint TEXT NOT NULL, body TEXT NOT NULL); CREATE TABLE IF NOT EXISTS credentials(hash TEXT PRIMARY KEY, body TEXT NOT NULL); CREATE TABLE IF NOT EXISTS challenges(id TEXT PRIMARY KEY, body TEXT NOT NULL); CREATE TABLE IF NOT EXISTS preparation_inputs(review_id TEXT PRIMARY KEY REFERENCES reviews(id), body TEXT NOT NULL); CREATE TABLE IF NOT EXISTS review_import_identities(review_id TEXT PRIMARY KEY REFERENCES reviews(id),provider TEXT NOT NULL,host TEXT NOT NULL,target_project TEXT NOT NULL,change_number INTEGER NOT NULL,current_snapshot_id TEXT NOT NULL);",
   );
   const tx = <T>(operation: () => T): T => {
     db.exec("BEGIN IMMEDIATE");
@@ -51,11 +53,16 @@ export const createStore = (filename: string) => {
     if (!row) throw new Error("source_unavailable");
     return JSON.parse(row.body) as Review;
   };
+  const indexReview=(review:Review)=>{
+    const snapshot=review.snapshot,candidate=snapshot.candidate;let host:string;try{host=candidate?.host??new URL(snapshot.prUrl).host;}catch{db.prepare('DELETE FROM review_import_identities WHERE review_id=?').run(review.reviewId);return;}
+    db.prepare('INSERT INTO review_import_identities VALUES (?,?,?,?,?,?) ON CONFLICT(review_id) DO UPDATE SET provider=excluded.provider,host=excluded.host,target_project=excluded.target_project,change_number=excluded.change_number,current_snapshot_id=excluded.current_snapshot_id').run(review.reviewId,candidate?.provider??'github',host,candidate?.targetProject??snapshot.repository,candidate?.number??snapshot.prNumber,review.currentSnapshotId??snapshot.snapshotId);
+  };
   const save = (review: Review) => {
     db.prepare("INSERT OR REPLACE INTO reviews VALUES (?,?)").run(
       review.reviewId,
       JSON.stringify(review),
     );
+    indexReview(review);
   };
   const authorize = (principal: Principal, review: Review) => {
     if (principal.kind === "bootstrap") throw new Error("unauthorized");
@@ -78,6 +85,7 @@ export const createStore = (filename: string) => {
     return token;
   };
   const validateSnapshot=(snapshot:Snapshot) => {
+    if(snapshot.candidate){validateProviderSnapshot(snapshot);return;}
     if(!snapshotSchema.safeParse(snapshot).success||Buffer.byteLength(JSON.stringify(snapshot),"utf8")>8*1024*1024)throw new Error("source_unavailable");
     const keys=new Set<string>();
     for(const source of snapshot.sources){
@@ -88,8 +96,6 @@ export const createStore = (filename: string) => {
     }
     const url=new URL(snapshot.prUrl);
     if(url.username||url.password)throw new Error("source_unavailable");
-    const candidate=snapshot.candidate;
-    if(candidate&&(candidate.baseSha!==snapshot.baseSha||candidate.headSha!==snapshot.headSha||candidate.targetProject!==snapshot.repository||candidate.number!==snapshot.prNumber||candidate.url!==snapshot.prUrl||candidate.host!==url.host))throw new Error("source_unavailable");
     for(const reference of snapshot.documentReferences??[])if(!validateAnchor(snapshot.snapshotId,snapshot.sources,reference.source)||(reference.target&&!validateAnchor(snapshot.snapshotId,snapshot.sources,reference.target)))throw new Error("source_unavailable");
     for(const file of snapshot.changedFiles??[])for(const disposition of file.dispositions)if(disposition.state==="prepared"&&!snapshot.sources.some(source=>source.path===disposition.path&&source.side===disposition.side))throw new Error("source_unavailable");
   };
@@ -173,11 +179,14 @@ export const createStore = (filename: string) => {
         const snapshots=review.snapshots??[review.snapshot];
         const currentSnapshotId=review.currentSnapshotId??review.snapshot.snapshotId;
         if(!snapshots.length||new Set(snapshots.map(snapshot=>snapshot.snapshotId)).size!==snapshots.length||!snapshots.some(snapshot=>snapshot.snapshotId===currentSnapshotId))throw new Error("source_unavailable");
-        if(!review.snapshots||!review.currentSnapshotId)save({...review,snapshots,currentSnapshotId});
+        if(!review.snapshots||!review.currentSnapshotId)save({...review,snapshots,currentSnapshotId});else indexReview(review);
       }
     });
   }catch(error){db.close();throw error;}
+  let imports:ReturnType<typeof createImportStore>;
+  try{imports=createImportStore({db,tx,load,save,...(options.importLimits?{limits:options.importLimits}:{})});}catch(error){db.close();throw error;}
   return {
+    imports,
     close: () => db.close(),
     issueUser: () => issue({ kind: "user", actorId: "local-user" }),
     authenticate: (token: string): Principal => {
@@ -495,3 +504,4 @@ export const createStore = (filename: string) => {
   };
 };
 export type Store = ReturnType<typeof createStore>;
+export type {ImportOwner,ImportGrant} from './imports.ts';

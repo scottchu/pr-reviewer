@@ -10,7 +10,7 @@
 
 As a reviewer, I open one pinned before/after source change in our own real PR, select a source span, ask its responsible agent a question, and inspect the agent's persisted source-backed answer. I can distinguish the source, author, delivery state and uncertainty behind that answer. The existing Codex or Claude session initiating attachment is the responsible session; the app does not replace it.
 
-The default bootstrap uses PR 14 with immutable identity and teaching scope defined in [runtime knowledge](runtime.md#bootstrap-target-and-source-bounds). Its documentation claim is a valid first bounded source question, not evidence of executable code behavior. Source is manually prepared from immutable Git objects; read-only structural graphs and immutable continuation/history have bounded local implementations. General import, semantic graphs, repository jobs and player/narration remain later scope.
+The default bootstrap uses PR 14 with immutable identity and teaching scope defined in [runtime knowledge](runtime.md#bootstrap-target-and-source-bounds). Its documentation claim is a valid first bounded source question, not evidence of executable code behavior. Source is manually prepared from immutable Git objects; read-only structural graphs and immutable continuation/history have bounded local implementations. The isolated slice03 candidate adds repository-path discovery and durable import jobs as described in [durable import jobs](import-jobs.md). Semantic graphs and player/narration remain later scope.
 
 ## Interaction
 
@@ -22,7 +22,7 @@ A reviewer can give the agent a local repository or worktree path instead of loc
 
 Return the matched provider, project, PR/MR identity, URL, state and verified comparison base/head. Preserve the distinction between a current provider head and an already pinned review snapshot. Multiple plausible matches require presenting candidates; no match, a detached/default branch without a unique association, inaccessible metadata or unavailable authentication remains an explicit unresolved result. Never select the latest PR/MR merely because it exists, install a global tool silently, or print credentials embedded in remotes.
 
-This is the agent's source-acquisition responsibility; the reviewer should not have to supply an identifier when the path already resolves uniquely. The current application's derived preparation utility still accepts an explicit, manually verified pinned source specification. Automated in-app discovery and GitLab source import are not implemented or established by this entry contract. Once a path is supplied, verify provider metadata before claiming an actual match or preparing source; no path lookup has been exercised by this documentation change.
+This is the agent's source-acquisition responsibility; the reviewer should not have to supply an identifier when the path already resolves uniquely. The merged/manual baseline's setup utility retains its explicit pinned source specification. The isolated slice03 candidate implements in-app path discovery and bounded import through existing provider tools; source/job contracts and exact verified limits are maintained in [durable import jobs](import-jobs.md). Live GitHub own-PR use is distinct from controlled provider tests; live GitLab remains unverified where glab is unavailable. Once a path is supplied, verify provider metadata before claiming an actual match or preparing source.
 
 ### Anchored review
 
@@ -44,3 +44,6 @@ The bounded continuation/graph implementation and future import boundary are dis
 A saved anchored question produces one correctly attributed persisted answer from the exact attached session via MCP, visible through the app read model. Identical command retries do not duplicate state; altered payload reuse, invalid anchors and stale/revoked attachment generations reject without partial writes. Agent MCP calls progress during its own turn. Unknown notification outcomes never trigger blind redispatch. Tests cover these behaviors plus keyboard interaction, React controls following the design guidelines and principles and own-PR use. An unfamiliar-reviewer evaluation remains separate evidence; no engineering result is labeled human comprehension.
 
 The [slice plan](../../plans/480p/slices/01-review-loop/plan.md) sequences delivery and records 01-A through 01-G results. Its checklist is not a substitute for this maintained product specification. Learning and detailed interface changes return here before slice acceptance.
+
+
+The merged/manual runtime baseline and the isolated slice03 import candidate are distinct. The candidate now implements repository-path import; its exact operations, limits, persisted recovery and pending acceptance are maintained in [durable import jobs](import-jobs.md). No unrun live-provider/native/human or whole-round gate is implied.

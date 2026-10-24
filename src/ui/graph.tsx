@@ -1,107 +1,35 @@
-import React, { useEffect, useMemo, useState } from 'react';
-import { ReactFlow, Background, Controls, MarkerType, Position } from '@xyflow/react';
-import type { Node, Edge } from '@xyflow/react';
-import type { Anchor, SourceGraph } from '../domain/public.ts';
+import React, {useEffect,useState} from 'react';
+import {ReactFlow,Background,Controls,MarkerType,Position} from '@xyflow/react';
+import type {Node,Edge} from '@xyflow/react';
+import type {Anchor,SourceGraph,GraphFile} from '../domain/public.ts';
 import '@xyflow/react/dist/style.css';
-
-export const ReviewGraph = ({ graph, selectedPath, onOpen }: {
-  graph: SourceGraph; selectedPath: string; onOpen: (anchor: Anchor) => void;
-}) => {
-  const [context, setContext] = useState(false);
-  const [spans, setSpans] = useState(false);
-  const [focusedPath, setFocusedPath] = useState(selectedPath);
-  const [spanId, setSpanId] = useState("");
-  useEffect(() => setFocusedPath(selectedPath), [selectedPath]);
-  const paths = [...new Set([
-    ...graph.dispositions.map(item => item.path),
-    ...graph.nodes.filter(node => !node.context && node.kind === 'file').map(node => node.path),
-  ])];
-  const focusedIds = new Set(graph.nodes.filter(node => node.path === focusedPath && node.kind === 'file').map(node => node.id));
-  const neighborIds = new Set(graph.edges.filter(edge => edge.kind === 'document_reference' && (focusedIds.has(edge.source) || focusedIds.has(edge.target))).flatMap(edge => [edge.source, edge.target]));
-  const related = graph.nodes.filter(node => node.kind === 'file' && node.path !== focusedPath && neighborIds.has(node.id));
-  const contextNodes = context ? related.slice(0, 4) : [];
-  const spanNodes = graph.nodes.filter(node => node.path === focusedPath && node.kind === 'hunk');
-  const activeSpan = spanNodes.find(node => node.id === spanId) ?? spanNodes[0];
-  const visible = useMemo(() => graph.nodes.filter(node =>
-    node.path === focusedPath && (node.kind === 'file' || spans && node.id === activeSpan?.id) || contextNodes.some(item => item.id === node.id)
-  ), [graph, focusedPath, spans, context, activeSpan?.id]);
-  const nodes: Node[] = visible.map(node => {
-    const precedingSpans = visible.filter(other => other.kind === 'hunk' && other.path === node.path && other.side === node.side && other.anchor.startLine < node.anchor.startLine).length;
-    const spanRows = Math.max(0, ...(['base', 'head'] as const).map(side => visible.filter(other => other.kind === 'hunk' && other.path === focusedPath && other.side === side).length));
-    const y = node.path !== focusedPath
-      ? 340 + spanRows * 290 + contextNodes.indexOf(node) * 340
-      : node.kind === 'hunk' ? 340 + precedingSpans * 290 : 0;
-    return {
-      id: node.id, position: { x: node.side === 'base' ? 0 : 560, y },
-      sourcePosition: Position.Right, targetPosition: Position.Left,
-      draggable: false, connectable: false, deletable: false,
-      ariaLabel: `${node.side === 'base' ? 'Before' : 'After'} ${node.kind} ${node.label}. ${node.change}. Open source.`,
-      style: { width: 430, height: node.kind === 'file' ? 300 : 250 },
-      data: { label: <div className={`graph-node ${node.kind}`}>
-        <span className="eyebrow">{node.side === 'base' ? 'Before' : 'After'} · {node.change} · {node.kind}</span>
-        <strong>{node.label}</strong>
-        <span className="graph-summary">{node.summary || 'Prepared source; no change excerpt'}</span>
-        <button className="nodrag nopan" onClick={() => onOpen(node.anchor)}>
-          Open {node.side} {node.path}{node.kind === 'hunk' ? `:${node.anchor.startLine}–${node.anchor.endLine}` : ''}
-        </button>
-      </div> },
-    };
-  });
-  const ids = new Set(nodes.map(node => node.id));
-  const edges: Edge[] = graph.edges.filter(edge => ids.has(edge.source) && ids.has(edge.target)).map(edge => ({
-    id: edge.id, source: edge.source, target: edge.target,
-    label: edge.kind === 'document_reference' ? 'document link' : edge.label,
-    type: 'smoothstep', markerEnd: { type: MarkerType.ArrowClosed },
-    style: { stroke: edge.kind === 'document_reference' ? '#5e638a' : '#858b92', strokeDasharray: edge.kind === 'document_reference' ? '5 3' : undefined },
-    focusable: true, ariaLabel: `${edge.kind}: ${edge.label}; ${edge.method}`,
-  }));
-  const evidenceButton = (anchor: Anchor) => <button onClick={() => onOpen(anchor)}>{anchor.side} · {anchor.path}:{anchor.startLine}–{anchor.endLine}</button>;
-  const focusFile = (path: string) => {
-    setFocusedPath(path);
-    setSpans(false);
-    setContext(false);
-    setSpanId("");
-  };
-  return <section className="review-graph" aria-labelledby="graph-title" id="review-graph">
-    <div className="graph-heading"><div>
-      <p className="eyebrow">Source structure · read only</p>
-      <h2 id="graph-title" tabIndex={-1}>Change map</h2>
-      <p>{paths.length} changed paths · {graph.dispositions.filter(item => item.state === 'prepared').length} prepared changed-file sides · {graph.dispositions.filter(item => item.state !== 'prepared').length} unavailable/unprepared</p>
-    </div><div className="graph-options">
-      <label><input type="checkbox" checked={context} onChange={event => { setContext(event.target.checked); if(event.target.checked) setSpans(false); }} /> Show referenced context</label>
-      <label><input type="checkbox" checked={spans} onChange={event => { setSpans(event.target.checked); if(event.target.checked) setContext(false); }} /> Show selected file’s changed spans</label>
-    </div></div>
-    <nav aria-label="Changed files" className="changed-file-index">
-      <h3>Complete changed-file index</h3>
-      <p>Choose a file to focus the map. Source selection and question drafts stay where you left them.</p>
-      <ul>{paths.map(path => {
-        const file = graph.nodes.find(node => node.path === path && node.kind === 'file');
-        const dispositions = graph.dispositions.filter(item => item.path === path);
-        return <li key={path}><button aria-current={focusedPath === path ? 'true' : undefined} aria-label={`Focus ${path}`} onClick={() => focusFile(path)}>
-          <strong>{path}</strong><span>{file?.change ?? 'unavailable'} · {dispositions.map(item => `${item.side}: ${item.state}`).join(' · ') || 'legacy prepared source'}</span>
-        </button></li>;
-      })}</ul>
-    </nav>
-    <p className="graph-focus" role="status">Focused file: <strong>{focusedPath}</strong> · {nodes.length} visible nodes · {edges.length} visible relationships of {graph.edges.length} total. {context ? `${contextNodes.length} of ${related.length} directly related source nodes shown.` : `${related.length} directly related source nodes available through context expansion.`}</p>
-    {spans && <div className="span-selection"><label>Changed span<select aria-label="Changed span" value={activeSpan?.id ?? ''} onChange={event => setSpanId(event.target.value)} disabled={!spanNodes.length}>{spanNodes.map(node => <option key={node.id} value={node.id}>{node.side === 'base' ? 'Before' : 'After'} lines {node.anchor.startLine}–{node.anchor.endLine} · {node.change}</option>)}</select></label><p>{activeSpan ? 1 : 0} of {spanNodes.length} changed spans shown. All spans remain available here and in the evidence list. Choosing one keeps source selection and drafts unchanged.</p></div>}
-    <div className="graph-columns" aria-hidden="true"><strong>Before · base</strong><strong>After · head</strong></div>
-    <div className={`graph-canvas ${spans ? "span-focus" : ""}`}><ReactFlow key={`${graph.snapshotId}:${focusedPath}:${context}:${spans}:${spans ? activeSpan?.id : ""}`} nodes={nodes} edges={edges}
-      fitView fitViewOptions={{ padding: 0.15, maxZoom: 1 }} minZoom={0.15} maxZoom={1.4}
-      nodesDraggable={false} nodesConnectable={false} edgesReconnectable={false} deleteKeyCode={null}
-      onNodeDoubleClick={(_event, node) => { const item = graph.nodes.find(item => item.id === node.id); if (item) onOpen(item.anchor); }}
-      onEdgeClick={(_event, edge) => { const item = graph.edges.find(item => item.id === edge.id); if (item?.anchors[0]) onOpen(item.anchors[0]); }}>
-      <Background /><Controls showInteractive={false} />
-    </ReactFlow></div>
-    {!nodes.length && <p>No selectable source for this file. Its changed-path disposition remains in the inventory below.</p>}
-    <p className="graph-limits">{graph.unknowns.join(' ')}</p>
-    <details><summary>Accessible source and relationship evidence ({graph.nodes.length} nodes, {graph.edges.length} relationships)</summary>
-      <div className="graph-evidence"><h3>Source nodes</h3><ul>{graph.nodes.map(node => <li key={node.id}>{evidenceButton(node.anchor)}<span>{node.kind} · {node.method} · {node.change}</span></li>)}</ul>
-        <h3>Relationships</h3><ul>{graph.edges.map(edge => <li key={edge.id}><strong>{edge.kind}: {edge.label}</strong><span>{edge.method}</span>{edge.anchors.map((anchor, index) => <React.Fragment key={index}>{evidenceButton(anchor)}</React.Fragment>)}</li>)}</ul>
-      </div>
-    </details>
-    <details><summary>Unresolved references and changed-path dispositions ({graph.unresolved.length} unresolved)</summary><ul>
-      {graph.unresolved.map((reference, index) => <li key={index}>{evidenceButton(reference.source)} → {reference.destination}: {reference.reason}</li>)}
-      {graph.dispositions.filter(item => item.state !== 'prepared').map(item => <li key={item.side + item.path}>{item.side} {item.path}: {item.state} · {item.reason}</li>)}
-    </ul></details>
-  </section>;
+const fileLabel=(file:GraphFile)=>file.oldPath&&file.newPath&&file.oldPath!==file.newPath?`${file.oldPath} → ${file.newPath}`:file.newPath??file.oldPath??'Metadata';
+export const ReviewGraph=({graph,selectedPath,selectedFileKey,onOpen}:{graph:SourceGraph;selectedPath:string;selectedFileKey?:string|undefined;onOpen:(anchor:Anchor,fileKey?:string)=>void})=>{
+ const [context,setContext]=useState(false),[spans,setSpans]=useState(false),[focusedKey,setFocusedKey]=useState(''),[spanId,setSpanId]=useState('');
+ useEffect(()=>{setFocusedKey(graph.files.find(file=>file.key===selectedFileKey)?.key??graph.files.find(file=>file.oldPath===selectedPath||file.newPath===selectedPath)?.key??graph.files[0]?.key??'');},[graph.snapshotId,selectedPath,selectedFileKey]);
+ const focused=graph.files.find(file=>file.key===focusedKey)??graph.files[0],label=focused?fileLabel(focused):'No changed paths';
+ const focusedNode=(node:SourceGraph['nodes'][number])=>node.fileKey?node.fileKey===focused?.key:node.path===focused?.oldPath||node.path===focused?.newPath;
+ const focusedIds=new Set(graph.nodes.filter(node=>focusedNode(node)&&node.kind==='file').map(node=>node.id));
+ const neighborIds=new Set(graph.edges.filter(edge=>edge.kind==='document_reference'&&(focusedIds.has(edge.source)||focusedIds.has(edge.target))).flatMap(edge=>[edge.source,edge.target]));
+ const related=graph.nodes.filter(node=>node.kind==='file'&&!focusedNode(node)&&neighborIds.has(node.id)),contextNodes=context?related.slice(0,4):[];
+ const spanNodes=graph.nodes.filter(node=>focusedNode(node)&&node.kind==='hunk'),activeSpan=spanNodes.find(node=>node.id===spanId)??spanNodes[0];
+ const visible=graph.nodes.filter(node=>focusedNode(node)&&(node.kind==='file'||spans&&node.id===activeSpan?.id)||contextNodes.some(item=>item.id===node.id));
+ const nodes:Node[]=visible.map(node=>({id:node.id,position:{x:node.side==='base'?0:560,y:focusedNode(node)?node.kind==='hunk'?340:0:340+(spans?290:0)+contextNodes.indexOf(node)*340},sourcePosition:Position.Right,targetPosition:Position.Left,draggable:false,connectable:false,deletable:false,ariaLabel:`${node.side==='base'?'Before':'After'} ${node.kind} ${node.label}. ${node.change}. Open source.`,style:{width:430,height:node.kind==='file'?300:250},data:{label:<div className={`graph-node ${node.kind}`}><span className="eyebrow">{node.side==='base'?'Before':'After'} · {node.change} · {node.kind}</span><strong>{node.label}</strong><span className="graph-summary">{node.summary||'Prepared source; no change excerpt'}</span><button className="nodrag nopan" onClick={()=>onOpen(node.anchor,node.fileKey)}>Open {node.side} {node.path}{node.kind==='hunk'?`:${node.anchor.startLine}–${node.anchor.endLine}`:''}</button></div>}}));
+ const ids=new Set(nodes.map(node=>node.id));
+ const edges:Edge[]=graph.edges.filter(edge=>ids.has(edge.source)&&ids.has(edge.target)).map(edge=>({id:edge.id,source:edge.source,target:edge.target,label:edge.kind==='document_reference'?'document link':edge.label,type:'smoothstep',markerEnd:{type:MarkerType.ArrowClosed},style:{stroke:edge.kind==='document_reference'?'#5e638a':'#858b92',strokeDasharray:edge.kind==='document_reference'?'5 3':undefined},focusable:true,ariaLabel:`${edge.kind}: ${edge.label}; ${edge.method}`}));
+ const evidenceButton=(anchor:Anchor,fileKey?:string)=><button onClick={()=>onOpen(anchor,fileKey)}>{anchor.side} · {anchor.path}:{anchor.startLine}–{anchor.endLine}</button>;
+ const focusFile=(key:string)=>{setFocusedKey(key);setSpans(false);setContext(false);setSpanId('');};
+ return <section className="review-graph" aria-labelledby="graph-title" id="review-graph">
+  <div className="graph-heading"><div><p className="eyebrow">Source structure · read only</p><h2 id="graph-title" tabIndex={-1}>Change map</h2><p>{graph.files.length} changed paths · {graph.dispositions.filter(item=>item.state==='prepared').length} prepared changed-file sides · {graph.dispositions.filter(item=>item.state!=='prepared').length} unavailable/unprepared</p></div><div className="graph-options"><label><input type="checkbox" checked={context} onChange={event=>{setContext(event.target.checked);if(event.target.checked)setSpans(false);}}/> Show referenced context</label><label><input type="checkbox" checked={spans} onChange={event=>{setSpans(event.target.checked);if(event.target.checked)setContext(false);}}/> Show selected file’s changed spans</label></div></div>
+  <nav aria-label="Changed files" className="changed-file-index"><h3>Complete changed-file index</h3><p>Choose a file to focus the map. Source selection and question drafts stay where you left them.</p><ul>{graph.files.map(file=><li key={file.key}><button aria-current={focused?.key===file.key?'true':undefined} aria-label={`Focus ${fileLabel(file)}`} onClick={()=>focusFile(file.key)}><strong>{fileLabel(file)}</strong><span>{file.status} · {file.dispositions.map(item=>`${item.side}: ${item.state}${item.reason==='empty'?' (empty)':''}`).join(' · ')||'legacy prepared source'}</span></button></li>)}</ul></nav>
+  <p className="graph-focus" role="status">Focused file: <strong>{label}</strong> · {nodes.length} visible nodes · {edges.length} visible relationships of {graph.edges.length} total. {context?`${contextNodes.length} of ${related.length} directly related source nodes shown.`:`${related.length} directly related source nodes available through context expansion.`}</p>
+  {spans&&<div className="span-selection"><label>Changed span<select aria-label="Changed span" value={activeSpan?.id??''} onChange={event=>setSpanId(event.target.value)} disabled={!spanNodes.length}>{spanNodes.map(node=><option key={node.id} value={node.id}>{node.side==='base'?'Before':'After'} lines {node.anchor.startLine}–{node.anchor.endLine} · {node.change}</option>)}</select></label><p>{activeSpan?1:0} of {spanNodes.length} changed spans shown. All spans remain available here and in the evidence list. Choosing one keeps source selection and drafts unchanged.</p></div>}
+  <div className="graph-columns" aria-hidden="true"><strong>Before · base</strong><strong>After · head</strong></div>
+  <div className={`graph-canvas ${spans?'span-focus':''}`}><ReactFlow key={`${graph.snapshotId}:${focused?.key}:${context}:${spans}:${spans?activeSpan?.id:''}`} nodes={nodes} edges={edges} fitView fitViewOptions={{padding:0.15,maxZoom:1}} minZoom={0.15} maxZoom={1.4} nodesDraggable={false} nodesConnectable={false} edgesReconnectable={false} deleteKeyCode={null} onNodeDoubleClick={(_event,node)=>{const item=graph.nodes.find(item=>item.id===node.id);if(item)onOpen(item.anchor,item.fileKey);}} onEdgeClick={(_event,edge)=>{const item=graph.edges.find(item=>item.id===edge.id);if(item?.anchors[0])onOpen(item.anchors[0],focused?.key);}}><Background/><Controls showInteractive={false}/></ReactFlow></div>
+  {!nodes.length&&<p>No selectable source for this file. Its empty/unsupported/absent sides remain in the complete ledger.</p>}
+  <p className="graph-limits">{graph.unknowns.join(' ')}</p>
+  {graph.files.some(file=>file.hunks!==undefined)&&<details><summary>Complete path and primary hunk ledger ({graph.files.length} paths, {graph.files.reduce((n,file)=>n+(file.hunks?.length??0),0)} hunks)</summary><ul>{graph.files.map(file=><li key={file.key}><strong>{fileLabel(file)} · {file.status}</strong><p>Before mode {file.oldMode??'unknown'} · After mode {file.newMode??'unknown'} · {file.coverage??'not prepared'} coverage</p><ul>{file.dispositions.map(item=><li key={item.side}>{item.side} {item.path}: {item.state} · {item.reason}</li>)}{file.hunks?.map(hunk=><li key={hunk.id}>Hunk {hunk.id} · Before {hunk.oldStart}+{hunk.oldLines} → After {hunk.newStart}+{hunk.newLines}{graph.nodes.filter(node=>node.fileKey===file.key&&node.kind==='hunk'&&((node.side==='base'&&node.anchor.startLine===hunk.oldStart)||(node.side==='head'&&node.anchor.startLine===hunk.newStart))).map(node=><React.Fragment key={node.id}>{evidenceButton(node.anchor,file.key)}</React.Fragment>)}</li>)}</ul></li>)}</ul></details>}
+  <details><summary>Accessible source and relationship evidence ({graph.nodes.length} nodes, {graph.edges.length} relationships)</summary><div className="graph-evidence"><h3>Source nodes</h3><ul>{graph.nodes.map(node=><li key={node.id}>{evidenceButton(node.anchor,node.fileKey)}<span>{node.kind} · {node.method} · {node.change}</span></li>)}</ul><h3>Relationships</h3><ul>{graph.edges.map(edge=><li key={edge.id}><strong>{edge.kind}: {edge.label}</strong><span>{edge.method}</span>{edge.anchors.map((anchor,index)=><React.Fragment key={index}>{evidenceButton(anchor)}</React.Fragment>)}</li>)}</ul></div></details>
+  <details><summary>Unresolved references and changed-path dispositions ({graph.unresolved.length} unresolved)</summary><ul>{graph.unresolved.map((reference,index)=><li key={index}>{evidenceButton(reference.source)} → {reference.destination}: {reference.reason}</li>)}{graph.dispositions.filter(item=>item.state!=='prepared').map((item,index)=><li key={index}>{item.side} {item.path}: {item.state} · {item.reason}</li>)}</ul></details>
+ </section>;
 };

@@ -98,7 +98,7 @@ export const createReviewBridge = (reviewId: string, initialSnapshotId?:string) 
           graph: state.review?.snapshot.snapshotId===review.snapshot.snapshotId?state.graph:projectGraph(review.snapshot),
           error: "",
           initialSelection: (() => {
-            const source=review.snapshot.sources.find(s=>s.side==="head")??review.snapshot.sources[0];
+            const source=review.snapshot.sources.find(s=>s.side==="head"&&s.lineCount>0)??review.snapshot.sources.find(s=>s.lineCount>0);
             return source?{snapshotId:review.snapshot.snapshotId,side:source.side,path:source.path,startLine:1,endLine:1}:null;
           })(),
           authenticated: true,
@@ -135,6 +135,7 @@ export const createReviewBridge = (reviewId: string, initialSnapshotId?:string) 
     };
   };
   return {
+    canLeaveReview:()=>!state.busy&&!state.selecting&&!pending,
     getSnapshot: () => state,
     subscribe: (listener: () => void) => {
       listeners.add(listener);
@@ -222,3 +223,5 @@ export const createReviewBridge = (reviewId: string, initialSnapshotId?:string) 
     diagnostics: () => registry.diagnostics(),
   };
 };
+export {createImportsBridge,describeImportJobs} from './imports.ts';
+export type {ImportViewJob,ImportAction} from './imports.ts';
