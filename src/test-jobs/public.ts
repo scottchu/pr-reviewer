@@ -7,3 +7,6 @@ export type {HeadFileEntry} from './files.ts';
 export {createHeadGitReader} from './git-process.ts';
 export {executePreparedHeadTest,prepareHeadTestInputs,createHeadTestConfiguration,readHeadTestConfiguration,inspectHeadTestPreparation,isHeadTestPreparation} from './preparation.ts';
 export type {HeadTestPreparationWitness,HeadTestConfiguration,HeadTestQualification} from './preparation.ts';
+
+export {observeHeadTestOutcome,readHeadTestOutcome,readHeadTestArtifact} from './outcome.ts';
+export type {HeadTestOutcomeWitness,HeadArtifactLocation} from './outcome.ts';

@@ -406,3 +406,6 @@ export {headTestEffectOccupiesSlot,headTestDefinition,headTestCanonical,HEAD_TES
 export type {HeadTestDefinition,HeadTestCommand,HeadTestScope,HeadTestQuery,HeadTestTarget,HeadTestTargets,HeadTestInvocation,HeadTestJob,HeadTestReceipt,HeadTestView} from "./head-tests.ts";
 export {processQuiescenceEligible} from './process.ts';
 export type {ProcessQuiescenceRecord} from './process.ts';
+
+export {headTestArtifactQuerySchema} from "./head-tests.ts";
+export type {HeadTestResult,HeadTestArtifact,HeadTestAdmissionReceipt,HeadTestArtifactQuery,HeadTestArtifactView} from "./head-tests.ts";

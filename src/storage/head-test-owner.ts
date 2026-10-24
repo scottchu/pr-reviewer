@@ -2,9 +2,9 @@ import {createHash,randomUUID} from 'node:crypto';
 import type {DatabaseSync} from 'node:sqlite';
 import {z} from 'zod';
 import {headTestCanonical,processQuiescenceEligible,HEAD_TEST_DEFINITION_DIGEST} from '../domain/public.ts';
-import type {HeadTestJob,Principal,Review} from '../domain/public.ts';
-import {isHeadTestQuiescence,isHeadTestProcessQuiescence,readHeadTestQuiescence,isHeadTestPreparation,inspectHeadTestPreparation} from '../test-jobs/public.ts';
-import type {HeadTestQuiescenceWitness,HeadTestPreparationWitness,HeadTestQualification} from '../test-jobs/public.ts';
+import type {HeadTestAdmissionReceipt,HeadTestJob,Principal,Review} from '../domain/public.ts';
+import {isHeadTestQuiescence,isHeadTestProcessQuiescence,readHeadTestQuiescence,isHeadTestPreparation,inspectHeadTestPreparation,readHeadTestOutcome} from '../test-jobs/public.ts';
+import type {HeadTestOutcomeWitness,HeadTestQuiescenceWitness,HeadTestPreparationWitness,HeadTestQualification} from '../test-jobs/public.ts';
 import type {ExecutionLease} from './execution.ts';
 import type {HeadTestOwner,HeadTestGrant,HeadTestJournal,HeadTestProcess,HeadTestStoredJob as Job,HeadTestPrivateInvocation} from './head-test-contracts.ts';
 const processSchema=z.object({ordinal:z.number().int().min(1).max(34),role:z.enum(['git_prepare','runtime_version','test_root']),state:z.enum(['requested','started','exited']),intentDigest:z.string().regex(/^[a-f0-9]{64}$/),inputCount:z.number().int().min(0).max(8192),inputBytes:z.number().int().min(0).max(8192*65),pid:z.number().int().positive().max(Number.MAX_SAFE_INTEGER).optional(),startIdentity:z.string().min(1).max(1024).optional(),spawnDisposition:z.literal('not_spawned').optional(),exitCode:z.number().int().nullable().optional(),signal:z.string().max(64).nullable().optional()}).strict();
@@ -69,6 +69,26 @@ export const createHeadTestOwnerStore=({db,tx,execution,rows,get,put,publicJob,l
     const next=old?processes.map(item=>item.ordinal===old.ordinal?{...item,...observation,observationDigest}:item):[...processes,{...observation,observationDigest}];update({...changeInvocation(job,{...invocation,processes:next}),...(observation.role==='test_root'&&observation.state==='started'&&job.state==='preparing'?{state:'running' as const}:{})});return {disposition:'recorded' as const};
    });
   },
+  complete:(value:HeadTestGrant,witness:HeadTestOutcomeWitness):HeadTestAdmissionReceipt=>tx(()=>{
+   execution.assertCurrent();const handle=grants.get(value),observed=readHeadTestOutcome(witness);
+   if(!handle||handle.generation!==generation()||!observed)throw new Error('invalid_test_witness');
+   const job=get(handle.jobId),invocation=job.invocations.at(-1),result=observed.result,commandId=`test-result:${job.jobId}`;
+   if(!invocation||invocation.invocationId!==handle.invocationId||result.jobId!==job.jobId||result.invocationId!==handle.invocationId)throw new Error('invalid_test_witness');
+   const old=db.prepare('SELECT actor,fingerprint,body FROM test_receipts WHERE id=?').get(commandId) as {actor:string;fingerprint:string;body:string}|undefined;
+   if(old){credential(job);if(old.actor!==job.actorId||old.fingerprint!==result.resultId||job.result?.resultId!==result.resultId)throw new Error('command_conflict');return JSON.parse(old.body) as HeadTestAdmissionReceipt;}
+   for(const table of ['receipts','import_receipts','analysis_receipts','story_receipts'])if(db.prepare(`SELECT id FROM ${table} WHERE id=?`).get(commandId))throw new Error('command_conflict');
+   if(invocation.state!=='running'||headTestCanonical(observed.journal)!==headTestCanonical(journal(job))||invocation.processJournalVersion!==1||!Array.isArray(invocation.processes)||invocation.processes.some(item=>!processQuiescenceEligible(item)))throw new Error('invalid_test_witness');
+   let authorized=true;try{credential(job);}catch{authorized=false;}
+   if(authorized!==observed.control.authorized||Boolean(job.cancellation)!==observed.control.cancelled||(job.stopReason??null)!==observed.control.stopReason||!authorized&&result.state!=='error'||job.cancellation&&result.state!=='cancelled')throw new Error('test_outcome_changed');
+   if(Date.now()>=observed.deadline&&['passed','failed'].includes(result.state))throw new Error('test_outcome_changed');
+   if(job.reservedBytes!==2*1024*1024||job.result)throw new Error('test_reservation_conflict');
+   const next:Job={...changeInvocation(job,{...invocation,state:'completed',quiescence:'confirmed'}),state:result.state,reason:result.reason,effectDisposition:'quiescent',result,artifactLocations:observed.locations,reservedBytes:0,retainedBytes:0,jobRevision:job.jobRevision+1,updatedAt:new Date().toISOString()};
+   const receipt:HeadTestAdmissionReceipt={commandId,jobId:job.jobId,jobRevision:next.jobRevision,resultId:result.resultId,state:'applied'};
+   const retainedBytes=observed.artifactBytes+Buffer.byteLength(headTestCanonical(next))+Buffer.byteLength(headTestCanonical(receipt));
+   if(retainedBytes+32>job.reservedBytes)throw new Error('test_storage_limit');
+   execution.release({kind:'test',jobId:job.jobId,invocationId:invocation.invocationId,phase:invocation.phase});put({...next,retainedBytes:retainedBytes+32});
+   db.prepare('INSERT INTO test_receipts VALUES (?,?,?,?)').run(commandId,job.actorId,result.resultId,headTestCanonical(receipt));return receipt;
+  }),
   markUnknown:(value:HeadTestGrant,reason:string)=>tx(()=>{const {job}=grant(value);if(!/^[a-z][a-z0-9_]{0,63}$/.test(reason))throw new Error('invalid_test_reason');unknownJob(job,reason);}),
   unknown:(value:HeadTestOwner):readonly HeadTestJournal[]=>{owner(value);return rows().filter(({job})=>job.state==='unknown'&&job.effectDisposition!=='quiescent'&&job.invocations.length>0).map(({job})=>journal(job));},
   reconcileQuiescence:(value:HeadTestOwner,witness:HeadTestQuiescenceWitness)=>tx(()=>{

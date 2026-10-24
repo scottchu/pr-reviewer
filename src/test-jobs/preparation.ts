@@ -20,7 +20,11 @@ type Closure=Awaited<ReturnType<typeof copyHeadTestClosure>>;
 type Account=Awaited<ReturnType<typeof accountHeadTestSource>>;
 export type HeadTestQualification=Readonly<{schema:'head-test-qualification-v1';repository:'scottchu/pr-reviewer';headSha:string;treeId:string;sourceManifestId:string;closureManifestId:string;sourceAccountId:string;runtimeSha256:string;runtimeVersion:'1.4.2';platform:'darwin-arm64';targetDigest:string;environmentPolicy:'head-test-env-v1';metadata:Closure['metadata'];provenance:'measured-existing-local-installation-not-vendor-attested'}>;
 type ConfigurationData=Readonly<{qualification:HeadTestQualification;qualificationId:string;repository:string;donor:string}>;
-type Prepared=Readonly<{started:number;outputBudget:HeadOutputBudget;journal:HeadTestJournal;jobId:string;invocationId:string;headSha:string;targetDigest:string;rootId:string;root:string;repository:string;donor:string;source:Source;closure:Closure;account:Account;runtimeSha256:string;version:HeadBunRun;qualificationId:string|null}>;
+export type Prepared=Readonly<{started:number;outputBudget:HeadOutputBudget;journal:HeadTestJournal;jobId:string;invocationId:string;headSha:string;targetDigest:string;rootId:string;root:string;repository:string;donor:string;source:Source;closure:Closure;account:Account;runtimeSha256:string;version:HeadBunRun;qualificationId:string|null}>;
+export type HeadLiveAttempt={job:HeadTestJob;invocationId:string;active:boolean;sealed?:boolean;stage:'intent'|'source'|'closure'|'runtime'|'account'|'prepared'|'execution';source?:Source;closure?:Closure;account?:Account;runtimeSha256?:string;started:number;outputBudget:HeadOutputBudget;rootId?:string;root?:string;prepared?:HeadTestPreparationWitness;run?:HeadBunRun;failure?:string;postVerified?:boolean};
+const attempts=new WeakMap<object,HeadLiveAttempt>();
+export const readHeadLiveAttempt=(grant:HeadTestGrant)=>attempts.get(grant);
+export const readPreparedHeadTest=(witness:HeadTestPreparationWitness)=>preparations.get(witness);
 const preparations=new WeakMap<object,Prepared>(),configurations=new WeakMap<object,ConfigurationData>();
 export const readHeadTestConfiguration=(value:HeadTestConfiguration):ConfigurationData|null=>{const record=configurations.get(value);return record?structuredClone(record):null;};
 export const inspectHeadTestPreparation=(value:HeadTestPreparationWitness)=>{
@@ -32,7 +36,9 @@ export const isHeadTestPreparation=(value:HeadTestPreparationWitness,job:HeadTes
 };
 export const verifyHeadTestPreparedFiles=async(value:HeadTestPreparationWitness,check:()=>void)=>{
  const record=preparations.get(value);if(!record)throw new Error('invalid_test_witness');
- const entries=await inventoryHeadFiles(join(record.root,'source'),check),expected=[...record.source.manifest.entries.map(entry=>({path:entry.path,mode:entry.mode==='100755'?0o755:0o644,bytes:entry.bytes,sha256:entry.sha256})),...record.closure.manifest.packages.flatMap(pkg=>pkg.entries.map(entry=>({...entry,path:`node_modules/${pkg.entry}/${entry.path}`})))].sort((a,b)=>a.path<b.path?-1:a.path>b.path?1:0);
+ const directories:string[]=[];const entries=await inventoryHeadFiles(join(record.root,'source'),check,path=>directories.push(path)),expected=[...record.source.manifest.entries.map(entry=>({path:entry.path,mode:entry.mode==='100755'?0o755:0o644,bytes:entry.bytes,sha256:entry.sha256})),...record.closure.manifest.packages.flatMap(pkg=>pkg.entries.map(entry=>({...entry,path:`node_modules/${pkg.entry}/${entry.path}`})))].sort((a,b)=>a.path<b.path?-1:a.path>b.path?1:0);
+ const expectedDirectories=new Set<string>();for(const entry of expected){const parts=entry.path.split('/');for(let count=1;count<parts.length;count++)expectedDirectories.add(parts.slice(0,count).join('/'));}
+ if(headTestCanonical(directories.sort())!==headTestCanonical([...expectedDirectories].sort()))throw new Error('prepared_inputs_changed');
  if(headTestCanonical(entries)!==headTestCanonical(expected))throw new Error('prepared_inputs_changed');
  if((await readHeadRegular(join(record.root,'empty-bunfig.toml'),0,check)).length!==0)throw new Error('runtime_config_unavailable');await verifyHeadBun(check);
 };
@@ -42,39 +48,46 @@ export const createHeadTestConfiguration=async(value:HeadTestPreparationWitness,
  const qualification:HeadTestQualification={schema:'head-test-qualification-v1',repository:'scottchu/pr-reviewer',headSha:record.headSha,treeId:record.source.manifest.treeId,sourceManifestId:record.source.sourceManifestId,closureManifestId:record.closure.closureManifestId,sourceAccountId:record.account.sourceAccountId,runtimeSha256:record.runtimeSha256,runtimeVersion:'1.4.2',platform:'darwin-arm64',targetDigest:record.targetDigest,environmentPolicy:'head-test-env-v1',metadata:record.closure.metadata,provenance:'measured-existing-local-installation-not-vendor-attested'};
  const config=Object.freeze({}) as HeadTestConfiguration;configurations.set(config,{qualification,qualificationId:headDigest(headTestCanonical(qualification)),repository:record.repository,donor:record.donor});return config;
 };
-export const prepareHeadTestInputs=async({store,grant,executionRoot,fixtureInputs}:{store:Store;grant:HeadTestGrant;executionRoot:string;fixtureInputs?:Readonly<{repository:string;donor:string}>}):Promise<HeadTestPreparationWitness>=>{
- const {job,invocationId}=store.tests.input(grant),configured=store.tests.resolveHeadTestSource(grant);
+const prepareInputs=async({store,grant,executionRoot,fixtureInputs}:{store:Store;grant:HeadTestGrant;executionRoot:string;fixtureInputs?:Readonly<{repository:string;donor:string}>}):Promise<HeadTestPreparationWitness>=>{
+ const attempt=attempts.get(grant)!;const {job,invocationId}=store.tests.input(grant),configured=store.tests.resolveHeadTestSource(grant);
  if(fixtureInputs&&job.provenance!=='test_only_execution')throw new Error('fixture_configuration_forbidden');
  const locators=job.provenance==='test_only_execution'?fixtureInputs:configured;if(!locators)throw new Error('source_unavailable');
  if(job.target.digest!==HEAD_TEST_DEFINITION_DIGEST||process.platform!=='darwin'||process.arch!=='arm64')throw new Error('runtime_unavailable');
- const outputBudget=createHeadOutputBudget(),rootId=store.tests.registerRoot(grant),root=join(await realpath(executionRoot),rootId),started=Date.now(),deadline=started+30000;
+ const outputBudget=attempt.outputBudget,rootId=store.tests.registerRoot(grant),root=join(await realpath(executionRoot),rootId),started=attempt.started,deadline=started+30000;attempt.rootId=rootId;attempt.root=root;
  const check=()=>{const control=store.tests.control(grant);if(!control.authorized||control.cancelled||control.stopReason)throw new Error(control.cancelled?'test_cancelled':'test_stopped');if(Date.now()>=deadline)throw new Error('prepare_deadline');};
  check();await mkdir(root,{mode:0o700});for(const child of ['empty','home','tmp','config','cache']){check();await mkdir(join(root,child),{mode:0o700});}await writeFile(join(root,'empty-bunfig.toml'),'',{flag:'wx',mode:0o600});
  const observer={journal:()=>store.tests.journal(grant),control:()=>store.tests.control(grant),recordStop:(reason:string)=>store.tests.recordStop(grant,reason),recordProcess:store.tests.recordProcess.bind(null,grant)};
- const read=createHeadGitReader({repository:locators.repository,headSha:job.headSha,ownedRoot:root,observer,outputBudget}),source=await materializeHeadTestSource({headSha:job.headSha,destination:join(root,'source'),read,check});
- const closure=await copyHeadTestClosure({source:join(root,'source'),donor:locators.donor,check}),runtimeSha256=await verifyHeadBun(check),version=await createHeadBunRunner({ownedRoot:root,observer,deadline,outputBudget})('runtime_version');
+ attempt.stage='source';const read=createHeadGitReader({repository:locators.repository,headSha:job.headSha,ownedRoot:root,observer,outputBudget}),source=await materializeHeadTestSource({headSha:job.headSha,destination:join(root,'source'),read,check});
+ attempt.source=source;attempt.stage='closure';const closure=await copyHeadTestClosure({source:join(root,'source'),donor:locators.donor,check});attempt.closure=closure;attempt.stage='runtime';const runtimeSha256=await verifyHeadBun(check);attempt.runtimeSha256=runtimeSha256;const version=await createHeadBunRunner({ownedRoot:root,observer,deadline,outputBudget})('runtime_version');
  if(!version.terminationConfirmed||version.reason||version.exitCode!==0||version.output.filter(item=>item.channel==='stdout').map(item=>item.text).join('').trim()!=='1.4.2')throw new Error('runtime_unavailable');
- const account=await accountHeadTestSource(join(root,'source'),source.manifest,check);check();
+ attempt.stage='account';const account=await accountHeadTestSource(join(root,'source'),source.manifest,check);attempt.account=account;check();
  const record:Prepared={started,outputBudget,journal:store.tests.journal(grant),jobId:job.jobId,invocationId,headSha:job.headSha,targetDigest:job.target.digest,rootId,root,repository:locators.repository,donor:locators.donor,source,closure,account,runtimeSha256,version,qualificationId:job.qualificationId??null};
  if(job.provenance==='qualified_local_configuration'){
   if(!configured)throw new Error('qualification_required');const q=configured.qualification;
   if(q.headSha!==job.headSha||q.sourceManifestId!==source.sourceManifestId||q.closureManifestId!==closure.closureManifestId||q.sourceAccountId!==account.sourceAccountId||q.runtimeSha256!==runtimeSha256||headTestCanonical(q.metadata)!==headTestCanonical(closure.metadata))throw new Error('qualification_changed');
  }
  if(Buffer.byteLength(headTestCanonical({source:source.manifest,closure:closure.manifest,account:account.account}))>1024*1024)throw new Error('test_evidence_limit');
- const witness=Object.freeze({}) as HeadTestPreparationWitness;preparations.set(witness,record);await verifyHeadTestPreparedFiles(witness,check);return witness;
+ const witness=Object.freeze({}) as HeadTestPreparationWitness;preparations.set(witness,record);await verifyHeadTestPreparedFiles(witness,check);attempt.prepared=witness;attempt.stage='prepared';return witness;
 };
 
+export const prepareHeadTestInputs=async(input:Parameters<typeof prepareInputs>[0]):Promise<HeadTestPreparationWitness>=>{
+ if(attempts.has(input.grant))throw new Error('test_attempt_already_started');
+ const current=input.store.tests.input(input.grant),attempt:HeadLiveAttempt={...current,active:true,stage:'intent',started:Date.now(),outputBudget:createHeadOutputBudget()};attempts.set(input.grant,attempt);
+ try{return await prepareInputs(input);}catch(error){attempt.failure=error instanceof Error&&/^[a-z][a-z0-9_]{0,63}$/.test(error.message)?error.message:'preparation_error';throw error;}finally{attempt.active=false;}
+};
 const executed=new WeakSet<object>();
 /** Fixed target only; result admission is a separate authority. */
 export const executePreparedHeadTest=async({store,grant,witness}:{store:Store;grant:HeadTestGrant;witness:HeadTestPreparationWitness})=>{
  const record=preparations.get(witness),input=store.tests.input(grant);
  if(!record||executed.has(witness)||input.job.jobId!==record.jobId||input.invocationId!==record.invocationId||input.job.headSha!==record.headSha||input.job.target.digest!==record.targetDigest||input.job.invocations.at(-1)?.phase!=='execute'||input.job.preparation?.sourceManifestId!==record.source.sourceManifestId)throw new Error('invalid_test_witness');
- executed.add(witness);const deadline=record.started+120000;
+ const attempt=attempts.get(grant);if(!attempt||attempt.active||attempt.sealed||attempt.prepared!==witness)throw new Error('invalid_test_witness');
+ executed.add(witness);attempt.active=true;attempt.stage='execution';const deadline=record.started+120000;try{
  const check=()=>{const control=store.tests.control(grant);if(!control.authorized||control.cancelled||control.stopReason)throw new Error(control.cancelled?'test_cancelled':'test_stopped');if(Date.now()>=deadline)throw new Error('test_deadline');};
  check();await verifyHeadTestPreparedFiles(witness,check);
  const observer={journal:()=>store.tests.journal(grant),control:()=>store.tests.control(grant),recordStop:(reason:string)=>store.tests.recordStop(grant,reason),recordProcess:store.tests.recordProcess.bind(null,grant)};
- const run=await createHeadBunRunner({ownedRoot:record.root,observer,deadline,outputBudget:record.outputBudget})('test_root');
+ const run=await createHeadBunRunner({ownedRoot:record.root,observer,deadline,outputBudget:record.outputBudget})('test_root');attempt.run=run;
  // Defensive inventory runs even after cancellation; it grants no new process authority.
  await verifyHeadTestPreparedFiles(witness,()=>{if(Date.now()>=deadline+1000)throw new Error('test_deadline');});
- return {run,output:record.outputBudget.snapshot()};
+ attempt.postVerified=true;return {run,output:record.outputBudget.snapshot()};
+ }catch(error){attempt.failure=error instanceof Error&&/^[a-z][a-z0-9_]{0,63}$/.test(error.message)?error.message:'execution_error';throw error;}finally{attempt.active=false;}
 };

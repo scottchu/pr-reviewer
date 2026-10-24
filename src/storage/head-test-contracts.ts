@@ -12,7 +12,7 @@ export type HeadTestPrivateInvocation = HeadTestInvocation & Readonly<{
 }>;
 export type HeadTestStoredJob = Omit<HeadTestJob,'invocations'> & Readonly<{
  credentialReference: string; reservedBytes: number; retainedBytes: number;
- invocations: readonly HeadTestPrivateInvocation[]; stopReason?: string;
+ invocations: readonly HeadTestPrivateInvocation[]; stopReason?: string; artifactLocations?: readonly Readonly<{artifactId:string;path:string}>[];
 }>;
 export type HeadTestJournal = Readonly<{
  jobId: string; jobRevision: number; invocation: HeadTestPrivateInvocation;

@@ -1,11 +1,11 @@
-import {readHeadTestConfiguration} from '../test-jobs/public.ts';
+import {readHeadTestConfiguration,readHeadTestArtifact} from '../test-jobs/public.ts';
 import type {HeadTestConfiguration} from '../test-jobs/public.ts';
 import {createHeadTestOwnerStore} from './head-test-owner.ts';
 import type {HeadTestStoredJob as StoredJob} from './head-test-contracts.ts';
 import {createHash, randomUUID} from 'node:crypto';
 import type {DatabaseSync} from 'node:sqlite';
-import {headTestEffectOccupiesSlot, headTestCanonical, headTestCommandSchema, headTestDefinition, HEAD_TEST_DEFINITION_DIGEST, headTestQuerySchema, headTestScopeSchema} from '../domain/public.ts';
-import type {HeadTestCommand, HeadTestJob, HeadTestQuery, HeadTestReceipt, HeadTestScope, HeadTestTargets, HeadTestTarget, HeadTestView, Principal, Review, Snapshot} from '../domain/public.ts';
+import {headTestEffectOccupiesSlot, headTestCanonical, headTestCommandSchema, headTestDefinition, HEAD_TEST_DEFINITION_DIGEST, headTestQuerySchema, headTestScopeSchema,headTestArtifactQuerySchema} from '../domain/public.ts';
+import type {HeadTestArtifactQuery, HeadTestArtifactView, HeadTestCommand, HeadTestJob, HeadTestQuery, HeadTestReceipt, HeadTestScope, HeadTestTargets, HeadTestTarget, HeadTestView, Principal, Review, Snapshot} from '../domain/public.ts';
 import type {ExecutionLease} from './execution.ts';
 
 export type HeadTestOptions = Readonly<{testOnlyAvailable?: true; testOnlyExecution?: true; configuration?: HeadTestConfiguration; maxPending?: number; maxJobsPerReview?: number; maxRetainedBytes?: number}>;
@@ -13,7 +13,7 @@ type Ports = Readonly<{db: DatabaseSync; tx: <T>(operation: () => T) => T; load:
 const hash = (value: string) => createHash('sha256').update(value).digest('hex');
 const reserveBytes = 2 * 1024 * 1024;
 const terminal = new Set<HeadTestJob['state']>(['cancelled', 'passed', 'failed', 'timed_out', 'unavailable', 'error']);
-const publicJob = ({credentialReference: _credential, reservedBytes: _reserved, retainedBytes: _retained, stopReason: _stop, invocations, ...job}: StoredJob): HeadTestJob => ({...job,invocations:invocations.map(({invocationId,phase,state,quiescence,processes})=>({invocationId,phase,state,quiescence,...(processes?{processCount:processes.length}:{})}))});
+const publicJob = ({credentialReference: _credential, reservedBytes: _reserved, retainedBytes: _retained, stopReason: _stop, artifactLocations: _locations, invocations, ...job}: StoredJob): HeadTestJob => ({...job,invocations:invocations.map(({invocationId,phase,state,quiescence,processes})=>({invocationId,phase,state,quiescence,...(processes?{processCount:processes.length}:{})}))});
 const target = (): HeadTestTarget => ({targetId: 'review-source-core-v1', revision: 2, digest: HEAD_TEST_DEFINITION_DIGEST, definition: headTestDefinition()});
 const configuredRepository = (snapshot: Snapshot): boolean => {
   const url = new URL(snapshot.prUrl), candidate = snapshot.candidate;
@@ -135,5 +135,12 @@ export const createHeadTestStore = ({db, tx, load, authenticate, authorize, exec
     const matching = (db.prepare("SELECT rowid AS sequence,body FROM test_jobs WHERE rowid>? AND json_extract(body,'$.reviewId')=? AND json_extract(body,'$.snapshotId')=? ORDER BY rowid LIMIT 33").all(after, scope.reviewId, scope.snapshotId) as {sequence: number; body: string}[]).map(row => ({sequence: row.sequence, job: JSON.parse(row.body) as StoredJob})), page = matching.slice(0, 32);
     return {...scope, jobs: page.map(row => publicJob(row.job)), selectedJob: null, nextCursor: matching.length > 32 ? Buffer.from(headTestCanonical({v: 1, ...scope, after: page.at(-1)!.sequence})).toString('base64url') : null};
   };
-  return {targets, command, query, ...createHeadTestOwnerStore({db,tx,load,authorize,execution,rows,get,put,publicJob,fixtureExecution,configuration})};
+  const artifact=async(token:string,input:HeadTestArtifactQuery):Promise<HeadTestArtifactView>=>{
+   const parsed=headTestArtifactQuerySchema.parse(input),scope={reviewId:parsed.reviewId,snapshotId:parsed.snapshotId};const {principal}=auth(token,scope),job=get(parsed.jobId);
+   if(job.reviewId!==scope.reviewId||job.snapshotId!==scope.snapshotId||principal.kind==='user'&&principal.actorId!==job.actorId)throw new Error('test_job_unavailable');
+   const descriptor=job.result?.artifacts.find(item=>item.artifactId===parsed.artifactId),location=job.artifactLocations?.find(item=>item.artifactId===parsed.artifactId);if(!descriptor||!location)throw new Error('test_artifact_unavailable');
+   const bytes=await readHeadTestArtifact(location,descriptor);auth(token,scope);const offset=parsed.offset??0;if(offset>bytes.length)throw new Error('invalid_artifact_offset');const end=Math.min(bytes.length,offset+(parsed.length??65536)),chunk=bytes.subarray(offset,end);
+   return {jobId:job.jobId,artifactId:descriptor.artifactId,sha256:descriptor.sha256,totalBytes:bytes.length,offset,bytes:chunk.length,complete:end===bytes.length,text:chunk.toString('utf8')};
+  };
+  return {targets, command, query, artifact, ...createHeadTestOwnerStore({db,tx,load,authorize,execution,rows,get,put,publicJob,fixtureExecution,configuration})};
 };

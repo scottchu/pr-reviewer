@@ -12,7 +12,7 @@ const regular=async(path:string,max:number,check:()=>void):Promise<Buffer>=>{
  }finally{await file.close();}
 };
 const plainDirectory=async(path:string)=>{const stat=await lstat(path);if(!stat.isDirectory()||stat.isSymbolicLink())throw new Error('environment_unavailable');};
-export const inventoryHeadFiles=async(root:string,check:()=>void):Promise<readonly HeadFileEntry[]>=>{
+export const inventoryHeadFiles=async(root:string,check:()=>void,onDirectory?:(path:string)=>void):Promise<readonly HeadFileEntry[]>=>{
  await plainDirectory(root);const entries:HeadFileEntry[]=[],seen=new Set<string>();let total=0,dirs=0;
  const visit=async(relative:string,depth:number):Promise<void>=>{
   check();if(depth>128||++dirs>32768)throw new Error('environment_limit');
@@ -20,7 +20,7 @@ export const inventoryHeadFiles=async(root:string,check:()=>void):Promise<readon
    check();if(!name||name==='.'||name==='..'||/[\x00-\x1f\x7f\\:/]/.test(name))throw new Error('environment_unavailable');
    const path=relative?`${relative}/${name}`:name,normalized=path.normalize('NFC').toLowerCase();if(seen.has(normalized))throw new Error('environment_unavailable');seen.add(normalized);
    const full=join(root,path),stat=await lstat(full);if(stat.isSymbolicLink())throw new Error('environment_unavailable');
-   if(stat.isDirectory()){await visit(path,depth+1);continue;}
+   if(stat.isDirectory()){onDirectory?.(path);await visit(path,depth+1);continue;}
    if(!stat.isFile()||stat.nlink!==1||(stat.mode&0o7000)!==0)throw new Error('environment_unavailable');
    if(stat.size>32*1024*1024||entries.length>=32768||(total+=stat.size)>64*1024*1024)throw new Error('environment_limit');
    const bytes=await regular(full,32*1024*1024,check);entries.push({path,mode:stat.mode&0o777,bytes:bytes.length,sha256:headDigest(bytes)});
