@@ -1,10 +1,12 @@
 import React, { useEffect, useState, useSyncExternalStore } from "react";
 import { createRoot } from "react-dom/client";
-import { createReviewBridge, questionStatus } from "../application/public.ts";
+import { createReviewBridge, createImportsBridge, questionStatus } from "../application/public.ts";
+import {sourceComparison} from "../domain/public.ts";
 import type { Anchor, Review, SourceView } from "../domain/public.ts";
 import "./style.css";
 import { ReviewGraph } from "./graph.tsx";
-const bridge = createReviewBridge(
+import {Imports} from "./imports.tsx";
+const initialBridge = () => createReviewBridge(
   new URLSearchParams(window.location.search).get("reviewId") ?? "pr-14",
   new URLSearchParams(window.location.search).get("snapshotId")??undefined,
 );
@@ -83,13 +85,16 @@ const SourcePane = ({
   );
 };
 const App = () => {
+  const [bridge,setBridge]=useState(initialBridge);
+  const [importsBridge]=useState(createImportsBridge);
+  const [comparisonKey,setComparisonKey]=useState<string|undefined>();
   const state = useSyncExternalStore(bridge.subscribe, bridge.getSnapshot);
   const [credential, setCredential] = useState(""),
     [draft, setDraft] = useState(""),
     [selected, setSelected] = useState<Anchor | null>(null),
     [parentQuestionId,setParentQuestionId]=useState<string|undefined>(),
     [onlySelectedDiscussion,setOnlySelectedDiscussion]=useState(false);
-  useEffect(() => bridge.connect(), []);
+  useEffect(() => bridge.connect(), [bridge]);
   useEffect(() => {
     if (state.initialSelection && !selected)
       setSelected(state.initialSelection);
@@ -107,7 +112,7 @@ const App = () => {
         <form
           onSubmit={(event) => {
             event.preventDefault();
-            void bridge.login(credential);
+            void bridge.login(credential);void importsBridge.login(credential);
           }}
         >
           <label htmlFor="credential">Local access token</label>
@@ -128,17 +133,22 @@ const App = () => {
     if(draft.trim())return;
     try{await bridge.selectSnapshot(snapshotId);const url=new URL(window.location.href);url.searchParams.set("snapshotId",snapshotId);window.history.replaceState(null,"",url);setSelected(bridge.getSnapshot().initialSelection);}catch{}
   };
-  const openSource = async(anchor:Anchor) => {
+  const openSource = async(anchor:Anchor,fileKey?:string) => {
     if(draft.trim() && selected && JSON.stringify(anchor)!==JSON.stringify(selected)) return;
     if(anchor.snapshotId!==review.snapshot.snapshotId){
       try{await bridge.selectSnapshot(anchor.snapshotId);}catch{return;}
     }
-    setSelected(anchor);
+    setSelected(anchor);setComparisonKey(fileKey);
     const url=new URL(window.location.href);url.searchParams.set("snapshotId",anchor.snapshotId);url.hash=`source-${anchor.side}-${anchor.startLine}`;window.history.replaceState(null,"",url);
     requestAnimationFrame(()=>document.getElementById(`source-${anchor.side}-${anchor.startLine}`)?.scrollIntoView({block:"center"}));
   };
   return (
     <main>
+      <Imports bridge={importsBridge} review={review} canOpen={!draft.trim()&&bridge.canLeaveReview()} onOpen={reviewId=>{
+        if(draft.trim()||!bridge.canLeaveReview())return;
+        const next=createReviewBridge(reviewId);setSelected(null);setComparisonKey(undefined);setParentQuestionId(undefined);setBridge(next);void next.login(credential);
+        const url=new URL(window.location.href);url.searchParams.set('reviewId',reviewId);url.searchParams.delete('snapshotId');url.hash='';window.history.replaceState(null,'',url);
+      }}/>
       <header className="identity">
         <div>
           <p className="eyebrow">Pinned source · source structure review</p>
@@ -186,7 +196,7 @@ const App = () => {
       </header>
       <section className="snapshot-selection" aria-label="Snapshot history"><label>Snapshot<select value={review.snapshot.snapshotId} disabled={Boolean(draft.trim())||state.busy} onChange={event=>{void chooseSnapshot(event.target.value);}}>{(review.snapshotSummaries??[{snapshotId:review.snapshot.snapshotId,baseSha:review.snapshot.baseSha,headSha:review.snapshot.headSha}]).map(snapshot=><option key={snapshot.snapshotId} value={snapshot.snapshotId}>{snapshot.snapshotId===(review.currentSnapshotId??review.snapshot.snapshotId)?"Current":"History"} · {snapshot.headSha.slice(0,12)} · {snapshot.snapshotId.slice(0,12)}</option>)}</select></label><p role="status">{review.snapshot.snapshotId===(review.currentSnapshotId??review.snapshot.snapshotId)?"Viewing current snapshot":"Viewing historical snapshot"}. Selection is private and does not move saved source or discussion.</p>{state.error&&<p role="alert">{state.error}</p>}</section>
       {state.selecting&&<p role="status">Opening the selected snapshot. Question composition is held until its source is ready.</p>}
-      {state.graph && selected && <ReviewGraph graph={state.graph} selectedPath={selected.path} onOpen={openSource}/>}
+      {state.graph && <ReviewGraph graph={state.graph} selectedPath={selected?.path??""} onOpen={openSource}/>}
       <section className="source-identity">
         <h2>{selected?.path ?? state.sources[0]?.path}</h2>
         <p>
@@ -195,18 +205,16 @@ const App = () => {
         </p>
         <a href="#graph-title" onClick={()=>document.getElementById("graph-title")?.focus()}>Return to change map</a>
         {draft.trim()&&<p role="status">Source selection is held while your question draft is nonempty. Save or clear it before navigating.</p>}
-        <label>Source file<select value={selected?.path??""} disabled={Boolean(draft.trim())} onChange={e=>{const source=state.sources.find(s=>s.path===e.target.value&&s.side==="head")??state.sources.find(s=>s.path===e.target.value);if(source)openSource({snapshotId:review.snapshot.snapshotId,path:source.path,side:source.side,startLine:1,endLine:1});}}>{[...new Set(state.sources.map(s=>s.path))].map(path=><option key={path}>{path}</option>)}</select></label>
+        <label>Source file<select value={selected?.path??""} disabled={Boolean(draft.trim())} onChange={e=>{const source=state.sources.find(s=>s.path===e.target.value&&s.side==="head"&&s.lineCount>0)??state.sources.find(s=>s.path===e.target.value&&s.lineCount>0);if(source)openSource({snapshotId:review.snapshot.snapshotId,path:source.path,side:source.side,startLine:1,endLine:1});}}>{[...new Set(state.sources.filter(s=>s.lineCount>0).map(s=>s.path))].map(path=><option key={path}>{path}</option>)}</select></label>
       </section>
-      {selected && (
-        <>
-          <div className="source-grid">
+      {selected && <div className="source-grid">
             {(["base", "head"] as const).map(side => {
-              const source = state.sources.find(item => item.path === selected.path && item.side === side);
+              const source = sourceComparison(review.snapshot,selected,comparisonKey).find(item=>item.side===side);
               return source ? <SourcePane key={side} source={source} review={review} selected={selected} onSelect={openSource} /> : <section key={side} className="source-pane"><header><h2>{side === "base" ? "Before" : "After"}</h2></header><p>This side has no prepared source for {selected.path}. {review.snapshot.changedFiles?.find(file => file.oldPath === selected.path || file.newPath === selected.path)?.dispositions.find(item => item.side === side)?.reason ?? "Absent from the pinned change or not prepared; no selectable anchor."}</p></section>;
             })}
-          </div>
+          </div>}
           <section className="conversation">
-            <div className="composer">
+            {selected?<div className="composer">
               <p className="eyebrow">Ask about this source</p>
               <h2>One question, grounded in the change</h2>
               <form
@@ -286,7 +294,7 @@ const App = () => {
                 </button>
                 {state.error && <p role="alert">{state.error}</p>}
               </form>
-            </div>
+            </div>:<p>No selectable source lines in this snapshot. Inspect the complete ledger; historical discussion remains available.</p>}
             <section aria-label="Discussion" className="discussion">
               <h2>Discussion</h2>
               <div aria-live="polite" className="status-summary">
@@ -368,11 +376,8 @@ const App = () => {
               })}
             </section>
           </section>
-        </>
-      )}
       <footer>
-        Manual immutable source preparation · no general import or repository
-        execution
+        Immutable source review · bounded read-only acquisition · no target program execution
       </footer>
     </main>
   );

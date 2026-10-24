@@ -32,7 +32,7 @@ type Connection = {
 export const createStore = (filename: string) => {
   const db = new DatabaseSync(filename);
   db.exec(
-    "PRAGMA busy_timeout=3000; PRAGMA foreign_keys=ON; PRAGMA journal_mode=WAL; CREATE TABLE IF NOT EXISTS reviews(id TEXT PRIMARY KEY, body TEXT NOT NULL); CREATE TABLE IF NOT EXISTS receipts(id TEXT PRIMARY KEY, actor TEXT NOT NULL, fingerprint TEXT NOT NULL, body TEXT NOT NULL); CREATE TABLE IF NOT EXISTS credentials(hash TEXT PRIMARY KEY, body TEXT NOT NULL); CREATE TABLE IF NOT EXISTS challenges(id TEXT PRIMARY KEY, body TEXT NOT NULL); CREATE TABLE IF NOT EXISTS preparation_inputs(review_id TEXT PRIMARY KEY REFERENCES reviews(id), body TEXT NOT NULL);",
+    "PRAGMA busy_timeout=3000; PRAGMA foreign_keys=ON; PRAGMA journal_mode=WAL; CREATE TABLE IF NOT EXISTS reviews(id TEXT PRIMARY KEY, body TEXT NOT NULL); CREATE TABLE IF NOT EXISTS receipts(id TEXT PRIMARY KEY, actor TEXT NOT NULL, fingerprint TEXT NOT NULL, body TEXT NOT NULL); CREATE TABLE IF NOT EXISTS credentials(hash TEXT PRIMARY KEY, body TEXT NOT NULL); CREATE TABLE IF NOT EXISTS challenges(id TEXT PRIMARY KEY, body TEXT NOT NULL); CREATE TABLE IF NOT EXISTS preparation_inputs(review_id TEXT PRIMARY KEY REFERENCES reviews(id), body TEXT NOT NULL); CREATE TABLE IF NOT EXISTS review_import_identities(review_id TEXT PRIMARY KEY REFERENCES reviews(id),provider TEXT NOT NULL,host TEXT NOT NULL,target_project TEXT NOT NULL,change_number INTEGER NOT NULL,current_snapshot_id TEXT NOT NULL);",
   );
   const tx = <T>(operation: () => T): T => {
     db.exec("BEGIN IMMEDIATE");
@@ -52,11 +52,16 @@ export const createStore = (filename: string) => {
     if (!row) throw new Error("source_unavailable");
     return JSON.parse(row.body) as Review;
   };
+  const indexReview=(review:Review)=>{
+    const snapshot=review.snapshot,candidate=snapshot.candidate;let host:string;try{host=candidate?.host??new URL(snapshot.prUrl).host;}catch{db.prepare('DELETE FROM review_import_identities WHERE review_id=?').run(review.reviewId);return;}
+    db.prepare('INSERT INTO review_import_identities VALUES (?,?,?,?,?,?) ON CONFLICT(review_id) DO UPDATE SET provider=excluded.provider,host=excluded.host,target_project=excluded.target_project,change_number=excluded.change_number,current_snapshot_id=excluded.current_snapshot_id').run(review.reviewId,candidate?.provider??'github',host,candidate?.targetProject??snapshot.repository,candidate?.number??snapshot.prNumber,review.currentSnapshotId??snapshot.snapshotId);
+  };
   const save = (review: Review) => {
     db.prepare("INSERT OR REPLACE INTO reviews VALUES (?,?)").run(
       review.reviewId,
       JSON.stringify(review),
     );
+    indexReview(review);
   };
   const authorize = (principal: Principal, review: Review) => {
     if (principal.kind === "bootstrap") throw new Error("unauthorized");
@@ -173,7 +178,7 @@ export const createStore = (filename: string) => {
         const snapshots=review.snapshots??[review.snapshot];
         const currentSnapshotId=review.currentSnapshotId??review.snapshot.snapshotId;
         if(!snapshots.length||new Set(snapshots.map(snapshot=>snapshot.snapshotId)).size!==snapshots.length||!snapshots.some(snapshot=>snapshot.snapshotId===currentSnapshotId))throw new Error("source_unavailable");
-        if(!review.snapshots||!review.currentSnapshotId)save({...review,snapshots,currentSnapshotId});
+        if(!review.snapshots||!review.currentSnapshotId)save({...review,snapshots,currentSnapshotId});else indexReview(review);
       }
     });
   }catch(error){db.close();throw error;}

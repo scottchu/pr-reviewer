@@ -4,7 +4,7 @@
 
 **Direction:** Accepted bounded slice 03 design
 
-**Implementation:** Planned against independently accepted 02B ports merged through PR22; full import job/UI is not delivered
+**Implementation:** Slice03 candidate implements job ownership, verified provider admission and React path/ledger/history controls in isolation. Bounded prerequisite/foundation/process reviews passed. Full own-PR, independent integrated review and round acceptance remain pending; the deployed main baseline is separate.
 
 **Parents:** [Review/source history](evolution.md), [existing contracts](contracts.md), [reactive ownership](../reactive-design.md)
 
@@ -166,3 +166,49 @@ Termination uncertainty is sticky for the entire phase, not just its latest subp
 
 
 Runtime restart preserves the retained manual setup entry alongside any number of provider-imported reviews. The legacy source-input/snapshot exports remain that setup’s compatibility projection, not an import catalog or authority to rewrite another review. DB-only setup recovery first uses the authoritative preparation_inputs row; without one it may reconstruct a uniquely identifiable original manual review. It never chooses a provider-imported review arbitrarily. Multiple manual setup identities remain an explicit conflict. Imported reviews reopen through their exact review/snapshot URL or the explicit job result action.
+
+
+The owning store maintains an additive review_import_identities lookup keyed by reviewId, with provider/host/target-project/change-number and current snapshot ID. Initial creation rechecks that lookup atomically; it does not parse every retained source aggregate to discover identity collisions. Legacy identities are populated from their retained review without rewriting source or IDs. Every review save updates the lookup in the same transaction. Content validation, witness comparison, source-budget calculation and admission request hashing precede the transaction; authoritative state/CAS checks and writes remain atomic.
+
+
+## Persisted job representation and public ports
+
+This is format import-job-v1 knowledge. SQLite remains user_version0; JSON job bodies have no additional schema discriminator. The additive physical tables below coexist with the legacy tables in persistence-compatibility.md. A fresh store has empty job/receipt/owner tables. Initialization does not start work; only the runtime’s configured import runner begins an owner generation after the existing data-root runtime lock.
+
+| Table/key | Columns and authoritative meaning |
+|---|---|
+| import_jobs / id | body JSON; id equals jobId. Updates preserve insertion order for queue fairness. |
+| import_receipts / id | actor, fingerprint, body JSON. Separate job command/receipt scope from legacy review receipts; id is the stable commandId. |
+| import_owner / id=1 | generation: UUID for this runner ownership epoch, distinct from review attachment generation. |
+| review_import_identities / review_id | provider, host, target_project, change_number, current_snapshot_id; review_id references reviews.id. Derive from retained current snapshot, treating legacy manual identity as GitHub with its existing URL host/repository/number. |
+
+A job body retains jobId, actorId, credentialReference (SHA256 bearer verifier key, never token), path, canonicalWorktree (null before discovery), state, jobRevision, createdAt/updatedAt (UTC strings), reserved reviewId, target (null for create or reviewId/expectedCurrentSnapshotId), candidate (null before selection), ordered candidates, discoveryRevision, full bounded discovery value, existingReviews, ordered invocations, artifact (null until registered), admissionCommandId, admission (null until attempted), reason (null or bounded reason). Existing-review choices contain reviewId/currentSnapshotId and optional candidateIndex for ambiguous discovery. Public owner readback omits credentialReference and is restricted to that exact active credential/actor; job revisions are not review cursors.
+
+An invocation retains invocationId, phase (discovery/acquisition/reverification), generation, state (running/completed/unknown/cancelled), startedAt and ordered processes; optional artifact retains that invocation’s registered result even after later re-verification. Each process retains ordinal (one-based, increasing), executable role (git/gh/glab), state (requested/started/exited), optional observed pid/startIdentity, exitCode/signal/reason, and requestedAt/startedAt/endedAt UTC timestamps as observations occur. A requested row precedes spawn. No argv, stderr or environment secrets are persisted. Exited records establish leader observations; live groups still keep phase uncertainty as described above.
+
+The registered artifact reference has exactly schema import-result-v1, artifactId, jobId, invocationId, digest and bytes. Its bytes/hash cover the full encoded envelope, not just source text. The envelope’s value is the original full acquisition result. It grants no source trust. IDs for jobs, reserved new reviews, invocations, artifacts and ownership epochs are generated UUIDs and retained before the effects they identify; source snapshot IDs retain their separate versioned digest scheme. Process ordinal belongs only to its invocation.
+
+| Owner HTTP command | Required payload besides type/commandId |
+|---|---|
+| RequestImport | path; optional target reviewId/expectedCurrentSnapshotId fixed before acquisition. |
+| ChooseImportCandidate | jobId, discoveryRevision, candidateIndex; optional explicit continuation target. Membership/revision/current identity are checked by the store. |
+| CancelImport | jobId. A request is distinct from confirmed termination. |
+| ReverifyImportResult | jobId with registered known result; starts a separate provider/Git invocation only after explicit owner action. |
+| AdmitImportResult | jobId; optional new continuation target. Uses a new admission attempt identity and retained in-memory proof, or requires re-verification after proof loss. |
+
+POST /api/imports/commands accepts these strict objects under the existing local owner bearer authentication; jobId uses UUID syntax, commandId is1–128 characters, path is1–4096 characters and candidateIndex is a nonnegative integer. Discovery revision is positive. Agent/bootstrap credentials have no import command or job-read authority. GET /api/imports returns authorized jobs, not credentials or source artifact bodies. Unconfigured runner ingress returns source_unavailable rather than queuing work without an owner. The8MiB encoded HTTP bound still applies; acquired manifests use the private16MiB artifact route, never a raw provider JSON trust flag.
+
+Job receipt bodies contain commandId, actorId, state applied/rejected, jobId (null when no job was identified), jobRevision, result and optional error. Fingerprints are SHA256 of compact UTF8 canonical command JSON: sort object keys recursively by the existing localeCompare convention, preserve array order and literal values, and apply no source/manual recipe or text normalization. Exact command/actor/fingerprint retry returns its original receipt; changed payload conflicts without launching again. Initial admission reserves an import-admit:UUID command ID durably with the job. An explicit new AdmitImportResult action reserves import-admit:<that owner commandId>; it never changes a prior rejected attempt. Its fingerprint binds jobId, target, reserved reviewId and the full canonical snapshot, computed before the transaction. Successful receipt result contains reviewId, reviewRevision and snapshotId (plus retained/current indicators for continuation); source/job/result receipt commit together.
+
+Startup additively populates the identity lookup for existing reviews while preserving source IDs, aggregate revision, credentials, setup inputs and legacy receipts. Beginning a new owner epoch changes surviving running invocations to unknown and known but unadmitted results to needs_reverification. It does not replay them, reset their IDs or promote an orphan artifact. Queued never-claimed work remains eligible. Legacy source and retry compatibility remains governed by persistence-compatibility.md; introducing job tables never rewrites manual identity or the old receipt fingerprint.
+
+## Current design reflection
+
+Actual implementation inspection supports retaining one SQLite owner and immutable aggregate sources, with small private artifacts bridging async effects to admission. A second worker database or provider JSON flag would split atomicity or trust. The identity lookup is a deliberate derived index so collision checks do not decode every historical source body. Content verification, budgets and request hashing stay outside the transaction; authoritative membership/current checks and writes stay inside. Native async effects plus managed routes satisfy the bounded lifecycle without another library/service. Readable focused graph views sit over the full immutable ledger; future context/relations must preserve that invariant instead of fitting all facts onto a miniature canvas.
+
+The React panel is pure presentation over application-supplied action availability; subscriptions, stable unknown-request retry and effect scheduling remain outside it. The import-request-to-runner and verified-result-to-admission registry routes belong to the runner, job-committed-to-authorized-view belongs to the import bridge, and the existing review-committed-to-view route projects admitted history without moving private selection. React remount reads status rather than claiming jobs. Source comparison focus is private view state; saved anchors retain exact snapshot/side/path/lines, including shared copy bases, rather than a persistent ledger-view selection. Reopening a shared source may require explicitly choosing its comparison again.
+
+These are delivered-candidate design/compatibility facts, not full slice acceptance. Remaining review, own-PR, process-fault/budget breadth and docs-only rebuild sufficiency must be established separately. No target program/tests execute; context/analysis04, live GitLab, automatic native turn/catalog, Claude and unfamiliar-human acceptance remain outside this checkpoint’s evidence.
+
+
+A retained legacy setup value whose URL cannot establish a host remains readable but is not entered into the provider identity lookup. The index must not invent a host or let such a value claim provider membership. This preserves earlier controlled/setup compatibility without treating an invalid URL as acquisition provenance.

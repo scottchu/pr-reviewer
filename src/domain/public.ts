@@ -375,8 +375,8 @@ export const compareSources = (
   return [view(base, a, left), view(head, b, right)];
 };
 
-export { projectGraph, sourceViews } from "./graph.ts";
-export type { SourceGraph, GraphNode, GraphEdge } from "./graph.ts";
+export { projectGraph, sourceViews,sourceComparison,uniqueSources,graphFiles } from "./graph.ts";
+export type { SourceGraph, GraphNode, GraphEdge,GraphFile } from "./graph.ts";
 
 export { inlineDocumentLinks, resolveDocumentDestination, documentHeadingLine } from "./markdown.ts";
 

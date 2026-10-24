@@ -33,6 +33,7 @@ test('provider creation commits source, job and receipt atomically; raw witnesse
  const first=request('first');const job=first.acquisition.job;const prepared=await acquirePreparedSnapshot({jobId:job.jobId,reviewId:job.reviewId,worktree:f.root,candidate:f.candidate},f.effects);assert.equal(prepared.kind,'prepared');if(prepared.kind!=='prepared')return;
  store.imports.finishResult(first.acquisition.grant,{schema:'import-result-v1',artifactId:'a',jobId:job.jobId,invocationId:job.invocations.at(-1)!.invocationId,digest:'0'.repeat(64),bytes:1});
  const rejected=store.imports.admit(owner,job.jobId,prepared.snapshot,{} as never);assert.equal(rejected.error,'source_unavailable');assert.equal(store.list(store.authenticate(token)).length,0);
+ assert.equal(store.imports.command(token,{type:'AdmitImportResult',commandId:'missing-target',jobId:job.jobId,target:{reviewId:'not-a-review',expectedCurrentSnapshotId:'missing'}}).error,'source_unavailable');
  store.imports.command(token,{type:'AdmitImportResult',commandId:'retry-verified',jobId:job.jobId});
  const current=store.imports.ready(owner)[0]!;
  const verified=await acquirePreparedSnapshot({jobId:job.jobId,reviewId:current.reviewId,worktree:f.root,candidate:f.candidate},f.effects);if(verified.kind!=='prepared')throw new Error('fixture');
@@ -45,4 +46,19 @@ test('provider creation commits source, job and receipt atomically; raw witnesse
  const again=store.imports.claim(owner)!;const retained=await acquirePreparedSnapshot({jobId:again.job.jobId,reviewId:current.reviewId,worktree:f.root,candidate:f.candidate},f.effects);if(retained.kind!=='prepared')throw new Error('fixture');
  store.imports.finishResult(again.grant,{schema:'import-result-v1',artifactId:'b',jobId:again.job.jobId,invocationId:again.job.invocations.at(-1)!.invocationId,digest:'1'.repeat(64),bytes:1});assert.equal(store.imports.admit(owner,again.job.jobId,retained.snapshot,retained.witness).result.alreadyRetained,true);assert.equal(store.review(store.authenticate(token),current.reviewId).revision,1);
  }finally{store.close();rmSync(f.root,{recursive:true,force:true});}
+});
+
+test('provider graph and source comparisons retain primary copy ledger identity and never invent empty-line anchors',async()=>{
+ const f=fixture();try{const prepared=await acquirePreparedSnapshot({jobId:'job',reviewId:'r',worktree:f.root,candidate:f.candidate},f.effects);if(prepared.kind!=='prepared')throw new Error('fixture');
+ const {projectGraph,sourceComparison}=await import('../src/domain/public.ts');const graph=projectGraph(prepared.snapshot);assert.equal(graph.files.length,4);const copy=graph.files.find(file=>file.status==='copied')!;assert.ok(copy);const anchor={snapshotId:prepared.snapshot.snapshotId,side:'head' as const,path:'b',startLine:1,endLine:1};
+ const pair=sourceComparison(prepared.snapshot,anchor,copy.key);assert.deepEqual(pair.map(source=>[source.side,source.path]),[['base','a'],['head','b']]);assert.ok(pair.every(source=>source.lines.every(line=>line.status==='unchanged')));assert.equal(graph.nodes.filter(node=>node.fileKey===copy.key&&node.kind==='hunk').length,0);
+ assert.ok(graph.nodes.every(node=>node.anchor.startLine>=1&&node.anchor.endLine>=node.anchor.startLine));assert.equal(graph.nodes.some(node=>node.path==='empty'),false);assert.equal(graph.files.find(file=>file.newPath==='empty')?.dispositions[0]?.state,'prepared');
+ }finally{rmSync(f.root,{recursive:true,force:true});}
+});
+
+for(const kind of ['unsupported','zero'] as const)test(`provider ${kind} result admits a complete zero-selectable-source review without fake question anchors`,async()=>{
+ const {createImportRunner}=await import('../src/import-jobs/public.ts');const f=fixture({kind}),store=createStore(join(f.root,'review.sqlite')),token=store.issueUser();
+ const memory=new Map<string,unknown>();const runner=createImportRunner(store,{write:async({jobId,invocationId,value})=>{memory.set(jobId,value);return {schema:'import-result-v1',artifactId:jobId,jobId,invocationId,digest:'0'.repeat(64),bytes:1};},read:async()=>null},{effects:()=>({...f.effects,terminationConfirmed:()=>true})});
+ try{store.imports.command(token,{type:'RequestImport',commandId:'request',path:f.root});runner.wake();await runner.idle();const job=store.imports.list(token)[0]!;assert.equal(job.state,'admitted',JSON.stringify(job));const review=store.review(store.authenticate(token),job.reviewId);assert.equal(review.snapshot.sources.length,0);assert.equal(review.snapshot.changedFiles?.length,kind==='zero'?0:1);const {projectGraph}=await import('../src/domain/public.ts');assert.equal(projectGraph(review.snapshot).nodes.length,0);assert.equal(store.command(store.authenticate(token),{type:'AskQuestion',commandId:'fake-line',reviewId:review.reviewId,text:'fake line',anchor:{snapshotId:review.snapshot.snapshotId,side:'head',path:'a',startLine:1,endLine:1}}).error,'invalid_anchor');
+ }finally{await runner.stop();store.close();rmSync(f.root,{recursive:true,force:true});}
 });

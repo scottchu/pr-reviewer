@@ -1,9 +1,11 @@
+import {createImportRunner} from "../import-jobs/public.ts";
+import type {ImportArtifacts} from "../import-artifacts/public.ts";
 import {verifyPreparedSnapshot} from "../source-preparation/public.ts";
 import type {PreparedSnapshotWitness} from "../source-preparation/public.ts";
 import { createServer } from "node:http";
 import type { IncomingMessage, ServerResponse } from "node:http";
 import { z } from "zod";
-import { commandSchema } from "../domain/public.ts";
+import { commandSchema,importCommandSchema } from "../domain/public.ts";
 import type { Principal } from "../domain/public.ts";
 import type { Store } from "../storage/public.ts";
 import { createScheduler } from "../delivery/public.ts";
@@ -32,7 +34,8 @@ const send = (res: ServerResponse, status: number, value: unknown) => {
   });
   res.end(JSON.stringify(value));
 };
-export const createGateway = (store: Store, notify: Notify) => {
+export const createGateway = (store: Store, notify: Notify, options:{importArtifacts?:ImportArtifacts}={}) => {
+  const importRunner=options.importArtifacts?createImportRunner(store,options.importArtifacts):null;
   const scheduler = createScheduler(store, notify);
   const registry = createRegistry();
   const deliveryRoute = registry.register(
@@ -60,6 +63,12 @@ export const createGateway = (store: Store, notify: Notify) => {
       const user = () => {
         if (principal.kind !== "user") throw new Error("unauthorized");
       };
+      if(req.method==="GET"&&url.pathname==="/api/imports"){user();send(res,200,store.imports.list(authorization.slice(7)));return;}
+      if(req.method==="POST"&&url.pathname==="/api/imports/commands"){
+        user();if(!importRunner)throw new Error("source_unavailable");
+        const receipt=store.imports.command(authorization.slice(7),importCommandSchema.parse(await readBody(req)));
+        if(receipt.state==="applied")importRunner.wake();send(res,200,receipt);return;
+      }
       if (req.method === "GET" && url.pathname === "/api/reviews") {
         send(res, 200, store.list(principal));
         return;
@@ -218,6 +227,7 @@ export const createGateway = (store: Store, notify: Notify) => {
     },
     close: async () => {
       scheduler.stop();
+      await importRunner?.stop();
       registry.dispose();
       await new Promise<void>((resolve, reject) =>
         server.close((error) => (error ? reject(error) : resolve())),

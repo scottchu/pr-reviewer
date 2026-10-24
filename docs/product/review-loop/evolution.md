@@ -132,7 +132,7 @@ The preparation boundary reconstructs the original manual input from the manifes
 
 A successful verifier issues an internal nonserialized witness bound to the review ID and exact canonical manifest. The store accepts new source only with that matching witness, then performs CAS/authorization atomically. A serialized flag, forged object, witness from another review, or witness paired with changed content cannot authorize admission. Failed verification still produces a durable rejected receipt for a valid authenticated command. Idempotent exact retained-snapshot/receipt reads need no new Git acquisition and never rewind current.
 
-The importer-v1 algorithm remains distinct: provider host/target/source projects/change, actual baseline/head, ordered source object/hash entries and complete ledger/hunks determine its existing ID. Its future adapter must verify that exact scheme and provenance through this same public boundary before integration. Current manual admission does not silently reinterpret or bless importer-v1 IDs, and no unintegrated acquisition internals are imported here. Source object IDs/modes/hunks/counts remain losslessly representable for that successor.
+The importer-v1 algorithm remains distinct: provider host/target/source projects/change, actual baseline/head, ordered source object/hash entries and complete ledger/hunks determine its existing ID. The slice03 candidate adapter verifies that exact scheme and provenance through this same public boundary, separately from manual admission. Raw provider JSON cannot obtain its witness; acquisition is invoked through its public port. Source object IDs/modes/hunks/counts remain losslessly representable for that successor.
 
 ## Continuation structure reflection
 

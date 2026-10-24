@@ -4,7 +4,7 @@
 
 **Date:** 2026-10-24 UTC
 
-**Status:** Full integration implementation dispatched from merged main a5043c5; bounded 02B and acquisition prerequisites reconciled, product acceptance pending
+**Status:** Runnable integration checkpoint; actual own-PR/full fault-matrix/independent integrated review and acceptance pending
 
 **Parent:** [720p round](../../plan.md)
 
@@ -99,3 +99,8 @@ The first derived boundary now exercises trusted provider preparation with real 
 
 
 The next foundation checkpoint adds the bounded asynchronous coordinator and tracked fixed-executable process effect. Normal tests pass:11 Bun tests and63 Node tests; strict compiler and subsystem checks pass. The coordinator control-flow tests use controlled GitHub metadata over real disposable Git; they do not establish live-provider/React acceptance. Real child tests separately observe request/start/exit, output bounds and cancellation. Independent early review found that storage could complete an invocation with an unresolved requested/started journal; a failing-first regression now guards discovery/result/confirmed failure/cancellation and retains the effects slot until terminal observations. Artifact implementation remains held for its independent filesystem correction/recheck; only its agreed port is consumed here. Gateway/React and the full I01–I20 evidence remain active work.
+
+
+## Reviewable combined checkpoint
+
+[The current checkpoint](checkpoint.md) records the combined gateway/runner/artifact/React ledger/history implementation, exact prerequisite inputs/early corrections,11 Bun +87 Node checks and11 actual Chrome journeys, with immutable external artifact identities. It explicitly lists unrun integrated fault/provider/own-PR/audit gates. Root may publish the reviewable PR now; publication is needed for actual-own-PR I16/I19 and is not acceptance. Product knowledge now includes exact job tables/commands/readbacks/receipt fingerprints, provider representation, process uncertainty, startup coexistence and the actual-code rewrite rationale. No04 implementation is derived from provisional03 completion.

@@ -1,12 +1,29 @@
 import { compareSources, validateAnchor, inlineDocumentLinks, resolveDocumentDestination, documentHeadingLine } from './public.ts';
-import type { Anchor, Snapshot, Source, SourceView, SourceDisposition, DocumentReference } from './public.ts';
-export type GraphNode = { id: string; kind: 'file' | 'hunk'; label: string; side: 'base' | 'head'; path: string; anchor: Anchor; summary: string; method: string; change: string; context: boolean };
+import type { Anchor, Snapshot, Source, SourceView, SourceDisposition, DocumentReference, ChangedFile } from './public.ts';
+export type GraphNode = { id: string; kind: 'file' | 'hunk'; label: string; side: 'base' | 'head'; path: string; anchor: Anchor; summary: string; method: string; change: string; context: boolean; fileKey?:string };
 export type GraphEdge = { id: string; kind: 'comparison' | 'contains' | 'document_reference'; source: string; target: string; label: string; method: string; anchors: Anchor[] };
-export type SourceGraph = { snapshotId: string; nodes: GraphNode[]; edges: GraphEdge[]; unresolved: DocumentReference[]; dispositions: SourceDisposition[]; unknowns: string[] };
+export type GraphFile=ChangedFile & {key:string};
+export type SourceGraph = { files:GraphFile[]; snapshotId: string; nodes: GraphNode[]; edges: GraphEdge[]; unresolved: DocumentReference[]; dispositions: SourceDisposition[]; unknowns: string[] };
 const sourceId = (snapshot: Snapshot, side: string, path: string) => JSON.stringify([snapshot.snapshotId,side,path]);
 const anchorFor = (snapshot: Snapshot, source: Source, startLine=1, endLine=source.lineCount): Anchor => ({snapshotId:snapshot.snapshotId,side:source.side,path:source.path,startLine,endLine});
-const singleView = (source: Source, status: 'added' | 'removed' | 'unchanged' | 'not_analyzed'): SourceView => ({...source,lines:source.content.replace(/\n$/,'').split('\n').map((text,index)=>({number:index+1,text,status}))});
+const singleView = (source: Source, status: 'added' | 'removed' | 'unchanged' | 'not_analyzed'): SourceView => ({...source,lines:(source.lineCount===0?[]:source.content.replace(/\n$/,'').split('\n')).map((text,index)=>({number:index+1,text,status}))});
+export const graphFiles=(snapshot:Snapshot):GraphFile[] => snapshot.changedFiles?.map((file,index)=>({...file,key:JSON.stringify([index,file.oldPath,file.newPath])}))??[...new Set(snapshot.sources.map(source=>source.path))].map((path,index)=>({key:JSON.stringify([index,path,path]),status:'modified' as const,oldPath:snapshot.sources.some(source=>source.path===path&&source.side==='base')?path:null,newPath:snapshot.sources.some(source=>source.path===path&&source.side==='head')?path:null,dispositions:[]}));
+export const uniqueSources=(snapshot:Snapshot):Source[]=>snapshot.sources.filter((source,index,sources)=>sources.findIndex(item=>item.side===source.side&&item.path===source.path)===index);
+const providerView=(source:Source,files:readonly ChangedFile[]):SourceView=>{
+ const view=singleView(source,'unchanged');
+ for(const file of files){if((source.side==='base'?file.oldPath:file.newPath)!==source.path)continue;
+  if(file.coverage!=='text'){for(const line of view.lines)line.status='not_analyzed';continue;}
+  for(const hunk of file.hunks??[]){const start=source.side==='base'?hunk.oldStart:hunk.newStart,length=source.side==='base'?hunk.oldLines:hunk.newLines;for(const line of view.lines)if(line.number>=start&&line.number<start+length)line.status=hunk.oldLines&&hunk.newLines?'modified':source.side==='base'?'removed':'added';}
+ }return view;
+};
+export const sourceComparison=(snapshot:Snapshot,anchor:Anchor,fileKey?:string):SourceView[]=>{
+ if(!snapshot.candidate)return sourceViews(snapshot).filter(source=>source.path===anchor.path);
+ const files=graphFiles(snapshot),file=files.find(file=>file.key===fileKey)??files.find(file=>(anchor.side==='base'?file.oldPath:file.newPath)===anchor.path);
+ if(!file)return [];
+ return (['base','head'] as const).flatMap(side=>{const path=side==='base'?file.oldPath:file.newPath,source=uniqueSources(snapshot).find(source=>source.side===side&&source.path===path);return source?[providerView(source,[file])]:[];});
+};
 export const sourceViews = (snapshot: Snapshot): SourceView[] => {
+ if(snapshot.candidate)return uniqueSources(snapshot).map(source=>providerView(source,snapshot.changedFiles??[]));
  const views: SourceView[]=[];
  for(const source of snapshot.sources){
   const opposite=snapshot.sources.find(s=>s.path===source.path&&s.side!==source.side);
@@ -31,7 +48,26 @@ const referenceValid = (snapshot:Snapshot, reference:DocumentReference):boolean 
  } catch {return false;}
 
 };
+const providerGraph=(snapshot:Snapshot):SourceGraph=>{
+ const files=graphFiles(snapshot),nodes:GraphNode[]=[],edges:GraphEdge[]=[];
+ for(const file of files){
+  const pair:GraphNode[]=[];
+  for(const side of ['base','head'] as const){
+   const path=side==='base'?file.oldPath:file.newPath,source=uniqueSources(snapshot).find(source=>source.side===side&&source.path===path);if(!source||source.lineCount===0)continue;
+   const id=JSON.stringify([file.key,sourceId(snapshot,side,source.path)]),view=providerView(source,[file]),anchor=anchorFor(snapshot,source);
+   const summary=view.lines.filter(line=>!['unchanged','not_analyzed'].includes(line.status)&&line.text.trim()).slice(0,3).map(line=>line.text.slice(0,150)).join('\n');
+   const node:GraphNode={id,kind:'file',label:source.path,side,path:source.path,anchor,summary,method:'verified_git_blob',change:file.status,context:false,fileKey:file.key};nodes.push(node);pair.push(node);
+   for(const hunk of file.hunks??[]){const start=side==='base'?hunk.oldStart:hunk.newStart,length=side==='base'?hunk.oldLines:hunk.newLines;if(length===0)continue;const span=anchorFor(snapshot,source,start,start+length-1),hunkId=JSON.stringify([file.key,hunk.id,side]);
+    nodes.push({id:hunkId,kind:'hunk',label:`${side==='base'?'Before':'After'} lines ${start}–${start+length-1}`,side,path:source.path,anchor:span,summary:view.lines.slice(start-1,start+length-1).slice(0,3).map(line=>line.text.slice(0,160)).join('\n'),method:'pinned_git_hunk',change:hunk.oldLines&&hunk.newLines?'modified':side==='base'?'removed':'added',context:false,fileKey:file.key});
+    edges.push({id:JSON.stringify(['contains',hunkId]),kind:'contains',source:id,target:hunkId,label:'contains pinned Git span',method:'primary_ledger_hunk',anchors:[span]});
+   }
+  }
+  if(pair.length===2)edges.push({id:JSON.stringify(['comparison',file.key]),kind:'comparison',source:pair[0]!.id,target:pair[1]!.id,label:'before → after',method:'verified_changed_path_pair',anchors:pair.map(node=>node.anchor)});
+ }
+ return {snapshotId:snapshot.snapshotId,files,nodes,edges,unresolved:[],dispositions:files.flatMap(file=>file.dispositions),unknowns:['Callers/callees not analyzed. No semantic leaf assertion.','Imported coverage uses pinned Git hunks, not execution evidence.','Document reference preparation has not run for this imported snapshot. Empty and unsupported sides have no selectable line anchors.']};
+};
 export const projectGraph = (snapshot: Snapshot): SourceGraph => {
+ if(snapshot.candidate)return providerGraph(snapshot);
  const nodes: GraphNode[]=[], edges: GraphEdge[]=[], unresolved: DocumentReference[]=[];
  const unknowns=['Callers/callees not analyzed. No semantic leaf assertion.', 'Only bounded inline Markdown links outside code fences analyzed; reference-style and HTML links not analyzed.'];
  if((snapshot.documentReferences?.length??0)>=120)unknowns.push("Reference budget reached; remaining inline links not analyzed.");
@@ -63,5 +99,5 @@ export const projectGraph = (snapshot: Snapshot): SourceGraph => {
   const source=sourceId(snapshot,reference.source.side,reference.source.path),target=sourceId(snapshot,reference.target.side,reference.target.path);
   edges.push({id:JSON.stringify(['reference',reference.source,reference.destination]),kind:'document_reference',source,target,label:`document link · ${reference.destination}`,method:reference.method,anchors:[reference.source,reference.target]});
  }
- return {snapshotId:snapshot.snapshotId,nodes,edges,unresolved,dispositions:snapshot.changedFiles?.flatMap(f=>f.dispositions)??[],unknowns:[...new Set(unknowns)]};
+ return {snapshotId:snapshot.snapshotId,files:graphFiles(snapshot),nodes,edges,unresolved,dispositions:snapshot.changedFiles?.flatMap(f=>f.dispositions)??[],unknowns:[...new Set(unknowns)]};
 };
