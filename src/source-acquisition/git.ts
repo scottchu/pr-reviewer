@@ -41,14 +41,14 @@ export const importChange = async (input: Readonly<{worktree:string;candidate:Ca
   if (lookup.kind === "unavailable") return lookup;
   const candidate = lookup.candidate;
   if (["provider","host","targetProject","sourceProject","number","baseSha","headSha","targetTipSha","sourceBranch","targetBranch","baselineMethod","url"].some(k => candidate[k as keyof Candidate] !== input.candidate[k as keyof Candidate])) return {kind:"unavailable",issues:[{reason:"stale_candidate"}]};
-  const git = (args:readonly string[],maxBytes:number) => effects.run({executable:"git",args:["--no-optional-locks","-c","core.fsmonitor=false","-c","core.hooksPath=/dev/null",...args],cwd:input.worktree,maxBytes,timeoutMs:budgets.timeoutMs});
+  const git = (args:readonly string[],maxBytes:number) => effects.run({executable:"git",args:["--no-optional-locks","--no-lazy-fetch","--literal-pathspecs",`--attr-source=${candidate.headSha}`,"-c","core.fsmonitor=false","-c","core.hooksPath=/dev/null",...args],cwd:input.worktree,maxBytes,timeoutMs:budgets.timeoutMs});
   for (const oid of [candidate.baseSha,candidate.headSha]) {
     const type=await git(["cat-file","-t",oid],128);
     if (type.kind !== "ok" || type.stdout.toString().trim() !== "commit") return {kind:"unavailable",issues:[{reason:"missing_object"}]};
     const object=await git(["cat-file","commit",oid],1_048_576);
     if (object.kind !== "ok" || objectHash("commit",object.stdout,oid) !== oid) return {kind:"unavailable",issues:[{reason:"missing_object"}]};
   }
-  const raw=await git(["diff-tree","-r","--no-commit-id","--raw","--no-abbrev","-z","--no-ext-diff","--no-textconv","-M","-C",candidate.baseSha,candidate.headSha,"--"],budgets.maxInventoryBytes);
+  const raw=await git(["diff-tree","-r","--no-commit-id","--raw","--no-abbrev","-z","--no-ext-diff","--no-textconv","--text","--no-relative","--ignore-submodules=none","-O","/dev/null","-l512","-M","-C",candidate.baseSha,candidate.headSha,"--"],budgets.maxInventoryBytes);
   if (raw.kind !== "ok") return {kind:"unavailable",issues:[{reason:raw.reason}]};
   let entries:RawEntry[];
   try {entries=inventory(raw.stdout);} catch {return {kind:"unavailable",issues:[{reason:"invalid_metadata"}]};}
@@ -88,7 +88,7 @@ export const importChange = async (input: Readonly<{worktree:string;candidate:Ca
     let hunks:Hunk[]=[];
     let coverage:ChangedPath["coverage"]=dispositions.every(d => d.state === "prepared") ? "text" : "unsupported";
     if (coverage === "text") {
-      const patch=await git(["diff","--no-ext-diff","--no-textconv","--no-color","--no-renames","--unified=0",...(entry.oldPath && entry.newPath ? [entry.oldOid,entry.newOid,"--"] : [candidate.baseSha,candidate.headSha,"--",...new Set([entry.oldPath,entry.newPath].filter((p):p is string => p !== null))])],Math.min(budgets.maxTotalBytes,2*budgets.maxBlobBytes+65536));
+      const patch=await git(["diff","--no-ext-diff","--no-textconv","--no-color","--no-renames","--text","--no-relative","--ignore-submodules=none","--diff-algorithm=myers","--no-indent-heuristic","--inter-hunk-context=0","-O","/dev/null","--unified=0",...(entry.oldPath && entry.newPath ? [entry.oldOid,entry.newOid,"--"] : [candidate.baseSha,candidate.headSha,"--",...new Set([entry.oldPath,entry.newPath].filter((p):p is string => p !== null))])],Math.min(budgets.maxTotalBytes,2*budgets.maxBlobBytes+65536));
       let failure:Disposition["reason"]|null=null;
       if (patch.kind !== "ok") failure="patch_unavailable";
       else {
@@ -98,6 +98,9 @@ export const importChange = async (input: Readonly<{worktree:string;candidate:Ca
             const oldStart=Number(match[1]),oldLines=Number(match[2] ?? 1),newStart=Number(match[3]),newLines=Number(match[4] ?? 1);
             hunks.push({id:digest(`${entry.oldPath}\0${entry.newPath}\0${match[0]}`),oldStart,oldLines,newStart,newLines});
           }
+        const before=fileSources.find(s => s.side === "base")?.content ?? "";
+        const after=fileSources.find(s => s.side === "head")?.content ?? "";
+        if (before !== after && hunks.length === 0) failure="patch_unavailable";
         if (hunkCount+hunks.length > budgets.maxHunks) failure="hunk_limit";
       }
       if (failure) {

@@ -4,7 +4,7 @@
 
 **Packet:** Slice 03 handoff v1 at `773ce21b61b95f16b722d72ecd4824c079fe52b7`
 
-**Status:** Implementing the bounded acquisition module; no slice acceptance
+**Status:** Bounded acquisition corrections module-tested; targeted independent recheck pending; no slice acceptance
 
 **Owner scope:** `src/source-acquisition/**`, `tests/source-acquisition.test.ts`, this slice directory. Shared admission and durable-product updates belong to the integration owner.
 
@@ -99,3 +99,36 @@ Promote the acquired provider-baseline, incomplete-route, immutable-ledger, boun
 The durable import job, subprocess launch identity/restart reconciliation, AddSnapshot mapping, concurrent comment route, React path/candidate/ledger UI, real active own-PR task predeclaration, actual graph-first review, semantic graph integration, full strict/test/E2E checks and unfamiliar-reviewer acceptance remain unimplemented or unrun in this preparation module. Root owns those gates after reviewed 02 compatibility and independent preparation review. No publication/merge/release/deployment occurs in this bounded worker assignment.
 
 Retain this clean committed worktree for root's integration/review. No raw runtime logs or secrets were saved; the source and this evidence record are sufficient to rerun preparation checks. No task-owned fixture directory is needed for recovery.
+
+## Independent-review correction checkpoint
+
+**Reviewed identity:** `2c8879cc038286a8eab38f03cdd1ef0846e92aa1`
+
+**Status:** Original checkpoint requires corrections; correction result and new verification follow below
+
+Independent review reproduced three defects: a missing promisor blob can cause `cat-file` to lazily fetch and execute a configured upload-pack helper; an added/deleted magic filename can be interpreted as a pathspec; and untracked worktree attributes can suppress prepared-text hunks. The original no-execution and complete-hunk claims were therefore too broad. Preserve the original evidence as historical test coverage, not acceptance of those boundaries.
+
+Correction acceptance requires failing real Git regressions before repair, no fixture helper execution or object retrieval under promisor configuration, literal path handling, and identical hunks/source identity across ambient attribute/config changes. Pin read-only Git behavior rather than relying on default local configuration. Root/integration owner promotes the reviewed policy into durable product docs; the acquisition worker does not edit shared docs.
+
+### Correction result and knowledge contribution
+
+**Status:** Corrections implemented and module-tested; targeted independent recheck pending
+
+**Original review:** `/tmp/pr-reviewer-source-acquisition-review/report.md`, reviewing immutable `2c8879cc038286a8eab38f03cdd1ef0846e92aa1`. The reviewer-owned reproduction directory and detached source were read only and retained unchanged.
+
+**Failure evidence:** Before correction, the original ten tests passed while all three new real-Git regressions failed: the task-owned upload-pack helper wrote its sentinel; an added `:(exclude)*` file had no hunk; and ambient attributes/config changed the snapshot identity. This confirms the review findings rather than treating the previous passing suite as safety evidence.
+
+**Derived corrections:**
+
+- All production read-only Git effects disable lazy object retrieval with `GIT_NO_LAZY_FETCH=1` after removing inherited Git environment overrides. Import commands also specify `--no-lazy-fetch`. A missing promised object remains missing; the acquisition route never attempts recovery through a repository remote/helper. Do not treat an eventual missing-object return as evidence that no prior fetch or execution happened.
+- Git path arguments are literal through `GIT_LITERAL_PATHSPECS=1` in the production effect and `--literal-pathspecs` in import commands. An option separator alone does not establish this property.
+- Git import selects pinned head attributes explicitly (`--attr-source=<headSha>`) and disables system attributes. Prepared UTF-8 text uses forced text diffs with fixed Myers algorithm, no indent heuristic, zero unified/inter-hunk context, non-relative paths and an explicit empty ordering file. Inventory likewise pins text/order/relative/rename-limit behavior. Local worktree or info attributes and local diff ordering/algorithm/context configuration cannot silently redefine prepared source spans.
+- Different verified before/after text with an unexpectedly empty hunk result now yields `unsupported/patch_unavailable`, rather than a complete text disposition. Truly empty additions/deletions, metadata-only changes and unchanged rename/copy text can validly retain zero hunks.
+
+These are acquired boundary policies for the integration owner's durable product specification. They do not change provider identity, admission signatures, source hashes, budgets or existing historical review targets. No submodule omission finding was asserted by independent review; the explicit submodule diff option pins acquisition policy rather than claiming a reproduced separate defect.
+
+**Final module verification:** The existing Node command now reports **16 passed / 0 failed**. All four module files plus the focused test pass the same scoped strict TypeScript command. New regressions exercise missing promised commits, trees and blobs through both direct production effects and the complete import; fixture fetch helpers remain unexecuted and removed object paths remain absent. Both added and deleted magic filenames have exact expected spans. Dirty worktree/info `-diff` attributes and local histogram/context/inter-hunk/relative/order configuration leave the entire changed-file ledger and snapshotId exactly equal to the clean import. A synthetic unexpected empty patch becomes unsupported while genuine empty files and pure renames remain text-covered. All created fixture repositories are removed in `finally`.
+
+**Repeated actual-source checks:** After correction, explicit real GitHub PR 19/20 lookup and local object import succeeded again with the exact same baselines, heads, counts and snapshot IDs in the earlier provider table: PR 19 `45/53/56` changed paths/prepared sides/hunks, PR 20 `3/6/3`, with zero missing/unsupported sides. These are final-provider observations, not a retarget of the pilot's earlier pinned PR 19 snapshot. No fetch, branch switch, user file write, auth update or target code execution was requested. Live GitLab remains unrun because its CLI was previously observed absent; no provider capability claim expands from these corrections.
+
+**Limits and handoff:** The corrected command flags are exercised with installed Git `2.56.0`; another Git version must support them or return unavailable rather than silently retrying with weaker policy. Tests use harmless task-owned helper sentinels, not actual user hooks or network remotes. This bounded correction does not establish exhaustive hostile-process containment or whole-slice UI/graph/history acceptance. Root must dispatch the targeted reviewer at the exact new clean correction commit, promote reviewed policies to durable docs and reconcile integration readiness. No package, shared runtime, pilot database or authentication files changed. Keep this worktree for that recheck and subsequent integration; no worker temporary fixture remains necessary for recovery.

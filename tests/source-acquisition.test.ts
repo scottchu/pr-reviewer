@@ -214,3 +214,126 @@ test("lookup projects only declared provenance fields and never carries input ex
   assert.equal(result.kind,"resolved");
   assert.equal(JSON.stringify(result).includes("must-not-leak"),false);
 });
+
+const effectsForCandidate = (candidate:Candidate):AcquisitionEffects => {
+  const real=createNodeEffects();
+  return {run:async c=>c.executable === "git" ? real.run(c) : ok(c.args.at(-1)?.includes("/compare/") ? {merge_base_commit:{sha:candidate.baseSha}} : {number:candidate.number,html_url:candidate.url,title:candidate.title,state:candidate.state,head:{ref:candidate.sourceBranch,sha:candidate.headSha,repo:{full_name:candidate.sourceProject}},base:{ref:candidate.targetBranch,sha:candidate.targetTipSha,repo:{full_name:candidate.targetProject}}})};
+};
+
+test("missing promisor blob never lazily fetches or executes a configured upload-pack helper", async () => {
+  const f=gitFixture();
+  try {
+    const blob=f.git("rev-parse",`${f.candidate.headSha}:added.txt`);
+    const sentinel=join(f.root,"lazy-fetch-executed");
+    const helper=join(f.root,"fixture-upload-pack");
+    writeFileSync(helper,`#!/bin/sh\nprintf invoked > '${sentinel}'\nexit 1\n`,{mode:0o755});
+    f.git("config","remote.origin.url",f.root);
+    f.git("config","remote.origin.promisor","true");
+    f.git("config","remote.origin.partialclonefilter","blob:none");
+    f.git("config","remote.origin.uploadpack",helper);
+    const objectPath=join(f.root,".git","objects",blob.slice(0,2),blob.slice(2));
+    rmSync(objectPath);
+    const direct=await createNodeEffects().run({executable:"git",args:["cat-file","-t",blob],cwd:f.root,maxBytes:128,timeoutMs:2000});
+    assert.equal(direct.kind,"unavailable");
+    assert.equal(existsSync(sentinel),false,"the read-only runner lazily invoked the fixture fetch helper");
+    const result=await importChange({worktree:f.root,candidate:f.candidate},f.effects);
+    assert.equal(existsSync(sentinel),false,"read-only acquisition executed the fixture fetch helper");
+    assert.equal(existsSync(objectPath),false,"read-only acquisition retrieved a missing object");
+    assert.equal(result.kind,"imported");
+    if(result.kind === "imported") assert.equal(result.value.changedFiles.find(e=>e.newPath === "added.txt")?.dispositions[0]?.reason,"missing_object");
+  } finally {f.cleanup();}
+});
+
+test("added magic path names are literal and retain their complete added hunk", async () => {
+  const f=gitFixture();
+  try {
+    const path=":(exclude)*";
+    writeFileSync(join(f.root,path),"literal addition\n");
+    f.git("add","--all");f.git("commit","--quiet","-m","magic path");
+    const candidate={...f.candidate,headSha:f.git("rev-parse","HEAD")};
+    const result=await importChange({worktree:f.root,candidate},effectsForCandidate(candidate));
+    assert.equal(result.kind,"imported");
+    if(result.kind === "imported") assert.deepEqual(result.value.changedFiles.find(e=>e.newPath === path)?.hunks.map(({oldStart,oldLines,newStart,newLines})=>({oldStart,oldLines,newStart,newLines})),[{oldStart:0,oldLines:0,newStart:1,newLines:1}]);
+  } finally {f.cleanup();}
+});
+
+test("pinned text hunks and snapshot identity ignore worktree/info attributes and local diff configuration", async () => {
+  const f=gitFixture();
+  try {
+    const clean=await importChange({worktree:f.root,candidate:f.candidate},f.effects);
+    assert.equal(clean.kind,"imported");
+    writeFileSync(join(f.root,".gitattributes"),"* -diff\n");
+    writeFileSync(join(f.root,".git","info","attributes"),"* -diff\n");
+    f.git("config","diff.context","9");
+    f.git("config","diff.interHunkContext","99");
+    f.git("config","diff.algorithm","histogram");
+    f.git("config","diff.relative","true");
+    const order=join(f.root,"fixture-diff-order");
+    writeFileSync(order,"vendor\nmodify.txt\nadded.txt\n");
+    f.git("config","diff.orderFile",order);
+    const dirty=await importChange({worktree:f.root,candidate:f.candidate},f.effects);
+    assert.equal(dirty.kind,"imported");
+    if(clean.kind === "imported" && dirty.kind === "imported") {
+      assert.equal(dirty.value.snapshotId,clean.value.snapshotId);
+      assert.deepEqual(dirty.value.changedFiles,clean.value.changedFiles);
+      assert.equal(dirty.value.changedFiles.find(e=>e.newPath === "added.txt")?.hunks.length,1);
+      assert.equal(dirty.value.changedFiles.find(e=>e.newPath === "modify.txt")?.hunks.length,2);
+    }
+  } finally {f.cleanup();}
+});
+
+
+test("deleted magic path names retain their complete deleted hunk", async () => {
+  const f=gitFixture();
+  try {
+    const path=":(exclude)*";
+    writeFileSync(join(f.root,path),"literal deletion\n");
+    f.git("add","--all");f.git("commit","--quiet","-m","magic baseline");
+    const baseSha=f.git("rev-parse","HEAD");
+    rmSync(join(f.root,path));
+    f.git("add","--all");f.git("commit","--quiet","-m","magic deletion");
+    const candidate={...f.candidate,baseSha,targetTipSha:baseSha,headSha:f.git("rev-parse","HEAD")};
+    const result=await importChange({worktree:f.root,candidate},effectsForCandidate(candidate));
+    assert.equal(result.kind,"imported");
+    if(result.kind === "imported") assert.deepEqual(result.value.changedFiles.find(e=>e.oldPath === path)?.hunks.map(({oldStart,oldLines,newStart,newLines})=>({oldStart,oldLines,newStart,newLines})),[{oldStart:1,oldLines:1,newStart:0,newLines:0}]);
+  } finally {f.cleanup();}
+});
+
+test("missing promised commits and trees stay unavailable without helper execution or retrieval", async () => {
+  for(const kind of ["commit","tree"] as const) {
+    const f=gitFixture();
+    try {
+      const oid=kind === "commit" ? f.candidate.headSha : f.git("rev-parse",`${f.candidate.headSha}^{tree}`);
+      const sentinel=join(f.root,`lazy-${kind}-executed`);
+      const helper=join(f.root,`fixture-${kind}-upload-pack`);
+      writeFileSync(helper,`#!/bin/sh\nprintf invoked > '${sentinel}'\nexit 1\n`,{mode:0o755});
+      f.git("config","remote.origin.url",f.root);
+      f.git("config","remote.origin.promisor","true");
+      f.git("config","remote.origin.partialclonefilter","blob:none");
+      f.git("config","remote.origin.uploadpack",helper);
+      const objectPath=join(f.root,".git","objects",oid.slice(0,2),oid.slice(2));
+      rmSync(objectPath);
+      const direct=await createNodeEffects().run({executable:"git",args:["cat-file","-t",oid],cwd:f.root,maxBytes:128,timeoutMs:2000});
+      assert.equal(direct.kind,"unavailable");
+      const result=await importChange({worktree:f.root,candidate:f.candidate},f.effects);
+      assert.equal(result.kind,"unavailable");
+      assert.equal(existsSync(sentinel),false,`missing ${kind} invoked the fixture fetch helper`);
+      assert.equal(existsSync(objectPath),false,`missing ${kind} was retrieved`);
+    } finally {f.cleanup();}
+  }
+});
+
+test("unexpected empty text patches remain unsupported while genuine empty/rename spans stay valid", async () => {
+  const f=gitFixture();
+  try {
+    const effects:AcquisitionEffects={run:async c=>c.executable === "git" && c.args.includes("diff") ? ok("") : f.effects.run(c)};
+    const result=await importChange({worktree:f.root,candidate:f.candidate},effects);
+    assert.equal(result.kind,"imported");
+    if(result.kind === "imported") {
+      assert.equal(result.value.changedFiles.find(e=>e.newPath === "modify.txt")?.coverage,"unsupported");
+      assert.equal(result.value.changedFiles.find(e=>e.newPath === "added.txt")?.dispositions[0]?.reason,"patch_unavailable");
+      assert.equal(result.value.changedFiles.find(e=>e.newPath === "empty.txt")?.coverage,"text");
+      assert.equal(result.value.changedFiles.find(e=>e.newPath === "renamed.txt")?.coverage,"text");
+    }
+  } finally {f.cleanup();}
+});
