@@ -122,4 +122,4 @@ The original packet was planning-only; subsequent implementation and review rece
 
 ## Active-turn Codex correction
 
-The [versioned Codex steering correction packet](codex-steer-correction.md) supersedes unconditional queue delivery for active Codex work. Existing native delivery receipts remain historical; owner-route and active-turn evidence must be independently established. The packet also records MCP subscription feasibility without adopting a new subscription or wake service.
+The [versioned Codex steering correction packet](codex-steer-correction.md) defines the required replacement for unconditional queue delivery during active Codex work. Implementation remains blocked on a supported existing-owner route; the coordinator retained current queue behavior meanwhile. Existing native delivery receipts remain historical; owner-route and active-turn evidence must be independently established. The packet also records MCP subscription feasibility without adopting a new subscription or wake service.
