@@ -14,9 +14,11 @@ export const createTrackedEffects=({imports,grant,executables={},phaseTimeoutMs=
   return await new Promise<CommandResult>((resolve,reject)=>{
    const child=spawn(executables[command.executable]??command.executable,[...command.args],{cwd:command.cwd,env,stdio:['ignore','pipe','pipe'],detached:true});
    let started=false,exited=false,finished=false,identity:string|null=null,reason:IssueReason|null=null,cancelled=false,bytes=0,spawnError=false,journalLost=false;
-   const chunks:Buffer[]=[];let killTimer:ReturnType<typeof setTimeout>|undefined;
+   const chunks:Buffer[]=[];let killTimer:ReturnType<typeof setTimeout>|undefined,observationTimer:ReturnType<typeof setTimeout>|undefined;
+   const cleanup=()=>{clearTimeout(timeout);clearInterval(cancellation);if(killTimer)clearTimeout(killTimer);if(observationTimer)clearTimeout(observationTimer);};
+   const unknown=()=>{if(finished)return;finished=true;confirmed=false;cleanup();child.stdout.destroy();child.stderr.destroy();child.unref();reject(new Error('termination_unknown'));};
    const stop=(next:IssueReason|null,isCancel=false)=>{
-    if(finished||exited)return;reason??=next;cancelled ||= isCancel;
+    if(finished||exited)return;reason??=next;cancelled ||= isCancel;if(!observationTimer)observationTimer=setTimeout(unknown,700);
     if(!started||!child.pid||!identity||processIdentity(child.pid)!==identity){confirmed=false;return;}
     try{process.kill(-child.pid,'SIGTERM');}catch(error){if((error as NodeJS.ErrnoException).code!=='ESRCH')confirmed=false;}
     if(!killTimer)killTimer=setTimeout(()=>{if(!exited&&child.pid&&processIdentity(child.pid)===identity){try{process.kill(-child.pid,'SIGKILL');}catch{confirmed=false;}}},250);
@@ -28,11 +30,11 @@ export const createTrackedEffects=({imports,grant,executables={},phaseTimeoutMs=
     if(!child.pid){journalLost=true;stop('command_failed');return;}
     try{imports.recordProcess(grant,{ordinal:current,executable:command.executable,state:'started',pid:child.pid,...(identity?{startIdentity:identity}:{})});}catch{journalLost=true;confirmed=false;stop('command_failed');}
    });
-   const collect=(chunk:Buffer,stdout:boolean)=>{bytes+=chunk.length;if(bytes>command.maxBytes){stop('output_limit');return;}if(stdout)chunks.push(chunk);};
+   const collect=(chunk:Buffer,stdout:boolean)=>{if(finished)return;bytes+=chunk.length;if(bytes>command.maxBytes){stop('output_limit');return;}if(stdout)chunks.push(chunk);};
    child.stdout.on('data',(chunk:Buffer)=>collect(chunk,true));child.stderr.on('data',(chunk:Buffer)=>collect(chunk,false));
    child.once('error',(error:NodeJS.ErrnoException)=>{spawnError=true;reason=error.code==='ENOENT'?'tool_missing':'command_failed';});
    child.once('close',(code,signal)=>{
-    exited=true;finished=true;clearTimeout(timeout);clearInterval(cancellation);if(killTimer)clearTimeout(killTimer);
+    if(finished)return;exited=true;finished=true;cleanup();
     // The parent exit alone does not prove descendants in its owned group stopped.
     confirmed=!journalLost&&(!started||Boolean(child.pid&&!groupExists(child.pid)));
     try{imports.recordProcess(grant,{ordinal:current,executable:command.executable,state:'exited',exitCode:code,signal,reason:cancelled?'cancelled':reason??(code===0?'ok':'command_failed')});}catch{confirmed=false;}

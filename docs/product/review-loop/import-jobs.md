@@ -146,3 +146,17 @@ A still-live verified result may be rebound to the same job’s explicitly chose
 
 
 Storage independently enforces process ordering: discovery completion, result registration and confirmed failure/cancellation require every journaled subprocess to have an observed terminal disposition. A requested/started row cannot be ignored because a trusted caller reports a result or requests cancellation. Unresolved process state keeps the single effects slot occupied; an uncertain failure is recorded as unknown. This is a storage invariant in addition to the tracked adapter’s termination checks.
+
+
+Provider comparison presentation is ledger-specific. A rename/copy pairs its old base path with its new head path; shared copied base content does not borrow the modified original’s hunks. Graph render-node identities may distinguish these comparisons while source anchors continue to identify the exact immutable side/path/lines. The raw hunk has one primary ledger entry with separate selectable side spans. Zero-line prepared blobs remain inspectable metadata, without invented line1 anchors. A review with no selectable source still shows the complete ledger, import/history controls and retained discussion.
+
+Artifact cleanup attempts every owned handle close independently. A close-only failure after publication is publication_unknown and preserves the final file; a read close-only failure is a sanitized I/O error. Existing typed primary failures retain precedence. Neither raw filesystem errors/private paths nor publication uncertainty constitute a result/admission receipt.
+
+
+The runner retains the promise of its actual active phase across ordinary scheduling ticks. No-op wakeups cannot replace that ownership record. Idle/stop await that same phase, including tracked child exit and durable terminal or unknown settlement; shutdown requests cancellation but does not report completion merely because the polling route stopped.
+
+
+Observed leader exit does not establish process-group quiescence. Recovery checks the recorded owned group even for an exited leader; a live descendant keeps the invocation unknown and occupies the effects slot. It never kills a group after its ownership identity can no longer be verified. Group absence is safe evidence of stopped effects; possible group/PID reuse remains conservative rather than authorizing a kill or overlap.
+
+
+A timeout/cancellation also bounds termination observation. After TERM, the tracked adapter may escalate to KILL only while the original live leader identity still verifies. If that leader exits while a descendant retains inherited pipes, the adapter settles within a further700ms as termination_unknown, detaches its read handles and retains the durable unknown slot. It does not wait indefinitely for pipe closure or infer descendant termination from leader exit. Future quiescence checks remain read-only and cannot kill an unverified/reused group.

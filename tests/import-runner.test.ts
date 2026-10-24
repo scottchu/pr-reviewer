@@ -8,7 +8,7 @@ import {createStore} from '../src/storage/public.ts';
 import {createImportRunner} from '../src/import-jobs/public.ts';
 import type {ImportArtifacts} from '../src/import-jobs/public.ts';
 import type {ArtifactReference} from '../src/domain/public.ts';
-const artifacts=()=>{const values=new Map<string,unknown>();const port:ImportArtifacts={write:async({jobId,invocationId,value})=>{const artifactId=randomUUID(),encoded=JSON.stringify(value);values.set(artifactId,structuredClone(value));return {schema:'import-result-v1',artifactId,jobId,invocationId,digest:createHash('sha256').update(encoded).digest('hex'),bytes:Buffer.byteLength(encoded)};},read:async({reference})=>structuredClone(values.get(reference.artifactId))};return {port,values};};
+const artifacts=()=>{const values=new Map<string,unknown>();const port:ImportArtifacts={write:async({jobId,invocationId,value})=>{const artifactId=randomUUID(),encoded=JSON.stringify(value);values.set(artifactId,structuredClone(value));return {schema:'import-result-v1',artifactId,jobId,invocationId,digest:createHash('sha256').update(encoded).digest('hex'),bytes:Buffer.byteLength(encoded)};},read:async({reference})=>structuredClone(values.get((reference as ArtifactReference).artifactId))};return {port,values};};
 test('bounded coordinator drives discovery through immutable atomic admission and restart only rereads admitted state',async()=>{
  const f=providerFixture(),path=join(f.root,'review.sqlite'),store=createStore(path),token=store.issueUser(),a=artifacts();let calls=0;
  store.imports.command(token,{type:'RequestImport',commandId:'request',path:f.root});const runner=createImportRunner(store,a.port,{effects:()=>({run:async command=>{calls++;return f.effects.run(command);},terminationConfirmed:()=>true})});

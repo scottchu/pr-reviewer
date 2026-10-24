@@ -4,10 +4,11 @@ import {acquirePreparedSnapshot,bindPreparedSnapshotToReview} from '../source-pr
 import type {PreparedSnapshotWitness} from '../source-preparation/public.ts';
 import type {Store,ImportGrant} from '../storage/public.ts';
 import {canonical} from '../domain/public.ts';
-import type {ArtifactReference,Snapshot} from '../domain/public.ts';
+import type {Snapshot} from '../domain/public.ts';
 import {createRegistry} from '../integration/registry.ts';
 import {createTrackedEffects,groupExists} from './process.ts';
-export type ImportArtifacts={write:(input:{jobId:string;invocationId:string;value:unknown})=>Promise<ArtifactReference>;read:(input:{reference:ArtifactReference;expectedJobId:string;expectedInvocationId:string})=>Promise<unknown>};
+import type {ImportArtifacts} from '../import-artifacts/public.ts';
+export type {ImportArtifacts} from '../import-artifacts/public.ts';
 export const createImportRunner=(store:Store,artifacts:ImportArtifacts,options:{effects?:(grant:ImportGrant,signal:AbortSignal)=>AcquisitionEffects&{terminationConfirmed:()=>boolean}}={})=>{
  const imports=store.imports,owner=imports.beginOwner(),registry=createRegistry(),verified=new Map<string,{snapshot:Snapshot;witness:PreparedSnapshotWitness}>();
  let active=false,stopped=false,current:Promise<void>|null=null,abort:AbortController|null=null;
@@ -24,7 +25,7 @@ export const createImportRunner=(store:Store,artifacts:ImportArtifacts,options:{
    // Quiescence is observation only. The interrupted invocation is never replayed.
    for(const job of imports.unknown(owner)){
     const processes=job.invocations.at(-1)?.processes??[];
-    if(processes.every(process=>process.state==='exited'||process.state==='started'&&process.pid!==undefined&&!groupExists(process.pid)))imports.confirmQuiescent(owner,job.jobId);
+    if(processes.every(process=>process.state==='exited'&&(process.pid===undefined||!groupExists(process.pid))||process.state==='started'&&process.pid!==undefined&&!groupExists(process.pid)))imports.confirmQuiescent(owner,job.jobId);
    }
    admission.emit();
    while(!stopped){
@@ -55,7 +56,7 @@ export const createImportRunner=(store:Store,artifacts:ImportArtifacts,options:{
    }
   }finally{active=false;}
  };
- const request=registry.register('import-request-to-runner','import-owner',()=>!stopped,()=>{current=tick();void current.catch(()=>{});});
+ const request=registry.register('import-request-to-runner','import-owner',()=>!stopped,()=>{if(active||stopped)return;current=tick();void current.catch(()=>{});});
  const timer=setInterval(()=>request.emit(),200);request.emit();
  return {wake:()=>request.emit(),idle:async()=>{await current;},diagnostics:()=>registry.diagnostics(),stop:async()=>{stopped=true;abort?.abort();clearInterval(timer);registry.dispose();await current;}};
 };
