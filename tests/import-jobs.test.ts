@@ -18,3 +18,17 @@ test('restart distinguishes queued resume from uncertain claimed work and does n
  const next=f.store.imports.beginOwner();assert.equal(f.store.imports.list(token)[0]?.state,'unknown');assert.equal(f.store.imports.claim(next),null);assert.throws(()=>f.store.imports.recordProcess(claim.grant,{ordinal:1,executable:'git',state:'requested'}),/stale_import_runner/);
  }finally{f.close();}
 });
+
+test('unresolved process journals prevent completion, confirmed cancellation and release of the single effects slot',()=>{
+ const f=fixture();try{const token=f.store.issueUser();const receipt=f.store.imports.command(token,{type:'RequestImport',commandId:'running',path:'/repo'});const owner=f.store.imports.beginOwner(),claim=f.store.imports.claim(owner)!;
+ f.store.imports.recordProcess(claim.grant,{ordinal:1,executable:'git',state:'requested'});
+ assert.throws(()=>f.store.imports.finishDiscovery(claim.grant,{kind:'none',canonicalWorktree:null,candidates:[]}),/import_process_unresolved/);
+ f.store.imports.recordProcess(claim.grant,{ordinal:1,executable:'git',state:'started',pid:123,startIdentity:'controlled observation; no actual process'});
+ f.store.imports.command(token,{type:'CancelImport',commandId:'cancel',jobId:receipt.jobId!});
+ assert.throws(()=>f.store.imports.finishDiscovery(claim.grant,{kind:'none',canonicalWorktree:null,candidates:[]}),/import_process_unresolved/);
+ assert.throws(()=>f.store.imports.finishResult(claim.grant,{schema:'import-result-v1',artifactId:'unused',jobId:claim.job.jobId,invocationId:claim.job.invocations.at(-1)!.invocationId,digest:'0'.repeat(64),bytes:1}),/import_process_unresolved/);
+ assert.throws(()=>f.store.imports.fail(claim.grant,'cancelled',true),/import_process_unresolved/);
+ f.store.imports.command(token,{type:'RequestImport',commandId:'other',path:'/other'});assert.equal(f.store.imports.claim(owner),null);assert.equal(f.store.imports.list(token)[0]?.state,'cancel_requested');
+ f.store.imports.recordProcess(claim.grant,{ordinal:1,executable:'git',state:'exited',exitCode:null,signal:'SIGTERM'});f.store.imports.fail(claim.grant,'import_cancelled',true);assert.equal(f.store.imports.list(token)[0]?.state,'cancelled');assert.ok(f.store.imports.claim(owner));
+ }finally{f.close();}
+});

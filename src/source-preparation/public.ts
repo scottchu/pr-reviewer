@@ -162,3 +162,9 @@ export const validateProviderSnapshot=(snapshot:Snapshot):void=>{
  for(const [key,count] of consumed)if(snapshot.sources.filter(s=>JSON.stringify([s.side,s.path])===key).length!==count)fail();
  for(const key of keys.keys())if(!consumed.has(key))fail();
 };
+
+export const bindPreparedSnapshotToReview=(witness:PreparedSnapshotWitness,jobId:string,reviewId:string,snapshot:Snapshot):PreparedSnapshotWitness=>{
+ const recorded=witnesses.get(witness);
+ if(!recorded||recorded.jobId!==jobId||recorded.fingerprint!==canonical(snapshot))throw new Error('source_unavailable');
+ const bound=Object.freeze({}) as PreparedSnapshotWitness;witnesses.set(bound,{jobId,reviewId,fingerprint:recorded.fingerprint});return bound;
+};

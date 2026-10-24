@@ -15,11 +15,12 @@ export const createImportStore=({db,tx,load,save}:Ports)=>{
  const owners=new WeakMap<object,string>(),grants=new WeakMap<object,{generation:string;jobId:string;invocationId:string}>();
  const all=()=> (db.prepare('SELECT body FROM import_jobs ORDER BY rowid').all() as {body:string}[]).map(row=>JSON.parse(row.body) as ImportJob);
  const get=(id:string)=>{const row=db.prepare('SELECT body FROM import_jobs WHERE id=?').get(id) as {body:string}|undefined;if(!row)throw new Error('invalid_request');return JSON.parse(row.body) as ImportJob;};
- const put=(job:ImportJob)=>{db.prepare('INSERT OR REPLACE INTO import_jobs VALUES (?,?)').run(job.jobId,JSON.stringify(job));};
+ const put=(job:ImportJob)=>{db.prepare('INSERT INTO import_jobs VALUES (?,?) ON CONFLICT(id) DO UPDATE SET body=excluded.body').run(job.jobId,JSON.stringify(job));};
  const update=(job:ImportJob)=>{job.jobRevision++;job.updatedAt=new Date().toISOString();put(job);};
  const user=(reference:string):Principal=>{const row=db.prepare('SELECT body FROM credentials WHERE hash=?').get(reference) as {body:string}|undefined;const principal=row?JSON.parse(row.body) as Principal:null;if(!principal||principal.kind!=='user')throw new Error('unauthorized');return principal;};
  const owner=(value:ImportOwner)=>{const generation=owners.get(value),row=db.prepare('SELECT generation FROM import_owner WHERE id=1').get() as {generation:string}|undefined;if(!generation||row?.generation!==generation)throw new Error('stale_import_runner');return generation;};
  const grant=(value:ImportGrant)=>{const record=grants.get(value),row=db.prepare('SELECT generation FROM import_owner WHERE id=1').get() as {generation:string}|undefined;if(!record||record.generation!==row?.generation)throw new Error('stale_import_runner');const job=get(record.jobId),invocation=job.invocations.at(-1);if(!invocation||invocation.invocationId!==record.invocationId||invocation.state!=='running')throw new Error('stale_import_runner');return {job,invocation};};
+ const terminal=(invocation:ImportInvocation)=>{if(invocation.processes.some(process=>process.state!=='exited'))throw new Error('import_process_unresolved');};
  const matching=(candidate:ProviderCandidate)=> (db.prepare('SELECT id,body FROM reviews').all() as {id:string;body:string}[]).flatMap(row=>{const review=JSON.parse(row.body) as Review,snapshot=review.snapshot,identity=snapshot.candidate??{provider:'github' as const,host:new URL(snapshot.prUrl).host,targetProject:snapshot.repository,number:snapshot.prNumber};return importStableIdentity(identity as ProviderCandidate)===importStableIdentity(candidate)?[{reviewId:row.id,currentSnapshotId:review.currentSnapshotId??snapshot.snapshotId}]:[];});
  const view=(job:ImportJob)=>{const {credentialReference,...publicJob}=job;return publicJob;};
  const retainedBytes=(review:Review)=> (review.snapshots??[review.snapshot]).reduce((n,snapshot)=>n+snapshot.sources.reduce((sum,source)=>sum+Buffer.byteLength(source.content,'utf8'),0),0);
@@ -49,7 +50,7 @@ export const createImportStore=({db,tx,load,save}:Ports)=>{
       if(!['needs_reverification','admission_conflict','result_ready'].includes(job.state)||!job.artifact)throw new Error('invalid_request');job.state='reverify_queued';job.reason=null;
      }else if(parsed.type==='AdmitImportResult'){
       if(!['admission_conflict','result_ready'].includes(job.state)||!job.artifact)throw new Error('invalid_request');
-      if(parsed.target){job.target=parsed.target;job.reviewId=parsed.target.reviewId;}else{job.target=null;job.reviewId=randomUUID();}
+      if(parsed.target){job.target=parsed.target;job.reviewId=parsed.target.reviewId;}else{if(job.target)job.reviewId=randomUUID();job.target=null;}
       job.admissionCommandId=`import-admit:${parsed.commandId}`;job.admission=null;job.state='result_ready';job.reason=null;
      }
      update(job);
@@ -84,13 +85,13 @@ export const createImportStore=({db,tx,load,save}:Ports)=>{
   recordProcess:(value:ImportGrant,observation:ProcessObservation)=>tx(()=>{
    const {job,invocation}=grant(value);if(job.state==='cancel_requested'&&observation.state==='requested')throw new Error('import_cancelled');
    const old=invocation.processes.find(process=>process.ordinal===observation.ordinal);
-   if(observation.state==='requested'){if(old||invocation.processes.length>=256||invocation.processes.some(process=>process.state!=='exited'))throw new Error('import_process_limit');invocation.processes.push(observation);}
+   if(observation.state==='requested'){if(old||observation.ordinal!==invocation.processes.length+1||invocation.processes.length>=256||invocation.processes.some(process=>process.state!=='exited'))throw new Error('import_process_limit');invocation.processes.push(observation);}
    else {if(!old||old.executable!==observation.executable||observation.state==='started'&&old.state!=='requested'||observation.state==='exited'&&!['requested','started'].includes(old.state))throw new Error('invalid_import_observation');Object.assign(old,observation);}
    update(job);
   }),
   cancelled:(value:ImportGrant)=>{const {job}=grant(value);return job.state==='cancel_requested';},
   finishDiscovery:(value:ImportGrant,discovery:{kind:string;canonicalWorktree:string|null;candidates:readonly ProviderCandidate[]})=>tx(()=>{
-   const {job,invocation}=grant(value);if(invocation.phase!=='discovery')throw new Error('stale_import_runner');invocation.state='completed';
+   const {job,invocation}=grant(value);terminal(invocation);if(invocation.phase!=='discovery')throw new Error('stale_import_runner');invocation.state='completed';
    if(job.state==='cancel_requested'){job.state='cancelled';update(job);return;}
    user(job.credentialReference);job.discovery=discovery;job.canonicalWorktree=discovery.canonicalWorktree;job.candidates=structuredClone(discovery.candidates) as ProviderCandidate[];job.discoveryRevision=job.jobRevision+1;
    if(discovery.kind==='unique'&&job.candidates.length===1&&discovery.canonicalWorktree){job.candidate=job.candidates[0]!;job.existingReviews=matching(job.candidate);if(job.target&&!job.existingReviews.some(review=>review.reviewId===job.target!.reviewId)){job.state='failed';job.reason='review_identity_conflict';}else job.state=job.existingReviews.length&&!job.target?'choosing':'acquisition_queued';}
@@ -98,11 +99,11 @@ export const createImportStore=({db,tx,load,save}:Ports)=>{
    update(job);
   }),
   finishResult:(value:ImportGrant,reference:ArtifactReference)=>tx(()=>{
-   const {job,invocation}=grant(value);if(invocation.phase==='discovery'||reference.jobId!==job.jobId||reference.invocationId!==invocation.invocationId||reference.schema!=='import-result-v1'||reference.bytes>16*1024*1024)throw new Error('invalid_import_artifact');
+   const {job,invocation}=grant(value);terminal(invocation);if(invocation.phase==='discovery'||reference.jobId!==job.jobId||reference.invocationId!==invocation.invocationId||reference.schema!=='import-result-v1'||reference.bytes>16*1024*1024)throw new Error('invalid_import_artifact');
    if(job.state==='cancel_requested'){invocation.state='cancelled';job.state='cancelled';update(job);return false;}
-   user(job.credentialReference);invocation.state='completed';job.artifact=reference;job.state='result_ready';job.reason=null;update(job);return true;
+   user(job.credentialReference);invocation.state='completed';invocation.artifact=reference;job.artifact=reference;job.state='result_ready';job.reason=null;update(job);return true;
   }),
-  fail:(value:ImportGrant,reason:string,terminationConfirmed=true)=>tx(()=>{const {job,invocation}=grant(value);invocation.state=terminationConfirmed?(job.state==='cancel_requested'?'cancelled':'completed'):'unknown';job.state=!terminationConfirmed?'unknown':job.state==='cancel_requested'?'cancelled':'failed';job.reason=reason;update(job);}),
+  fail:(value:ImportGrant,reason:string,terminationConfirmed=true)=>tx(()=>{const {job,invocation}=grant(value);if(terminationConfirmed)terminal(invocation);invocation.state=terminationConfirmed?(job.state==='cancel_requested'?'cancelled':'completed'):'unknown';job.state=!terminationConfirmed?'unknown':job.state==='cancel_requested'?'cancelled':'failed';job.reason=reason;update(job);}),
   ready:(value:ImportOwner)=>{owner(value);return all().filter(job=>job.state==='result_ready');},
   unknown:(value:ImportOwner)=>{owner(value);return all().filter(job=>job.state==='unknown');},
   confirmQuiescent:(value:ImportOwner,jobId:string)=>tx(()=>{owner(value);const job=get(jobId);if(job.state!=='unknown')throw new Error('invalid_request');job.state=job.artifact?'needs_reverification':'failed';job.reason='interrupted_invocation_not_replayed';update(job);}),
