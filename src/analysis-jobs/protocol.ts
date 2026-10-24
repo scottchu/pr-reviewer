@@ -65,11 +65,26 @@ export const validateEnvelope=(value:unknown,request:WorkerRequest):WorkerEnvelo
  requireValid(('inventoryId' in result?result.inventoryId:result.analysisId)===expectedId);
  requireValid(result.coverage.length===sources.length&&result.coverage.every((row,i)=>{const s=sources[i]!;return row.side===s.side&&row.path===s.path&&row.role===s.role&&row.selected===s.selected&&row.prepared===!!s.source;}));
  requireValid(result.observed.bytes===sources.reduce((sum,s)=>sum+(s.source?Buffer.byteLength(s.source.content):0),0)&&result.observed.inventoryBytes===Buffer.byteLength(canonical(sourceMetadata)));
+ requireValid(result.observed.astNodes<=input.budgets.astNodes+1&&result.observed.invocationSites<=input.budgets.invocationSites+1);
+ requireValid(result.coverage.reduce((sum,row)=>sum+(row.examined??0),0)===result.observed.invocationSites);
+ for(let i=0;i<sources.length;i++){const s=sources[i]!,row=result.coverage[i]!;
+  for(const n of [row.examined,row.resolved,row.unresolved])requireValid(n===null||n<=result.observed.invocationSites);
+  const initial=s.exclusion??(!/\.tsx?$/.test(s.path)?'unsupported':!s.selected?'not_selected':!s.source?'missing':null);
+  if(initial)requireValid(row.status===initial||result.status==='unavailable'&&row.status==='budget_exceeded');
+  if(row.status==='scanned')requireValid(!initial&&row.parseStatus==='parsed'&&row.examined!==null);
+  if(row.status==='parse_failed')requireValid(!initial&&row.parseStatus==='failed'&&row.examined===null&&row.resolved===null&&row.unresolved===null);
+  if(row.parseStatus==='not_parsed')requireValid(row.examined===null&&row.resolved===null&&row.unresolved===null);
+  if(result.status!=='unavailable')requireValid(row.status!=='pending'&&row.status!=='budget_exceeded');
+ }
  const sourceMap=new Map(sources.map(s=>[sourceKey(s),s]));
- const line=(text:string,offset:number)=>{let n=1;for(let i=0;i<offset;i++){const c=text.charCodeAt(i);if(c===13){if(text.charCodeAt(i+1)===10){if(i+1<offset)n++;i++;}else n++;}else if(c===10||c===0x2028||c===0x2029)n++;}return n;};
- const checkAnchor=(a:Anchor)=>{const source=sourceMap.get(sourceKey(a));requireValid(source?.source&&a.snapshotId===input.snapshotId&&a.contentHash===source.source.contentHash&&a.end>=a.start&&a.end<=source.source.content.length);requireValid(a.startLine===line(source.source.content,a.start)&&a.endLine===line(source.source.content,Math.max(a.start,a.end-1)));};
+ const lineStarts=new Map<string,number[]>();for(const s of sources)if(s.source){const starts=[0],text=s.source.content;for(let i=0;i<text.length;i++){const c=text.charCodeAt(i);if(c===13){if(text.charCodeAt(i+1)===10)i++;starts.push(i+1);}else if(c===10||c===0x2028||c===0x2029)starts.push(i+1);}lineStarts.set(sourceKey(s),starts);}
+ const line=(starts:readonly number[],offset:number)=>{let low=0,high=starts.length;while(low<high){const mid=(low+high)>>>1;if(starts[mid]!<=offset)low=mid+1;else high=mid;}return low;};
+ const checkAnchor=(a:Anchor)=>{const source=sourceMap.get(sourceKey(a));requireValid(source?.source&&a.snapshotId===input.snapshotId&&a.contentHash===source.source.contentHash&&a.end>=a.start&&a.end<=source.source.content.length);const starts=lineStarts.get(sourceKey(a))!;requireValid(a.startLine===line(starts,a.start)&&a.endLine===line(starts,Math.max(a.start,a.end-1)));};
+ const checkAnchors=(anchors:readonly Anchor[],side:Anchor['side'])=>{const seen=new Set<string>();for(const a of anchors){checkAnchor(a);const key=canonical(a);requireValid(a.side===side&&!seen.has(key));seen.add(key);}};
  for(const d of result.diagnostics){const s=sourceMap.get(sourceKey(d));requireValid(s?.source&&d.start<=s.source.content.length);}
  if(result.status==='unavailable'){if(result.triggeringSource)requireValid(sourceMap.has(sourceKey(result.triggeringSource)));return envelope;}
+ requireValid(result.observed.bytes<=input.budgets.totalBytes&&result.observed.inventoryBytes<=input.budgets.inventoryBytes&&sources.every(s=>!s.source||Buffer.byteLength(s.source.content)<=input.budgets.fileBytes));
+ for(const side of ['base','head'] as const)requireValid(sources.filter(s=>s.side===side).length<=input.budgets.inventoryPathsPerSide&&sources.filter(s=>s.side===side&&s.source).length<=input.budgets.filesPerSide);
  requireValid(result.observed.astNodes<=input.budgets.astNodes&&result.observed.invocationSites<=input.budgets.invocationSites);
  const nodes=result.status==='available'?result.declarations:result.nodes;
  requireValid(nodes.length<=input.budgets.outputNodes);const nodeMap=new Map<string,FunctionNode>();
@@ -78,12 +93,22 @@ export const validateEnvelope=(value:unknown,request:WorkerRequest):WorkerEnvelo
  const edgeMap=new Map(result.edges.map(e=>[e.id,e])),unresolvedMap=new Map(result.unresolved.map(s=>[s.id,s]));requireValid(edgeMap.size===result.edges.length&&unresolvedMap.size===result.unresolved.length);
  let siteCount=result.unresolved.length;const sites=new Set<string>();
  const checkSite=(a:Anchor,caller:string)=>{checkAnchor(a);const n=nodeMap.get(caller);requireValid(n&&sourceKey(n.body)===sourceKey(a)&&a.start>=n.body.start&&a.end<=n.body.end);const key=canonical(a);requireValid(!sites.has(key));sites.add(key);};
- for(const e of result.edges){const caller=nodeMap.get(e.caller),callee=nodeMap.get(e.callee);requireValid(caller&&callee&&e.id===digest([e.caller,e.callee])&&canonical(e.target)===canonical(callee.declaration)&&caller.declaration.side===callee.declaration.side);checkAnchor(e.target);for(const s of e.sites){checkSite(s.anchor,e.caller);for(const a of [...s.linkage,...s.signatures]){checkAnchor(a);requireValid(a.side===s.anchor.side);}}siteCount+=e.sites.length;}
- for(const s of result.unresolved){checkSite(s.anchor,s.caller);requireValid(s.id===digest([s.caller,s.anchor,s.reason]));for(const a of s.candidates){checkAnchor(a);requireValid(a.side===s.anchor.side);}}
+ const resolvedCounts=new Map<string,number>(),unresolvedCounts=new Map<string,number>();
+ for(const e of result.edges){const caller=nodeMap.get(e.caller),callee=nodeMap.get(e.callee);requireValid(caller&&callee&&e.id===digest([e.caller,e.callee])&&canonical(e.target)===canonical(callee.declaration)&&caller.declaration.side===callee.declaration.side);checkAnchor(e.target);for(const s of e.sites){checkSite(s.anchor,e.caller);checkAnchors(s.linkage,s.anchor.side);checkAnchors(s.signatures,s.anchor.side);resolvedCounts.set(sourceKey(s.anchor),(resolvedCounts.get(sourceKey(s.anchor))??0)+1);}siteCount+=e.sites.length;}
+ for(const s of result.unresolved){checkSite(s.anchor,s.caller);requireValid(s.id===digest([s.caller,s.anchor,s.reason]));checkAnchors(s.candidates,s.anchor.side);unresolvedCounts.set(sourceKey(s.anchor),(unresolvedCounts.get(sourceKey(s.anchor))??0)+1);}
  requireValid(siteCount<=input.budgets.outputSites&&result.neighborhoods.length===seeds.length);
+ requireValid(siteCount===result.observed.invocationSites);
+ for(const row of result.coverage){const resolved=resolvedCounts.get(sourceKey(row))??0,unresolved=unresolvedCounts.get(sourceKey(row))??0;
+  if(row.status==='scanned')requireValid(row.resolved===resolved&&row.unresolved===unresolved&&row.examined===resolved+unresolved);else requireValid(resolved===0&&unresolved===0&&row.resolved===null&&row.unresolved===null);
+ }
  for(let i=0;i<result.neighborhoods.length;i++){const n=result.neighborhoods[i]!;requireValid(canonical(n.seed)===canonical(seeds[i]));const member=n.nodeId?nodeMap.get(n.nodeId):null;
   requireValid(n.nodeId===null?!!n.unresolvedSeed:member&&n.unresolvedSeed===null&&sourceKey(member.declaration)===sourceKey(n.seed)&&member.declaration.contentHash===n.seed.contentHash&&member.declaration.start===n.seed.start&&member.declaration.end===n.seed.end&&member.kind!=='callback'&&member.kind!=='module');
   requireValid(canonical(n.incoming)===canonical(result.edges.filter(e=>e.callee===n.nodeId).map(e=>e.id))&&canonical(n.outgoing)===canonical(result.edges.filter(e=>e.caller===n.nodeId).map(e=>e.id))&&canonical(n.unresolved)===canonical(result.unresolved.filter(s=>s.caller===n.nodeId).map(s=>s.id)));
+  requireValid(n.incomingAssessment===(n.incoming.length?'resolved_callers_found':'No resolved callers found in these supplied files'));
+  const invocations=result.edges.filter(e=>e.caller===n.nodeId).reduce((sum,e)=>sum+e.sites.length,0)+n.unresolved.length;
+  requireValid(!member?n.outgoingAssessment==='not_fully_analyzed':invocations?n.outgoingAssessment!=='No explicit invocation sites in this function body under the supported syntax scan.':n.outgoingAssessment!=='invocations_present');
+  const mandatory=['static-binding-is-not-runtime-execution','test-path-classification-is-not-execution-evidence',...(result.coverage.some(row=>row.side===n.seed.side&&row.status!=='scanned')||input.corpus[n.seed.side].inventory!=='repository-enumeration'?['incomplete-incoming-source-scope']:[])];
+  requireValid(new Set(n.limitations).size===n.limitations.length&&mandatory.every(l=>n.limitations.includes(l))&&n.limitations.every(l=>mandatory.includes(l)||l==='framework-invocation-not-analyzed'));
  }
  return envelope;
 };

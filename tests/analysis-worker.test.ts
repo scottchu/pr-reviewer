@@ -30,7 +30,7 @@ test('bounded transport rejects malformed, truncated, oversized and repeated fra
 
 test('parent rejects response provenance, complete schema, canonical identifiers and anchors',async()=>{
  const original=(await runAnalysisWorker(request,observations().port)).envelope;
- const mutations=[(e:any)=>e.inputFingerprint='0'.repeat(64),(e:any)=>e.invocationId='wrong',(e:any)=>e.phase='compute',(e:any)=>e.result.extra=true,(e:any)=>e.result.inventoryId='0'.repeat(64),(e:any)=>e.result.declarations[0].id='0'.repeat(64),(e:any)=>e.result.declarations[0].declaration.startLine=42,(e:any)=>e.result.declarations.push(e.result.declarations[0]),(e:any)=>e.result.coverage[0].path='other.ts'];
+ const mutations=[(e:any)=>e.inputFingerprint='0'.repeat(64),(e:any)=>e.invocationId='wrong',(e:any)=>e.phase='compute',(e:any)=>e.result.extra=true,(e:any)=>e.result.inventoryId='0'.repeat(64),(e:any)=>e.result.declarations[0].id='0'.repeat(64),(e:any)=>e.result.declarations[0].declaration.startLine=42,(e:any)=>e.result.declarations.push(e.result.declarations[0]),(e:any)=>e.result.coverage[0].path='other.ts',(e:any)=>e.result.coverage[0].examined=999999,(e:any)=>e.result.observed.invocationSites=0,(e:any)=>e.result.coverage[0].parseStatus='not_parsed',(e:any)=>e.result.coverage[0].status='pending'];
  for(const mutate of mutations){const value=structuredClone(original);mutate(value);await assert.rejects(fixture(emit(value)),/analysis_worker_/);}
 });
 
@@ -57,6 +57,7 @@ test('leader exit never accepts valid output while owned descendants remain',asy
 test('journal failure cannot mint authority and missing executable is a bounded known failure',async()=>{
  await assert.rejects(fixture('setTimeout(()=>{},30000)',{timeoutMs:100},{recordProcess:row=>{if(row.state==='started')throw Error('journal');},cancelled:()=>false}),/termination_unknown/);
  const o=observations();await assert.rejects(runAnalysisWorker(request,o.port,{executable:'/nonexistent/owner-fixture'}),/failed/);assert.deepEqual(o.rows.map(r=>r.state),['requested','exited']);
+ for(const port of [{recordProcess:()=>{throw Error('private-path:/tmp/secret');},cancelled:()=>false},{recordProcess:()=>{},cancelled:()=>{throw Error('private-path:/tmp/secret');}}])await assert.rejects(runAnalysisWorker(request,port),error=>{assert.equal(String(error),'Error: analysis_worker_observation');return true;});
 });
 
 test('actual heap exhaustion is a known resource failure with sanitized diagnostics',async()=>{
@@ -82,7 +83,33 @@ test('compute references and source anchors cannot be forged in otherwise valid 
  const compute:WorkerRequest={...request,phase:'compute',input:{...input,seeds:[{side:d.side,path:d.path,contentHash:d.contentHash,start:d.start,end:d.end}]}};
  const base=(await runAnalysisWorker(compute,observations().port)).envelope;
  const root=mkdtempSync(join(tmpdir(),'pr-reviewer-worker-compute-')),entryPath=join(root,'fixture.cjs');try{
- const mutations=[(e:any)=>e.result.edges[0].callee='0'.repeat(64),(e:any)=>e.result.edges[0].id='0'.repeat(64),(e:any)=>e.result.edges[0].sites[0].anchor.contentHash='0'.repeat(64),(e:any)=>e.result.edges[0].sites[0].anchor.end=100000,(e:any)=>e.result.neighborhoods[0].outgoing=[],(e:any)=>e.result.nodes[0].body.side='base',(e:any)=>e.result.edges.push(e.result.edges[0])];
+ const mutations=[(e:any)=>e.result.edges[0].callee='0'.repeat(64),(e:any)=>e.result.edges[0].id='0'.repeat(64),(e:any)=>e.result.edges[0].sites[0].anchor.contentHash='0'.repeat(64),(e:any)=>e.result.edges[0].sites[0].anchor.end=100000,(e:any)=>e.result.neighborhoods[0].outgoing=[],(e:any)=>e.result.nodes[0].body.side='base',(e:any)=>e.result.edges.push(e.result.edges[0]),(e:any)=>e.result.coverage[0].resolved=0,(e:any)=>e.result.coverage[0].unresolved=100,(e:any)=>{e.result.observed.invocationSites=0;e.result.coverage[0].examined=0;},(e:any)=>e.result.neighborhoods[0].outgoingAssessment='No explicit invocation sites in this function body under the supported syntax scan.',(e:any)=>e.result.neighborhoods[0].incomingAssessment='resolved_callers_found',(e:any)=>e.result.neighborhoods[0].limitations=[]];
  for(const mutate of mutations){const envelope=structuredClone(base);mutate(envelope);writeFileSync(entryPath,emit(envelope));await assert.rejects(runAnalysisWorker(compute,observations().port,{entryPath}),/analysis_worker_/);}
  }finally{rmSync(root,{recursive:true,force:true});}
+});
+
+test('worker preserves rich pure-module results and honest partial/budget outcomes exactly',async()=>{
+ // The oracle compiler is loaded in this test only; worker.ts uses type-only source-analysis imports.
+ const {listNeighborhoodDeclarations,analyzeNeighborhood}=await import('../src/source-analysis/public.ts');
+ const texts=[['impl.ts','export function target(x: number): number; export function target(x: string): string; export function target(x: number | string) { return x; }'],['bridge.ts',"export { target as renamed } from './impl';"],['use.ts',"import { renamed } from './bridge'; const caller = () => renamed(1); let mutable = () => 1; mutable(); const dynamic = () => import('./impl'); const missing = () => external();"],['component.tsx','export const Component = () => <div />;'],['broken.ts','const broken = ( => ;']] as const;
+ const sources=texts.map(([path,content])=>({...input.sources[0]!,path,source:{content,contentHash:createHash('sha256').update(content).digest('hex')}}));
+ const rich={...input,sources:[...sources,{side:'head' as const,path:'absent.ts',commit:input.commits.head,role:'context' as const,selected:true,exclusion:'missing' as const}]};
+ const inventory=listNeighborhoodDeclarations(rich);assert.equal(inventory.status,'available');if(inventory.status!=='available')throw Error('fixture');const d=inventory.declarations.find(d=>d.name==='caller')!.declaration;
+ const compute={...rich,seeds:[{side:d.side,path:d.path,contentHash:d.contentHash,start:d.start,end:d.end}]};
+ for(const phase of ['inventory','compute'] as const){
+  for(const budget of [{},{astNodes:1},{invocationSites:0},{outputNodes:0},{totalBytes:0},{inventoryBytes:1}]){
+   const request:WorkerRequest=phase==='inventory'?{protocol:'analysis-worker-v1',invocationId:'rich-inventory',phase,input:{...rich,budgets:{...input.budgets,...budget}}}:{protocol:'analysis-worker-v1',invocationId:'rich-compute',phase,input:{...compute,budgets:{...input.budgets,...budget}}};
+   const expected=request.phase==='inventory'?listNeighborhoodDeclarations(request.input):analyzeNeighborhood(request.input);const actual=await runAnalysisWorker(request,observations().port);assert.deepEqual(actual.envelope.result,expected);
+  }
+ }
+});
+
+test('bounded repeated anchors cannot make parent validation repeatedly rescan source prefixes',async()=>{
+ const content=' '.repeat(240000)+'export const target = () => 1;\nexport const caller = () => {'+'target();'.repeat(20)+'};\n';
+ const rich={...input,sources:[{...input.sources[0]!,source:{content,contentHash:createHash('sha256').update(content).digest('hex')}}]};
+ const inventoryRequest:WorkerRequest={...request,input:rich};const inventory=(await runAnalysisWorker(inventoryRequest,observations().port)).envelope;if(inventory.phase!=='inventory'||inventory.result.status!=='available')throw Error('fixture');
+ const seeds=inventory.result.declarations.map(d=>{const {side,path,contentHash,start,end}=d.declaration;return {side,path,contentHash,start,end};});const compute:WorkerRequest={...request,phase:'compute',input:{...rich,seeds}};
+ const envelope=structuredClone((await runAnalysisWorker(compute,observations().port)).envelope);if(envelope.phase!=='compute'||envelope.result.status!=='analyzed')throw Error('fixture');
+ const changed=JSON.parse(JSON.stringify(envelope));for(const edge of changed.result.edges)for(const site of edge.sites)site.signatures=Array.from({length:2000},()=>edge.target);
+ const root=mkdtempSync(join(tmpdir(),'pr-reviewer-worker-bounded-')),entryPath=join(root,'fixture.cjs');try{writeFileSync(entryPath,emit(changed));const start=Date.now();await assert.rejects(runAnalysisWorker(compute,observations().port,{entryPath}),/analysis_worker_/);assert.ok(Date.now()-start<5000);}finally{rmSync(root,{recursive:true,force:true});}
 });

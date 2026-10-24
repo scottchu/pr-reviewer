@@ -16,8 +16,8 @@ export const runAnalysisWorker:AnalysisWorker=async(value,observations,options={
  const limits={...CEILINGS};for(const name of Object.keys(CEILINGS) as (keyof typeof CEILINGS)[]){const v=options[name];if(v!==undefined){if(!Number.isSafeInteger(v)||v<1||v>CEILINGS[name])throw Error('analysis_worker_limit');limits[name]=v as never;}}
  for(const path of [options.executable,options.entryPath])if(path!==undefined&&(typeof path!=='string'||!path.startsWith('/')||path.includes('\0')))throw Error('analysis_worker_owner_option');
  const request=validateRequest(value),requestKey=canonical(request),input=frame(request,limits.inputBytes);
- if(options.signal?.aborted||observations.cancelled())throw Error('analysis_worker_cancelled');
- const startedAt=Date.now();observations.recordProcess({ordinal:1,executable:'node',state:'requested'});
+ try{if(options.signal?.aborted||observations.cancelled())throw Error('analysis_worker_cancelled');}catch(error){throw Error(error instanceof Error&&error.message==='analysis_worker_cancelled'?'analysis_worker_cancelled':'analysis_worker_observation');}
+ const startedAt=Date.now();try{observations.recordProcess({ordinal:1,executable:'node',state:'requested'});}catch{throw Error('analysis_worker_observation');}
  return await new Promise((resolve,reject)=>{
   // Explicit allowlist: no NODE_OPTIONS, loader, inspector, credential or target environment.
   const child=spawn(options.executable??process.execPath,['--max-old-space-size=256','--experimental-strip-types',options.entryPath??fileURLToPath(new URL('./worker-entry.ts',import.meta.url))],{stdio:['pipe','pipe','pipe'],detached:true,env:{LANG:'C',TZ:'UTC',NO_COLOR:'1'}});
