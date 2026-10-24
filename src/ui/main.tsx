@@ -207,7 +207,7 @@ const App = () => {
       {state.selecting&&<p role="status">Opening the selected snapshot. Question composition is held until its source is ready.</p>}
       <StoryPanel key={`story:${review.reviewId}`} bridge={storyBridge}/>
       <div onFocusCapture={pauseStory} onPointerDownCapture={pauseStory} onScrollCapture={pauseStory}><SemanticPanel key={`semantic:${review.reviewId}`} bridge={analysisBridge}/></div>
-      {state.graph && <div onFocusCapture={pauseStory} onPointerDownCapture={pauseStory}><ReviewGraph graph={state.graph} selectedPath={storyFocus?.sources[0]?.reference.anchor.path??selected?.path??""} selectedFileKey={storyFocus?.comparisonKey??comparisonKey} onOpen={openSource}/></div>}
+      {state.graph && <div onFocusCapture={pauseStory} onPointerDownCapture={pauseStory}><ReviewGraph graph={state.graph} selectedPath={storyFocus?.sources[0]?.reference.anchor.path??selected?.path??""} selectedFileKey={storyFocus?.comparisonKey??comparisonKey} storyFocus={storyFocus?.graphFocus} onOpen={openSource}/></div>}
       <section className="source-identity" onFocusCapture={pauseStory}>
         <h2>{selected?.path ?? state.sources[0]?.path}</h2>
         <p>

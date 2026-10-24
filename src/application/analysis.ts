@@ -24,14 +24,14 @@ export const createAnalysisBridge=(reviewId:string)=>{
  const empty=():SemanticView=>({view:null,authenticated:false,busy:false,reading:false,uncertain:false,error:'',source:null,sourceAnchor:null,sourceBusy:false,focus:'',snippets:{}});
  let state=empty(),token='',generation=0,snapshotId='',analysisId:string|undefined,disposed=false;
  const registry=createRegistry(),listeners=new Set<()=>void>();
- let connection:object|null=null,read:{controller:AbortController;owner:Owner}|null=null,sourceRead:{controller:AbortController;owner:Owner}|null=null;
+ let connection:object|null=null,read:{controller:AbortController;owner:Owner;done:Promise<void>;finish:()=>void}|null=null,sourceRead:{controller:AbortController;owner:Owner}|null=null;
  let pending:{command:AnalysisCommand;fingerprint:string;receipt?:AnalysisReceipt;jobGeneration?:number}|null=null;
  let operation:object|null=null;
  const warmControllers=new Set<AbortController>();
  const publish=(next:SemanticView)=>{state=next;for(const listener of listeners)listener();};
  const owner=():Owner=>({generation,token,snapshotId,analysisId});
  const owns=(o:Owner)=>!disposed&&o.generation===generation&&o.token===token&&o.snapshotId===snapshotId;
- const abortRead=()=>{read?.controller.abort();read=null;};
+ const abortRead=()=>{read?.controller.abort();read?.finish();read=null;};
  const interrupt=()=>{generation++;abortRead();sourceRead?.controller.abort();sourceRead=null;for(const c of warmControllers)c.abort();warmControllers.clear();operation=null;};
  const request=async(o:Owner,path:string,body?:unknown,signal?:AbortSignal)=>{
   const response=await fetch(path,{headers:{Authorization:`Bearer ${o.token}`,'Content-Type':'application/json'},...(body?{method:'POST',body:JSON.stringify(body)}:{}),...(signal?{signal}:{})});
@@ -58,7 +58,7 @@ export const createAnalysisBridge=(reviewId:string)=>{
  };
  const refresh=async(o:Owner,mode:'explicit'|'poll'='explicit',minimum?:AnalysisReceipt,jobGeneration?:number)=>{
   if(!owns(o)||!o.token||!o.snapshotId||(mode==='poll'&&(read||state.busy||state.sourceBusy)))return;
-  o={...o,analysisId};abortRead();const currentRead={owner:o,controller:new AbortController()};read=currentRead;
+  o={...o,analysisId};abortRead();let finish=()=>{};const done=new Promise<void>(resolve=>{finish=resolve;});const currentRead={owner:o,controller:new AbortController(),done,finish};read=currentRead;
   const current=()=>owns(o)&&read===currentRead&&!currentRead.controller.signal.aborted;
   publish({...state,reading:true});
   try{
@@ -72,7 +72,7 @@ export const createAnalysisBridge=(reviewId:string)=>{
     publish({...state,view,authenticated:true,error:'',focus:same?state.focus:'',snippets:same?state.snippets:{}});void warm(o);return view;
    }
   }catch(error){if(current())publish({...state,error:error instanceof Error?error.message:'request_failed'});throw error;
-  }finally{if(read===currentRead){read=null;if(owns(o))publish({...state,reading:false});}}
+  }finally{if(read===currentRead){read=null;if(owns(o))publish({...state,reading:false});}currentRead.finish();}
  };
  const send=async(intent:Intent):Promise<AnalysisReceipt>=>{
   if(disposed||!token)throw new Error('unauthorized');if(state.busy)throw new Error('submission_in_progress');
@@ -101,7 +101,18 @@ export const createAnalysisBridge=(reviewId:string)=>{
   }finally{if(current()){operation=null;publish({...state,busy:false});}}
  };
  const select=async(nextSnapshotId:string,nextAnalysisId?:string)=>{
-  if(snapshotId===nextSnapshotId&&analysisId===nextAnalysisId&&(state.view||read))return;
+  if(snapshotId===nextSnapshotId&&analysisId===nextAnalysisId){
+   if(state.view)return;
+   // The same exact selection shares readiness, rather than mistaking an
+   // in-flight read for a loaded view. Abort/disposal releases every waiter.
+   const shared=read;
+   if(shared){
+    await shared.done;
+    if(!owns(shared.owner)||snapshotId!==nextSnapshotId||analysisId!==nextAnalysisId)throw new Error('selection_superseded');
+    if(state.view)return;
+    throw new Error(state.error||'analysis_unavailable');
+   }
+  }
   // Commands retain their exact retry intent within this credential even when private navigation changes.
   interrupt();snapshotId=nextSnapshotId;analysisId=nextAnalysisId;
   publish({...empty(),authenticated:Boolean(token),uncertain:Boolean(pending)});

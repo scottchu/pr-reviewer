@@ -1,12 +1,14 @@
 import React, {useEffect,useState} from 'react';
 import {ReactFlow,Background,Controls,MarkerType,Position} from '@xyflow/react';
 import type {Node,Edge} from '@xyflow/react';
+import type {StoryGraphFocus} from '../application/public.ts';
 import type {Anchor,SourceGraph,GraphFile} from '../domain/public.ts';
 import '@xyflow/react/dist/style.css';
 const fileLabel=(file:GraphFile)=>file.oldPath&&file.newPath&&file.oldPath!==file.newPath?`${file.oldPath} → ${file.newPath}`:file.newPath??file.oldPath??'Metadata';
-export const ReviewGraph=({graph,selectedPath,selectedFileKey,onOpen}:{graph:SourceGraph;selectedPath:string;selectedFileKey?:string|undefined;onOpen:(anchor:Anchor,fileKey?:string)=>void})=>{
+export const ReviewGraph=({graph,selectedPath,selectedFileKey,storyFocus,onOpen}:{graph:SourceGraph;selectedPath:string;selectedFileKey?:string|undefined;storyFocus?:StoryGraphFocus|undefined;onOpen:(anchor:Anchor,fileKey?:string)=>void})=>{
  const [context,setContext]=useState(false),[spans,setSpans]=useState(false),[focusedKey,setFocusedKey]=useState(''),[spanId,setSpanId]=useState('');
  useEffect(()=>{setFocusedKey(graph.files.find(file=>file.key===selectedFileKey)?.key??graph.files.find(file=>file.oldPath===selectedPath||file.newPath===selectedPath)?.key??graph.files[0]?.key??'');},[graph.snapshotId,selectedPath,selectedFileKey]);
+ useEffect(()=>{if(!storyFocus||!graph.files.some(file=>file.key===storyFocus.fileKey))return;setFocusedKey(storyFocus.fileKey);setSpans(Boolean(storyFocus.hunkId));setSpanId(storyFocus.hunkId??'');setContext(false);},[graph.snapshotId,storyFocus?.intentId]);
  const focused=graph.files.find(file=>file.key===focusedKey)??graph.files[0],label=focused?fileLabel(focused):'No changed paths';
  const focusedNode=(node:SourceGraph['nodes'][number])=>node.fileKey?node.fileKey===focused?.key:node.path===focused?.oldPath||node.path===focused?.newPath;
  const focusedIds=new Set(graph.nodes.filter(node=>focusedNode(node)&&node.kind==='file').map(node=>node.id));
