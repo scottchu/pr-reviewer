@@ -1,6 +1,7 @@
 import type {Store,HeadTestGrant} from '../storage/public.ts';
 import {createRegistry} from '../integration/registry.ts';
 import {prepareHeadTestInputs,executePreparedHeadTest} from './preparation.ts';
+import {cleanupHeadTestRoots} from './cleanup.ts';
 import {observeHeadTestOutcome} from './outcome.ts';
 import {observeHeadTestQuiescence} from './evidence.ts';
 export type HeadTestRunnerOptions=Readonly<{executionRoot:string;artifactRoot:string;fixtureInputs?:Readonly<{repository:string;donor:string}>}>;
@@ -12,6 +13,7 @@ export const createTestRunner=(store:Store,options:HeadTestRunnerOptions)=>{
  const tick=async()=>{
   if(active||stopped||fenced)return;active=true;
   try{
+   if(tests.cleanupPending(owner).length)await cleanupHeadTestRoots(store,owner);
    for(const journal of tests.unknown(owner)){const witness=observeHeadTestQuiescence(journal);if(witness)tests.reconcileQuiescence(owner,witness);}
    while(!stopped&&!fenced){
     const claim=tests.claim(owner);if(!claim)break;grant=claim.grant;
@@ -27,6 +29,7 @@ export const createTestRunner=(store:Store,options:HeadTestRunnerOptions)=>{
      }
     }catch(error){note(error);try{tests.markUnknown(grant,'test_outcome_unavailable');}catch{/* A committed receipt or replacement epoch remains authoritative. */}}
     finally{grant=null;}
+    await cleanupHeadTestRoots(store,owner);
    }
   }finally{active=false;}
  };

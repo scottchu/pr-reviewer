@@ -87,7 +87,7 @@ export type HeadTestJob = Readonly<{
   state: "queued" | "preparing" | "running" | "cancel_requested" | "cancelled" | "passed" | "failed" | "timed_out" | "unavailable" | "error" | "unknown";
   reason: string | null; effectDisposition: "none" | "unresolved" | "quiescent";
   cancellation: Readonly<{commandId: string; actorId: string; requestedAt: string}> | null;
-  invocations: readonly HeadTestInvocation[]; result?: HeadTestResult;
+  invocations: readonly HeadTestInvocation[]; result?: HeadTestResult; cleanup?: Readonly<{state:'pending'|'complete'|'error';attempts:number;reason:string|null}>;
 }>;
 export type HeadTestReceipt = Readonly<{commandId: string; actorId: string; reviewId: string; snapshotId: string; jobId: string; jobRevision: number; state: "applied"; result: Readonly<{disposition: "queued" | "cancelled" | "cancel_requested" | "already_terminal"}>}>;
 export type HeadTestView = Readonly<HeadTestScope & {jobs: readonly HeadTestJob[]; selectedJob: HeadTestJob | null; nextCursor: string | null}>;
@@ -101,12 +101,15 @@ export const headTestEffectOccupiesSlot = (job: Pick<HeadTestJob, 'state' | 'eff
 };
 
 export type HeadTestArtifact=Readonly<{artifactId:string;kind:'source_evidence'|'process_output';label:string;bytes:number;sha256:string}>;
+export type HeadTestProcessExecution=Readonly<{executable:string;argv:readonly string[];cwd:string;attemptedAt:string;startedAt:string|null;exitedAt:string|null}>;
+export type HeadTestVerification=Readonly<{observedAt:string;inputs:'verified'|'error';overlays:'verified'|'error';sourceDigest:string|null;expectedSourceDigest:string|null;changedEntries:number|null;overlayDigest:string|null;files:number;bytes:number;reason:string|null}>;
 export type HeadTestResult=Readonly<{
  schema:'head-test-result-v1';resultId:string;jobId:string;invocationId:string;
  intent:Readonly<{reviewId:string;snapshotId:string;actorId:string;repository:string;baseSha:string;headSha:string;targetDigest:string;qualificationId:string|null}>;
  coverage:'no_process_execution'|'partial_preparation'|'prepared_execution';stage:string;
  evidence:Readonly<{treeId:string|null;sourceManifestId:string|null;closureManifestId:string|null;sourceAccountId:string|null;runtimeSha256:string|null;environmentId:string|null;absentReason:'not_completed'}>;
- processes:readonly Readonly<{ordinal:number;role:string;state:string;exitCode:number|null;signal:string|null}>[];
+ processes:readonly Readonly<{ordinal:number;role:string;state:string;exitCode:number|null;signal:string|null;execution:HeadTestProcessExecution|null;executionAbsence:'not_observed'|null}>[];
+ verification:Readonly<{pre:HeadTestVerification|null;post:HeadTestVerification|null;absenceReason:'not_reached'}>;
  state:'passed'|'failed'|'cancelled'|'timed_out'|'unavailable'|'error';reason:string;
  preparation:HeadTestJob['preparation']|null;preparationAbsence:'not_completed'|null;
  execution:Readonly<{exitCode:number|null;signal:string|null;collectionObserved:boolean;counts:Readonly<{passed:number;failed:number;total:number}>|null}>|null;executionAbsence:'not_started'|null;
@@ -116,4 +119,4 @@ export type HeadTestResult=Readonly<{
 export type HeadTestAdmissionReceipt=Readonly<{commandId:string;jobId:string;jobRevision:number;resultId:string;state:'applied'}>;
 export const headTestArtifactQuerySchema=z.object({reviewId:id,snapshotId:id,jobId:id,artifactId:z.string().uuid(),offset:z.number().int().nonnegative().max(Number.MAX_SAFE_INTEGER).optional(),length:z.number().int().min(1).max(65536).optional()}).strict();
 export type HeadTestArtifactQuery=z.infer<typeof headTestArtifactQuerySchema>;
-export type HeadTestArtifactView=Readonly<{jobId:string;artifactId:string;sha256:string;totalBytes:number;offset:number;bytes:number;complete:boolean;text:string}>;
+export type HeadTestArtifactView=Readonly<{jobId:string;artifactId:string;sha256:string;totalBytes:number;offset:number;bytes:number;complete:boolean;nextOffset:number;encoding:'base64';data:string}>;

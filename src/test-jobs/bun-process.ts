@@ -32,6 +32,7 @@ export const createHeadBunRunner=({ownedRoot,observer,deadline,outputBudget=crea
   const journal=observer.journal(),prior=observeHeadTestProcessQuiescence(journal),requested:HeadTestProcess={ordinal:(journal.invocation.processes?.length??0)+1,role,state:'requested',intentDigest:headDigest(headTestCanonical({executable:HEAD_BUN,args,cwd,env})),inputCount:0,inputBytes:0};
   if(observer.recordProcess(requested,...(prior?[prior]:[])).disposition!=='recorded')throw new Error('test_launch_already_recorded');active=true;
   return await new Promise<HeadBunRun>((resolve)=>{
+   const attemptedAt=new Date().toISOString();let startedAt:string|null=null;const execution=(exitedAt:string|null)=>({executable:'<qualified-bun>',argv:args.map(arg=>arg.replaceAll(root,'<owned-root>')),cwd:cwd.replace(root,'<owned-root>'),attemptedAt,startedAt,exitedAt});
    const child=spawn(HEAD_BUN,args,{cwd,env,detached:true,stdio:['ignore','pipe','pipe']});let started=false,closed=false,finished=false,spawnError=false,journalFailed=false,observedIdentity:string|null=null,reason:string|null=null,bytes=0;
    const output:{channel:'stdout'|'stderr';bytes:number;text:string;data:Uint8Array}[]=[];let kill:ReturnType<typeof setTimeout>|undefined,grace:ReturnType<typeof setTimeout>|undefined;
    const cleanup=()=>{clearTimeout(timeout);clearInterval(polling);if(kill)clearTimeout(kill);if(grace)clearTimeout(grace);};
@@ -43,11 +44,11 @@ export const createHeadBunRunner=({ownedRoot,observer,deadline,outputBudget=crea
     try{process.kill(-child.pid,'SIGTERM');}catch(error){if((error as NodeJS.ErrnoException).code!=='ESRCH')reason='termination_unknown';}
     if(!kill)kill=setTimeout(()=>{if(!closed&&child.pid&&observedIdentity&&identity(child.pid)===observedIdentity){try{process.kill(-child.pid,'SIGKILL');}catch{reason='termination_unknown';}}},250);
    };
-   child.once('spawn',()=>{started=true;observedIdentity=child.pid?identity(child.pid):null;try{observer.recordProcess({...requested,state:'started',...(child.pid?{pid:child.pid}:{}),...(observedIdentity?{startIdentity:observedIdentity}:{})});}catch{journalFailed=true;stop('journal_write_failed');}});
+   child.once('spawn',()=>{started=true;startedAt=new Date().toISOString();observedIdentity=child.pid?identity(child.pid):null;try{observer.recordProcess({...requested,state:'started',execution:execution(null),...(child.pid?{pid:child.pid}:{}),...(observedIdentity?{startIdentity:observedIdentity}:{})});}catch{journalFailed=true;stop('journal_write_failed');}});
    child.once('error',()=>{spawnError=true;reason??='runtime_unavailable';});
    const collect=(channel:'stdout'|'stderr',chunk:Buffer)=>{if(finished)return;bytes+=chunk.length;if(!outputBudget.append(role,channel,chunk)){stop('output_limit');return;}output.push({channel,bytes:chunk.length,text:chunk.toString('utf8'),data:Uint8Array.from(chunk)});};
    child.stdout.on('data',(chunk:Buffer)=>collect('stdout',chunk));child.stderr.on('data',(chunk:Buffer)=>collect('stderr',chunk));
-   child.once('close',(exitCode,signal)=>{closed=true;if(finished)return;try{observer.recordProcess({...requested,state:'exited',...(child.pid?{pid:child.pid}:{}),...(observedIdentity?{startIdentity:observedIdentity}:{}),...(!started&&spawnError&&child.pid===undefined?{spawnDisposition:'not_spawned' as const}:{}),exitCode,signal});}catch{journalFailed=true;}finish(exitCode,signal,!journalFailed&&(!started&&spawnError||Boolean(child.pid&&!groupExists(child.pid))));});
+   child.once('close',(exitCode,signal)=>{closed=true;if(finished)return;try{observer.recordProcess({...requested,state:'exited',execution:execution(new Date().toISOString()),...(child.pid?{pid:child.pid}:{}),...(observedIdentity?{startIdentity:observedIdentity}:{}),...(!started&&spawnError&&child.pid===undefined?{spawnDisposition:'not_spawned' as const}:{}),exitCode,signal});}catch{journalFailed=true;}finish(exitCode,signal,!journalFailed&&(!started&&spawnError||Boolean(child.pid&&!groupExists(child.pid))));});
    const timeout=setTimeout(()=>stop('test_deadline'),Math.min(deadline-Date.now(),role==='runtime_version'?10000:120000));
    const polling=setInterval(()=>{try{const now=observer.control();if(!now.authorized||now.cancelled||now.stopReason)stop(now.cancelled?'test_cancelled':now.stopReason??'unauthorized');}catch{stop('stale_test_owner');}},40);
   });

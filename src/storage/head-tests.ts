@@ -13,7 +13,7 @@ type Ports = Readonly<{db: DatabaseSync; tx: <T>(operation: () => T) => T; load:
 const hash = (value: string) => createHash('sha256').update(value).digest('hex');
 const reserveBytes = 2 * 1024 * 1024;
 const terminal = new Set<HeadTestJob['state']>(['cancelled', 'passed', 'failed', 'timed_out', 'unavailable', 'error']);
-const publicJob = ({credentialReference: _credential, reservedBytes: _reserved, retainedBytes: _retained, stopReason: _stop, artifactLocations: _locations, invocations, ...job}: StoredJob): HeadTestJob => ({...job,invocations:invocations.map(({invocationId,phase,state,quiescence,processes})=>({invocationId,phase,state,quiescence,...(processes?{processCount:processes.length}:{})}))});
+const publicJob = ({credentialReference: _credential, reservedBytes: _reserved, retainedBytes: _retained, stopReason: _stop, artifactLocations: _locations, cleanupLocation:_cleanupLocation,cleanupAfter:_cleanupAfter, invocations, ...job}: StoredJob): HeadTestJob => ({...job,invocations:invocations.map(({invocationId,phase,state,quiescence,processes})=>({invocationId,phase,state,quiescence,...(processes?{processCount:processes.length}:{})}))});
 const target = (): HeadTestTarget => ({targetId: 'review-source-core-v1', revision: 2, digest: HEAD_TEST_DEFINITION_DIGEST, definition: headTestDefinition()});
 const configuredRepository = (snapshot: Snapshot): boolean => {
   const url = new URL(snapshot.prUrl), candidate = snapshot.candidate;
@@ -140,7 +140,7 @@ export const createHeadTestStore = ({db, tx, load, authenticate, authorize, exec
    if(job.reviewId!==scope.reviewId||job.snapshotId!==scope.snapshotId||principal.kind==='user'&&principal.actorId!==job.actorId)throw new Error('test_job_unavailable');
    const descriptor=job.result?.artifacts.find(item=>item.artifactId===parsed.artifactId),location=job.artifactLocations?.find(item=>item.artifactId===parsed.artifactId);if(!descriptor||!location)throw new Error('test_artifact_unavailable');
    const bytes=await readHeadTestArtifact(location,descriptor);auth(token,scope);const offset=parsed.offset??0;if(offset>bytes.length)throw new Error('invalid_artifact_offset');const end=Math.min(bytes.length,offset+(parsed.length??65536)),chunk=bytes.subarray(offset,end);
-   return {jobId:job.jobId,artifactId:descriptor.artifactId,sha256:descriptor.sha256,totalBytes:bytes.length,offset,bytes:chunk.length,complete:end===bytes.length,text:chunk.toString('utf8')};
+   return {jobId:job.jobId,artifactId:descriptor.artifactId,sha256:descriptor.sha256,totalBytes:bytes.length,offset,bytes:chunk.length,complete:end===bytes.length,nextOffset:end,encoding:'base64',data:chunk.toString('base64')};
   };
   return {targets, command, query, artifact, ...createHeadTestOwnerStore({db,tx,load,authorize,execution,rows,get,put,publicJob,fixtureExecution,configuration})};
 };

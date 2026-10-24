@@ -3,11 +3,11 @@ import type {DatabaseSync} from 'node:sqlite';
 import {z} from 'zod';
 import {headTestCanonical,processQuiescenceEligible,HEAD_TEST_DEFINITION_DIGEST} from '../domain/public.ts';
 import type {HeadTestAdmissionReceipt,HeadTestJob,Principal,Review} from '../domain/public.ts';
-import {isHeadTestQuiescence,isHeadTestProcessQuiescence,readHeadTestQuiescence,isHeadTestPreparation,inspectHeadTestPreparation,readHeadTestOutcome} from '../test-jobs/public.ts';
-import type {HeadTestOutcomeWitness,HeadTestQuiescenceWitness,HeadTestPreparationWitness,HeadTestQualification} from '../test-jobs/public.ts';
+import {isHeadTestQuiescence,isHeadTestProcessQuiescence,readHeadTestQuiescence,isHeadTestPreparation,inspectHeadTestPreparation,readHeadTestOutcome,readHeadCleanup} from '../test-jobs/public.ts';
+import type {HeadTestOutcomeWitness,HeadTestQuiescenceWitness,HeadTestPreparationWitness,HeadTestQualification,HeadCleanupInput,HeadCleanupWitness} from '../test-jobs/public.ts';
 import type {ExecutionLease} from './execution.ts';
 import type {HeadTestOwner,HeadTestGrant,HeadTestJournal,HeadTestProcess,HeadTestStoredJob as Job,HeadTestPrivateInvocation} from './head-test-contracts.ts';
-const processSchema=z.object({ordinal:z.number().int().min(1).max(34),role:z.enum(['git_prepare','runtime_version','test_root']),state:z.enum(['requested','started','exited']),intentDigest:z.string().regex(/^[a-f0-9]{64}$/),inputCount:z.number().int().min(0).max(8192),inputBytes:z.number().int().min(0).max(8192*65),pid:z.number().int().positive().max(Number.MAX_SAFE_INTEGER).optional(),startIdentity:z.string().min(1).max(1024).optional(),spawnDisposition:z.literal('not_spawned').optional(),exitCode:z.number().int().nullable().optional(),signal:z.string().max(64).nullable().optional()}).strict();
+const processSchema=z.object({ordinal:z.number().int().min(1).max(34),role:z.enum(['git_prepare','runtime_version','test_root']),state:z.enum(['requested','started','exited']),intentDigest:z.string().regex(/^[a-f0-9]{64}$/),inputCount:z.number().int().min(0).max(8192),inputBytes:z.number().int().min(0).max(8192*65),pid:z.number().int().positive().max(Number.MAX_SAFE_INTEGER).optional(),startIdentity:z.string().min(1).max(1024).optional(),spawnDisposition:z.literal('not_spawned').optional(),exitCode:z.number().int().nullable().optional(),signal:z.string().max(64).nullable().optional(),execution:z.object({executable:z.string().max(128),argv:z.array(z.string().max(1024)).max(64),cwd:z.string().max(128),attemptedAt:z.iso.datetime(),startedAt:z.iso.datetime().nullable(),exitedAt:z.iso.datetime().nullable()}).strict().optional()}).strict();
 type Ports=Readonly<{db:DatabaseSync;tx:<T>(operation:()=>T)=>T;execution:ExecutionLease;rows:()=>readonly {job:Job}[];get:(id:string)=>Job;put:(job:Job)=>unknown;publicJob:(job:Job)=>HeadTestJob;load:(id:string)=>Review;authorize:(principal:Principal,review:Review)=>void;fixtureExecution:boolean;configuration:Readonly<{qualification:HeadTestQualification;qualificationId:string;repository:string;donor:string}>|null}>;
 export const createHeadTestOwnerStore=({db,tx,execution,rows,get,put,publicJob,load,authorize,fixtureExecution,configuration}:Ports)=>{
  db.exec('CREATE TABLE IF NOT EXISTS test_owner(id INTEGER PRIMARY KEY CHECK(id=1),generation TEXT NOT NULL)');
@@ -22,10 +22,23 @@ export const createHeadTestOwnerStore=({db,tx,execution,rows,get,put,publicJob,l
  const changeInvocation=(job:Job,invocation:HeadTestPrivateInvocation)=>({...job,invocations:job.invocations.map(item=>item.invocationId===invocation.invocationId?invocation:item)});
  const unknownJob=(job:Job,reason:string)=>update({...job,state:'unknown',reason,effectDisposition:'unresolved',invocations:job.invocations.map(item=>item.state==='running'?{...item,state:'unknown',quiescence:'unresolved'}:item)});
  const journal=(job:Job):HeadTestJournal=>({jobId:job.jobId,jobRevision:job.jobRevision,invocation:structuredClone(job.invocations.at(-1)!)});
+ const cleanupInput=(value:HeadTestOwner,jobId:string):HeadCleanupInput=>{
+  owner(value);const job=get(jobId),invocation=job.invocations.at(-1);
+  if(!job.result||!job.cleanupLocation||!job.cleanup||job.cleanup.state==='complete'||job.state==='unknown'||job.effectDisposition!=='quiescent'||!invocation||invocation.state!=='completed'||invocation.quiescence!=='confirmed'||invocation.processJournalVersion!==1||invocation.filesystemRoots?.length!==1||invocation.filesystemRoots[0]!==job.cleanupLocation.rootId||!invocation.processes||invocation.processes.some(item=>!processQuiescenceEligible(item)))throw new Error('invalid_test_cleanup');
+  return {jobId,invocationId:invocation.invocationId,resultId:job.result.resultId,attempts:job.cleanup.attempts,location:structuredClone(job.cleanupLocation),journal:journal(job)};
+ };
  return {
+  cleanupPending:(value:HeadTestOwner):readonly HeadCleanupInput[]=>{owner(value);return rows().filter(({job})=>job.cleanup&&job.cleanup.state!=='complete'&&(job.cleanupAfter??0)<=Date.now()).slice(0,8).map(({job})=>cleanupInput(value,job.jobId));},
+  checkCleanup:(value:HeadTestOwner,input:HeadCleanupInput)=>{if(headTestCanonical(cleanupInput(value,input.jobId))!==headTestCanonical(input))throw new Error('invalid_test_cleanup');},
+  recordCleanup:(value:HeadTestOwner,witness:HeadCleanupWitness)=>tx(()=>{
+   owner(value);const observed=readHeadCleanup(witness);if(!observed||headTestCanonical(cleanupInput(value,observed.input.jobId))!==headTestCanonical(observed.input))throw new Error('invalid_test_cleanup');
+   const job=get(observed.input.jobId),attempts=Math.min(Number.MAX_SAFE_INTEGER,observed.input.attempts+1);
+   update({...job,cleanup:{state:observed.state,attempts,reason:observed.reason},cleanupAfter:observed.state==='complete'?0:Date.now()+Math.min(60000,1000*2**Math.min(6,attempts-1))});
+  }),
   beginOwner:():HeadTestOwner=>tx(()=>{execution.assertCurrent();const id=randomUUID();db.prepare('INSERT OR REPLACE INTO test_owner VALUES(1,?)').run(id);for(const {job} of rows()){const invocation=job.invocations.at(-1);if(invocation?.state==='running'){unknownJob(job,'interrupted_test_invocation');execution.retain({kind:'test',jobId:job.jobId,invocationId:invocation.invocationId,phase:invocation.phase});}}const value=Object.freeze({}) as HeadTestOwner;owners.set(value,id);return value;}),
   claim:(value:HeadTestOwner):{job:HeadTestJob;grant:HeadTestGrant}|null=>tx(()=>{
    const id=owner(value);
+   if(rows().some(({job})=>job.cleanup&&job.cleanup.state!=='complete'))return null;
    for(const {job} of rows()){
     if(job.state!=='queued'||job.provenance==='test_only_configuration'||job.provenance==='test_only_execution'&&!fixtureExecution)continue;
     if(job.provenance==='qualified_local_configuration'&&(!configuration||configuration.qualificationId!==job.qualificationId||configuration.qualification.headSha!==job.headSha)){unclaimed(job,'unavailable','qualification_required');continue;}
@@ -55,7 +68,7 @@ export const createHeadTestOwnerStore=({db,tx,execution,rows,get,put,publicJob,l
    return tx(()=>{const {job,invocation}=grant(value),processes=invocation.processes;if(invocation.processJournalVersion!==1||!processes)throw new Error('test_process_unresolved');const old=processes.find(item=>item.ordinal===observation.ordinal);
     if(old?.state===observation.state&&old.observationDigest===observationDigest)return {disposition:'duplicate' as const};
     if(observation.state==='requested'){
-     active(job);if(observation.pid!==undefined||observation.startIdentity!==undefined||observation.spawnDisposition!==undefined||observation.exitCode!==undefined||observation.signal!==undefined)throw new Error('invalid_test_observation');
+     active(job);if(observation.pid!==undefined||observation.startIdentity!==undefined||observation.spawnDisposition!==undefined||observation.exitCode!==undefined||observation.signal!==undefined||observation.execution!==undefined)throw new Error('invalid_test_observation');
      if(old||observation.ordinal!==processes.length+1||processes.length>=34)throw new Error('test_process_limit');
      if(processes.some(item=>item.state!=='exited'||!processQuiescenceEligible(item))||processes.length>0&&(!priorQuiescence||!isHeadTestProcessQuiescence(priorQuiescence,journal(job))))throw new Error('test_process_unresolved');
      if(observation.role==='test_root'&&invocation.phase!=='execute'||observation.role!=='test_root'&&invocation.phase!=='prepare')throw new Error('test_phase_conflict');
@@ -63,6 +76,7 @@ export const createHeadTestOwnerStore=({db,tx,execution,rows,get,put,publicJob,l
     }else{
      if(!old||old.state==='exited'||old.role!==observation.role||old.intentDigest!==observation.intentDigest||old.inputCount!==observation.inputCount||old.inputBytes!==observation.inputBytes||observation.state==='started'&&old.state!=='requested')throw new Error('invalid_test_observation');
      if(old.pid!==undefined&&observation.pid!==undefined&&old.pid!==observation.pid||old.startIdentity!==undefined&&observation.startIdentity!==undefined&&old.startIdentity!==observation.startIdentity)throw new Error('invalid_test_observation');
+     if(old.execution&&(!observation.execution||headTestCanonical({...old.execution,exitedAt:null})!==headTestCanonical({...observation.execution,exitedAt:null})))throw new Error('invalid_test_observation');
      if(observation.state==='started'&&(observation.pid===undefined||observation.exitCode!==undefined||observation.spawnDisposition!==undefined))throw new Error('invalid_test_observation');
      if(observation.spawnDisposition!==undefined&&(!processQuiescenceEligible(observation)||old.state!=='requested'||old.pid!==undefined||old.startIdentity!==undefined))throw new Error('invalid_test_observation');
     }
@@ -82,11 +96,12 @@ export const createHeadTestOwnerStore=({db,tx,execution,rows,get,put,publicJob,l
    if(authorized!==observed.control.authorized||Boolean(job.cancellation)!==observed.control.cancelled||(job.stopReason??null)!==observed.control.stopReason||!authorized&&result.state!=='error'||job.cancellation&&result.state!=='cancelled')throw new Error('test_outcome_changed');
    if(Date.now()>=observed.deadline&&['passed','failed'].includes(result.state))throw new Error('test_outcome_changed');
    if(job.reservedBytes!==2*1024*1024||job.result)throw new Error('test_reservation_conflict');
-   const next:Job={...changeInvocation(job,{...invocation,state:'completed',quiescence:'confirmed'}),state:result.state,reason:result.reason,effectDisposition:'quiescent',result,artifactLocations:observed.locations,reservedBytes:0,retainedBytes:0,jobRevision:job.jobRevision+1,updatedAt:new Date().toISOString()};
+   if(observed.cleanupLocation&&(invocation.filesystemRoots?.length!==1||invocation.filesystemRoots[0]!==observed.cleanupLocation.rootId))throw new Error('invalid_test_witness');
+   const next:Job={...changeInvocation(job,{...invocation,state:'completed',quiescence:'confirmed'}),state:result.state,reason:result.reason,effectDisposition:'quiescent',result,artifactLocations:observed.locations,...(observed.cleanupLocation?{cleanupLocation:observed.cleanupLocation,cleanupAfter:0,cleanup:{state:'pending' as const,attempts:0,reason:null}}:{}),reservedBytes:0,retainedBytes:0,jobRevision:job.jobRevision+1,updatedAt:new Date().toISOString()};
    const receipt:HeadTestAdmissionReceipt={commandId,jobId:job.jobId,jobRevision:next.jobRevision,resultId:result.resultId,state:'applied'};
    const retainedBytes=observed.artifactBytes+Buffer.byteLength(headTestCanonical(next))+Buffer.byteLength(headTestCanonical(receipt));
-   if(retainedBytes+32>job.reservedBytes)throw new Error('test_storage_limit');
-   execution.release({kind:'test',jobId:job.jobId,invocationId:invocation.invocationId,phase:invocation.phase});put({...next,retainedBytes:retainedBytes+32});
+   if(retainedBytes+512>job.reservedBytes)throw new Error('test_storage_limit');
+   execution.release({kind:'test',jobId:job.jobId,invocationId:invocation.invocationId,phase:invocation.phase});put({...next,retainedBytes:retainedBytes+512});
    db.prepare('INSERT INTO test_receipts VALUES (?,?,?,?)').run(commandId,job.actorId,result.resultId,headTestCanonical(receipt));return receipt;
   }),
   markUnknown:(value:HeadTestGrant,reason:string)=>tx(()=>{const {job}=grant(value);if(!/^[a-z][a-z0-9_]{0,63}$/.test(reason))throw new Error('invalid_test_reason');unknownJob(job,reason);}),

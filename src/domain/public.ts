@@ -409,3 +409,5 @@ export type {ProcessQuiescenceRecord} from './process.ts';
 
 export {headTestArtifactQuerySchema} from "./head-tests.ts";
 export type {HeadTestResult,HeadTestArtifact,HeadTestAdmissionReceipt,HeadTestArtifactQuery,HeadTestArtifactView} from "./head-tests.ts";
+
+export type {HeadTestProcessExecution,HeadTestVerification} from './head-tests.ts';

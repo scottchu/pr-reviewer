@@ -19,7 +19,7 @@ test('B04 actual fixed fixture result atomically releases lease with replayable 
   assert.equal(job.state,'passed');assert.match(job.preparation!.environmentId,/^[a-f0-9]{64}$/);assert.equal(job.result!.evidence.environmentId,job.preparation!.environmentId);assert.equal(job.result!.coverage,'prepared_execution');assert.equal(job.result!.execution!.collectionObserved,true);assert.equal(job.invocations[0]!.quiescence,'confirmed');assert.equal(JSON.stringify(job).includes(input.executionRoot),false);
   const output=job.result!.artifacts.find(item=>item.label==='test_root.stderr')!;
   const query={reviewId:'review',snapshotId:'head-snapshot',jobId:job.jobId,artifactId:output.artifactId};
-  const artifact=await f.store.tests.artifact(f.token,query);assert.match(artifact.text,/4 pass/);assert.equal(artifact.complete,true);
+  const artifact=await f.store.tests.artifact(f.token,query);assert.match(Buffer.from(artifact.data,'base64').toString('utf8'),/4 pass/);assert.equal(artifact.complete,true);
   await assert.rejects(f.store.tests.artifact('invalid',query),/unauthorized/);await assert.rejects(f.store.tests.artifact(f.token,{...query,snapshotId:'wrong'}));
   f.store.imports.command(f.token,{type:'RequestImport',commandId:'after-result',path:'/never-run'});assert.ok(f.store.imports.claim(f.store.imports.beginOwner()));
  }finally{f.cleanup();await input.cleanup();}
@@ -32,7 +32,7 @@ test('B04 early copy failure settles partial preparation without invented comple
   await assert.rejects(prepareHeadTestInputs({store:f.store,grant,executionRoot:input.executionRoot,fixtureInputs:input}),/environment_unavailable/);
   const witness=await observeHeadTestOutcome({store:f.store,grant,artifactRoot});assert.ok(witness);const receipt=f.store.tests.complete(grant,witness);
   const result=f.store.tests.query(f.token,{reviewId:'review',snapshotId:'head-snapshot',jobId:receipt.jobId}).selectedJob!.result!;
-  assert.equal(result.state,'unavailable');assert.equal(result.coverage,'partial_preparation');assert.equal(result.preparation,null);assert.equal(result.execution,null);assert.equal(result.executionAbsence,'not_started');
+  assert.equal(result.state,'unavailable');assert.equal(result.coverage,'partial_preparation');assert.equal(result.preparation,null);assert.equal(result.execution,null);assert.equal(result.executionAbsence,'not_started');assert.equal(result.verification.pre,null);assert.equal(result.verification.post,null);
  }finally{f.cleanup();await input.cleanup();}
 });
 test('B04 cancellation after observation invalidates success witness then settles cancellation with same invocation',async()=>{

@@ -45,6 +45,7 @@ export const createHeadGitReader=({repository,headSha,ownedRoot,observer,outputB
     const journal=observer.journal(),ordinal=(journal.invocation.processes?.length??0)+1,prior=observeHeadTestProcessQuiescence(journal);
     const requested:HeadTestProcess={ordinal,role:'git_prepare',state:'requested',intentDigest:headDigest(headTestCanonical({executable:git,args,cwd:join(root,'empty'),env,inputDigest:spec.input?headDigest(spec.input):null})),inputCount:request.role==='batch'?request.objectIds.length:0,inputBytes:spec.input?.length??0};
     const ack=observer.recordProcess(requested,...(prior?[prior]:[]));if(ack.disposition!=='recorded')throw new Error('test_launch_already_recorded');
+    const attemptedAt=new Date().toISOString();let startedAt:string|null=null;const execution=(exitedAt:string|null)=>({executable:'<fixed-git>',argv:args.map(arg=>arg.replaceAll(repo,'<source-repository>')),cwd:'<owned-root>/empty',attemptedAt,startedAt,exitedAt});
     const child=spawn(git,args,{cwd:join(root,'empty'),env,detached:true,stdio:['pipe','pipe','pipe']});
     let started=false,closed=false,spawnError=false,journalFailed=false,observedIdentity:string|null=null,reason:string|null=null,stdoutBytes=0;
     let exitCode:number|null=null,exitSignal:NodeJS.Signals|null=null,kill:ReturnType<typeof setTimeout>|undefined,grace:ReturnType<typeof setTimeout>|undefined;
@@ -56,13 +57,13 @@ export const createHeadGitReader=({repository,headSha,ownedRoot,observer,outputB
      try{process.kill(-child.pid,'SIGTERM');}catch(error){if((error as NodeJS.ErrnoException).code!=='ESRCH')reason='termination_unknown';}
      if(!kill)kill=setTimeout(()=>{if(!closed&&child.pid&&observedIdentity&&identity(child.pid)===observedIdentity){try{process.kill(-child.pid,'SIGKILL');}catch{reason='termination_unknown';}}},250);
     };
-    child.once('spawn',()=>{started=true;observedIdentity=child.pid?identity(child.pid):null;try{observer.recordProcess({...requested,state:'started',...(child.pid?{pid:child.pid}:{}),...(observedIdentity?{startIdentity:observedIdentity}:{})});}catch{journalFailed=true;stop('journal_write_failed');}});
+    child.once('spawn',()=>{started=true;startedAt=new Date().toISOString();observedIdentity=child.pid?identity(child.pid):null;try{observer.recordProcess({...requested,state:'started',execution:execution(null),...(child.pid?{pid:child.pid}:{}),...(observedIdentity?{startIdentity:observedIdentity}:{})});}catch{journalFailed=true;stop('journal_write_failed');}});
     child.once('error',()=>{spawnError=true;reason??='source_unavailable';});
     child.stdin.on('error',()=>{if(!closed)stop('git_input_failed');});
     child.stderr.on('data',(chunk:Buffer)=>{if(!outputBudget.append('git_prepare','stderr',chunk))stop('output_limit');});
     child.once('close',(code,signal)=>{
      closed=true;exitCode=code;exitSignal=signal;
-     try{observer.recordProcess({...requested,state:'exited',...(child.pid?{pid:child.pid}:{}),...(observedIdentity?{startIdentity:observedIdentity}:{}),...(!started&&spawnError&&child.pid===undefined?{spawnDisposition:'not_spawned' as const}:{}),exitCode:code,signal});}catch{journalFailed=true;}
+     try{observer.recordProcess({...requested,state:'exited',execution:execution(new Date().toISOString()),...(child.pid?{pid:child.pid}:{}),...(observedIdentity?{startIdentity:observedIdentity}:{}),...(!started&&spawnError&&child.pid===undefined?{spawnDisposition:'not_spawned' as const}:{}),exitCode:code,signal});}catch{journalFailed=true;}
      resolveClose();
     });
     const timeout=setTimeout(()=>stop('prepare_deadline'),Math.min(10000,remaining));

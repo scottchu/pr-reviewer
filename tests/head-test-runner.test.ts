@@ -19,7 +19,7 @@ test('B01-B04 gateway request executes the same durable job while a real prepara
   let view=active;const deadline=Date.now()+10000;while(!view.selectedJob!.result&&Date.now()<deadline){await pause(20);view=await post('/api/tests/jobs',scope) as HeadTestView;}
   assert.equal(view.selectedJob!.state,'passed');assert.equal(view.selectedJob!.result!.intent.headSha,input.headSha);assert.equal(view.selectedJob!.jobId,receipt.jobId);
   const output=view.selectedJob!.result!.artifacts.find(item=>item.label==='test_root.stderr')!;
-  const artifact=await post('/api/tests/artifact',{...scope,artifactId:output.artifactId}) as HeadTestArtifactView;assert.match(artifact.text,/4 pass/);
+  const artifact=await post('/api/tests/artifact',{...scope,artifactId:output.artifactId}) as HeadTestArtifactView;assert.match(Buffer.from(artifact.data,'base64').toString('utf8'),/4 pass/);
   assert.equal(f.store.review(f.store.authenticate(f.token),'review').questions.length,1);assert.equal(notifications,0);assert.ok(gateway.testDiagnostics().some(route=>route.id==='verified-head-test-result-to-admission'));
  }finally{await gateway.close();f.cleanup();await input.cleanup();}
 });

@@ -1,3 +1,4 @@
+import type {HeadCleanupLocation} from './cleanup.ts';
 import {randomUUID} from 'node:crypto';
 import {mkdir,writeFile,rename,realpath,lstat} from 'node:fs/promises';
 import {join} from 'node:path';
@@ -11,7 +12,7 @@ import {observeHeadTestProcessQuiescence} from './evidence.ts';
 declare const outcomeBrand:unique symbol;
 export type HeadTestOutcomeWitness=Readonly<{[outcomeBrand]:true}>;
 export type HeadArtifactLocation=Readonly<{artifactId:string;path:string}>;
-type Outcome=Readonly<{journal:HeadTestJournal;result:HeadTestResult;locations:readonly HeadArtifactLocation[];artifactBytes:number;deadline:number;control:Readonly<{authorized:boolean;cancelled:boolean;stopReason:string|null}>}>;
+type Outcome=Readonly<{journal:HeadTestJournal;result:HeadTestResult;locations:readonly HeadArtifactLocation[];artifactBytes:number;cleanupLocation:HeadCleanupLocation|null;deadline:number;control:Readonly<{authorized:boolean;cancelled:boolean;stopReason:string|null}>}>;
 const outcomes=new WeakMap<object,Outcome>();
 const publications=new WeakMap<object,{root:string;artifacts:HeadTestArtifact[];locations:HeadArtifactLocation[]}>();
 export const readHeadTestOutcome=(witness:HeadTestOutcomeWitness):Outcome|null=>{const value=outcomes.get(witness);return value?structuredClone(value):null;};
@@ -22,7 +23,7 @@ const observedCollection=(text:string)=>{
 };
 /** Publishes observation only. Exact journal/control validation at admission remains mandatory. */
 export const observeHeadTestOutcome=async({store,grant,artifactRoot}:{store:Store;grant:HeadTestGrant;artifactRoot:string}):Promise<HeadTestOutcomeWitness|null>=>{
- const attempt=readHeadLiveAttempt(grant);if(!attempt||attempt.active)return null;
+ const attempt=readHeadLiveAttempt(grant);if(!attempt||attempt.active||attempt.rootCreationAttempted&&!attempt.cleanupLocation)return null;
  const input=store.tests.input(grant),journal=store.tests.journal(grant),control=store.tests.control(grant);
  if(input.job.jobId!==attempt.job.jobId||input.invocationId!==attempt.invocationId||!observeHeadTestProcessQuiescence(journal))return null;
  if(attempt.run&&!attempt.run.terminationConfirmed)return null;
@@ -37,7 +38,7 @@ export const observeHeadTestOutcome=async({store,grant,artifactRoot}:{store:Stor
  else if(prepared&&run&&attempt.postVerified&&collected&&run.signal===null&&run.exitCode!==null&&!run.reason){if(run.exitCode===0&&collection!.failed===0){state='passed';reason='tests_passed';}else if(run.exitCode!==0&&collection!.failed>0){state='failed';reason='assertions_failed';}else{reason='execution_exit_inconsistent';}}
  else if(!prepared){state='unavailable';reason='preparation_incomplete';}
  const blobs:{kind:HeadTestArtifact['kind'];label:string;data:Buffer}[]=[];
- if(attempt.source||attempt.closure||attempt.account)blobs.push({kind:'source_evidence',label:'source_evidence',data:Buffer.from(headTestCanonical({source:attempt.source?.manifest??null,closure:attempt.closure?.manifest??null,account:attempt.account?.account??null,metadata:attempt.closure?.metadata??null}))});
+ if(attempt.source||attempt.closure||attempt.account)blobs.push({kind:'source_evidence',label:'source_evidence',data:Buffer.from(headTestCanonical({source:attempt.source?.manifest??null,closure:attempt.closure?.manifest??null,account:attempt.account?.account??null,metadata:attempt.closure?.metadata??null,overlays:attempt.overlays??null,inputVerification:attempt.inputVerification??null}))});
  for(const role of ['git_prepare','runtime_version','test_root'] as const)for(const channel of ['stdout','stderr'] as const){const chunks=output.chunks.filter(chunk=>chunk.role===role&&chunk.channel===channel);if(chunks.length)blobs.push({kind:'process_output',label:`${role}.${channel}`,data:Buffer.concat(chunks.map(chunk=>Buffer.from(chunk.data)))});}
  const artifactBytes=blobs.reduce((sum,blob)=>sum+blob.data.length,0);if(artifactBytes>2*1024*1024-32768)throw new Error('test_evidence_limit');
  attempt.sealed=true;attempt.active=true;try{
@@ -51,10 +52,10 @@ export const observeHeadTestOutcome=async({store,grant,artifactRoot}:{store:Stor
  await rename(staging,destination);publications.set(attempt,{root,artifacts,locations});}
  for(const artifact of artifacts){const location=locations.find(item=>item.artifactId===artifact.artifactId)!;await readHeadTestArtifact(location,artifact);}
  }
- const body:Omit<HeadTestResult,'resultId'>={schema:'head-test-result-v1',jobId:input.job.jobId,invocationId:input.invocationId,intent:{reviewId:input.job.reviewId,snapshotId:input.job.snapshotId,actorId:input.job.actorId,repository:input.job.repository,baseSha:input.job.baseSha,headSha:input.job.headSha,targetDigest:input.job.target.digest,qualificationId:input.job.qualificationId??null},coverage:prepared?'prepared_execution':journal.invocation.processes!.length?'partial_preparation':'no_process_execution',stage:attempt.stage,evidence:{treeId:attempt.source?.manifest.treeId??null,sourceManifestId:attempt.source?.sourceManifestId??null,closureManifestId:attempt.closure?.closureManifestId??null,sourceAccountId:attempt.account?.sourceAccountId??null,runtimeSha256:attempt.runtimeSha256??null,environmentId:input.job.preparation?.environmentId??null,absentReason:'not_completed'},processes:journal.invocation.processes!.map(item=>({ordinal:item.ordinal,role:item.role,state:item.state,exitCode:item.exitCode??null,signal:item.signal??null})),state,reason,preparation:input.job.preparation??null,preparationAbsence:input.job.preparation?null:'not_completed',execution:run?{exitCode:run.exitCode,signal:run.signal,collectionObserved:collected,counts:collection}:null,executionAbsence:run?null:'not_started',output:{observedBytes:output.observedBytes,retainedBytes:output.retainedBytes,overflow:output.overflow},artifacts};
+ const body:Omit<HeadTestResult,'resultId'>={schema:'head-test-result-v1',jobId:input.job.jobId,invocationId:input.invocationId,intent:{reviewId:input.job.reviewId,snapshotId:input.job.snapshotId,actorId:input.job.actorId,repository:input.job.repository,baseSha:input.job.baseSha,headSha:input.job.headSha,targetDigest:input.job.target.digest,qualificationId:input.job.qualificationId??null},coverage:prepared?'prepared_execution':journal.invocation.processes!.length?'partial_preparation':'no_process_execution',stage:attempt.stage,evidence:{treeId:attempt.source?.manifest.treeId??null,sourceManifestId:attempt.source?.sourceManifestId??null,closureManifestId:attempt.closure?.closureManifestId??null,sourceAccountId:attempt.account?.sourceAccountId??null,runtimeSha256:attempt.runtimeSha256??null,environmentId:input.job.preparation?.environmentId??null,absentReason:'not_completed'},processes:journal.invocation.processes!.map(item=>({ordinal:item.ordinal,role:item.role,state:item.state,exitCode:item.exitCode??null,signal:item.signal??null,execution:item.execution??null,executionAbsence:item.execution?null:'not_observed'})),verification:{pre:attempt.verification?.pre??null,post:attempt.verification?.post??null,absenceReason:'not_reached'},state,reason,preparation:input.job.preparation??null,preparationAbsence:input.job.preparation?null:'not_completed',execution:run?{exitCode:run.exitCode,signal:run.signal,collectionObserved:collected,counts:collection}:null,executionAbsence:run?null:'not_started',output:{observedBytes:output.observedBytes,retainedBytes:output.retainedBytes,overflow:output.overflow},artifacts};
  const result:HeadTestResult={...body,resultId:headDigest(headTestCanonical(body))};
  if(headTestCanonical(journal)!==headTestCanonical(store.tests.journal(grant))||!observeHeadTestProcessQuiescence(journal))throw new Error('test_outcome_changed');
- const witness=Object.freeze({}) as HeadTestOutcomeWitness;outcomes.set(witness,{journal,result,locations,artifactBytes,deadline:attempt.started+120000,control:{authorized:control.authorized,cancelled:control.cancelled,stopReason:control.stopReason}});return witness;
+ const witness=Object.freeze({}) as HeadTestOutcomeWitness;outcomes.set(witness,{journal,result,locations,artifactBytes,cleanupLocation:attempt.cleanupLocation??null,deadline:attempt.started+120000,control:{authorized:control.authorized,cancelled:control.cancelled,stopReason:control.stopReason}});return witness;
  }finally{attempt.active=false;}
 };
 export const readHeadTestArtifact=async(location:HeadArtifactLocation,artifact:HeadTestArtifact):Promise<Buffer>=>{

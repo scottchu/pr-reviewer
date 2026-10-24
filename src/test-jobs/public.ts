@@ -13,3 +13,6 @@ export type {HeadTestOutcomeWitness,HeadArtifactLocation} from './outcome.ts';
 
 export {createTestRunner} from './coordinator.ts';
 export type {HeadTestRunnerOptions} from './coordinator.ts';
+
+export {cleanupHeadTestRoots,readHeadCleanup} from './cleanup.ts';
+export type {HeadCleanupLocation,HeadCleanupInput,HeadCleanupWitness} from './cleanup.ts';

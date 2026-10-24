@@ -126,3 +126,9 @@ The3191ebc design candidate had two required P2 corrections: early preparation s
 [Execution revision6](execution-06b.md#revision6-delivered05e-and-preserved-q4-review) records delivered7b6dc03, actual merge10bc29e, the single export-append conflict resolution, preserved Q4 review pins and the required05E journal/quiescence contract. [I6](execution-06b.md#i6-named-b1-implementation-assignment) supersedes I2 for B1 only: exact source-object repository, existing runtime/copied-closure recipe, new private task roots and transient loopback observations are named. Combined inherited06A/05E checks are the first implementation task, not claimed planning evidence.
 
 A missing PID, missing journal/version, requested-only row or legacy exited/no-PID row remains unknown; explicit definitive not_spawned and fresh owned-group absence have separate evidentiary meanings. Preserve test-specific unknown outcomes and all three Q4 completion witnesses. Actual af39 D6 accepted/D7 PASS stays pinned to af39; corrected05E own-PR/full G1 remains root-owned and pending. No test runner, UI or CLI has been delivered by this amendment.
+
+### B1 full-review correction checkpoint
+
+Status: four P2 corrections implemented in the sole backend worktree; narrow independent recheck pending
+
+Consume the [execution checkpoint](checkpoint-06b-execution.md) and corrected [consumer ports](consumer-ports-06b.md). `1e35644` remains the negative review pin. The successor changes byte transport, result evidence and persisted owned-root cleanup; B2/B3 remain gated until root consumes the independent recheck. Separately assigned SDK dependency changes require a later clean integration and fresh exact-head/closure qualification; existing receipts do not transfer qualification automatically.
