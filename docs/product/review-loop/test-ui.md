@@ -2,7 +2,7 @@
 
 Status: application consumer contract retained; standalone panel superseded by the unified-canvas direction; revised UX and acceptance pending
 Technology: React presentation over the managed application bridge
-Authority: [test execution](test-execution.md) owns command/job/result/artifact semantics
+Authority: [test execution](test-execution.md) owns command/job/result/artifact semantics; [test compatibility](test-compatibility.md#separate-private-test-intent-protocol) defines the exact separate sessionStorage key, envelope, scope, absent/null and recovery rules.
 
 ## User experience
 
@@ -44,7 +44,7 @@ Test-intent storage has its own origin/review/access-scope key and versioned rec
 ## Same-canvas reconciliation before future composition
 
 Date: 2026-10-24
-Accepted correction source: c9230830fddbe0624132eee8423beb2c546d71c1, docs/product/review-loop/canvas-reading.md (root-owned contract, not yet merged into this B2 tree).
+Accepted correction source: c9230830fddbe0624132eee8423beb2c546d71c1, docs/product/review-loop/canvas-reading.md (retained accepted direction; this historical checkpoint is not a current branch-merge status).
 Status: accepted direction; inspectable canvas preview and concrete layout adoption required before production composition.
 
 Target availability, durable test job/result identity, output and question context must be graph-connected presentations inside the same canvas. Zoom/focused lenses reveal inline diff/code while preserving neighborhood and exact return. A separate test panel or file inspector cannot become the primary reading/evidence destination. Reuse the retained B2 application bridge and recovery boundaries only after that preview is reviewed; these engineering ports do not imply adoption of the standalone HeadTests component or its main.tsx placement. No live test result may be invented to fill the mockup.

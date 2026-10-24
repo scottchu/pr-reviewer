@@ -1,0 +1,842 @@
+{
+  "format": "head-test-compatibility-vectors-v1",
+  "meaning": "Nonsecret complete format vectors only. Synthetic IDs, process and source hashes do not constitute a runnable target, real result, OS observation or qualification witness.",
+  "environment": {
+    "value": {
+      "schema": "head-test-environment-v1",
+      "headSha": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "sourceManifestId": "1111111111111111111111111111111111111111111111111111111111111111",
+      "closureManifestId": "2222222222222222222222222222222222222222222222222222222222222222",
+      "sourceAccountId": "3333333333333333333333333333333333333333333333333333333333333333",
+      "targetDigest": "c8b3c8001ff71830ccf50405d6a50fe671c9943a4f5a4934616ce82dc043a940",
+      "runtimeSha256": "35d20dd0263e5c950194434b925454fdfa9ba6e4467da960410fa05b08a7a5b5",
+      "runtimeVersion": "1.4.2",
+      "platform": "darwin-arm64",
+      "cwd": ".",
+      "environmentPolicy": "head-test-env-v1"
+    },
+    "canonicalUtf8": "{\"closureManifestId\":\"2222222222222222222222222222222222222222222222222222222222222222\",\"cwd\":\".\",\"environmentPolicy\":\"head-test-env-v1\",\"headSha\":\"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa\",\"platform\":\"darwin-arm64\",\"runtimeSha256\":\"35d20dd0263e5c950194434b925454fdfa9ba6e4467da960410fa05b08a7a5b5\",\"runtimeVersion\":\"1.4.2\",\"schema\":\"head-test-environment-v1\",\"sourceAccountId\":\"3333333333333333333333333333333333333333333333333333333333333333\",\"sourceManifestId\":\"1111111111111111111111111111111111111111111111111111111111111111\",\"targetDigest\":\"c8b3c8001ff71830ccf50405d6a50fe671c9943a4f5a4934616ce82dc043a940\"}",
+    "sha256": "03ad033bc28a5e2a6929ae0fee948c3ab1c1e17ccd8369dca69df39e5144ce5d"
+  },
+  "qualification": {
+    "value": {
+      "schema": "head-test-qualification-v1",
+      "repository": "scottchu/pr-reviewer",
+      "headSha": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "treeId": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+      "sourceManifestId": "1111111111111111111111111111111111111111111111111111111111111111",
+      "closureManifestId": "2222222222222222222222222222222222222222222222222222222222222222",
+      "sourceAccountId": "3333333333333333333333333333333333333333333333333333333333333333",
+      "runtimeSha256": "35d20dd0263e5c950194434b925454fdfa9ba6e4467da960410fa05b08a7a5b5",
+      "runtimeVersion": "1.4.2",
+      "platform": "darwin-arm64",
+      "targetDigest": "c8b3c8001ff71830ccf50405d6a50fe671c9943a4f5a4934616ce82dc043a940",
+      "environmentPolicy": "head-test-env-v1",
+      "metadata": {
+        "sourcePackageSha256": "8888888888888888888888888888888888888888888888888888888888888888",
+        "donorPackageSha256": "8888888888888888888888888888888888888888888888888888888888888888",
+        "nonScriptPackageDigest": "9999999999999999999999999999999999999999999999999999999999999999",
+        "lockSha256": "0000000000000000000000000000000000000000000000000000000000000000",
+        "changedScriptKeys": []
+      },
+      "provenance": "measured-existing-local-installation-not-vendor-attested"
+    },
+    "sha256": "d18fc683612fb08df72615471de97b66c0fb12d42083f6f0443472f7ba71cdfb"
+  },
+  "storedJobs": {
+    "queued": {
+      "schema": "head-test-job-v1",
+      "jobId": "11111111-1111-4111-8111-111111111111",
+      "reviewId": "example-review",
+      "snapshotId": "example-snapshot",
+      "repository": "scottchu/pr-reviewer",
+      "sourceProject": "scottchu/pr-reviewer",
+      "baseSha": "cccccccccccccccccccccccccccccccccccccccc",
+      "headSha": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "actorId": "local-user",
+      "target": {
+        "targetId": "review-source-core-v1",
+        "revision": 2,
+        "digest": "c8b3c8001ff71830ccf50405d6a50fe671c9943a4f5a4934616ce82dc043a940",
+        "definition": {
+          "schema": "head-test-target-v1",
+          "targetId": "review-source-core-v1",
+          "revision": 2,
+          "repository": {
+            "host": "github.com",
+            "targetProject": "scottchu/pr-reviewer",
+            "sourceProject": "scottchu/pr-reviewer"
+          },
+          "argvTemplate": [
+            "test",
+            "--no-install",
+            "--no-env-file",
+            "--config=<owned-empty-bunfig>",
+            "tests/domain.test.ts",
+            "tests/registry.test.ts",
+            "tests/graph.test.ts",
+            "tests/source-analysis.test.ts"
+          ],
+          "cwd": ".",
+          "runtime": {
+            "role": "qualified-existing-bun",
+            "version": "1.4.2",
+            "sha256": "35d20dd0263e5c950194434b925454fdfa9ba6e4467da960410fa05b08a7a5b5"
+          },
+          "config": {
+            "role": "owned-empty-bunfig",
+            "bytes": 0,
+            "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          },
+          "closure": {
+            "recipe": "existing-copy-v1",
+            "packages": {
+              "zod": "4.6.7",
+              "typescript-analysis": "typescript@6.0.3"
+            },
+            "metadata": "exact-lock-and-entire-package-minus-scripts"
+          },
+          "environmentPolicy": "head-test-env-v1",
+          "limits": {
+            "prepareMs": 30000,
+            "totalMs": 120000,
+            "sourceFiles": 8192,
+            "sourceFileBytes": 8388608,
+            "sourceBytes": 67108864,
+            "closureFiles": 32768,
+            "closureFileBytes": 33554432,
+            "closureBytes": 67108864,
+            "outputBytes": 1048576,
+            "encodedResultBytes": 2097152,
+            "gitLaunches": 32,
+            "runtimeVersionLaunches": 1,
+            "testLaunches": 1
+          }
+        }
+      },
+      "provenance": "test_only_execution",
+      "createdAt": "2026-10-24T12:00:00.000Z",
+      "updatedAt": "2026-10-24T12:00:00.000Z",
+      "jobRevision": 1,
+      "state": "queued",
+      "reason": null,
+      "effectDisposition": "none",
+      "cancellation": null,
+      "invocations": [],
+      "credentialReference": "local-owner:v1",
+      "reservedBytes": 2097152,
+      "retainedBytes": 0
+    },
+    "unfinished": {
+      "schema": "head-test-job-v1",
+      "jobId": "11111111-1111-4111-8111-111111111111",
+      "reviewId": "example-review",
+      "snapshotId": "example-snapshot",
+      "repository": "scottchu/pr-reviewer",
+      "sourceProject": "scottchu/pr-reviewer",
+      "baseSha": "cccccccccccccccccccccccccccccccccccccccc",
+      "headSha": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "actorId": "local-user",
+      "target": {
+        "targetId": "review-source-core-v1",
+        "revision": 2,
+        "digest": "c8b3c8001ff71830ccf50405d6a50fe671c9943a4f5a4934616ce82dc043a940",
+        "definition": {
+          "schema": "head-test-target-v1",
+          "targetId": "review-source-core-v1",
+          "revision": 2,
+          "repository": {
+            "host": "github.com",
+            "targetProject": "scottchu/pr-reviewer",
+            "sourceProject": "scottchu/pr-reviewer"
+          },
+          "argvTemplate": [
+            "test",
+            "--no-install",
+            "--no-env-file",
+            "--config=<owned-empty-bunfig>",
+            "tests/domain.test.ts",
+            "tests/registry.test.ts",
+            "tests/graph.test.ts",
+            "tests/source-analysis.test.ts"
+          ],
+          "cwd": ".",
+          "runtime": {
+            "role": "qualified-existing-bun",
+            "version": "1.4.2",
+            "sha256": "35d20dd0263e5c950194434b925454fdfa9ba6e4467da960410fa05b08a7a5b5"
+          },
+          "config": {
+            "role": "owned-empty-bunfig",
+            "bytes": 0,
+            "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          },
+          "closure": {
+            "recipe": "existing-copy-v1",
+            "packages": {
+              "zod": "4.6.7",
+              "typescript-analysis": "typescript@6.0.3"
+            },
+            "metadata": "exact-lock-and-entire-package-minus-scripts"
+          },
+          "environmentPolicy": "head-test-env-v1",
+          "limits": {
+            "prepareMs": 30000,
+            "totalMs": 120000,
+            "sourceFiles": 8192,
+            "sourceFileBytes": 8388608,
+            "sourceBytes": 67108864,
+            "closureFiles": 32768,
+            "closureFileBytes": 33554432,
+            "closureBytes": 67108864,
+            "outputBytes": 1048576,
+            "encodedResultBytes": 2097152,
+            "gitLaunches": 32,
+            "runtimeVersionLaunches": 1,
+            "testLaunches": 1
+          }
+        }
+      },
+      "provenance": "test_only_execution",
+      "createdAt": "2026-10-24T12:00:00.000Z",
+      "updatedAt": "2026-10-24T12:00:00.000Z",
+      "jobRevision": 3,
+      "state": "preparing",
+      "reason": null,
+      "effectDisposition": "unresolved",
+      "cancellation": null,
+      "invocations": [
+        {
+          "invocationId": "22222222-2222-4222-8222-222222222222",
+          "phase": "prepare",
+          "state": "running",
+          "quiescence": "unresolved",
+          "processJournalVersion": 1,
+          "processes": [
+            {
+              "ordinal": 1,
+              "role": "git_prepare",
+              "state": "requested",
+              "intentDigest": "4444444444444444444444444444444444444444444444444444444444444444",
+              "inputCount": 0,
+              "inputBytes": 0,
+              "observationDigest": "06d83606767b7aac33fb5c5294887e45555f4f65791a24d1c3b914bf3f2e3da4"
+            }
+          ],
+          "filesystemRoots": []
+        }
+      ],
+      "credentialReference": "local-owner:v1",
+      "reservedBytes": 2097152,
+      "retainedBytes": 0
+    },
+    "quiescentUnknown": {
+      "schema": "head-test-job-v1",
+      "jobId": "11111111-1111-4111-8111-111111111111",
+      "reviewId": "example-review",
+      "snapshotId": "example-snapshot",
+      "repository": "scottchu/pr-reviewer",
+      "sourceProject": "scottchu/pr-reviewer",
+      "baseSha": "cccccccccccccccccccccccccccccccccccccccc",
+      "headSha": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "actorId": "local-user",
+      "target": {
+        "targetId": "review-source-core-v1",
+        "revision": 2,
+        "digest": "c8b3c8001ff71830ccf50405d6a50fe671c9943a4f5a4934616ce82dc043a940",
+        "definition": {
+          "schema": "head-test-target-v1",
+          "targetId": "review-source-core-v1",
+          "revision": 2,
+          "repository": {
+            "host": "github.com",
+            "targetProject": "scottchu/pr-reviewer",
+            "sourceProject": "scottchu/pr-reviewer"
+          },
+          "argvTemplate": [
+            "test",
+            "--no-install",
+            "--no-env-file",
+            "--config=<owned-empty-bunfig>",
+            "tests/domain.test.ts",
+            "tests/registry.test.ts",
+            "tests/graph.test.ts",
+            "tests/source-analysis.test.ts"
+          ],
+          "cwd": ".",
+          "runtime": {
+            "role": "qualified-existing-bun",
+            "version": "1.4.2",
+            "sha256": "35d20dd0263e5c950194434b925454fdfa9ba6e4467da960410fa05b08a7a5b5"
+          },
+          "config": {
+            "role": "owned-empty-bunfig",
+            "bytes": 0,
+            "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          },
+          "closure": {
+            "recipe": "existing-copy-v1",
+            "packages": {
+              "zod": "4.6.7",
+              "typescript-analysis": "typescript@6.0.3"
+            },
+            "metadata": "exact-lock-and-entire-package-minus-scripts"
+          },
+          "environmentPolicy": "head-test-env-v1",
+          "limits": {
+            "prepareMs": 30000,
+            "totalMs": 120000,
+            "sourceFiles": 8192,
+            "sourceFileBytes": 8388608,
+            "sourceBytes": 67108864,
+            "closureFiles": 32768,
+            "closureFileBytes": 33554432,
+            "closureBytes": 67108864,
+            "outputBytes": 1048576,
+            "encodedResultBytes": 2097152,
+            "gitLaunches": 32,
+            "runtimeVersionLaunches": 1,
+            "testLaunches": 1
+          }
+        }
+      },
+      "provenance": "test_only_execution",
+      "createdAt": "2026-10-24T12:00:00.000Z",
+      "updatedAt": "2026-10-24T12:00:00.000Z",
+      "jobRevision": 6,
+      "state": "unknown",
+      "reason": "interrupted_test_invocation",
+      "effectDisposition": "quiescent",
+      "cancellation": null,
+      "invocations": [
+        {
+          "invocationId": "22222222-2222-4222-8222-222222222222",
+          "phase": "prepare",
+          "state": "unknown",
+          "quiescence": "confirmed",
+          "processJournalVersion": 1,
+          "processes": [
+            {
+              "ordinal": 1,
+              "role": "git_prepare",
+              "state": "exited",
+              "intentDigest": "4444444444444444444444444444444444444444444444444444444444444444",
+              "inputCount": 0,
+              "inputBytes": 0,
+              "spawnDisposition": "not_spawned",
+              "exitCode": null,
+              "signal": null,
+              "observationDigest": "17fa17111011a952b5899cf16421df43d08305d43b6e4d73c619e633d26fc42c"
+            }
+          ],
+          "filesystemRoots": []
+        }
+      ],
+      "credentialReference": "local-owner:v1",
+      "reservedBytes": 2097152,
+      "retainedBytes": 0
+    },
+    "admittedPendingCleanup": {
+      "schema": "head-test-job-v1",
+      "jobId": "11111111-1111-4111-8111-111111111111",
+      "reviewId": "example-review",
+      "snapshotId": "example-snapshot",
+      "repository": "scottchu/pr-reviewer",
+      "sourceProject": "scottchu/pr-reviewer",
+      "baseSha": "cccccccccccccccccccccccccccccccccccccccc",
+      "headSha": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "actorId": "local-user",
+      "target": {
+        "targetId": "review-source-core-v1",
+        "revision": 2,
+        "digest": "c8b3c8001ff71830ccf50405d6a50fe671c9943a4f5a4934616ce82dc043a940",
+        "definition": {
+          "schema": "head-test-target-v1",
+          "targetId": "review-source-core-v1",
+          "revision": 2,
+          "repository": {
+            "host": "github.com",
+            "targetProject": "scottchu/pr-reviewer",
+            "sourceProject": "scottchu/pr-reviewer"
+          },
+          "argvTemplate": [
+            "test",
+            "--no-install",
+            "--no-env-file",
+            "--config=<owned-empty-bunfig>",
+            "tests/domain.test.ts",
+            "tests/registry.test.ts",
+            "tests/graph.test.ts",
+            "tests/source-analysis.test.ts"
+          ],
+          "cwd": ".",
+          "runtime": {
+            "role": "qualified-existing-bun",
+            "version": "1.4.2",
+            "sha256": "35d20dd0263e5c950194434b925454fdfa9ba6e4467da960410fa05b08a7a5b5"
+          },
+          "config": {
+            "role": "owned-empty-bunfig",
+            "bytes": 0,
+            "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          },
+          "closure": {
+            "recipe": "existing-copy-v1",
+            "packages": {
+              "zod": "4.6.7",
+              "typescript-analysis": "typescript@6.0.3"
+            },
+            "metadata": "exact-lock-and-entire-package-minus-scripts"
+          },
+          "environmentPolicy": "head-test-env-v1",
+          "limits": {
+            "prepareMs": 30000,
+            "totalMs": 120000,
+            "sourceFiles": 8192,
+            "sourceFileBytes": 8388608,
+            "sourceBytes": 67108864,
+            "closureFiles": 32768,
+            "closureFileBytes": 33554432,
+            "closureBytes": 67108864,
+            "outputBytes": 1048576,
+            "encodedResultBytes": 2097152,
+            "gitLaunches": 32,
+            "runtimeVersionLaunches": 1,
+            "testLaunches": 1
+          }
+        }
+      },
+      "provenance": "test_only_execution",
+      "createdAt": "2026-10-24T12:00:00.000Z",
+      "updatedAt": "2026-10-24T12:00:00.000Z",
+      "jobRevision": 9,
+      "state": "passed",
+      "reason": "tests_passed",
+      "effectDisposition": "quiescent",
+      "cancellation": null,
+      "invocations": [
+        {
+          "invocationId": "22222222-2222-4222-8222-222222222222",
+          "phase": "execute",
+          "state": "completed",
+          "quiescence": "confirmed",
+          "processJournalVersion": 1,
+          "processes": [
+            {
+              "ordinal": 1,
+              "role": "test_root",
+              "state": "exited",
+              "intentDigest": "7777777777777777777777777777777777777777777777777777777777777777",
+              "inputCount": 0,
+              "inputBytes": 0,
+              "pid": 12345,
+              "startIdentity": "example-only-process-identity",
+              "exitCode": 0,
+              "signal": null,
+              "execution": {
+                "executable": "<qualified-bun>",
+                "argv": [
+                  "test",
+                  "--no-install",
+                  "--no-env-file",
+                  "--config=<owned-root>/empty-bunfig.toml",
+                  "tests/domain.test.ts",
+                  "tests/registry.test.ts",
+                  "tests/graph.test.ts",
+                  "tests/source-analysis.test.ts"
+                ],
+                "cwd": "<owned-root>/source",
+                "attemptedAt": "2026-10-24T12:00:00.000Z",
+                "startedAt": "2026-10-24T12:00:00.000Z",
+                "exitedAt": "2026-10-24T12:00:00.000Z"
+              },
+              "observationDigest": "628ce7672d8d5ebee9851be6cf0a438346766573727e773af09164b18e8cd1e0"
+            }
+          ],
+          "filesystemRoots": [
+            "33333333-3333-4333-8333-333333333333"
+          ]
+        }
+      ],
+      "credentialReference": "local-owner:v1",
+      "reservedBytes": 0,
+      "retainedBytes": 7999,
+      "preparation": {
+        "sourceManifestId": "1111111111111111111111111111111111111111111111111111111111111111",
+        "closureManifestId": "2222222222222222222222222222222222222222222222222222222222222222",
+        "sourceAccountId": "3333333333333333333333333333333333333333333333333333333333333333",
+        "runtimeSha256": "35d20dd0263e5c950194434b925454fdfa9ba6e4467da960410fa05b08a7a5b5",
+        "treeId": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+        "environmentId": "03ad033bc28a5e2a6929ae0fee948c3ab1c1e17ccd8369dca69df39e5144ce5d"
+      },
+      "result": {
+        "schema": "head-test-result-v1",
+        "jobId": "11111111-1111-4111-8111-111111111111",
+        "invocationId": "22222222-2222-4222-8222-222222222222",
+        "intent": {
+          "reviewId": "example-review",
+          "snapshotId": "example-snapshot",
+          "actorId": "local-user",
+          "repository": "scottchu/pr-reviewer",
+          "baseSha": "cccccccccccccccccccccccccccccccccccccccc",
+          "headSha": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+          "targetDigest": "c8b3c8001ff71830ccf50405d6a50fe671c9943a4f5a4934616ce82dc043a940",
+          "qualificationId": null
+        },
+        "coverage": "prepared_execution",
+        "stage": "execution",
+        "evidence": {
+          "sourceManifestId": "1111111111111111111111111111111111111111111111111111111111111111",
+          "closureManifestId": "2222222222222222222222222222222222222222222222222222222222222222",
+          "sourceAccountId": "3333333333333333333333333333333333333333333333333333333333333333",
+          "runtimeSha256": "35d20dd0263e5c950194434b925454fdfa9ba6e4467da960410fa05b08a7a5b5",
+          "treeId": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+          "environmentId": "03ad033bc28a5e2a6929ae0fee948c3ab1c1e17ccd8369dca69df39e5144ce5d",
+          "absentReason": "not_completed"
+        },
+        "processes": [
+          {
+            "ordinal": 1,
+            "role": "test_root",
+            "state": "exited",
+            "exitCode": 0,
+            "signal": null,
+            "execution": {
+              "executable": "<qualified-bun>",
+              "argv": [
+                "test",
+                "--no-install",
+                "--no-env-file",
+                "--config=<owned-root>/empty-bunfig.toml",
+                "tests/domain.test.ts",
+                "tests/registry.test.ts",
+                "tests/graph.test.ts",
+                "tests/source-analysis.test.ts"
+              ],
+              "cwd": "<owned-root>/source",
+              "attemptedAt": "2026-10-24T12:00:00.000Z",
+              "startedAt": "2026-10-24T12:00:00.000Z",
+              "exitedAt": "2026-10-24T12:00:00.000Z"
+            },
+            "executionAbsence": null
+          }
+        ],
+        "verification": {
+          "pre": {
+            "observedAt": "2026-10-24T12:00:00.000Z",
+            "inputs": "verified",
+            "overlays": "verified",
+            "sourceDigest": "5555555555555555555555555555555555555555555555555555555555555555",
+            "expectedSourceDigest": "5555555555555555555555555555555555555555555555555555555555555555",
+            "changedEntries": 0,
+            "overlayDigest": "6666666666666666666666666666666666666666666666666666666666666666",
+            "files": 0,
+            "bytes": 0,
+            "reason": null
+          },
+          "post": {
+            "observedAt": "2026-10-24T12:00:00.000Z",
+            "inputs": "verified",
+            "overlays": "verified",
+            "sourceDigest": "5555555555555555555555555555555555555555555555555555555555555555",
+            "expectedSourceDigest": "5555555555555555555555555555555555555555555555555555555555555555",
+            "changedEntries": 0,
+            "overlayDigest": "6666666666666666666666666666666666666666666666666666666666666666",
+            "files": 0,
+            "bytes": 0,
+            "reason": null
+          },
+          "absenceReason": "not_reached"
+        },
+        "state": "passed",
+        "reason": "tests_passed",
+        "preparation": {
+          "sourceManifestId": "1111111111111111111111111111111111111111111111111111111111111111",
+          "closureManifestId": "2222222222222222222222222222222222222222222222222222222222222222",
+          "sourceAccountId": "3333333333333333333333333333333333333333333333333333333333333333",
+          "runtimeSha256": "35d20dd0263e5c950194434b925454fdfa9ba6e4467da960410fa05b08a7a5b5",
+          "treeId": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+          "environmentId": "03ad033bc28a5e2a6929ae0fee948c3ab1c1e17ccd8369dca69df39e5144ce5d"
+        },
+        "preparationAbsence": null,
+        "execution": {
+          "exitCode": 0,
+          "signal": null,
+          "collectionObserved": true,
+          "counts": {
+            "passed": 1,
+            "failed": 0,
+            "total": 1
+          }
+        },
+        "executionAbsence": null,
+        "output": {
+          "observedBytes": 3,
+          "retainedBytes": 3,
+          "overflow": false
+        },
+        "artifacts": [
+          {
+            "artifactId": "44444444-4444-4444-8444-444444444444",
+            "kind": "process_output",
+            "label": "test_root.stdout",
+            "bytes": 3,
+            "sha256": "dc51b8c96c2d745df3bd5590d990230a482fd247123599548e0632fdbf97fc22"
+          }
+        ],
+        "resultId": "8ad8f22d1c87050b2e5b3f691a242fde78b6843d5bc63e1fbc447dc68a3bc895"
+      },
+      "artifactLocations": [
+        {
+          "artifactId": "44444444-4444-4444-8444-444444444444",
+          "path": "/example/artifacts/publication/44444444-4444-4444-8444-444444444444"
+        }
+      ],
+      "cleanupLocation": {
+        "rootId": "33333333-3333-4333-8333-333333333333",
+        "path": "/example/owned/33333333-3333-4333-8333-333333333333",
+        "parent": "/example/owned",
+        "device": 1,
+        "inode": 2,
+        "parentDevice": 1,
+        "parentInode": 3
+      },
+      "cleanupAfter": 0,
+      "cleanup": {
+        "state": "pending",
+        "attempts": 0,
+        "reason": null
+      }
+    }
+  },
+  "commandReceiptRow": {
+    "id": "example-request",
+    "actor": "local-user",
+    "fingerprint": "348e22fd1ac01130f28b55960615241b8c365577af30fab17113c857a76f5765",
+    "body": {
+      "commandId": "example-request",
+      "actorId": "local-user",
+      "reviewId": "example-review",
+      "snapshotId": "example-snapshot",
+      "jobId": "11111111-1111-4111-8111-111111111111",
+      "jobRevision": 1,
+      "state": "applied",
+      "result": {
+        "disposition": "queued"
+      }
+    }
+  },
+  "admissionReceiptRow": {
+    "id": "test-result:11111111-1111-4111-8111-111111111111",
+    "actor": "local-user",
+    "fingerprint": "8ad8f22d1c87050b2e5b3f691a242fde78b6843d5bc63e1fbc447dc68a3bc895",
+    "body": {
+      "commandId": "test-result:11111111-1111-4111-8111-111111111111",
+      "jobId": "11111111-1111-4111-8111-111111111111",
+      "jobRevision": 9,
+      "resultId": "8ad8f22d1c87050b2e5b3f691a242fde78b6843d5bc63e1fbc447dc68a3bc895",
+      "state": "applied"
+    }
+  },
+  "result": {
+    "value": {
+      "schema": "head-test-result-v1",
+      "jobId": "11111111-1111-4111-8111-111111111111",
+      "invocationId": "22222222-2222-4222-8222-222222222222",
+      "intent": {
+        "reviewId": "example-review",
+        "snapshotId": "example-snapshot",
+        "actorId": "local-user",
+        "repository": "scottchu/pr-reviewer",
+        "baseSha": "cccccccccccccccccccccccccccccccccccccccc",
+        "headSha": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "targetDigest": "c8b3c8001ff71830ccf50405d6a50fe671c9943a4f5a4934616ce82dc043a940",
+        "qualificationId": null
+      },
+      "coverage": "prepared_execution",
+      "stage": "execution",
+      "evidence": {
+        "sourceManifestId": "1111111111111111111111111111111111111111111111111111111111111111",
+        "closureManifestId": "2222222222222222222222222222222222222222222222222222222222222222",
+        "sourceAccountId": "3333333333333333333333333333333333333333333333333333333333333333",
+        "runtimeSha256": "35d20dd0263e5c950194434b925454fdfa9ba6e4467da960410fa05b08a7a5b5",
+        "treeId": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+        "environmentId": "03ad033bc28a5e2a6929ae0fee948c3ab1c1e17ccd8369dca69df39e5144ce5d",
+        "absentReason": "not_completed"
+      },
+      "processes": [
+        {
+          "ordinal": 1,
+          "role": "test_root",
+          "state": "exited",
+          "exitCode": 0,
+          "signal": null,
+          "execution": {
+            "executable": "<qualified-bun>",
+            "argv": [
+              "test",
+              "--no-install",
+              "--no-env-file",
+              "--config=<owned-root>/empty-bunfig.toml",
+              "tests/domain.test.ts",
+              "tests/registry.test.ts",
+              "tests/graph.test.ts",
+              "tests/source-analysis.test.ts"
+            ],
+            "cwd": "<owned-root>/source",
+            "attemptedAt": "2026-10-24T12:00:00.000Z",
+            "startedAt": "2026-10-24T12:00:00.000Z",
+            "exitedAt": "2026-10-24T12:00:00.000Z"
+          },
+          "executionAbsence": null
+        }
+      ],
+      "verification": {
+        "pre": {
+          "observedAt": "2026-10-24T12:00:00.000Z",
+          "inputs": "verified",
+          "overlays": "verified",
+          "sourceDigest": "5555555555555555555555555555555555555555555555555555555555555555",
+          "expectedSourceDigest": "5555555555555555555555555555555555555555555555555555555555555555",
+          "changedEntries": 0,
+          "overlayDigest": "6666666666666666666666666666666666666666666666666666666666666666",
+          "files": 0,
+          "bytes": 0,
+          "reason": null
+        },
+        "post": {
+          "observedAt": "2026-10-24T12:00:00.000Z",
+          "inputs": "verified",
+          "overlays": "verified",
+          "sourceDigest": "5555555555555555555555555555555555555555555555555555555555555555",
+          "expectedSourceDigest": "5555555555555555555555555555555555555555555555555555555555555555",
+          "changedEntries": 0,
+          "overlayDigest": "6666666666666666666666666666666666666666666666666666666666666666",
+          "files": 0,
+          "bytes": 0,
+          "reason": null
+        },
+        "absenceReason": "not_reached"
+      },
+      "state": "passed",
+      "reason": "tests_passed",
+      "preparation": {
+        "sourceManifestId": "1111111111111111111111111111111111111111111111111111111111111111",
+        "closureManifestId": "2222222222222222222222222222222222222222222222222222222222222222",
+        "sourceAccountId": "3333333333333333333333333333333333333333333333333333333333333333",
+        "runtimeSha256": "35d20dd0263e5c950194434b925454fdfa9ba6e4467da960410fa05b08a7a5b5",
+        "treeId": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+        "environmentId": "03ad033bc28a5e2a6929ae0fee948c3ab1c1e17ccd8369dca69df39e5144ce5d"
+      },
+      "preparationAbsence": null,
+      "execution": {
+        "exitCode": 0,
+        "signal": null,
+        "collectionObserved": true,
+        "counts": {
+          "passed": 1,
+          "failed": 0,
+          "total": 1
+        }
+      },
+      "executionAbsence": null,
+      "output": {
+        "observedBytes": 3,
+        "retainedBytes": 3,
+        "overflow": false
+      },
+      "artifacts": [
+        {
+          "artifactId": "44444444-4444-4444-8444-444444444444",
+          "kind": "process_output",
+          "label": "test_root.stdout",
+          "bytes": 3,
+          "sha256": "dc51b8c96c2d745df3bd5590d990230a482fd247123599548e0632fdbf97fc22"
+        }
+      ],
+      "resultId": "8ad8f22d1c87050b2e5b3f691a242fde78b6843d5bc63e1fbc447dc68a3bc895"
+    },
+    "canonicalPreimageUtf8": "{\"artifacts\":[{\"artifactId\":\"44444444-4444-4444-8444-444444444444\",\"bytes\":3,\"kind\":\"process_output\",\"label\":\"test_root.stdout\",\"sha256\":\"dc51b8c96c2d745df3bd5590d990230a482fd247123599548e0632fdbf97fc22\"}],\"coverage\":\"prepared_execution\",\"evidence\":{\"absentReason\":\"not_completed\",\"closureManifestId\":\"2222222222222222222222222222222222222222222222222222222222222222\",\"environmentId\":\"03ad033bc28a5e2a6929ae0fee948c3ab1c1e17ccd8369dca69df39e5144ce5d\",\"runtimeSha256\":\"35d20dd0263e5c950194434b925454fdfa9ba6e4467da960410fa05b08a7a5b5\",\"sourceAccountId\":\"3333333333333333333333333333333333333333333333333333333333333333\",\"sourceManifestId\":\"1111111111111111111111111111111111111111111111111111111111111111\",\"treeId\":\"bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb\"},\"execution\":{\"collectionObserved\":true,\"counts\":{\"failed\":0,\"passed\":1,\"total\":1},\"exitCode\":0,\"signal\":null},\"executionAbsence\":null,\"intent\":{\"actorId\":\"local-user\",\"baseSha\":\"cccccccccccccccccccccccccccccccccccccccc\",\"headSha\":\"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa\",\"qualificationId\":null,\"repository\":\"scottchu/pr-reviewer\",\"reviewId\":\"example-review\",\"snapshotId\":\"example-snapshot\",\"targetDigest\":\"c8b3c8001ff71830ccf50405d6a50fe671c9943a4f5a4934616ce82dc043a940\"},\"invocationId\":\"22222222-2222-4222-8222-222222222222\",\"jobId\":\"11111111-1111-4111-8111-111111111111\",\"output\":{\"observedBytes\":3,\"overflow\":false,\"retainedBytes\":3},\"preparation\":{\"closureManifestId\":\"2222222222222222222222222222222222222222222222222222222222222222\",\"environmentId\":\"03ad033bc28a5e2a6929ae0fee948c3ab1c1e17ccd8369dca69df39e5144ce5d\",\"runtimeSha256\":\"35d20dd0263e5c950194434b925454fdfa9ba6e4467da960410fa05b08a7a5b5\",\"sourceAccountId\":\"3333333333333333333333333333333333333333333333333333333333333333\",\"sourceManifestId\":\"1111111111111111111111111111111111111111111111111111111111111111\",\"treeId\":\"bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb\"},\"preparationAbsence\":null,\"processes\":[{\"execution\":{\"argv\":[\"test\",\"--no-install\",\"--no-env-file\",\"--config=<owned-root>/empty-bunfig.toml\",\"tests/domain.test.ts\",\"tests/registry.test.ts\",\"tests/graph.test.ts\",\"tests/source-analysis.test.ts\"],\"attemptedAt\":\"2026-10-24T12:00:00.000Z\",\"cwd\":\"<owned-root>/source\",\"executable\":\"<qualified-bun>\",\"exitedAt\":\"2026-10-24T12:00:00.000Z\",\"startedAt\":\"2026-10-24T12:00:00.000Z\"},\"executionAbsence\":null,\"exitCode\":0,\"ordinal\":1,\"role\":\"test_root\",\"signal\":null,\"state\":\"exited\"}],\"reason\":\"tests_passed\",\"schema\":\"head-test-result-v1\",\"stage\":\"execution\",\"state\":\"passed\",\"verification\":{\"absenceReason\":\"not_reached\",\"post\":{\"bytes\":0,\"changedEntries\":0,\"expectedSourceDigest\":\"5555555555555555555555555555555555555555555555555555555555555555\",\"files\":0,\"inputs\":\"verified\",\"observedAt\":\"2026-10-24T12:00:00.000Z\",\"overlayDigest\":\"6666666666666666666666666666666666666666666666666666666666666666\",\"overlays\":\"verified\",\"reason\":null,\"sourceDigest\":\"5555555555555555555555555555555555555555555555555555555555555555\"},\"pre\":{\"bytes\":0,\"changedEntries\":0,\"expectedSourceDigest\":\"5555555555555555555555555555555555555555555555555555555555555555\",\"files\":0,\"inputs\":\"verified\",\"observedAt\":\"2026-10-24T12:00:00.000Z\",\"overlayDigest\":\"6666666666666666666666666666666666666666666666666666666666666666\",\"overlays\":\"verified\",\"reason\":null,\"sourceDigest\":\"5555555555555555555555555555555555555555555555555555555555555555\"}}}",
+    "sha256": "8ad8f22d1c87050b2e5b3f691a242fde78b6843d5bc63e1fbc447dc68a3bc895"
+  },
+  "artifact": {
+    "descriptor": {
+      "artifactId": "44444444-4444-4444-8444-444444444444",
+      "kind": "process_output",
+      "label": "test_root.stdout",
+      "bytes": 3,
+      "sha256": "dc51b8c96c2d745df3bd5590d990230a482fd247123599548e0632fdbf97fc22"
+    },
+    "rawUtf8": "ok\n",
+    "page": {
+      "jobId": "11111111-1111-4111-8111-111111111111",
+      "artifactId": "44444444-4444-4444-8444-444444444444",
+      "sha256": "dc51b8c96c2d745df3bd5590d990230a482fd247123599548e0632fdbf97fc22",
+      "totalBytes": 3,
+      "offset": 0,
+      "bytes": 3,
+      "complete": true,
+      "nextOffset": 3,
+      "encoding": "base64",
+      "data": "b2sK"
+    }
+  },
+  "privateIntent": {
+    "key": "pr-reviewer:test-intent:v1:http%3A%2F%2F127.0.0.1%3A4173:example-review:local-owner%3Av1",
+    "uncertain": {
+      "version": 1,
+      "origin": "http://127.0.0.1:4173",
+      "reviewId": "example-review",
+      "ownerScope": "local-owner:v1",
+      "scope": {
+        "reviewId": "example-review",
+        "snapshotId": "example-snapshot"
+      },
+      "command": {
+        "type": "RequestTest",
+        "commandId": "example-request",
+        "reviewId": "example-review",
+        "snapshotId": "example-snapshot",
+        "targetId": "review-source-core-v1",
+        "expectedTargetRevision": 2
+      },
+      "receipt": null
+    },
+    "acceptedAwaitingReadback": {
+      "version": 1,
+      "origin": "http://127.0.0.1:4173",
+      "reviewId": "example-review",
+      "ownerScope": "local-owner:v1",
+      "scope": {
+        "reviewId": "example-review",
+        "snapshotId": "example-snapshot"
+      },
+      "command": {
+        "type": "RequestTest",
+        "commandId": "example-request",
+        "reviewId": "example-review",
+        "snapshotId": "example-snapshot",
+        "targetId": "review-source-core-v1",
+        "expectedTargetRevision": 2
+      },
+      "receipt": {
+        "commandId": "example-request",
+        "actorId": "local-user",
+        "reviewId": "example-review",
+        "snapshotId": "example-snapshot",
+        "jobId": "11111111-1111-4111-8111-111111111111",
+        "jobRevision": 1,
+        "state": "applied",
+        "result": {
+          "disposition": "queued"
+        }
+      }
+    }
+  },
+  "legacyScope": {
+    "origin": "https://review.example",
+    "syntheticCredential": "example-not-a-secret",
+    "preimageUtf8": "pr-reviewer-credential-scope-v1\u000022:https://review.example20:example-not-a-secret",
+    "sha256": "1f6d7931e2f82771d761bcacb3a08105c8f58b0b3af5740a7449efb6a89db7ea"
+  }
+}
