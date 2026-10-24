@@ -10,7 +10,8 @@ const point=z.object({x:finite,y:finite}).strict(),viewport=point.extend({zoom:f
 export const draftSchema=z.object({id,anchor:anchorSchema.nullable(),comparisonKey:z.string().max(4096).optional(),parentQuestionId:id.optional(),text:z.string(),submitted:z.boolean()}).strict();
 export type QuestionDraft=z.infer<typeof draftSchema>;
 const cursor=z.object({versionId:id,chapterId:id,stepId:id,index:z.number().int().min(0).max(31)}).strict();
-const structural=z.object({fileKey:z.string().max(4096),context:z.boolean(),spans:z.boolean(),spanId:z.string().max(4096),viewport}).strict();
+const inspection=z.object({anchor:anchorSchema,contentHash:digest,expanded:z.boolean().optional()}).strict();
+const structural=z.object({fileKey:z.string().max(4096),context:z.boolean(),spans:z.boolean(),spanId:z.string().max(4096),viewport,inspection:inspection.optional()}).strict();
 const semantic=z.object({analysisId:id.nullable(),focus:z.string().max(4096),viewport,fullSource:z.boolean(),sourceAnchor:semanticAnchorSchema.nullable(),corpusId:id.nullable()}).strict();
 export const graphFramesSchema=z.object({structural:structural.nullable(),semantic:semantic.nullable()}).strict();
 export type GraphFrames=z.infer<typeof graphFramesSchema>;
