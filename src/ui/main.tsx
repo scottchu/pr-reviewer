@@ -5,6 +5,7 @@ import {sourceComparison} from "../domain/public.ts";
 import type { Anchor, Review, SourceView } from "../domain/public.ts";
 import "./style.css";
 import { ReviewGraph } from "./graph.tsx";
+import {HeadTests} from './head-tests.tsx';
 import {Imports} from "./imports.tsx";
 import {StoryPanel,QuestionEvidenceStatus} from "./story.tsx";
 import {SemanticPanel} from "./semantic-panel.tsx";
@@ -181,6 +182,7 @@ const App = () => {
       {state.selecting&&<p role="status">Opening the selected snapshot. Question composition is held until its source is ready.</p>}
       {interactionError&&<p role="alert">{interactionError}</p>}
       {state.recovery.state!=='none'&&<section className="question-recovery" aria-label="Question recovery"><h2>Unresolved question</h2><p role="status">{state.recovery.message}</p>{state.recovery.commandId&&<p>Original source: {state.recovery.snapshotId} · saved command {state.recovery.commandId}</p>}{['awaiting_ack','accepted_awaiting_readback','storage_unavailable'].includes(state.recovery.state)&&<button disabled={state.busy} onClick={()=>act(()=>bridge.recoverPendingQuestion())}>Recover saved question</button>}</section>}
+      <HeadTests bridge={workspace.tests}/>
       <StoryPanel key={`story:${review.reviewId}`} bridge={storyBridge}/>
       <div onFocusCapture={pauseStory} onPointerDownCapture={pauseStory} onScrollCapture={pauseStory}><SemanticPanel key={`semantic:${review.reviewId}`} bridge={analysisBridge} onGraphState={captureSemantic} graphRestore={storyState.maps.semantic?{id:storyState.mapRestoreId,frame:storyState.maps.semantic}:undefined}/></div>
       {state.graph && <div onFocusCapture={pauseStory} onPointerDownCapture={pauseStory}><ReviewGraph graph={state.graph} selectedPath={storyFocus?.sources[0]?.reference.anchor.path??selected?.path??""} selectedFileKey={storyFocus?.comparisonKey??comparisonKey} storyFocus={storyFocus?.graphFocus} onStateChange={captureStructural} restore={storyState.maps.structural?{id:storyState.mapRestoreId,frame:storyState.maps.structural}:undefined} onOpen={openSource}/></div>}
@@ -347,7 +349,7 @@ const App = () => {
             </section>
           </section>
       <footer>
-        Immutable source review · bounded read-only acquisition · no target program execution
+        Immutable source review · bounded acquisition · exact-head test evidence
       </footer>
     </main>
   );

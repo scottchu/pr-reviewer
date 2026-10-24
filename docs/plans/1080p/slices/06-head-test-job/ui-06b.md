@@ -1,8 +1,8 @@
 # B2: exact-head test workspace consumer
 
 Date: 2026-10-24
-Status: implementation packet committed before derived changes; acceptance pending
-Packet revision: B2.1
+Status: application checkpoint in progress; standalone UI composition paused after unified-canvas correction
+Packet revision: B2.2
 Owner: implement_head_test_react
 Parent: [slice06](plan.md), [execution](execution-06b.md), [public ports](consumer-ports-06b.md), [B4](integration-06b4.md)
 Durable specification: [test workspace](../../../../product/review-loop/test-ui.md), [execution authority](../../../../product/review-loop/test-execution.md)
@@ -44,3 +44,10 @@ Write meaningful application RED tests before implementation; then direct focuse
 ## Independent-review handoff
 
 Fresh reviewer consumes the exact committed candidate, this packet and durable test-ui/test-execution knowledge. Adversarially exercise malformed/cross-scope responses, lost receipts and persistence failure, cancellation ordering, stale generations, teardown and artifact offsets/decoder boundaries. Inspect actual React journey and visual evidence separately. Return concrete findings and bounded engineering readiness; no own-PR comprehension or production pass can be inferred from fixtures.
+
+## User direction correction and safe checkpoint
+
+Date: 2026-10-24
+Status: root instructed this executor to pause new UI composition/visual polish.
+
+The final experience must keep everything in one canvas; zoom/focused lens reveals inline diff/code while graph context remains. A separate file inspector/standalone panel is not accepted final UX. Preserve the existing provisional HeadTests panel, actual fixture journey/screenshots and application bridge for reconciliation. Continue independent application/domain checks only; root owns revised mocks/spec and reauthorization of composition. This correction supersedes the section-based presentation above, without discarding durable command/recovery/byte-port work.

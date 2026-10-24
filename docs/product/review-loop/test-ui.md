@@ -1,16 +1,18 @@
 # Exact-head tests in the review workspace
 
-Status: accepted B2 consumer design; implementation and independent acceptance pending
+Status: application consumer contract retained; standalone panel superseded by the unified-canvas direction; revised UX and acceptance pending
 Technology: React presentation over the managed application bridge
 Authority: [test execution](test-execution.md) owns command/job/result/artifact semantics
 
 ## User experience
 
-A reviewer can see which fixed test target is configured for the displayed immutable snapshot, its full head, target revision and availability reason. An unavailable target remains unavailable until owner qualification; the panel cannot qualify source or accept executable inputs. Run captures the displayed scope and target revision. A durable receipt identifies one job and its minimum read revision, followed by progress and history. Fixture provenance is visibly labeled and never presented as a production pass.
+The accepted experience keeps all review work in one canvas. Zoom and a focused lens reveal inline diff/code while preserving graph context. A separate file inspector or standalone panel is not the accepted final UX. The current React test panel is retained engineering evidence only; canvas placement and interaction await the root-owned revised specification.
+
+Within that experience a reviewer can see which fixed test target is configured for the displayed immutable snapshot, its full head, target revision and availability reason. An unavailable target remains unavailable until owner qualification; the panel cannot qualify source or accept executable inputs. Run captures the displayed scope and target revision. A durable receipt identifies one job and its minimum read revision, followed by progress and history. Fixture provenance is visibly labeled and never presented as a production pass.
 
 Jobs preserve their original review, snapshot, base/head and target. History selection cannot relabel an old result with a new head. Cancellation is an intent: requested, observed stopped/quiescent and unknown are separate facts. Results show stored result identity, outcome/reason, collection counts when present, raw output accounting and cleanup state. Missing counts or cleanup evidence remain absent. Unknown effects are never retried automatically.
 
-Saved questions, private drafts, story playback and navigation retain their existing owners and can proceed independently of test transport. No test action asks or wakes a participant. The panel is an ordinary keyboard-operable section with visible focus, explicit button labels, polite progress and readable wrapping at narrow widths. Output uses a bounded scroll region and plain text; command-looking and HTML-like text cannot become controls.
+Saved questions, private drafts, story playback and navigation retain their existing owners and can proceed independently of test transport. No test action asks or wakes a participant. The retained provisional panel is an ordinary keyboard-operable section with visible focus, explicit button labels, polite progress and readable wrapping at narrow widths. Output uses a bounded scroll region and plain text; command-looking and HTML-like text cannot become controls.
 
 ## Application coordination and recovery
 
@@ -27,3 +29,14 @@ Artifact descriptor and response identities must agree. Offsets count bytes. Dec
 ## Verification boundary
 
 Focused lifecycle/recovery/byte tests and actual React fixture journeys establish engineering behavior only. Actual own-PR execution, exact-source production qualification, CLI same-job evidence, unfamiliar-reviewer comprehension, visual acceptance and deployment have separate receipts. The initial panel does not add generic terminal access, target configuration, scheduling, automatic test runs or automatic agent feedback.
+
+## Direction correction checkpoint
+
+Date: 2026-10-24
+Status: UI composition and visual polish paused after the user required a unified canvas. Application/domain validation continues independently; no canvas redesign or production adoption is claimed. Existing standalone React fixture screenshots and tests preserve useful transport/recovery evidence, not acceptance of the superseded composition.
+
+## Delivered application checkpoint (provisional UI)
+
+The bridge uses the shared browser-safe response codecs from the domain public interface. It additionally verifies all canonical result identity fields and SHA256 over the canonical result body. Complete viewed artifacts receive a SHA256 check over the original assembled bytes before final text publication. The display cap is 1MiB, including source-evidence artifacts that may be larger; reaching the cap is explicit and does not claim complete artifact inspection.
+
+Test-intent storage has its own origin/review/access-scope key and versioned record. The normal local owner uses a stable nonsecret scope; explicit existing legacy access uses its fingerprint and explicit Authorization, with no fallback to local-owner authority. Access fingerprinting cannot delay or reorder the existing review login request. Workspace review-scope-to-head-test-view and bridge head-test-committed-to-authorized-view routes own scope propagation/polling. The bridge uses separate request, selected-job and artifact abort slots with a 10-second default request bound; polling is 500ms by default and creates no mutation. Replacing scope preserves pending original intent while clearing visible history/artifacts.

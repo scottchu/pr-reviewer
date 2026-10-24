@@ -1,3 +1,4 @@
+import {createHeadTestsBridge} from './head-tests.ts';
 import {localOwnerSession} from './local-access.ts';
 import {createReviewBridge} from './review.ts';
 import {createAnalysisBridge} from './analysis.ts';
@@ -7,7 +8,7 @@ import type {PrivateSession,GraphFrames} from './private-session.ts';
 import type {Anchor} from '../domain/public.ts';
 import {createRegistry} from '../integration/registry.ts';
 export const createReviewWorkspace=(reviewId:string,initialSnapshotId?:string,options:{session?:PrivateSession}={})=>{
- const session=options.session??createPrivateSession(),analysis=createAnalysisBridge(reviewId),registry=createRegistry();
+ const session=options.session??createPrivateSession(),analysis=createAnalysisBridge(reviewId),tests=createHeadTestsBridge(reviewId),registry=createRegistry();
  let generation=0,credential='',disposed=false;
  let mapInput:{kind:'structural'|'semantic';snapshotId:string;frame:GraphFrames['structural']|GraphFrames['semantic']}|null=null;
  const mapRoutes=new Map<'structural'|'semantic',ReturnType<typeof registry.register>>();
@@ -19,7 +20,7 @@ export const createReviewWorkspace=(reviewId:string,initialSnapshotId?:string,op
  const login=async(value:string=localOwnerSession)=>{
    const captured=value.trim(),expected=++generation;credential=captured;disposed=false;
    try{
-    await review.login(captured);if(!owns(expected,captured))return;
+    const testsReady=tests.setAccess(captured);await review.login(captured);if(!owns(expected,captured))return;await testsReady;if(!owns(expected,captured))return;
     const current=review.getSnapshot().review;if(!review.getSnapshot().authenticated||!current)return;
     // Private hydration may select a retained analysis; finish the initial
     // semantic login read before handing that selection owner to StoryBridge.
@@ -29,14 +30,17 @@ export const createReviewWorkspace=(reviewId:string,initialSnapshotId?:string,op
   };
 
  return {
-  review,analysis,story,canLeaveReview:canLeave,
+  review,analysis,story,tests,canLeaveReview:canLeave,
   connect:()=>{
    if(confirmedRoute)throw new Error('duplicate_route');disposed=false;
    confirmedRoute=registry.register('question-confirmed-to-exact-draft',reviewId,()=>review.getSnapshot().authenticated,()=>story.confirmDraft(confirmedDraft));
    const guard=registry.register('question-recovery-to-draft-guard',reviewId,()=>true,()=>story.setQuestionGuard(review.getSnapshot().busy||review.getQuestionRecovery().state!=='none'));
    for(const kind of ['structural','semantic'] as const)mapRoutes.set(kind,registry.register(`${kind}-map-view-to-private-frame`,reviewId,()=>Boolean(mapInput&&mapInput.kind===kind&&!disposed&&credential&&review.getSnapshot().authenticated&&story.getSnapshot().authenticated&&review.getSnapshot().review?.snapshot.snapshotId===mapInput.snapshotId&&story.getSnapshot().snapshotId===mapInput.snapshotId),()=>{if(mapInput)story.updateGraphFrame(kind,mapInput.frame);}));
-   const unsubscribe=review.subscribe(()=>guard.emit()),disconnect=review.connect();guard.emit();
-   return()=>{generation++;disposed=true;disconnect();unsubscribe();guard.dispose();confirmedRoute?.dispose();confirmedRoute=null;for(const route of mapRoutes.values())route.dispose();mapRoutes.clear();mapInput=null;};
+   let testSnapshot='';
+   const testScope=registry.register('review-scope-to-head-test-view',reviewId,()=>true,()=>{const current=review.getSnapshot();if(!current.authenticated||!current.review){if(testSnapshot){testSnapshot='';tests.lock();}return;}const id=current.review.snapshot.snapshotId;if(testSnapshot!==id){testSnapshot=id;void tests.select(id);}});
+   const disconnectTests=tests.connect();
+   const unsubscribe=review.subscribe(()=>{guard.emit();testScope.emit();}),disconnect=review.connect();guard.emit();testScope.emit();
+   return()=>{generation++;disposed=true;disconnect();disconnectTests();unsubscribe();testScope.dispose();guard.dispose();confirmedRoute?.dispose();confirmedRoute=null;for(const route of mapRoutes.values())route.dispose();mapRoutes.clear();mapInput=null;};
   },
   open:()=>login(),
   login,

@@ -38,3 +38,6 @@ export {createStoryBridge,storyTransition,storyProjection,storyPresentation,ques
 export type {StoryBridge,StoryState,StoryIntent,StoryProjection,StoryExcerpt,StoryClock,StorySemanticPort,StoryGraphFocus,QuestionEvidenceIntent} from './story.ts';
 export {createReviewWorkspace} from './workspace.ts';
 export type {ReviewWorkspace} from './workspace.ts';
+
+export {createHeadTestsBridge} from './head-tests.ts';
+export type {HeadTestsBridge,HeadTestsState,TestArtifactState} from './head-tests.ts';
