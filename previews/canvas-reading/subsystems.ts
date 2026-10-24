@@ -1,4 +1,5 @@
-import type {Frame,Group} from './state.ts';
+import {explanation,selectedProseAnchor} from './state.ts';
+import type {ProseAnchor,Frame,Group} from './state.ts';
 export type Scenario='canvas'|'story'|'discussion'|'tests'|'import'|'integrated';
 export const scenarioNames:Record<Scenario,string>={canvas:'Canvas / diff',story:'Story / exploration',discussion:'Discussion / participants',tests:'Tests / evidence',import:'Import / history',integrated:'Connected review'};
 export type StoryPreview=Readonly<{playing:boolean;step:number;condition:'ready'|'missing'|'stale';returnFrame:Frame|null;version:'preview-story-v1'}>;
@@ -14,10 +15,17 @@ export const storyTransition=(state:StoryPreview,action:StoryAction):StoryPrevie
 };
 
 export const newerExplanation={id:'auth-header-explanation',version:'mock-auth-account-v2',contentHash:'f4c5eaadcdd64b583896e699e524f2f5567c05704af49879a6da6659fcdc69c0',text:'This newer local account separates the source call from live delivery. accessHeaders changes request headers; attachment and notification evidence remain unavailable.'} as const;
-export type DiscussionPreview=Readonly<{delivery:'not_attached'|'idle'|'unknown';prose:'current'|'newer'|'missing';viewingOriginal:boolean}>;
-export const initialDiscussion=():DiscussionPreview=>({delivery:'not_attached',prose:'current',viewingOriginal:false});
-export type DiscussionAction={type:'delivery';delivery:DiscussionPreview['delivery']}|{type:'prose';prose:DiscussionPreview['prose']}|{type:'original'};
-export const discussionTransition=(state:DiscussionPreview,action:DiscussionAction):DiscussionPreview=>action.type==='delivery'?{...state,delivery:action.delivery}:action.type==='prose'?{...state,prose:action.prose,viewingOriginal:false}:state.prose==='missing'?state:{...state,viewingOriginal:true};
+export type DiscussionPreview=Readonly<{delivery:'not_attached'|'idle'|'unknown';prose:'current'|'newer'|'missing';viewingOriginal:boolean;originalUnavailable:boolean}>;
+export const initialDiscussion=():DiscussionPreview=>({delivery:'not_attached',prose:'current',viewingOriginal:false,originalUnavailable:false});
+export const resolveProseAnchor=(anchor:ProseAnchor)=>[explanation,newerExplanation].find(content=>content.id===anchor.contentId&&content.version===anchor.version&&content.contentHash===anchor.contentHash&&selectedProseAnchor(anchor.start,anchor.end,content)?.quote===anchor.quote)??null;
+export type DiscussionAction={type:'delivery';delivery:DiscussionPreview['delivery']}|{type:'prose';prose:DiscussionPreview['prose']}|{type:'original'}|{type:'locate';anchor:ProseAnchor};
+export const discussionTransition=(state:DiscussionPreview,action:DiscussionAction):DiscussionPreview=>{
+ if(action.type==='delivery')return {...state,delivery:action.delivery};
+ if(action.type==='prose')return {...state,prose:action.prose,viewingOriginal:false,originalUnavailable:action.prose==='missing'?true:action.prose==='current'?false:state.originalUnavailable};
+ if(action.type==='original')return state.originalUnavailable?state:{...state,viewingOriginal:true};
+ const content=resolveProseAnchor(action.anchor);if(!content)return state;
+ return content.version===newerExplanation.version?{...state,prose:'newer',viewingOriginal:false}:{...state,prose:state.originalUnavailable?'missing':'current',viewingOriginal:false};
+};
 
 export type MockJobState='queued'|'preparing'|'running'|'cancel_requested'|'cancelled'|'passed'|'failed'|'unknown';
 export type MockJob=Readonly<{jobId:string;jobRevision:number;commandId:string;invocationId:string;resultId:string|null;state:MockJobState;effectDisposition:'none'|'unresolved'|'quiescent';headSha:string;environment:string;provenance:'test_only_execution';counts:{passed:number;failed:number}|null}>;
