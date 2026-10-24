@@ -99,3 +99,7 @@ No slice02 implementation or acceptance run occurred during this planning task. 
 **Owner/workspace:** continuation/bootstrap executor; `/tmp/pr-reviewer-02-graph-history`, branch `build-review-history-and-graph`.
 
 **Status:** 02A implementation in progress; existing pilot untouched. Product derivation details are in evolution.md. PR20's three changed Markdown paths are verified against the pinned local comparison. Independent graph-first understanding, native host acceptance and human comprehension remain unrun.
+
+**02A review status:** Independent engineering accepted frozen `2e0384f` after original and residual recovery/provenance repros. A narrow readable-span/absent-side UI correction is under targeted validation; see [review and knowledge receipts](review-receipts-02a.md). Graph-first critique, docs-only readiness, engineering checks and native/human/full-slice acceptance remain distinct. 02B history work is not started.
+
+**Successor coverage note:** Complete changed inventory, explicit selected input, prepared one-hop source and analyzed reference coverage differ. The current global first-120 reference budget warns about unanalysed remaining links but exposes no exact omitted-path/link-count ledger; unresolved entries cover attempts only. Preserve these limitations when deriving acquisition/semantic integration; owner input persistence is not history admission.

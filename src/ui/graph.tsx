@@ -10,6 +10,7 @@ export const ReviewGraph = ({ graph, selectedPath, onOpen }: {
   const [context, setContext] = useState(false);
   const [spans, setSpans] = useState(false);
   const [focusedPath, setFocusedPath] = useState(selectedPath);
+  const [spanId, setSpanId] = useState("");
   useEffect(() => setFocusedPath(selectedPath), [selectedPath]);
   const paths = [...new Set([
     ...graph.dispositions.map(item => item.path),
@@ -19,9 +20,11 @@ export const ReviewGraph = ({ graph, selectedPath, onOpen }: {
   const neighborIds = new Set(graph.edges.filter(edge => edge.kind === 'document_reference' && (focusedIds.has(edge.source) || focusedIds.has(edge.target))).flatMap(edge => [edge.source, edge.target]));
   const related = graph.nodes.filter(node => node.kind === 'file' && node.path !== focusedPath && neighborIds.has(node.id));
   const contextNodes = context ? related.slice(0, 4) : [];
+  const spanNodes = graph.nodes.filter(node => node.path === focusedPath && node.kind === 'hunk');
+  const activeSpan = spanNodes.find(node => node.id === spanId) ?? spanNodes[0];
   const visible = useMemo(() => graph.nodes.filter(node =>
-    node.path === focusedPath && (node.kind === 'file' || spans) || contextNodes.some(item => item.id === node.id)
-  ), [graph, focusedPath, spans, context]);
+    node.path === focusedPath && (node.kind === 'file' || spans && node.id === activeSpan?.id) || contextNodes.some(item => item.id === node.id)
+  ), [graph, focusedPath, spans, context, activeSpan?.id]);
   const nodes: Node[] = visible.map(node => {
     const precedingSpans = visible.filter(other => other.kind === 'hunk' && other.path === node.path && other.side === node.side && other.anchor.startLine < node.anchor.startLine).length;
     const spanRows = Math.max(0, ...(['base', 'head'] as const).map(side => visible.filter(other => other.kind === 'hunk' && other.path === focusedPath && other.side === side).length));
@@ -57,6 +60,7 @@ export const ReviewGraph = ({ graph, selectedPath, onOpen }: {
     setFocusedPath(path);
     setSpans(false);
     setContext(false);
+    setSpanId("");
   };
   return <section className="review-graph" aria-labelledby="graph-title" id="review-graph">
     <div className="graph-heading"><div>
@@ -64,8 +68,8 @@ export const ReviewGraph = ({ graph, selectedPath, onOpen }: {
       <h2 id="graph-title" tabIndex={-1}>Change map</h2>
       <p>{paths.length} changed paths · {graph.dispositions.filter(item => item.state === 'prepared').length} prepared changed-file sides · {graph.dispositions.filter(item => item.state !== 'prepared').length} unavailable/unprepared</p>
     </div><div className="graph-options">
-      <label><input type="checkbox" checked={context} onChange={event => setContext(event.target.checked)} /> Show referenced context</label>
-      <label><input type="checkbox" checked={spans} onChange={event => setSpans(event.target.checked)} /> Show selected file’s changed spans</label>
+      <label><input type="checkbox" checked={context} onChange={event => { setContext(event.target.checked); if(event.target.checked) setSpans(false); }} /> Show referenced context</label>
+      <label><input type="checkbox" checked={spans} onChange={event => { setSpans(event.target.checked); if(event.target.checked) setContext(false); }} /> Show selected file’s changed spans</label>
     </div></div>
     <nav aria-label="Changed files" className="changed-file-index">
       <h3>Complete changed-file index</h3>
@@ -79,8 +83,9 @@ export const ReviewGraph = ({ graph, selectedPath, onOpen }: {
       })}</ul>
     </nav>
     <p className="graph-focus" role="status">Focused file: <strong>{focusedPath}</strong> · {nodes.length} visible nodes · {edges.length} visible relationships of {graph.edges.length} total. {context ? `${contextNodes.length} of ${related.length} directly related source nodes shown.` : `${related.length} directly related source nodes available through context expansion.`}</p>
+    {spans && <div className="span-selection"><label>Changed span<select aria-label="Changed span" value={activeSpan?.id ?? ''} onChange={event => setSpanId(event.target.value)} disabled={!spanNodes.length}>{spanNodes.map(node => <option key={node.id} value={node.id}>{node.side === 'base' ? 'Before' : 'After'} lines {node.anchor.startLine}–{node.anchor.endLine} · {node.change}</option>)}</select></label><p>{activeSpan ? 1 : 0} of {spanNodes.length} changed spans shown. All spans remain available here and in the evidence list. Choosing one keeps source selection and drafts unchanged.</p></div>}
     <div className="graph-columns" aria-hidden="true"><strong>Before · base</strong><strong>After · head</strong></div>
-    <div className="graph-canvas"><ReactFlow key={`${graph.snapshotId}:${focusedPath}:${context}:${spans}`} nodes={nodes} edges={edges}
+    <div className={`graph-canvas ${spans ? "span-focus" : ""}`}><ReactFlow key={`${graph.snapshotId}:${focusedPath}:${context}:${spans}:${spans ? activeSpan?.id : ""}`} nodes={nodes} edges={edges}
       fitView fitViewOptions={{ padding: 0.15, maxZoom: 1 }} minZoom={0.15} maxZoom={1.4}
       nodesDraggable={false} nodesConnectable={false} edgesReconnectable={false} deleteKeyCode={null}
       onNodeDoubleClick={(_event, node) => { const item = graph.nodes.find(item => item.id === node.id); if (item) onOpen(item.anchor); }}

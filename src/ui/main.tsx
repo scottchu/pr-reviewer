@@ -187,16 +187,10 @@ const App = () => {
       {selected && (
         <>
           <div className="source-grid">
-            {(["base","head"] as const).filter(side=>!state.sources.some(s=>s.path===selected.path&&s.side===side)).map(side=><section key={side} className="source-pane"><header><h2>{side==="base"?"Before":"After"}</h2></header><p>This side has no prepared source for {selected.path}. {review.snapshot.changedFiles?.find(f=>f.oldPath===selected.path||f.newPath===selected.path)?.dispositions.find(d=>d.side===side)?.reason??"Absent from the pinned change or not prepared; no selectable anchor."}</p></section>)}
-            {state.sources.filter(source=>source.path===selected.path).map((source) => (
-              <SourcePane
-                key={source.side + source.path}
-                source={source}
-                review={review}
-                selected={selected}
-                onSelect={openSource}
-              />
-            ))}
+            {(["base", "head"] as const).map(side => {
+              const source = state.sources.find(item => item.path === selected.path && item.side === side);
+              return source ? <SourcePane key={side} source={source} review={review} selected={selected} onSelect={openSource} /> : <section key={side} className="source-pane"><header><h2>{side === "base" ? "Before" : "After"}</h2></header><p>This side has no prepared source for {selected.path}. {review.snapshot.changedFiles?.find(file => file.oldPath === selected.path || file.newPath === selected.path)?.dispositions.find(item => item.side === side)?.reason ?? "Absent from the pinned change or not prepared; no selectable anchor."}</p></section>;
+            })}
           </div>
           <section className="conversation">
             <div className="composer">
