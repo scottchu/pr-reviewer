@@ -21,3 +21,8 @@ Status: Named dispatch; contracts and implementation pending. Full05/720p/origin
 The new worktree is clean at the exact base and has no ignored dependency/cache/runtime state. The old05B worktree is released and is not an editable destination. Root owns its retirement. New tests use owned disposable data and reserved loopback ports; logs/screenshots remain external. Declared dependency entries may be reused only through a real ignored task `node_modules`; generated `.vite`, `.vite-temp` and `.cache` directories must be real local ignored directories, never shared cache links.
 
 Next: commit exact public return-frame/draft/recovery/storage/error contracts, then derive failing tests and implementation. No05C browser, recovery, understanding or acceptance result is claimed.
+
+
+## Contract checkpoint
+
+The exact05C application/frame/draft/private-storage/recovery ports, error/quarantine behavior, scope/fingerprint/clear ordering, quota meaning and selected-source/issue presentation are now derived in [durable knowledge](../../../../product/review-loop/story-and-exploration.md#exact05c-application-frame-and-private-storage-derivation). Implementation follows that committed authority. Ordinary view persistence is best effort; mandatory pending write/readback gates every mutation. No body/credential persistence or new durable server subsystem is authorized. Next: failing tests for storage/credential/receipt identity and one-owner frame/draft transitions.
