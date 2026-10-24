@@ -60,3 +60,7 @@ Run an implementer self-check first to catch broken presentation and a faulty an
 ## Round-specific evaluation packets
 
 Keep selected PRs, answer keys, evaluator decisions, conditions and actual results with their owning round or slice. The initial [480p evaluation packet](../plans/480p/evaluation.md) records unresolved first-round inputs. Later slices extend this protocol prospectively and keep their own evidence beside their plans.
+
+## Graph-first agent critique
+
+Every new PR/MR also follows the accepted [graph-first review protocol](graph-first-review.md). A fresh independent agent adopts the tired-reviewer perspective, freezes its account before source inspection and then records source corrections and ease-of-understanding ratings. This prospective qualitative check complements the human rubric; it does not replace unfamiliar-human observation or establish a causal improvement over code-only review. The current dedicated reviewer is assigned by root; identity and familiarity are recorded in the slice dispatch/evidence rather than made a permanent product dependency.

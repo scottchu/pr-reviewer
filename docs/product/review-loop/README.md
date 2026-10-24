@@ -33,6 +33,8 @@ This is the agent's source-acquisition responsibility; the reviewer should not h
 5. The agent receives a CLI notification, reads the review through MCP and submits its reply through MCP. The app renders the authoritative persisted reply and evidence links. Agent stdout and transcripts are diagnostics, not replies to paste into the UI.
 6. Open a reply's source link at its immutable side/path/span. Restart preserves accepted questions/replies and pending work. Full reopen/follow-up and switching to a new head are slice 02.
 
+The next accepted scope is defined in [continuation, graph bootstrap and import](evolution.md). These planned behaviors are not attributed to the first milestone.
+
 ## Public interfaces and ownership
 
 [Contracts](contracts.md) define IDs, data, commands, MCP and error semantics. [Delivery](delivery.md) defines CLI notification and recovery. [Local runtime](runtime.md) defines operational setup and evidence limits. [Presentation](presentation.md) defines React UI and design-guideline conformance. UI owns local selection and draft; domain owns validation and durable review state; command processing owns atomic receipts/events; delivery owns CLI effects; the MCP adapter validates credentials and delegates domain operations. Managed integration routes own subscriptions and teardown. No adapter writes around ingress.

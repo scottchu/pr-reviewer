@@ -3,6 +3,7 @@ import { createRoot } from "react-dom/client";
 import { createReviewBridge, questionStatus } from "../application/public.ts";
 import type { Anchor, Review, SourceView } from "../domain/public.ts";
 import "./style.css";
+import { ReviewGraph } from "./graph.tsx";
 const bridge = createReviewBridge(
   new URLSearchParams(window.location.search).get("reviewId") ?? "pr-14",
 );
@@ -30,11 +31,13 @@ const SourcePane = ({
             : "＋ additions · ∼ modifications"}
         </span>
       </header>
+      {source.lines.some(line=>line.status==="not_analyzed")&&<p className="comparison-unknown">Comparison not analyzed: the opposite source is unavailable or exceeds the comparison budget. These lines are not labeled additions/removals.</p>}
       <div className="source-scroll">
         <ol>
           {source.lines.map(({ text: line, number, status }) => {
-            const changed = status !== "unchanged",
+            const changed = status !== "unchanged" && status !== "not_analyzed",
               active =
+                selected.path === source.path &&
                 selected.side === source.side &&
                 number >= selected.startLine &&
                 number <= selected.endLine;
@@ -61,7 +64,7 @@ const SourcePane = ({
                   {number}
                 </button>
                 <span className="change-marker" aria-label={`${status} line`}>
-                  {status === "modified"
+                  {status === "not_analyzed" ? "?" : status === "modified"
                     ? "∼"
                     : changed
                       ? source.side === "base"
@@ -118,11 +121,16 @@ const App = () => {
       </main>
     );
   const attachment = review.attachment;
+  const openSource = (anchor:Anchor) => {
+    if(draft.trim() && selected && JSON.stringify(anchor)!==JSON.stringify(selected)) return;
+    setSelected(anchor);
+    requestAnimationFrame(()=>document.getElementById(`source-${anchor.side}-${anchor.startLine}`)?.scrollIntoView({block:"center"}));
+  };
   return (
     <main>
       <header className="identity">
         <div>
-          <p className="eyebrow">Pinned source · documentation review</p>
+          <p className="eyebrow">Pinned source · source structure review</p>
           <h1>
             <a href={review.snapshot.prUrl} target="_blank" rel="noreferrer">
               PR {review.snapshot.prNumber}
@@ -165,25 +173,24 @@ const App = () => {
           )}
         </div>
       </header>
+      {state.graph && selected && <ReviewGraph graph={state.graph} selectedPath={selected.path} onOpen={openSource}/>}
       <section className="source-identity">
         <h2>{selected?.path ?? state.sources[0]?.path}</h2>
         <p>
           Read the fixed before and after. Select a line or specify an inclusive
           range below.
         </p>
+        <a href="#graph-title" onClick={()=>document.getElementById("graph-title")?.focus()}>Return to change map</a>
+        {draft.trim()&&<p role="status">Source selection is held while your question draft is nonempty. Save or clear it before navigating.</p>}
+        <label>Source file<select value={selected?.path??""} disabled={Boolean(draft.trim())} onChange={e=>{const source=state.sources.find(s=>s.path===e.target.value&&s.side==="head")??state.sources.find(s=>s.path===e.target.value);if(source)openSource({snapshotId:review.snapshot.snapshotId,path:source.path,side:source.side,startLine:1,endLine:1});}}>{[...new Set(state.sources.map(s=>s.path))].map(path=><option key={path}>{path}</option>)}</select></label>
       </section>
       {selected && (
         <>
           <div className="source-grid">
-            {state.sources.map((source) => (
-              <SourcePane
-                key={source.side + source.path}
-                source={source}
-                review={review}
-                selected={selected}
-                onSelect={setSelected}
-              />
-            ))}
+            {(["base", "head"] as const).map(side => {
+              const source = state.sources.find(item => item.path === selected.path && item.side === side);
+              return source ? <SourcePane key={side} source={source} review={review} selected={selected} onSelect={openSource} /> : <section key={side} className="source-pane"><header><h2>{side === "base" ? "Before" : "After"}</h2></header><p>This side has no prepared source for {selected.path}. {review.snapshot.changedFiles?.find(file => file.oldPath === selected.path || file.newPath === selected.path)?.dispositions.find(item => item.side === side)?.reason ?? "Absent from the pinned change or not prepared; no selectable anchor."}</p></section>;
+            })}
           </div>
           <section className="conversation">
             <div className="composer">
@@ -297,7 +304,7 @@ const App = () => {
                     <p className="body">{question.text}</p>
                     <a
                       href={`#source-${question.anchor.side}-${question.anchor.startLine}`}
-                      onClick={() => setSelected(question.anchor)}
+                      onClick={() => openSource(question.anchor)}
                     >
                       {question.anchor.side} · {question.anchor.path}:
                       {question.anchor.startLine}–{question.anchor.endLine}
@@ -322,7 +329,7 @@ const App = () => {
                               <a
                                 key={index}
                                 href={`#source-${anchor.side}-${anchor.startLine}`}
-                                onClick={() => setSelected(anchor)}
+                                onClick={() => openSource(anchor)}
                               >
                                 Source: {anchor.side} {anchor.path}:
                                 {anchor.startLine}–{anchor.endLine}

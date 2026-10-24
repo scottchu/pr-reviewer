@@ -2,7 +2,7 @@
 
 **Status:** Accepted direction, documented for further refinement
 
-**Implementation:** Not started in this repository
+**Implementation:** First bounded React/SQLite/CLI/MCP milestone merged in PR 19; private local pilot documented in PR 20. Native Codex/Claude journey, complete own-PR dogfood and unfamiliar-human acceptance remain open.
 
 ## From vision to system
 
@@ -36,7 +36,7 @@ Preserve the slim, draggable bottom-center player: drag, previous, replay/pause,
 
 **Evidence storage:** Referenced source snapshots, patches and execution artifact files
 
-These are accepted technology directions. Strict TypeScript compiler settings will be derived when an implementation slice establishes the scaffold. No dependencies or application scaffold are introduced by this document.
+These are accepted technology directions. The first milestone derived strict TypeScript settings and a bounded application from slice 01. Later subsystems remain planned; see the [current delivery plan](../plans/delivery-through-1080p.md) and [continuation/import boundary](review-loop/evolution.md).
 
 ## Development rules
 

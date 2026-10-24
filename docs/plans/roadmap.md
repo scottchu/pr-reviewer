@@ -2,17 +2,17 @@
 
 **Direction:** Accepted progressive delivery: 480p → 720p → 1080p → 4K
 
-**Plan status:** Slice sequence and dual-host/reactive refinement independently reviewed; later contracts remain provisional; no implementation started
+**Plan status:** First runnable milestone merged; autonomous delivery through 1080p active under the [current execution plan](delivery-through-1080p.md). Full round acceptance remains incomplete.
 
 **Owner:** Project maintainer owns product decisions; implementing agent owns delivery and evidence
 
-**Schedule:** Ordered outcomes; no dates committed
+**Schedule:** User-requested autonomous delivery through 1080p tonight (2026-10-23); report unfulfilled external/human gates honestly.
 
-**Authorization:** Source design and isolated preparation experiments authorized; bounded product implementation starts at dispatch. No production installation/deployment.
+**Authorization:** Bounded implementation, tests, agent review and PR delivery through slices 01–08; root coordinates standing merge/local-pilot authority. No new production hosting or authentication changes. Passkey is a known issue deferred to the last follow-up.
 
 ## Goal and current gap
 
-Deliver the [vision](../product/vision.md): a reviewer can explain changed behavior, trace its consequences and justify a decision with evidence. The [high-level design](../product/architecture.md) defines the required boundaries. This repository contains documentation only. Host integration, application behavior, source analysis, execution and comprehension are unverified.
+Deliver the [vision](../product/vision.md): a reviewer can explain changed behavior, trace its consequences and justify a decision with evidence. The [high-level design](../product/architecture.md) defines the required boundaries. The repository has a runnable React/SQLite review-loop milestone and a private local pilot. Controlled-host application checks passed; complete native-host, own-PR and unfamiliar-human acceptance remain open. General import, graph, story and execution features are still planned. [Current evidence and sequencing](delivery-through-1080p.md) distinguish those states.
 
 Every product slice must be dogfoodable using our own real PR; the [mandatory dogfood protocol](../rules/own-pr-dogfood.md) defines candidate identity, pinned target provenance, observations and revalidation. This accepted requirement applies from slice 01, not only to maturity work.
 
@@ -30,22 +30,24 @@ The [functional/reactive direction](../product/reactive-design.md) is accepted; 
 2. Use [our selected PR 14 task](480p/slices/01-review-loop/bootstrap-task.md), its pinned source account and [prospective evaluation criterion](480p/evaluation.md). Task selection is the agent's responsibility. Actual product/human results follow a runnable candidate.
 3. Dispatch [slice 01 implementation](480p/slices/01-review-loop/handoffs/implementation.md) from the [durable product design](../product/review-loop/README.md) and concrete execution/test plan. Host-specific failures block that route's acceptance, not all independent implementation. Independent review receives the actual candidate after code exists.
 
-The following inventories establish order, scope boundaries and observable checks. All entries are **planned, unimplemented and unverified**. Slices 02–12 remain provisional until their predecessors supply evidence; create their individual documents before implementation, not an entire speculative hierarchy now. Slice 02 now has a [provisional continuation plan](480p/slices/02-review-continuation/plan.md) to receive slice 01 findings; this does not make its inputs ready. Every row inherits the architecture constraints, mandatory own-PR dogfood gate and common test contract below. Supplemental representative PRs cannot replace the own-PR run.
+The following inventories establish outcomes, scope boundaries and observable checks. Slice 01 has an independently accepted code milestone with incomplete full acceptance. [Slice 02](480p/slices/02-review-continuation/plan.md) is ready for bounded engineering against delivered interfaces under the explicit [sequencing amendment](delivery-through-1080p.md#sequencing-amendment-and-readiness); native/human gates remain open. Slice 03 has a separate preparation packet; 04–12 are provisional until their scoped inputs are reconciled. Create individual slice pages before implementation, not the entire speculative hierarchy now. Every row inherits the architecture constraints, mandatory own-PR dogfood gate and common test contract below. Supplemental representative PRs cannot replace the own-PR run.
 
 ## 480p: understand and discuss one real behavior
 
 The [480p round plan](480p/plan.md) coordinates this round and its individual slice plans. All rounds follow the [planning and agent handoff contract](README.md#planning-hierarchy-and-agent-handoffs). Completed slices promote learning into durable product docs and contribute evidence to dependent plans.
 
-Round outcome: complete a rough real review in both originating Codex and Claude sessions, then continue it without losing the question, answer or source identity. A full semantic canvas and general analyzer are unnecessary.
+Round outcome: complete a rough real review in both originating Codex and Claude sessions, then continue it without losing the question, answer or source identity. Slice 02 now includes a minimal read-only source graph for mandatory graph-first PR review; full semantic analysis remains 04.
 
 | Slice and reviewer outcome | Predecessor / required input | Included scope and exclusions | Observable acceptance and test strategy |
 |---|---|---|---|
 | **01 — Ask about one behavior.** Read a real before/after span, ask an anchored question, inspect the responsible agent's answer. | Established CLI/MCP route; selected PR14 snapshot/span/account, concrete run/test plan and bounded implementation dispatch. | Minimum source/context presentation, React controls following the design guidelines and principles, authenticated attachment, durable comment/inbox/receipt path, supported MCP read/reply. Excludes general import, graph edits and repository jobs. | **Own-PR task:** Ask about one real behavior or changed-document claim in our slice PR and inspect the persisted source-backed answer. [Detailed contract](480p/slices/01-review-loop/plan.md): real UI → exact host turn → MCP read/write → authoritative UI answer; own-turn commands progress; dedup/stale/unknown cases are honest. Domain/adapter tests plus real-host E2E and separate reviewer comprehension evidence. |
-| **02 — Continue the same review.** Reopen the discussion after restart and inspect a new pinned head without misattributing the old answer. | Slice 01; a second head for the same selected PR; explicit snapshot-switch behavior. | Reopen and follow up, durable inbox/cursor recovery, historical source/reply access, explicit new snapshot choice. Uses the same bounded source preparation as 01. Excludes general importer and automatic anchor migration. | **Own-PR task:** Reopen our PR discussion after restart, then compare the retained answer with a newer pinned head of that PR. E2E: save an addressed question, restart before delivery, recover it once, reply and reopen; switch to the new head and see the old discussion labeled with its original snapshot, then ask on the new span. Assert no lost/coalesced-away item or silent re-anchoring; stale attachment generation cannot write. Reviewer explains which source the old answer describes. |
+| **02 — Continue the same review.** Reopen the discussion after restart and inspect a new pinned head without misattributing the old answer. | Slice 01; a second head for the same selected PR; explicit snapshot-switch behavior. | Reopen and follow up, durable inbox/cursor recovery, historical source/reply access, explicit new snapshot choice. Adds bounded multi-file manual preparation and a read-only evidence-linked graph bootstrap for every-PR review. Excludes general importer, semantic call analysis and automatic anchor migration. | **Own-PR task:** Reopen our PR discussion after restart, then compare the retained answer with a newer pinned head of that PR. E2E: save an addressed question, restart before delivery, recover it once, reply and reopen; switch to the new head and see the old discussion labeled with its original snapshot, then ask on the new span. Assert no lost/coalesced-away item or silent re-anchoring; stale attachment generation cannot write. Reviewer explains which source the old answer describes. |
 
 Exit evidence: 01-Codex and 01-Claude pass their scoped checks, slice 02 continuation is proven separately for each supported host, and the agreed comprehension rubric passes for the selected behavior. Restart tests in 01 protect its basic durability; 02 adds a user-facing continuation and source-update journey.
 
 ## 720p: understand the whole PR
+
+[Active round plan](720p/plan.md); [slice 03 preparation](720p/slices/03-whole-change/plan.md) may proceed in parallel against the frozen import boundary.
 
 Round outcome: account for every changed part, investigate its relevant neighborhood and follow or leave a coherent explanation without losing context.
 
@@ -58,6 +60,8 @@ Round outcome: account for every changed part, investigate its relevant neighbor
 Exit evidence: all changed hunks have an inspectable disposition, relationships retain provenance/unknowns, and the reviewer can explain the broader change and return from exploration. A complete coverage count alone does not prove understanding.
 
 ## 1080p: investigate and improve the explanation with evidence
+
+[Round plan](1080p/plan.md); create each bounded slice packet from actual predecessor evidence before coding.
 
 Round outcome: challenge a claim, run a bounded relevant check, understand its limits and preserve a correction in the shared review.
 
@@ -102,8 +106,6 @@ All code must be tested, preferably through TDD. Each slice needs domain/interfa
 
 ## Decisions, progress and next action
 
-Slice 01 now has a selected own-PR source/account, concrete [product contract](../product/review-loop/README.md), [execution plan](480p/slices/01-review-loop/execution.md) and implementation/review handoffs. Preparation experiments record their actual pass/failure limits. Implement from those sources; verify the real integrated per-host path and human-use result before acceptance. There is no remaining user-choice blocker for the first source example or basic CLI notification mechanism.
+Use [delivery through 1080p](delivery-through-1080p.md) as the current execution contract. Slice 02 bootstraps actual graph review before continuation; slice 03 acquisition preparation can run in parallel under separate ownership. Both native hosts and human evaluation remain acceptance requirements without blocking unrelated engineering. TypeScript/TSX is the bounded initial 04 analysis scope; parser precision and target runner/comparison details are resolved in their committed packets, not inferred from current tests.
 
-Language/framework selection still gates 04; target repository runner and execution scope gate 06; comparison conditions gate 07; representative scale/device/budgets gate 09–11; extension choice gates 12. These later choices do not block the bounded first slice. Full product implementation, own-PR use and comprehension remain unrun.
-
-Current revision addresses the [planning review](480p/reviews/slicing-revision.md). Application tests, host experiments and user evaluations have not run. Build/release/install/update/uninstall and deployment are N/A for this documentation endpoint. The earlier Playground prototype remains an unchanged reference; no runtime artifacts are restored here. Decisions API, hosted agent runtime, generalized multi-agent ownership, remote workers and automatic external PR posting remain deferred.
+Every new PR/MR follows [graph-first understanding review](../rules/graph-first-review.md), including any separate planning PR after a versioned bootstrap candidate exists. Passkey remains a known issue deferred to the last follow-up; preserve login and data now. 4K scope is provisional and outside the requested endpoint. The retained Playground prototype remains a read-only reference, never an application restoration source. Hosted agents, generalized ownership, remote workers and external PR posting remain deferred.

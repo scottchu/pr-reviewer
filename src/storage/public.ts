@@ -29,7 +29,7 @@ type Connection = {
 export const createStore = (filename: string) => {
   const db = new DatabaseSync(filename);
   db.exec(
-    "PRAGMA foreign_keys=ON; PRAGMA journal_mode=WAL; PRAGMA busy_timeout=3000; CREATE TABLE IF NOT EXISTS reviews(id TEXT PRIMARY KEY, body TEXT NOT NULL); CREATE TABLE IF NOT EXISTS receipts(id TEXT PRIMARY KEY, actor TEXT NOT NULL, fingerprint TEXT NOT NULL, body TEXT NOT NULL); CREATE TABLE IF NOT EXISTS credentials(hash TEXT PRIMARY KEY, body TEXT NOT NULL); CREATE TABLE IF NOT EXISTS challenges(id TEXT PRIMARY KEY, body TEXT NOT NULL);",
+    "PRAGMA foreign_keys=ON; PRAGMA journal_mode=WAL; PRAGMA busy_timeout=3000; CREATE TABLE IF NOT EXISTS reviews(id TEXT PRIMARY KEY, body TEXT NOT NULL); CREATE TABLE IF NOT EXISTS receipts(id TEXT PRIMARY KEY, actor TEXT NOT NULL, fingerprint TEXT NOT NULL, body TEXT NOT NULL); CREATE TABLE IF NOT EXISTS credentials(hash TEXT PRIMARY KEY, body TEXT NOT NULL); CREATE TABLE IF NOT EXISTS challenges(id TEXT PRIMARY KEY, body TEXT NOT NULL); CREATE TABLE IF NOT EXISTS preparation_inputs(review_id TEXT PRIMARY KEY REFERENCES reviews(id), body TEXT NOT NULL);",
   );
   const tx = <T>(operation: () => T): T => {
     db.exec("BEGIN IMMEDIATE");
@@ -153,7 +153,11 @@ export const createStore = (filename: string) => {
       if (!row) throw new Error("unauthorized");
       return JSON.parse(row.body) as Principal;
     },
-    prepare: (reviewId: string, snapshot: Snapshot) =>
+    preparedInput: (reviewId:string):unknown|null => {
+      const row=db.prepare("SELECT body FROM preparation_inputs WHERE review_id=?").get(reviewId) as {body:string}|undefined;
+      return row?JSON.parse(row.body):null;
+    },
+    prepare: (reviewId: string, snapshot: Snapshot, sourceInput?:unknown) =>
       tx(() => {
         for (const source of snapshot.sources) {
           const lines = source.content.endsWith("\n")
@@ -169,6 +173,7 @@ export const createStore = (filename: string) => {
         if (db.prepare("SELECT id FROM reviews WHERE id=?").get(reviewId)) {
           if (canonical(load(reviewId).snapshot) !== canonical(snapshot))
             throw new Error("command_conflict");
+          if(sourceInput!==undefined)db.prepare("INSERT OR IGNORE INTO preparation_inputs VALUES (?,?)").run(reviewId,JSON.stringify(sourceInput));
           return;
         }
         save({
@@ -181,6 +186,7 @@ export const createStore = (filename: string) => {
           inbox: [],
           attempts: [],
         });
+        if(sourceInput!==undefined)db.prepare("INSERT INTO preparation_inputs VALUES (?,?)").run(reviewId,JSON.stringify(sourceInput));
       }),
     list: (principal: Principal) => {
       if (principal.kind !== "user") throw new Error("unauthorized");

@@ -1,9 +1,10 @@
-import { compareSources } from "../domain/public.ts";
-import type { SourceView } from "../domain/public.ts";
+import { sourceViews, projectGraph } from "../domain/public.ts";
+import type { SourceView, SourceGraph } from "../domain/public.ts";
 import type { Anchor, Receipt, Review } from "../domain/public.ts";
 import { createRegistry } from "../integration/registry.ts";
 export type View = {
   sources: SourceView[];
+  graph: SourceGraph | null;
   initialSelection: Anchor | null;
   review: Review | null;
   error: string;
@@ -29,6 +30,7 @@ export const createReviewBridge = (reviewId: string) => {
   let token = "";
   let state: View = {
     sources: [],
+    graph: null,
     initialSelection: null,
     review: null,
     error: "",
@@ -82,18 +84,13 @@ export const createReviewBridge = (reviewId: string) => {
         publish({
           ...state,
           review,
-          sources: compareSources(
-            review.snapshot.sources.find((s) => s.side === "base")!,
-            review.snapshot.sources.find((s) => s.side === "head")!,
-          ),
+          sources: state.review?.snapshot.snapshotId===review.snapshot.snapshotId?state.sources:sourceViews(review.snapshot),
+          graph: state.review?.snapshot.snapshotId===review.snapshot.snapshotId?state.graph:projectGraph(review.snapshot),
           error: "",
-          initialSelection: {
-            snapshotId: review.snapshot.snapshotId,
-            side: "head",
-            path: review.snapshot.sources.find((s) => s.side === "head")!.path,
-            startLine: 1,
-            endLine: 1,
-          },
+          initialSelection: (() => {
+            const source=review.snapshot.sources.find(s=>s.side==="head")??review.snapshot.sources[0];
+            return source?{snapshotId:review.snapshot.snapshotId,side:source.side,path:source.path,startLine:1,endLine:1}:null;
+          })(),
           authenticated: true,
         });
       if (expected === generation && !controller.signal.aborted) return review;

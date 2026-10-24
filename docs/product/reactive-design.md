@@ -4,13 +4,13 @@
 
 **Library status:** Not selected; RxJS and Effect Stream are candidates, not installed dependencies
 
-**Implementation:** Not started
+**Implementation:** Bounded explicit lifecycle registry, gateway-owned delivery and React external-store bridge exist; native acceptance remains separate.
 
 ## React-specific design and functional preference
 
 The product targets React; this contract does not require a framework-agnostic core or separate core/React packages. Pure domain functions and public subsystem interfaces keep responsibilities testable and effects controlled; they do not commit the product to supporting another framework. React-specific presentation hooks and bindings are appropriate within these boundaries.
 
-Prefer functional patterns over classes, without banning classes where justified. Choose React patterns according to the actual requirement; no particular component customization pattern is prescribed. UI composition must not own domain policy or bypass managed subscription routes. Strict TypeScript is an accepted implementation convention; lint/format tool selection is deferred. For the remaining conventions, see the [architecture conventions](../rules/development.md#implementation-conventions). No compiler/linter configuration or runtime implementation exists yet.
+Prefer functional patterns over classes, without banning classes where justified. Choose React patterns according to the actual requirement; no particular component customization pattern is prescribed. UI composition must not own domain policy or bypass managed subscription routes. Strict TypeScript is an accepted implementation convention; lint/format tool selection is deferred. For the remaining conventions, see the [architecture conventions](../rules/development.md#implementation-conventions). Strict compiler configuration and bounded runtime exist. No lint tool is selected.
 
 ## Responsibility before library choice
 
@@ -106,3 +106,5 @@ Record the selected release, scope, rationale, observed complexity and test resu
 - [React external-store subscription](https://react.dev/reference/react/useSyncExternalStore).
 
 Sources inspected 2026-10-23. Library versions and local behavior remain unverified until the bounded implementation decision; no package is installed by this design.
+
+Current bounded coordination uses an explicit managed registry, gateway-owned durable delivery and the React external-store bridge. Native lifecycle composition is adequate for this checkpoint; RxJS/Effect remain candidates only if future composition needs justify their cost. No stream package is required to rebuild current behavior.

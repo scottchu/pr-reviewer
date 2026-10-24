@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "check": "tsc --noEmit && bun scripts/check-boundaries.ts",
-    "test": "bun test tests/domain.test.ts tests/registry.test.ts && node --experimental-strip-types --test tests/storage.test.ts tests/delivery.test.ts tests/gateway.test.ts tests/application.test.ts tests/runtime.test.ts",
+    "test": "bun test tests/domain.test.ts tests/registry.test.ts tests/graph.test.ts && node --experimental-strip-types --test tests/storage.test.ts tests/delivery.test.ts tests/gateway.test.ts tests/application.test.ts tests/runtime.test.ts",
     "test:e2e": "playwright test",
     "dev": "node --experimental-strip-types scripts/dev.ts",
     "stop": "node --experimental-strip-types scripts/stop.ts",
@@ -16,6 +16,7 @@
   },
   "dependencies": {
     "@modelcontextprotocol/sdk": "1.32.2",
+    "@xyflow/react": "12.10.0",
     "react": "19.3.1",
     "react-dom": "19.3.1",
     "zod": "4.6.7"
