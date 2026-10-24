@@ -22,4 +22,4 @@ Assigned worktree was clean at3581fa2. Primary checkout remains main70280d8. No 
 
 ## Progress and evidence
 
-Next: commit exact durable application state/intents/projection/lifecycle contract, then derive tests and implementation. Initial code input has no delivered player; no browser or acceptance result is claimed.
+Durable exact05B state/intents/projection/lifecycle and05C ownership seams are now specified in [product knowledge](../../../../product/review-loop/story-and-exploration.md#exact-05b-application-and-react-contract). Next: failing focused tests, then derived implementation. Initial code input has no delivered player; no browser or acceptance result is claimed.
