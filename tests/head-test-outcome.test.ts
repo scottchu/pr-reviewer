@@ -69,3 +69,13 @@ test('B04 corrupted artifact preserves committed result while bounded read repor
   assert.equal(f.store.tests.query(f.token,{reviewId:'review',snapshotId:'head-snapshot',jobId:receipt.jobId}).selectedJob!.result!.resultId,result.resultId);
  }finally{f.cleanup();await input.cleanup();}
 });
+test('B04 observed assertion failure is failed rather than environment error or unknown',async()=>{
+ const input=await headPreparationFixture({assertionFailure:true}),f=headTestFixture({testOptions:{testOnlyExecution:true}},{headSha:input.headSha});
+ try{
+  const artifactRoot=join(input.root,'artifacts');await mkdir(artifactRoot);f.store.tests.command(f.token,f.request);const {grant}=f.store.tests.claim(f.store.tests.beginOwner())!;
+  const prepared=await prepareHeadTestInputs({store:f.store,grant,executionRoot:input.executionRoot,fixtureInputs:input});f.store.tests.prepared(grant,prepared);const run=await executePreparedHeadTest({store:f.store,grant,witness:prepared});assert.notEqual(run.run.exitCode,0);
+  const witness=await observeHeadTestOutcome({store:f.store,grant,artifactRoot});assert.ok(witness);const receipt=f.store.tests.complete(grant,witness);
+  const job=f.store.tests.query(f.token,{reviewId:'review',snapshotId:'head-snapshot',jobId:receipt.jobId}).selectedJob!;
+  assert.equal(job.state,'failed');assert.equal(job.result!.reason,'assertions_failed');assert.deepEqual(job.result!.execution!.counts,{passed:0,failed:4,total:4});
+ }finally{f.cleanup();await input.cleanup();}
+});

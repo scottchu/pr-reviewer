@@ -109,7 +109,7 @@ export type HeadTestResult=Readonly<{
  processes:readonly Readonly<{ordinal:number;role:string;state:string;exitCode:number|null;signal:string|null}>[];
  state:'passed'|'failed'|'cancelled'|'timed_out'|'unavailable'|'error';reason:string;
  preparation:HeadTestJob['preparation']|null;preparationAbsence:'not_completed'|null;
- execution:Readonly<{exitCode:number|null;signal:string|null;collectionObserved:boolean}>|null;executionAbsence:'not_started'|null;
+ execution:Readonly<{exitCode:number|null;signal:string|null;collectionObserved:boolean;counts:Readonly<{passed:number;failed:number;total:number}>|null}>|null;executionAbsence:'not_started'|null;
  output:Readonly<{observedBytes:number;retainedBytes:number;overflow:boolean}>;
  artifacts:readonly HeadTestArtifact[];
 }>;

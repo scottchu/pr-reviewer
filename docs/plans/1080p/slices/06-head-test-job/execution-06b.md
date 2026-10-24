@@ -139,3 +139,7 @@ Independent report `/tmp/pr-reviewer-06-plan-review/review-692dbca.md`, SHA-256 
 ## B1 qualification and prepared transition progress
 
 [Exact qualification/prepared checkpoint](checkpoint-06b-qualification.md) adds private witness/configuration construction and same-lease transition with34 bounded checks and an exact2bd prerequisite qualification observation. Full result/artifact/coordinator and B2/B3 consumer readiness remain pending.
+
+## Current B1 consumer and integration checkpoint
+
+[Public consumer ports](consumer-ports-06b.md) supersede the earlier missing-result/coordinator status: same-job result/receipt/artifact admission, qualified fixed execution and managed gateway owner are implemented candidates. Root separately authorized scripts.test registration only; conflict-free task merges consumed mainb096 plus87562cd/b22a3fd knowledge. All14 new Node suites are in the normal entrypoint, which passed47 Bun and348 Node cases before the subsequent assertion-count refinement. Other scripts/dependencies/lock remain unchanged. Full independent B1 review, fresh final-source qualification and all B2/B3/06C/product acceptance gates remain open.

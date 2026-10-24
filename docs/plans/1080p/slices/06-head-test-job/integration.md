@@ -2,9 +2,9 @@
 
 **Date:** 2026-10-24
 
-**Handoff revision:** 6; exact combined source input `10bc29e09efbf6ee0433ef4ad527af73d4e5fec3` plus this committed packet.
+**Handoff revision:** 7; current delivered consumer values are pinned in [the B1 public-port checkpoint](consumer-ports-06b.md); original revision6 input10bc29e and review pins remain historical.
 
-**Status:** R3 passed internal06A and Q4 revision5 passed at0b9002f. Delivered05E is reconciled; narrow successor review precedes B1 code dispatch. Full-slice acceptance remains open.
+**Status:** B1 backend candidate implemented with actual isolated322 execution evidence and normal entrypoint pass. Independent full-backend/process review is required before B2/B3 dispatch or acceptance; this is not a product/UI/CLI readiness claim.
 
 **Owner:** `plan_head_test_slice06` is the named B1 backend integrator in [I6](execution-06b.md#i6-named-b1-implementation-assignment); root owns acceptance and dispatch. B2/B3 remain unassigned.
 
@@ -14,7 +14,7 @@
 
 ## Versioned boundary and composition
 
-The following are exact proposed interface responsibilities, not an already delivered export inventory. Implementers may choose local helper names but cannot change values/authority/evidence meanings without first updating the durable specification and this handoff.
+The following retains the planned responsibility map. The linked public-port checkpoint is the exact delivered B1 export/HTTP inventory; B2/B3 responsibilities remain proposed and unassigned. Implementers may choose local helper names but cannot change values/authority/evidence meanings without first updating the durable specification and this handoff.
 
 | Owner / public surface | Inputs, outputs and boundary |
 |---|---|

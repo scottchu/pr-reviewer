@@ -2,15 +2,15 @@
 
 **Date:** 2026-10-24
 
-**Packet revision:** 6.
+**Packet revision:** 7; implementation/readback reconciliation over preserved revision6 history.
 
-**Status:** Internal06A independently READY; Q4 revision5 design PASS at0b9002f. [06B packet](execution-06b.md) reconciles delivered05E at10bc29e and names B1 for narrow successor review before code dispatch. Full G1 and product-job/React/CLI/own-PR acceptance remain open.
+**Status:** Internal06A independently READY. B1 backend consumer candidate is implemented; [public ports and evidence](consumer-ports-06b.md) supersede the earlier planning-only status. Mainb096 predecessor/87562cd closeout/b22a3fd steering knowledge are merged into the task branch. Full B1 independent review and06 React/CLI/fault/own-PR/visual/knowledge acceptance remain open.
 
 **Parent:** [1080p round](../../plan.md), [delivery through1080p](../../../delivery-through-1080p.md).
 
 **Durable specification:** [Configured tests on a pinned head](../../../../product/review-loop/test-execution.md), revision `head-test-v1`.
 
-**Ownership:** Root owns acceptance, exact role assignment, integration, PR/main and delivery. This planning worker is the sole slice06 product-doc writer for this packet. Implementation and review role scopes are in [integration revision6](integration.md); unassigned roles are not ready dispatches.
+**Ownership:** Root owns acceptance, exact role assignment, integration, PR/main and delivery. This planning worker is the sole slice06 product-doc writer for this packet. Implementation and review role scopes are in [integration revision7](integration.md); unassigned roles are not ready dispatches.
 
 ## Intent, baseline and gap
 
@@ -25,7 +25,7 @@ Source baseline is immutable `67b24f31dd322d034c0a2ec6b73006c009fba310`. Existin
 | Decision / observation | Status and effect |
 |---|---|
 | Select `review-source-core-v1` only | Proposed initial delivery: exact declared four-file Bun stage, cwd isolated root. Optional Node production target deferred to avoid enlarging the first effect surface. Real process regression tests remain required engineering verification. |
-| Complete raw-object execution tree without linked Git metadata | Qualified on exact67 by the bounded raw-object probe; avoids checkout hooks/filters/export transformations and live-worktree mutation. Production preparation remains unimplemented. |
+| Complete raw-object execution tree without linked Git metadata | Qualified on exact67 by the bounded raw-object probe; avoids checkout hooks/filters/export transformations and live-worktree mutation. Historical qualification on67; current B1 preparation/execution candidate has separate exact322 evidence in the consumer checkpoint. |
 | Existing two-package closure, task-owned copy | Observed copied existing closure qualified on exact67; fresh metadata/content/copy checks remain mandatory per run. Never link shared writable dependencies or run package scripts. |
 | Script-only donor manifest drift | Root accepted in-scope design choice for review: exact lock plus canonical entire package.json minus only scripts must match. Record full manifests and exact changed script keys. Any other mismatch is unavailable. |
 | Single shared import/analysis/test effect slot | Required boundary. Extend atomic lease, epoch checks and unfinished scan; unknown test effects participate. Discussion remains independent. |
