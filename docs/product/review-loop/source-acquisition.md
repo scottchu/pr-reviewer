@@ -4,7 +4,7 @@
 
 **Context contract:** `pinned-typescript-context-v1`
 
-**Implementation status:** Context port independently reviewed and incorporated into the slice04 core candidate with trusted snapshot/corpus witness and mapping tests. Full integration/React acceptance remains open.
+**Implementation status:** Context port and integrated core/React candidate independently reviewed with trusted snapshot/corpus witness and mapping tests. Actual ownPR understanding and full slice acceptance remain open.
 
 **Parents:** [Review loop](README.md), [import boundary](evolution.md#import-boundary-v1)
 

@@ -4,7 +4,7 @@
 
 **Contract revision:** `source-neighborhood-v1`
 
-**Implementation:** Pure analyzer/declaration modules and integrated owned-worker/store core independently reviewed. The integrated React candidate is under correction/review; actual ownPR understanding and full slice acceptance remain open.
+**Implementation:** Pure analyzer/declaration modules and integrated owned-worker/store/React candidate independently reviewed. Actual ownPR understanding and full slice acceptance remain open.
 
 **Parents:** [Architecture](../architecture.md), [source and graph boundary](evolution.md), [reactive ownership](../reactive-design.md)
 

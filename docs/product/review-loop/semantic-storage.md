@@ -4,7 +4,7 @@
 
 **Date:** 2026-10-24 UTC
 
-**Status:** Bounded core and worker independently reviewed; integrated React, ownPR understanding and whole-product acceptance remain open.
+**Status:** Bounded core, worker and integrated React independently reviewed; ownPR understanding and whole-product acceptance remain open.
 
 **Parents:** [Semantic meaning and execution](semantic-graph.md), [existing persistence compatibility](persistence-compatibility.md).
 
