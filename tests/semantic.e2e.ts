@@ -54,7 +54,7 @@ test('real React, Git, SQLite and Node worker: explicit both-side neighbors, exa
  await until(async()=>(await query()).jobs.at(-1)?.state==='admitted');const admitted=await query(),exitObservedAt=new Date().toISOString(),facts=admitted.analysis!;expect(admitted.jobs.at(-1)!.invocations.at(-1)!.processes.at(-1)!.state).toBe('exited');expect(facts.status).toBe('analyzed');if(facts.status!=='analyzed')throw new Error('analysis_unavailable');
  expect(facts.edges.filter(edge=>facts.nodes.find(node=>node.id===edge.caller)?.name==='caller')).toHaveLength(2);expect(facts.edges.filter(edge=>facts.nodes.find(node=>node.id===edge.callee)?.name==='helper')).toHaveLength(2);
  await expect(panel.getByRole('heading',{name:'Admitted static neighborhood'})).toBeVisible();await expect(panel.locator('.semantic-canvas .react-flow__node')).toHaveCount(6);expect(await panel.locator('.semantic-canvas .react-flow__node').count()).toBeLessThanOrEqual(12);
- await expect(panel.locator('.semantic-node pre').filter({hasText:'helper(2)'})).toHaveCount(1);await expect(panel.getByText(/unsupported_dispatch/).first()).toBeVisible();
+ await expect(panel.locator('.semantic-node pre')).toHaveCount(0);await expect(panel.locator('.semantic-node-direction').first()).toContainText('Calls:');await expect(panel.getByText(/unsupported_dispatch/).first()).toBeVisible();
  await page.getByLabel('Your question').fill('UNSENT original source draft');const selection=await page.getByLabel('Source file').inputValue();
  for(const side of ['base','head'] as const){
   const caller=facts.nodes.find(node=>node.name==='caller'&&node.declaration.side===side)!,helper=facts.nodes.find(node=>node.name==='helper'&&node.declaration.side===side)!;

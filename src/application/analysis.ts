@@ -20,6 +20,12 @@ export const semanticProjection=(view:AnalysisView|null,focus:string)=>{
  const nodes=selected.sort((a,b)=>rank(a)-rank(b)),ids=new Set(nodes.map(node=>node.id));
  return {nodes,edges:analysis.edges.filter(edge=>ids.has(edge.caller)&&ids.has(edge.callee)),totalNodes:relevant.size};
 };
+export const semanticRelationshipProjection=(view:AnalysisView|null,focus:string)=>{
+ const projection=semanticProjection(view,focus),analysis=view?.analysis;
+ const active=projection.nodes.find(node=>node.id===focus)?.id??(analysis?.status==='analyzed'?analysis.neighborhoods.find(item=>item.nodeId)?.nodeId:undefined);
+ const name=(id:string)=>analysis?.status==='analyzed'?analysis.nodes.find(node=>node.id===id)?.name??'Unavailable function':'Unavailable function';
+ return {...projection,nodes:projection.nodes.map(node=>({node,selected:node.id===active,incoming:projection.edges.filter(edge=>edge.callee===node.id).map(edge=>name(edge.caller)),outgoing:projection.edges.filter(edge=>edge.caller===node.id).map(edge=>name(edge.callee))})),edges:projection.edges.map(edge=>({edge,label:`${name(edge.caller)} → ${name(edge.callee)} · static call`}))};
+};
 export const semanticIssueProjection=(view:(Pick<AnalysisView,'analysis'> & {corpus:Pick<NonNullable<AnalysisView['corpus']>,'issues'>|null})| null,focus:string,sourceAnchor:SemanticAnchor|null=null)=>{
  const analysis=view?.analysis,selected=sourceAnchor??(analysis?.status==='analyzed'?analysis.nodes.find(node=>node.id===focus)?.body:null)??null;
  const matches=(anchor:SemanticAnchor)=>Boolean(selected&&anchor.snapshotId===selected.snapshotId&&anchor.side===selected.side&&anchor.path===selected.path&&anchor.contentHash===selected.contentHash&&anchor.start<selected.end&&anchor.end>selected.start);

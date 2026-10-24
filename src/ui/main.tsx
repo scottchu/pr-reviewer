@@ -6,7 +6,7 @@ import type { Anchor, Review, SourceView } from "../domain/public.ts";
 import "./style.css";
 import { ReviewGraph } from "./graph.tsx";
 import {Imports} from "./imports.tsx";
-import {StoryPanel} from "./story.tsx";
+import {StoryPanel,QuestionEvidenceStatus} from "./story.tsx";
 import {SemanticPanel} from "./semantic-panel.tsx";
 const initialWorkspace = () => createReviewWorkspace(
   new URLSearchParams(window.location.search).get("reviewId") ?? "pr-14",
@@ -257,7 +257,7 @@ const App = () => {
                     />
                   </label>
                 </div>
-                <p className="selection" id="selection">
+                <QuestionEvidenceStatus bridge={storyBridge}/><p className="selection" id="selection">
                   {selected.side} · {selected.path}:{selected.startLine}–
                   {selected.endLine}
                 </p>
