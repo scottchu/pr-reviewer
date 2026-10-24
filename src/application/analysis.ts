@@ -40,6 +40,8 @@ export const createAnalysisBridge=(reviewId:string)=>{
  let connection:object|null=null,read:{controller:AbortController;owner:Owner;done:Promise<void>;finish:()=>void}|null=null,sourceRead:{controller:AbortController;owner:Owner}|null=null;
  let pending:{command:AnalysisCommand;fingerprint:string;receipt?:AnalysisReceipt;jobGeneration?:number}|null=null;
  let operation:object|null=null;
+ let priorSelection:{snapshotId:string;analysisId:string|undefined;state:SemanticView}|null=null;
+ const captureAnalysisId=()=>state.view?.analysis?.status==='analyzed'?state.view.analysis.analysisId:null;
  const warmControllers=new Set<AbortController>();
  const publish=(next:SemanticView)=>{state=next;for(const listener of listeners)listener();};
  const owner=():Owner=>({generation,token,snapshotId,analysisId});
@@ -127,15 +129,19 @@ export const createAnalysisBridge=(reviewId:string)=>{
    }
   }
   // Commands retain their exact retry intent within this credential even when private navigation changes.
-  interrupt();snapshotId=nextSnapshotId;analysisId=nextAnalysisId;
+  const previous=state.view?{snapshotId,analysisId,state}:priorSelection;
+  interrupt();snapshotId=nextSnapshotId;analysisId=nextAnalysisId;priorSelection=previous;const selection=owner();
   publish({...empty(),authenticated:Boolean(token),uncertain:Boolean(pending)});
-  if(token&&snapshotId)await refresh(owner());
+  try{if(token&&snapshotId)await refresh(selection);if(owns(selection))priorSelection=null;}catch(error){
+   if(owns(selection)){interrupt();snapshotId=previous?.snapshotId??'';analysisId=previous?.analysisId;priorSelection=null;publish(previous?{...previous.state,reading:false,sourceBusy:false,busy:false,error:error instanceof Error?error.message:'analysis_unavailable'}:{...empty(),error:error instanceof Error?error.message:'analysis_unavailable'});}
+   throw error;
+  }
  };
  return {
   getSnapshot:()=>state,subscribe:(listener:()=>void)=>{listeners.add(listener);return()=>listeners.delete(listener);},
-  login:async(value:string=localOwnerSession,nextSnapshotId=snapshotId)=>{interrupt();token=value.trim();snapshotId=nextSnapshotId;analysisId=undefined;pending=null;disposed=false;publish(empty());if(token&&snapshotId)await refresh(owner());},
-  logout:()=>{interrupt();token='';pending=null;publish(empty());},select,
-  refresh:()=>refresh(owner()),send,
+  login:async(value:string=localOwnerSession,nextSnapshotId=snapshotId)=>{interrupt();priorSelection=null;token=value.trim();snapshotId=nextSnapshotId;analysisId=undefined;pending=null;disposed=false;publish(empty());if(token&&snapshotId)await refresh(owner());},
+  logout:()=>{interrupt();priorSelection=null;token='';pending=null;publish(empty());},select,
+  refresh:()=>refresh(owner()),send,captureAnalysisId,
   requestContext:(worktree:string,sourceProject:string,context:Pick<Extract<AnalysisCommand,{type:'RequestAnalysis'}>,'contextFilesPerSide'|'priorityPaths'>={})=>send({type:'RequestAnalysis',reviewId,snapshotId,expectedAnalysisGeneration:state.view?.analysisGeneration??0,...(worktree.trim()?{worktree:worktree.trim()}:{}),...(sourceProject.trim()?{sourceProject:sourceProject.trim()}:{}),...(context.contextFilesPerSide===undefined?{}:{contextFilesPerSide:context.contextFilesPerSide}),...(context.priorityPaths===undefined?{}:{priorityPaths:structuredClone(context.priorityPaths)})}),
   chooseDeclarations:(declarationIds:string[])=>{
    const preparation=state.view?.preparation,job=state.view?.jobs.find(job=>job.jobId===preparation?.jobId);
@@ -151,7 +157,7 @@ export const createAnalysisBridge=(reviewId:string)=>{
   focus:(id:string)=>{publish({...state,focus:id});void warm(owner());},
   openSource:async(anchor:SemanticAnchor,navigation:{intent?:'inspect'|'restore';signal?:AbortSignal}={})=>{
    if(navigation.signal?.aborted)throw new Error('selection_superseded');
-   if(!analysisId&&state.view?.analysis){analysisId=state.view.analysis.analysisId;abortRead();publish({...state,reading:false});}
+   if(!analysisId&&captureAnalysisId()){analysisId=captureAnalysisId()!;abortRead();publish({...state,reading:false});}
    const o=owner(),corpus=state.view?.corpus;if(!corpus||anchor.snapshotId!==snapshotId)throw new Error('source_unavailable');
    sourceRead?.controller.abort();const op={owner:o,controller:new AbortController()};sourceRead=op;
    const cancel=()=>{op.controller.abort();if(sourceRead===op){sourceRead=null;if(owns(o))publish({...state,sourceBusy:false});}};navigation.signal?.addEventListener('abort',cancel,{once:true});

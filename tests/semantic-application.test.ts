@@ -1,5 +1,7 @@
 import {test} from 'node:test';
 import {writeFileSync} from 'node:fs';
+import {join} from 'node:path';
+import {createHash} from 'node:crypto';
 import {semanticFixture,eventually} from './semantic-fixture.ts';
 import {createGateway} from '../src/server/public.ts';
 import assert from 'node:assert/strict';
@@ -276,4 +278,37 @@ test('D3 relationship presentation names caller and callee without changing admi
  assert.deepEqual(projected.edges.map(item=>item.edge),edges);assert.equal(projected.edges[0]!.label,'name-a → name-b · static call');
  assert.deepEqual(projected.nodes.find(item=>item.node.id==='a')!.incoming,['name-b']);assert.deepEqual(projected.nodes.find(item=>item.node.id==='a')!.outgoing,['name-b']);
  assert.equal(semanticRelationshipProjection(null,'a').edges.length,0);
+});
+
+
+test('failed explicit semantic selection restores prior valid polling scope',async()=>{
+ const f=controlledFetch(),bridge=createAnalysisBridge('r');try{
+ const login=bridge.login('owner','s');f.calls[0]!.resolve(view());await login;
+ bridge.focus('kept');const selected=bridge.select('missing','a'.repeat(64));f.calls[1]!.resolve({error:'analysis_record_unavailable'},400);await assert.rejects(selected,/analysis_record_unavailable/);
+ assert.equal(bridge.getSnapshot().view?.snapshotId,'s');assert.equal(bridge.getSnapshot().focus,'kept');
+ const refresh=bridge.refresh();assert.equal(new URL(f.calls[2]!.url,'http://local').searchParams.get('snapshotId'),'s');assert.equal(new URL(f.calls[2]!.url,'http://local').searchParams.has('analysisId'),false);f.calls[2]!.resolve(view());await refresh;
+ const stale=bridge.select('stale','b'.repeat(64)),staleRejected=assert.rejects(stale,/unauthorized/),fresh=bridge.select('fresh');f.calls[4]!.resolve(view('fresh'));await fresh;f.calls[3]!.resolve({error:'unauthorized'},403);await staleRejected;assert.equal(bridge.getSnapshot().view?.snapshotId,'fresh');
+ }finally{f.restore();}
+});
+
+ test('real unavailable compute legacy frame reload restores draft without poisoned polling', {timeout:30000},async()=>{
+const {createReviewWorkspace}=await import('../src/application/workspace.ts'),{createPrivateSession}=await import('../src/application/private-session.ts');const f=semanticFixture();writeFileSync(join(f.root,'caller.ts'),'import {callee} from "./callee";\nexport const caller=()=>{'+ 'callee();'.repeat(4001)+'};\n');f.git('add','caller.ts');f.git('commit','-qm','bounded output-site failure');const headSha=f.git('rev-parse','HEAD'),snapshot={...f.snapshot,headSha,snapshotId:createHash('sha256').update(headSha).digest('hex')};f.store.prepare('bounded',snapshot);
+const gateway=createGateway(f.store,async()=>({state:'unknown',reason:'fixture'})),base=`http://127.0.0.1:${await gateway.listen(0)}`,original=fetch,reads:{url:string;status:number}[]=[];globalThis.fetch=(async(input:Parameters<typeof fetch>[0],options?:RequestInit)=>{const url=String(input),response=await original(url.startsWith('/')?base+url:url,options);if(url.startsWith('/api/analysis?'))reads.push({url,status:response.status});return response;}) as typeof fetch;
+const values=new Map<string,string>(),storage={getItem:(k:string)=>values.get(k)??null,setItem:(k:string,v:string)=>{values.set(k,v);},removeItem:(k:string)=>{values.delete(k);}},session=createPrivateSession({storage,origin:'http://fixture'}),query=()=>f.store.analysis.query(f.token,{reviewId:'bounded',snapshotId:snapshot.snapshotId});let a:ReturnType<typeof createReviewWorkspace>|undefined,b:ReturnType<typeof createReviewWorkspace>|undefined,da=()=>{},db=()=>{};
+try{
+ a=createReviewWorkspace('bounded',snapshot.snapshotId,{session});da=a.connect();await a.login(f.token);await a.analysis.requestContext(f.root,'scottchu/pr-reviewer');await eventually(()=>query().jobs.at(-1)?.state==='awaiting_declarations',10000);await a.analysis.refresh();const inv=query().preparation!.inventory!;await a.analysis.chooseDeclarations((inv.status==='available'?inv.declarations:[]).filter(x=>x.name==='callee').map(x=>x.id));await eventually(()=>query().jobs.at(-1)?.state==='unavailable',15000);await a.analysis.refresh();const view=a.analysis.getSnapshot().view!;assert.ok(view.analysis);assert.equal(view.analysis.status,'unavailable');assert.equal(view.analysis.status==='unavailable'&&view.analysis.limit,'outputSites');assert.equal(view.selectedAnalysisId,null);
+ assert.equal(a.analysis.captureAnalysisId(),null);
+ const sourceAnchor=inv.status==='available'?inv.declarations.find(item=>item.declaration.side==='head')!.declaration:null;assert.ok(sourceAnchor);await a.analysis.openSource(sourceAnchor);await a.analysis.refresh();assert.equal(new URL(reads.at(-1)!.url,'http://local').searchParams.has('analysisId'),false);a.analysis.closeSource();
+ // Reproduce a legacy persisted frame through the real public capture path.
+ a.story.editDraft('Preserve failed-compute draft');
+ a.captureMap('semantic',snapshot.snapshotId,{analysisId:view.analysis.analysisId,focus:'',viewport:{x:18,y:18,zoom:1},fullSource:true,sourceAnchor,corpusId:view.corpus!.corpusId});assert.ok([...values.values()].some(v=>v.includes(view.analysis!.analysisId)));da();
+ const start=reads.length;b=createReviewWorkspace('bounded',snapshot.snapshotId,{session});db=b.connect();await b.login(f.token);assert.equal(b.analysis.getSnapshot().error,'');await b.analysis.refresh();await b.analysis.refresh();assert.equal(b.story.getSnapshot().maps.semantic?.analysisId,null);assert.equal(b.story.getSnapshot().drafts[0]?.text,'Preserve failed-compute draft');assert.match(b.story.getSnapshot().viewRecoveryMessage,/unavailable.*not admitted/i);assert.ok(reads.slice(start).every(read=>read.status===200));assert.deepEqual(b.story.getSnapshot().maps.semantic?.viewport,{x:18,y:18,zoom:1});assert.equal(b.story.getSnapshot().maps.semantic?.fullSource,true);assert.deepEqual(b.analysis.getSnapshot().sourceAnchor,sourceAnchor);
+ // An arbitrary missing pin remains an honest restoration failure, while the bridge rolls back.
+ b.captureMap('semantic',snapshot.snapshotId,{analysisId:'f'.repeat(64),focus:'',viewport:{x:18,y:18,zoom:1},fullSource:false,sourceAnchor:null,corpusId:null});db();b=createReviewWorkspace('bounded',snapshot.snapshotId,{session});db=b.connect();await b.login(f.token);assert.match(b.story.getSnapshot().viewRecoveryMessage,/analysis_record_unavailable/);await b.analysis.refresh();assert.equal(new URL(reads.at(-1)!.url,'http://local').searchParams.has('analysisId'),false);
+ // A newer preparation cannot establish that the saved old pin is the displayed unavailable result.
+ await b.analysis.requestContext(f.root,'scottchu/pr-reviewer');await eventually(()=>query().jobs.at(-1)?.state==='awaiting_declarations',10000);await b.analysis.refresh();assert.equal(b.analysis.getSnapshot().view?.analysis,null);assert.equal(b.analysis.captureAnalysisId(),null);
+ b.story.resetPrivateView();b.captureMap('semantic',snapshot.snapshotId,{analysisId:view.analysis.analysisId,focus:'',viewport:{x:18,y:18,zoom:1},fullSource:false,sourceAnchor:null,corpusId:null});db();b=createReviewWorkspace('bounded',snapshot.snapshotId,{session});db=b.connect();await b.login(f.token);assert.match(b.story.getSnapshot().viewRecoveryMessage,/analysis_record_unavailable/);await b.analysis.refresh();assert.equal(new URL(reads.at(-1)!.url,'http://local').searchParams.has('analysisId'),false);
+
+}finally{da();db();a?.logout();b?.logout();globalThis.fetch=original;await gateway.close();f.cleanup();}
+
 });

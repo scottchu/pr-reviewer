@@ -104,6 +104,7 @@ const defaultClock:StoryClock={now:()=>performance.now(),every:(callback,period)
 export const createStoryBridge=(reviewId:string,options:{clock?:StoryClock;semantic?:StorySemanticPort;session?:PrivateSession;selectSnapshot?:(snapshotId:string)=>Promise<Snapshot>;readSnapshot?:(snapshotId:string,signal?:AbortSignal)=>Promise<Snapshot>}={})=>{
  const clock=options.clock??defaultClock,registry=createRegistry(),listeners=new Set<()=>void>();
  let state=freeze(empty(reviewId)),token='',scope='',privateIntent=0,hydrating=false,viewCheckpointBlocked=false,generation=0,versionId:string|undefined,connection:object|null=null,disposed=false;
+ let recoveryNotice='';
  let contextTarget:number|'current'|null=null;
  let read:AbortController|null=null,contextRead:AbortController|null=null,evidenceRead:AbortController|null=null,focusSerial=0,stopClock:(()=>void)|null=null,lastTick=0,disposeConnection:(()=>void)|null=null;
  let focusRoute:ReturnType<typeof registry.register>|null=null,pollRoute:ReturnType<typeof registry.register>|null=null;
@@ -115,7 +116,7 @@ export const createStoryBridge=(reviewId:string,options:{clock?:StoryClock;seman
  const activeDraft=()=>state.drafts.find(draft=>draft.id===state.activeDraftId)??state.drafts[0]??null;
  const makeDraft=(snapshot:Snapshot):QuestionDraft=>{const source=snapshot.sources.find(source=>source.side==='head'&&source.lineCount>0)??snapshot.sources.find(source=>source.lineCount>0);return {id:crypto.randomUUID(),anchor:source?{snapshotId:snapshot.snapshotId,side:source.side,path:source.path,startLine:1,endLine:1}:null,text:'',submitted:false};};
  const privateView=():PrivateStoryView|null=>state.snapshotId&&state.drafts.length?{reviewId,snapshotId:state.snapshotId,versionId:state.view?.version?.versionId??null,cursor:state.cursor,elapsedMs:state.elapsedMs,surface:state.surface,position:state.position,pageScroll:state.pageScroll,maps:state.maps,activeDraftId:state.activeDraftId,drafts:[...state.drafts],returnFrame:state.returnFrame}:null;
- const checkpoint=()=>{const value=privateView();if(!options.session||!scope||hydrating||viewCheckpointBlocked||!value)return;const result=options.session.saveView(scope,value);if(result.message!==state.viewRecoveryMessage)state=freeze({...state,viewRecoveryMessage:result.message});};
+ const checkpoint=()=>{const value=privateView();if(!options.session||!scope||hydrating||viewCheckpointBlocked||!value)return;const result=options.session.saveView(scope,value);const message=result.message||recoveryNotice;if(message!==state.viewRecoveryMessage)state=freeze({...state,viewRecoveryMessage:message});};
  const replaceDraft=(draft:QuestionDraft)=>publish({...state,drafts:state.drafts.map(current=>current.id===draft.id?draft:current)});
  const assertEditable=()=>{if(state.questionLocked)throw new Error('submission_pending: reconcile the unresolved question first');};
  const assertCanNavigate=()=>{assertEditable();if(activeDraft()?.text.trim())throw new Error('draft_held: keep or clear the active draft before changing its source');};
@@ -131,20 +132,25 @@ export const createStoryBridge=(reviewId:string,options:{clock?:StoryClock;seman
   if(value.returnFrame){const frame=value.returnFrame;if(!value.drafts.some(draft=>draft.id===frame.originalDraftId))throw new Error('saved_return_draft_unavailable');if(!snapshots.has(frame.snapshotId)&&options.readSnapshot)snapshots.set(frame.snapshotId,await options.readSnapshot(frame.snapshotId,validation.signal));if(!snapshots.has(frame.snapshotId))throw new Error('saved_return_source_unavailable');if(frame.versionId){const view=await request(capturedToken,`/api/story?${new URLSearchParams({reviewId,snapshotId:frame.snapshotId,versionId:frame.versionId})}`,validation.signal) as StoryView;if(!view.version||view.version.versionId!==frame.versionId||frame.cursor&&cursorAt(view,frame.cursor.index)?.stepId!==frame.cursor.stepId)throw new Error('saved_return_story_unavailable');}}
   if(expected!==generation)throw new Error('selection_superseded');
   validateMap(state.snapshot,value.maps);
-  await restoreSemantic(value.maps,value.snapshotId,()=>expected===generation&&!disposed&&capturedToken===token,validation.signal);
+  const recovered=await restoreSemantic(value.maps,value.snapshotId,()=>expected===generation&&!disposed&&capturedToken===token,validation.signal);
   if(expected!==generation||disposed||capturedToken!==token)throw new Error('selection_superseded');
-  publish({...state,drafts:value.drafts,activeDraftId:value.activeDraftId,returnFrame:value.returnFrame,maps:value.maps,mapRestoreId:state.mapRestoreId+1,pageScroll:value.pageScroll,cursor:value.cursor,elapsedMs:value.elapsedMs,surface:value.surface,position:clamp(state,value.position.x,value.position.y),mode:value.returnFrame?'exploring':'paused',focusRevision:state.focusRevision+1});
+  recoveryNotice=recovered.message;
+  publish({...state,viewRecoveryMessage:recoveryNotice,drafts:value.drafts,activeDraftId:value.activeDraftId,returnFrame:value.returnFrame,maps:recovered.maps,mapRestoreId:state.mapRestoreId+1,pageScroll:value.pageScroll,cursor:value.cursor,elapsedMs:value.elapsedMs,surface:value.surface,position:clamp(state,value.position.x,value.position.y),mode:value.returnFrame?'exploring':'paused',focusRevision:state.focusRevision+1});
   }finally{readControllers.delete(validation);}
  };
  const restoreSemantic=async(maps:GraphFrames,snapshotId:string,owns:()=>boolean,signal?:AbortSignal)=>{
-  const frame=maps.semantic;if(!frame)return;if(!options.semantic)throw new Error('analysis_unavailable');
+  let frame=maps.semantic;if(!frame)return {maps,message:''};if(!options.semantic)throw new Error('analysis_unavailable');
   const check=()=>{if(!owns())throw new Error('selection_superseded');};check();
+  const observed=options.semantic.getSnapshot().view;let message='',normalizedId:string|null=null;
+  if(frame.analysisId&&observed?.reviewId===reviewId&&observed.snapshotId===snapshotId&&observed.selectedAnalysisId===null&&observed.analysis?.status==='unavailable'&&observed.analysis.analysisId===frame.analysisId&&observed.jobs.some(job=>job.analysisId===frame!.analysisId&&job.state==='unavailable')){
+   normalizedId=frame.analysisId;frame={...frame,analysisId:null};maps={...maps,semantic:frame};message='Saved unavailable analysis was not admitted; restored its diagnostic view without a historical analysis pin.';
+  }
   await awaitRead(options.semantic.select(snapshotId,frame.analysisId??undefined),signal);check();
-  const loaded=options.semantic.getSnapshot();if(frame.analysisId&&loaded.view?.analysis?.analysisId!==frame.analysisId)throw new Error('analysis_record_unavailable');
+  const loaded=options.semantic.getSnapshot();if(normalizedId&&(loaded.view?.snapshotId!==snapshotId||loaded.view.selectedAnalysisId!==null||loaded.view.analysis?.status!=='unavailable'||loaded.view.analysis.analysisId!==normalizedId||!loaded.view.jobs.some(job=>job.analysisId===normalizedId&&job.state==='unavailable')))throw new Error('analysis_record_unavailable');if(frame.analysisId&&loaded.view?.analysis?.analysisId!==frame.analysisId)throw new Error('analysis_record_unavailable');
   if(frame.focus&&(loaded.view?.analysis?.status!=='analyzed'||!loaded.view.analysis.nodes.some(node=>node.id===frame.focus)))throw new Error('analysis_focus_unavailable');
   if(frame.corpusId&&loaded.view?.corpus?.corpusId!==frame.corpusId)throw new Error('source_corpus_unavailable');
   if(frame.sourceAnchor){if(!options.semantic.openSource)throw new Error('source_unavailable');await awaitRead(options.semantic.openSource(frame.sourceAnchor,{intent:'restore',...(signal?{signal}:{})}),signal);check();const selected=options.semantic.getSnapshot();if(JSON.stringify(selected.sourceAnchor)!==JSON.stringify(frame.sourceAnchor)||!selected.source||selected.source.corpusId!==frame.corpusId||selected.source.contentHash!==frame.sourceAnchor.contentHash||selected.source.snapshotId!==snapshotId||selected.source.side!==frame.sourceAnchor.side||selected.source.path!==frame.sourceAnchor.path||frame.sourceAnchor.snapshotId!==snapshotId||frame.sourceAnchor.end<=frame.sourceAnchor.start||frame.sourceAnchor.end>selected.source.content.length)throw new Error(selected.error||'source_unavailable');}
-  else options.semantic.closeSource?.();check();options.semantic.focus(frame.focus);
+  else options.semantic.closeSource?.();check();options.semantic.focus(frame.focus);return {maps,message};
  };
  const stageEvidence=async(target:StoryState,reference:StoryReference,captured:string,owns:()=>boolean,signal:AbortSignal):Promise<StoryState>=>{
   let text='',sources=target.semanticSources;const check=()=>{if(!owns())throw new Error('selection_superseded');};check();
@@ -272,13 +278,14 @@ export const createStoryBridge=(reviewId:string,options:{clock?:StoryClock;seman
  return {
   getSnapshot:()=>state,subscribe:(listener:()=>void)=>{listeners.add(listener);return()=>{listeners.delete(listener);};},intent,
   login:async(value:string,snapshot:Snapshot)=>{
+   recoveryNotice='';
    interrupt();disposed=false;hydrating=true;viewCheckpointBlocked=false;scope='';token=value.trim();versionId=undefined;contextTarget=null;const draft=makeDraft(snapshot);publish({...empty(reviewId),drafts:[draft],activeDraftId:draft.id,questionLocked:state.questionLocked,snapshot:structuredClone(snapshot),snapshotId:snapshot.snapshotId,reducedMotion:state.reducedMotion,hidden:state.hidden,viewport:state.viewport,playerSize:state.playerSize});wireRoutes();const expected=generation;
    try{const view=token?await refresh():undefined;if(!view||expected!==generation)return;if(options.session){const nextScope=await options.session.scope(token);if(expected!==generation)return;scope=nextScope;const saved=options.session.readView(scope);if(saved.kind==='record'&&saved.record?.value){const value=saved.record.value;try{await restorePrivate({...value,drafts:value.drafts.map(draft=>saved.record!.submitted.includes(draft.id)?{...draft,text:'',submitted:true}:draft)},expected);if(saved.record.omitted.length)publish({...state,viewRecoveryMessage:'Oversize saved draft text is unavailable after reload.'});}catch(error){if(expected===generation){viewCheckpointBlocked=true;publish({...state,viewRecoveryMessage:error instanceof Error?error.message:'saved_view_unavailable'});}}}else if(saved.kind!=='none'&&saved.kind!=='record')publish({...state,viewRecoveryMessage:`view_${saved.kind}`});}}
    finally{if(expected===generation){hydrating=false;checkpoint();}}
   },
-  logout:()=>{interrupt();scope='';hydrating=false;token='';versionId=undefined;contextTarget=null;publish(empty(reviewId));wireRoutes();},select:async(snapshot:Snapshot)=>{assertCanNavigate();await select(snapshot);},refresh:()=>refresh(),
+  logout:()=>{interrupt();recoveryNotice='';scope='';hydrating=false;token='';versionId=undefined;contextTarget=null;publish(empty(reviewId));wireRoutes();},select:async(snapshot:Snapshot)=>{assertCanNavigate();await select(snapshot);},refresh:()=>refresh(),
   activeDraft,getPrivateView:privateView,assertCanNavigate,
-  resetPrivateView:()=>{assertEditable();options.session?.clearView();viewCheckpointBlocked=false;publish({...state,viewRecoveryMessage:''});checkpoint();},
+  resetPrivateView:()=>{assertEditable();recoveryNotice='';options.session?.clearView();viewCheckpointBlocked=false;publish({...state,viewRecoveryMessage:''});checkpoint();},
   setQuestionGuard:(locked:boolean)=>{if(locked)invalidatePrivateIntent();if(state.questionLocked!==locked)publish({...state,questionLocked:locked});},
   editDraft:(text:string)=>{invalidatePrivateIntent();assertEditable();const draft=activeDraft();if(!draft)return;if(draft.submitted){const next={...draft,id:crypto.randomUUID(),text,submitted:false};publish({...state,drafts:state.drafts.map(item=>item.id===draft.id?next:item),activeDraftId:next.id});}else replaceDraft({...draft,text});},
   selectSource:(anchor:Anchor,comparisonKey?:string)=>{invalidatePrivateIntent();assertEditable();const draft=activeDraft();if(!draft||!state.snapshot||!validateAnchor(state.snapshot.snapshotId,state.snapshot.sources,anchor))throw new Error('invalid_anchor');if(draft.text.trim()&&(JSON.stringify(anchor)!==JSON.stringify(draft.anchor)||comparisonKey!==draft.comparisonKey))throw new Error('draft_held: source selection is held while the active draft is nonempty');const {comparisonKey:old,...rest}=draft;replaceDraft({...rest,anchor:structuredClone(anchor),...(comparisonKey?{comparisonKey}:{})});intent({type:'pause',reason:'source'});},
@@ -315,9 +322,9 @@ export const createStoryBridge=(reviewId:string,options:{clock?:StoryClock;seman
    validateMap(snapshot,frame.maps);
    let restored:StoryState={...state,snapshot,snapshotId:frame.snapshotId,view,context,cursor:frame.cursor,elapsedMs:frame.elapsedMs,surface:frame.surface,position:clamp(state,frame.position.x,frame.position.y),maps:frame.maps,pageScroll:frame.pageScroll,activeDraftId:original.id,returnFrame:null,mode:'paused',evidence:null,evidenceText:'',semanticSources:{}};
    if(frame.evidence)restored=await stageEvidence(restored,frame.evidence,captured,owns,signal);check();
-   await restoreSemantic(frame.maps,frame.snapshotId,owns,signal);check();
+   const recovered=await restoreSemantic(frame.maps,frame.snapshotId,owns,signal);check();restored={...restored,maps:recovered.maps,viewRecoveryMessage:recovered.message};
    if(state.snapshotId!==frame.snapshotId){if(!options.selectSnapshot)throw new Error('source_unavailable');await options.selectSnapshot(frame.snapshotId);check();}
-   interrupt();versionId=view.version?.versionId;contextTarget=context.selectedRevision;
+   interrupt();recoveryNotice=recovered.message;versionId=view.version?.versionId;contextTarget=context.selectedRevision;
    publish({...restored,drafts:state.drafts,questionLocked:state.questionLocked,mapRestoreId:state.mapRestoreId+1,focusRevision:state.focusRevision+1,reading:false,contextReading:false,evidenceBusy:false,error:''});wireRoutes();
    }finally{if(restoreOperation===operation)restoreOperation=null;}
   },
