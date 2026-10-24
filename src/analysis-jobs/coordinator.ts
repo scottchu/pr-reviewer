@@ -15,11 +15,18 @@ export type AnalysisRunnerOptions = {
 export const createAnalysisRunner = (store: Store, options: AnalysisRunnerOptions = {}) => {
     const analysis = store.analysis, owner = analysis.beginOwner(), registry = createRegistry();
     let active = false, stopped = false, current: Promise<void> | null = null, abort: AbortController | null = null;
+    let fenced=false,failure:string|null=null;
+    let lastJobs:ReturnType<typeof analysis.diagnostics>=[];
+    const noteFailure=(error:unknown)=>{const raw=error instanceof Error?error.message:"analysis_failed";failure=/^[a-z][a-z0-9_]{0,63}$/.test(raw)?raw:"analysis_failed";if(raw==="stale_execution_owner"||raw==="stale_analysis_runner")fenced=true;};
+    const diagnosticSnapshot=()=>{
+        if(!fenced)try{lastJobs=analysis.diagnostics(owner);}catch(error){noteFailure(error);}
+        return {cursorMeaning:"route_publications" as const,disposition:fenced?"fenced" as const:"active" as const,failure,jobs:structuredClone(lastJobs)};
+    };
     const pending: (() => void)[] = [];
     const admission = registry.register("verified-semantic-result-to-admission", "analysis-owner", () => !stopped, () => { while (pending.length)
         pending.shift()!(); });
     const tick = async () => {
-        if (active || stopped)
+        if (active || stopped || fenced)
             return;
         active = true;
         try {
@@ -28,7 +35,7 @@ export const createAnalysisRunner = (store: Store, options: AnalysisRunnerOption
                 if (processes.every(process => process.state === "exited" && (process.pid === undefined || !groupExists(process.pid)) || process.state === "started" && process.pid !== undefined && !groupExists(process.pid)))
                     analysis.confirmQuiescent(owner, job.jobId);
             }
-            while (!stopped) {
+            while (!stopped && !fenced) {
                 const claim = analysis.claim(owner);
                 if (!claim)
                     break;
@@ -79,8 +86,8 @@ export const createAnalysisRunner = (store: Store, options: AnalysisRunnerOption
         }
     };
     const requests = registry.register("analysis-request-committed-to-owner", "analysis-owner", () => !stopped, () => { if (active || stopped)
-        return; current = tick(); void current.catch(() => { }); });
+        return; current = tick(); void current.catch(noteFailure); });
     const timer = setInterval(() => requests.emit(), 200);
     requests.emit();
-    return { wake: () => requests.emit(), idle: async () => { await current; }, diagnostics: () => registry.diagnostics(), stop: async () => { stopped = true; abort?.abort(); clearInterval(timer); pending.length = 0; registry.dispose(); await current; } };
+    return { wake: () => requests.emit(), idle: async () => { await current; }, diagnostics: () => {const routes=registry.diagnostics();if(!routes.length)return [];const snapshot=diagnosticSnapshot();return routes.map(route=>({...route,...snapshot}));}, stop: async () => { stopped = true; abort?.abort(); clearInterval(timer); pending.length = 0; registry.dispose(); await current?.catch(noteFailure); } };
 };

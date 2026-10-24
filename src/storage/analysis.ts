@@ -207,7 +207,8 @@ export const createAnalysisStore = ({ db, tx, load, authorize, execution, limits
                     if (!worktree)
                         throw new Error("source_locator_required");
                     for (const older of pending.filter(item => item.reviewId === reviewId && item.snapshotId === snapshotId)) {
-                        older.state = older.state === "unknown" ? "unknown" : "superseded";
+                        if (older.state === "unknown") continue;
+                        older.state = "superseded";
                         older.reason = "new_analysis_generation";
                         update(older);
                     }
@@ -429,6 +430,13 @@ export const createAnalysisStore = ({ db, tx, load, authorize, execution, limits
             if (contextResult.corpus)
                 job.failureAccount = account({ corpus: contextResult.corpus, issues: contextResult.issues });
         } update(job); }),
+        diagnostics: (value: AnalysisOwner) => {
+            owner(value);
+            const latest=db.prepare("SELECT body FROM analysis_jobs ORDER BY rowid DESC LIMIT 1").get() as {body:string}|undefined;
+            const effect=db.prepare("SELECT body FROM analysis_jobs WHERE json_extract(body,'$.state')='unknown' OR json_extract(body,'$.invocations[#-1].state')='running' ORDER BY rowid DESC LIMIT 1").get() as {body:string}|undefined;
+            const jobs=new Map([effect,latest].flatMap(row=>row?[JSON.parse(row.body) as Job]:[]).map(job=>[job.jobId,job]));
+            return [...jobs.values()].map(job=>({reviewId:job.reviewId,snapshotId:job.snapshotId,jobId:job.jobId,invocationId:job.invocations.at(-1)?.invocationId??null,analysisGeneration:job.generation,jobRevision:job.jobRevision,graphRevision:graph(job.reviewId,job.snapshotId).graphRevision,phase:job.invocations.at(-1)?.phase??null,state:job.state,reason:job.reason===null?null:/^[a-z][a-z0-9_]{0,63}$/.test(job.reason)?job.reason:"analysis_failed"}));
+        },
         unknown: (value: AnalysisOwner) => { owner(value); return all().filter(job => job.state === "unknown").map(publicJob); },
         confirmQuiescent: (value: AnalysisOwner, jobId: string) => tx(() => { owner(value); const job = get(jobId), invocation = job.invocations.at(-1); if (job.state !== "unknown" || !invocation)
             throw new Error("invalid_request"); execution.clearQuiescent("analysis", job.jobId, invocation.invocationId); job.state = "failed"; job.reason = "interrupted_invocation_not_replayed"; update(job); }),
