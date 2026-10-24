@@ -1,0 +1,71 @@
+import {test} from 'node:test';
+import assert from 'node:assert/strict';
+import {createStoryBridge,storyTransition,storyProjection,createAnalysisBridge} from '../src/application/public.ts';
+import type {StoryState,StoryClock} from '../src/application/public.ts';
+import type {StoryView,StoryContextView,StoryContent,AnalysisView} from '../src/domain/public.ts';
+import {storyFixture} from './story-fixture.ts';
+const deferredFetch=()=>{
+ const original=globalThis.fetch;
+ const calls:{url:string;options:RequestInit|undefined;resolve:(body:unknown)=>void}[]=[];
+ globalThis.fetch=((url:string|URL|Request,options?:RequestInit)=>new Promise<Response>(resolve=>calls.push({url:String(url),options,resolve:body=>resolve(new Response(JSON.stringify(body),{status:200}))}))) as typeof fetch;
+ return {calls,restore:()=>{globalThis.fetch=original;}};
+};
+const turn=()=>new Promise<void>(resolve=>setImmediate(resolve));
+const manualClock=()=>{let now=0,serial=0;const timers=new Map<number,{callback:()=>void;period:number}>();const clock:StoryClock={now:()=>now,every:(callback,period)=>{const id=++serial;timers.set(id,{callback,period});return()=>{timers.delete(id);};}};return {clock,timers,advance:(ms:number)=>{now+=ms;for(const timer of [...timers.values()])if(timer.period===250)timer.callback();},poll:()=>{for(const timer of [...timers.values()])if(timer.period===700)timer.callback();}};};
+const authored=(f:ReturnType<typeof storyFixture>)=>{
+ const chapter=f.story.chapters[0]!,step=f.story.steps[0]!;
+ const story:StoryContent={...f.story,chapters:[{...chapter,stepIds:['second','step']},{...chapter,id:'limits',title:'Remaining limits',stepIds:['last']}],steps:[step,{...step,id:'last',headline:'Limits remain'}, {...step,id:'second',headline:'Begin here'}]};
+ assert.equal(f.store.story.command(f.token,f.publish({story})).state,'applied');
+ return f.store.story.query(f.token,{reviewId:'r',snapshotId:'snapshot'});
+};
+const context=(f:ReturnType<typeof storyFixture>):StoryContextView=>f.store.story.context(f.token,{reviewId:'r',snapshotId:'snapshot',contextRevision:0});
+const load=async(f:ReturnType<typeof storyFixture>,fetcher:ReturnType<typeof deferredFetch>,bridge:ReturnType<typeof createStoryBridge>,view:StoryView,token=f.token)=>{const offset=fetcher.calls.length,promise=bridge.login(token,f.snapshot);fetcher.calls[offset]!.resolve(view);await turn();fetcher.calls[offset+1]!.resolve(context(f));await promise;};
+test('S07 pure traversal follows chapter order, visible time, pause, replay and a final nonlooping end',async()=>{const f=storyFixture(),fetcher=deferredFetch(),bridge=createStoryBridge('r');try{
+ await load(f,fetcher,bridge,authored(f));let state=bridge.getSnapshot();assert.equal(state.mode,'paused');assert.equal(storyProjection(state)?.step.id,'second');
+ const initial=state;state=storyTransition(state,{type:'replay'});state=storyTransition(state,{type:'tick',elapsedMs:7999});assert.equal(state.cursor?.stepId,'second');assert.equal(state.elapsedMs,7999);assert.equal(initial.elapsedMs,0);
+ state=storyTransition(state,{type:'pause',reason:'reading'});assert.equal(storyTransition(state,{type:'tick',elapsedMs:90000}).elapsedMs,7999);
+ state=storyTransition(state,{type:'replay'});assert.equal(state.elapsedMs,0);state=storyTransition(state,{type:'tick',elapsedMs:8000});assert.equal(state.cursor?.stepId,'step');assert.equal(state.mode,'playing');
+ state=storyTransition(state,{type:'tick',elapsedMs:8000});assert.equal(state.cursor?.chapterId,'limits');state=storyTransition(state,{type:'tick',elapsedMs:8000});assert.equal(state.mode,'ended');assert.equal(state.cursor?.stepId,'last');assert.equal(storyTransition(state,{type:'tick',elapsedMs:8000}).mode,'ended');
+ assert.equal(storyTransition(state,{type:'chapter',chapterId:'change'}).cursor?.stepId,'second');assert.equal(storyTransition(state,{type:'previous'}).cursor?.stepId,'step');
+ }finally{bridge.logout();fetcher.restore();f.cleanup();}});
+test('S08 one managed clock, reading/hidden/surface/disconnect pause without catch-up and reconnect returns route baseline',async()=>{const f=storyFixture(),fetcher=deferredFetch(),time=manualClock(),bridge=createStoryBridge('r',{clock:time.clock});let dispose=()=>{};try{
+ await load(f,fetcher,bridge,authored(f));dispose=bridge.connect();assert.equal(bridge.diagnostics().length,2);assert.equal(time.timers.size,1);
+ bridge.intent({type:'replay'});assert.equal(time.timers.size,2);time.advance(3500);assert.equal(bridge.getSnapshot().elapsedMs,3500);
+ bridge.intent({type:'visibility',hidden:true});time.advance(100000);assert.equal(bridge.getSnapshot().elapsedMs,3500);assert.equal(bridge.getSnapshot().mode,'paused');assert.equal(time.timers.size,1);
+ bridge.intent({type:'visibility',hidden:false});bridge.intent({type:'replay'});time.advance(1200);bridge.intent({type:'surface',surface:'diff'});assert.equal(bridge.getSnapshot().elapsedMs,1200);assert.equal(bridge.getSnapshot().mode,'paused');
+ bridge.intent({type:'replay'});dispose();assert.equal(time.timers.size,0);assert.deepEqual(bridge.diagnostics(),[]);assert.equal(bridge.getSnapshot().mode,'paused');time.advance(50000);assert.equal(bridge.getSnapshot().elapsedMs,0);
+ dispose=bridge.connect();assert.equal(time.timers.size,1);assert.equal(bridge.diagnostics().length,2);dispose();assert.equal(time.timers.size,0);
+ }finally{dispose();bridge.logout();fetcher.restore();f.cleanup();}});
+test('S10 publication markers keep exact cursor/evidence/context and foreground reads own the slot; late credential/disposal responses fence',async()=>{const f=storyFixture(),fetcher=deferredFetch(),time=manualClock(),bridge=createStoryBridge('r',{clock:time.clock});let dispose=()=>{};try{
+ const view=authored(f);await load(f,fetcher,bridge,view);bridge.intent({type:'next'});const cursor=bridge.getSnapshot().cursor;dispose=bridge.connect();
+ const start=fetcher.calls.length;const refresh=bridge.refresh();time.poll();assert.equal(fetcher.calls.length,start+1);assert.match(fetcher.calls[start]!.url,new RegExp(`versionId=${view.version!.versionId}`));
+ fetcher.calls[start]!.resolve({...view,storyRevision:2,contextRevision:1,newerVersion:true,newerContext:true});await refresh;assert.deepEqual(bridge.getSnapshot().cursor,cursor);assert.equal(bridge.getSnapshot().view?.newerVersion,true);assert.equal(bridge.getSnapshot().context?.selectedRevision,0);
+ const oldIndex=fetcher.calls.length,old=bridge.refresh();dispose();assert.equal(fetcher.calls[oldIndex]!.options?.signal?.aborted,true);fetcher.calls[oldIndex]!.resolve({...view,storyRevision:99});await old;assert.equal(bridge.getSnapshot().view?.storyRevision,2);
+ const oldLoginIndex=fetcher.calls.length,oldLogin=bridge.login('old',f.snapshot),freshIndex=fetcher.calls.length,fresh=bridge.login('fresh',f.snapshot);fetcher.calls[freshIndex]!.resolve(view);await turn();fetcher.calls[freshIndex+1]!.resolve(context(f));await fresh;fetcher.calls[oldLoginIndex]!.resolve({...view,storyRevision:88});await oldLogin;assert.equal(bridge.getSnapshot().view?.storyRevision,1);
+ }finally{dispose();bridge.logout();fetcher.restore();f.cleanup();}});
+test('S07/S12 evidence retains LF snapshot and exact UTF-16 semantic coordinates, source hash failures stay explicit, player clamp is pure',async()=>{const f=storyFixture(),fetcher=deferredFetch(),bridge=createStoryBridge('r');try{
+ await load(f,fetcher,bridge,authored(f));const source=storyProjection(bridge.getSnapshot())!.sources[0]!;assert.equal(source.text,'export const value = 2;');assert.equal(source.coordinates,'snapshot LF lines');
+ await bridge.openEvidence({...f.source,contentHash:'f'.repeat(64)});assert.match(bridge.getSnapshot().evidenceText,/unavailable/i);
+ let state:StoryState=storyTransition(bridge.getSnapshot(),{type:'resizePlayer',viewport:{width:390,height:844},size:{width:374,height:44}});state=storyTransition(state,{type:'movePlayer',x:9999,y:-9999});assert.equal(state.position.x,0);assert.equal(state.position.y,-784);assert.equal(state.mode,'paused');state=storyTransition(state,{type:'resetPlayer'});assert.deepEqual(state.position,{x:0,y:0});
+ }finally{bridge.logout();fetcher.restore();f.cleanup();}});
+test('S07/S10 exact semantic UTF-16 slices survive parser-line differences; old source and version reads cannot change a newer cursor',async()=>{const f=storyFixture(),fetcher=deferredFetch(),bridge=createStoryBridge('r');let dispose=()=>{};try{
+ const view=authored(f),content='// 😀\u2028export const value = "😀";\r\n',start=content.indexOf('export'),end=content.indexOf(';')+1;
+ const ref={type:'semantic_source' as const,corpusId:'c'.repeat(64),anchor:{snapshotId:'snapshot',side:'head' as const,path:'value.ts',contentHash:'d'.repeat(64),start,end,startLine:2,endLine:2}};
+ const semantic={...view,version:{...view.version!,story:{...view.version!.story,analysisId:'e'.repeat(64),corpusId:ref.corpusId,steps:view.version!.story.steps.map(step=>({...step,focus:{type:'sources' as const,fileKey:f.fileKey,sources:[ref]}}))}}};
+ await load(f,fetcher,bridge,semantic);dispose=bridge.connect();const first=fetcher.calls.at(-1)!;assert.match(first.url,/corpusId=cccc/);assert.equal(new URL(first.url,'http://local').searchParams.get('contentHash'),ref.anchor.contentHash);
+ first.resolve({...ref.anchor,corpusId:ref.corpusId,content,commit:'b'.repeat(40),role:'context',selected:true,objectId:'0'.repeat(40),lineCount:2});await turn();assert.equal(storyProjection(bridge.getSnapshot())!.sources[0]!.text,'export const value = "😀";');assert.equal(storyProjection(bridge.getSnapshot())!.sources[0]!.coordinates,'semantic UTF-16 offsets');
+ const evidence=bridge.openEvidence({...ref,anchor:{...ref.anchor,contentHash:'f'.repeat(64)}}),late=fetcher.calls.at(-1)!;bridge.intent({type:'next'});late.resolve({...ref.anchor,corpusId:ref.corpusId,content:'WRONG',contentHash:'f'.repeat(64)});await evidence;assert.equal(bridge.getSnapshot().evidence,null);assert.equal(bridge.getSnapshot().cursor?.stepId,'step');
+ const old=bridge.refresh(),oldCall=fetcher.calls.at(-1)!,open=bridge.openVersion();const newCall=fetcher.calls.at(-1)!;assert.equal(new URL(newCall.url,'http://local').searchParams.has('versionId'),false);newCall.resolve({...semantic,version:{...semantic.version,versionId:'new-version',storyRevision:2},storyRevision:2});await turn();fetcher.calls.at(-1)!.resolve(context(f));await open;oldCall.resolve({...semantic,storyRevision:99});await old;assert.equal(bridge.getSnapshot().cursor?.versionId,'new-version');assert.equal(bridge.getSnapshot().view?.storyRevision,2);
+ }finally{dispose();bridge.logout();fetcher.restore();f.cleanup();}});
+test('S08 scopes and repeated connections dispose exactly once; observers cannot create clocks or commands, no-op visibility cannot cause a render loop',async()=>{const f=storyFixture(),fetcher=deferredFetch(),time=manualClock(),bridge=createStoryBridge('r',{clock:time.clock});let dispose=()=>{};try{
+ let notifications=0;const unsubscribe=bridge.subscribe(()=>notifications++),second=bridge.subscribe(()=>notifications++);assert.equal(time.timers.size,0);await load(f,fetcher,bridge,authored(f));dispose=bridge.connect();const oldDispose=dispose;dispose=bridge.connect();oldDispose();assert.equal(time.timers.size,1);assert.equal(bridge.diagnostics().length,2);const scope=JSON.parse(bridge.diagnostics()[0]!.scope) as {reviewId:string;snapshotId:string;generation:number};assert.equal(scope.reviewId,'r');assert.equal(scope.snapshotId,'snapshot');assert.equal(JSON.stringify(scope).includes(f.token),false);
+ const before=notifications;bridge.intent({type:'visibility',hidden:false});bridge.intent({type:'reducedMotion',value:false});assert.equal(notifications,before);unsubscribe();second();dispose();assert.equal(time.timers.size,0);assert.equal(fetcher.calls.every(call=>!call.options?.body),true);
+ }finally{dispose();bridge.logout();fetcher.restore();f.cleanup();}});
+
+test('S07 managed semantic focus pins the exact admitted analysis, cannot apply a late cursor, and exposes no inspector/navigation or worker command route',async()=>{const f=storyFixture(),fetcher=deferredFetch();let release=()=>{},first=true;const calls:{snapshot:string;analysis:string|undefined}[]=[],focused:string[]=[];
+ const semanticView:AnalysisView={reviewId:'r',snapshotId:'snapshot',currentSnapshotId:'newer-source',analysisGeneration:2,graphRevision:7,selectedAnalysisId:'a'.repeat(64),jobs:[],preparation:null,corpus:null,inventory:null,clarifications:[],analysis:{analyzer:'source-neighborhood-v1.0.1',parser:'test-double',snapshotId:'snapshot',corpusDigest:'c'.repeat(64),analysisId:'a'.repeat(64),corpus:{base:{commit:'a'.repeat(40),inventory:'selected-context',acquisition:'test'},head:{commit:'b'.repeat(40),inventory:'selected-context',acquisition:'test'}},coverage:[],diagnostics:[],observed:{bytes:0,inventoryBytes:0,astNodes:0,invocationSites:0},status:'analyzed',nodes:[],edges:[],unresolved:[],neighborhoods:[]}};
+ const semantic={select:async(snapshot:string,analysis?:string)=>{calls.push({snapshot,analysis});if(first){first=false;await new Promise<void>(resolve=>{release=resolve;});}},focus:(id:string)=>{focused.push(id);},getSnapshot:()=>({...createAnalysisBridge('r').getSnapshot(),view:semanticView})};
+ const bridge=createStoryBridge('r',{semantic});let dispose=()=>{};try{
+  const view=authored(f),story={...view.version!.story,analysisId:'a'.repeat(64),corpusId:'c'.repeat(64),steps:view.version!.story.steps.map(step=>step.id==='second'?{...step,focus:{type:'semantic' as const,reference:{type:'static_node' as const,analysisId:'a'.repeat(64),factId:'exact-node'},sources:[f.source]}}:step)};
+  await load(f,fetcher,bridge,{...view,version:{...view.version!,story}});dispose=bridge.connect();await turn();assert.deepEqual(calls,[{snapshot:'snapshot',analysis:'a'.repeat(64)}]);bridge.intent({type:'next'});await turn();release();await turn();assert.deepEqual(focused,[]);bridge.intent({type:'previous'});await turn();assert.deepEqual(focused,['exact-node']);assert.equal(bridge.diagnostics().find(route=>route.id==='story-focus-to-coordinated-view')!.cursor,3);assert.equal(fetcher.calls.every(call=>!call.options?.body),true);
+ }finally{release();dispose();bridge.logout();fetcher.restore();f.cleanup();}});

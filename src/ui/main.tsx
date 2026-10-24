@@ -1,11 +1,12 @@
 import React, { useEffect, useState, useSyncExternalStore } from "react";
 import { createRoot } from "react-dom/client";
-import { createReviewBridge, createImportsBridge, createAnalysisBridge, questionStatus } from "../application/public.ts";
+import { createReviewBridge, createImportsBridge, createAnalysisBridge, createStoryBridge, storyProjection, questionStatus } from "../application/public.ts";
 import {sourceComparison} from "../domain/public.ts";
 import type { Anchor, Review, SourceView } from "../domain/public.ts";
 import "./style.css";
 import { ReviewGraph } from "./graph.tsx";
 import {Imports} from "./imports.tsx";
+import {StoryPanel} from "./story.tsx";
 import {SemanticPanel} from "./semantic-panel.tsx";
 const initialBridge = () => createReviewBridge(
   new URLSearchParams(window.location.search).get("reviewId") ?? "pr-14",
@@ -89,6 +90,9 @@ const App = () => {
   const [bridge,setBridge]=useState(initialBridge);
   const [importsBridge]=useState(createImportsBridge);
   const [analysisBridge,setAnalysisBridge]=useState(()=>createAnalysisBridge(new URLSearchParams(window.location.search).get("reviewId")??"pr-14"));
+  const [storyBridge,setStoryBridge]=useState(()=>createStoryBridge(new URLSearchParams(window.location.search).get("reviewId")??"pr-14",{semantic:analysisBridge}));
+  const storyState=useSyncExternalStore(storyBridge.subscribe,storyBridge.getSnapshot);
+  const storyFocus=storyProjection(storyState);
   const [comparisonKey,setComparisonKey]=useState<string|undefined>();
   const state = useSyncExternalStore(bridge.subscribe, bridge.getSnapshot);
   const [credential, setCredential] = useState(""),
@@ -102,7 +106,7 @@ const App = () => {
       setSelected(state.initialSelection);
   }, [state.initialSelection, selected]);
   const review = state.review;
-  useEffect(()=>{if(review)void analysisBridge.select(review.snapshot.snapshotId).catch(()=>{});},[analysisBridge,review?.snapshot.snapshotId]);
+  useEffect(()=>{if(review){void analysisBridge.select(review.snapshot.snapshotId).catch(()=>{});void storyBridge.select(review.snapshot);}},[analysisBridge,storyBridge,review?.snapshot.snapshotId]);
   if (!state.authenticated || !review)
     return (
       <main className="login">
@@ -115,7 +119,7 @@ const App = () => {
         <form
           onSubmit={(event) => {
             event.preventDefault();
-            void bridge.login(credential).then(()=>{const current=bridge.getSnapshot().review;if(current)void analysisBridge.login(credential,current.snapshot.snapshotId).catch(()=>{});});void importsBridge.login(credential);
+            void bridge.login(credential).then(()=>{const current=bridge.getSnapshot().review;if(current){void analysisBridge.login(credential,current.snapshot.snapshotId).catch(()=>{});void storyBridge.login(credential,current.snapshot);}});void importsBridge.login(credential);
           }}
         >
           <label htmlFor="credential">Local access token</label>
@@ -136,7 +140,9 @@ const App = () => {
     if(draft.trim())return;
     try{await bridge.selectSnapshot(snapshotId);const url=new URL(window.location.href);url.searchParams.set("snapshotId",snapshotId);window.history.replaceState(null,"",url);setSelected(bridge.getSnapshot().initialSelection);}catch{}
   };
+  const pauseStory=()=>storyBridge.intent({type:"pause",reason:"reading"});
   const openSource = async(anchor:Anchor,fileKey?:string) => {
+    pauseStory();
     if(draft.trim() && selected && JSON.stringify(anchor)!==JSON.stringify(selected)) return;
     if(anchor.snapshotId!==review.snapshot.snapshotId){
       try{await bridge.selectSnapshot(anchor.snapshotId);}catch{return;}
@@ -149,7 +155,7 @@ const App = () => {
     <main>
       <Imports bridge={importsBridge} review={review} canOpen={!draft.trim()&&bridge.canLeaveReview()} onOpen={reviewId=>{
         if(draft.trim()||!bridge.canLeaveReview())return;
-        const next=createReviewBridge(reviewId);setSelected(null);setComparisonKey(undefined);setParentQuestionId(undefined);setBridge(next);const semantic=createAnalysisBridge(reviewId);setAnalysisBridge(semantic);void next.login(credential).then(()=>{const current=next.getSnapshot().review;if(current)void semantic.login(credential,current.snapshot.snapshotId).catch(()=>{});});
+        const next=createReviewBridge(reviewId);setSelected(null);setComparisonKey(undefined);setParentQuestionId(undefined);setBridge(next);const semantic=createAnalysisBridge(reviewId);setAnalysisBridge(semantic);const story=createStoryBridge(reviewId,{semantic});storyBridge.logout();setStoryBridge(story);void next.login(credential).then(()=>{const current=next.getSnapshot().review;if(current){void semantic.login(credential,current.snapshot.snapshotId).catch(()=>{});void story.login(credential,current.snapshot);}});
         const url=new URL(window.location.href);url.searchParams.set('reviewId',reviewId);url.searchParams.delete('snapshotId');url.hash='';window.history.replaceState(null,'',url);
       }}/>
       <header className="identity">
@@ -199,9 +205,10 @@ const App = () => {
       </header>
       <section className="snapshot-selection" aria-label="Snapshot history"><label>Snapshot<select value={review.snapshot.snapshotId} disabled={Boolean(draft.trim())||state.busy} onChange={event=>{void chooseSnapshot(event.target.value);}}>{(review.snapshotSummaries??[{snapshotId:review.snapshot.snapshotId,baseSha:review.snapshot.baseSha,headSha:review.snapshot.headSha}]).map(snapshot=><option key={snapshot.snapshotId} value={snapshot.snapshotId}>{snapshot.snapshotId===(review.currentSnapshotId??review.snapshot.snapshotId)?"Current":"History"} · {snapshot.headSha.slice(0,12)} · {snapshot.snapshotId.slice(0,12)}</option>)}</select></label><p role="status">{review.snapshot.snapshotId===(review.currentSnapshotId??review.snapshot.snapshotId)?"Viewing current snapshot":"Viewing historical snapshot"}. Selection is private and does not move saved source or discussion.</p>{state.error&&<p role="alert">{state.error}</p>}</section>
       {state.selecting&&<p role="status">Opening the selected snapshot. Question composition is held until its source is ready.</p>}
-      <SemanticPanel key={review.reviewId} bridge={analysisBridge}/>
-      {state.graph && <ReviewGraph graph={state.graph} selectedPath={selected?.path??""} selectedFileKey={comparisonKey} onOpen={openSource}/>}
-      <section className="source-identity">
+      <StoryPanel key={`story:${review.reviewId}`} bridge={storyBridge}/>
+      <div onFocusCapture={pauseStory} onPointerDownCapture={pauseStory} onScrollCapture={pauseStory}><SemanticPanel key={`semantic:${review.reviewId}`} bridge={analysisBridge}/></div>
+      {state.graph && <div onFocusCapture={pauseStory} onPointerDownCapture={pauseStory}><ReviewGraph graph={state.graph} selectedPath={storyFocus?.sources[0]?.reference.anchor.path??selected?.path??""} selectedFileKey={storyFocus?.comparisonKey??comparisonKey} onOpen={openSource}/></div>}
+      <section className="source-identity" onFocusCapture={pauseStory}>
         <h2>{selected?.path ?? state.sources[0]?.path}</h2>
         <p>
           Read the fixed before and after. Select a line or specify an inclusive
@@ -211,13 +218,13 @@ const App = () => {
         {draft.trim()&&<p role="status">Source selection is held while your question draft is nonempty. Save or clear it before navigating.</p>}
         <label>Source file<select value={selected?.path??""} disabled={Boolean(draft.trim())} onChange={e=>{const source=state.sources.find(s=>s.path===e.target.value&&s.side==="head"&&s.lineCount>0)??state.sources.find(s=>s.path===e.target.value&&s.lineCount>0);if(source)openSource({snapshotId:review.snapshot.snapshotId,path:source.path,side:source.side,startLine:1,endLine:1});}}>{[...new Set(state.sources.filter(s=>s.lineCount>0).map(s=>s.path))].map(path=><option key={path}>{path}</option>)}</select></label>
       </section>
-      {selected && <div className="source-grid">
+      {selected && <div className="source-grid" onFocusCapture={pauseStory} onPointerDownCapture={pauseStory} onScrollCapture={pauseStory}>
             {(["base", "head"] as const).map(side => {
               const source = sourceComparison(review.snapshot,selected,comparisonKey).find(item=>item.side===side);
               return source ? <SourcePane key={side} source={source} review={review} selected={selected} onSelect={anchor=>{void openSource(anchor,comparisonKey);}} /> : <section key={side} className="source-pane"><header><h2>{side === "base" ? "Before" : "After"}</h2></header><p>This side has no prepared source for {selected.path}. {review.snapshot.changedFiles?.find(file => file.oldPath === selected.path || file.newPath === selected.path)?.dispositions.find(item => item.side === side)?.reason ?? "Absent from the pinned change or not prepared; no selectable anchor."}</p></section>;
             })}
           </div>}
-          <section className="conversation">
+          <section className="conversation" onFocusCapture={pauseStory}>
             {selected?<div className="composer">
               <p className="eyebrow">Ask about this source</p>
               <h2>One question, grounded in the change</h2>

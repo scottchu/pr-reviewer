@@ -23,3 +23,25 @@ Assigned worktree was clean at3581fa2. Primary checkout remains main70280d8. No 
 ## Progress and evidence
 
 Durable exact05B state/intents/projection/lifecycle and05C ownership seams are now specified in [product knowledge](../../../../product/review-loop/story-and-exploration.md#exact-05b-application-and-react-contract). Next: failing focused tests, then derived implementation. Initial code input has no delivered player; no browser or acceptance result is claimed.
+
+
+## Derived checkpoint before independent review
+
+Status: Implemented candidate; focused engineering passed. Independent review is pending. Full05C exploration/recovery and slice/round acceptance remain open.
+
+The controller, pure transition and exact excerpt projection are exported through `application/public.ts`. It owns the private version/cursor/evidence/clock and two scoped registry routes. Semantic focus uses the public select/focus/read-model port and does not open the legacy inspector, whose focus/scroll effect must remain explicit user navigation. Snapshot LF and semantic UTF-16 excerpts retain their owning coordinates. No story intent sends a durable command, requests context, starts analysis or wakes a participant. Newer markers do not move the current cursor/evidence/context or legacy composer.
+
+The React panel presents exact before/after evidence, per-claim basis/uncertainty/author, chapter why/what/how/example, separate retained context provenance, complete explained/unexplained scope, history and limits. A shared Flow/Diff state and one-row draggable/keyboard-reset player retain the original question draft/source. Legacy composer/Anchor/comparison policy still lives in main; this is an explicit temporary05C migration seam, not a claim that the legacy UI already has application-owned draft coordination.05C must add return-frame and dual-draft intents to the same public story/application owner before restoring/mutating those values; it must not create another player or infer a new question identity from UI state.
+
+### Focused checks
+
+- `PATH=/Applications/ChatGPT.app/Contents/Resources/cua_node/bin:$PATH /Users/scottchu/.asdf/shims/bun run check`: PASS, strict TypeScript and subsystem imports.
+- `/Applications/ChatGPT.app/Contents/Resources/cua_node/bin/node --experimental-strip-types --test tests/story-application.test.ts`: PASS,7 tests. Initial red failed on the absent public controller export. Green covers chapter-defined traversal, visible clock/end/pause/replay, foreground/poll ownership, credential/version/disposal fences, exact semantic Unicode slice, late evidence/cursor fences, scoped routes/reconnect/no-op notifications, pure clamp, managed public semantic focus and zero command paths.
+- `PATH=/Applications/ChatGPT.app/Contents/Resources/cua_node/bin:$PATH REVIEW_E2E_ARTIFACT_DIR=/tmp/pr-reviewer-05b-browser /Users/scottchu/.asdf/shims/bun run test:e2e tests/story.e2e.ts`: PASS,2 actual Chrome React/gateway/SQLite journeys, desktop1440×1080 and coarse390×844→360×740. Playback uses the browser virtual clock; this is not a physical timing/device test. Narrow controls are one row and measure at least44×44. The browser sends zero POSTs throughout story following/inspection. No analysis job or question is created.
+- During the initial red browser run, duplicate sibling story/semantic keys caused repeated mounts; explicit distinct keys repaired it. Explicit latest-version opening initially reused the default old version parameter; a null latest selector and regression repair it. Original failing states are not relabeled as passing. Final clean-commit rerun/source identity and aggregate regressions will be recorded below.
+
+### Inspectable artifacts and limits
+
+External artifact root: `/tmp/pr-reviewer-05b-browser`. The first passing captures were made with derived code still dirty atop39f994e and are labeled as such in the JSON; a clean immutable candidate rerun follows the code commit. Controlled target: `story-browser` / `story-snapshot`, manually prepared before/head fixture with one changed source file and immutable owner context/story publication. This is actual React engineering, not the actual ownPR, a native initiating-session reply, unfamiliar-reviewer understanding or human art-direction approval. Actual pilot/main/MCP/keys/source answer key were not accessed.
+
+Required screenshots: `story.e2e.ts-desktop-React-31b63-lds-original-question-draft/story-first-step.png`, `story-chapter-account.png`, `story-desktop-panel.png`, `story-desktop-1440x1080.png`; `story.e2e.ts-coarse-pointe-cb72c--draggable-one-row-controls/story-narrow-360x740.png` and `story-player-narrow.png` beneath that root. Implementer inspected the rendered desktop panel and narrow player for restrained neutral hierarchy, meaningful red/green/yellow text, provenance separation, readable source and visible controls. Independent screenshot critique remains pending; no final visual or understanding acceptance is claimed.
