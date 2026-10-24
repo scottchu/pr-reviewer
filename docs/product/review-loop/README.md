@@ -10,7 +10,7 @@
 
 As a reviewer, I open one pinned before/after source change in our own real PR, select a source span, ask its responsible agent a question, and inspect the agent's persisted source-backed answer. I can distinguish the source, author, delivery state and uncertainty behind that answer. The existing Codex or Claude session initiating attachment is the responsible session; the app does not replace it.
 
-The default bootstrap uses PR 14 with immutable identity and teaching scope defined in [runtime knowledge](runtime.md#bootstrap-target-and-source-bounds). Its documentation claim is a valid first bounded source question, not evidence of executable code behavior. Source is manually prepared from immutable Git objects; read-only structural graphs and immutable continuation/history have bounded local implementations. General import, semantic graphs, repository jobs and player/narration remain later scope.
+The default bootstrap uses PR 14 with immutable identity and teaching scope defined in [runtime knowledge](runtime.md#bootstrap-target-and-source-bounds). Its documentation claim is a valid first bounded source question, not evidence of executable code behavior. Source is manually prepared from immutable Git objects; read-only structural graphs and immutable continuation/history have bounded local implementations. The isolated slice03 candidate adds repository-path discovery and durable import jobs as described in [durable import jobs](import-jobs.md). Semantic graphs and player/narration remain later scope.
 
 ## Interaction
 
@@ -22,7 +22,7 @@ A reviewer can give the agent a local repository or worktree path instead of loc
 
 Return the matched provider, project, PR/MR identity, URL, state and verified comparison base/head. Preserve the distinction between a current provider head and an already pinned review snapshot. Multiple plausible matches require presenting candidates; no match, a detached/default branch without a unique association, inaccessible metadata or unavailable authentication remains an explicit unresolved result. Never select the latest PR/MR merely because it exists, install a global tool silently, or print credentials embedded in remotes.
 
-This is the agent's source-acquisition responsibility; the reviewer should not have to supply an identifier when the path already resolves uniquely. The current application's derived preparation utility still accepts an explicit, manually verified pinned source specification. Automated in-app discovery and GitLab source import are not implemented or established by this entry contract. Once a path is supplied, verify provider metadata before claiming an actual match or preparing source; no path lookup has been exercised by this documentation change.
+This is the agent's source-acquisition responsibility; the reviewer should not have to supply an identifier when the path already resolves uniquely. The merged/manual baseline's setup utility retains its explicit pinned source specification. The isolated slice03 candidate implements in-app path discovery and bounded import through existing provider tools; source/job contracts and exact verified limits are maintained in [durable import jobs](import-jobs.md). Live GitHub own-PR use is distinct from controlled provider tests; live GitLab remains unverified where glab is unavailable. Once a path is supplied, verify provider metadata before claiming an actual match or preparing source.
 
 ### Anchored review
 
