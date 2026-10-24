@@ -48,3 +48,10 @@ Accepted correction source: c9230830fddbe0624132eee8423beb2c546d71c1, docs/produ
 Status: accepted direction; inspectable canvas preview and concrete layout adoption required before production composition.
 
 Target availability, durable test job/result identity, output and question context must be graph-connected presentations inside the same canvas. Zoom/focused lenses reveal inline diff/code while preserving neighborhood and exact return. A separate test panel or file inspector cannot become the primary reading/evidence destination. Reuse the retained B2 application bridge and recovery boundaries only after that preview is reviewed; these engineering ports do not imply adoption of the standalone HeadTests component or its main.tsx placement. No live test result may be invented to fill the mockup.
+
+## Separate tests/evidence preview reconciliation
+
+Date: 2026-10-24
+Design source: cc50132, docs/plans/720p/slices/05-explanation-exploration/subsystem-mockups.md, group E, in the root-owned canvas design packet.
+
+The separately inspectable tests/evidence scenario consumes the target/job/result/cancellation vocabulary above and the same-canvas reading contract. It may show explicitly simulated fixture transitions, with qualification absent, while production source remains unavailable until qualified. A relevant test source is not evidence that a fixed target includes or ran it. Preserve exact source/environment/job/result identities across history and distinguish cancel intent, quiescence and unknown. This reconciliation authorizes a bounded mock only; application integration, real execution and layout adoption retain separate gates.

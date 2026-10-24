@@ -60,3 +60,8 @@ Date: 2026-10-24
 Status: docs-only reconciliation; no production composition resumed.
 
 Root dispatched a separate isolated unified-canvas preview from committed c9230830fddbe0624132eee8423beb2c546d71c1. Its owning05 packet is canvas-reading-mockup.md plus canvas-preview-implementation.md. Future B2 presentation must place configured target/job/result/output context in that same graph-connected canvas, with inline diff/code and exact return; preserve current application/recovery ports as inputs. The retained standalone panel and5-case fixture browser receipt are superseded composition evidence, not user layout adoption. Wait for the inspectable preview and root/user feedback before deriving production UI. No test execution, backend, source or application files change in this reconciliation.
+
+### Separate subsystem preview dependency
+
+Date: 2026-10-24
+Design packet: cc50132, 720p/05/subsystem-mockups.md group E and product/review-loop/canvas-reading.md. The owner has reconciled public target, receipt, job, result, artifact and cancel/unknown semantics in test-ui.md. A separately isolated same-canvas mock may now demonstrate labeled simulated outcomes; it does not qualify PR25, execute its relevant auth test or accept a production composition. Retained B2 engineering remains unchanged.
