@@ -5,5 +5,5 @@ export type {HeadGitRead,HeadGitRequest,HeadSourceManifest,HeadSourceEntry} from
 export {copyHeadTestClosure,inventoryHeadFiles} from './files.ts';
 export type {HeadFileEntry} from './files.ts';
 export {createHeadGitReader} from './git-process.ts';
-export {prepareHeadTestInputs,createHeadTestConfiguration,readHeadTestConfiguration,inspectHeadTestPreparation,isHeadTestPreparation} from './preparation.ts';
+export {executePreparedHeadTest,prepareHeadTestInputs,createHeadTestConfiguration,readHeadTestConfiguration,inspectHeadTestPreparation,isHeadTestPreparation} from './preparation.ts';
 export type {HeadTestPreparationWitness,HeadTestConfiguration,HeadTestQualification} from './preparation.ts';

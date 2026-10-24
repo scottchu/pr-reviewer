@@ -1,3 +1,5 @@
+import {createHeadOutputBudget} from './output.ts';
+import type {HeadOutputBudget} from './output.ts';
 import {spawn,execFileSync} from 'node:child_process';
 import {realpath,lstat} from 'node:fs/promises';
 import {join} from 'node:path';
@@ -27,8 +29,8 @@ const vector=(request:HeadGitRequest,head:string):{args:string[];input:Buffer|nu
  return {args:request.role==='listing'?['ls-tree','-rlz',request.objectId]:['cat-file',request.role,request.objectId],input:null,maximum:8*1024*1024};
 };
 /** Fixed private Git roles only. A stream must be consumed or closed to settle its process. */
-export const createHeadGitReader=({repository,headSha,ownedRoot,observer}:{repository:string;headSha:string;ownedRoot:string;observer:Observer}):HeadGitRead=>{
- let active=false,poisoned=false,diagnosticBytes=0;const phaseStarted=Date.now();
+export const createHeadGitReader=({repository,headSha,ownedRoot,observer,outputBudget=createHeadOutputBudget()}:{repository:string;headSha:string;ownedRoot:string;observer:Observer;outputBudget?:HeadOutputBudget}):HeadGitRead=>{
+ let active=false,poisoned=false;const phaseStarted=Date.now();
  const read:HeadGitRead=async request=>{
   const spec=vector(request,headSha);
   return (async function*(){
@@ -57,7 +59,7 @@ export const createHeadGitReader=({repository,headSha,ownedRoot,observer}:{repos
     child.once('spawn',()=>{started=true;observedIdentity=child.pid?identity(child.pid):null;try{observer.recordProcess({...requested,state:'started',...(child.pid?{pid:child.pid}:{}),...(observedIdentity?{startIdentity:observedIdentity}:{})});}catch{journalFailed=true;stop('journal_write_failed');}});
     child.once('error',()=>{spawnError=true;reason??='source_unavailable';});
     child.stdin.on('error',()=>{if(!closed)stop('git_input_failed');});
-    child.stderr.on('data',(chunk:Buffer)=>{diagnosticBytes+=chunk.length;if(diagnosticBytes>1024*1024)stop('output_limit');});
+    child.stderr.on('data',(chunk:Buffer)=>{if(!outputBudget.append('git_prepare','stderr',chunk))stop('output_limit');});
     child.once('close',(code,signal)=>{
      closed=true;exitCode=code;exitSignal=signal;
      try{observer.recordProcess({...requested,state:'exited',...(child.pid?{pid:child.pid}:{}),...(observedIdentity?{startIdentity:observedIdentity}:{}),...(!started&&spawnError&&child.pid===undefined?{spawnDisposition:'not_spawned' as const}:{}),exitCode:code,signal});}catch{journalFailed=true;}

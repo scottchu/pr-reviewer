@@ -1,3 +1,5 @@
+import {createHeadOutputBudget} from './output.ts';
+import type {HeadOutputBudget} from './output.ts';
 import {createHash} from 'node:crypto';
 import {spawn,execFileSync} from 'node:child_process';
 import {constants} from 'node:fs';
@@ -16,9 +18,9 @@ export const verifyHeadBun=async(check:()=>void):Promise<string>=>{
  try{const before=await file.stat();if(!before.isFile()||before.size>128*1024*1024)throw new Error('runtime_unavailable');const digest=createHash('sha256');let bytes=0;while(true){check();const chunk=Buffer.alloc(65536),read=await file.read(chunk,0,chunk.length,null);if(!read.bytesRead)break;bytes+=read.bytesRead;if(bytes>128*1024*1024)throw new Error('runtime_unavailable');digest.update(chunk.subarray(0,read.bytesRead));}const after=await file.stat(),hash=digest.digest('hex');if(bytes!==before.size||before.mtimeMs!==after.mtimeMs||before.ctimeMs!==after.ctimeMs||hash!==headTestDefinition().runtime.sha256)throw new Error('runtime_unavailable');return hash;}finally{await file.close();}
 };
 type Observer=Readonly<{journal:()=>HeadTestJournal;control:()=>Readonly<{authorized:boolean;cancelled:boolean;stopReason:string|null}>;recordStop:(reason:string)=>void;recordProcess:(observation:HeadTestProcess,prior?:HeadTestQuiescenceWitness)=>Readonly<{disposition:'recorded'|'duplicate'}>}>;
-export type HeadBunRun=Readonly<{role:'runtime_version'|'test_root';exitCode:number|null;signal:string|null;output:readonly Readonly<{channel:'stdout'|'stderr';bytes:number;text:string}>[];outputBytes:number;terminationConfirmed:boolean;reason:string|null}>;
+export type HeadBunRun=Readonly<{role:'runtime_version'|'test_root';exitCode:number|null;signal:string|null;output:readonly Readonly<{channel:'stdout'|'stderr';bytes:number;text:string;data:Uint8Array}>[];outputBytes:number;terminationConfirmed:boolean;reason:string|null}>;
 const identity=(pid:number):string|null=>{try{return execFileSync('/bin/ps',['-p',String(pid),'-o','lstart=','-o','pgid='],{encoding:'utf8',timeout:1000,maxBuffer:1024,env:{LANG:'C',LC_ALL:'C',TZ:'UTC'},stdio:['ignore','pipe','ignore']}).trim()||null;}catch{return null;}};
-export const createHeadBunRunner=({ownedRoot,observer,deadline}:{ownedRoot:string;observer:Observer;deadline:number})=>{
+export const createHeadBunRunner=({ownedRoot,observer,deadline,outputBudget=createHeadOutputBudget()}:{ownedRoot:string;observer:Observer;deadline:number;outputBudget?:HeadOutputBudget})=>{
  let active=false,poisoned=false;
  return async(role:'runtime_version'|'test_root'):Promise<HeadBunRun>=>{
   if(active||poisoned)throw new Error('test_process_unavailable');const current=observer.control();if(!current.authorized||current.cancelled||current.stopReason)throw new Error('test_stopped');
@@ -31,7 +33,7 @@ export const createHeadBunRunner=({ownedRoot,observer,deadline}:{ownedRoot:strin
   if(observer.recordProcess(requested,...(prior?[prior]:[])).disposition!=='recorded')throw new Error('test_launch_already_recorded');active=true;
   return await new Promise<HeadBunRun>((resolve)=>{
    const child=spawn(HEAD_BUN,args,{cwd,env,detached:true,stdio:['ignore','pipe','pipe']});let started=false,closed=false,finished=false,spawnError=false,journalFailed=false,observedIdentity:string|null=null,reason:string|null=null,bytes=0;
-   const output:{channel:'stdout'|'stderr';bytes:number;text:string}[]=[];let kill:ReturnType<typeof setTimeout>|undefined,grace:ReturnType<typeof setTimeout>|undefined;
+   const output:{channel:'stdout'|'stderr';bytes:number;text:string;data:Uint8Array}[]=[];let kill:ReturnType<typeof setTimeout>|undefined,grace:ReturnType<typeof setTimeout>|undefined;
    const cleanup=()=>{clearTimeout(timeout);clearInterval(polling);if(kill)clearTimeout(kill);if(grace)clearTimeout(grace);};
    const finish=(exitCode:number|null,signal:string|null,confirmed:boolean)=>{if(finished)return;finished=true;active=false;poisoned ||= !confirmed||reason!==null;cleanup();resolve({role,exitCode,signal,output,outputBytes:bytes,terminationConfirmed:confirmed,reason});};
    const stop=(next:string)=>{
@@ -43,7 +45,7 @@ export const createHeadBunRunner=({ownedRoot,observer,deadline}:{ownedRoot:strin
    };
    child.once('spawn',()=>{started=true;observedIdentity=child.pid?identity(child.pid):null;try{observer.recordProcess({...requested,state:'started',...(child.pid?{pid:child.pid}:{}),...(observedIdentity?{startIdentity:observedIdentity}:{})});}catch{journalFailed=true;stop('journal_write_failed');}});
    child.once('error',()=>{spawnError=true;reason??='runtime_unavailable';});
-   const collect=(channel:'stdout'|'stderr',chunk:Buffer)=>{if(finished)return;bytes+=chunk.length;if(bytes>1024*1024){stop('output_limit');return;}output.push({channel,bytes:chunk.length,text:chunk.toString('utf8')});};
+   const collect=(channel:'stdout'|'stderr',chunk:Buffer)=>{if(finished)return;bytes+=chunk.length;if(!outputBudget.append(role,channel,chunk)){stop('output_limit');return;}output.push({channel,bytes:chunk.length,text:chunk.toString('utf8'),data:Uint8Array.from(chunk)});};
    child.stdout.on('data',(chunk:Buffer)=>collect('stdout',chunk));child.stderr.on('data',(chunk:Buffer)=>collect('stderr',chunk));
    child.once('close',(exitCode,signal)=>{closed=true;if(finished)return;try{observer.recordProcess({...requested,state:'exited',...(child.pid?{pid:child.pid}:{}),...(observedIdentity?{startIdentity:observedIdentity}:{}),...(!started&&spawnError&&child.pid===undefined?{spawnDisposition:'not_spawned' as const}:{}),exitCode,signal});}catch{journalFailed=true;}finish(exitCode,signal,!journalFailed&&(!started&&spawnError||Boolean(child.pid&&!groupExists(child.pid))));});
    const timeout=setTimeout(()=>stop('test_deadline'),Math.min(deadline-Date.now(),role==='runtime_version'?10000:120000));
