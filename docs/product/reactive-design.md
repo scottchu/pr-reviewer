@@ -74,6 +74,20 @@ Cursor means **authorized route publication**: it advances before the receiver r
 | import-request-to-runner; verified-import-result-to-admission / import owner | Authorized durable job polling/wake → owned bounded runner; private verified result witness → public trusted admission. Stop/epoch/shared-execution-owner fences; no UI process effects. |
 | analysis-request-committed-to-owner; verified-semantic-result-to-admission / analysis owner | Authorized durable job polling/wake → owned phase coordinator; private verified worker result → trusted admission. Stop/epoch/lease/grant and result-validation fences; no admission from child JSON alone. |
 
+Current configured-test and canvas additions use the same registry and do not change cursor meaning:
+
+| Route ID / owner | Public boundary and lifetime |
+|---|---|
+| head-test-request-committed-to-owner / test coordinator | Durable queue/wake → test owner claim; scope test-owner, stop/fence predicate, one active tick;200ms observation catches lost wake. |
+| verified-head-test-result-to-admission / test coordinator | Private verified outcome → trusted store admission; scope test-owner, owner fence; child/result JSON is not a witness. |
+| review-scope-to-head-test-view / workspace | Authorized displayed review snapshot → HeadTestsBridge.select; loss of review authorization locks test view; selection cannot retarget pending intent. |
+| head-test-committed-to-authorized-view / HeadTestsBridge | Connected, undisposed, not-busy publication → catalog/history and focused exact job reads; scope reviewId. Default500ms; separate occupied request slots coalesce reads, default10000ms request bound. Access/snapshot generation and abort fences govern completion. No mutation on polling/remount. |
+| canvas-inspection-to-private-frame / workspace | Ready, authorized nonbusy/error-free canvas frame → StoryBridge structural frame capture; suppress during restoration and require exact review/story snapshot. Sole structural inspection capture authority. |
+| review-source-to-canvas-inspection / workspace | Review source/graph → canvas authorized scope; scope change increments restore owner and invalidates pending restore. |
+| story-frame-to-canvas-inspection / workspace | Authenticated same-snapshot story frame → transactional canvas restoration; exact restore owner/serial and current frame freshness fence publication. |
+
+The structural-map-view-to-private-frame compatibility registration remains present. Current CanvasSurface capture uses canvas-inspection-to-private-frame; the canvas contract owns capture precedence and preservation requirements. Canvas specifics remain owned by the canvas contract. Test slots and private intent semantics are defined in [test UI](review-loop/test-ui.md) and [test compatibility](review-loop/test-compatibility.md). Historical test design names test-request-committed-to-owner, verified-test-outcome-to-admission and test-job-committed-to-authorized-view, and 1000ms polling, are superseded; they are not additional active registrations.
+
 Attachment revocation/replacement is enforced by authoritative store/adapter generation checks and applicable scope teardown. It has no separate current registered route named attachment-revoked. Timers, callbacks and public query completion are deliberately distinct from a durable stream broker. Add routes at their responsible composition owner with explicit tests and bounded teardown; do not build the broader monitoring direction merely to reproduce current behavior.
 
 ## Test the wiring as a first-class boundary
