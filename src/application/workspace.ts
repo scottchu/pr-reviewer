@@ -12,7 +12,7 @@ export const createReviewWorkspace=(reviewId:string,initialSnapshotId?:string,op
  const mapRoutes=new Map<'structural'|'semantic',ReturnType<typeof registry.register>>();
  let confirmedDraft='',confirmedRoute:ReturnType<typeof registry.register>|null=null;
  const owns=(expected:number,captured:string)=>!disposed&&expected===generation&&captured===credential;
- const story=createStoryBridge(reviewId,{session,semantic:analysis,selectSnapshot:async id=>{const expected=generation,captured=credential;const result=await review.selectSnapshot(id);if(!owns(expected,captured))throw new Error('workspace_superseded');return result.snapshot;},readSnapshot:id=>review.readSnapshot(id)});
+ const story=createStoryBridge(reviewId,{session,semantic:analysis,selectSnapshot:async id=>{const expected=generation,captured=credential;const result=await review.selectSnapshot(id);if(!owns(expected,captured))throw new Error('workspace_superseded');return result.snapshot;},readSnapshot:(id,signal)=>review.readSnapshot(id,signal)});
  const review=createReviewBridge(reviewId,initialSnapshotId,{session,onConfirmedDraft:id=>{confirmedDraft=id;if(!confirmedRoute)throw new Error('workspace_disconnected');confirmedRoute.emit();}});
  const canLeave=()=>{try{story.assertCanNavigate();return review.canLeaveReview();}catch{return false;}};
  return {

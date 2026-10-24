@@ -10,6 +10,8 @@ export const createReviewBridge=(reviewId:string,initialSnapshotId?:string,optio
  const session=options.session??createPrivateSession(),registry=createRegistry(),listeners=new Set<()=>void>();
  let state=empty(),token='',scope='',generation=0,selectedSnapshotId:string|null=initialSnapshotId??null,inflight:AbortController|null=null;
  let pending:PendingQuestion|null=null,pendingAccess:'none'|'authorized'|'locked'|'quarantined'|'storage_unavailable'='none',operation:object|null=null;
+ const readControllers=new Set<AbortController>();
+ const abortReads=()=>{for(const controller of readControllers)controller.abort();readControllers.clear();};
  const recovery=():QuestionRecovery=>{
   if(pendingAccess==='quarantined')return {state:'quarantined',message:'Saved question recovery is corrupt or unsupported. It is quarantined; no replacement question can be sent.',busy:state.busy};
   if(pendingAccess==='storage_unavailable')return {state:'storage_unavailable',message:'Question recovery storage is unavailable. No uncheckpointed question will be sent.',busy:state.busy};
@@ -20,8 +22,13 @@ export const createReviewBridge=(reviewId:string,initialSnapshotId?:string,optio
  const publish=(next:View)=>{state={...next};state={...state,recovery:recovery()};for(const listener of listeners)listener();};
  const owns=(expected:number,captured:string,op?:object)=>generation===expected&&token===captured&&(!op||operation===op);
  const request=async(captured:string,path:string,body?:unknown,signal?:AbortSignal)=>{
-  const response=await fetch(path,{headers:{Authorization:`Bearer ${captured}`,'Content-Type':'application/json'},...(body===undefined?{}:{method:'POST',body:typeof body==='string'?body:JSON.stringify(body)}),...(signal?{signal}:{})});
-  const value=await response.json() as unknown;if(!response.ok)throw new Error(String((value as {error?:string}).error??'request_failed'));return value;
+  const controller=body===undefined?new AbortController():null;if(controller)readControllers.add(controller);
+  const ownedSignal=controller?(signal?AbortSignal.any([signal,controller.signal]):controller.signal):signal;
+  try{
+   if(ownedSignal?.aborted)throw new Error('selection_superseded');
+   const response=await fetch(path,{headers:{Authorization:`Bearer ${captured}`,'Content-Type':'application/json'},...(body===undefined?{}:{method:'POST',body:typeof body==='string'?body:JSON.stringify(body)}),...(ownedSignal?{signal:ownedSignal}:{})});
+   const value=await response.json() as unknown;if(ownedSignal?.aborted)throw new Error('selection_superseded');if(!response.ok)throw new Error(String((value as {error?:string}).error??'request_failed'));return value;
+  }finally{if(controller)readControllers.delete(controller);}
  };
  const interruptSelection=()=>{if(state.selecting){selectedSnapshotId=state.review?.snapshot.snapshotId??selectedSnapshotId;publish({...state,selecting:false});}};
  const refresh=async(minimumRevision=0)=>{
@@ -87,12 +94,12 @@ export const createReviewBridge=(reviewId:string,initialSnapshotId?:string,optio
  return {
   getSnapshot:()=>state,subscribe:(listener:()=>void)=>{listeners.add(listener);return()=>listeners.delete(listener);},
   canLeaveReview:()=>!state.busy&&!state.selecting&&!pending&&pendingAccess==='none',getQuestionRecovery:()=>state.recovery,
-  connect:()=>{const route=registry.register('review-committed-to-view',reviewId,()=>Boolean(token)&&!state.busy&&!state.selecting&&!inflight,()=>{void refresh();});const timer=setInterval(()=>route.emit(),700);route.emit();return()=>{clearInterval(timer);route.dispose();generation++;operation=null;const canceled=inflight;inflight=null;interruptSelection();canceled?.abort();publish({...state,busy:false});};},
-  login:async(value:string)=>{token=value.trim();scope='';generation++;operation=null;inflight?.abort();inflight=null;interruptSelection();publish({...empty(),recovery:{state:'locked',message:'Authorizing private recovery…',busy:false}});const expected=generation,captured=token,review=await refresh();if(review&&owns(expected,captured))await hydrateRecovery(expected,captured);},
-  logout:()=>{generation++;operation=null;token='';scope='';inflight?.abort();inflight=null;pendingAccess=pending?'locked':pendingAccess;let error='';try{session.clearView();}catch(cause){error=cause instanceof Error?cause.message:'view_storage_unavailable';}publish({...empty(),error});},
-  readSnapshot:async(snapshotId:string):Promise<Snapshot>=>{const expected=generation,captured=token;if(!captured||!state.authenticated)throw new Error('unauthorized');const review=await request(captured,`/api/reviews/${encodeURIComponent(reviewId)}?snapshotId=${encodeURIComponent(snapshotId)}`) as Review;if(!owns(expected,captured))throw new Error('selection_superseded');if(review.reviewId!==reviewId||review.snapshot.snapshotId!==snapshotId)throw new Error('source_unavailable');return review.snapshot;},
+  connect:()=>{const route=registry.register('review-committed-to-view',reviewId,()=>Boolean(token)&&!state.busy&&!state.selecting&&!inflight,()=>{void refresh();});const timer=setInterval(()=>route.emit(),700);route.emit();return()=>{clearInterval(timer);route.dispose();generation++;abortReads();operation=null;const canceled=inflight;inflight=null;interruptSelection();canceled?.abort();publish({...state,busy:false});};},
+  login:async(value:string)=>{abortReads();token=value.trim();scope='';generation++;operation=null;inflight?.abort();inflight=null;interruptSelection();publish({...empty(),recovery:{state:'locked',message:'Authorizing private recovery…',busy:false}});const expected=generation,captured=token,review=await refresh();if(review&&owns(expected,captured))await hydrateRecovery(expected,captured);},
+  logout:()=>{generation++;abortReads();operation=null;token='';scope='';inflight?.abort();inflight=null;pendingAccess=pending?'locked':pendingAccess;let error='';try{session.clearView();}catch(cause){error=cause instanceof Error?cause.message:'view_storage_unavailable';}publish({...empty(),error});},
+  readSnapshot:async(snapshotId:string,signal?:AbortSignal):Promise<Snapshot>=>{const expected=generation,captured=token;if(!captured||!state.authenticated)throw new Error('unauthorized');const review=await request(captured,`/api/reviews/${encodeURIComponent(reviewId)}?snapshotId=${encodeURIComponent(snapshotId)}`,undefined,signal) as Review;if(!owns(expected,captured)||signal?.aborted)throw new Error('selection_superseded');if(review.reviewId!==reviewId||review.snapshot.snapshotId!==snapshotId)throw new Error('source_unavailable');return review.snapshot;},
   selectSnapshot:async(snapshotId:string)=>{
-   if(state.busy||pending||pendingAccess!=='none')throw new Error('submission_pending: reconcile the question before changing snapshots');const previous=state.review?.snapshot.snapshotId??selectedSnapshotId;selectedSnapshotId=snapshotId;const expected=++generation;publish({...state,selecting:true});
+   if(state.busy||pending||pendingAccess!=='none')throw new Error('submission_pending: reconcile the question before changing snapshots');abortReads();const previous=state.review?.snapshot.snapshotId??selectedSnapshotId;selectedSnapshotId=snapshotId;const expected=++generation;publish({...state,selecting:true});
    try{const review=await refresh();if(expected!==generation)throw new Error('selection_superseded');if(!review){selectedSnapshotId=previous;throw new Error(state.error||'source_unavailable');}return review;}finally{if(expected===generation)publish({...state,selecting:false});}
   },
   ask:(anchor:Anchor,text:string,parentQuestionId?:string,draftId?:string)=>perform(async(expected,captured,op)=>{
