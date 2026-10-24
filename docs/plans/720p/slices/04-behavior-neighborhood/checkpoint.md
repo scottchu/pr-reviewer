@@ -2,11 +2,11 @@
 
 **Date:** 2026-10-24
 
-**Status:** Reviewed04 technical candidate; G14 presentation CHANGES NEEDED; no04 merge or full-slice acceptance
+**Status:** Original028 negative preserved. G14 bounded agent-presentation obligation is closed by the combined7b6/05 outcome and independently closed ea test-wiring P2; root delivery and full host/human/round acceptance remain pending. See the final receipt below.
 
 **Parents:** [04 plan](plan.md), [04 integration](integration.md), [05 handoff](../05-explanation-exploration/integration.md), [720p round](../../plan.md)
 
-## Exact evidence and interpretation
+## Historical028 exact evidence and interpretation
 
 | Item | Identity / observed disposition |
 |---|---|
@@ -42,3 +42,9 @@ Before merge, a fresh reviewer must assess the actual final combined PR target/b
 | P3 selected issue/span triage | Within05 exploration, default to selected-declaration/path-relevant existing issues, retain explicit complete-list access and provenance, group only existing diagnostic codes/causes, and foreground the exact selected source span before full-file expansion. No new static facts or automatic severity inference. S08/S09/S13. |
 
 Give05 exact authorized analysis/source reads, cap/priority meaning, historical pins and receipt minima; the [05 integration packet](../05-explanation-exploration/integration.md) records these ports and new application coordination/recovery responsibilities.06 receives delivered inputs only after the combined720p contribution is reconciled; no06 hierarchy or automatic implementation unlock is created now.
+
+## Combined7b6 G14 closure
+
+Root accepts the original predeclared bounded presentation obligation through [05 final acceptance](../05-explanation-exploration/acceptance-7b6.md), not by relabeling028. A new fresh actual7b6 story/graph-first account supplies a coherent before/after example, decision/consequence, unchanged consumer and complete responsibility groups with explicit unknowns. Independent source/key checks support it; overall effort is workable with effort, with graph overlap/technical vocabulary retained as limits. The sole B1 P2 (missing normal regression entrypoint) is independently closed atea. A meaningful same-original-session MCP answer, actual reload persistence and one first-enabled Resume restore the unfinished original draft/place. Exact target/build/snapshot/analysis/story pins and all frozen report hashes are in that nearby receipt.
+
+This closes G14 for that bounded agent task alongside the separately reviewed engineering; it is not a retrospective pass of028/67, a complete122-file code audit, unfamiliar-human evaluation, automatic native/Claude acceptance, main merge or pilot deployment. The [round reflection](../../reviews/reflection-7b6.md) records actual-source rebuild decisions and the final small durable clarification requiring root's narrow docs-only recheck. Root owns delivery; no06 worktree is edited and no automatic successor acceptance is granted.

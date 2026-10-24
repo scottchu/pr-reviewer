@@ -2,7 +2,7 @@
 
 **Date:** 2026-10-24
 
-**Plan revision:** 2; combined04+05 dependency amendment, preserving original baseline history
+**Plan revision:** 3; bounded04/05 closure and720 source-informed reflection, preserving original baseline history
 
 **Status:** Active delivery plan; engineering continuation ready by capability, full product acceptance incomplete
 
@@ -26,9 +26,13 @@ Deliver the connected review journey: continue/history → path-selected multi-f
 
 ### Current reconciled delivery state
 
-Main and the retained pilot are70280d8 after accepted03 merge/rollout; continuation/history, structural graph and durable multi-file import are implemented. Draft PR24 technical candidate028b6b9 adds reviewed bounded semantic neighborhoods, explicit caps/coverage and exact source/clarification navigation. Actual graph-firstA→sourceB finds useful static relationships but CHANGES NEEDED for the complete user/lifecycle/whole-scope explanation task. [04 checkpoint](720p/slices/04-behavior-neighborhood/checkpoint.md) records exact source/build/evidence and preserves native/Claude/human limits. The historical table above is not a current claim that graph/import/jobs are absent.
+Main/pilot's last reported delivered baseline remains70280d8; this documentation assignment does not update or reverify deployment. Combined PR24 now has independently reviewed bounded semantic/story/exploration/recovery and journal-loss engineering. Fresh actual7b6 story/graph A froze before source/key, gave a coherent workable account, and B1/B2 supported it. The sole P2 missing normal-entrypoint journal regression was corrected atea and independently closed in B4 after inspection of the actual47 Bun/302 Node normal-run log. [Final bounded04/05 receipt](720p/slices/05-explanation-exploration/acceptance-7b6.md) keeps runtime7b6, manifestea and later docs headsb0 distinct.
 
-Root adopted sequenceB: [05 revision3](720p/slices/05-explanation-exploration/plan.md) may implement on reviewed028 before04 merge after committed packet review and scoped assignment. Keep PR24 draft and combine04+05; G14 stays open until a fresh final-target story/graph-first account and source comparison establish the meaningful bounded outcome before merge. This explicit case-specific replacement of the accepted04-merge prerequisite does not lower acceptance, authorize06 code, change main/pilot, or turn technical tests into comprehension.
+The same original root session supplied a meaningful source-backed MCP answer to the reviewer's genuine operational question. Actual reload and first enabled Resume restored the unfinished original draft/anchor, story cursor, maps and scroll without alerts; the answer remained persisted. This accepts bounded agent comprehension/own-PR D7 and closes04 G14 through new evidence. It does not claim automatic native queued-turn/catalog, Claude, unfamiliar-human comprehension or full-round completion. The original028/67/af39 negatives and all test/audit source pins remain unchanged.
+
+The [720p actual-code reflection](720p/reviews/reflection-7b6.md) revisits source/effect/store/application/React/integration ownership. Whole-current-product docs-only readiness is qualified YES atb0; root requires a narrow fresh recheck for the new durable operational limit (identity-less process evidence can retain the shared lane indefinitely, with no delivered public repair). It is not an actual rebuild or runtime proof.
+
+Root still owns final PR head/base/check reconciliation, supported merge, clean main fast-forward and existing-pilot deployment/rollback/live version and behavior verification.06's independently assigned work remains on its separate branch/packet; this receipt contributes current process/source/question limits but grants no automatic successor acceptance. Later06–08 and full480p/720p/1080p remain incomplete. No settings, session replacement, global installation or expanded merge/deployment authority is created here.
 
 ## Sequencing amendment and readiness
 
@@ -42,14 +46,14 @@ Root assigns an implementation owner and independent reviewers to committed pack
 | Parallel with 1 | Importer agent: slice 03 source acquisition/domain preparation | [Packet v1](720p/slices/03-whole-change/plan.md), frozen [boundary v1](../product/review-loop/evolution.md#import-boundary-v1). Separate owned source files; no shared gateway/store/UI/package/lockfile writes. | Pure candidate discovery/import-result implementation and fixtures; actual provider evidence only where authenticated tooling exists. Integration waits on agreed history contract. |
 | Parallel with 1 | Host-evidence owner, if independently assigned | Existing-session contracts and actual supported tooling; no global settings edits, session replacement or invented evidence | Bounded repair/revalidation of the native route or precise external blocker. Preserve independent Codex/Claude statuses. |
 | 2 (delivered) | Slice03 vertical importer/job/UI | Merged/live70280d8; ownPR bounded import/continuation accepted, native/human limits separate | Actual path discovery → pinned complete ledger → UI/source/graph; comments progress during real import job. |
-| 3 (technical candidate) | Slice04: evidence-backed TypeScript/TSX neighborhood | Reviewed028 technical ports; actual whole-task G14 CHANGES NEEDED, carried explicitly into combined04+05 | Before/after one-hop callers/callees including unchanged code; unresolved relations truthful; graph annotation CAS. |
-| 4 (next) | Slice05: minimal story and exploration | [Revision3 handoffs](720p/slices/05-explanation-exploration/integration.md), reviewed028 before04 merge under adopted exception; independent plan review and assignment before code | One-row draggable previous/replay-pause/next/chapter player; explore and resume without losing state. |
+| 3 (bounded accepted; delivery pending) | Slice04: evidence-backed TypeScript/TSX neighborhood | Combined7b6 bounded G14 accepted through05; original028 negative retained; full host/human and root delivery open | Before/after one-hop callers/callees including unchanged code; unresolved relations truthful; graph annotation CAS. |
+| 4 (bounded accepted; delivery pending) | Slice05: minimal story and exploration | [Final receipt](720p/slices/05-explanation-exploration/acceptance-7b6.md), reviewed engineering, fresh7b6 account/meaningful return and ea normal-entrypoint closure; final knowledge delta/root delivery open | One-row draggable previous/replay-pause/next/chapter player; explore and resume without losing state. |
 | 5 | Slice 06: configured head test jobs | Agreed repository target/environment and isolated execution source; no arbitrary shell | Actual bounded process outcomes/cancellation and continued discussion; source/environment/artifact provenance. |
 | 6 | Slice 07: base/head evidence comparison | Head-runner evidence; target valid on both pinned sides or explicit incompatibility | Separate worktrees/results; mismatches and missing outcomes visible, no unsupported causal claim. |
 | 7 | Slice 08: retained correction and bounded enrichment | Proven graph/write/job/inbox contracts | Corrections survive agent revision and reopen; subscribed terminal events deliver without reply/update wake loops. |
 | Last | Passkey known-issue follow-up | After 01–08 engineering delivery/review; separately scoped diagnosis and source decisions | Preserve login/data/credentials until a reviewed plan exists; no auth change authorized by this plan. |
 
-The [720p round](720p/plan.md) and [1080p round](1080p/plan.md) keep later scope concise. 04/05 packets now exist. Refine later individual06–08 scope and both handoffs only from actual delivered predecessor results immediately before implementation; this amendment creates no later hierarchy. No speculative whole hierarchy is generated now.
+The [720p round](720p/plan.md) and [1080p round](1080p/plan.md) keep later scope concise. 04/05 now have bounded acceptance receipts, and06 has a separately owned packet/workstream. Reconcile actual delivered predecessor results before each dependent implementation/acceptance; keep07/08 details provisional. This closeout creates no new slice hierarchy. No speculative whole hierarchy is generated now.
 
 ## Initial graph bootstrap order (historical, already implemented)
 
@@ -85,7 +89,7 @@ A runtime/data owner is exclusive per candidate. Use separate external data root
 |---|---|---|
 | Reviewed slice 01 interfaces can support additive history | Confirmed baseline interfaces; history design is new and testable | 02 owner tests migration, old-anchor reply and retry/unknown preservation before integration. |
 | Existing provider tooling can discover the target | Unverified per provider/host; affects only that provider route | 03 owner inspect existing authenticated tools; unavailable route stays explicit, no global install. |
-| Bounded TypeScript/TSX analysis is useful for our source | Observed useful028 constructor/unchanged-context relationships with honest limits; whole-change understanding still incomplete |05 adds attributed source-backed explanation, responsibility accounts and bounded exploration; preserve04 G14 finding until fresh combined acceptance. |
+| Bounded TypeScript/TSX analysis is useful for our source | Observed useful bounded relationships and workable actual7b6 account/meaningful return; no human/causal productivity proof | Preserve original028/67 findings, final bounded closure and remaining graph-decoding effort;06 must keep evidence types distinct. |
 | Existing repo tests can be safe configured targets | Provisional until 06 packet inspects declarations | Select nonrecursive bounded targets; stop for new execution destinations or permission needs. |
 | Agent critique can guide usability iteration | Accepted evidence type with limits | Never label it unfamiliar-human or causal-efficacy evidence. |
 
