@@ -76,11 +76,11 @@ export const createAnalysisStore = ({ db, tx, load, authorize, execution, limits
     } | undefined; if (!row)
         throw new Error("unauthorized"); return JSON.parse(row.body) as Principal; };
     const auth = (reference: string, reviewId: string) => { const principal = credential(reference), review = load(reviewId); authorize(principal, review); return { principal, review }; };
-    const owner = (value: AnalysisOwner) => { const generation = owners.get(value), row = db.prepare("SELECT generation FROM analysis_owner WHERE id=1").get() as {
+    const owner = (value: AnalysisOwner) => { execution.assertCurrent(); const generation = owners.get(value), row = db.prepare("SELECT generation FROM analysis_owner WHERE id=1").get() as {
         generation: string;
     } | undefined; if (!generation || generation !== row?.generation)
         throw new Error("stale_analysis_runner"); return generation; };
-    const grant = (value: AnalysisGrant) => { const record = grants.get(value), row = db.prepare("SELECT generation FROM analysis_owner WHERE id=1").get() as {
+    const grant = (value: AnalysisGrant) => { execution.assertCurrent(); const record = grants.get(value), row = db.prepare("SELECT generation FROM analysis_owner WHERE id=1").get() as {
         generation: string;
     } | undefined; if (!record || record.ownerRunId !== row?.generation)
         throw new Error("stale_analysis_runner"); const job = get(record.jobId), invocation = job.invocations.at(-1); if (!invocation || invocation.invocationId !== record.invocationId || invocation.state !== "running")
@@ -200,18 +200,9 @@ export const createAnalysisStore = ({ db, tx, load, authorize, execution, limits
                         throw new Error("analysis_queue_full");
                     const identity = contextIdentity(snapshot, parsed.sourceProject);
                     let worktree = parsed.worktree;
-                    if (!worktree) {
-                        const imports = (db.prepare("SELECT body FROM import_jobs ORDER BY rowid DESC").all() as {
-                            body: string;
-                        }[]).map(row => JSON.parse(row.body) as {
-                            reviewId: string;
-                            canonicalWorktree: string | null;
-                            candidate?: {
-                                baseSha: string;
-                                headSha: string;
-                            };
-                        });
-                        worktree = imports.find(item => item.reviewId === reviewId && item.candidate?.baseSha === snapshot.baseSha && item.candidate?.headSha === snapshot.headSha)?.canonicalWorktree ?? undefined;
+                    if (!worktree && snapshot.candidate) {
+                        const imports = (db.prepare("SELECT body FROM import_jobs ORDER BY rowid DESC").all() as {body:string}[]).map(row => JSON.parse(row.body) as import("../domain/public.ts").ImportJob);
+                        worktree = imports.find(item => item.state === "admitted" && item.admission?.state === "applied" && item.admission.result.reviewId === reviewId && item.admission.result.snapshotId === snapshot.snapshotId && item.reviewId === reviewId && semanticCanonical(item.candidate) === semanticCanonical(snapshot.candidate))?.canonicalWorktree ?? undefined;
                     }
                     if (!worktree)
                         throw new Error("source_locator_required");
@@ -314,7 +305,7 @@ export const createAnalysisStore = ({ db, tx, load, authorize, execution, limits
                 throw new Error("source_unavailable");
             return { ...found, snapshotId: query.snapshotId, corpusId: query.corpusId };
         },
-        beginOwner: (): AnalysisOwner => tx(() => { const generation = randomUUID(); db.prepare("INSERT OR REPLACE INTO analysis_owner VALUES (1,?)").run(generation); for (const job of all()) {
+        beginOwner: (): AnalysisOwner => tx(() => { execution.assertCurrent(); const generation = randomUUID(); db.prepare("INSERT OR REPLACE INTO analysis_owner VALUES (1,?)").run(generation); for (const job of all()) {
             const invocation = job.invocations.at(-1);
             if (invocation && (invocation.state === "running" || job.state === "unknown")) {
                 execution.retain({ kind: "analysis", jobId: job.jobId, invocationId: invocation.invocationId, phase: invocation.phase });
@@ -387,7 +378,7 @@ export const createAnalysisStore = ({ db, tx, load, authorize, execution, limits
         }),
         finishContext: (value: AnalysisGrant, body: CorpusRecord, witness: PreparedContextWitness) => {
             const observed = grant(value), snapshot = snapshotFor(load(observed.job.reviewId), observed.job.snapshotId);
-            const verified = snapshot && isPreparedContextWitness(witness, observed.job.jobId, observed.job.reviewId, snapshot, body.corpus), prepared=prepareRecord(body);
+            const verified = snapshot && isPreparedContextWitness(witness, observed.job.jobId, observed.job.reviewId, snapshot, body.corpus, body.issues), prepared=prepareRecord(body);
             return tx(() => { const { job, invocation } = grant(value); if (invocation.phase !== "context" || !verified || body.corpus.snapshotId !== job.snapshotId)
                 throw new Error("source_identity_conflict"); ended(invocation); active(job); retain(job, "corpus", body.corpus.corpusId, prepared); release(job, invocation); invocation.state = "completed"; job.corpusId = body.corpus.corpusId; job.contextIssues = body.issues; job.state = "inventory_queued"; update(job); });
         },

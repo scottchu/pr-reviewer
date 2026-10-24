@@ -1,6 +1,6 @@
 import { createHash } from "node:crypto";
 import { loadSourceContext } from "../source-acquisition/public.ts";
-import type { ContextCorpus, ContextIdentity, ContextInput, AcquisitionEffects } from "../source-acquisition/public.ts";
+import type { ContextCorpus, ContextIdentity, ContextInput, ContextIssue, AcquisitionEffects } from "../source-acquisition/public.ts";
 import { canonical, snapshotFor } from "../domain/public.ts";
 import type { Review, Snapshot } from "../domain/public.ts";
 import type { DeclarationInventoryInput, AnalysisBudgets } from "../source-analysis/public.ts";
@@ -10,6 +10,7 @@ const records = new WeakMap<object, {
     reviewId: string;
     snapshot: string;
     corpus: string;
+    issues: string;
 }>();
 declare const contextBrand: unique symbol;
 export type PreparedContextWitness = {
@@ -27,11 +28,11 @@ export const contextIdentity = (snapshot: Snapshot, sourceProject?: string): Con
         throw new Error("source_identity_conflict");
     return { provider: "github", host: url.host, targetProject: snapshot.repository, number: snapshot.prNumber, sourceProject };
 };
-export const isPreparedContextWitness = (value: unknown, jobId: string, reviewId: string, snapshot: Snapshot, corpus: ContextCorpus): value is PreparedContextWitness => {
+export const isPreparedContextWitness = (value: unknown, jobId: string, reviewId: string, snapshot: Snapshot, corpus: ContextCorpus, issues: readonly ContextIssue[]): value is PreparedContextWitness => {
     if (!value || typeof value !== "object")
         return false;
     const record = records.get(value);
-    return Boolean(record && record.jobId === jobId && record.reviewId === reviewId && record.snapshot === canonical(snapshot) && record.corpus === canonical(corpus));
+    return Boolean(record && record.jobId === jobId && record.reviewId === reviewId && record.snapshot === canonical(snapshot) && record.corpus === canonical(corpus) && record.issues === canonical(issues));
 };
 export const acquirePreparedContext = async (input: {
     jobId: string;
@@ -67,7 +68,7 @@ export const acquirePreparedContext = async (input: {
             throw new Error("source_identity_conflict");
     }
     const witness = Object.freeze({}) as PreparedContextWitness;
-    records.set(witness, { jobId: input.jobId, reviewId: input.review.reviewId, snapshot: canonical(snapshot), corpus: canonical(corpus) });
+    records.set(witness, { jobId: input.jobId, reviewId: input.review.reviewId, snapshot: canonical(snapshot), corpus: canonical(corpus), issues: canonical(result.issues) });
     return { kind: "prepared" as const, corpus, issues: result.issues, witness };
 };
 // This value does not load TypeScript into the gateway. The worker revalidates all limits.

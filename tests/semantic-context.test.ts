@@ -25,10 +25,10 @@ test("context witness binds exact retained snapshot/job and mapping preserves un
         assert.equal(result.kind, "prepared");
         if (result.kind !== "prepared")
             return;
-        assert.equal(isPreparedContextWitness(result.witness, "analysis", "review", prepared.snapshot, result.corpus), true);
-        assert.equal(isPreparedContextWitness(JSON.parse(JSON.stringify(result.witness)), "analysis", "review", prepared.snapshot, result.corpus), false);
-        assert.equal(isPreparedContextWitness(result.witness, "other", "review", prepared.snapshot, result.corpus), false);
-        assert.equal(isPreparedContextWitness(result.witness, "analysis", "review", prepared.snapshot, { ...result.corpus, corpusId: "f".repeat(64) }), false);
+        assert.equal(isPreparedContextWitness(result.witness, "analysis", "review", prepared.snapshot, result.corpus, result.issues), true);
+        assert.equal(isPreparedContextWitness(JSON.parse(JSON.stringify(result.witness)), "analysis", "review", prepared.snapshot, result.corpus, result.issues), false);
+        assert.equal(isPreparedContextWitness(result.witness, "other", "review", prepared.snapshot, result.corpus, result.issues), false);
+        assert.equal(isPreparedContextWitness(result.witness, "analysis", "review", prepared.snapshot, { ...result.corpus, corpusId: "f".repeat(64) }, result.issues), false);
         const input = contextAnalysisInput(result.corpus);
         assert.ok(input.sources.some(source => source.path === "caller.ts" && source.role === "context" && source.source));
         assert.equal(input.corpus.base.inventory, "repository-enumeration");

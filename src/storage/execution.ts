@@ -36,6 +36,7 @@ export const createExecutionLease = (db: DatabaseSync) => {
         return false;
     };
     return {
+        assertCurrent: check,
         acquire: (next: Occupant) => { check(); if (occupant() || unresolved())
             return false; db.prepare("INSERT INTO execution_lease VALUES (1,?)").run(JSON.stringify(next)); return true; },
         retain: (next: Occupant) => { check(); if (!occupant())
