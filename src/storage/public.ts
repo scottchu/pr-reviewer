@@ -1,7 +1,7 @@
 import {createStoryStore} from './story.ts';
 import type {StoryLimits} from './story.ts';
 import {storyEvidenceQuerySchema,storyCanonical,validateSemanticAnchor} from '../domain/public.ts';
-import type {StoryEvidenceQuery,StoryEvidence,StoryReference,SemanticAnchor,AnalysisView,SemanticSource} from '../domain/public.ts';
+import type {StoryEvidenceQuery,StoryEvidence,StoryReference,SemanticAnchor,AnalysisEvidence,SemanticSource} from '../domain/public.ts';
 import {createAnalysisStore} from "./analysis.ts";
 import type {AnalysisLimits} from "./analysis.ts";
 import {createExecutionLease} from "./execution.ts";
@@ -207,9 +207,9 @@ export const createStore = (filename: string,options:{importLimits?:ImportLimits
     const selected=analysis.marker(token,{reviewId:query.reviewId,snapshotId:query.snapshotId}).selectedAnalysisId;
     const knownUnavailable=(error:unknown):boolean=>error instanceof Error&&['analysis_record_unavailable','source_unavailable'].includes(error.message);
     const knownInvalid=(error:unknown):boolean=>knownUnavailable(error)||error instanceof Error&&['story_reference_invalid','story_context_unavailable'].includes(error.message);
-    let view:AnalysisView|undefined,basisUnavailable=false;
+    let view:AnalysisEvidence|undefined,basisUnavailable=false;
     if(query.analysisId)try{
-      view=analysis.query(token,{reviewId:query.reviewId,snapshotId:query.snapshotId,analysisId:query.analysisId});
+      view=analysis.evidence(token,{reviewId:query.reviewId,snapshotId:query.snapshotId,analysisId:query.analysisId});
       if(view.analysis?.status!=='analyzed'||view.analysis.analysisId!==query.analysisId||view.corpus?.corpusId!==query.corpusId){view=undefined;basisUnavailable=true;}
     }catch(error){if(!knownUnavailable(error))throw error;basisUnavailable=true;}
     const sourceMap=new Map(snapshot.sources.map(source=>[JSON.stringify([source.side,source.path]),source]));

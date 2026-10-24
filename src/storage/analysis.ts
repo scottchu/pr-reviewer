@@ -1,8 +1,8 @@
 import { createHash, randomUUID } from "node:crypto";
 import type { DatabaseSync } from "node:sqlite";
 import { analysisCommandSchema, analysisQuerySchema, semanticSourceQuerySchema, semanticCanonical, snapshotFor, analysisDiagnosticCode } from "../domain/public.ts";
-import {validateSemanticAnchor,analysisMarkerQuerySchema} from "../domain/public.ts";
-import type { AnalysisMarker,AnalysisMarkerQuery,AnalysisCommand, AnalysisReceipt, AnalysisView, AnalysisQuery, AnalysisJobView, AnalysisInvocation, AnalysisProcess, GraphClarification, SemanticAnchor, SemanticSourceQuery, SemanticSource, Principal, Review, CorpusAccount } from "../domain/public.ts";
+import {validateSemanticAnchor,analysisMarkerQuerySchema,analysisEvidenceQuerySchema} from "../domain/public.ts";
+import type { AnalysisEvidence,AnalysisEvidenceQuery,AnalysisMarker,AnalysisMarkerQuery,AnalysisCommand, AnalysisReceipt, AnalysisView, AnalysisQuery, AnalysisJobView, AnalysisInvocation, AnalysisProcess, GraphClarification, SemanticAnchor, SemanticSourceQuery, SemanticSource, Principal, Review, CorpusAccount } from "../domain/public.ts";
 import { contextIdentity, contextAnalysisInput, isPreparedContextWitness } from "../source-preparation/public.ts";
 import type { PreparedContextWitness } from "../source-preparation/public.ts";
 import type { ContextCorpus, ContextIssue, ContextResult } from "../source-acquisition/public.ts";
@@ -266,6 +266,13 @@ export const createAnalysisStore = ({ db, tx, load, authorize, execution, limits
             if(!snapshotFor(review,query.snapshotId))throw new Error('source_unavailable');
             const current=graph(query.reviewId,query.snapshotId);
             return {reviewId:query.reviewId,snapshotId:query.snapshotId,currentSnapshotId:review.currentSnapshotId??review.snapshot.snapshotId,analysisGeneration:current.generation,graphRevision:current.graphRevision,selectedAnalysisId:current.selectedAnalysisId};
+        },
+        evidence: (token:string,input:AnalysisEvidenceQuery):AnalysisEvidence=>{
+            const query=analysisEvidenceQuerySchema.parse(input),{review}=auth(hash(token),query.reviewId);
+            if(!snapshotFor(review,query.snapshotId))throw new Error('source_unavailable');
+            const admitted=all().find(job=>job.reviewId===query.reviewId&&job.snapshotId===query.snapshotId&&job.analysisId===query.analysisId&&job.state==='admitted');
+            if(!admitted?.corpusId)throw new Error('analysis_record_unavailable');
+            return {reviewId:query.reviewId,snapshotId:query.snapshotId,analysisId:query.analysisId,corpus:account(corpus(admitted)),analysis:record<AnalysisResult>(query.reviewId,'analysis',query.analysisId),clarifications:clarificationRows(query.reviewId,query.snapshotId).filter(item=>item.analysisId===query.analysisId)};
         },
         query: (token: string, input: AnalysisQuery): AnalysisView => {
             const query = analysisQuerySchema.parse(input), { review } = auth(hash(token), query.reviewId);

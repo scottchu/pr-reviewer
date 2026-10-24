@@ -398,3 +398,6 @@ export type {StoryReference,StoryContent,StoryCommand,StoryAuthor,StoryCapture,S
 
 export {analysisMarkerQuerySchema} from './semantic.ts';
 export type {AnalysisMarker,AnalysisMarkerQuery} from './semantic.ts';
+
+export {analysisEvidenceQuerySchema} from './semantic.ts';
+export type {AnalysisEvidence,AnalysisEvidenceQuery} from './semantic.ts';

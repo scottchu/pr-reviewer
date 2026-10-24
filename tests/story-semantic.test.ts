@@ -28,20 +28,26 @@ test('S01 exact UTF-16 source/fact/clarification basis is admitted-only, histori
   const clarificationId=f.store.analysis.query(f.token,scope).clarifications[0]!.clarificationId;
   assert.equal(f.store.storyEvidence(f.token,{...scope,analysisId:story.analysisId!,corpusId:story.corpusId!,references:[{type:'clarification',analysisId:story.analysisId!,clarificationId,revision:1}]}).invalid.length,0);
   assert.equal(f.store.story.command(f.token,{...command,commandId:'after-clarification',expectedStoryRevision:1}).state,'applied');
-  f.store.analysis.command(f.token,{...f.request,commandId:'new-generation',expectedAnalysisGeneration:1});runner.wake();await eventually(()=>query().jobs.at(-1)?.state==='awaiting_declarations');choose('unknown');await eventually(()=>query().jobs.at(-1)?.state==='admitted');
+  f.store.analysis.command(f.token,{...f.request,commandId:'new-generation',expectedAnalysisGeneration:1,contextFilesPerSide:1});runner.wake();await eventually(()=>query().jobs.at(-1)?.state==='awaiting_declarations');choose('callee');await eventually(()=>query().jobs.at(-1)?.state==='admitted');
   const historical=f.store.story.query(f.token,scope);assert.equal(historical.version!.story.analysisId,analysis.analysisId);assert.deepEqual(historical.brokenEvidence,[]);assert.equal(historical.staticNeighborhoodAvailable,true);assert.equal(historical.historicalAnalysis,true);
+  const newer=query();assert.notEqual(newer.corpus!.corpusId,story.corpusId);
+  const newCorpusDb=new DatabaseSync(f.filename);newCorpusDb.prepare("DELETE FROM analysis_records WHERE review_id=? AND kind='corpus' AND id=?").run('r',newer.corpus!.corpusId);newCorpusDb.close();
+  assert.equal(f.store.analysis.source(f.token,{...scope,corpusId:story.corpusId!,side:anchor.side,path:anchor.path,contentHash:anchor.contentHash}).contentHash,anchor.contentHash);
+  const exactEvidence=f.store.analysis.evidence(f.token,{...scope,analysisId:analysis.analysisId});assert.equal(exactEvidence.corpus.corpusId,story.corpusId);assert.equal(exactEvidence.analysis.analysisId,analysis.analysisId);assert.throws(()=>f.store.analysis.evidence('wrong-token',{...scope,analysisId:analysis.analysisId}),/unauthorized/);
+  const independentHistorical=f.store.story.query(f.token,scope);assert.equal(independentHistorical.basisUnavailable,false);assert.deepEqual(independentHistorical.brokenEvidence,[]);assert.equal(independentHistorical.historicalAnalysis,true);assert.equal(independentHistorical.version!.story.analysisId,analysis.analysisId);
+  assert.throws(()=>f.store.analysis.query(f.token,{...scope,analysisId:analysis.analysisId}),/analysis_record_unavailable/);
   assert.equal(f.store.story.command(f.token,{...command,commandId:'historical-publication',expectedStoryRevision:2}).state,'applied');
   const original=f.store.story.query(f.token,{...scope,versionId:published.result.versionId!}).version;
-  const actualQuery=f.store.analysis.query;
-  f.store.analysis.query=()=>{throw new Error('controlled_unexpected_storage_failure');};
-  try{assert.throws(()=>f.store.story.query(f.token,{...scope,versionId:published.result.versionId!}),/controlled_unexpected_storage_failure/);}finally{f.store.analysis.query=actualQuery;}
+  const actualQuery=f.store.analysis.evidence;
+  f.store.analysis.evidence=()=>{throw new Error('controlled_unexpected_storage_failure');};
+  try{assert.throws(()=>f.store.story.query(f.token,{...scope,versionId:published.result.versionId!}),/controlled_unexpected_storage_failure/);}finally{f.store.analysis.evidence=actualQuery;}
   const sourceOnly:StoryContent={...story};delete sourceOnly.analysisId;delete sourceOnly.corpusId;
   const snapshotSource={type:'snapshot_source' as const,anchor:{snapshotId:f.snapshot.snapshotId,side:'head' as const,path:'callee.ts',startLine:1,endLine:1},contentHash:f.snapshot.sources.find(source=>source.side==='head')!.hash};
   sourceOnly.claims=sourceOnly.claims.map(claim=>claim.id==='source'?{...claim,basis:'source_observation',references:[snapshotSource]}:claim);
   sourceOnly.steps=sourceOnly.steps.map(step=>({...step,focus:{type:'sources',fileKey:graphFiles(f.snapshot)[0]!.key,sources:[snapshotSource]}}));
   sourceOnly.scope=sourceOnly.scope.map(row=>row.type==='explained'?{...row,references:[snapshotSource]}:row);
   assert.equal(f.store.story.command(f.token,{...command,commandId:'source-only',expectedStoryRevision:3,story:sourceOnly}).state,'applied');
-  const queryMarkerBeforeDeletion=query().selectedAnalysisId;
+  const queryMarkerBeforeDeletion=newer.selectedAnalysisId;
   const db=new DatabaseSync(f.filename);db.prepare("DELETE FROM analysis_records WHERE review_id=? AND kind='corpus' AND id=?").run('r',story.corpusId!);db.close();
   const broken=f.store.story.query(f.token,{...scope,versionId:published.result.versionId!});assert.deepEqual(broken.version,original);assert.equal(broken.basisUnavailable,true);assert.equal(broken.staticNeighborhoodAvailable,false);assert.ok(broken.brokenEvidence.length>=2);
   const unaffected=f.store.story.query(f.token,scope);assert.equal(unaffected.version!.story.title,sourceOnly.title);assert.equal(unaffected.basisUnavailable,false);assert.deepEqual(unaffected.brokenEvidence,[]);assert.equal(unaffected.currentAnalysisId,queryMarkerBeforeDeletion);
