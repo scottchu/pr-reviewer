@@ -185,3 +185,11 @@ Relative links are checked only to files present in this base. Companion module 
 **Carried limits:** Representative import290 launches, new-head/history/source-followup and restart passed in03. Controlled reply persistence was not a meaningful answer; Notified was not received/consumed. The structural graph still required manual policy synthesis. Full native/Claude/unfamiliar-human480p and720p acceptance remain open independently. Static neighbors must not be presented as lifecycle or causal understanding.
 
 **Stage1 endpoint:** Commit incorporated modules and baseline checks, then stable typed public04 command/query/application boundaries and isolated fixtures for a separate04U owner. Continue G01–G11 core/fault work; G12–G15 and full04 acceptance remain root-coordinated open gates.
+
+### Incorporated module checkpoint
+
+Context source commits9263829/f60c86e/1d11a05/d2def88 map to3babfb2/f421166/1cc8d99/bb06348. Analysis a9b8334/fa4b92a/20cc65a/04e30e5 map to6e698ed/8c53bee/011cfe1/a62e074. Declaration46ae8ae/8a2837b/cb8d224 map to18e4287/974b09b/82884c8. Conflicting old04 plan text was excluded to preserve accepted03 contribution and the authoritative integration packet; module preparation records remain linked history. Only the approved TypeScript6.0.3 alias was added to package/lock; compiler7.0.2 and current03 scripts/pins were preserved. Aggregate test registration now includes context/analysis and boundary registration includes source-analysis.
+
+The independent declaration report found no concrete findings:36 focused tests/453 assertions, six adversarial tests/77 assertions,89 complete baseline request/result pairs deep-equal versus04e30e5. These are retained preparation results, not new integrated execution or full-input equivalence. Compiler exception injection, worker lifecycle and wall/RSS behavior were not covered there.
+
+**Integrated module checks:** Strict compiler/boundaries passed;36 analyzer/declaration tests453 assertions and11 real-Git context tests passed at the incorporated module checkpoint. Aggregate analyzer registration uses Bun (its tests use bun:test); context uses Node. Other integrated regressions are next, not implied passed by these module checks.

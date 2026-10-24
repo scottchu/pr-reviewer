@@ -5,6 +5,7 @@ const allowed: Record<string, string[]> = {
   storage: ["domain","source-preparation"],
   "source-preparation":["domain","source-acquisition"],
   "source-acquisition":[],
+  "source-analysis":[],
   "import-artifacts":[],
   "import-jobs":["domain","storage","source-acquisition","source-preparation","import-artifacts","integration"],
   delivery: ["domain", "storage"],

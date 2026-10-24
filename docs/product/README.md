@@ -5,6 +5,9 @@ This is the durable product specification: what PR Reviewer does, why, and how i
 - [Vision](vision.md): purpose and the experience of understanding a PR.
 - [Continuation and source import](review-loop/evolution.md): merged structural graph/immutable history and the bounded import candidate.
 - [Durable import jobs](review-loop/import-jobs.md): implemented slice03 path/discovery/job/admission/artifact candidate, exact compatibility and separately pending final acceptance.
+- [Pinned source context](review-loop/source-acquisition.md): bounded unchanged source acquisition and complete coverage accounting.
+- [Static source analysis](review-loop/source-analysis.md): exact supported declarations, static facts and honest unknowns.
+- [Retained semantic neighborhoods](review-loop/semantic-graph.md): slice04 integration contract and independent source/graph identities.
 - [Persistence compatibility](review-loop/persistence-compatibility.md): supported legacy/current SQLite records, migration and exact identity/retry conventions.
 - [First review loop](review-loop/README.md): user story, UI, data/command/MCP contracts and CLI delivery/recovery.
 - [Architecture](architecture.md): system relationships, technology direction and subsystem boundaries.
