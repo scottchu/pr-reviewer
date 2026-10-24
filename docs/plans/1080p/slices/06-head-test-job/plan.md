@@ -163,6 +163,6 @@ Consume [B3 implementation and independent-review handoff](cli-06b.md), based on
 
 ## B4 combined access and consumer checkpoint
 
-Status: assigned integration preparation; B2 and product acceptance remain gated.
+Status: typed B4 access/SDK/CLI checkpoint implemented and normal regression verified; independent combined review, browser verification, B2 and product acceptance remain gated.
 
 [The B4 packet](integration-06b4.md) reconciles exact B1/CLI, single-local-owner and SDK2 inputs. The sole integrator owns narrow test-port compatibility and combined evidence; no test UI/application work is authorized here.

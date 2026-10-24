@@ -1,3 +1,4 @@
+import {localPrincipal} from './access.ts';
 import {createHash,randomUUID} from 'node:crypto';
 import type {DatabaseSync} from 'node:sqlite';
 import {z} from 'zod';
@@ -15,7 +16,7 @@ export const createHeadTestOwnerStore=({db,tx,execution,rows,get,put,publicJob,l
  const generation=()=> (db.prepare('SELECT generation FROM test_owner WHERE id=1').get() as {generation:string}|undefined)?.generation;
  const owner=(value:HeadTestOwner)=>{execution.assertCurrent();const id=owners.get(value);if(!id||id!==generation())throw new Error('stale_test_owner');return id;};
  const grant=(value:HeadTestGrant)=>{execution.assertCurrent();const record=grants.get(value);if(!record||record.generation!==generation())throw new Error('stale_test_owner');const job=get(record.jobId),invocation=job.invocations.at(-1);if(!invocation||invocation.invocationId!==record.invocationId||invocation.state!=='running')throw new Error('stale_test_owner');return {job,invocation};};
- const credential=(job:Job)=>{const row=db.prepare('SELECT body FROM credentials WHERE hash=?').get(job.credentialReference) as {body:string}|undefined;if(!row)throw new Error('unauthorized');const principal=JSON.parse(row.body) as Principal,review=load(job.reviewId);authorize(principal,review);if(principal.kind!=='user'||principal.actorId!==job.actorId)throw new Error('unauthorized');const snapshot=(review.snapshots??[review.snapshot]).find(item=>item.snapshotId===job.snapshotId);if(!snapshot||snapshot.headSha!==job.headSha||snapshot.repository!==job.repository)throw new Error('source_unavailable');};
+ const credential=(job:Job)=>{const local=localPrincipal(job.credentialReference),row=local?undefined:db.prepare('SELECT body FROM credentials WHERE hash=?').get(job.credentialReference) as {body:string}|undefined;if(!local&&!row)throw new Error('unauthorized');const principal=local??JSON.parse(row!.body) as Principal,review=load(job.reviewId);authorize(principal,review);if(principal.kind!=='user'||principal.actorId!==job.actorId)throw new Error('unauthorized');const snapshot=(review.snapshots??[review.snapshot]).find(item=>item.snapshotId===job.snapshotId);if(!snapshot||snapshot.headSha!==job.headSha||snapshot.repository!==job.repository)throw new Error('source_unavailable');};
  const active=(job:Job)=>{credential(job);if(job.cancellation)throw new Error('test_cancelled');if(job.stopReason)throw new Error('test_stopped');};
  const update=(job:Job)=>{const next={...job,jobRevision:job.jobRevision+1,updatedAt:new Date().toISOString()};put(next);return next;};
  const unclaimed=(job:Job,state:'unavailable'|'error',reason:string)=>{const next={...job,state,reason,reservedBytes:0};return update({...next,retainedBytes:Buffer.byteLength(headTestCanonical(publicJob(next)))});};

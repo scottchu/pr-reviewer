@@ -4,9 +4,9 @@
 
 **Handoff revision:** 7; current delivered consumer values are pinned in [the B1 public-port checkpoint](consumer-ports-06b.md); original revision6 input10bc29e and review pins remain historical.
 
-**Status:** B1 backend candidate implemented with actual isolated322 execution evidence and normal entrypoint pass. Independent full-backend/process review is required before B2/B3 dispatch or acceptance; this is not a product/UI/CLI readiness claim.
+**Status:** B1 and CLI independently ready at their original pins; current combined single-owner/SDK/CLI integration is governed by [B4](integration-06b4.md). B2 and full product acceptance remain root-gated.
 
-**Owner:** `plan_head_test_slice06` is the named B1 backend integrator in [I6](execution-06b.md#i6-named-b1-implementation-assignment); root owns acceptance and dispatch. B2/B3 remain unassigned.
+**Owner:** `plan_head_test_slice06` is the named B1 backend integrator in [I6](execution-06b.md#i6-named-b1-implementation-assignment); root owns acceptance and dispatch. B3 is delivered; B2 remains unassigned.
 
 **Parent:** [Slice plan and gates](plan.md).
 
@@ -132,3 +132,7 @@ A missing PID, missing journal/version, requested-only row or legacy exited/no-P
 Status: four P2 corrections implemented in the sole backend worktree; narrow independent recheck pending
 
 Consume the [execution checkpoint](checkpoint-06b-execution.md) and corrected [consumer ports](consumer-ports-06b.md). `1e35644` remains the negative review pin. The successor changes byte transport, result evidence and persisted owned-root cleanup; B2/B3 remain gated until root consumes the independent recheck. Separately assigned SDK dependency changes require a later clean integration and fresh exact-head/closure qualification; existing receipts do not transfer qualification automatically.
+
+## Current B4 consumer integration
+
+[B4](integration-06b4.md) reconciles released auth a63293d, SDK9a271e and CLIc7111d1 over B1e9f107d. Root consumed CLI independent READY (report SHA25692258fc570b3fd119c5485ce92c340f32a2c4f58d2ae8f0fb05a280619bdda1a;9 CLI plus4 adversarial checks). Historical gates above retain their original pins. Current test consumers use the shared local-owner access and same stored result/artifact ports; there is no owner token input. The combined candidate needs independent review and fresh production qualification after freeze. No B2 app/UI, native runtime or own-PR acceptance is claimed.

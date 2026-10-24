@@ -45,3 +45,9 @@ The root-assigned backend-only checkpoint now has a [candidate and review handof
 ## 06B current successor planning
 
 Internal06A db03505 passed independent R3 (66 regressions plus5 adversarial checks); [execution06B](slices/06-head-test-job/execution-06b.md) now reconciles that backend with actual05D af39 at task merge08889d0. It specifies process grants/journals/preparation/result/cancel/restart and React/CLI consumption before code. Source67 Q2 qualification remains recipe-only for a new head. Q4 revision5 design passed at0b9002f. The current [revision6 reconciliation and named B1 assignment](slices/06-head-test-job/execution-06b.md#i6-named-b1-implementation-assignment) merges delivered05E7b6dc03 while preserving06A at10bc29e. Narrow successor review precedes backend code; combined inherited checks and fresh exact-head source/environment qualification remain required. Root reports af39 D6 accepted/D7 PASS at their original pin; corrected05E own-PR/full G1 and06 product acceptance remain open.07/08 stay provisional.
+
+## 06B combined consumer integration
+
+Status: B1 backend and B3 CLI independently ready at their original pins; B4 combined candidate verification underway.
+
+[The B4 packet](slices/06-head-test-job/integration-06b4.md) integrates the accepted single-local-owner access and SDK2 baselines with delivered test-job/CLI ports. It preserves private process authority, shared exclusion, unknown history, cleanup and scoped participant access. Existing own-PR/main/pilot receipts stay root-owned and pinned. B2 React remains unassigned pending stable reviewed consumer ports. New combined source/dependencies invalidate earlier qualification; exact-head execution and full06 UI/CLI/own-PR acceptance remain open.07/08 stay provisional.

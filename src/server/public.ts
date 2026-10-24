@@ -72,13 +72,13 @@ export const createGateway = (store: Store, notify: Notify, options:{importArtif
         if (principal.kind !== "user") throw new Error("unauthorized");
       };
       if(req.method==='POST'&&url.pathname==='/api/tests/targets'){
-        send(res,200,store.tests.targets(authorization.slice(7),headTestScopeSchema.parse(await readBody(req))));return;
+        send(res,200,store.tests.targets(access,headTestScopeSchema.parse(await readBody(req))));return;
       }
       if(req.method==='POST'&&url.pathname==='/api/tests/artifact'){
-        send(res,200,await store.tests.artifact(authorization.slice(7),headTestArtifactQuerySchema.parse(await readBody(req))));return;
+        send(res,200,await store.tests.artifact(access,headTestArtifactQuerySchema.parse(await readBody(req))));return;
       }
       if(req.method==='POST'&&url.pathname==='/api/tests/jobs'){
-        send(res,200,store.tests.query(authorization.slice(7),headTestQuerySchema.parse(await readBody(req))));return;
+        send(res,200,store.tests.query(access,headTestQuerySchema.parse(await readBody(req))));return;
       }
       if(req.method==='POST'&&url.pathname==='/api/story/commands'){
         const command=storyCommandSchema.parse(await readBody(req));
@@ -172,7 +172,7 @@ export const createGateway = (store: Store, notify: Notify, options:{importArtif
       if (req.method === "POST" && url.pathname === "/api/commands") {
         const input = await readBody(req);
         if (input !== null && typeof input === 'object' && 'type' in input && (input.type === 'RequestTest' || input.type === 'CancelTest')) {
-          const receipt=store.tests.command(authorization.slice(7),headTestCommandSchema.parse(input));testRunner?.wake();send(res,200,receipt);return;
+          const receipt=store.tests.command(access,headTestCommandSchema.parse(input));testRunner?.wake();send(res,200,receipt);return;
         }
         const command = commandSchema.parse(input);
         let witness:PreparedSnapshotWitness|undefined;

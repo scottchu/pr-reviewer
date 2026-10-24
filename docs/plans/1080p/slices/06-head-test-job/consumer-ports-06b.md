@@ -2,7 +2,7 @@
 
 **Date:** 2026-10-24.
 
-**Status:** Implemented backend candidate for independent review; production qualification, full B1 and product acceptance remain open.
+**Status:** B1 and B3 independently ready at their original pins; B4 combined access/SDK/CLI candidate awaiting independent review. New-head production qualification and React/own-PR product acceptance remain open.
 
 **Owner:** plan_head_test_slice06.
 
@@ -85,3 +85,9 @@ External record /tmp/pr-reviewer-06-execution/evidence/qualified-run-098867e.jso
 Status: not frozen; independent review found four required corrections against `1e35644`.
 
 Artifact pages return exact base64 bytes (`encoding`, `data`, `offset`, `bytes`, `nextOffset`, `complete`) instead of independently decoded text. Consumers must stream-decode or assemble bytes. Canonical result process observations and pre/post verification evidence are included; public job cleanup status separately exposes pending/complete/error without changing the historical result. B2/B3 must consume the committed and independently rechecked successor contract, not this negative candidate.
+
+## B4 integrated consumer authority
+
+The [B4 checkpoint](integration-06b4.md) supersedes historical Bearer-only gateway assumptions and B3-unassigned status. All three test POST reads and RequestTest/CancelTest use the gateway-selected shared StorageAccess. Missing Authorization selects store.localOwner; explicit invalid Bearer rejects, attached participants retain scoped reads and cannot mutate tests, revoked attachment returns the existing stale_attachment error. No public capability, credential file or replacement login is introduced. Local-owner jobs persist the shared private owner reference; token-created jobs retain hashed references and revocation behavior.
+
+B2 consumes the unchanged domain values and HTTP paths above, now without an owner credential header. Results are stored identities, artifact offsets count bytes and base64 is lossless; UI must incrementally decode text rather than decode arbitrary byte pages independently. Default target availability is still unavailable until the exact integrated head/runtime/copied closure is separately qualified. Only explicit internal test fixtures enable the controlled run evidence. The CLI entrypoint and all six commands are delivered; B2 application/React implementation is root-assigned after review, with its own managed routes, intent recovery, concurrent discussion, E2E, visual and own-PR gates.
