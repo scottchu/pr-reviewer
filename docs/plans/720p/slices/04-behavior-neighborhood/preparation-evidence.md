@@ -1,0 +1,148 @@
+# 04P preparation execution evidence
+
+**Date:** 2026-10-23
+
+**Status:** Initial independent review required changes; corrections locally verified; correction recheck pending; pure module preparation only
+
+**Packet:** `a9b8334a94e8dcb87b90fa69f64e791031587ec2`
+
+**Initial implementation candidate:** `fa4b92a8ddbc9fa24139ef690cc2694e08571f81`. The subsequent evidence-only commit `20cc65a1bb64dee38c494b132bd114acdf5d3e9b` was independently reviewed and required changes. These historical identities are preserved; the correction below supersedes preparation readiness.
+
+**Executor scope:** `src/source-analysis/**`, `tests/source-analysis.test.ts`, slice 04 records and durable source-analysis specification; serialized `package.json` / `bun.lock` ownership for the exact runtime alias only. No integration, publication, deployment or live-client work.
+
+**Workspace:** `/tmp/pr-reviewer-source-analysis`, branch `analyze-pinned-typescript-neighborhoods`. Clean starting identity was the packet commit; primary main remained clean at `cd8715ad2f848c444f952919ce019e7b1e913538`. No task-owned runtime records were present before writes. Other worktrees and local services are outside scope.
+
+## Compatibility and tooling
+
+- Bun: `1.4.2`.
+- Existing Node: `/Applications/ChatGPT.app/Contents/Resources/cua_node/bin/node` (`24.21.0`, supplied by coordinator and read back directly).
+- Approved analysis runtime alias installed as `typescript-analysis: npm:typescript@6.0.3`. Package and lock delta contains only that alias; compiler `typescript: 7.0.2` and other versions remain unchanged.
+- Minimal compatibility check passed: classic `createProgram`, an explicitly supplied in-memory compiler host, `noLib`, ESNext/Bundler resolution, `.js` to `.ts` source substitution, and checker import-alias binding resolved only `/v/a.ts`; parser version was `6.0.3` with zero syntax diagnostics.
+
+## Verification plan and evidence boundary
+
+Write expected P01–P19 source fact/unknown/coordinate/coverage sets before analyzer implementation, observe red, then implement the public value port and run focused tests plus strict checks. Run the declared regression suite because the runtime dependency/lock changed. Tests use synthetic source only; source hashes establish byte consistency, not Git provenance.
+
+The new subsystem and focused test are not registered in shared boundary/test scripts yet. Preparation includes manual import-boundary review; 04I must register them. Worker timeout, acquisition/admission, React E2E, actual own-PR graph-first understanding, native-host evidence and slice acceptance remain unrun integration gates.
+
+## Red/green and corpus results
+
+All fixtures are synthetic in-memory modules, with supplied source SHA-256 hashes and synthetic immutable side IDs. They do not establish acquisition/Git provenance, actual test execution by the target project or actual PR comprehension.
+
+1. The readonly public values and all P01–P19 fixtures were written before `analyze.ts`. Initial `bun test tests/source-analysis.test.ts` was red: missing `./analyze.ts`, 0 pass / 1 load failure.
+2. First implementation run: 17 pass / 2 fail. Two fixture expectations were corrected against the literal source: the review call starts at UTF-16 offset 63, and sorted seeds place `broken.ts` before `valid.ts`. The complete expected edge set and malformed-source rejection were preserved.
+3. Strict checking rejected use of an undeclared compiler field. Implementation switched to public `Program.getSyntacticDiagnostics`; no private-field assertion, unstable API or dependency replacement remains.
+4. Additional assignment counterexample exposed an actual false edge after shorthand destructuring. The compiler distinguishes shorthand property and value symbols; written-value lookup corrected it. The exact destructuring/for-of/parameter-shadowing test subsequently passed with zero confirmed calls. This correction is maintained in durable source knowledge.
+5. Initial focused result: **23 tests passed, 0 failed, 267 assertions**. The 19 fixed corpus rows plus four focused counterexample/coordinate/ownership tests passed. The subsequent independent counterexample and correction are recorded below; this initial count did not establish complete negative-case coverage.
+
+| Corpus | Observed source behavior |
+|---|---|
+| P01 | Exact base/head review→decide and decide→normalize sites, head-only decide→validate; one-hop neighborhoods, no transitive or cross-side call. |
+| P02 | Same-spelled local and renamed-import bindings stay distinct; let/observed writes, destructuring/iteration assignment and parameter shadowing never create definite calls. |
+| P03 | Named/default/namespace imports and explicit two-hop/local/default exports resolve to implementations with ordered linkage; missing export, declaration-only, star ambiguity and type-only bindings remain typed unknowns. |
+| P04 | Relative `.ts`/`.js` substitution and explicit alias resolve; missing/external/config inheritance/package/out-of-root cases stay unknown. Known excluded targets are classified through a metadata-only virtual resolver without preparing their bytes. |
+| P05 | Two overload signatures retain exact spans and resolve to the unique body; declaration-only/union/multiple implementation cases have exact unknown sets. |
+| P06 | Distinct recursion sites aggregate once; duplicate seeds do not duplicate facts; shared callee, exact two-link boundary, cyclic and overlong re-export behavior verified. |
+| P07 | Named nested/callback ownership and function-valued parameter unknown verified; no invented callback invocation edge. Declaration-header/computed-name calls do not belong to the new function body. |
+| P08 | TSX helper call resolves; JSX tag/prop reference creates no execution edge; JSX-only body is not a leaf. |
+| P09 | Literal body uses the exact qualified outgoing-leaf wording; dynamic member call is unresolved and never leaf. Incoming absence remains supplied-files only. |
+| P10 | Exact site list retained for method/new/computed/returned-call/call/apply/bind/import/eval/tagged-template syntax; only the inner direct factory call resolves. |
+| P11 | Direct optional immutable call resolves with conditional syntax flag; missing optional binding is unknown, with no execution claim. |
+| P12 | Malformed source has no function/call/leaf facts; independent valid file remains analyzed and imported malformed target is blocked. Invalid generic syntax is rejected by the selected parser. |
+| P13 | Exact CRLF/astral UTF-16 offsets, inclusive lines, two sites on one line, BOM retention and byte-versus-offset distinction verified. |
+| P14 | Source order and duplicate seed order preserve full output/identity; content/config/side changes alter identity; parser/analyzer versions are explicit. Repeated calls preserve input and frozen-result behavior. |
+| P15 | Exact lowered file/count/byte/seed/AST/site/output/alias/re-export boundaries and one-over behavior verified. Resolved plus unresolved sites count toward output cap; budget failure has no graph. Preflight failures leave all parse statuses unparsed. |
+| P16 | Same path on two sides allowed; duplicate side/path, bad hash/unsafe path/inconsistent commit reject without facts; absent/hash/range/unsupported seeds have exact typed outcomes. Empty seed requests reject. |
+| P17 | Actual supplied unchanged and test-source calls appear; excluding caller removes only its actual relationship and retains its missing coverage. No relevance/run evidence is invented. |
+| P18 | Deliberately absent `src/domain/public.ts` remains unresolved despite existing in the checkout. Compiler-system read/file/directory/current-directory/emit and fetch sentinels recorded **zero calls**. |
+| P19 | Complete known inventory, narrower selected set, prepared unselected/context source, failed parse and scan-pending source remain separate. Budget trigger records exact side/path, observed prefix and unknown unvisited counts. |
+
+## Commands and observed results
+
+- Initial `bun test tests/source-analysis.test.ts`: pass, 23 tests / 267 assertions. Includes all P01–P19 and four additional counterexample tests. Latest correction results are below.
+- `PATH=/Applications/ChatGPT.app/Contents/Resources/cua_node/bin:$PATH bun run check`: pass. Existing boundary script passes its existing registered subsystems; manual new-subsystem review is separate below.
+- `PATH=/Applications/ChatGPT.app/Contents/Resources/cua_node/bin:$PATH bun run test`: pass, 11 Bun tests / 42 assertions plus 20 Node tests, no failures. This regresses the declared existing suite after the alias/lock delta; it does **not** select the new focused file.
+- `node_modules/.bin/tsc` readback: points to `../typescript/bin/tsc`; package version readback is `7.0.2`. Analysis package version readback is `6.0.3`.
+
+No global runtime/package-manager install, analysis-side target source Git/filesystem read, target emit/transpile, changes to existing runtime scripts, pilot/candidate endpoints, auth/session/Tailscale state, push, PR, merge or deployment was performed. Tests use the existing declared toolchain and their own test fixtures; executing the declared regression suite is distinct from executing analyzed target source. Timings are routine local observations, not hard latency/RSS guarantees.
+
+## Delivered public port and integration notes
+
+`src/source-analysis/public.ts` exports `analyzeNeighborhood`, readonly request/result/anchor/coverage/seed/profile/budget value types and frozen maximum `DEFAULT_BUDGETS`. The input carries request/change/side identities, explicit inventory/selection/retained content, one or more seeds, pinned optional alias configuration and explicit lowerable bounds. The result is deeply frozen; no compiler object escapes. A valid result includes the deterministic global supplied-source index and separate one-hop seed neighborhoods. Typed unavailable results retain source/account/count diagnostics and no graph. See the durable source document for full value meaning, seed spans, parser versus scan ledger, certainty, leaf wording and rationale.
+
+Manual import-boundary review: analysis implementation imports only `typescript-analysis`, `node:crypto` and its own public value module. The public module exports only analysis values and the analyzer. No acquisition/domain/storage/server/application/UI/integration internal imports, filesystem/process/network imports, compiler-system fallback, target execution or compiler-host constructor fallback exist. The virtual content host resolves only selected supplied source; a separate metadata-only host classifies known excluded targets without loading bytes. No config discovery, ambient package loading, default-library host or plugin execution path is supplied.
+
+**Readiness:** Corrections ready for coordinator-dispatched independent recheck, not independently approved. Keep this worktree/branch for review and integration recovery. The sole ignored artifact is its local `node_modules/`, retained for those checks; no task-owned raw logs/runtime records require separate preservation. Durable knowledge has been reconciled to source-analysis.md and read back before handoff.
+
+**Remaining gates:** Independent source/negative-case review; shared subsystem/test registration; actual 02B/03 interfaces; same-commit unchanged-context acquisition/retention; analysis admission/job/CAS/worker timeout/cancellation/generation; managed routes; React semantic graph and graph clarification; actual own-PR graph-first critique; native/human evidence; milestone reflection/docs-only whole-product audit. Root owns dispatch/publication/integration and acceptance. No synthetic test closes these gates.
+
+## Independent-review correction and inventory clarification
+
+**Review disposition:** Changes needed against `20cc65a1bb64dee38c494b132bd114acdf5d3e9b`.
+
+**Retained independent report:** `/tmp/pr-reviewer-source-analysis-review/review-report.md`; exact probes/output remain beside that report. The reviewer checkout/artifacts were read only during correction. The maintained facts and rationale are captured here and in durable source; continuing the product does not depend on that temporary report.
+
+**Confirmed P1:** Assertion-wrapped assignment of a function binding produced a false `resolved_static` edge despite zero compiler diagnostics. Non-null assignment and namespace element assignment exposed the same missing write classification. These violated 04P-A; the initial preparation was not approved.
+
+**Failing first:** Two added regression tests failed against the original classifier while the original 23 tests remained green. They require assertion/type-assertion/non-null/satisfies assignment targets to become `mutable_binding` sites, preserve an untouched same-spelled lexical binding, reject namespace literal/asserted/dynamic element writes as certain calls and keep runtime object methods unsupported. They do not resolve a write to a replacement implementation.
+
+**Correction:** Unwrap transparent TypeScript assignment-target wrappers before inspecting the lexical binding. For true namespace-import writes, mark the actual literal member symbol uncertain; for an unknown computed key, retain uncertainty for the namespace/exported symbols. Ordinary objects/parameters are not namespace imports and gain no method edge. Analyzer version is now `source-neighborhood-v1.0.1`, keeping corrected facts distinct in analysis identity. Parser/dependency versions are unchanged.
+
+**Independent probe replay by the author:** The reviewer's unchanged source strings were executed against the corrected public port by replacing only the harness import target in memory. Assertion call `[109,117)`, non-null call `[92,100)` and namespace call `[95,106)` now each yield zero confirmed edges and exactly one `mutable_binding` site. The assertion case still has zero diagnostics. The original control retains exactly one imported call `[202,219)` plus its four `unsupported_dispatch` sites `[123,140)`, `[142,156)`, `[158,175)` and `[177,198)`. This is author revalidation, not independent correction approval.
+
+**Accepted inventory correction:** Root clarified that the known side/path ledger can exceed the prepared-source set. The original 128-entry check wrongly consumed the source allowance for content-less exclusions. New explicit lowerable limits are `inventoryPathsPerSide: 4096` and `inventoryBytes: 2097152`; `filesPerSide: 128` now counts entries carrying source, including unselected prepared entries. Prepared source still uses the existing per-file/combined byte limits. Canonical ledger metadata removes content text, preserves hash/object IDs, records absent source as null and counts the UTF-8 JSON representation of all rows. `observed.inventoryBytes` reports that measure; both new budget values participate in identity. The contract is pre-integration with no production IDs to migrate.
+
+**Budget failing first:** A new 130-path inventory with one prepared source and 129 exclusions initially returned unavailable. After separating the limits it succeeds and retains all 130 coverage rows. The tests verify 129 prepared but unselected sources still reject, exact lowered path/byte limits pass, one-over limits reject with every row unparsed/no graph, and callers cannot raise either new maximum.
+
+**Latest checks:** `bun test tests/source-analysis.test.ts` passes **26 tests / 322 assertions**, including every P01–P19 case and the three correction/contract tests. `PATH=/Applications/ChatGPT.app/Contents/Resources/cua_node/bin:$PATH bun run check` passes. Exact independent probes replay as above. Package/lock files, shared scripts and runtime integrations are unchanged by this correction; the existing-suite regression remains the previously recorded baseline, not a newly rerun correction result.
+
+**Hold:** Root dispatches correction review and integration. No publication, slice acceptance, UI/native/own-PR result or broader language-flow analysis is claimed.
+
+
+## 04D declaration inventory amendment
+
+**Date:** 2026-10-24
+
+**Status:** Pure amendment implemented and locally verified; independent amendment review pending; no full 04 acceptance
+
+**Authority:** `47e8b503196160daba0b33f70175f0d36d040deb`, integration handoff 04D v1 and semantic-graph declaration selection amendment. Root explicitly identifies `04e30e5b965f1ab06914fbdc9ffa6683f105b557` as the independently accepted analyzer baseline; historical correction-review status above describes its earlier handback.
+
+**Scoped packet:** [Declaration preparation v1](declaration-preparation.md), contract committed first as `46ae8ae` before tests/code. Implementation candidate: `8a2837b`.
+
+**Workspace:** `/tmp/pr-reviewer-declaration-inventory`, branch `list-pinned-neighborhood-declarations`, exact base 04e30e5. Primary main and the original source-analysis worktree were preserved. No task runtime records were present before writes. The only worktree-local generated artifact is a task-owned `node_modules` symlink to the existing `/tmp/pr-reviewer-source-analysis/node_modules`, used read-only. No installation or dependency/package/lock change occurred.
+
+### Public port and behavior
+
+`listNeighborhoodDeclarations(input: DeclarationInventoryInput): DeclarationInventoryResult` is exported through `src/source-analysis/public.ts`. Input is the existing analysis identity/corpus/source/profile/budget value without seeds. Structural callers retaining seeds do not affect inventory. Available results expose inventory version `source-declarations-v1.0.0`, parser `typescript@6.0.3`, inventory/corpus identity, complete coverage/diagnostics/observations and a sorted readonly declaration list. Each member has its stable existing node ID, kind/name/role and exact declaration/body anchors. Map its declaration anchor's side/path/hash/start/end directly to an analyzer Seed; no name or cross-side pairing is inferred.
+
+For example, supplied `const chosen = () => 1;` produces one `const-arrow` member with declaration text `chosen = () => 1` and body text `1`. Named nested declarations and TSX functions remain selectable. Modules, anonymous contexts, methods, mutable variables, body-less signatures, declaration files and declaration-only source roles do not. Unavailable results omit `declarations` entirely; an available empty list with explicit missing/excluded/failed coverage is allowed and does not claim repository absence.
+
+The implementation shares the exact preflight and supplied-source compiler host and the existing AST declaration walk. Inventory returns before semantic call binding. Default `outputNodes: 2000` bounds selectable declarations only, while AST/invocation and all existing source/metadata budgets still apply. The 2,001st selectable declaration (or first above a lower bound) fails the whole index with `limit: outputNodes`, exact trigger and observed declaration count. This interpretation is inventory-specific; analyzer node budgeting/facts/version remain unchanged. Inventory counts scanned invocation syntax without classifying resolution, so resolved/unresolved coverage stays null. Parsed, scanned, selected and prepared remain separate.
+
+### Red/green and verification
+
+- Baseline before amendment: `bun test tests/source-analysis.test.ts` passed 26 tests / 322 assertions.
+- Failing first: the added inventory fixtures failed at module load because `listNeighborhoodDeclarations` was absent (0 pass /1 failure). After implementation, a Unicode expected-end fixture incorrectly stopped at an inner semicolon; it was corrected to the literal closing-body offset. No parser offset or existing behavior changed.
+- An attempted compiler-function spy was unsupported by Bun because the TypeScript export is an accessor. It was removed rather than claiming an injected parser-failure result. Preflight no-parse observations and manual control-flow inspection cover preflight ordering; a new injected compiler-exception case is not claimed.
+- Final `bun test tests/source-analysis.test.ts`: **36 pass, 0 fail, 453 assertions** (all 26 existing plus ten inventory tests).
+- Final `PATH=/Applications/ChatGPT.app/Contents/Resources/cua_node/bin:$PATH bun run check`: **pass**, including strict TypeScript and existing registered subsystem boundaries. Shared registration still excludes this pure subsystem; manual boundary inspection found only `typescript-analysis`, `node:crypto` and the subsystem's public value module imports. Integration must register the focused suite/boundary; no shared registration was edited here.
+- Tool readback: Bun 1.4.2, Node 24.21.0, analysis alias 6.0.3, existing check compiler 7.0.2.
+- `git diff --check`: **pass**.
+
+The ten inventory cases cover exact function/const/sibling spans and seed mapping; nested and TSX implementations; signature/anonymous/method/declaration-only exclusions; same-name/shadowed/both-side identities; independently recomputed canonical inventory digest and identity-field changes; input-order invariance and deep immutable outputs/unchanged inputs; BOM/CRLF/astral UTF-16 coordinates; malformed source with independent valid source; missing/excluded/unselected/unsupported coverage; exact 2,000/2,001 and lowered declaration limits; exact/one-over AST, invocation, source bytes/count and metadata/path bounds; complete 130-row ledger with only one prepared source and 129-prepared rejection; no ambient compiler-system/network reads; preflight unavailable observations with no selectable partial index.
+
+### Frozen analyzer compatibility
+
+Before code changes, a task-owned copy of the exact baseline focused tests wrapped every public analyzer call. The wrapper recorded request JSON SHA-256, complete result JSON SHA-256 and analysisId, preserving invocation order. All 26 tests passed and produced 89 captures. Replaying that unchanged test harness against candidate 8a2837b produces identical captures, including unavailable/coverage/unknown/edge/anchor results and analysis IDs. Combined SHA-256 of `JSON.stringify(captures)` before and after is:
+
+`4ca658fb403b5db09ff84b55091ad18b20c0ef8b717224fb4d9ccbfb946fc785`
+
+Harness and raw before/after logs: `/tmp/pr-reviewer-declaration-compat/frozen.test.ts`, `before.log`, `after.log`. It imports the public module in the new worktree and uses a separate read-only dependency symlink. For a replay, recreate the task-local read-only dependency link with `ln -s /tmp/pr-reviewer-source-analysis/node_modules node_modules` in the task worktree, then use `bun test /tmp/pr-reviewer-declaration-compat/frozen.test.ts`; compare the `COMPATIBILITY` JSON lines. Root can independently regenerate the harness from `git show 04e30e5:tests/source-analysis.test.ts`, aliasing the public analyzer import and recording each request/result/ID. These artifacts remain retained for fresh review; durable source/packet/evidence and exact baseline commit preserve behavior knowledge without requiring raw logs.
+
+### Limits and successor gates
+
+This is local pure preparation only. No package/shared-script/tsconfig/runtime/store/server/acquisition/UI/03 edits, installation, target execution, Git/provider/network acquisition, auth/session/Serve/pilot changes, push/PR/merge or deployment occurred. No target-project tests were executed. Existing whole-product regressions were not rerun because there is no shared dependency or runtime change; focused analyzer compatibility and strict checks are the relevant new evidence. UI E2E/real-process budgets/cancellation/admission and ownPR graph-first understanding are unrun and outside this amendment. Native/human evidence remains separately open.
+
+Root owns fresh independent amendment review before integration, exact source/worker admission, shared registration and later full 04 delivery. Full integration still depends on final accepted 03 public ports. The pure operation provides deterministic work bounds, not measured RSS or a wall-clock guarantee. It is not a trusted acquisition/admission witness. No plan/review/implementation claim here closes the full slice gates.
+
+**Checkpoint:** Durable contract and this scoped packet/evidence were read back before handoff. Worktree and compatibility artifacts are retained for root's active independent review/recovery; the task worktree dependency symlink was removed after checks because the directory-only ignore rule does not ignore a symlink. The compatibility harness dependency symlink remains for review, pointing at the unchanged original installation. The task worktree is clean; root can recreate its link for checks. No uncertain/unrelated artifacts were removed.

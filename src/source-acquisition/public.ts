@@ -29,3 +29,18 @@ export type ImportResult = Readonly<{ kind: "imported"; value: ImportValue }> | 
 export { parseRemote, discoverChange, lookupChange } from "./provider.ts";
 export { importChange, defaultBudgets } from "./git.ts";
 export { createNodeEffects } from "./runner.ts";
+
+/** Bounded context values; provider identity is declared, Git object provenance is verified. */
+export type ContextSide = "base" | "head";
+export type ContextRole = "changed" | "context" | "declaration-only";
+export type ContextIdentity = ChangeReference & Readonly<{sourceProject:string}>;
+export type ContextBudgets = Readonly<{filesPerSide:number;fileBytes:number;totalBytes:number;inventoryEntriesPerSide:number;inventoryMetadataBytes:number;treeObjectsPerSide:number;treeBytesPerSide:number;timeoutMs:number}>;
+export type ContextInput = Readonly<{worktree:string;snapshotId:string;identity:ContextIdentity;commits:Readonly<Record<ContextSide,string>>;priorityPaths?:Readonly<Partial<Record<ContextSide,readonly string[]>>>;budgets?:Partial<ContextBudgets>}>;
+export type ContextReason = "text" | "empty" | "not_selected" | "source_limit" | "file_limit" | "total_byte_limit" | "binary" | "invalid_utf8" | "symlink" | "submodule" | "missing_object" | "object_type" | "hash_mismatch" | "tree_limit" | "tree_byte_limit" | "inventory_limit" | "inventory_metadata_limit" | "invalid_tree";
+export type ContextLedgerEntry = Readonly<{side:ContextSide;path:string;commit:string;objectId:string;mode:string;kind:"source"|"tree"|"submodule";role:ContextRole;change:"changed"|"unchanged"|"unknown";priority:boolean;selected:boolean;preparation:"prepared"|"excluded"|"missing"|"unsupported";reason:ContextReason}>;
+export type ContextSource = Readonly<{side:ContextSide;path:string;commit:string;role:ContextRole;selected:true;content:string;contentHash:string;objectId:string;lineCount:number}>;
+export type ContextAccount = Readonly<{commit:string;inventory:"repository-enumeration"|"selected-context";enumeration:"not_started"|"complete"|"incomplete";knownSourcePaths:number;knownBoundaryPaths:number;observedTreeEntries:number;treeObjectsRead:number;treeBytesRead:number;unvisitedPaths:0|null;preparedSources:number;excludedSources:number;missingSources:number;unsupportedSources:number}>;
+export type ContextIssue = Readonly<{reason:ContextReason|"invalid_input"|"required_source_unavailable";side?:ContextSide;path?:string;limit?:keyof ContextBudgets}>;
+export type ContextCorpus = Readonly<{contract:"pinned-typescript-context-v1";profile:"pinned-typescript-context-v1";provenance:"declared-provider-verified-git";snapshotId:string;identity:ContextIdentity;commits:Readonly<Record<ContextSide,string>>;budgets:ContextBudgets;priorityPaths:Readonly<Record<ContextSide,readonly string[]>>;corpusId:string;accounts:Readonly<Record<ContextSide,ContextAccount>>;ledger:readonly ContextLedgerEntry[];sources:readonly ContextSource[];observed:Readonly<{sourceBytes:number;ledgerMetadataBytes:number}>}>;
+export type ContextResult = Readonly<{kind:"prepared";corpus:ContextCorpus;issues:readonly ContextIssue[]}> | Readonly<{kind:"unavailable";corpus:ContextCorpus|null;issues:readonly ContextIssue[]}>;
+export { loadSourceContext, DEFAULT_CONTEXT_BUDGETS } from "./context.ts";

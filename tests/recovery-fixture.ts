@@ -1,0 +1,3 @@
+import {createPrivateSession} from '../src/application/private-session.ts';
+import type {SessionStoragePort} from '../src/application/private-session.ts';
+export const recoveryMemory=()=>{const values=new Map<string,string>();let fail='';const storage:SessionStoragePort={getItem:key=>{if(fail==='read')throw new Error('read_disabled');return values.get(key)??null;},setItem:(key,value)=>{if(fail==='write'||fail==='accepted'&&value.includes('accepted_awaiting_readback'))throw new Error('quota');values.set(key,value);},removeItem:key=>{if(fail==='remove')throw new Error('remove_disabled');values.delete(key);}};return {values,storage,session:createPrivateSession({storage,origin:'http://local'}),fail:(value:string)=>{fail=value;}};};

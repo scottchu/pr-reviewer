@@ -8,7 +8,7 @@ Rebuilding the current product includes opening a copy of its supported earlier 
 
 ## SQLite aggregate formats
 
-The delivered files use SQLite user_version 0 with JSON text records; there is no numeric application schema discriminator. The following physical tables and column names are compatibility facts. Keys and values are text; JSON bodies use the member names below. Extra retained JSON members survive an additive migration and are not automatically interpreted as new authority.
+The delivered files use SQLite user_version 0 with JSON text records; there is no numeric application schema discriminator. The following physical tables and column names are compatibility facts. Identity keys and JSON bodies are text; added revision/byte columns described below are integers. JSON bodies use the member names below. Extra retained JSON members survive an additive migration and are not automatically interpreted as new authority.
 
 | Table / key | Other columns and meaning |
 |---|---|
@@ -109,3 +109,131 @@ Normative data vectors (origin `docs/a.md`, same-side target `docs/b.md` text `#
 | Target heading `# Foo  Bar!`, requested fragment foo--bar | Matches that heading's exact line; fragment foo-bar does not match. |
 
 All successful target anchors retain the origin's source side and the final immutable snapshot ID. Identity construction substitutes pending only in snapshotId members, as defined above. These vectors specify compatibility behavior; they do not claim richer Markdown/semantic analysis or an actual provider operation.
+
+
+## Story table compatibility
+
+These additive tables share the existing SQLite connection and `reviews.id` membership. Create missing tables without resetting earlier review/semantic/import data; user_version remains0. Column order is part of supported physical compatibility because delivered inserts use it. All listed non-ID columns are required; authoritative IDs are nonempty. The JSON bodies and IDs remain immutable except the small head pointer/counter body.
+
+| Table | Columns in physical order | Keys and membership |
+|---|---|---|
+| story_heads | review_id, snapshot_id, body | Primary key (review_id,snapshot_id); review_id references reviews.id. |
+| story_captures | id, review_id, snapshot_id, body, bytes | Primary key id (captureId); review_id references reviews.id. |
+| story_contexts | review_id, snapshot_id, revision, body, bytes | Primary key (review_id,snapshot_id,revision); review_id references reviews.id. |
+| story_versions | id, review_id, snapshot_id, revision, body, bytes | Primary key id (versionId), unique (review_id,snapshot_id,revision); review_id references reviews.id. |
+| story_receipts | id, actor, fingerprint, body | Primary key id (commandId). actor is authenticated actorId; fingerprint binds the full principal and command. |
+
+`revision` and `bytes` are integers. `bytes` is the UTF-8 length of the exact compact canonical JSON body, without a newline; it is not source text length, character count or digest length. Bodies recursively sort object member names, preserve array order and exact text, and omit absent optional members. No numeric schema discriminator is stored inside these story rows.
+
+| Body | Complete member/absence meaning |
+|---|---|
+| Head | storyRevision, contextRevision, currentVersionId, seriesAuthor. Both counters are nonnegative integers. currentVersionId is a string or explicit null; seriesAuthor is the initial full user/agent principal or explicit null. Missing head means both revisions0 and both nullable members null. |
+| Capture | captureId, kind (Epic/Ticket/PR), title, text, actorId, createdAt, contentHash, freshness; optional originUrl and supersedesCaptureId are absent when not supplied. contentHash is lowercase SHA-256 of exact capture text UTF-8. freshness is captured with an origin URL, otherwise unknown. createdAt is server-issued UTC ISO text. |
+| Context | Exactly captureIds, an ordered unique array of retained IDs from this review/snapshot. Revision0 implicitly means an empty array and requires no row. A later explicit empty selection has its own positive revision/row. |
+| Version | reviewId, snapshotId, versionId, storyRevision, contextRevision, contentHash, author, createdAt, previousVersionId, story. previousVersionId is explicit null for the first version, otherwise the preceding current ID. story is the complete strict authored value in the [story contract](story-and-exploration.md#immutable-story-and-context-values); optional questionId and paired analysisId/corpusId remain absent when unused. contentHash covers canonical story payload only, not server metadata. |
+| Story receipt | commandId, actorId, state (applied/rejected), reviewId, snapshotId, storyRevision, contextRevision, result; error is absent on success and supplied on rejection. result always exists: captureId for context create, versionId for publication, or an empty object for context selection/rejection. It is not a legacy review revision/cursor receipt. |
+
+A user author is exactly kind=user and actorId. An agent author also retains reviewId, attachmentId and generation with kind=agent. Preserve the full principal in version.author and head.seriesAuthor; do not rebuild agent authority from actorId alone. The first successful publication establishes seriesAuthor, which stays unchanged when a user appends a correction. Current-version author may differ from seriesAuthor; ownership transfer is not implicit.
+
+Body quota sums bytes once for every immutable capture/context/version across the entire review, including old revisions, up to8MiB (owner tests may lower only). Heads and receipts are excluded; implicit context0 consumes no quota. Context create charges the new capture plus new selection body; select charges its new selection body; publish charges its full version body. Exact quota passes. One byte over rejects atomically, preserving bodies/pointers and recording only the authorized rejected receipt. Pre-dispatch schema/authorization errors and ID collisions do not overwrite another receipt namespace.
+
+Compact normative row/retry vectors (opaque sample IDs are fixed data, not an ID-generation algorithm):
+
+| Starting records and action | Required retained result |
+|---|---|
+| No rows for review R / snapshot S | Query is storyRevision0, contextRevision0, currentVersionId null, seriesAuthor null; context0 is captureIds empty, with no required physical row. |
+| User U creates capture C1 under expected context0 | Head body is `{"contextRevision":1,"currentVersionId":null,"seriesAuthor":null,"storyRevision":0}`. Capture row C1 and context row (R,S,1) exist; the latter body is `{"captureIds":["C1"]}`. Story revision remains0. |
+| Select empty captures under expected context1 | Append context row (R,S,2), body `{"captureIds":[]}`; preserve C1/context1. Head contextRevision2; other head members unchanged. |
+| Publish version V1 by U at story0/context2 | Append version row V1 / revision1 with previousVersionId null. Head is contextRevision2/currentVersionId V1/seriesAuthor `{"actorId":"U","kind":"user"}`/storyRevision1. Persist its receipt Q1 and full principal+command fingerprint atomically. |
+| Exact authorized retry Q1 after another context revision | Return the identical original receipt/version IDs and original revision values. No second body, quota charge, publication or notification. Fresh authorization and series ownership still apply before replay. |
+| Reuse Q1 with another payload/principal, or collide with a legacy/import/analysis receipt ID | command_conflict; no second value or overwritten original receipt. Revoked/unauthorized principals cannot obtain replay merely by knowing Q1. |
+| Close/reopen a copy of this store | Preserve C1, both context rows, V1, Q1, counters/nullability/author attribution and all earlier review data. Do not synthesize a different source, author, pointer or receipt. |
+
+For a capture whose exact text is `why`, contentHash is `2be23c585f15e5fd3279d0663036dd9f6e634f4225ef326fc83fb874dbb81a0f`, independent of title/origin/time; those metadata still contribute to its canonical body bytes/quota. These vectors specify format compatibility. Same-code reopen tests are engineering evidence, not independent cross-implementation compatibility acceptance.
+
+## Structural comparison identity compatibility
+
+A primary comparison key (`GraphFile.key`, called `fileKey` in stories and saved views) is a compact ECMAScript JSON array string, not a digest. If the snapshot has `changedFiles`, preserve its exact ledger order, including an explicitly empty array. For each zero-based ledger index, encode `[index, oldPath, newPath]`; absent sides are literal JSON null. Status, source bytes/hash, provider hunk and snapshotId are not members of this key. A reordered ledger changes these keys; identical ordered ledgers in different snapshots may have identical keys, so the containing snapshot identity remains mandatory.
+
+Only when `changedFiles` is absent, collect distinct source path strings in first-occurrence manifest order. The key at index i encodes `[i, path, path]`, including a path with only one supplied side. This fallback row has status modified, no dispositions, and oldPath/newPath equal to that path only for actually supplied base/head sides, otherwise null. The fallback key still contains the path twice rather than those nullable row fields. Never sort paths, deduplicate the retained source manifest, or substitute a source hash. An explicit empty ledger does not invoke this fallback.
+
+Structural node identities use the following complete recipes. Here “encode” means compact ECMAScript JSON.stringify with array order preserved, native string escaping and no added spaces/newline. Each intermediate encoded value is a **string** inside the next array, not a nested array. No Unicode normalization or hashing occurs.
+
+| Identity | Exact value to encode |
+|---|---|
+| Source identity | `[snapshotId, side, path]` |
+| Provider file node | `[fileKey, encoded source identity]` |
+| Provider structural hunk node | `[fileKey, retained acquisition hunk id, side]` |
+| Manual/non-provider file node | The encoded source identity itself |
+| Manual/non-provider structural hunk node | `[encoded source identity, startLine, endLine]`, using one-based inclusive run endpoints |
+
+The presence of `candidate` selects provider graph projection; presence of `changedFiles` alone does not. Provider projection visits ledger rows in order, then base/head. It uses the first retained source with the row's exact side/path for lookup without altering manifest multiplicity. Missing/empty sources have no selectable node. Each retained acquisition hunk contributes a side-specific structural hunk only when that side's length is positive; its anchor is sideStart through sideStart+sideLength−1. Acquisition hunk IDs already have their own [pinned acquisition recipe](acquisition-compatibility.md); the structural ID wraps that retained ID rather than hashing its line range again. Provider nodes carry their row's fileKey.
+
+Manual projection visits manifest sources in order. Its structural hunks are maximal contiguous runs of changed lines in that side's bounded comparison, excluding unchanged/not_analyzed lines. Split source lines by removing one trailing LF and splitting on LF. For a same-path opposite side, use exact-line longest common subsequence: greedily retain equal lines; on equal remaining subsequence lengths choose removal from base before addition from head. Each block between retained equal lines marks both sides modified if it has removals and additions, otherwise removed/added. The comparison is unavailable above one million base×head lines. With no opposite side, an explicit added-head/deleted-base ledger row marks added/removed; another matching ledger status is not_analyzed, and no matching row is unchanged. Manual file/hunk nodes omit fileKey; their source path/side and graphFiles membership validate a story focus. Do not fabricate hunks for unavailable or unchanged runs.
+
+A story structural hunk must be an actual hunk node with the exact ID, matching its fileKey when that node carries one and matching the row's path on the node's side. A sources focus must also match its row's side paths. Private maps retain the same keys, not replacement coordinates. Copy comparisons can share the exact base source with a modified original: `[0,"a.md","a.md"]` and `[1,"a.md","b.md"]` remain distinct primary keys and yield distinct provider base nodes even with identical source bytes. Explicit comparison selection uses the exact key; an ordinary path-only lookup chooses the first matching ledger side/path and cannot distinguish all copies.
+
+[Complete structural/story conformance data](graph-story-compatibility-v1.json) supplies full snapshots and expected ordered file keys and file/hunk identities. Its graph cases cover manual single-file fallback, first-occurrence multi-file/head-only fallback, explicit added-side ledger, explicit empty ledger and provider modified-original/copied/added comparisons with a repeated base-source manifest occurrence. For snapshot S/head/a.md, the manual file ID is `["S","head","a.md"]`; its line1 hunk ID is `["[\"S\",\"head\",\"a.md\"]",1,1]`. With provider key `[0,"a.md","a.md"]` and acquisition hunk H1, the head hunk ID is `["[0,\"a.md\",\"a.md\"]","H1","head"]`. The fixture's identities are nonsecret protocol data, not a verified Git acquisition or source witness.
+
+## Story receipt fingerprint compatibility
+
+This story-family protocol is distinct from [legacy receipt fingerprint v1](#receipt-fingerprint-v1) and from the browser request hash. Parse the complete strict PutStoryContext/PublishStory command first, preserving every supplied valid member, commandId, ordered array and exact text. Do not trim story prose/capture text, normalize Unicode, add absent optional members, or include generated version/capture IDs, timestamps or receipt fields. Obtain the complete current credential-derived principal: a user object has exactly kind and actorId; an agent object additionally has reviewId, attachmentId and generation. Bootstrap is unauthorized.
+
+The hash-bearing value is an **object with exactly two members named `principal` and `command`**, whose values are those complete objects. It is not an array or concatenated separately encoded strings. Canonical encoding recursively sorts object member names by ECMAScript string `<`/`>` comparison (UTF-16 code-unit lexicographic order, not localeCompare), omits undefined/absent object properties, preserves array order, and uses compact native JSON encoding of keys/primitives. Supported inputs have no undefined array elements or nonfinite numbers. Null remains null and is never substituted for absence. Thus the top-level canonical text starts with `{"command":` and ends with the complete principal member. Hash its exact UTF-8 bytes, without BOM or final newline, with SHA-256 to lowercase hexadecimal. The same canonical rule covers story content hashes and stored story JSON bodies; their hash input is their own body, not this receipt wrapper.
+
+[Complete owner/agent vectors](graph-story-compatibility-v1.json) contain each full command and principal, exact `canonicalPreimage` string and expected digest. The owner context selection uses ordered captureIds C2,C1; its preimage is:
+
+```json
+{"command":{"action":{"captureIds":["C2","C1"],"type":"select"},"commandId":"ctx-1","expectedContextRevision":0,"reviewId":"R","snapshotId":"S","type":"PutStoryContext"},"principal":{"actorId":"U","kind":"user"}}
+```
+
+Its fingerprint is `76b40f045856091a6c86b4700595b27302ba3ee766c5943b920dfaacd602f084`. The complete agent PublishStory vector has fingerprint `64649b193aaea457451dc7d959b86a6c3d3218bafdfb4183054cd0050886a7bb`; changing only principal.generation from3 to4 gives `33c92d95400c5315f73c6365861943e59efbfaa467e90b51ee73e60e4824f688`. That vector intentionally retains surrounding title/claim whitespace. Reordering object properties preserves either digest; changing capture array order, text bytes or the complete principal changes it. The receipt row's actor column remains actorId, while its fingerprint binds the full principal. Authorization/current attachment and series ownership still precede replay: a revoked/old-generation caller may fail authorization before hash comparison, while an otherwise authorized different payload/principal conflicts instead of replacing the original receipt. These are format/hash vectors, not authority grants or executed publication evidence.
+
+## Browser private schema1 compatibility
+
+The two tab sessionStorage keys are `pr-reviewer:pending-question:v1` and `pr-reviewer:private-view:v1`. Their values are JSON text, not nested storage entries. All objects below, including nested objects, are strict: an extra member rejects. All listed members are required unless marked optional. Null is allowed **only** where stated; omission is not null. Object member order/whitespace in the outer envelope is immaterial to parsing; the pending request member is a string whose original bytes are immutable and hash-bearing. No migration, repair, rekey or automatic resend is implied. A future format needs an explicit compatibility decision; unknown schema currently remains quarantined in place.
+
+Shared scalar notation: ID is a nonempty string of at most128 UTF-16 code units; digest is64 lowercase hexadecimal characters. Number is finite; integer means a JSON number with integral value. Point is exactly x,y (finite numbers); viewport adds zoom (finite0.1–4 inclusive). Side is base/head. A snapshot Anchor is exactly snapshotId,side,path,startLine,endLine: snapshotId/path are nonempty strings and lines are positive integers; authorized immutable source membership and ordered valid span are checked separately. A semantic Anchor is exactly snapshotId,side,path,contentHash,start,end,startLine,endLine: snapshotId is ID; path is a safe relative repository path of1–1024 code units with no absolute prefix, backslash, NUL, empty/dot/dotdot segment; contentHash is digest; start/end are nonnegative integers in UTF-16 offsets and lines positive integers. Exact nonempty in-bounds ranges and retained authority are checked during restoration, never inferred from schema validity.
+
+| Object | Complete serialized members and constraints |
+|---|---|
+| Pending envelope | schema exactly number1; origin nonempty string≤4096; scope digest; reviewId ID; draftId ID; phase awaiting_ack or accepted_awaiting_readback; request string; fingerprint digest; optional receipt object below. No snapshotId top-level: it is in request.anchor. |
+| Stored request | String containing a complete strict AskQuestion object: type exactly AskQuestion, commandId nonempty≤128, reviewId string, anchor snapshot Anchor, text string, optional parentQuestionId nonempty string. No draftId or bearer member. reviewId equals pending.reviewId; text.trim is nonempty and≤16KiB UTF-8. The application initially uses story canonical encoding above, but recovery hashes/reuses the retained request string, never reparses/reserializes it to change bytes. |
+| Review receipt in pending | commandId ID, actorId ID, state applied/rejected, revision and cursor nonnegative integers, result, optional error string≤256 (empty allowed). result is either exactly questionId ID plus eventId ID-or-null, or exactly an empty object. This is the review receipt family, not StoryReceipt. |
+| View envelope | schema number1; origin and scope as pending; submitted array of0–64 IDs; omitted array of0–2 IDs; value PrivateStoryView-or-null. Neither array is optional, including when empty. |
+| PrivateStoryView | reviewId ID, snapshotId ID, versionId ID-or-null, cursor Cursor-or-null, elapsedMs finite0–8000 inclusive, surface flow/diff, position Point, pageScroll finite≥0, maps GraphFrames, activeDraftId ID, drafts array of1–2 Draft objects, returnFrame ReturnFrame-or-null. |
+| Draft | id ID; anchor snapshot Anchor-or-null; optional comparisonKey string≤4096 (empty allowed); optional parentQuestionId ID; text string; submitted boolean. Optional members are absent when unused, not null. Text omission uses an empty string plus envelope.omitted, never omission of text. |
+| Cursor | versionId,chapterId,stepId (all IDs) and index integer0–31. index is flattened story step order; exact retained story cursor validation is additional. |
+| GraphFrames | structural StructuralFrame-or-null; semantic SemanticFrame-or-null. Both keys required even when neither map exists. |
+| StructuralFrame | fileKey string≤4096, context boolean, spans boolean, spanId string≤4096, viewport Viewport. Empty strings are allowed as unselected presentation values; restoration still requires available exact membership. Keys use the structural recipes above. |
+| SemanticFrame | analysisId ID-or-null, focus string≤4096, viewport Viewport, fullSource boolean, sourceAnchor semantic Anchor-or-null, corpusId ID-or-null. Empty focus is allowed. Analysis/corpus/source membership is validated against retained authorized records at restore, not replaced by current facts. |
+| ReturnFrame | snapshotId ID, versionId ID-or-null, cursor Cursor-or-null, elapsedMs finite0–8000, surface flow/diff, position Point, pageScroll finite≥0, maps GraphFrames, originalDraftId ID, evidence strict StoryReference-or-null. The full StoryReference discriminator/member union is [specified here](story-and-exploration.md#exact-authoring-core-value-contract); it is a value, not a source body. No reviewId, drafts, mode or bearer member is stored in this frame. |
+
+Return-frame evidence uses the following exact discriminator union. All objects are strict; all digest/ID/path scalars follow the definitions above. Its snapshot anchor is the narrower authored-reference shape: snapshotId ID, safe relative path≤1024, side, and positive safe-integer startLine/endLine. This differs from the broader legacy draft Anchor parser; both still require authorized exact membership before use.
+
+| evidence.type | Other members (no omitted required fields) |
+|---|---|
+| snapshot_source | anchor (authored-reference snapshot anchor), contentHash digest. |
+| semantic_source | corpusId digest, anchor (complete semantic Anchor). |
+| static_node / static_edge | analysisId digest, factId ID. |
+| capture | captureId ID, contentHash digest; optional start and end must both be absent or both nonnegative safe integers with end>start (UTF-16). |
+| metadata | field exactly title,prUrl,repository,prNumber,baseSha or headSha. No body member. |
+| clarification | analysisId digest, clarificationId ID, revision positive safe integer. |
+
+PrivateStoryView additionally requires unique draft IDs, an activeDraftId naming a retained draft, and an active non-null anchor on its own snapshotId. A non-null cursor's versionId equals the surrounding versionId. A return frame's originalDraftId names a retained draft different from activeDraftId, and its non-null cursor.versionId equals frame.versionId. Inactive original and exploration drafts may belong to different snapshots. Map/frame/source/story validation and credential/lifetime fencing precede hydration; a structurally valid envelope is never proof of source availability or permission. No extra schema-level paired-null constraint is implied for the map fields; invalid retained memberships are rejected by restoration rather than guessed.
+
+Pending validation checks parsed AskQuestion membership/type and exact reviewId, request/record byte bounds and SHA-256 of the **stored request string UTF-8**. accepted_awaiting_readback additionally requires receipt present, applied state, same commandId, questionId and explicit nullable eventId. awaiting_ack normally omits receipt; the shape permits an optional strict receipt, but its phase still requires explicit identical-command ingress rather than receipt-based read-only recovery. A null eventId is valid saved-without-attachment data; a missing eventId is invalid. Before returning authorized private details, ReviewBridge separately requires successful review read, matching origin/scope and valid snapshot anchor. Accepted confirmation reads at least receipt.revision and matches actual questionId/actor/trimmed text/full anchor/parent; a later unrelated revision is insufficient.
+
+Bounds count the full UTF-8 encoded stored JSON including escaping: pending≤256KiB and its request string≤128KiB independently; view≤64KiB. Production request writes validate before any POST and verify storage readback equality. Per-draft8KiB is the ordinary **save policy**, not an added wire-schema string maximum: oversized text remains in memory, stores text empty and records the draft ID in omitted. Submitted IDs force matching stored drafts to text empty/submitted true even for stale ordinary checkpoints. Preserve an omitted empty draft marker across passive checkpoints/reloads until explicit replacement/edit/reset; do not turn its missing body into a successful full recovery. Submitted and omitted IDs are local guards, never server command fields.
+
+[Complete schema1 browser fixtures](private-session-v1.json) are normative nonsecret data, not executable code. Each named value is the **entire** record to JSON-encode at its corresponding key; the grouping names are fixture labels, not extra storage members:
+
+| Fixture | Expected read/use |
+|---|---|
+| pendingAwaitingAck | Exact original request with surrounding text whitespace and parent Q0; fingerprint `98d7c5487165f1366d8ee33a3824ad4da5cfdb58bfd1d1131d32766c9bbe71b1`. Same authorized credential may explicitly resend only this exact string/commandId. No automatic send on hydration. |
+| pendingAcceptedUnaddressed | Same request/fingerprint and applied receipt at revision7/cursor2, question Q1 and eventId null. Explicit recovery performs read only. Null event is not notification evidence. |
+| pendingAcceptedAddressed | Complete alternative accepted record with eventId E1. Same read-only recovery; this data alone does not prove notifier execution. |
+| ordinaryTwoDrafts | Active exploration D2 on T, inactive submitted original D1 on S; submitted guard D1, no omitted text. Return frame preserves S/V1 cursor,1250ms, structural/semantic maps, expanded source,500px scroll and snapshot evidence. Current exploration has no story version/cursor and null maps; null is explicit. |
+| ordinaryOmittedDraft | Complete alternative ordinary view with D2 text empty and omitted D2. Preserve its unavailable-after-reload warning across passive saves; preserve D1 submitted guard. |
+
+All fixture scope values use the [nonsecret browser origin/bearer vector](story-and-exploration.md#browser-scope-compatibility-vector). Same-origin/same-scope parsing yields a record, but permission/hydration still waits for successful real review/source/story reads; these opaque sample IDs are not such reads. Valid records with different origin/scope remain locked. Invalid JSON, unknown schema, extra members, missing required nullable members, invalid view relationships, over-bound records, wrong request digest, or malformed accepted receipt remain quarantined at the original key. Keep raw data unchanged; ordinary reset is explicit and cannot clear pending. A storage read/write/readback failure is storage_unavailable, not absence. Completion first persists the matching submitted-draft guard, then clears only the fully matching pending identity/phase/receipt with removal readback; mismatch/clear failure conservatively retains uncertainty. Preserve the existing [recovery state and authority rules](story-and-exploration.md#exact05c-application-frame-and-private-storage-derivation).

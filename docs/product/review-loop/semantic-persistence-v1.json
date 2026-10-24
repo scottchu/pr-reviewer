@@ -1,0 +1,225 @@
+{
+  "version": "semantic-persistence-v1",
+  "meaning": "Physical row/body format examples, not a complete database, verified trace, credential or private witness. Body objects are serialized as compact JSON in the named TEXT column. Existing review, credential, immutable evidence and other job history rows are dependencies, not supplied here.",
+  "admittedGraph": {
+    "analysis_graphs": [
+      {
+        "review_id": "review-example",
+        "snapshot_id": "semantic-data-vector-v1",
+        "body": {
+          "generation": 1,
+          "graphRevision": 3,
+          "selectedAnalysisId": "b40ac25418f1e748dff368e41b30348a8703b7c7778e6b43dd64e341837aa2cd"
+        }
+      }
+    ],
+    "graph_clarifications": [
+      {
+        "id": "50000000-0000-4000-8000-000000000001",
+        "review_id": "review-example",
+        "snapshot_id": "semantic-data-vector-v1",
+        "body": {
+          "clarificationId": "50000000-0000-4000-8000-000000000001",
+          "analysisId": "b40ac25418f1e748dff368e41b30348a8703b7c7778e6b43dd64e341837aa2cd",
+          "primary": {
+            "snapshotId": "semantic-data-vector-v1",
+            "side": "head",
+            "path": "a.ts",
+            "contentHash": "bb94d8ad1fc171c85a13c5102fdf32a5bc28adc7cf2280e699cece7ccfed37de",
+            "start": 14,
+            "end": 33,
+            "startLine": 1,
+            "endLine": 1
+          },
+          "authorId": "agent-example",
+          "history": [
+            {
+              "revision": 1,
+              "actorId": "agent-example",
+              "actorKind": "agent",
+              "kind": "interpretation",
+              "text": "Static binding supports this source relationship; execution is unobserved.",
+              "evidence": [
+                {
+                  "snapshotId": "semantic-data-vector-v1",
+                  "side": "head",
+                  "path": "a.ts",
+                  "contentHash": "bb94d8ad1fc171c85a13c5102fdf32a5bc28adc7cf2280e699cece7ccfed37de",
+                  "start": 14,
+                  "end": 33,
+                  "startLine": 1,
+                  "endLine": 1
+                }
+              ],
+              "createdAt": "2026-10-24T00:00:00.000Z"
+            },
+            {
+              "revision": 2,
+              "actorId": "local-user",
+              "actorKind": "user",
+              "kind": "correction",
+              "text": "This is static source evidence, not an observed runtime consequence.",
+              "evidence": [],
+              "createdAt": "2026-10-24T00:01:00.000Z"
+            }
+          ]
+        }
+      }
+    ],
+    "analysis_receipts": [
+      {
+        "id": "clarification-correction-example",
+        "actor": "local-user",
+        "fingerprint": "245d17e77af02f22f60660b707f79d4cba88bec3e88e46ad73ca5e9d3793f9d0",
+        "body": {
+          "commandId": "clarification-correction-example",
+          "actorId": "local-user",
+          "state": "applied",
+          "reviewId": "review-example",
+          "snapshotId": "semantic-data-vector-v1",
+          "analysisGeneration": 1,
+          "graphRevision": 3,
+          "result": {
+            "clarificationId": "50000000-0000-4000-8000-000000000001"
+          }
+        }
+      }
+    ],
+    "receiptCommand": {
+      "type": "PutGraphClarification",
+      "commandId": "clarification-correction-example",
+      "reviewId": "review-example",
+      "snapshotId": "semantic-data-vector-v1",
+      "analysisId": "b40ac25418f1e748dff368e41b30348a8703b7c7778e6b43dd64e341837aa2cd",
+      "expectedGraphRevision": 2,
+      "clarificationId": "50000000-0000-4000-8000-000000000001",
+      "text": "This is static source evidence, not an observed runtime consequence.",
+      "kind": "correction",
+      "primary": {
+        "snapshotId": "semantic-data-vector-v1",
+        "side": "head",
+        "path": "a.ts",
+        "contentHash": "bb94d8ad1fc171c85a13c5102fdf32a5bc28adc7cf2280e699cece7ccfed37de",
+        "start": 14,
+        "end": 33,
+        "startLine": 1,
+        "endLine": 1
+      },
+      "evidence": []
+    },
+    "expectedStartup": {
+      "launch": false,
+      "preserveSelectedAnalysisId": "b40ac25418f1e748dff368e41b30348a8703b7c7778e6b43dd64e341837aa2cd",
+      "preserveGraphRevision": 3,
+      "preserveClarificationLocalRevisions": [
+        1,
+        2
+      ]
+    }
+  },
+  "unfinishedInvocation": {
+    "analysis_owner": [
+      {
+        "id": 1,
+        "generation": "30000000-0000-4000-8000-000000000001"
+      }
+    ],
+    "execution_owner": [
+      {
+        "id": 1,
+        "epoch": "40000000-0000-4000-8000-000000000001"
+      }
+    ],
+    "execution_lease": [
+      {
+        "id": 1,
+        "body": {
+          "kind": "analysis",
+          "jobId": "10000000-0000-4000-8000-000000000001",
+          "invocationId": "20000000-0000-4000-8000-000000000001",
+          "phase": "compute"
+        }
+      }
+    ],
+    "analysis_jobs": [
+      {
+        "id": "10000000-0000-4000-8000-000000000001",
+        "body": {
+          "jobId": "10000000-0000-4000-8000-000000000001",
+          "reviewId": "review-example",
+          "snapshotId": "semantic-data-vector-v1",
+          "generation": 2,
+          "jobRevision": 12,
+          "state": "compute_running",
+          "reason": null,
+          "corpusId": "601ba2201ea742a1e70bad923550ca60480d86a3c0ccd323b1bf8d3449d4c27d",
+          "inventoryId": "f778487157458f5f5963387bd8d71948fa751c798fbf9775509fc3ca761ba761",
+          "analysisId": null,
+          "declarationIds": [
+            "ec3f96424e4fa3212424e3b5fe83678ff31dafcd7145a05031a1c9da1102f70f"
+          ],
+          "invocations": [
+            {
+              "invocationId": "20000000-0000-4000-8000-000000000001",
+              "ownerRunId": "30000000-0000-4000-8000-000000000001",
+              "phase": "compute",
+              "state": "running",
+              "processes": [
+                {
+                  "ordinal": 1,
+                  "executable": "node",
+                  "state": "requested"
+                }
+              ]
+            }
+          ],
+          "contextIssues": [],
+          "admission": null,
+          "credentialReference": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+          "actorId": "local-user",
+          "worktree": "/private/example/repository",
+          "sourceProject": "example/review",
+          "priorityPaths": {
+            "head": [
+              "a.ts"
+            ]
+          },
+          "failureAccount": null,
+          "contextFilesPerSide": 1
+        }
+      }
+    ],
+    "expectedStartup": {
+      "newEpochRequired": true,
+      "newOwnerGenerationRequired": true,
+      "jobState": "unknown",
+      "invocationState": "unknown",
+      "reason": "interrupted_invocation",
+      "sharedSlotRetained": true,
+      "automaticReplay": false,
+      "pidToKill": null,
+      "jobRevision": 13
+    }
+  },
+  "loweredContextRequest": {
+    "command": {
+      "type": "RequestAnalysis",
+      "commandId": "capped-context-example",
+      "reviewId": "review-example",
+      "snapshotId": "semantic-data-vector-v1",
+      "expectedAnalysisGeneration": 1,
+      "worktree": "/private/example/repository",
+      "sourceProject": "example/review",
+      "priorityPaths": {
+        "head": [
+          "a.ts"
+        ]
+      },
+      "contextFilesPerSide": 1
+    },
+    "fingerprint": "4420ce7b4d520bf636c9afc7aad7f28683c318be6dcceff149f6fecce309500e",
+    "expectedEffectiveLoaderFilesPerSide": 1,
+    "expectedCorpusId": "601ba2201ea742a1e70bad923550ca60480d86a3c0ccd323b1bf8d3449d4c27d",
+    "legacyJobMemberAbsentMeans": 128
+  }
+}

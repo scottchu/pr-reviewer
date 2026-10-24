@@ -392,7 +392,7 @@ test('controlled overlapping history choices preserve displayed source and inter
   if(deferred&&id!==ids[0])await delay(id===ids[1]?1600:1100);
   try{await route.fulfill({json:projection(id)});}catch{/* Superseded request was aborted by the actual bridge. */}
  });
- await page.route('**/api/commands',async route=>{captured=route.request().postDataJSON() as Record<string,unknown>;await route.fulfill({json:{state:'rejected',error:'controlled_probe_only'}});});
+ await page.route('**/api/commands',async route=>{captured=route.request().postDataJSON() as Record<string,unknown>;await route.fulfill({json:{commandId:captured.commandId,actorId:'local-user',state:'rejected',revision:1,cursor:0,result:{},error:'controlled_probe_only'}});});
  const url=new URL(uiUrl);url.searchParams.set('reviewId','controlled-history');await page.goto(url.toString());await page.getByLabel('Local access token').fill(token);await page.getByRole('button',{name:'Open review'}).click();
  const select=page.getByRole('combobox',{name:'Snapshot',exact:true});await select.selectOption(ids[1]!);await expect.poll(()=>requests.includes(ids[1]!)).toBe(true);await select.selectOption(ids[2]!);const compositionHeld=await page.getByLabel('Your question').isDisabled();await expect(select).toHaveValue(ids[2]!);expect(compositionHeld).toBe(true);
  await expect(page.locator('.source-grid code')).toHaveText(['Source visible for snapshot 3']);deferred=false;const beforePoll=requests.length;await expect.poll(()=>requests.length).toBeGreaterThan(beforePoll);

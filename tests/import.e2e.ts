@@ -20,10 +20,38 @@ test.beforeAll(async()=>{
  writeFileSync(join(root,'bin','gh'),`#!${process.execPath}\nconst {readFileSync}=require('node:fs');const candidate=JSON.parse(readFileSync(${JSON.stringify(providerState)},'utf8'));const endpoint=process.argv.at(-1);const pull={number:candidate.number,html_url:candidate.url,title:candidate.title,state:candidate.state,head:{ref:candidate.sourceBranch,sha:candidate.headSha,repo:{full_name:candidate.sourceProject}},base:{ref:candidate.targetBranch,sha:candidate.targetTipSha,repo:{full_name:candidate.targetProject}}};const value=endpoint.includes('/compare/')?{merge_base_commit:{sha:candidate.baseSha}}:endpoint.includes('/pulls?')?[pull]:endpoint==='repos/team/repo'?{full_name:'team/repo',default_branch:'main'}:pull;setTimeout(()=>process.stdout.write(JSON.stringify(value)),candidate.delay);\n`,{mode:0o700});await start();
 });
 test.afterAll(async()=>{await stop();rmSync(root,{recursive:true,force:true});rmSync(fixture.root,{recursive:true,force:true});});
-test('03 controlled provider + real Git: path discovery, complete copy/empty/binary ledger, background continuation and immutable source after restart',async({page})=>{
+test('03 controlled provider + real Git: path discovery, complete copy/empty/binary ledger, background continuation and immutable source after restart',async({page},testInfo)=>{
  await page.setViewportSize({width:1600,height:1200});await page.goto(uiUrl);await page.getByLabel('Local access token').fill(token);await page.getByRole('button',{name:'Open review',exact:true}).click();
  await expect(page.getByRole('heading',{name:'Open a change from a repository'})).toBeVisible();await page.getByLabel('Repository path').fill(fixture.root);await page.getByRole('button',{name:'Import review',exact:true}).click();
- await expect.poll(async()=>(await jobs())[0]?.state).toBe('admitted');const imported=(await jobs())[0]!;await page.getByRole('button',{name:'Open imported review',exact:true}).click();await expect(page).toHaveURL(new RegExp(imported.reviewId));
+ await expect.poll(async()=>(await jobs())[0]?.state).toBe('admitted');const imported=(await jobs())[0]!;
+ // Hold the real imported-review login result across bridge mount and a 700ms poll.
+ // Controlled provider metadata remains separate from the actual React/gateway authorization handoff.
+ const importedReview=await api(`/api/reviews/${imported.reviewId}`) as Review;
+ let reviewReads=0,held=false,release=()=>{};
+ const gate=new Promise<void>(resolve=>{release=resolve;});
+ const requests:{url:string;status:number}[]=[];
+ page.on('response',response=>{if(response.url().includes('/api/analysis?'))requests.push({url:response.url(),status:response.status()});});
+ await page.route(`**/api/reviews/${imported.reviewId}?*`,async route=>{
+  reviewReads++;
+  if(reviewReads===1){const response=await route.fetch();held=true;await gate;try{await route.fulfill({response});}catch{/* An aborted login is the failing-first regression. */}}
+  else await route.continue();
+ });
+ try{
+  await page.getByRole('button',{name:'Open imported review',exact:true}).click();
+  await expect.poll(()=>held).toBe(true);
+  await delay(850);
+  expect(reviewReads,'mount/timer background routes must preserve the held explicit login').toBe(1);
+ }finally{release();}
+ await expect(page).toHaveURL(new RegExp(imported.reviewId));
+ const panel=page.getByRole('region',{name:'Function neighborhoods'});
+ await panel.getByText('Acquire verified pinned context',{exact:true}).click();
+ await expect(panel.getByRole('button',{name:'Prepare declarations',exact:true})).toBeEnabled();
+ await expect.poll(()=>requests.filter(request=>{
+  const url=new URL(request.url);return request.status===200&&url.searchParams.get('reviewId')===imported.reviewId&&url.searchParams.get('snapshotId')===importedReview.snapshot.snapshotId;
+ }).length).toBeGreaterThan(0);
+ await page.unroute(`**/api/reviews/${imported.reviewId}?*`);
+ writeFileSync(testInfo.outputPath('imported-review-semantic-authorization.json'),JSON.stringify({provenance:'Controlled provider metadata; actual React and gateway. The real login response is held across mount and timer; no fake review/analysis result.',candidate:execFileSync('git',['rev-parse','HEAD'],{encoding:'utf8'}).trim(),sourceDirty:execFileSync('git',['status','--porcelain'],{encoding:'utf8'}).trim().length>0,reviewId:imported.reviewId,snapshotId:importedReview.snapshot.snapshotId,requests,heldAcrossPollMs:850,prepared:false},null,2));
+
  await expect(page.getByRole('navigation',{name:'Changed files'}).getByRole('button')).toHaveCount(4);await page.getByRole('button',{name:'Focus a → b',exact:true}).click();await expect(page.locator('.react-flow__node')).toHaveCount(2);await page.getByRole('button',{name:'Open head b',exact:true}).click();await expect(page.locator('.source-grid .source-pane').nth(0).locator('code').first()).toHaveText('original');await expect(page.getByLabel('Source file')).toHaveValue('b');await page.getByRole('button',{name:'Select base line 2',exact:true}).click();await expect(page.locator('.source-grid .source-pane').nth(1).locator('code').first()).toHaveText('original');
  await page.getByRole('button',{name:'Focus empty',exact:true}).click();await expect(page.locator('.react-flow__node')).toHaveCount(0);await expect(page.getByText(/No selectable source for this file/)).toBeVisible();await page.getByRole('button',{name:'Focus binary',exact:true}).click();await expect(page.locator('.react-flow__node')).toHaveCount(0);
  await page.getByText(/Complete path and primary hunk ledger/).click();await expect(page.getByText('head binary: unsupported · binary',{exact:true}).first()).toBeVisible();await expect(page.getByText('head empty: prepared · empty',{exact:true})).toBeVisible();

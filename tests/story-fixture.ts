@@ -1,0 +1,20 @@
+import {createHash} from 'node:crypto';
+import {mkdtempSync,rmSync} from 'node:fs';
+import {tmpdir} from 'node:os';
+import {join} from 'node:path';
+import {createStore} from '../src/storage/public.ts';
+import {graphFiles} from '../src/domain/public.ts';
+import type {StoryContent,StoryCommand,StoryLimits,Store} from '../src/storage/public.ts';
+export const storyFixture=(limits?:StoryLimits)=>{
+ const root=mkdtempSync(join(tmpdir(),'pr-reviewer-story-'));
+ const filename=join(root,'review.sqlite');
+ let store:Store=createStore(filename,limits?{storyLimits:limits}:{});
+ const content='export const value = 2;\n';
+ const snapshot={snapshotId:'snapshot',repository:'owner/repo',prUrl:'https://github.com/owner/repo/pull/1',prNumber:1,baseSha:'a'.repeat(40),headSha:'b'.repeat(40),sources:[{side:'head' as const,path:'value.ts',content,hash:createHash('sha256').update(content).digest('hex'),lineCount:1}]};
+ store.prepare('r',snapshot);const token=store.issueUser();
+ const source={type:'snapshot_source' as const,anchor:{snapshotId:'snapshot',side:'head' as const,path:'value.ts',startLine:1,endLine:1},contentHash:snapshot.sources[0]!.hash};
+ const fileKey=graphFiles(snapshot)[0]!.key;
+ const story:StoryContent={title:'Value changes',captureIds:[],chapters:[{id:'change',title:'Change and limits',why:'why',what:'what',how:'what',example:{scenarioKind:'illustrative',input:'what',before:'why',after:'what'},stepIds:['step']}],steps:[{id:'step',headline:'Read the value',claimIds:['what'],focus:{type:'sources',fileKey,sources:[source]}}],claims:[{id:'why',text:'Product rationale has not been supplied.',basis:'unknown',references:[],uncertainty:'Ask the owner what motivated the change.'},{id:'what',text:'The exported value is two; source presence does not establish execution.',basis:'source_observation',references:[source]}],scope:[{type:'explained',fileKey,chapterId:'change',explanation:'Exports the value used by the example.',references:[source]}],limitations:['Illustrative example; no execution evidence.']};
+ const publish=(overrides:Partial<Extract<StoryCommand,{type:'PublishStory'}>>={}):Extract<StoryCommand,{type:'PublishStory'}>=>({type:'PublishStory',commandId:'publish',reviewId:'r',snapshotId:'snapshot',expectedStoryRevision:0,contextRevision:0,story,...overrides});
+ return {root,filename,snapshot,token,source,fileKey,story,publish,get store(){return store;},restart:()=>{store.close();store=createStore(filename,limits?{storyLimits:limits}:{});},cleanup:()=>{store.close();rmSync(root,{recursive:true,force:true});}};
+};

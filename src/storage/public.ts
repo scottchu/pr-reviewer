@@ -1,3 +1,10 @@
+import {createStoryStore} from './story.ts';
+import type {StoryLimits} from './story.ts';
+import {storyEvidenceQuerySchema,storyCanonical,validateSemanticAnchor} from '../domain/public.ts';
+import type {StoryEvidenceQuery,StoryEvidence,StoryReference,SemanticAnchor,AnalysisEvidence,SemanticSource} from '../domain/public.ts';
+import {createAnalysisStore} from "./analysis.ts";
+import type {AnalysisLimits} from "./analysis.ts";
+import {createExecutionLease} from "./execution.ts";
 import type {ImportLimits} from "./imports.ts";
 import {createImportStore} from "./imports.ts";
 import {isPreparedSnapshotWitness,validateProviderSnapshot} from "../source-preparation/public.ts";
@@ -30,7 +37,7 @@ type Connection = {
   connectionId: string;
   corroborated: boolean;
 };
-export const createStore = (filename: string,options:{importLimits?:ImportLimits}={}) => {
+export const createStore = (filename: string,options:{importLimits?:ImportLimits;analysisLimits?:AnalysisLimits;storyLimits?:StoryLimits}={}) => {
   const db = new DatabaseSync(filename);
   db.exec(
     "PRAGMA busy_timeout=3000; PRAGMA foreign_keys=ON; PRAGMA journal_mode=WAL; CREATE TABLE IF NOT EXISTS reviews(id TEXT PRIMARY KEY, body TEXT NOT NULL); CREATE TABLE IF NOT EXISTS receipts(id TEXT PRIMARY KEY, actor TEXT NOT NULL, fingerprint TEXT NOT NULL, body TEXT NOT NULL); CREATE TABLE IF NOT EXISTS credentials(hash TEXT PRIMARY KEY, body TEXT NOT NULL); CREATE TABLE IF NOT EXISTS challenges(id TEXT PRIMARY KEY, body TEXT NOT NULL); CREATE TABLE IF NOT EXISTS preparation_inputs(review_id TEXT PRIMARY KEY REFERENCES reviews(id), body TEXT NOT NULL); CREATE TABLE IF NOT EXISTS review_import_identities(review_id TEXT PRIMARY KEY REFERENCES reviews(id),provider TEXT NOT NULL,host TEXT NOT NULL,target_project TEXT NOT NULL,change_number INTEGER NOT NULL,current_snapshot_id TEXT NOT NULL);",
@@ -113,6 +120,7 @@ export const createStore = (filename: string,options:{importLimits?:ImportLimits
         normalizationError = true;
       }
       const fingerprint = hash(canonical(normalized));
+      if(db.prepare('SELECT id FROM story_receipts WHERE id=?').get(input.commandId))return {commandId:input.commandId,actorId:principal.actorId,state:'rejected',revision:0,cursor:0,result:{},error:'command_conflict'};
       const old = db
         .prepare("SELECT actor,fingerprint,body FROM receipts WHERE id=?")
         .get(input.commandId) as
@@ -183,10 +191,92 @@ export const createStore = (filename: string,options:{importLimits?:ImportLimits
       }
     });
   }catch(error){db.close();throw error;}
+  const execution=createExecutionLease(db);
   let imports:ReturnType<typeof createImportStore>;
-  try{imports=createImportStore({db,tx,load,save,...(options.importLimits?{limits:options.importLimits}:{})});}catch(error){db.close();throw error;}
+  try{imports=createImportStore({db,tx,load,save,execution,...(options.importLimits?{limits:options.importLimits}:{})});}catch(error){db.close();throw error;}
+  const analysis=createAnalysisStore({db,tx,load,authorize,execution,...(options.analysisLimits?{limits:options.analysisLimits}:{})});
+  const authenticate = (token: string): Principal => {
+    const row=db.prepare("SELECT body FROM credentials WHERE hash=?").get(hash(token)) as {body:string}|undefined;
+    if(!row)throw new Error("unauthorized");return JSON.parse(row.body) as Principal;
+  };
+  let story:ReturnType<typeof createStoryStore>;
+  const storyEvidence=(token:string,input:StoryEvidenceQuery):StoryEvidence=>{
+    const query=storyEvidenceQuerySchema.parse(input),principal=authenticate(token),review=load(query.reviewId);authorize(principal,review);
+    const snapshot=(review.snapshots??[review.snapshot]).find(item=>item.snapshotId===query.snapshotId);if(!snapshot)throw new Error('source_unavailable');
+    const references=[...new Map(query.references.map(ref=>[storyCanonical(ref),ref])).values()];
+    const selected=analysis.marker(token,{reviewId:query.reviewId,snapshotId:query.snapshotId}).selectedAnalysisId;
+    const knownUnavailable=(error:unknown):boolean=>error instanceof Error&&['analysis_record_unavailable','source_unavailable'].includes(error.message);
+    const knownInvalid=(error:unknown):boolean=>knownUnavailable(error)||error instanceof Error&&['story_reference_invalid','story_context_unavailable'].includes(error.message);
+    let view:AnalysisEvidence|undefined,basisUnavailable=false;
+    if(query.analysisId)try{
+      view=analysis.evidence(token,{reviewId:query.reviewId,snapshotId:query.snapshotId,analysisId:query.analysisId});
+      if(view.analysis?.status!=='analyzed'||view.analysis.analysisId!==query.analysisId||view.corpus?.corpusId!==query.corpusId){view=undefined;basisUnavailable=true;}
+    }catch(error){if(!knownUnavailable(error))throw error;basisUnavailable=true;}
+    const sourceMap=new Map(snapshot.sources.map(source=>[JSON.stringify([source.side,source.path]),source]));
+    const nodes=new Map(view?.analysis?.status==='analyzed'?view.analysis.nodes.map(node=>[node.id,node]):[]),edges=new Map(view?.analysis?.status==='analyzed'?view.analysis.edges.map(edge=>[edge.id,edge]):[]);
+    const sourceCache=new Map<string,SemanticSource|null>(),lfIndexes=new Map<string,number[]>(),valid:StoryReference[]=[],invalid:StoryEvidence['invalid']=[],facts:StoryEvidence['facts']=[];
+    const semanticSource=(anchor:SemanticAnchor):SemanticSource=>{
+      if(basisUnavailable||!query.corpusId||anchor.snapshotId!==query.snapshotId)throw new Error('story_reference_invalid');
+      const key=JSON.stringify([query.corpusId,anchor.side,anchor.path,anchor.contentHash]);
+      if(!sourceCache.has(key)){
+        let source:SemanticSource|null=null;
+        try{source=analysis.source(token,{reviewId:query.reviewId,snapshotId:query.snapshotId,corpusId:query.corpusId,side:anchor.side,path:anchor.path,contentHash:anchor.contentHash});}
+        catch(error){if(!knownUnavailable(error))throw error;}
+        sourceCache.set(key,source);
+      }
+      const source=sourceCache.get(key);
+      if(!source||hash(source.content)!==source.contentHash||!validateSemanticAnchor(source,anchor))throw new Error('source_unavailable');
+      return source;
+    };
+    const snapshotAnchor=(anchor:SemanticAnchor):Extract<StoryReference,{type:'snapshot_source'}>|null=>{
+      const semantic=semanticSource(anchor),key=JSON.stringify([anchor.side,anchor.path]),source=sourceMap.get(key);
+      if(!source||source.hash!==anchor.contentHash||source.content!==semantic.content||hash(source.content)!==source.hash)return null;
+      let starts=lfIndexes.get(key);
+      if(!starts){starts=[0];for(let offset=0;offset<source.content.length;offset++)if(source.content.charCodeAt(offset)===10)starts.push(offset+1);lfIndexes.set(key,starts);}
+      const line=(offset:number)=>{let low=0,high=starts.length;while(low<high){const middle=(low+high)>>>1;if(starts[middle]!<=offset)low=middle+1;else high=middle;}return low;};
+      const mapped={snapshotId:anchor.snapshotId,side:anchor.side,path:anchor.path,startLine:line(anchor.start),endLine:line(anchor.end-1)};
+      if(!validateAnchor(query.snapshotId,[source],mapped))throw new Error('source_unavailable');
+      return {type:'snapshot_source',anchor:mapped,contentHash:source.hash};
+    };
+    for(const reference of references)try{
+      switch(reference.type){
+        case 'snapshot_source':{
+          const source=sourceMap.get(JSON.stringify([reference.anchor.side,reference.anchor.path]));
+          if(!source||source.hash!==reference.contentHash||hash(source.content)!==source.hash||!validateAnchor(query.snapshotId,[source],reference.anchor))throw new Error('source_unavailable');
+          break;
+        }
+        case 'semantic_source':{
+          if(!query.analysisId||query.corpusId!==reference.corpusId)throw new Error('story_reference_invalid');
+          semanticSource(reference.anchor);break;
+        }
+        case 'static_node':case 'static_edge':{
+          if(basisUnavailable||!query.analysisId||reference.analysisId!==query.analysisId)throw new Error('story_reference_invalid');
+          const node=reference.type==='static_node'?nodes.get(reference.factId):undefined,edge=reference.type==='static_edge'?edges.get(reference.factId):undefined;
+          if(!node&&!edge)throw new Error('story_reference_invalid');
+          const anchors:SemanticAnchor[]=node?[node.declaration,node.body]:edge?[edge.target,...edge.sites.flatMap(site=>[site.anchor,...site.linkage,...site.signatures])]:[];
+          const snapshotAnchors=anchors.flatMap(anchor=>{const mapped=snapshotAnchor(anchor);return mapped?[mapped]:[];});
+          facts.push({reference,anchors,snapshotAnchors});break;
+        }
+        case 'capture':{
+          const capture=story.context(token,{reviewId:query.reviewId,snapshotId:query.snapshotId,captureId:reference.captureId}).captures[0];
+          if(!capture||capture.contentHash!==reference.contentHash||hash(capture.text)!==capture.contentHash||reference.start!==undefined&&reference.end!>capture.text.length)throw new Error('story_context_unavailable');
+          break;
+        }
+        case 'metadata':{const value=snapshot[reference.field];if(value===undefined||value==='')throw new Error('source_unavailable');break;}
+        case 'clarification':{
+          if(basisUnavailable||reference.analysisId!==query.analysisId||!view?.clarifications.some(item=>item.clarificationId===reference.clarificationId&&item.analysisId===reference.analysisId&&item.history.some(revision=>revision.revision===reference.revision)))throw new Error('story_reference_invalid');
+          break;
+        }
+      }valid.push(reference);
+    }catch(error){if(!knownInvalid(error))throw error;invalid.push({reference,reason:(error as Error).message});}
+    return {reviewId:query.reviewId,snapshotId:query.snapshotId,selectedAnalysisId:selected,valid,invalid,facts,basisUnavailable};
+  };
+  story=createStoryStore({db,tx,load,authenticate,authorize,resolveEvidence:storyEvidence,...(options.storyLimits?{limits:options.storyLimits}:{})});
   return {
     imports,
+    story,
+    storyEvidence,
+    analysis,
     close: () => db.close(),
     issueUser: () => issue({ kind: "user", actorId: "local-user" }),
     authenticate: (token: string): Principal => {
@@ -505,3 +595,8 @@ export const createStore = (filename: string,options:{importLimits?:ImportLimits
 };
 export type Store = ReturnType<typeof createStore>;
 export type {ImportOwner,ImportGrant} from './imports.ts';
+
+export type {AnalysisOwner,AnalysisGrant,AnalysisLimits} from './analysis.ts';
+
+export type {StoryLimits} from './story.ts';
+export type {StoryContent,StoryCommand} from '../domain/public.ts';

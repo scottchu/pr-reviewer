@@ -1,9 +1,11 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import {
-  createReviewBridge,
+  createReviewBridge as createBaseReviewBridge,
   questionStatus,
 } from "../src/application/public.ts";
+import {recoveryMemory} from './recovery-fixture.ts';
+const createReviewBridge=(id:string)=>createBaseReviewBridge(id,undefined,{session:recoveryMemory().session});
 import type { Review, Anchor } from "../src/domain/public.ts";
 const review: Review = {
   reviewId: "r",
@@ -36,23 +38,20 @@ const anchor: Anchor = {
 test("application preserves unknown command identity, reads accepted revision and disposes/remounts routes", async () => {
   const original = globalThis.fetch;
   let failures = 1;
+  let accepted:Review['questions'][number]|undefined;
   const ids: string[] = [];
   globalThis.fetch = (async (
     input: Parameters<typeof fetch>[0],
     init?: Parameters<typeof fetch>[1],
   ) => {
     if (init?.method === "POST") {
-      const command = JSON.parse(String(init.body)) as { commandId: string };
+      const command = JSON.parse(String(init.body)) as { commandId: string;text:string };
       ids.push(command.commandId);
       if (failures-- > 0) throw new Error("lost_ack");
-      return Response.json({
-        commandId: command.commandId,
-        state: "applied",
-        revision: 1,
-        result: {},
-      });
+      accepted={questionId:"q",anchor,text:command.text.trim(),actorId:"u",revision:1,createdAt:"now",working:false};
+      return Response.json({commandId:command.commandId,actorId:"u",state:"applied",revision:1,cursor:1,result:{questionId:"q",eventId:null}});
     }
-    return Response.json(review);
+    return Response.json({...review,questions:accepted?[accepted]:[]});
   }) as typeof fetch;
   try {
     const bridge = createReviewBridge("r");
@@ -146,32 +145,29 @@ test("presentation separates answered/read state from unknown notification histo
   assert.equal(r.attempts[0]?.state, "unknown");
 });
 
-test("definitive HTTP rejection allows corrected submission; pending readback retains retry", async () => {
+test("authoritative matching rejection allows correction; an accepted retry only reads back", async () => {
   const original = globalThis.fetch;
   let reject = true,
     blockReadback = false;
+  let accepted:Review['questions'][number]|undefined;
   const ids: string[] = [];
   globalThis.fetch = (async (
     _input: Parameters<typeof fetch>[0],
     init?: Parameters<typeof fetch>[1],
   ) => {
     if (init?.method === "POST") {
-      const body = JSON.parse(String(init.body)) as { commandId: string };
+      const body = JSON.parse(String(init.body)) as { commandId: string;text:string };
       ids.push(body.commandId);
       if (reject) {
         reject = false;
-        return Response.json({ error: "invalid_request" }, { status: 400 });
+        return Response.json({commandId:body.commandId,actorId:"u",state:"rejected",revision:1,cursor:0,result:{},error:"invalid_request"});
       }
-      return Response.json({
-        commandId: body.commandId,
-        state: "applied",
-        revision: 2,
-        result: {},
-      });
+      accepted={questionId:body.commandId,anchor,text:body.text.trim(),actorId:"u",revision:2,createdAt:"now",working:false};
+      return Response.json({commandId:body.commandId,actorId:"u",state:"applied",revision:2,cursor:1,result:{questionId:body.commandId,eventId:null}});
     }
     if (blockReadback)
       return Response.json({ error: "projection_pending" }, { status: 409 });
-    return Response.json({ ...review, revision: 2 });
+    return Response.json({ ...review, revision: 2,questions:accepted?[accepted]:[] });
   }) as typeof fetch;
   try {
     const bridge = createReviewBridge("r");
@@ -185,11 +181,11 @@ test("definitive HTTP rejection allows corrected submission; pending readback re
     blockReadback = true;
     await assert.rejects(
       bridge.ask(anchor, "Wait for accepted readback"),
-      /readback_pending/,
+      /projection_pending/,
     );
     blockReadback = false;
     await bridge.ask(anchor, "Wait for accepted readback");
-    assert.equal(ids[2], ids[3]);
+    assert.equal(ids.length,3);
   } finally {
     globalThis.fetch = original;
   }
@@ -275,3 +271,178 @@ test('disposing an in-flight source choice releases loading and remount observes
  }) as typeof fetch;
  try{const bridge=createReviewBridge('r');await bridge.login('token');const dispose=bridge.connect();const choice=bridge.selectSnapshot('newest').then(()=>null,error=>error);dispose();assert.match(String(await choice),/selection_superseded/);assert.equal(bridge.getSnapshot().selecting,false);const remount=bridge.connect();await new Promise(resolve=>setTimeout(resolve,10));remount();assert.equal(requests.at(-1),'s');assert.equal(bridge.getSnapshot().review?.snapshot.snapshotId,'s');}finally{globalThis.fetch=original;}
 });
+
+// Derives from presentation.md: foreground read ownership is separate from route timing.
+for (const emission of ['connection', 'interval'] as const) {
+  test(`background ${emission} preserves the explicit login result used by an imported-review handoff`, async (context) => {
+    const original = globalThis.fetch;
+    context.mock.timers.enable({ apis: ['setInterval'] });
+    let reads = 0, complete!: (response: Response) => void;
+    let loginSignal: AbortSignal | null | undefined;
+    globalThis.fetch = (async (_input: Parameters<typeof fetch>[0], init?: Parameters<typeof fetch>[1]) => {
+      if (++reads !== 1) return Response.json(review);
+      loginSignal = init?.signal;
+      return new Promise<Response>((resolve, reject) => {
+        complete = resolve;
+        loginSignal?.addEventListener('abort', () => reject(new DOMException('Aborted', 'AbortError')), { once: true });
+      });
+    }) as typeof fetch;
+    const bridge = createReviewBridge('r');
+    let dispose: (() => void) | undefined;
+    try {
+      if (emission === 'interval') dispose = bridge.connect();
+      const login = bridge.login('user-token');
+      if (emission === 'connection') dispose = bridge.connect();
+      context.mock.timers.tick(1400);
+      assert.equal(reads, 1, 'background emissions cannot start another read while login owns its request');
+      assert.equal(loginSignal?.aborted, false);
+      complete(Response.json(review));
+      await login;
+      assert.equal(bridge.getSnapshot().authenticated, true);
+      assert.equal(bridge.getSnapshot().review?.snapshot.snapshotId, 's', 'login continuation can initialize the exact semantic scope');
+      context.mock.timers.tick(700);
+      assert.equal(reads, 2, 'polling resumes after the foreground request settles');
+    } finally {
+      dispose?.();
+      assert.equal(bridge.diagnostics().length, 0);
+      context.mock.timers.reset();
+      globalThis.fetch = original;
+    }
+  });
+}
+
+test('background intervals preserve one slow background projection instead of repeatedly aborting it', async (context) => {
+  const original = globalThis.fetch;
+  context.mock.timers.enable({ apis: ['setInterval'] });
+  let reads = 0, complete!: (response: Response) => void;
+  let heldSignal: AbortSignal | null | undefined;
+  globalThis.fetch = (async (_input: Parameters<typeof fetch>[0], init?: Parameters<typeof fetch>[1]) => {
+    if (++reads === 1) return Response.json(review);
+    heldSignal = init?.signal;
+    return new Promise<Response>((resolve, reject) => {
+      complete = resolve;
+      heldSignal?.addEventListener('abort', () => reject(new DOMException('Aborted', 'AbortError')), { once: true });
+    });
+  }) as typeof fetch;
+  const bridge = createReviewBridge('r');
+  let dispose: (() => void) | undefined;
+  try {
+    await bridge.login('user-token');
+    dispose = bridge.connect();
+    context.mock.timers.tick(2100);
+    assert.equal(reads, 2);
+    assert.equal(heldSignal?.aborted, false);
+    const committed = new Promise<void>(resolve => {
+      const unsubscribe = bridge.subscribe(() => {
+        if (bridge.getSnapshot().review?.revision === 2) { unsubscribe(); resolve(); }
+      });
+    });
+    complete(Response.json({ ...review, revision: 2 }));
+    await committed;
+    assert.equal(bridge.getSnapshot().review?.revision, 2);
+  } finally {
+    dispose?.();
+    assert.equal(bridge.diagnostics().length, 0);
+    context.mock.timers.reset();
+    globalThis.fetch = original;
+  }
+});
+
+test('background connection and timer preserve authoritative revocation receipt readback', async (context) => {
+  const original = globalThis.fetch;
+  context.mock.timers.enable({ apis: ['setInterval'] });
+  const attachment = { attachmentId: 'a', actorId: 'agent', host: 'codex' as const, sessionId: 'session', connectionId: 'connection', generation: 1, active: true };
+  let reads = 0, complete!: (response: Response) => void;
+  let heldSignal: AbortSignal | null | undefined;
+  let markRead!: () => void;
+  const reading = new Promise<void>(resolve => { markRead = resolve; });
+  globalThis.fetch = (async (_input: Parameters<typeof fetch>[0], init?: Parameters<typeof fetch>[1]) => {
+    if (init?.method === 'POST') return Response.json({ state: 'applied', revision: 2 });
+    if (++reads === 1) return Response.json({ ...review, attachment });
+    heldSignal = init?.signal;
+    markRead();
+    return new Promise<Response>((resolve, reject) => {
+      complete = resolve;
+      heldSignal?.addEventListener('abort', () => reject(new DOMException('Aborted', 'AbortError')), { once: true });
+    });
+  }) as typeof fetch;
+  const bridge = createReviewBridge('r');
+  let dispose: (() => void) | undefined;
+  try {
+    await bridge.login('user-token');
+    const revoking = bridge.revoke();
+    await reading;
+    dispose = bridge.connect();
+    context.mock.timers.tick(1400);
+    assert.equal(reads, 2, 'receipt readback remains the only active projection');
+    assert.equal(heldSignal?.aborted, false);
+    complete(Response.json({ ...review, revision: 2, attachment: { ...attachment, active: false } }));
+    await revoking;
+    assert.equal(bridge.getSnapshot().review?.revision, 2);
+    assert.equal(bridge.getSnapshot().review?.attachment?.active, false);
+  } finally {
+    dispose?.();
+    assert.equal(bridge.diagnostics().length, 0);
+    context.mock.timers.reset();
+    globalThis.fetch = original;
+  }
+});
+
+for (const obsoleteCompletion of ['before-new-read', 'after-new-read', 'failure-before-new-read'] as const) {
+  test(`disposed ignored-abort read settles ${obsoleteCompletion} without owning the reconnected lifetime`, async (context) => {
+    const original = globalThis.fetch;
+    context.mock.timers.enable({ apis: ['setInterval'] });
+    const calls: { signal: AbortSignal | null | undefined; credential: string; resolve: (value: Response) => void; reject: (error: Error) => void }[] = [];
+    globalThis.fetch = ((_input: Parameters<typeof fetch>[0], init?: Parameters<typeof fetch>[1]) => new Promise<Response>((resolve, reject) => {
+      // Deliberately ignore abort: cancellation is not evidence that an obsolete transport settled.
+      calls.push({ signal: init?.signal, credential: new Headers(init?.headers).get('Authorization') ?? '', resolve, reject });
+    })) as typeof fetch;
+    const bridge = createReviewBridge('r');
+    let dispose: (() => void) | undefined;
+    const flush = () => new Promise<void>(resolve => setImmediate(resolve));
+    try {
+      const initialLogin = bridge.login('old-credential');
+      calls[0]!.resolve(Response.json(review));
+      await initialLogin;
+      dispose = bridge.connect();
+      assert.equal(calls.length, 2);
+      const obsolete = calls[1]!;
+      dispose();
+      assert.equal(obsolete.signal?.aborted, true);
+      assert.equal(bridge.diagnostics().length, 0);
+      dispose = bridge.connect();
+      assert.equal(calls.length, 3, 'reconnect cannot wait for a canceled transport to settle');
+      const fresh = bridge.login('fresh-credential');
+      assert.equal(calls.length, 4, 'explicit credential intent supersedes the new background read');
+      assert.equal(calls[2]!.signal?.aborted, true);
+      assert.equal(calls[3]!.credential, 'Bearer fresh-credential');
+      const settleObsolete = async () => {
+        if (obsoleteCompletion === 'failure-before-new-read') obsolete.reject(new Error('obsolete transport failed'));
+        else obsolete.resolve(Response.json({ ...review, revision: 99 }));
+        // The reconnect read is also obsolete after the explicit credential intent.
+        calls[2]!.resolve(Response.json({ ...review, revision: 88 }));
+        await flush();
+      };
+      if (obsoleteCompletion !== 'after-new-read') {
+        await settleObsolete();
+        assert.equal(bridge.getSnapshot().review,null);
+        assert.equal(bridge.getSnapshot().error, '');
+      }
+      context.mock.timers.tick(2100);
+      assert.equal(calls.length, 4, 'old finally cannot clear the active fresh-credential read slot');
+      assert.equal(calls[3]!.signal?.aborted, false);
+      calls[3]!.resolve(Response.json({ ...review, revision: 5 }));
+      await fresh;
+      if (obsoleteCompletion === 'after-new-read') await settleObsolete();
+      assert.equal(bridge.getSnapshot().review?.revision, 5, 'obsolete success cannot replace the new authorized projection');
+      assert.equal(bridge.getSnapshot().error, '');
+      context.mock.timers.tick(700);
+      assert.equal(calls.length, 5, 'a settled fresh request permits polling again');
+    } finally {
+      dispose?.();
+      assert.equal(bridge.diagnostics().length, 0);
+      context.mock.timers.reset();
+      globalThis.fetch = original;
+    }
+  });
+}

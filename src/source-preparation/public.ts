@@ -168,3 +168,6 @@ export const bindPreparedSnapshotToReview=(witness:PreparedSnapshotWitness,jobId
  if(!recorded||recorded.jobId!==jobId||recorded.fingerprint!==canonical(snapshot))throw new Error('source_unavailable');
  const bound=Object.freeze({}) as PreparedSnapshotWitness;witnesses.set(bound,{jobId,reviewId,fingerprint:recorded.fingerprint});return bound;
 };
+
+export {acquirePreparedContext,isPreparedContextWitness,contextIdentity,contextAnalysisInput} from './context.ts';
+export type {PreparedContextWitness} from './context.ts';
