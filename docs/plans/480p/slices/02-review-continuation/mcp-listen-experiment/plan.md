@@ -4,7 +4,7 @@
 
 **Date:** 2026-10-24
 
-**Status:** Stage 1 authorized; native outcome not yet tested. This experiment does not adopt production behavior.
+**Status:** Stage 1 source/fixture investigation complete; native Codex/Claude outcome INCONCLUSIVE. This experiment does not adopt production behavior.
 
 **Parent:** [Slice 02](../plan.md); [steering correction](../codex-steer-correction.md)
 
@@ -59,3 +59,7 @@ Root assigns a fresh reviewer, read-only against the exact committed experiment 
 ## Required return
 
 Committed plan/result heads, matrix and fixture commands/results, protocol versus native disposition, exact missing input and smallest supported next step. Preserve experiment data only as needed for root integration; no pilot/owner changes. Root owns PR/merge/publication and any later adoption.
+
+## Stage 1 result
+
+[Evidence and reproduction](evidence.md) records the primary-source matrix, one passing existing-SDK resource subscription fixture, strict TypeScript verification and the exact missing native connection. Protocol/client handling passed only in the controlled v1 fixture. Existing-session context delivery, automatic reaction and meaningful persisted reply remain INCONCLUSIVE. No production adoption, SDK upgrade or native session change occurred.
