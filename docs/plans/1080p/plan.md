@@ -41,3 +41,7 @@ Root authorizes [06A internal backend engineering](slices/06-head-test-job/plan.
 ## Internal06A engineering progress
 
 The root-assigned backend-only checkpoint now has a [candidate and review handoff](slices/06-head-test-job/checkpoint-06a.md): fixed unavailable catalog, test-only durable request/cancel/read fixtures, current authority/receipts and shared restart exclusion. Independent engineering review is next. This does not close the still-open full G1 predecessor gate or06 React/process/CLI/own-PR acceptance.05D presentation remains separately owned; no domain/store/server interface change from05D is assumed.
+
+## 06B current successor planning
+
+Internal06A db03505 passed independent R3 (66 regressions plus5 adversarial checks); [execution06B](slices/06-head-test-job/execution-06b.md) now reconciles that backend with actual05D af39 at task merge08889d0. It specifies process grants/journals/preparation/result/cancel/restart and React/CLI consumption before code. Source67 Q2 qualification remains recipe-only for a new head. Q4 independent design review and exact implementation assignment are next; full G1/af39 D6–D7 and06 product acceptance remain open.07/08 stay provisional.

@@ -2,9 +2,9 @@
 
 **Date:** 2026-10-24
 
-**Handoff revision:** 3; exact source input `67b24f31dd322d034c0a2ec6b73006c009fba310` plus the commit containing this packet.
+**Handoff revision:** 4; exact source input `67b24f31dd322d034c0a2ec6b73006c009fba310` plus the commit containing this packet.
 
-**Status:** P1 and Q2 passed their bounded design/qualification scopes. Root assigned I3 internal06A, now implemented for independent review in [checkpoint](checkpoint-06a.md). Earlier I2/R1 full-slice handoffs remain prospective; I3 and R3 below govern this checkpoint. No full-slice acceptance is claimed.
+**Status:** R3 passed internal06A; [execution06B](execution-06b.md) is the current design/review and prospective implementation handoff. P1/Q2/R3 are bounded predecessor evidence. Q4 independent process-contract review precedes code dispatch; full-slice acceptance remains open.
 
 **Parent:** [Slice plan and gates](plan.md).
 
@@ -108,3 +108,9 @@ Root assigns a reviewer other than the executor to the exact committed candidate
 Check unavailable-by-default and immutable constructor configuration; fixed definition/digest; strict no-effect commands; current actor/attachment/epoch authorization before replay; snapshot/head attribution; cross-family IDs and old receipt compatibility; durable cancel/CAS/reopen; quota/pagination; missing-lease recovery and inconsistent quiescence; comments while queued/unknown; absence of a test launch/result authority. Seeded recovery records establish storage behavior only. Return concrete findings and READY FOR INTERNAL CHECKPOINT, CHANGES NEEDED or BLOCKED, with actual independent checks and limits. This review cannot pass full T01–T10, G1, React, real process, CLI or own-PR gates.
 
 Next consumer inputs are `store.tests.{targets,command,query}`, `HeadTest*` public values, target revision2/digest and the shared test occupancy predicate. There is deliberately no test owner/grant/claim/result port yet.06B must document those interfaces before implementation and requalify actual source/environment; it cannot reinterpret test-only queued fixtures as execution readiness. Root retains sequential integration and final G1 reconciliation.
+
+## Revision4 successor execution roles
+
+The [06B packet](execution-06b.md) supersedes generic I2 assumptions for the next executable work. It pins db03505/af39 and reconciliation08889d0, promotes R3, divides B1 backend/B2 React/B3 CLI/B4 integration ownership and supplies the Q4 independent design review. This planning assignment names `plan_head_test_slice06` as sole06 docs writer only, in `/tmp/pr-reviewer-06-head-test-execution-plan` on `plan-head-test-execution`. No backend/UI/CLI executor is assigned by this revision. Root names them and their exact isolated worktrees after Q4 and after required public-port stability; the source-integrating backend owner alone changes shared schemas/gateway and coordinates narrow workspace/main edits. No parallel writer touches another role's owned files.
+
+R3 is engineering readiness of intent/storage only. Q4 evaluates the new durable process authority and consumer design, not runtime availability or product acceptance. Future engineering review reproduces matrix B01–B06/C01–C02 against the actual candidate and distinguishes controlled process faults from real fixed-target/own-PR evidence. The U1 fresh graph-first reader remains uncontaminated by the source-informed verifier key. No final G1/own-PR/knowledge or07/08 readiness is implied by either review.
