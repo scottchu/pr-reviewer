@@ -2,7 +2,7 @@
 
 Date: 2026-10-24
 
-Status: local core candidate; independent engineering review pending. This is an internal checkpoint of one MVP. 04 G14 remains OPEN / CHANGES NEEDED, PR24 DRAFT, 05B and 05C gated, and slice05/720p acceptance unclaimed.
+Status: 05A core independently READY at `baac411fd6c52b32daa7e7500bbd9c1f27764e4f`; root assignment and reconciliation precede05B implementation. This is an internal checkpoint of one MVP. 04 G14 remains OPEN / CHANGES NEEDED, PR24 DRAFT,05C remains dependent on reviewed05B, and slice05/720p acceptance is unclaimed.
 
 ## Authority and delivered interfaces
 
@@ -67,3 +67,14 @@ Independent recheck confirmed the original two P2 fixes at4bf and40 affected che
 Docs-first correction specifies authorized `store.analysis.evidence` with an exact required analysisId and only that admitted job’s corpus/result/clarifications. Story validation/readback uses that port and the separate body-free marker; no current facts are substituted, current preparation errors are not suppressed globally, and missing authored evidence stays broken. Required regression uses actual old default128 and new cap1 admitted analyses with distinct corpora: delete only new corpus, demonstrate old exact source/readback/publication remain valid, then delete/corrupt the authored old corpus and retain truthful broken evidence.05B remains gated pending independent corrected-candidate recheck.
 
 Historical follow-up verification: the new old128/newcap1 case was red at4bf (`basisUnavailable` incorrectly true after deleting only the newer corpus). After the exact admitted-evidence port correction, **40 affected Node tests PASS, zero failures/skips**, duration10.1 seconds; strict TypeScript and subsystem boundaries PASS. This reruns the same six story files plus semantic-storage/authority/history/mapping/quota, including all previous Unicode and missing/corrupt-own-basis cases. The expanded actual admitted test confirms distinct corpora, retained old source bytes, truthful historical labels/readback, successful new publication on the intact old basis, preserved general-query failure semantics, public evidence authorization, and truthful old-own-corpus deletion/corruption. The injected unexpected-error test now targets the exact evidence port. No current/preparation body fallback was added and no original finding was relabeled. Independent final recheck remains pending.
+
+
+### Final independent core disposition
+
+Reviewed source: `baac411fd6c52b32daa7e7500bbd9c1f27764e4f`. Final independent report: `/tmp/pr-reviewer-05-core-review/ready-baac411.md`, SHA-256 `60b0a02df840f813d124e4d06c23096ab359c719741317c1775fcd5ab01af630` (read back and digest verified). Disposition: **READY for the bounded05A core, no remaining material blocker**. The independent recheck passed strict TypeScript/subsystem boundaries and all40 affected tests, reproduced the original Unicode/missing-corpus cases plus the distinct historical-corpus case, and checked exact evidence-port authority. This closes the05A engineering dependency only. The original00a/4bf findings and their source identities remain retained above.
+
+One nonblocking wording correction is docs-only: evidence() scans retained job records to locate the exact admitted job, then avoids unrelated semantic/preparation bodies. It does not promise to avoid reading all current/pending job metadata. No code or test change accompanies this clarification.
+
+Reviewed05B inputs are the committed domain story/context DTOs and query/command schemas, public story/context/readback/receipt/error/CAS meanings, authorized storyEvidence, body-free analysis marker and exact admitted analysis evidence port, existing reviewed028 semantic/source ports, corrected owning-coordinate matching, and historical/broken-evidence indicators.05B first reconciles these inputs and root’s isolated owner assignment, documents its new application coordination contract, then implements actual React follow/read/pause and managed routes. The core supplies no player, clock, exploration/return-frame or pending-question browser recovery operation; those remain05B/05C work. It does not establish whole05/720p acceptance, final own-PR comprehension, native delivery or unfamiliar-human outcomes.
+
+Final checkpoint inspection: only ignored task dependency entry links remain locally; no uncertain artifact was deleted. Product knowledge, exact authority/interfaces, verification and retained limitations are reconciled in the durable story contract and this checkpoint. Root owns candidate integration/push/PR24 and downstream assignments.

@@ -4,7 +4,7 @@
 
 **Date:** 2026-10-24
 
-**Status:** Revision3 packet independently READY; named 05A core dispatch and local candidate recorded in [05A checkpoint](checkpoint-05a.md). Independent core review precedes05B.04 G14 remains CHANGES NEEDED and PR24 remains draft.
+**Status:** Revision3 packet independently READY; named 05A core dispatch and local candidate recorded in [05A checkpoint](checkpoint-05a.md). 05A core atbaac411 is independently READY;05B requires root assignment and input reconciliation.04 G14 remains CHANGES NEEDED and PR24 remains draft.
 
 **Parent:** [Slice05 plan](plan.md)
 
@@ -58,6 +58,8 @@ Owner scope: new story domain/storage files and focused tests; public domain/sto
 Controlled owner or attached-SDK story publication can verify engineering while native delivery remains unavailable. Label those fixtures precisely. It is not permission to simulate a meaningful original-session answer or to mark native/human acceptance complete. Any actual live participant run uses only the already attached initiating session and existing authorized route; host changes require separate owner work, outside05.
 
 ### 05B — application state and readable React
+
+Predecessor input state:05A core `baac411fd6c52b32daa7e7500bbd9c1f27764e4f` independently READY; see the [final core disposition](checkpoint-05a.md#final-independent-core-disposition). Its strict StoryContent/StoryCommand/StoryView/StoryContextView/StoryReceipt/StoryEvidence contracts and existing028 semantic/source ports are ready to reconcile before a named05B assignment. Consume `store.story` command/query/context ingress and public gateway/MCP routes, exact independent revision/CAS/minimum/readback meanings, historical/broken-basis markers and owner-normalized snapshot versus semantic anchor formats. The owner uses body-free `analysis.marker` and exact admitted `analysis.evidence`;05B must not reach analysis/storage internals or reconstruct fact validity in UI. Missing native delivery, whole-product understanding and browser recovery remain open; no05B application/player API is claimed delivered by05A.
 
 Use05A committed values; do not design a competing story schema in UI. New public application state contains exact review/snapshot/storyVersion, chapter/step/index, paused/playing/ended mode, elapsed visible time, displayed immutable evidence/comparison and newer-version/context markers. Explicit play/pause/previous/next/chapter/open-evidence intents return updated state through subscribe/getSnapshot; controlled effects own reads, source-focus delegation and one clock. These are05 additions, not028 exports. An existing draft remains separate and held;05C adds the full return-frame/recovery operations.
 
