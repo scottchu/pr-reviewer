@@ -49,7 +49,7 @@ test('B04 cancellation after observation invalidates success witness then settle
 test('B04 cancelled before preparation settles no-process evidence without fabricating identities',async()=>{
  const input=await headPreparationFixture(),f=headTestFixture({testOptions:{testOnlyExecution:true}},{headSha:input.headSha});
  try{
-  const artifactRoot=join(input.root,'artifacts');await mkdir(artifactRoot);f.store.tests.command(f.token,f.request);const {grant}=f.store.tests.claim(f.store.tests.beginOwner())!;const job=f.store.tests.input(grant).job;
+  const artifactRoot=join(input.root,'must-not-exist');f.store.tests.command(f.token,f.request);const {grant}=f.store.tests.claim(f.store.tests.beginOwner())!;const job=f.store.tests.input(grant).job;
   f.store.tests.command(f.token,{type:'CancelTest',commandId:'before-prepare',jobId:job.jobId,expectedJobRevision:job.jobRevision});
   await assert.rejects(prepareHeadTestInputs({store:f.store,grant,executionRoot:input.executionRoot,fixtureInputs:input}),/test_cancelled/);
   const witness=await observeHeadTestOutcome({store:f.store,grant,artifactRoot});assert.ok(witness);f.store.tests.complete(grant,witness);
