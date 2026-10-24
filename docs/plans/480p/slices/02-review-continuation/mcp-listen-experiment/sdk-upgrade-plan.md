@@ -1,10 +1,10 @@
 # MCP SDK v2 upgrade
 
-**Packet revision:** 2
+**Packet revision:** 3
 
 **Date:** 2026-10-24
 
-**Status:** Engineering candidate verified locally: strict/boundary, 47 Bun + 352 Node tests and two actual React journeys pass. Independent review, own-PR and native delivery acceptance remain open
+**Status:** Independent review requires a P2 factory-lifetime correction against 59850be. Prior direct-mode checks remain historical; fallback correction and narrow recheck pending. Own-PR and native delivery acceptance remain open
 
 **Parent:** [MCP experiment](plan.md); [480p slice 02](../plan.md)
 
@@ -71,3 +71,16 @@ The real stdio server uses `serveStdio` and explicit schema objects; the owner u
 **Review scope:** U1-U5, exact frozen source above and its evidence, read-only; root assigns a fresh reviewer. The following receipt update changes only documentation metadata. Reproduce the normal entrypoint and focused protocol/React checks as appropriate; preserve the disclosed first browser reload failure and cancellation-race limitation. Production code and dependencies are frozen at the implementation candidate. Own-PR/native acceptance and root delivery remain open, not implied by this readiness packet.
 
 **Worker checkpoint:** Knowledge reconciled to participant-adapters.md and runtime.md and local links verified. Unique candidate and review dependencies remain in this clean task worktree; private node_modules and external test/E2E logs are retained for root review. No worker process remains active. Writer is released to root after final status readback.
+
+
+## Factory-lifetime correction handoff v3
+
+**Review target:** 59850be5863fad3000b2480fa321763ee5f2916c, implementation e3e847b36cfb7252520fbd7e686c4b3f8c512e2c
+
+**Independent finding:** P2. Reusing one mutable SDK server from `serveStdio` fails modern discovery followed by legacy initialization on the same transport: the disposed modern probe leaves `initialize` missing (-32601). Direct modern and legacy tests did not cover this negotiation sequence.
+
+**Accepted repair:** Construct/register a fresh server and fresh unattached capability state for every SDK factory invocation, all from the same explicit launch/session binding. Keep transport start/close ownership outside the factory. Apply the same lifetime to the isolated subscription fixture. This is not a new user/native session, attachment replacement, gateway/UI/auth-policy change or callback route.
+
+**TDD and acceptance U2-F:** Add an actual production-stdio probe → legacy regression to the already registered semantic MCP suite; reproduce the reviewed failure before repair. After repair, require a successful 2025-11-25 initialization, expected catalog, denied pre-attachment read and normal trusted attachment/read on that same connection. Preserve direct modern/legacy, listen, JSONL utility and source/revocation/receipt tests. Rerun the focused MCP suites and strict/boundary checks; the unchanged whole regression/E2E run remains attributed to its earlier candidate unless a new finding requires broader execution.
+
+**Review evidence:** `/tmp/pr-reviewer-sdk-independent-review/report-59850be.md`, SHA-256 f782ea67cc28b8fbbc5debd69d94849edcc9e0c1aa93330a0821425844571c30. Original reproduction/log: `/tmp/pr-reviewer-06-plan-review/sdk-fallback-59850be.mjs` and `.log`. Root assigns the original reviewer a narrow recheck of the new exact correction commit; worker does not claim independent acceptance or deployment.
