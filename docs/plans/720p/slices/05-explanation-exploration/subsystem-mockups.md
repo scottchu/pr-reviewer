@@ -87,7 +87,7 @@ Source readback, 182 local Markdown target-path checks across the full 15-docume
 ## Local preview delivery checkpoint
 
 Date: 2026-10-24
-Preview code/build source: c29281855213c6ee0a37cd0043a1166ca65ba2ec
+Preview code/build source: a2634828fae6eb8025194f5f4012131445f54a4b
 Status: local fixture implementation and author engineering/visual evidence; no production acceptance
 
 The table above records design dispatch/readiness, not production completion. Current separate local entries are canvas, story, discussion, tests, import and integrated on http://localhost:56672/?scenario=<entry>. The latest explicit user correction authorizes root-owned private Tailscale Serve8474 to loopback56672; https://mac-mini.duckbill-ionian.ts.net:8474/ shares those entries. Original56671/8473 remains preserved. No Funnel or existing route change was performed by the preview author.
@@ -99,4 +99,4 @@ The table above records design dispatch/readiness, not production completion. Cu
 - Connected: [integration packet and evidence](connected-preview-packet.md).
 - [Versioned implementation and independent-review handoff](subsystem-preview-handoff-v1.md) records exact source/build, raw checks, screenshots, launch and remaining gates.
 
-Thirteen actual Chrome journeys, ten pure tests, strict preview TypeScript, exact source reproduction and browser build pass. Screenshots were inspected separately. These checks do not establish unfamiliar-reviewer comprehension or user layout acceptance. Durable learned constraints are maintained in [canvas interaction constraints](../../../../product/review-loop/canvas-interaction-constraints.md).
+Fourteen actual Chrome journeys, ten pure tests, strict preview TypeScript, exact source reproduction and browser build pass. Screenshots were inspected separately. These checks do not establish unfamiliar-reviewer comprehension or user layout acceptance. Durable learned constraints are maintained in [canvas interaction constraints](../../../../product/review-loop/canvas-interaction-constraints.md).
