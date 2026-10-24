@@ -29,7 +29,7 @@ Runtime: Node24.21.0 at `/Applications/ChatGPT.app/Contents/Resources/cua_node/b
 
 TDD began with missing public story exports (expected red); focused tests are now green. During development a collision test initially assumed RequestAnalysis without a worktree would apply; baseline correctly rejected it, and the test now asserts its persisted receipt owns the ID without assuming a job ran. No unresolved focused failure is hidden.
 
-Broader existing regression results will be appended after the clean candidate commit. Actual Chrome/UI, browser AskQuestion reload recovery, actual own-PR story authoring/comprehension and knowledge acceptance remain unrun later checkpoints. CI/PR/merge/deployment: not performed by this worker; root owns combined delivery.
+Core candidate: `00a9966a283a83967cf45487403cfa98f0322dc9`. The normal registered test script ran against that immutable code candidate with Node24 first on PATH: **47 Bun PASS and230 Node PASS (209 existing plus21 story), zero failures/skips**. Node suite duration18.7 seconds. Strict TypeScript and subsystem boundaries also passed. No code mutation occurred during the broad run. Actual Chrome/UI, browser AskQuestion reload recovery, actual own-PR story authoring/comprehension and knowledge acceptance remain unrun later checkpoints. CI/PR/merge/deployment: not performed by this worker; root owns combined delivery.
 
 ## Successor gate
 
