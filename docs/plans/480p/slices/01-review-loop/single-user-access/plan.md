@@ -2,7 +2,7 @@
 
 **Date:** 2026-10-24
 
-**Status:** Implemented and verified candidate; independent review, own-PR and live deployment remain coordinator gates
+**Status:** Coordinator accepted SU-A–E for the bounded access change; graph presentation changes needed; retained-data deployment/live pilot pending
 
 **Parent:** [Review-loop slice](../plan.md)
 
@@ -51,3 +51,21 @@ Stop affected work for a concrete conflicting requirement, network permission re
 **Independent review assignment input:** Use the exact candidate/base above and SU-A–E. Root supplies its PR head and actual graph-first task, assigns a fresh reviewer and freezes the UI account before source inspection. Read source docs runtime/contracts/import/semantic-storage/story/persistence policies and inspect changed public gateway/storage/application interfaces, source tests and actual clean-browser opening. Check preserved old jobs/credentials, explicit Bearer no-fallback, object-identity access checks, lifecycle/recovery fencing and network constraints. Reproduce with isolated ports/data, never the pilot. Report findings and actual limits.
 
 **Successor reconciliation:** Updated480p02 and720p03/04/05 packets with the delivered owner-access interface, legacy-job semantics and remaining gates. Roadmap/round/current-delivery summaries now carry the accepted correction instead of scheduling a replacement login. These updates do not accept those slices.
+
+## Version 3 coordinator acceptance receipt
+
+**Date:** 2026-10-24
+
+**Owner:** Root coordinator; this implementer records the supplied acceptance after reading the independent reports in full.
+
+**Accepted scope:** SU-A–E for the single-owner access change on implementation source `5cf0bc67f2db4d17c4653a55cc66493445e4b03a`. Root accepts the bounded change using the 25 passing React E2E journeys, 47 Bun and 306 Node tests, independent engineering readiness and the actual credential-free own-PR read path. The separately reviewed SDK and B1 work are not part of this candidate. This receipt adds no product or test changes.
+
+**Independent engineering:** READY in the assigned source/engineering scope, with no blocking correctness finding. The reviewer independently exercised focused storage/gateway/MCP/application checks, HTTP/SQLite restart, the affected runtime and strict boundaries. Its initial external runtime harness import errors were retained and a focused isolated-port rerun passed; they are not product findings.
+
+**Own-PR understanding:** PR 25, snapshot `845d21e3cf8780248524faaa773ffa01fddf2e196022d165ffc379b97603b4e3`, against base `b096826e31c0927190806de91ed70b8b64aa93d8` and implementation head `5cf0bc67f2db4d17c4653a55cc66493445e4b03a`. Independent Account A froze before source/diff/key access. It identified the access purpose correctly but left retained-job and browser-recovery behavior uncertain. Account B resolved those points from pinned source before expected-key comparison and found no new blocking source issue. The source-corrected account is sufficient for this bounded access change; the corrections are not retroactive graph comprehension.
+
+**Observed own-PR path:** Fresh reload required no token and logged no Authorization headers. Core review/import/story/context reads returned 200; the pinned identity, structural graph and source inspector were readable, and source-to-map return preserved the focused file. This is a scoped no-token read-path pass, not production retained-data migration or an error-free whole-page result.
+
+**Open product limitations:** Graph cognitive burden remains CHANGES NEEDED: the flat scope, truncated snippets, absent behavioral edges and large diagnostics require substantial manual synthesis. Semantic preparation retained budget failures and no story was published. Account B observed `analysis_record_unavailable` and repeated analysis HTTP 400 responses; no causal connection to the access diff was established. Failed semantic-selection diagnosis and presentation improvements remain open for B2/next graph work; this receipt performs neither diagnosis nor repair and does not accept full graph comprehension or the whole 720p/native/human endpoint.
+
+**Remaining delivery gates:** PR 25 was open as a draft at remote `a63293d` when root issued this receipt. Root owns final PR head reconciliation, supported merge and preserving-data deployment/live pilot verification. Production retained-data and existing private URL acceptance remain pending. Preserve the old `5cf0bc6` source/snapshot pin independently of later documentation commits. No push, deployment, new audit or new test run is performed by this closeout. See [report identities and evidence](evidence.md#coordinator-acceptance-and-independent-evidence).

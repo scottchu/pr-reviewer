@@ -2,7 +2,7 @@
 
 **Date:** 2026-10-24
 
-**Status:** Implementer verification passed; coordinator acceptance and deployment pending
+**Status:** Coordinator accepted the bounded access change; graph presentation changes needed; retained-data deployment/live pilot pending
 
 **Parent:** [Versioned correction packet](plan.md)
 
@@ -59,3 +59,25 @@ The earlier failure log/artifacts remain at `/tmp/pr-reviewer-single-user-access
 Root owns independent graph-first source review, actual own-PR dogfood, GitHub delivery, merge and preserving-data deployment/live readback through the existing private8472URL. Those were not performed by this implementer. The existing query reviewId/snapshotId selection policy is unchanged; the coordinator must verify the retained target URL. Source/browser passes do not claim a live Tailscale update, another-device use, native automatic Codex turn/catalog registration, Claude or unfamiliar-reviewer understanding.
 
 Private legacy credential-scoped browser recovery/view records remain preserved and locked if incompatible with the new origin/local-owner scope. The product does not request the original token, automatically rekey or replay an unresolved command. Authoritative stored review/history still opens. Explicit current-scope recovery retains original bytes and requires readback.
+
+## Coordinator acceptance and independent evidence
+
+**Date:** 2026-10-24
+
+**Decision owner:** Root coordinator. The implementer read all three reports below in full and verified their SHA-256 values before recording this supplied acceptance. Earlier pending-review statements above describe the implementation handoff; this receipt records the later coordinator decision.
+
+| Report | Exact retained identity | Conclusion and limit |
+|---|---|---|
+| Independent engineering | `/tmp/pr-reviewer-single-user-independent-review/review-5cf0bc6.md`; SHA-256 `38a1b2d5983c2c7a77600ac8fc8cbcd22955d6262dc87ae2baf5649800f887b2` | READY within assigned engineering scope; no blocking correctness finding. Independently executed focused 22-case gateway/storage/MCP checks, 91 application cases, HTTP/SQLite restart, affected runtime and strict/boundary checks. It attributes the author's full-suite results rather than claiming a second full run; graph-first UI evidence was outside that assignment. |
+| Frozen Account A | `/tmp/pr-reviewer-pr25-understanding/phase-a.md`; SHA-256 `8afe368a35d1109396b636ca9b260a1a1faeba49288a89cef5dee65719ea0e08` | Actual UI/graph account froze before source inspector, repository diff, PR description or expected-account access. Core access purpose was correct; retained jobs and browser recovery remained uncertain. Graph presentation CHANGES NEEDED. |
+| Source-corrected Account B | `/tmp/pr-reviewer-pr25-understanding/phase-b.md`; SHA-256 `ca4e297fb5c23e13e805bd37715d99895407d7f7eacda242e1716025b04b8906` | Pinned source resolved job actor/reference and locked legacy-recovery semantics before expected-key comparison. Bounded scope understanding sufficient after correction; no new blocking source finding. Actual no-token own-PR read path passed with explicit semantic errors retained. Graph cognitive burden still CHANGES NEEDED. |
+
+**Pinned own-PR target:** PR 25, snapshot `845d21e3cf8780248524faaa773ffa01fddf2e196022d165ffc379b97603b4e3`, base `b096826e31c0927190806de91ed70b8b64aa93d8`, implementation head `5cf0bc67f2db4d17c4653a55cc66493445e4b03a`. Account A stayed frozen; source and expected-account comparison followed in Account B. These identities remain pinned despite subsequent documentation-only commits. The separate SDK/B1 candidates are excluded.
+
+**Observed read-path evidence:** Account B reloaded only its assigned fresh task-local PR 25 candidate. No token input or logged Authorization header was needed; review/import/story/context requests returned 200, the pinned review/graph/source were readable, and opening the added local-access source then returning to the map preserved the focused file. No question, participant, import, story or analysis mutation was executed by that reviewer. This observed pass does not independently prove writes, cross-review switching, original-session activation, production retained-data migration or live pilot behavior.
+
+**Retained failures and presentation limits:** Account A had no published story and no admitted semantic facts; preparation reported budget_exceeded with the outputSites limit 4000. Its structural inventory and honest coverage labels did not establish behavioral understanding. Flat scope, clipped source snippets, unavailable behavioral relationships and voluminous diagnostics left the reviewer to assemble the account manually. Account B then observed `analysis_record_unavailable` and repeated `/api/analysis` 400 responses. No access-diff causality was established. Do not report an error-free whole-page journey. Presentation improvements and failed semantic-selection diagnosis remain OPEN for B2/next graph work; no diagnosis or repair was performed in this receipt.
+
+**Root acceptance:** SU-A–E are accepted for the bounded access correction, supported jointly by the frozen candidate's 25 E2E, 47 Bun and 306 Node passes, independent engineering review and the scoped actual no-token own-PR reading. Source-corrected understanding does not convert Account A into a graph-comprehension pass. Graph presentation remains CHANGES NEEDED; full graph, 720p, native and unfamiliar-human acceptance are not claimed.
+
+**Delivery state:** PR 25 remains open as a draft at the supplied remote head `a63293d` before this final documentation receipt. Root owns reconciliation and publication of the final docs head, PR merge, preserving-data deployment and live readback. Production retained-data/live pilot acceptance is PENDING. This closeout changes only this file and its plan, adds no tests/audits/network actions, and performs no push. The task branch/worktree and raw evidence remain retained for root delivery; sole documentation-writer ownership returns to root after this committed handoff.
