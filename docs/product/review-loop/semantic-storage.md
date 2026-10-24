@@ -4,7 +4,7 @@
 
 **Date:** 2026-10-24 UTC
 
-**Status:** Slice04 integration in progress; independently reviewed worker, React journey and whole-product acceptance remain open.
+**Status:** Bounded core and worker independently reviewed; integrated React, ownPR understanding and whole-product acceptance remain open.
 
 **Parents:** [Semantic meaning and execution](semantic-graph.md), [existing persistence compatibility](persistence-compatibility.md).
 
@@ -67,3 +67,9 @@ The private owner diagnostic query checks the shared epoch and runner generation
 A newer request preserves an older unknown invocation's original failure reason and job revision; supersession is not evidence that its uncertainty was resolved. Known pending work may become superseded, while unknown occupancy remains unchanged until a supported quiescence observation. This keeps the original failure disposition available to the bounded diagnostic projection.
 
 Diagnostic sanitation uses an explicit allowlist of stable authority/lifecycle, source-acquisition and fixed worker failure codes, shared by job summaries and runner failures. Identifier-like shape, length or an analysis_worker_ prefix does not establish that an error is an approved code. Unrecognized identifiers (including private source names), paths, tokens, SQL messages and other arbitrary text become analysis_failed. Known stale_execution_owner/stale_analysis_runner codes still produce fenced disposition; known phase/resource/termination codes retain their distinct meanings.
+
+## Structure and rebuild rationale
+
+Retain one SQLite owner for immutable evidence, generation/graph CAS and receipt atomicity, with short transactions and source/compiler validation outside them. Rebuilding should preserve the pure virtual-source analyzer, the separate fixed Node effect wrapper, trusted source/worker witnesses and distinct import/analysis grants. The shared lease is a small exclusion capability, not a competing task scheduler. Keep public query projections separate from private locator/credential data; React consumes immutable values and sends explicit intent.
+
+The bounded implementation currently keeps semantic policy beside its owning transaction to avoid two state writers. Small pure validation/projection helpers can improve maintainability without a new framework-agnostic layer, a second database owner or untracked UI policy. The independent review's epoch, locator, issues and diagnostic findings explain why every callback/replay/projection boundary must enforce its own authority and evidence meaning. Static facts remain sufficient only for their supported source-binding claims; they do not supply lifecycle rationale, meaningful answers, runtime execution or human comprehension.
