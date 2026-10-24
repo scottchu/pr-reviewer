@@ -27,3 +27,10 @@ Launch existing Vite against the isolated preview root on a freshly checked loop
 ## Meaningful verification before feedback
 
 First write pure-state checks for exact back/Resume and independent anchor/draft behavior, then actual React interaction checks. Verify source hashes/blob IDs and unchanged-body equality against the pinned raw Git objects. Strict-check only the isolated preview. Actual Chrome exercises keyboard Focus, zoom disclosure, unchanged neighbor, explicit line range/draft, authored evidence, context expansion, exact private frames, desktop and390px no document overflow/text selection. Capture overview/focus/neighbor/return/narrow states and separately critique actual reading scale, line wrapping, side identity, edge direction, controls and preserved context. Automated pass and screenshots are engineering/layout evidence, not human comprehension or user adoption. Stop after the running inspectable preview and report feedback gates.
+
+## Committed comment/subsystem amendment
+
+Source amendment: cc50132, consumed through a task merge before acceptance work.
+Status: C9–C10 added to the current preview; other subsystem examples remain separately staged.
+
+Read canvas-comments.md and subsystem-mockups.md. The current scenario adds selected-code and immutable prose selection, local-only human/agent threads/replies, content-adjacent badges, collapsed-group clustering, an accessible locate list and keyboard/touch alternatives. Prose anchors include stable ID/version/hash and exact UTF-16 offsets/quote; no prose AskQuestion/persistence schema is implied. Code keeps exact pinned commit/side/path/line identity within the explicit preview source set. Reserved marker lanes and in-node threads avoid covering content. This is the small canvas-context demonstration, not the complete discussion subsystem mockup.
