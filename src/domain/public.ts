@@ -9,28 +9,21 @@ export const anchorSchema = z
   })
   .strict();
 export type Anchor = z.infer<typeof anchorSchema>;
-export type Source = {
-  path: string;
-  side: "base" | "head";
-  content: string;
-  hash: string;
-  lineCount: number;
-};
-export type SourceDisposition = { side: "base" | "head"; path: string; state: "prepared" | "unprepared" | "unsupported" | "missing"; reason: string };
-export type ChangedFile = { status: "modified" | "added" | "deleted" | "type_changed"; oldPath: string | null; newPath: string | null; dispositions: SourceDisposition[] };
-export type DocumentReference = { destination: string; source: Anchor; target: Anchor | null; method: "inline_markdown_link"; reason: string | null };
-export type Snapshot = {
-  title?: string;
-  snapshotId: string;
-  repository: string;
-  prUrl: string;
-  prNumber: number;
-  baseSha: string;
-  headSha: string;
-  sources: Source[];
-  changedFiles?: ChangedFile[];
-  documentReferences?: DocumentReference[];
-};
+const repositoryPathSchema=z.string().min(1).max(1024).refine(path=>!path.startsWith("/")&&!path.split("/").includes("..")&&!path.includes("\0"));
+const shaSchema=z.string().regex(/^(?:[a-f0-9]{40}|[a-f0-9]{64})$/);
+export const sourceSchema=z.object({path:repositoryPathSchema,side:z.enum(["base","head"]),content:z.string().min(1),hash:z.string().regex(/^[a-f0-9]{64}$/),lineCount:z.number().int().positive(),objectId:shaSchema.optional()}).strict();
+export type Source=z.infer<typeof sourceSchema>;
+export const sourceDispositionSchema=z.object({side:z.enum(["base","head"]),path:repositoryPathSchema,state:z.enum(["prepared","unprepared","unsupported","missing"]),reason:z.string(),objectId:z.string().optional()}).strict();
+export type SourceDisposition=z.infer<typeof sourceDispositionSchema>;
+export const changedFileSchema=z.object({status:z.enum(["modified","added","deleted","renamed","copied","type_changed"]),oldPath:repositoryPathSchema.nullable(),newPath:repositoryPathSchema.nullable(),dispositions:z.array(sourceDispositionSchema),oldMode:z.string().optional(),newMode:z.string().optional(),hunks:z.array(z.object({id:z.string().min(1),oldStart:z.number().int().nonnegative(),oldLines:z.number().int().nonnegative(),newStart:z.number().int().nonnegative(),newLines:z.number().int().nonnegative()}).strict()).optional(),coverage:z.enum(["text","unsupported"]).optional()}).strict();
+export type ChangedFile=z.infer<typeof changedFileSchema>;
+export const documentReferenceSchema=z.object({destination:z.string(),source:anchorSchema,target:anchorSchema.nullable(),method:z.literal("inline_markdown_link"),reason:z.string().nullable()}).strict();
+export type DocumentReference=z.infer<typeof documentReferenceSchema>;
+export const providerCandidateSchema=z.object({provider:z.enum(["github","gitlab"]),host:z.string().min(1),sourceProject:z.string().min(1),targetProject:z.string().min(1),number:z.number().int().positive(),url:z.url(),title:z.string(),state:z.string(),sourceBranch:z.string(),targetBranch:z.string(),baseSha:shaSchema,headSha:shaSchema,targetTipSha:shaSchema,baselineMethod:z.enum(["github_compare_merge_base","gitlab_diff_refs"])}).strict();
+export type ProviderCandidate=z.infer<typeof providerCandidateSchema>;
+export const snapshotSchema=z.object({title:z.string().optional(),snapshotId:z.string().min(1),repository:z.string().min(1),prUrl:z.url(),prNumber:z.number().int().positive(),baseSha:shaSchema,headSha:shaSchema,sources:z.array(sourceSchema).min(1).max(512),changedFiles:z.array(changedFileSchema).optional(),documentReferences:z.array(documentReferenceSchema).optional(),candidate:providerCandidateSchema.optional(),counts:z.object({changedPaths:z.number().int().nonnegative(),preparedSides:z.number().int().nonnegative(),unsupportedSides:z.number().int().nonnegative(),missingSides:z.number().int().nonnegative(),hunks:z.number().int().nonnegative(),bytes:z.number().int().nonnegative()}).strict().optional()}).strict();
+export type Snapshot=z.infer<typeof snapshotSchema>;
+export type SnapshotSummary=Pick<Snapshot,"snapshotId"|"baseSha"|"headSha"|"title">;
 export type Attachment = {
   attachmentId: string;
   actorId: string;
@@ -42,6 +35,7 @@ export type Attachment = {
 };
 export type Question = {
   questionId: string;
+  parentQuestionId?: string;
   anchor: Anchor;
   text: string;
   actorId: string;
@@ -50,6 +44,7 @@ export type Question = {
   working: boolean;
 };
 export type Reply = {
+  snapshotId?: string;
   replyId: string;
   questionId: string;
   body: string;
@@ -79,6 +74,9 @@ export type Attempt = {
 export type Review = {
   reviewId: string;
   snapshot: Snapshot;
+  currentSnapshotId?: string;
+  snapshots?: Snapshot[];
+  snapshotSummaries?: SnapshotSummary[];
   revision: number;
   attachment: Attachment | null;
   questions: Question[];
@@ -113,6 +111,7 @@ export type Receipt = {
   error?: string;
 };
 export const commandSchema = z.discriminatedUnion("type", [
+  z.object({type:z.literal("AddSnapshot"),commandId:z.string().min(1).max(128),reviewId:z.string(),expectedCurrentSnapshotId:z.string().min(1),identityScheme:z.literal("manual_git_v1"),snapshot:snapshotSchema}).strict(),
   z
     .object({
       type: z.literal("AskQuestion"),
@@ -120,6 +119,7 @@ export const commandSchema = z.discriminatedUnion("type", [
       reviewId: z.string(),
       anchor: anchorSchema,
       text: z.string(),
+      parentQuestionId: z.string().min(1).optional(),
     })
     .strict(),
   z
@@ -201,19 +201,27 @@ export const applyCommand = (
       review.attachment.actorId !== principal.actorId)
   )
     throw new Error("stale_attachment");
+  if(command.reviewId!==review.reviewId)throw new Error("unauthorized");
+  if(command.type==="AddSnapshot"){
+    if(principal.kind!=="user")throw new Error("unauthorized");
+    const snapshots=review.snapshots??[review.snapshot];
+    if(snapshotReviewIdentity(review.snapshot)!==snapshotReviewIdentity(command.snapshot))throw new Error("review_identity_conflict");
+    const existing=snapshots.find(snapshot=>snapshot.snapshotId===command.snapshot.snapshotId);
+    if(existing){if(canonical(existing)!==canonical(command.snapshot))throw new Error("snapshot_conflict");return {review,result:{snapshotId:existing.snapshotId,currentSnapshotId:review.currentSnapshotId??review.snapshot.snapshotId,alreadyRetained:true}};}
+    if((review.currentSnapshotId??review.snapshot.snapshotId)!==command.expectedCurrentSnapshotId)throw new Error("current_snapshot_conflict");
+    return {review:{...review,snapshot:command.snapshot,snapshots:[...snapshots,command.snapshot],currentSnapshotId:command.snapshot.snapshotId,revision:review.revision+1},result:{snapshotId:command.snapshot.snapshotId,currentSnapshotId:command.snapshot.snapshotId}};
+  }
   const revision = review.revision + 1;
   if (command.type === "AskQuestion") {
     if (principal.kind !== "user") throw new Error("unauthorized");
     if (
-      !validateAnchor(
-        review.snapshot.snapshotId,
-        review.snapshot.sources,
-        command.anchor,
-      )
+      !snapshotFor(review,command.anchor.snapshotId) || !validateAnchor(command.anchor.snapshotId,snapshotFor(review,command.anchor.snapshotId)!.sources,command.anchor)
     )
       throw new Error("invalid_anchor");
+    if(command.parentQuestionId&&!review.questions.some(question=>question.questionId===command.parentQuestionId))throw new Error("invalid_parent_question");
     const question: Question = {
       questionId: ids.entity,
+      ...(command.parentQuestionId?{parentQuestionId:command.parentQuestionId}:{}),
       anchor: command.anchor,
       text: command.text,
       actorId: principal.actorId,
@@ -252,15 +260,18 @@ export const applyCommand = (
     if (principal.kind !== "agent") throw new Error("unauthorized");
     if (command.generation !== principal.generation)
       throw new Error("stale_attachment");
-    if (!review.questions.some((q) => q.questionId === command.questionId))
-      throw new Error("invalid_request");
+    const question=review.questions.find(q=>q.questionId===command.questionId);
+    if(!question)throw new Error("invalid_request");
+    const sourceSnapshot=snapshotFor(review,question.anchor.snapshotId);
+    if(!sourceSnapshot)throw new Error("source_unavailable");
     if (
       !command.evidence.every((a) =>
-        validateAnchor(review.snapshot.snapshotId, review.snapshot.sources, a),
+        validateAnchor(sourceSnapshot.snapshotId, sourceSnapshot.sources, a),
       )
     )
       throw new Error("invalid_anchor");
     const reply: Reply = {
+      snapshotId:sourceSnapshot.snapshotId,
       replyId: ids.entity,
       questionId: command.questionId,
       body: command.body,
@@ -367,3 +378,6 @@ export { projectGraph, sourceViews } from "./graph.ts";
 export type { SourceGraph, GraphNode, GraphEdge } from "./graph.ts";
 
 export { inlineDocumentLinks, resolveDocumentDestination, documentHeadingLine } from "./markdown.ts";
+
+export const snapshotFor=(review:Review,snapshotId:string):Snapshot|undefined=>(review.snapshots??[review.snapshot]).find(snapshot=>snapshot.snapshotId===snapshotId);
+export const snapshotReviewIdentity=(snapshot:Snapshot):string=>canonical(snapshot.candidate?{provider:snapshot.candidate.provider,host:snapshot.candidate.host,targetProject:snapshot.candidate.targetProject,number:snapshot.candidate.number,url:snapshot.candidate.url}:{provider:"github",host:new URL(snapshot.prUrl).host,targetProject:snapshot.repository,number:snapshot.prNumber,url:snapshot.prUrl});

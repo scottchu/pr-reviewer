@@ -2,7 +2,7 @@
 
 **Packet revision:** 1; dispatch pins this file's committed source revision
 
-**Status:** Ready for bounded engineering dispatch; native-host and unfamiliar-human acceptance remain open
+**Status:** 02A merged and independently accepted within its bounds; 02B engineering checkpoint ready for independent review. Full slice/native-host/unfamiliar-human acceptance remains open
 
 **Parent:** [480p round](../../plan.md); [overall execution contract](../../../delivery-through-1080p.md)
 
@@ -74,7 +74,7 @@ The graph-first reviewer role is the root's dedicated `tired_pr_reviewer`: exper
 | 02-D | Keyboard/source access, explicit pending/history labels and neutral readable presentation pass actual UI checks. Graph critique and human comprehension remain separate. |
 | 02-E | Actual own implementation PR is reviewed through UI/graph and exercises restart/new-head task, with separately pinned candidate/target identities and revalidation. |
 
-Use `bun run check`, `bun run test` and `bun run test:e2e` from the declared runtime toolchain; add meaningful targeted tests before deriving each new behavior. These new checks are planned, not run. Full slice acceptance requires both native hosts, own-PR task, independent review and human evidence; engineering checkpoints may be delivered with exact open gates.
+Use `bun run check`, `bun run test` and `bun run test:e2e` from the declared runtime toolchain; add meaningful targeted tests before deriving each new behavior. Observed engineering checks and remaining gates are recorded in [02B checkpoint evidence](checkpoint-02b.md). Full slice acceptance requires both native hosts, own-PR task, independent review and human evidence; engineering checkpoints may be delivered with exact open gates.
 
 ## Independent-review handoff v1
 
@@ -82,13 +82,13 @@ Root dispatches the graph reviewer with the task/rubric and actual candidate URL
 
 Then assign an engineer other than the implementer (the graph reviewer may continue after freezing its account) the exact diff/source/packet identity, implementation evidence, test commands/artifacts and acceptance 02-G/A–E. Independently inspect snapshot migration, old-question authorization, comparison/document-edge provenance, absent-source behavior, stale credentials, notification identity and managed subscription boundaries. Reproduce appropriate strict/tests/actual React journeys and review changes after fixes. Engineering acceptance, presentation critique, native host acceptance and human comprehension are separate dispositions.
 
-No product candidate or PR exists for this packet yet. Review scope and protocol are ready; actual review dispatch waits for exact candidate/target/evidence and actual rendered UI access, either direct or the explicitly recorded controlled-browser mediated route. A template cannot fabricate those inputs.
+02A was reviewed through actual PR21 and merged. The new 02B candidate requires a separately pinned own PR and fresh graph-first/engineering review; prior review is not automatically carried across changed history/preparation contracts. Root supplies actual candidate/target/UI identities and preserves the graph-first account before source investigation.
 
 ## Successor contribution and current evidence
 
 [Slice 03](../../../720p/slices/03-whole-change/plan.md) may prepare its acquisition subsystem against boundary v1 without touching this writer's shared files. Before integration, return actual snapshot admission/query signatures, history migration decisions, graph manifest/provenance rules, reusable fixtures, reviewed candidate identity and all limits. Its owner reconciles those inputs before the vertical importer route.
 
-No slice02 implementation or acceptance run occurred during this planning task. Historical slice01 code review remains valid for its pinned candidate; its former blanket slice02 block is superseded by the explicit capability amendment, not rewritten as a prior pass.
+The original packet was planning-only; subsequent implementation and review receipts below retain their own source identities. Historical slice01 review and bounded 02A acceptance remain valid only for their reviewed scopes.
 
 ## Active executor checkpoint
 
@@ -98,8 +98,22 @@ No slice02 implementation or acceptance run occurred during this planning task. 
 
 **Owner/workspace:** continuation/bootstrap executor; `/tmp/pr-reviewer-02-graph-history`, branch `build-review-history-and-graph`.
 
-**Status:** 02A implementation in progress; existing pilot untouched. Product derivation details are in evolution.md. PR20's three changed Markdown paths are verified against the pinned local comparison. Independent graph-first understanding, native host acceptance and human comprehension remain unrun.
+**Status:** Historical 02A executor record; implementation and independent bounded review completed in PR21, merged as cd8715ad. Existing pilot was preserved. PR20 was bootstrap; actual own PR21 supplied final graph-first review. Native/human/full-slice acceptance remained open.
 
-**02A review status:** Independent engineering accepted frozen `2e0384f` after original and residual recovery/provenance repros. A narrow readable-span/absent-side UI correction is under targeted validation; see [review and knowledge receipts](review-receipts-02a.md). Graph-first critique, docs-only readiness, engineering checks and native/human/full-slice acceptance remain distinct. 02B history work is not started.
+**02A review status:** Engineering accepted frozen `2e0384f`; targeted UI engineering and bounded semantic presentation accepted final `857fb07`. See [review and knowledge receipts](review-receipts-02a.md). Graph-first critique, docs-only readiness, engineering checks and native/human/full-slice acceptance remain distinct.
 
 **Successor coverage note:** Complete changed inventory, explicit selected input, prepared one-hop source and analyzed reference coverage differ. The current global first-120 reference budget warns about unanalysed remaining links but exposes no exact omitted-path/link-count ledger; unresolved entries cover attempts only. Preserve these limitations when deriving acquisition/semantic integration; owner input persistence is not history admission.
+
+## Active 02B checkpoint
+
+**Date:** 2026-10-23
+
+**Base:** merged 02A `cd8715ad2f848c444f952919ce019e7b1e913538`
+
+**Workspace:** `/tmp/pr-reviewer-02-graph-history`, new branch `continue-immutable-review-history`; clean at dispatch. The earlier task branch and frozen artifacts remain preserved.
+
+**Status:** History engineering and verified preparation implemented from committed v1 packet/current durable evolution contract; [checkpoint evidence](checkpoint-02b.md) records tests, copied migration, interfaces, reflection and open gates. Root owns PR/merge and the separate pilot updater. Only the serialized normal test-script property changed in package.json; no dependency/lock edits. This executor uses isolated data/ports.
+
+**Successor 03 readiness:** Acquisition checkpoint `6127f760b2fd0da609d088241c65c7c51c1f89c6` is independently integration-ready for its pure result boundary. Shared admission/history ports now exist in this engineering candidate, pending independent review; exact signatures and the still-required acquisition identity adapter are in the checkpoint and successor contribution. Preserve exact provider identity, source/target projects, blob object IDs, rename/copy/modes/hunks/coverage/counts when mapping; no narrowing or direct database import. Full importer job/UI/own-PR evidence remains unrun.
+
+**02B identity refinement:** Root accepted a source-preparation public boundary: extract existing manual schema/builder/safe Git reader; gateway verifies manual_git_v1 outside transactions and supplies a review/manifest-bound nonserialized witness. Preserve legacy ordered IDs and property-order-independent verification. Raw JSON is not trusted acquisition. Add forged/mismatched witness, tampered new ID/content, missing-object and preserved-legacy-ID regressions. Source-acquisition-v1 adapter remains a declared successor gate, with no narrowing or imported internal implementation.

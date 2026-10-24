@@ -1,3 +1,5 @@
+import {isPreparedSnapshotWitness} from "../source-preparation/public.ts";
+import type {PreparedSnapshotWitness} from "../source-preparation/public.ts";
 import { DatabaseSync } from "node:sqlite";
 import {
   createHash,
@@ -5,7 +7,7 @@ import {
   randomUUID,
   timingSafeEqual,
 } from "node:crypto";
-import { applyCommand, canonical, normalizeCommand } from "../domain/public.ts";
+import { applyCommand, canonical, normalizeCommand, snapshotSchema, validateAnchor } from "../domain/public.ts";
 import type {
   Review,
   Snapshot,
@@ -29,7 +31,7 @@ type Connection = {
 export const createStore = (filename: string) => {
   const db = new DatabaseSync(filename);
   db.exec(
-    "PRAGMA foreign_keys=ON; PRAGMA journal_mode=WAL; PRAGMA busy_timeout=3000; CREATE TABLE IF NOT EXISTS reviews(id TEXT PRIMARY KEY, body TEXT NOT NULL); CREATE TABLE IF NOT EXISTS receipts(id TEXT PRIMARY KEY, actor TEXT NOT NULL, fingerprint TEXT NOT NULL, body TEXT NOT NULL); CREATE TABLE IF NOT EXISTS credentials(hash TEXT PRIMARY KEY, body TEXT NOT NULL); CREATE TABLE IF NOT EXISTS challenges(id TEXT PRIMARY KEY, body TEXT NOT NULL); CREATE TABLE IF NOT EXISTS preparation_inputs(review_id TEXT PRIMARY KEY REFERENCES reviews(id), body TEXT NOT NULL);",
+    "PRAGMA busy_timeout=3000; PRAGMA foreign_keys=ON; PRAGMA journal_mode=WAL; CREATE TABLE IF NOT EXISTS reviews(id TEXT PRIMARY KEY, body TEXT NOT NULL); CREATE TABLE IF NOT EXISTS receipts(id TEXT PRIMARY KEY, actor TEXT NOT NULL, fingerprint TEXT NOT NULL, body TEXT NOT NULL); CREATE TABLE IF NOT EXISTS credentials(hash TEXT PRIMARY KEY, body TEXT NOT NULL); CREATE TABLE IF NOT EXISTS challenges(id TEXT PRIMARY KEY, body TEXT NOT NULL); CREATE TABLE IF NOT EXISTS preparation_inputs(review_id TEXT PRIMARY KEY REFERENCES reviews(id), body TEXT NOT NULL);",
   );
   const tx = <T>(operation: () => T): T => {
     db.exec("BEGIN IMMEDIATE");
@@ -75,8 +77,27 @@ export const createStore = (filename: string) => {
     );
     return token;
   };
-  const command = (principal: Principal, input: Command): Receipt =>
-    tx(() => {
+  const validateSnapshot=(snapshot:Snapshot) => {
+    if(!snapshotSchema.safeParse(snapshot).success||Buffer.byteLength(JSON.stringify(snapshot),"utf8")>8*1024*1024)throw new Error("source_unavailable");
+    const keys=new Set<string>();
+    for(const source of snapshot.sources){
+      const key=JSON.stringify([source.side,source.path]);
+      const bytes=Buffer.from(source.content,"utf8");
+      if(keys.has(key)||hash(source.content)!==source.hash||new TextDecoder("utf-8",{fatal:true,ignoreBOM:true}).decode(bytes)!==source.content||source.content.includes("\0")||source.lineCount!==(source.content.endsWith("\n")?source.content.split("\n").length-1:source.content.split("\n").length))throw new Error("source_unavailable");
+      keys.add(key);
+    }
+    const url=new URL(snapshot.prUrl);
+    if(url.username||url.password)throw new Error("source_unavailable");
+    const candidate=snapshot.candidate;
+    if(candidate&&(candidate.baseSha!==snapshot.baseSha||candidate.headSha!==snapshot.headSha||candidate.targetProject!==snapshot.repository||candidate.number!==snapshot.prNumber||candidate.url!==snapshot.prUrl||candidate.host!==url.host))throw new Error("source_unavailable");
+    for(const reference of snapshot.documentReferences??[])if(!validateAnchor(snapshot.snapshotId,snapshot.sources,reference.source)||(reference.target&&!validateAnchor(snapshot.snapshotId,snapshot.sources,reference.target)))throw new Error("source_unavailable");
+    for(const file of snapshot.changedFiles??[])for(const disposition of file.dispositions)if(disposition.state==="prepared"&&!snapshot.sources.some(source=>source.path===disposition.path&&source.side===disposition.side))throw new Error("source_unavailable");
+  };
+  const command = (principal: Principal, input: Command, witness?:PreparedSnapshotWitness): Receipt => {
+    // Acquisition and content validation never hold the database transaction.
+    let invalidSnapshot=input.type==="AddSnapshot"&&!isPreparedSnapshotWitness(witness,input.reviewId,input.snapshot);
+    if(input.type==="AddSnapshot"&&principal.kind==="user")try{validateSnapshot(input.snapshot);}catch{invalidSnapshot=true;}
+    return tx(() => {
       if (principal.kind === "bootstrap") throw new Error("unauthorized");
       let normalized: Command = input;
       let normalizationError = false;
@@ -115,6 +136,7 @@ export const createStore = (filename: string) => {
           { entity: randomUUID(), event: randomUUID() },
           new Date().toISOString(),
         );
+        if(invalidSnapshot&&next.result.alreadyRetained!==true)throw new Error("source_unavailable");
         save(next.review);
         receipt = {
           commandId: input.commandId,
@@ -143,6 +165,18 @@ export const createStore = (filename: string) => {
       );
       return receipt;
     });
+  };
+  try{
+    tx(()=>{
+      for(const row of db.prepare("SELECT id,body FROM reviews").all() as {id:string;body:string}[]){
+        const review=JSON.parse(row.body) as Review;
+        const snapshots=review.snapshots??[review.snapshot];
+        const currentSnapshotId=review.currentSnapshotId??review.snapshot.snapshotId;
+        if(!snapshots.length||new Set(snapshots.map(snapshot=>snapshot.snapshotId)).size!==snapshots.length||!snapshots.some(snapshot=>snapshot.snapshotId===currentSnapshotId))throw new Error("source_unavailable");
+        if(!review.snapshots||!review.currentSnapshotId)save({...review,snapshots,currentSnapshotId});
+      }
+    });
+  }catch(error){db.close();throw error;}
   return {
     close: () => db.close(),
     issueUser: () => issue({ kind: "user", actorId: "local-user" }),
@@ -171,7 +205,7 @@ export const createStore = (filename: string) => {
             throw new Error("source_unavailable");
         }
         if (db.prepare("SELECT id FROM reviews WHERE id=?").get(reviewId)) {
-          if (canonical(load(reviewId).snapshot) !== canonical(snapshot))
+          if (canonical((load(reviewId).snapshots??[load(reviewId).snapshot]).find(retained=>retained.snapshotId===snapshot.snapshotId)) !== canonical(snapshot))
             throw new Error("command_conflict");
           if(sourceInput!==undefined)db.prepare("INSERT OR IGNORE INTO preparation_inputs VALUES (?,?)").run(reviewId,JSON.stringify(sourceInput));
           return;
@@ -179,6 +213,8 @@ export const createStore = (filename: string) => {
         save({
           reviewId,
           snapshot,
+          snapshots:[snapshot],
+          currentSnapshotId:snapshot.snapshotId,
           revision: 1,
           attachment: null,
           questions: [],
@@ -194,12 +230,16 @@ export const createStore = (filename: string) => {
         db.prepare("SELECT id FROM reviews").all() as { id: string }[]
       ).map((r) => ({ reviewId: r.id, prUrl: load(r.id).snapshot.prUrl }));
     },
-    review: (principal: Principal, id: string, minimumRevision = 0) => {
+    review: (principal: Principal, id: string, minimumRevision = 0, snapshotId?:string):Review => {
       const review = load(id);
       authorize(principal, review);
       if (review.revision < minimumRevision)
         throw new Error("projection_pending");
-      return review;
+      const snapshots=review.snapshots??[review.snapshot];
+      const selected=snapshots.find(snapshot=>snapshot.snapshotId===(snapshotId??review.currentSnapshotId??review.snapshot.snapshotId));
+      if(!selected)throw new Error("source_unavailable");
+      const {snapshots:_sources,...projection}=review;
+      return {...projection,snapshot:selected,currentSnapshotId:review.currentSnapshotId??review.snapshot.snapshotId,snapshotSummaries:snapshots.map(({snapshotId,baseSha,headSha,title})=>({snapshotId,baseSha,headSha,...(title?{title}:{})}))};
     },
     command,
     registerConnection: (principal: Principal, connection: Connection) =>

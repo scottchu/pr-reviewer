@@ -26,8 +26,9 @@ export const questionStatus = (review: Review, questionId: string) => {
   if (item) return "Delivery pending";
   return "Saved · attach a session to enable delivery";
 };
-export const createReviewBridge = (reviewId: string) => {
+export const createReviewBridge = (reviewId: string, initialSnapshotId?:string) => {
   let token = "";
+  let selectedSnapshotId:string|null=initialSnapshotId??null;
   let state: View = {
     sources: [],
     graph: null,
@@ -76,11 +77,12 @@ export const createReviewBridge = (reviewId: string) => {
     inflight = controller;
     try {
       const review = (await request(
-        `/api/reviews/${encodeURIComponent(reviewId)}?minimumRevision=${minimumRevision}`,
+        `/api/reviews/${encodeURIComponent(reviewId)}?minimumRevision=${minimumRevision}${selectedSnapshotId?`&snapshotId=${encodeURIComponent(selectedSnapshotId)}`:""}`,
         undefined,
         controller.signal,
       )) as Review;
-      if (expected === generation && !controller.signal.aborted)
+      if (expected === generation && !controller.signal.aborted){
+        selectedSnapshotId??=review.snapshot.snapshotId;
         publish({
           ...state,
           review,
@@ -93,6 +95,7 @@ export const createReviewBridge = (reviewId: string) => {
           })(),
           authenticated: true,
         });
+      }
       if (expected === generation && !controller.signal.aborted) return review;
     } catch (error) {
       if (expected === generation && !controller.signal.aborted)
@@ -134,9 +137,17 @@ export const createReviewBridge = (reviewId: string) => {
       generation++;
       await refresh();
     },
-    ask: async (anchor: Anchor, text: string): Promise<Receipt> => {
+    selectSnapshot:async(snapshotId:string)=>{
+      if(state.busy||pending)throw new Error("submission_pending: reconcile the question before changing snapshots");
+      const previous=selectedSnapshotId;
+      selectedSnapshotId=snapshotId;generation++;
+      const review=await refresh();
+      if(!review){selectedSnapshotId=previous;throw new Error(state.error||"source_unavailable");}
+      return review;
+    },
+    ask: async (anchor: Anchor, text: string, parentQuestionId?:string): Promise<Receipt> => {
       if (state.busy) throw new Error("submission_in_progress");
-      const fingerprint = JSON.stringify({ anchor, text });
+      const fingerprint = JSON.stringify({ anchor, text,...(parentQuestionId?{parentQuestionId}:{}) });
       if (pending && pending.fingerprint !== fingerprint)
         throw new Error(
           "submission_unknown: retry the unchanged question to reconcile",
@@ -150,6 +161,7 @@ export const createReviewBridge = (reviewId: string) => {
           reviewId,
           anchor,
           text,
+          ...(parentQuestionId?{parentQuestionId}:{}),
         })) as Receipt;
         if (receipt.state === "rejected") {
           pending = null;

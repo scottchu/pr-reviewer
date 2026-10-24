@@ -1,0 +1,50 @@
+# Checkpoint 02B: immutable continuation engineering
+
+**Date:** 2026-10-23
+
+**Status:** Implemented and tested engineering checkpoint; independent review, fresh own-PR continuation and whole-product docs-only reassessment pending. Full slice/round/native-host/human acceptance is not claimed.
+
+**Base:** `cd8715ad2f848c444f952919ce019e7b1e913538`, merged independently reviewed 02A PR21.
+
+**Workspace:** `/tmp/pr-reviewer-02-graph-history`, branch `continue-immutable-review-history`. Root owns publication/merge. Existing pilot, secrets, sessions and routes were not changed by this executor.
+
+**Durable source:** [Continuation and identity verification](../../../../product/review-loop/evolution.md#continuation-derivation-contract-02b), [contracts](../../../../product/review-loop/contracts.md), [runtime](../../../../product/review-loop/runtime.md#admit-another-pinned-head-without-moving-history), [structure reflection](../../../../product/review-loop/evolution.md#continuation-structure-reflection).
+
+## Delivered behavior and interfaces
+
+Reviews retain snapshots/currentSnapshotId; public reads project one selected source plus lightweight snapshotSummaries and complete discussion. Explicit history navigation and source links preserve original anchors. Follow-up creates a new question with optional immutable same-review parentQuestionId. Current authorized agents can answer historical questions with their original source evidence; revocation/generation fencing still applies. Admission creates no inbox item or wake. Drafts and unresolved submissions hold selection; another admitted head never moves a private selection automatically.
+
+| Public boundary | Delivered contract |
+|---|---|
+| Domain command | AddSnapshot includes commandId, reviewId, expectedCurrentSnapshotId, identityScheme `manual_git_v1`, snapshot. Atomic owner permission, review membership, retained-ID equality and current CAS. Identical retained source returns applied without revision/rewind; new source increments once. |
+| Source preparation | `buildSnapshot(input)` and manual input schema retain the existing ordered identity. `manualInputFor(snapshot)` reconstructs explicit selection for recovery/verification. `verifyPreparedSnapshot(reviewId, snapshot, scheme)` reads pinned Git outside transactions and issues an internal review/manifest-bound witness; serialized/forged flags cannot authorize. |
+| Storage | `command(principal, command, witness?)` requires a matching witness for new source and retains valid rejected receipts. `review(principal, reviewId, minimumRevision?, snapshotId?)` returns selected source; missing history is source_unavailable. Additive constructor migration is atomic/idempotent. Original preparation input remains separate from history. |
+| Gateway / MCP | POST `/api/commands` verifies manual source before storage. Encoded body bound is 8 MiB including JSON overhead, separate from content budgets. GET review accepts snapshotId/minimumRevision; question_get resolves the question's snapshot. MCP review_get exposes optional snapshotId/minimumRevision, with existing attachment authorization. No MCP source-admission tool was added. |
+| Application / UI | Bridge initial snapshot parameter and explicit selectSnapshot query; selected history remains stable across polling/current changes. URL preserves explicit snapshot selection on reload. Full discussion labels snapshots, optionally filters selected source, and supports parent-linked follow-up. Graph/source/draft identities remain independent. |
+| Owner utility | `scripts/add-snapshot.ts` uses the running candidate's private credential/runtime reference and an explicit new source specification, expected-current ID and stable command ID; prints receipt only. No automatic conflict retry or new-head discovery. |
+
+Snapshot shape preserves optional provider candidate, source object IDs, rename/copy paths/modes, dispositions, hunks, coverage and counts for the acquisition successor. Representability does not mean the importer adapter or rename-aware product journey already runs. Current manual verification cannot bless acquisition-v1 IDs. No new dependency/lock change occurred; package mutation is limited to normal-test registration, serialized with the separate analyzer alias writer.
+
+## Verification and source identities
+
+Installed Node 24.21.0 owns SQLite/gateway; Bun 1.4.2 owns Vite. Strict TypeScript plus import-boundary checks passed. Normal tests passed: eleven Bun tests and thirty Node tests before the additional migration rollback case; nineteen focused preparation/history/runtime tests subsequently passed with rollback and populated migration coverage. The final focused history regression also checks retained-old idempotence without rewind, conflicting retained ID, missing parent and stale historical access. These are implementation checks, not independent review.
+
+All six actual Chrome journeys passed after verified preparation was introduced. The new history journey uses real PR21 source, comparison base `bdce918b4ab0563d698d3fcf9c1df1e19c1be68f`, original head `501917502a67caa513a923523b40d2084e53074f` and later head `857fb072aaba095b9dadbfac4dcf11ff914eacdc`, explicitly selected `src/ui/graph.tsx` with complete changed inventory and unprepared other paths. It saves a question, restarts before attachment/delivery, attaches a controlled existing session through real MCP SDK stdio, adds the new head through the owner utility, answers the old question, rejects new-source evidence for it, navigates its original source, protects a draft, creates a cross-snapshot follow-up, and restarts without rewinding current. This is not a test of native queued-turn delivery or the addressed-launch crash race; existing delivery fault tests separately retain unknown claims without replay.
+
+Commands: `bun run check`, `bun run test`, `bun run test:e2e`; then `node --experimental-strip-types --test tests/history.test.ts tests/preparation.test.ts tests/runtime.test.ts` after extraction of shared explicit-selection reconstruction and added rollback coverage. Test ports are isolated 5284/5285; runtime tests own 5484/5485 and release them. No retained candidate is running at this checkpoint.
+
+Chrome artifacts: `/var/folders/7q/rjwxsm_s54s17s8mn083p71h0000gn/T/pr-reviewer-02B-verified-history.YBDm5kNTQA`, including `pr21-immutable-history.png`. Actual image inspection confirmed current/history controls, complete inventory, original-snapshot answer/evidence, new-snapshot follow-up/parent labels and distinct controlled-host limitations. Long immutable IDs wrap; the graph still explains source structure rather than an authored semantic story. This test target is the earlier own PR21, not the unpublished new 02B PR.
+
+Copied actual old data evidence: `/var/folders/7q/rjwxsm_s54s17s8mn083p71h0000gn/T/pr-reviewer-02B-real-copy-migration.n0vuYlx1mq/report.json`. Source was the stopped owned `2e0384f` candidate, never the pilot. Original file SHA-256 `180ecadedef55aac9ef388a4ae6b50a3d1aa5a6cefb310d2f78b3dd0c56a976e` remained unchanged. Copy migration/reopen retained review `pr-21`, snapshot `2baf38ccc00d30be6ea773a43b8ff0ba6d8036e3b6222077c68f9df116b448e3`, revision 1, credential/preparation rows and all original aggregate fields. That actual copy had no questions/receipts; a populated copied legacy fixture separately preserves attachment credentials, saved question/receipt, read inbox/cursor and unknown notification identity, preventing blind replay. A malformed second aggregate test proves earlier conversions roll back.
+
+Separate-process CAS test admits exactly one of two verified snapshots against the same expected-current. Verification tests cover property-order permutation, tampered new IDs, hash-consistent forged content, forged/serialized/other-review/mismatched witnesses and missing pinned Git objects. The known pre-extraction PR14 snapshot ID remains `aefdff44d33f7202f2bbdce5483f3deac88de8d9c18a29efabbeaf4d3e753e47`.
+
+## Reflection, successor and remaining gates
+
+Actual-code reflection retained one atomic aggregate and separated source verification effects from pure admission policy, instead of a competing importer/store or trusting transport assertions. The selected-source projection avoids transferring every historical body. Aggregate growth/write amplification remains a bounded implementation cost, with no unlimited-history performance claim. Versioned adapters preserve legacy/provider identity without retargeting anchors. Rationale and compatibility field ordering live in durable evolution knowledge, not only this receipt.
+
+Slice03 receives actual public ports and representable metadata, but needs its own verified acquisition-v1 adapter through source-preparation, authenticated job/result ingress and actual product integration/evidence. `6127f760b2fd0da609d088241c65c7c51c1f89c6` remains independently reviewed acquisition preparation only and is not imported here. No future parser/job route is represented as delivered.
+
+Root must publish the clean 02B checkpoint, pin actual new PR base/head, prepare a fresh isolated target and withhold the source-informed expected account from the graph-first reviewer. Freeze that account before source drilldown, then perform independent engineering/history review and targeted fixes. Whole-current-product durable-docs-only audit follows this reflection and must close material source gaps before stage acceptance. Earlier qualified docs-only and 02A reviews are retained in [02A receipts](review-receipts-02a.md); they do not automatically accept these changed contracts.
+
+Native Codex MCP reply/readback evidence is being verified separately by root and must retain its exact owner/build/source/transport limits before inclusion. Controlled SDK transport, CLI enqueue acknowledgement, automatic native queued-turn delivery and native tool-catalog registration are different claims. Claude and unfamiliar-human/full-round acceptance remain open. No authentication, Tailscale or pilot migration was attempted by this executor.

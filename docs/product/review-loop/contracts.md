@@ -14,7 +14,7 @@ Use opaque application IDs, UUIDs where generated locally. Caller-supplied actor
 | Anchor | snapshotId, side, path, startLine/endLine (one-based inclusive). Nonempty bounded range in the selected source object; no mutable graph or viewport coordinates. |
 | Pairing challenge | challengeId, reviewId, expected host/session destination and authorized local user, expiry (five minutes), challenge hash, pending/consumed state and expected credential/connection binding. Single-use; no review source access from bootstrap credentials. |
 | Attachment | attachmentId, reviewId, server-derived actorId, host (codex/claude), exact sessionId and local owner/connection identity, generation, capabilities and active/revoked state. Session ID comes from the initiating session and authenticated pairing, not arbitrary browser attribution. Replacement advances generation. |
-| Question | questionId, reviewId, immutable anchor, trimmed nonempty text (at most 16 KiB UTF-8), user actorId, created revision/time. Persist before notification. |
+| Question | questionId, reviewId, immutable anchor, trimmed nonempty text (at most 16 KiB UTF-8), user actorId, created revision/time, optional immutable same-review parentQuestionId. Persist before notification. A follow-up creates a new question and never moves its parent. |
 | Reply | replyId, questionId, snapshotId, agent actorId, attachmentId/generation, nonempty body (at most 64 KiB UTF-8), source evidence anchors and explicitly stated limitations, created revision/time. Evidence references the pinned snapshot; wrong-side/path/span rejects. |
 | Command receipt | commandId, actorId, canonical payload fingerprint, state (applied/rejected), resulting revision/event cursor and result IDs or typed rejection. Same ID/actor/payload returns the same receipt; changed payload rejects. |
 | Addressed inbox item | eventId, questionId, attachmentId/generation, cursor, eligible recipient and consumption/read state. Own replies and receipts do not create wake events. Reading does not delete the question or the notification journal. |
@@ -28,17 +28,18 @@ The authenticated gateway derives actor and attachment from the connection. All 
 
 | Operation | Input / result |
 |---|---|
-| PrepareReview (bounded local setup) | Verified snapshot manifest and immutable Git content → reviewId/snapshotId and receipt. No install hooks, general remote import or repository execution. |
+| PrepareReview (bounded local setup) | Verified snapshot manifest and immutable Git content → prepared reviewId/snapshotId. This owner setup is distinct from command receipts and cannot advance an existing review’s current snapshot. No install hooks, general remote import or repository execution. |
+| AddSnapshot | Local user only: commandId, reviewId, expectedCurrentSnapshotId, identityScheme (`manual_git_v1`) and snapshot → receipt with retained/current IDs. Verify pinned source outside the transaction; permission, review membership and CAS apply atomically. Identical retained source is idempotent without rewind or wake. |
 | AttachSession | One-use pairing challenge plus supported initiating session context → verified attachmentId/generation; unverified claims remain pending. A local user explicitly chooses the review and grants that session access. |
-| AskQuestion | commandId, reviewId, anchor, text → questionId, eventId, revision/cursor. Validate current permission/source at apply. |
+| AskQuestion | commandId, reviewId, anchor, text, optional parentQuestionId → questionId, eventId, revision/cursor. Validate current permission and the anchor’s retained snapshot at apply. |
 | SubmitReply | commandId, questionId, attachment generation, body, evidence, limitations → replyId and revision/cursor. Recheck active authorization/generation in the transaction. |
 | RevokeAttachment | commandId and attachmentId → advanced generation/revoked state. Fence late delivery and stream emissions. |
-| GetReview / GetQuestion | Scoped IDs and optional minimumRevision → immutable source, relevant discussion/attachment and truthful delivery/read-model state. |
+| GetReview / GetQuestion | Review query accepts optional minimumRevision and snapshotId. Return selected snapshot, lightweight snapshotSummaries and currentSnapshotId with complete discussion/attachment/delivery state; omit other source bodies. Question query resolves its original snapshot independently of current. Missing history is source_unavailable. |
 | ReadInbox | Attachment-scoped cursor and bounded limit (default 20, maximum 100) → addressed question references and next cursor; preserve all eligible items under coalesced notifications. |
 
 Canonical fingerprints use normalized validated payloads with deterministic field ordering. The same commandId cannot be reused across actors; changed-payload ID reuse returns command_conflict. Domain validation failures return durable rejected receipts where identity/request are valid. Unauthenticated or malformed envelopes reject before domain dispatch.
 
-Errors are typed: invalid_request, unauthorized, stale_attachment, invalid_anchor, source_unavailable, command_conflict, projection_pending and delivery_unknown. They do not echo tokens or unrestricted conversation history. Unknown external effects are retained and reconciled, not relabeled failed merely on timeout.
+Errors are typed: invalid_request, unauthorized, stale_attachment, invalid_anchor, invalid_parent_question, source_unavailable, command_conflict, snapshot_conflict, current_snapshot_conflict, review_identity_conflict, projection_pending and delivery_unknown. They do not echo tokens or unrestricted conversation history. Unknown external effects are retained and reconciled, not relabeled failed merely on timeout.
 
 ## Attachment bootstrap
 
@@ -55,7 +56,7 @@ Provision the attachment capability to the trusted MCP connection/server session
 Use a supported local MCP transport with attachment-scoped credentials: stdio is the initial transport; any HTTP bridge remains loopback with explicit authentication. A separate stdio process forwards to the same app-owned gateway/database owner, not its own competing review store.
 
 - session_attach (bootstrap only): challenge proof plus routing claim → pending or verified attachment metadata; credential provisioning stays out of model-visible output.
-- review_get: reviewId → scoped source manifest and review state.
+- review_get: reviewId, optional minimumRevision/snapshotId → scoped selected source manifest, history summaries and review state.
 - question_get: questionId → exact question, before/after source and evidence limits.
 - inbox_read: cursor/limit → eligible requests for this authenticated attachment.
 - reply_submit: commandId, questionId, generation, body, evidence and limitations → authoritative command receipt.
@@ -92,7 +93,7 @@ The UI uses authenticated bounded polling through its application bridge and a m
 
 ## Review-driven recovery corrections
 
-Preparation is idempotent for an identical immutable snapshot and rejects a different snapshot under the same review ID. SQLite is authoritative: source preparation always reconstructs and verifies the pinned Git objects, ensures the database record exists, then regenerates its external snapshot export. A crash/export failure after database commit must recover without deleting saved discussion; an export alone is never trusted as proof of database preparation.
+Preparation is idempotent for an identical retained snapshot and rejects conflicting setup input. Advancing current uses AddSnapshot, never repeated setup. SQLite is authoritative: startup reconstructs and verifies the original pinned Git objects against retained history, ensures the database record exists, then exports the authoritative current snapshot without rewinding. [Continuation and verified preparation](evolution.md#continuation-derivation-contract-02b) define migration, the internal verification witness and identity compatibility. A crash/export failure after database commit must recover without deleting saved discussion; an export alone is never trusted as proof of database preparation.
 
 A definitive gateway envelope/authentication rejection releases the UI submission identity so the reviewer can correct the input. A transport failure or indeterminate server outcome retains the original identity for an unchanged retry. A successful receipt whose required readback is still unavailable retains the draft and identity until the accepted revision is visible.
 

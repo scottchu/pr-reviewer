@@ -194,3 +194,13 @@ test("definitive HTTP rejection allows corrected submission; pending readback re
     globalThis.fetch = original;
   }
 });
+
+test('history selection remains pinned through new current and unresolved submissions block source switching',async()=>{
+ const original=globalThis.fetch;let current='s',lost=false;const requested:string[]=[];
+ globalThis.fetch=(async(input:Parameters<typeof fetch>[0],init?:Parameters<typeof fetch>[1])=>{
+  if(init?.method==='POST'){if(lost)throw new Error('lost_ack');return Response.json({state:'applied',revision:1});}
+  const url=new URL(String(input),'http://localhost');requested.push(url.searchParams.get('snapshotId')??'default');const id=url.searchParams.get('snapshotId')??current;
+  return Response.json({...review,snapshot:{...review.snapshot,snapshotId:id},currentSnapshotId:current,snapshotSummaries:[{snapshotId:'s',baseSha:'a',headSha:'b'},{snapshotId:'new',baseSha:'a',headSha:'c'}]});
+ }) as typeof fetch;
+ try{const bridge=createReviewBridge('r');await bridge.login('token');current='new';const dispose=bridge.connect();await new Promise(resolve=>setTimeout(resolve,10));dispose();assert.equal(bridge.getSnapshot().review?.snapshot.snapshotId,'s');assert.equal(bridge.getSnapshot().review?.currentSnapshotId,'new');await bridge.selectSnapshot('new');assert.equal(bridge.getSnapshot().review?.snapshot.snapshotId,'new');lost=true;await assert.rejects(bridge.ask({...anchor,snapshotId:'new'},'Held'),/lost_ack/);await assert.rejects(bridge.selectSnapshot('s'),/submission_pending/);assert.equal(bridge.getSnapshot().review?.snapshot.snapshotId,'new');assert.ok(requested.includes('s'));}finally{globalThis.fetch=original;}
+});

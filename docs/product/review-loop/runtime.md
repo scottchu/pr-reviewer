@@ -74,7 +74,7 @@ bun run test
 bun run test:e2e
 ```
 
-`check` runs strict TypeScript and subsystem import constraints. `test` covers domain, transactional storage/restart, attachment failures, notification uncertainty, route lifecycle, application retry and owned process behavior. `test:e2e` uses existing Chrome with isolated temporary data for the complete controlled PR 14 reply path and a separate explicit PR 19 source/question path. `REVIEW_E2E_ARTIFACT_DIR` optionally selects a task-owned screenshot/artifact destination outside Git. Tests do not invoke real user sessions.
+`check` runs strict TypeScript and subsystem import constraints. `test` covers domain, transactional storage/history/restart, verified preparation, concurrent admission, attachment failures, notification uncertainty, route lifecycle, application retry and owned process behavior. `test:e2e` uses existing Chrome with isolated temporary data for controlled reply, actual pinned PR graph/source/question journeys, absent-side placement and two-head history/follow-up. `REVIEW_E2E_ARTIFACT_DIR` optionally selects a task-owned screenshot/artifact destination outside Git. Tests do not invoke real user sessions.
 
 ## Explicit manual source for the implementation PR
 
@@ -91,8 +91,16 @@ With no explicit selection or retained target, the bounded teaching workspace pr
 
 Preparation bounds each Git output/blob read to 1 MiB and validates strict UTF-8, nonempty selectable text and absence of NUL. The new multi-file format accepts at most 64 explicit paths, records every changed path, prepares at most 128 source objects including one-hop context, and analyzes at most 120 inline Markdown links. A line comparison is bounded to one million base/head line pairs; beyond that, source is inspectable but line analysis is labeled not analyzed. Added/deleted content uses only the real existing side, with no invented source on the absent side. Unsupported or unprepared changed sides retain explicit reasons; no question may anchor there. Legacy single-path missing/non-blob/invalid text still rejects before persistence.
 
-`REVIEW_SOURCE_SPEC` also accepts `paths` instead of `path` for the complete bounded graph preparation. It requires full pinned local objects and repository-relative paths, reads a complete changed-file inventory without rename inference, and adds only verified one-hop document context. The literal source links, exact line anchors and unresolved reasons accompany the manifest. This is owner-prepared evidence, not provider import or semantic graph analysis. A fresh root is required for another target until explicit snapshot-history admission is delivered.
+`REVIEW_SOURCE_SPEC` also accepts `paths` instead of `path` for the complete bounded graph preparation. It requires full pinned local objects and repository-relative paths, reads a complete changed-file inventory without rename inference, and adds only verified one-hop document context. The literal source links, exact line anchors and unresolved reasons accompany the manifest. This is owner-prepared evidence, not provider import or semantic graph analysis. Another PR requires a fresh root; a second head of the same PR uses explicit history admission below.
 
+
+## Admit another pinned head without moving history
+
+With an isolated candidate already running, prepare a private source specification for the same verified PR. Set `REVIEW_SOURCE_SPEC` to that file, `REVIEW_EXPECTED_SNAPSHOT_ID` to current read from the authoritative review, and `REVIEW_COMMAND_ID` to one stable unique command identity. Run `node --experimental-strip-types scripts/add-snapshot.ts` with the same `REVIEW_DATA_DIR`. The utility builds source outside ingress, reads the local credential privately and sends AddSnapshot; it prints only the receipt. An unchanged retry uses the same command ID. A rejected receipt is durable; correcting rejected input needs a new command ID. Inspect a stale expected-current conflict rather than overwriting automatically.
+
+The gateway independently reconstructs the manual manifest from local immutable Git objects before apply. Encoded JSON including metadata is limited to 8 MiB, distinct from per-read/source budgets. Unsupported schemes, forged IDs/content and unavailable required Git objects cannot admit new source. Exact already-retained snapshots and existing receipts remain idempotent when acquisition later becomes unavailable. This route has no provider discovery, import job UI or automatic source refresh.
+
+The browser holds its selected snapshot while current advances. Explicit selection updates the URL’s snapshotId so reload reopens that source. A nonempty draft or unresolved submission blocks changing snapshots. Evidence links resolve their original snapshot; follow-up creates a separate anchored question with a parent link and both snapshot labels. Source addition never requests an agent turn. Restart verifies original preparation against retained history, then exports current. Back up/copy old SQLite before an owner-approved runtime migration, retaining credentials and unknown attempts. Never reset the pilot to pass migration.
 
 ## Controlled browser review captures
 
