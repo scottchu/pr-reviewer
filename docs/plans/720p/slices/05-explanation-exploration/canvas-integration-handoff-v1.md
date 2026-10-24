@@ -1,8 +1,8 @@
 # Structural canvas integration review handoff v1
 
 Date: 2026-10-24
-Status: inspectable partial preproduction candidate; both independent renderer P2 findings author-corrected, independent recheck pending
-Implementation source:5edd337d4de46f2d5085d7e8c3f15a335654a41f
+Status: inspectable partial preproduction candidate; both renderer P2 corrections independently source-engineering READY; whole-product/UI-first gates open
+Implementation source:79ab8b09817b0d7eae8a2052d3ef6ff72ad17631 (prior reviewed checkpoint5edd337d4de46f2d5085d7e8c3f15a335654a41f)
 Parent: [implementation packet and evidence](canvas-integration-v1.md)
 Durable intent: [canvas reading](../../../../product/review-loop/canvas-reading.md), [architecture](../../../../product/architecture.md), [presentation](../../../../product/review-loop/presentation.md), [private compatibility](../../../../product/review-loop/persistence-compatibility.md), [Story recovery](../../../../product/review-loop/story-and-exploration.md)
 
@@ -19,3 +19,11 @@ Known divergence: semantic and other subsystem presentations remain separate; in
 ## Bounded renderer correction receipt
 
 The correction commit reserves latest authored-reference intent before awaiting and routes the primary-origin card through exact primary source inspection. Both retained RED regressions now pass:35 affected application cases and4 actual Chrome canvas journeys, with strict/boundaries. Raw reference-review-red.log/origin-review-red.log and renderer-review-{application,chrome}-green.log are in the evidence root. The original3 canvas cases were rerun after the correction. Independent recheck must inspect this new source pin;5edd remains the earlier reviewed source and is not relabeled fixed. The normal47+411/B2 Chrome evidence remains exactly its earlier source; no unchanged broad-test claim is advanced by the focused repair.
+
+## Corrected runtime and final docs checkpoint
+
+Current source/runtime79ab8b09817b0d7eae8a2052d3ef6ff72ad17631: Node24734/Bun24940, loopback56675/56674, same user-visible8475 route and exact manual PR25 snapshot. Candidate-manifest-79ab.json SHA25633ef13525890bedbfed985c8c374a88a2d53c5c23c871df704d9c3114066f935 is the corrected receipt. Owned-runtime read-only context→origin→Back smoke passes with no page/HTTP errors or narrow overflow. Recheck79ab READY is source engineering only:36 independent cases, strict/boundaries; four Chrome journeys remain author-attributed. Full earlier47 Bun/411 Node/eight Chrome stays on5edd.
+
+Durable canvas/architecture/presentation/private compatibility/Story knowledge and whole-current-product responsibility/lifecycle reflection are promoted outside plans, ready for the root-coordinated fresh docs-only whole-product audit. No copied implementation is required to learn inspection boundaries, exact reachability/partner rules, both-map startup transaction, scope/supersession, limits or compatibility. Independent UI-first understanding and layout/native/production gates remain open.
+
+The bounded successor is inherited normal-browser diagnosis/reconciliation described in the implementation packet; this handoff does not claim those old standalone selectors already pass. Preserve the current source/runtime identity during that work and record each later changed-source check separately.
