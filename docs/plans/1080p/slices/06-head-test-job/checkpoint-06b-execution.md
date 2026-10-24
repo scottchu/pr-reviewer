@@ -25,3 +25,13 @@ The next bounded derivation delivers live-attempt tracking across no-process/par
 `complete(grant,witness)` atomically persists the same-job result, exact `test-result:<jobId>` receipt and retained-byte accounting, completes its invocation and releases the exact lease. Identical receipt retry does no process work. Artifact reads validate identity/hash/size and reauthenticate after asynchronous I/O; corruption reports integrity failure while the historical result remains unchanged.
 
 26 owner/intent/outcome tests pass (`admission-regressions.log`), including actual fixed fixture execution→result/plain output, receipt retry, copied-witness rejection, competing import after admission, early copy failure, pre-prepare cancellation, late cancellation invalidating an earlier success witness, unauthorized artifact access and corruption. Five outcome cases were rerun after publication reuse/sealing (`admission-final.log`); strict TypeScript, boundaries and whitespace pass. These tests were added with the implementation; this receipt does not claim missing-port RED for the outcome machinery. Coordinator/gateway artifact wiring, full consumer contract, normal entrypoint registration and independent full-backend review remain open.
+
+## Corrective packet after independent full B1 review
+
+Date: 2026-10-24
+Status: four accepted P2 corrections in progress; B2/B3 remain gated
+Owner: `/root/plan_head_test_slice06`, sole backend and test-execution knowledge writer
+
+Negative source: `1e356446f9477325f0f93eea6bc0c0d670b2d5f0` (code `098867e`). Independent report `/tmp/pr-reviewer-06-plan-review/review-1e35644.md`, SHA256 `48ced05c5ab8c5cd157469f00dff0c52a83a4bd39a95e7b103f97f0c3c32da0d`. Preserve that source and its passing bounded receipts as history; it is not consumer-ready.
+
+The owning [test-execution contract](../../../../product/review-loop/test-execution.md) now specifies persisted post-admission cleanup/retry, exact base64 byte paging, bounded owned-directory overlay evidence, and actual process/verification observations. Implement only these corrections in the existing backend worktree. Reuse the review's cleanup/Unicode and overlay counterexamples as RED inputs; verify successful cleanup, deletion failure/restart retry, unknown exclusion, UTF-8 split boundaries, allowed Bun caches and rejected overlays, actual timestamps/role-substituted argv and explicit early-stage absence. Preserve source/runtime/qualification, receipts, old journals, authorization and lease fences. Run focused TDD first, then the combined registered suite/strict/boundaries; do not repeat full source qualification until the cohesive correction is ready. Return a committed candidate for the original reviewer; actual UI/CLI/own-PR acceptance remains open.
