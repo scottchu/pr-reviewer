@@ -12,3 +12,9 @@ export type StoryAction={type:'play'}|{type:'pause'}|{type:'step';step:number}|{
 export const storyTransition=(state:StoryPreview,action:StoryAction):StoryPreview=>{
  switch(action.type){case 'play':return state.condition==='ready'&&!state.returnFrame?{...state,playing:true}:state;case 'pause':return {...state,playing:false};case 'step':return {...state,step:Math.max(0,Math.min(2,action.step)),playing:action.step>=3?false:state.playing};case 'condition':return {...state,condition:action.condition,playing:false};case 'explore':return {...state,playing:false,returnFrame:state.returnFrame??structuredClone(action.frame)};case 'resume':return state.condition==='ready'?{...state,playing:false,returnFrame:null}:state;}
 };
+
+export const newerExplanation={id:'auth-header-explanation',version:'mock-auth-account-v2',contentHash:'f4c5eaadcdd64b583896e699e524f2f5567c05704af49879a6da6659fcdc69c0',text:'This newer local account separates the source call from live delivery. accessHeaders changes request headers; attachment and notification evidence remain unavailable.'} as const;
+export type DiscussionPreview=Readonly<{delivery:'not_attached'|'idle'|'unknown';prose:'current'|'newer'|'missing';viewingOriginal:boolean}>;
+export const initialDiscussion=():DiscussionPreview=>({delivery:'not_attached',prose:'current',viewingOriginal:false});
+export type DiscussionAction={type:'delivery';delivery:DiscussionPreview['delivery']}|{type:'prose';prose:DiscussionPreview['prose']}|{type:'original'};
+export const discussionTransition=(state:DiscussionPreview,action:DiscussionAction):DiscussionPreview=>action.type==='delivery'?{...state,delivery:action.delivery}:action.type==='prose'?{...state,prose:action.prose,viewingOriginal:false}:state.prose==='missing'?state:{...state,viewingOriginal:true};

@@ -34,7 +34,7 @@ export const transition=(state:Scene,intent:Intent):Scene=>{
  }
 };
 
-export const selectedProseAnchor=(start:number,end:number):ProseAnchor|null=>{
- const text=explanation.text,boundary=(offset:number)=>!(offset>0&&offset<text.length&&/[\uD800-\uDBFF]/.test(text[offset-1]!)&&/[\uDC00-\uDFFF]/.test(text[offset]!));
- return Number.isInteger(start)&&Number.isInteger(end)&&start>=0&&end>start&&end<=text.length&&boundary(start)&&boundary(end)?{kind:'prose',contentId:explanation.id,version:explanation.version,contentHash:explanation.contentHash,start,end,quote:text.slice(start,end)}:null;
+export const selectedProseAnchor=(start:number,end:number,content:{id:string;version:string;contentHash:string;text:string}=explanation):ProseAnchor|null=>{
+ const text=content.text,boundary=(offset:number)=>!(offset>0&&offset<text.length&&/[\uD800-\uDBFF]/.test(text[offset-1]!)&&/[\uDC00-\uDFFF]/.test(text[offset]!));
+ return Number.isInteger(start)&&Number.isInteger(end)&&start>=0&&end>start&&end<=text.length&&boundary(start)&&boundary(end)?{kind:'prose',contentId:content.id,version:content.version,contentHash:content.contentHash,start,end,quote:text.slice(start,end)}:null;
 };
