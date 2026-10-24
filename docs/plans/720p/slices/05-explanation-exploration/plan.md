@@ -4,7 +4,7 @@
 
 **Date:** 2026-10-24
 
-**Status:** Revision3 packet independently READY; [05A core checkpoint](checkpoint-05a.md) prepared under named root dispatch, independently READY atbaac411 for05B input reconciliation and root assignment.[05B player checkpoint](checkpoint-05b.md) is independently READY at exactcdc0c7e for bounded player/application engineering and the05C extension seam.05C still requires root assignment and missing return-frame/draft/recovery contract reconciliation before code.04 G14 remains OPEN / CHANGES NEEDED; PR24 remains draft.
+**Status:** Revision3 packet independently READY; [05A core checkpoint](checkpoint-05a.md) prepared under named root dispatch, independently READY atbaac411 for05B input reconciliation and root assignment.[05B player checkpoint](checkpoint-05b.md) is independently READY at exactcdc0c7e for bounded player/application engineering and the05C extension seam.05C is assigned in its [tracked checkpoint](checkpoint-05c.md), with durable return-frame/draft/recovery contracts and a stable engineering candidate prepared for independent full-checkpoint review.04 G14 remains OPEN / CHANGES NEEDED; PR24 remains draft.
 
 **Parent:** [720p round](../../plan.md), [roadmap slice05](../../../roadmap.md#720p-understand-the-whole-pr)
 

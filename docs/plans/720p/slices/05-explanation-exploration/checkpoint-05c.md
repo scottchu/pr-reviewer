@@ -2,7 +2,7 @@
 
 Date: 2026-10-24
 
-Status: Named dispatch; contracts and implementation pending. Full05/720p/original04 G14 acceptance remains OPEN.
+Status: Implemented engineering candidate; full05C independent review and exact clean-candidate broad verification pending. Full05/720p/original04 G14 acceptance remains OPEN.
 
 ## Dispatch receipt
 
@@ -51,3 +51,15 @@ The three independent76 P2 findings now have focused corrections. Workspace cont
 Validation: strict TypeScript and subsystem boundaries passed; Node24 focused private recovery/application/exploration plus retained story controller suite passed27 tests. This is an internal core correction; React changes remain uncommitted/in progress, and no full05C browser/controlled-notification/acceptance claim is made.
 
 Actual semantic-story Chrome found an integration defect inherited from05B: story source hydration used a GET query, but the existing gateway accepts only the authorized read-only POST query body. Snapshot-only05B Chrome and stubs did not establish that port. The new full-frame test correctly exposed `invalid_request` and retained its frame. Durable read-port meaning is corrected before the narrow application-only fix; no server/domain interface change is needed.
+
+## Stable full application/UI candidate
+
+The reviewed internal core correction at `bd07a6b20ad69e833ddda1cd1a5a4e38b4dae557` is independently READY for its bounded core scope. Report `/tmp/pr-reviewer-05-player-review/05c/core-ready-bd07a6b.md`, SHA-256 `ccd573568deddb0862b8e9867df3d48b9c7543220efe0b6a04bf31259073fcf4`. All three P2 findings/four original probes closed with27 focused checks and strict/boundary checks. This does not review the subsequent full React candidate.
+
+Main now derives source/comparison/text/parent from the single application's stable drafts; the workspace owns public path/navigation/ask operations and managed confirmation/guard/map-capture routes. The original/exploration draft switch, first-frame resume, private ordinary checkpoint and mandatory pending recovery UI are wired through those ports. Structural and semantic views collect viewport and exact focus/source state; restore identity applies the saved frame once. The semantic frame retains inspector expansion. The existing public authorized source read now uses its actual POST body. Root approved the narrow AnalysisBridge source-navigation projection so owned restoration cannot trigger normal explicit-open heading focus/scroll; genuine reading focus and normal inspection still pause/navigate as before.
+
+Meaningful focused Node24 coverage passes66 tests across the six affected application/controller files; strict TypeScript/subsystem checks pass. Existing three player Chrome journeys passed on the earlier dirty migration. The expanded new Chrome suite passes4 journeys on the final precommit dirty candidate at `/tmp/pr-reviewer-05c-browser-progress4`: desktop exact cursor/elapsed/surface/player/source/evidence/structural+semantic maps/expanded inspector/page scroll and dual drafts across reload/new publication/new source; narrow explicit newer-snapshot exploration and exact return; attached real server commit followed by intentionally dropped acknowledgement, reload and same-credential explicit byte-identical recovery; accepted receipt followed by lost readback, reload and read-only recovery. The dropped-ack case also proves same-actor/different-credential lock and zero automatic resend. Both attached cases retain exactly one question, one non-null event and one controlled notifier invocation. These are real React/Chrome/Git/gateway/SQLite/owned-worker fixtures, not actual ownPR or native-host causality.
+
+Initial new harness failures were a missing required corpus identity in the authored fixture and case-sensitive library control naming; a temporary request-helper variable collision failed strict checking and UI compilation before correction. The actual source-read GET mismatch is a product integration finding recorded above. Resume retained its frame on that failure. The later four-case pass includes the corrected source read, saved open semantic inspector and full-file expansion, not just the earlier snapshot-only frame. Authorized source POST reads are distinguished from durable command POSTs; the follow/explore journey emits no durable commands or worker requests.
+
+Next: commit this stable candidate, rerun focused+actual Chrome against its exact clean identity and then broad retained checks while root assigns full05C independent review. External screenshots are engineering evidence; final fresh ownPR comprehension and the retained long-page/collapsed chapter-context risk remain open. No full05/720p/04G14, native, Claude, provider-live or unfamiliar-reviewer acceptance is claimed.

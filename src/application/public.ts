@@ -32,7 +32,7 @@ export {createPrivateSession,credentialScope} from './private-session.ts';
 export type {PrivateSession,QuestionRecovery,QuestionDraft,StoryReturnFrame,GraphFrames,PrivateStoryView} from './private-session.ts';
 export {createImportsBridge,describeImportJobs} from './imports.ts';
 export type {ImportViewJob,ImportAction} from './imports.ts';
-export {createAnalysisBridge,semanticProjection,semanticExcerpt,semanticSourceKey} from './analysis.ts';
+export {createAnalysisBridge,semanticProjection,semanticExcerpt,semanticSourceKey,semanticIssueProjection} from './analysis.ts';
 export type {AnalysisBridge,SemanticView} from './analysis.ts';
 export {createStoryBridge,storyTransition,storyProjection} from './story.ts';
 export type {StoryBridge,StoryState,StoryIntent,StoryProjection,StoryExcerpt,StoryClock,StorySemanticPort,StoryGraphFocus} from './story.ts';

@@ -93,6 +93,7 @@ export const createStoryBridge=(reviewId:string,options:{clock?:StoryClock;seman
  const replaceDraft=(draft:QuestionDraft)=>publish({...state,drafts:state.drafts.map(current=>current.id===draft.id?draft:current)});
  const assertEditable=()=>{if(state.questionLocked)throw new Error('submission_pending: reconcile the unresolved question first');};
  const assertCanNavigate=()=>{assertEditable();if(activeDraft()?.text.trim())throw new Error('draft_held: keep or clear the active draft before changing its source');};
+ const validateMap=(snapshot:Snapshot,maps:GraphFrames)=>{const frame=maps.structural;if(!frame)return;const graph=projectGraph(snapshot),file=graph.files.find(file=>file.key===frame.fileKey);if(!file||frame.spans&&frame.spanId&&!graph.nodes.some(node=>node.kind==='hunk'&&node.id===frame.spanId&&(node.fileKey===frame.fileKey||node.path===file.oldPath||node.path===file.newPath)))throw new Error('saved_map_unavailable');};
  const restorePrivate=async(value:PrivateStoryView,expected:number)=>{
   const capturedToken=token;
   if(!state.snapshot||value.reviewId!==reviewId||value.snapshotId!==state.snapshotId)throw new Error('saved_view_source_unavailable: open its retained source explicitly');
@@ -103,6 +104,7 @@ export const createStoryBridge=(reviewId:string,options:{clock?:StoryClock;seman
   if(value.cursor){const exact=cursorAt(state.view,value.cursor.index);if(!exact||JSON.stringify(exact)!==JSON.stringify(value.cursor))throw new Error('saved_story_cursor_unavailable');}
   if(value.returnFrame){const frame=value.returnFrame;if(!value.drafts.some(draft=>draft.id===frame.originalDraftId))throw new Error('saved_return_draft_unavailable');if(!snapshots.has(frame.snapshotId)&&options.readSnapshot)snapshots.set(frame.snapshotId,await options.readSnapshot(frame.snapshotId));if(!snapshots.has(frame.snapshotId))throw new Error('saved_return_source_unavailable');if(frame.versionId){const view=await request(capturedToken,`/api/story?${new URLSearchParams({reviewId,snapshotId:frame.snapshotId,versionId:frame.versionId})}`,new AbortController().signal) as StoryView;if(!view.version||view.version.versionId!==frame.versionId||frame.cursor&&cursorAt(view,frame.cursor.index)?.stepId!==frame.cursor.stepId)throw new Error('saved_return_story_unavailable');}}
   if(expected!==generation)throw new Error('selection_superseded');
+  validateMap(state.snapshot,value.maps);
   await restoreSemantic(value.maps,value.snapshotId,()=>expected===generation&&!disposed&&capturedToken===token);
   if(expected!==generation||disposed||capturedToken!==token)throw new Error('selection_superseded');
   publish({...state,drafts:value.drafts,activeDraftId:value.activeDraftId,returnFrame:value.returnFrame,maps:value.maps,mapRestoreId:state.mapRestoreId+1,pageScroll:value.pageScroll,cursor:value.cursor,elapsedMs:value.elapsedMs,surface:value.surface,position:clamp(state,value.position.x,value.position.y),mode:value.returnFrame?'exploring':'paused',focusRevision:state.focusRevision+1});
@@ -112,14 +114,15 @@ export const createStoryBridge=(reviewId:string,options:{clock?:StoryClock;seman
   const check=()=>{if(!owns())throw new Error('selection_superseded');};check();
   await options.semantic.select(snapshotId,frame.analysisId??undefined);check();
   const loaded=options.semantic.getSnapshot();if(frame.analysisId&&loaded.view?.analysis?.analysisId!==frame.analysisId)throw new Error('analysis_record_unavailable');
+  if(frame.focus&&(loaded.view?.analysis?.status!=='analyzed'||!loaded.view.analysis.nodes.some(node=>node.id===frame.focus)))throw new Error('analysis_focus_unavailable');
   if(frame.corpusId&&loaded.view?.corpus?.corpusId!==frame.corpusId)throw new Error('source_corpus_unavailable');
-  if(frame.sourceAnchor){if(!options.semantic.openSource)throw new Error('source_unavailable');await options.semantic.openSource(frame.sourceAnchor);check();const selected=options.semantic.getSnapshot();if(JSON.stringify(selected.sourceAnchor)!==JSON.stringify(frame.sourceAnchor)||!selected.source||selected.source.corpusId!==frame.corpusId||selected.source.contentHash!==frame.sourceAnchor.contentHash)throw new Error(selected.error||'source_unavailable');}
+  if(frame.sourceAnchor){if(!options.semantic.openSource)throw new Error('source_unavailable');await options.semantic.openSource(frame.sourceAnchor,{intent:'restore'});check();const selected=options.semantic.getSnapshot();if(JSON.stringify(selected.sourceAnchor)!==JSON.stringify(frame.sourceAnchor)||!selected.source||selected.source.corpusId!==frame.corpusId||selected.source.contentHash!==frame.sourceAnchor.contentHash||selected.source.snapshotId!==snapshotId||selected.source.side!==frame.sourceAnchor.side||selected.source.path!==frame.sourceAnchor.path||frame.sourceAnchor.snapshotId!==snapshotId||frame.sourceAnchor.end<=frame.sourceAnchor.start||frame.sourceAnchor.end>selected.source.content.length)throw new Error(selected.error||'source_unavailable');}
   else options.semantic.closeSource?.();check();options.semantic.focus(frame.focus);
  };
  const stageEvidence=async(target:StoryState,reference:StoryReference,captured:string,owns:()=>boolean):Promise<StoryState>=>{
   let text='',sources=target.semanticSources;const check=()=>{if(!owns())throw new Error('selection_superseded');};check();
   if(reference.type==='snapshot_source'||reference.type==='semantic_source'){
-   if(reference.type==='semantic_source'&&!sources[sourceKey(reference)]){const anchor=reference.anchor,params=new URLSearchParams({reviewId,snapshotId:anchor.snapshotId,corpusId:reference.corpusId,side:anchor.side,path:anchor.path,contentHash:anchor.contentHash}),source=await request(captured,`/api/analysis/source?${params}`,new AbortController().signal) as SemanticSource;check();if(source.snapshotId!==anchor.snapshotId||source.corpusId!==reference.corpusId||source.side!==anchor.side||source.path!==anchor.path||source.contentHash!==anchor.contentHash)throw new Error('source_unavailable');sources={...sources,[sourceKey(reference)]:source};}
+   if(reference.type==='semantic_source'&&!sources[sourceKey(reference)]){const anchor=reference.anchor,params=new URLSearchParams({reviewId,snapshotId:anchor.snapshotId,corpusId:reference.corpusId,side:anchor.side,path:anchor.path,contentHash:anchor.contentHash}),source=await request(captured,'/api/analysis/source',new AbortController().signal,Object.fromEntries(params)) as SemanticSource;check();if(source.snapshotId!==anchor.snapshotId||source.corpusId!==reference.corpusId||source.side!==anchor.side||source.path!==anchor.path||source.contentHash!==anchor.contentHash)throw new Error('source_unavailable');sources={...sources,[sourceKey(reference)]:source};}
    const selected=excerpt({...target,semanticSources:sources},reference);if(selected.unavailable)throw new Error(selected.text);text=selected.text;
   }else if(reference.type==='capture'){const params=new URLSearchParams({reviewId,snapshotId:target.snapshotId??'',contextRevision:String(target.view?.version?.contextRevision??0),captureId:reference.captureId}),context=await request(captured,`/api/story/context?${params}`,new AbortController().signal) as StoryContextView;check();const capture=context.captures.find(capture=>capture.captureId===reference.captureId&&capture.contentHash===reference.contentHash);if(!capture)throw new Error('Exact supplied capture unavailable.');text=reference.start===undefined?capture.text:capture.text.slice(reference.start,reference.end);}
   else if(reference.type==='metadata')text=String(target.snapshot?.[reference.field]??'Retained metadata unavailable.');
@@ -133,8 +136,8 @@ export const createStoryBridge=(reviewId:string,options:{clock?:StoryClock;seman
   lastTick=clock.now();stopClock=clock.every(()=>{const now=clock.now(),elapsedMs=Math.max(0,now-lastTick);lastTick=now;const previous=state.cursor?.stepId;publish(storyTransition(state,{type:'tick',elapsedMs}));if(previous!==state.cursor?.stepId)focusRoute?.emit();},250);
  };
  const interrupt=()=>{generation++;focusSerial++;read?.abort();read=null;contextRead?.abort();contextRead=null;evidenceRead?.abort();evidenceRead=null;stopClock?.();stopClock=null;};
- const request=async(capturedToken:string,path:string,signal:AbortSignal)=>{
-  const response=await fetch(path,{headers:{Authorization:`Bearer ${capturedToken}`},signal});const body=await response.json() as unknown;
+ const request=async(capturedToken:string,path:string,signal:AbortSignal,query?:Record<string,string>)=>{
+  const response=await fetch(path,{headers:{Authorization:`Bearer ${capturedToken}`,...(query?{'Content-Type':'application/json'}:{})},signal,...(query?{method:'POST',body:JSON.stringify(query)}:{})});const body=await response.json() as unknown;
   if(!response.ok)throw new Error(String((body as {error?:string}).error??'request_failed'));return body;
  };
  const readContext=async(contextRevision?:number)=>{
@@ -176,7 +179,7 @@ export const createStoryBridge=(reviewId:string,options:{clock?:StoryClock;seman
  const hydrateSources=async(sources:readonly SourceReference[],controller:AbortController,owns:()=>boolean,capturedToken:string)=>{
   for(const ref of sources){if(!owns())return;if(ref.type!=='semantic_source'||state.semanticSources[sourceKey(ref)])continue;
    const params=new URLSearchParams({reviewId,snapshotId:ref.anchor.snapshotId,corpusId:ref.corpusId,side:ref.anchor.side,path:ref.anchor.path,contentHash:ref.anchor.contentHash});
-   const source=await request(capturedToken,`/api/analysis/source?${params}`,controller.signal) as SemanticSource;
+   const source=await request(capturedToken,'/api/analysis/source',controller.signal,Object.fromEntries(params)) as SemanticSource;
    if(owns()){
     if(source.snapshotId!==ref.anchor.snapshotId||source.path!==ref.anchor.path||source.side!==ref.anchor.side||source.contentHash!==ref.anchor.contentHash||source.corpusId!==ref.corpusId)throw new Error('story_source_selection_mismatch');
     publish({...state,semanticSources:{...state.semanticSources,[sourceKey(ref)]:source}});
@@ -216,7 +219,7 @@ export const createStoryBridge=(reviewId:string,options:{clock?:StoryClock;seman
  const intent=(intent:StoryIntent)=>{if(intent.type!=='tick'&&intent.type!=='resizePlayer')privateIntent++;if(state.mode==='exploring'&&['replay','previous','next','chapter'].includes(intent.type)){publish({...state,error:'resume_required: resume the saved story before story navigation'});return;}const previous=state.focusRevision;publish(storyTransition(state,intent));if(previous!==state.focusRevision){options.semantic?.closeSource?.();focusRoute?.emit();}};
  const select=async(snapshot:Snapshot)=>{
   if(state.snapshotId===snapshot.snapshotId)return;
-  const retained=state.returnFrame?{drafts:state.drafts,activeDraftId:state.activeDraftId,returnFrame:state.returnFrame,mode:'exploring' as const}:null;const draft=makeDraft(snapshot);interrupt();versionId=undefined;contextTarget=null;publish({...empty(reviewId),...(retained??{drafts:[draft],activeDraftId:draft.id}),questionLocked:state.questionLocked,snapshot:structuredClone(snapshot),snapshotId:snapshot.snapshotId,authenticated:Boolean(token),reducedMotion:state.reducedMotion,hidden:state.hidden,viewport:state.viewport,playerSize:state.playerSize});
+  const draft=makeDraft(snapshot),retained=state.returnFrame?{drafts:state.drafts.map(item=>{if(item.id!==state.activeDraftId)return item;const {comparisonKey,...rest}=item;return {...rest,anchor:draft.anchor};}),activeDraftId:state.activeDraftId,returnFrame:state.returnFrame,mode:'exploring' as const}:null;interrupt();versionId=undefined;contextTarget=null;publish({...empty(reviewId),...(retained??{drafts:[draft],activeDraftId:draft.id}),questionLocked:state.questionLocked,snapshot:structuredClone(snapshot),snapshotId:snapshot.snapshotId,authenticated:Boolean(token),reducedMotion:state.reducedMotion,hidden:state.hidden,viewport:state.viewport,playerSize:state.playerSize});
   wireRoutes();if(token&&!disposed)await refresh();
  };
  const bridgeOpenEvidence=async(reference:StoryReference)=>{
@@ -246,7 +249,7 @@ export const createStoryBridge=(reviewId:string,options:{clock?:StoryClock;seman
    try{const view=token?await refresh():undefined;if(!view||expected!==generation)return;if(options.session){const nextScope=await options.session.scope(token);if(expected!==generation)return;scope=nextScope;const saved=options.session.readView(scope);if(saved.kind==='record'&&saved.record?.value){const value=saved.record.value;try{await restorePrivate({...value,drafts:value.drafts.map(draft=>saved.record!.submitted.includes(draft.id)?{...draft,text:'',submitted:true}:draft)},expected);if(saved.record.omitted.length)publish({...state,viewRecoveryMessage:'Oversize saved draft text is unavailable after reload.'});}catch(error){if(expected===generation){viewCheckpointBlocked=true;publish({...state,viewRecoveryMessage:error instanceof Error?error.message:'saved_view_unavailable'});}}}else if(saved.kind!=='none'&&saved.kind!=='record')publish({...state,viewRecoveryMessage:`view_${saved.kind}`});}}
    finally{if(expected===generation){hydrating=false;checkpoint();}}
   },
-  logout:()=>{interrupt();scope='';hydrating=false;token='';versionId=undefined;contextTarget=null;publish(empty(reviewId));wireRoutes();},select,refresh:()=>refresh(),
+  logout:()=>{interrupt();scope='';hydrating=false;token='';versionId=undefined;contextTarget=null;publish(empty(reviewId));wireRoutes();},select:async(snapshot:Snapshot)=>{assertCanNavigate();await select(snapshot);},refresh:()=>refresh(),
   activeDraft,getPrivateView:privateView,assertCanNavigate,
   resetPrivateView:()=>{assertEditable();options.session?.clearView();viewCheckpointBlocked=false;publish({...state,viewRecoveryMessage:''});checkpoint();},
   setQuestionGuard:(locked:boolean)=>{if(state.questionLocked!==locked)publish({...state,questionLocked:locked});},
@@ -275,6 +278,7 @@ export const createStoryBridge=(reviewId:string,options:{clock?:StoryClock;seman
    if(view.reviewId!==reviewId||view.snapshotId!==frame.snapshotId||(view.version?.versionId??null)!==frame.versionId||frame.cursor&&JSON.stringify(cursorAt(view,frame.cursor.index))!==JSON.stringify(frame.cursor))throw new Error('return_story_unavailable');
    const context=await request(captured,`/api/story/context?${new URLSearchParams({reviewId,snapshotId:frame.snapshotId,contextRevision:String(view.version?.contextRevision??view.contextRevision)})}`,new AbortController().signal) as StoryContextView;check();
    if(context.reviewId!==reviewId||context.snapshotId!==frame.snapshotId||context.selectedRevision!==(view.version?.contextRevision??view.contextRevision))throw new Error('return_context_unavailable');
+   validateMap(snapshot,frame.maps);
    let restored:StoryState={...state,snapshot,snapshotId:frame.snapshotId,view,context,cursor:frame.cursor,elapsedMs:frame.elapsedMs,surface:frame.surface,position:clamp(state,frame.position.x,frame.position.y),maps:frame.maps,pageScroll:frame.pageScroll,activeDraftId:original.id,returnFrame:null,mode:'paused',evidence:null,evidenceText:'',semanticSources:{}};
    if(frame.evidence)restored=await stageEvidence(restored,frame.evidence,captured,owns);check();
    await restoreSemantic(frame.maps,frame.snapshotId,owns);check();

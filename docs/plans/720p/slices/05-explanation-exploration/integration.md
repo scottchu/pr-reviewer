@@ -4,7 +4,7 @@
 
 **Date:** 2026-10-24
 
-**Status:** Revision3 packet independently READY; named 05A core dispatch and local candidate recorded in [05A checkpoint](checkpoint-05a.md). 05A core atbaac411 is independently READY. Named05B [dispatch/checkpoint](checkpoint-05b.md) produced correctedcdc0c7e, independently READY for bounded05B and its05C extension seam.05C requires its next named root dispatch and contract reconciliation before code.04 G14 remains CHANGES NEEDED and PR24 remains draft.
+**Status:** Revision3 packet independently READY; named 05A core dispatch and local candidate recorded in [05A checkpoint](checkpoint-05a.md). 05A core atbaac411 is independently READY. Named05B [dispatch/checkpoint](checkpoint-05b.md) produced correctedcdc0c7e, independently READY for bounded05B and its05C extension seam.05C is assigned in its [tracked checkpoint](checkpoint-05c.md); durable contracts and a stable engineering candidate are prepared for full-checkpoint independent review.04 G14 remains CHANGES NEEDED and PR24 remains draft.
 
 **Parent:** [Slice05 plan](plan.md)
 

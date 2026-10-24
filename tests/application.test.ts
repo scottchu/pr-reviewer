@@ -1,9 +1,11 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import {
-  createReviewBridge,
+  createReviewBridge as createBaseReviewBridge,
   questionStatus,
 } from "../src/application/public.ts";
+import {recoveryMemory} from './recovery-fixture.ts';
+const createReviewBridge=(id:string)=>createBaseReviewBridge(id,undefined,{session:recoveryMemory().session});
 import type { Review, Anchor } from "../src/domain/public.ts";
 const review: Review = {
   reviewId: "r",
@@ -36,23 +38,20 @@ const anchor: Anchor = {
 test("application preserves unknown command identity, reads accepted revision and disposes/remounts routes", async () => {
   const original = globalThis.fetch;
   let failures = 1;
+  let accepted:Review['questions'][number]|undefined;
   const ids: string[] = [];
   globalThis.fetch = (async (
     input: Parameters<typeof fetch>[0],
     init?: Parameters<typeof fetch>[1],
   ) => {
     if (init?.method === "POST") {
-      const command = JSON.parse(String(init.body)) as { commandId: string };
+      const command = JSON.parse(String(init.body)) as { commandId: string;text:string };
       ids.push(command.commandId);
       if (failures-- > 0) throw new Error("lost_ack");
-      return Response.json({
-        commandId: command.commandId,
-        state: "applied",
-        revision: 1,
-        result: {},
-      });
+      accepted={questionId:"q",anchor,text:command.text.trim(),actorId:"u",revision:1,createdAt:"now",working:false};
+      return Response.json({commandId:command.commandId,actorId:"u",state:"applied",revision:1,cursor:1,result:{questionId:"q",eventId:null}});
     }
-    return Response.json(review);
+    return Response.json({...review,questions:accepted?[accepted]:[]});
   }) as typeof fetch;
   try {
     const bridge = createReviewBridge("r");
@@ -146,32 +145,29 @@ test("presentation separates answered/read state from unknown notification histo
   assert.equal(r.attempts[0]?.state, "unknown");
 });
 
-test("definitive HTTP rejection allows corrected submission; pending readback retains retry", async () => {
+test("authoritative matching rejection allows correction; an accepted retry only reads back", async () => {
   const original = globalThis.fetch;
   let reject = true,
     blockReadback = false;
+  let accepted:Review['questions'][number]|undefined;
   const ids: string[] = [];
   globalThis.fetch = (async (
     _input: Parameters<typeof fetch>[0],
     init?: Parameters<typeof fetch>[1],
   ) => {
     if (init?.method === "POST") {
-      const body = JSON.parse(String(init.body)) as { commandId: string };
+      const body = JSON.parse(String(init.body)) as { commandId: string;text:string };
       ids.push(body.commandId);
       if (reject) {
         reject = false;
-        return Response.json({ error: "invalid_request" }, { status: 400 });
+        return Response.json({commandId:body.commandId,actorId:"u",state:"rejected",revision:1,cursor:0,result:{},error:"invalid_request"});
       }
-      return Response.json({
-        commandId: body.commandId,
-        state: "applied",
-        revision: 2,
-        result: {},
-      });
+      accepted={questionId:body.commandId,anchor,text:body.text.trim(),actorId:"u",revision:2,createdAt:"now",working:false};
+      return Response.json({commandId:body.commandId,actorId:"u",state:"applied",revision:2,cursor:1,result:{questionId:body.commandId,eventId:null}});
     }
     if (blockReadback)
       return Response.json({ error: "projection_pending" }, { status: 409 });
-    return Response.json({ ...review, revision: 2 });
+    return Response.json({ ...review, revision: 2,questions:accepted?[accepted]:[] });
   }) as typeof fetch;
   try {
     const bridge = createReviewBridge("r");
@@ -185,11 +181,11 @@ test("definitive HTTP rejection allows corrected submission; pending readback re
     blockReadback = true;
     await assert.rejects(
       bridge.ask(anchor, "Wait for accepted readback"),
-      /readback_pending/,
+      /projection_pending/,
     );
     blockReadback = false;
     await bridge.ask(anchor, "Wait for accepted readback");
-    assert.equal(ids[2], ids[3]);
+    assert.equal(ids.length,3);
   } finally {
     globalThis.fetch = original;
   }
@@ -429,7 +425,7 @@ for (const obsoleteCompletion of ['before-new-read', 'after-new-read', 'failure-
       };
       if (obsoleteCompletion !== 'after-new-read') {
         await settleObsolete();
-        assert.equal(bridge.getSnapshot().review?.revision, 1);
+        assert.equal(bridge.getSnapshot().review,null);
         assert.equal(bridge.getSnapshot().error, '');
       }
       context.mock.timers.tick(2100);

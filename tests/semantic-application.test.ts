@@ -248,3 +248,21 @@ test('context controls send invalid cap/path/count to authoritative gateway vali
   }
  }finally{globalThis.fetch=original;await gateway.close();fixture.cleanup();}
 });
+
+test('S09 selected issue projection uses actual caller/span/path membership and keeps unassigned warning counts',async()=>{
+ const {semanticIssueProjection}=await import('../src/application/public.ts');
+ const selected={...anchor,start:10,end:30},other={...selected,path:'other.ts'};
+ const analysis:NonNullable<AnalysisView['analysis']>={status:'analyzed',analyzer:'source-neighborhood-v1.0.1',parser:'controlled parser',snapshotId:'s',corpusDigest:'a'.repeat(64),analysisId:'analysis',corpus:{base:{commit:'a',inventory:'selected-context',acquisition:'controlled-fixture'},head:{commit:'b',inventory:'selected-context',acquisition:'controlled-fixture'}},coverage:[],diagnostics:[{side:'head',path:'same.ts',start:15,code:'actual-code',message:'Selected diagnostic'},{side:'head',path:'same.ts',start:40,code:'outside',message:'Outside selected span'},{side:'head',path:'other.ts',start:15,code:'other',message:'Other path'}],observed:{bytes:0,inventoryBytes:0,astNodes:0,invocationSites:0},nodes:[{id:'focus',name:'selected',kind:'const-arrow',role:'changed',declaration:selected,body:selected}],edges:[],neighborhoods:[],unresolved:[{id:'selected',caller:'focus',anchor:{...selected,start:16,end:19},syntax:'CallExpression',reason:'unsupported_dispatch',candidates:[]},{id:'other',caller:'different',anchor:other,syntax:'CallExpression',reason:'missing_binding',candidates:[]}]};
+ const corpus={issues:[{reason:'file_limit' as const,side:'head' as const,path:'same.ts'},{reason:'source_limit' as const},{reason:'missing_object' as const,side:'head' as const,path:'other.ts'}]};
+ const result=semanticIssueProjection({analysis,corpus},'focus');assert.deepEqual(result.unresolved.map(item=>item.id),['selected']);assert.deepEqual(result.diagnostics.map(item=>item.code),['actual-code']);assert.equal(result.context.length,1);assert.deepEqual(result.global,[{reason:'source_limit'}]);assert.deepEqual(result.totals,{unresolved:2,diagnostics:3,context:3});
+ const inspected=semanticIssueProjection({analysis,corpus},'focus',other);assert.deepEqual(inspected.unresolved.map(item=>item.id),['other']);assert.deepEqual(inspected.diagnostics.map(item=>item.code),['other']);assert.equal(inspected.global.length,1);assert.equal(analysis.unresolved.length,2);
+});
+test('S09 source restore projects owned navigation without changing the exact authorized read; normal inspection stays explicit',async()=>{
+ const f=controlledFetch(),bridge=createAnalysisBridge('r');try{
+  // Public-port metadata fixture; actual gateway/source byte proof is the React journey.
+  const corpus={corpusId:'c'.repeat(64),sources:[]} as unknown as NonNullable<AnalysisView['corpus']>;
+  const login=bridge.login('owner','s');f.calls[0]!.resolve(view('s',{corpus}));await login;
+  const restored=bridge.openSource(anchor,{intent:'restore'});assert.equal(bridge.getSnapshot().sourceNavigation,'restore');assert.equal(f.calls[1]!.url,'/api/analysis/source');assert.equal(f.calls[1]!.options?.method,'POST');assert.deepEqual(JSON.parse(String(f.calls[1]!.options?.body)),{reviewId:'r',snapshotId:'s',corpusId:corpus.corpusId,side:anchor.side,path:anchor.path,contentHash:anchor.contentHash});f.calls[1]!.resolve({...anchor,corpusId:corpus.corpusId,content:'source'});await restored;assert.equal(bridge.getSnapshot().sourceNavigation,'restore');
+  const explicit=bridge.openSource(anchor);assert.equal(bridge.getSnapshot().sourceNavigation,'inspect');f.calls[2]!.resolve({...anchor,corpusId:corpus.corpusId,content:'source'});await explicit;assert.equal(bridge.getSnapshot().sourceAnchor,anchor);
+ }finally{f.restore();}
+});

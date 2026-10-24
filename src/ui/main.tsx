@@ -1,6 +1,6 @@
-import React, { useEffect, useState, useSyncExternalStore } from "react";
+import React, { useCallback, useEffect, useState, useSyncExternalStore } from "react";
 import { createRoot } from "react-dom/client";
-import { createReviewBridge, createImportsBridge, createAnalysisBridge, createStoryBridge, storyProjection, questionStatus } from "../application/public.ts";
+import { createReviewWorkspace, createImportsBridge, storyProjection, questionStatus } from "../application/public.ts";
 import {sourceComparison} from "../domain/public.ts";
 import type { Anchor, Review, SourceView } from "../domain/public.ts";
 import "./style.css";
@@ -8,7 +8,7 @@ import { ReviewGraph } from "./graph.tsx";
 import {Imports} from "./imports.tsx";
 import {StoryPanel} from "./story.tsx";
 import {SemanticPanel} from "./semantic-panel.tsx";
-const initialBridge = () => createReviewBridge(
+const initialWorkspace = () => createReviewWorkspace(
   new URLSearchParams(window.location.search).get("reviewId") ?? "pr-14",
   new URLSearchParams(window.location.search).get("snapshotId")??undefined,
 );
@@ -87,26 +87,21 @@ const SourcePane = ({
   );
 };
 const App = () => {
-  const [bridge,setBridge]=useState(initialBridge);
+  const [workspace,setWorkspace]=useState(initialWorkspace);
+  const {review:bridge,analysis:analysisBridge,story:storyBridge}=workspace;
   const [importsBridge]=useState(createImportsBridge);
-  const [analysisBridge,setAnalysisBridge]=useState(()=>createAnalysisBridge(new URLSearchParams(window.location.search).get("reviewId")??"pr-14"));
-  const [storyBridge,setStoryBridge]=useState(()=>createStoryBridge(new URLSearchParams(window.location.search).get("reviewId")??"pr-14",{semantic:analysisBridge}));
   const storyState=useSyncExternalStore(storyBridge.subscribe,storyBridge.getSnapshot);
-  const storyFocus=storyProjection(storyState);
-  const [comparisonKey,setComparisonKey]=useState<string|undefined>();
-  const state = useSyncExternalStore(bridge.subscribe, bridge.getSnapshot);
-  const [credential, setCredential] = useState(""),
-    [draft, setDraft] = useState(""),
-    [selected, setSelected] = useState<Anchor | null>(null),
-    [parentQuestionId,setParentQuestionId]=useState<string|undefined>(),
-    [onlySelectedDiscussion,setOnlySelectedDiscussion]=useState(false);
-  useEffect(() => bridge.connect(), [bridge]);
-  useEffect(() => {
-    if (state.initialSelection && !selected)
-      setSelected(state.initialSelection);
-  }, [state.initialSelection, selected]);
-  const review = state.review;
-  useEffect(()=>{if(review){void analysisBridge.select(review.snapshot.snapshotId).catch(()=>{});void storyBridge.select(review.snapshot);}},[analysisBridge,storyBridge,review?.snapshot.snapshotId]);
+  const storyFocus=storyProjection(storyState),activeDraft=storyState.drafts.find(draft=>draft.id===storyState.activeDraftId);
+  const selected=activeDraft?.anchor??null,draft=activeDraft?.text??'',comparisonKey=activeDraft?.comparisonKey,parentQuestionId=activeDraft?.parentQuestionId;
+  const state=useSyncExternalStore(bridge.subscribe,bridge.getSnapshot);
+  const [credential,setCredential]=useState(''),[onlySelectedDiscussion,setOnlySelectedDiscussion]=useState(false),[interactionError,setInteractionError]=useState('');
+  const act=(action:()=>unknown)=>{try{const result=action();if(result instanceof Promise)void result.catch(error=>setInteractionError(error instanceof Error?error.message:'interaction_failed'));setInteractionError('');}catch(error){setInteractionError(error instanceof Error?error.message:'interaction_failed');}};
+  useEffect(()=>workspace.connect(),[workspace]);
+  useEffect(()=>{const scroll=()=>storyBridge.setPageScroll(window.scrollY);window.addEventListener('scroll',scroll,{passive:true});return()=>window.removeEventListener('scroll',scroll);},[storyBridge]);
+  useEffect(()=>{if(storyState.mapRestoreId)requestAnimationFrame(()=>window.scrollTo({top:storyState.pageScroll}));},[storyBridge,storyState.mapRestoreId]);
+  const captureStructural=useCallback((frame:import('../application/public.ts').GraphFrames['structural'])=>workspace.captureMap('structural',state.review?.snapshot.snapshotId??null,frame),[workspace,state.review?.snapshot.snapshotId,storyState.snapshotId]);
+  const captureSemantic=useCallback((frame:import('../application/public.ts').GraphFrames['semantic'],snapshotId:string|null)=>workspace.captureMap('semantic',snapshotId,frame),[workspace,storyState.snapshotId]);
+  const review=state.review;
   if (!state.authenticated || !review)
     return (
       <main className="login">
@@ -119,7 +114,7 @@ const App = () => {
         <form
           onSubmit={(event) => {
             event.preventDefault();
-            void bridge.login(credential).then(()=>{const current=bridge.getSnapshot().review;if(current){void analysisBridge.login(credential,current.snapshot.snapshotId).catch(()=>{});void storyBridge.login(credential,current.snapshot);}});void importsBridge.login(credential);
+            act(()=>workspace.login(credential));void importsBridge.login(credential);
           }}
         >
           <label htmlFor="credential">Local access token</label>
@@ -137,25 +132,18 @@ const App = () => {
     );
   const attachment = review.attachment;
   const chooseSnapshot=async(snapshotId:string)=>{
-    if(draft.trim())return;
-    try{await bridge.selectSnapshot(snapshotId);const url=new URL(window.location.href);url.searchParams.set("snapshotId",snapshotId);window.history.replaceState(null,"",url);setSelected(bridge.getSnapshot().initialSelection);}catch{}
+    try{await workspace.selectSnapshot(snapshotId);const url=new URL(window.location.href);url.searchParams.set("snapshotId",snapshotId);window.history.replaceState(null,"",url);}catch{}
   };
   const pauseStory=()=>storyBridge.intent({type:"pause",reason:"reading"});
-  const openSource = async(anchor:Anchor,fileKey?:string) => {
-    pauseStory();
-    if(draft.trim() && selected && JSON.stringify(anchor)!==JSON.stringify(selected)) return;
-    if(anchor.snapshotId!==review.snapshot.snapshotId){
-      try{await bridge.selectSnapshot(anchor.snapshotId);}catch{return;}
-    }
-    setSelected(anchor);setComparisonKey(fileKey);
-    const url=new URL(window.location.href);url.searchParams.set("snapshotId",anchor.snapshotId);url.hash=`source-${anchor.side}-${anchor.startLine}`;window.history.replaceState(null,"",url);
-    requestAnimationFrame(()=>document.getElementById(`source-${anchor.side}-${anchor.startLine}`)?.scrollIntoView({block:"center"}));
+  const openSource=async(anchor:Anchor,fileKey?:string)=>{
+    pauseStory();try{await workspace.openSource(anchor,fileKey);}catch(error){setInteractionError(error instanceof Error?error.message:'source_unavailable');return;}
+    const url=new URL(window.location.href);url.searchParams.set('snapshotId',anchor.snapshotId);url.hash=`source-${anchor.side}-${anchor.startLine}`;window.history.replaceState(null,'',url);
+    requestAnimationFrame(()=>document.getElementById(`source-${anchor.side}-${anchor.startLine}`)?.scrollIntoView({block:'center'}));
   };
   return (
     <main>
-      <Imports bridge={importsBridge} review={review} canOpen={!draft.trim()&&bridge.canLeaveReview()} onOpen={reviewId=>{
-        if(draft.trim()||!bridge.canLeaveReview())return;
-        const next=createReviewBridge(reviewId);setSelected(null);setComparisonKey(undefined);setParentQuestionId(undefined);setBridge(next);const semantic=createAnalysisBridge(reviewId);setAnalysisBridge(semantic);const story=createStoryBridge(reviewId,{semantic});storyBridge.logout();setStoryBridge(story);void next.login(credential).then(()=>{const current=next.getSnapshot().review;if(current){void semantic.login(credential,current.snapshot.snapshotId).catch(()=>{});void story.login(credential,current.snapshot);}});
+      <Imports bridge={importsBridge} review={review} canOpen={workspace.canLeaveReview()} onOpen={reviewId=>{
+        if(!workspace.canLeaveReview())return;const next=createReviewWorkspace(reviewId);workspace.logout();setWorkspace(next);act(()=>next.login(credential));
         const url=new URL(window.location.href);url.searchParams.set('reviewId',reviewId);url.searchParams.delete('snapshotId');url.hash='';window.history.replaceState(null,'',url);
       }}/>
       <header className="identity">
@@ -203,11 +191,14 @@ const App = () => {
           )}
         </div>
       </header>
-      <section className="snapshot-selection" aria-label="Snapshot history"><label>Snapshot<select value={review.snapshot.snapshotId} disabled={Boolean(draft.trim())||state.busy} onChange={event=>{void chooseSnapshot(event.target.value);}}>{(review.snapshotSummaries??[{snapshotId:review.snapshot.snapshotId,baseSha:review.snapshot.baseSha,headSha:review.snapshot.headSha}]).map(snapshot=><option key={snapshot.snapshotId} value={snapshot.snapshotId}>{snapshot.snapshotId===(review.currentSnapshotId??review.snapshot.snapshotId)?"Current":"History"} · {snapshot.headSha.slice(0,12)} · {snapshot.snapshotId.slice(0,12)}</option>)}</select></label><p role="status">{review.snapshot.snapshotId===(review.currentSnapshotId??review.snapshot.snapshotId)?"Viewing current snapshot":"Viewing historical snapshot"}. Selection is private and does not move saved source or discussion.</p>{state.error&&<p role="alert">{state.error}</p>}</section>
+      <section className="snapshot-selection" aria-label="Snapshot history"><label>Snapshot<select value={review.snapshot.snapshotId} disabled={Boolean(draft.trim())||state.busy||storyState.questionLocked} onChange={event=>{void chooseSnapshot(event.target.value);}}>{(review.snapshotSummaries??[{snapshotId:review.snapshot.snapshotId,baseSha:review.snapshot.baseSha,headSha:review.snapshot.headSha}]).map(snapshot=><option key={snapshot.snapshotId} value={snapshot.snapshotId}>{snapshot.snapshotId===(review.currentSnapshotId??review.snapshot.snapshotId)?"Current":"History"} · {snapshot.headSha.slice(0,12)} · {snapshot.snapshotId.slice(0,12)}</option>)}</select></label><p role="status">{review.snapshot.snapshotId===(review.currentSnapshotId??review.snapshot.snapshotId)?"Viewing current snapshot":"Viewing historical snapshot"}. Selection is private and does not move saved source or discussion.</p>{state.error&&<p role="alert">{state.error}</p>}</section>
       {state.selecting&&<p role="status">Opening the selected snapshot. Question composition is held until its source is ready.</p>}
+      {interactionError&&<p role="alert">{interactionError}</p>}
+      {state.recovery.state!=='none'&&<section className="question-recovery" aria-label="Question recovery"><h2>Unresolved question</h2><p role="status">{state.recovery.message}</p>{state.recovery.commandId&&<p>Original source: {state.recovery.snapshotId} · saved command {state.recovery.commandId}</p>}{['awaiting_ack','accepted_awaiting_readback','storage_unavailable'].includes(state.recovery.state)&&<button disabled={state.busy} onClick={()=>act(()=>bridge.recoverPendingQuestion())}>Recover saved question</button>}</section>}
+      <button type="button" className="quiet" onClick={()=>{workspace.logout();setCredential('');}}>Log out</button>
       <StoryPanel key={`story:${review.reviewId}`} bridge={storyBridge}/>
-      <div onFocusCapture={pauseStory} onPointerDownCapture={pauseStory} onScrollCapture={pauseStory}><SemanticPanel key={`semantic:${review.reviewId}`} bridge={analysisBridge}/></div>
-      {state.graph && <div onFocusCapture={pauseStory} onPointerDownCapture={pauseStory}><ReviewGraph graph={state.graph} selectedPath={storyFocus?.sources[0]?.reference.anchor.path??selected?.path??""} selectedFileKey={storyFocus?.comparisonKey??comparisonKey} storyFocus={storyFocus?.graphFocus} onOpen={openSource}/></div>}
+      <div onFocusCapture={pauseStory} onPointerDownCapture={pauseStory} onScrollCapture={pauseStory}><SemanticPanel key={`semantic:${review.reviewId}`} bridge={analysisBridge} onGraphState={captureSemantic} graphRestore={storyState.maps.semantic?{id:storyState.mapRestoreId,frame:storyState.maps.semantic}:undefined}/></div>
+      {state.graph && <div onFocusCapture={pauseStory} onPointerDownCapture={pauseStory}><ReviewGraph graph={state.graph} selectedPath={storyFocus?.sources[0]?.reference.anchor.path??selected?.path??""} selectedFileKey={storyFocus?.comparisonKey??comparisonKey} storyFocus={storyFocus?.graphFocus} onStateChange={captureStructural} restore={storyState.maps.structural?{id:storyState.mapRestoreId,frame:storyState.maps.structural}:undefined} onOpen={openSource}/></div>}
       <section className="source-identity" onFocusCapture={pauseStory}>
         <h2>{selected?.path ?? state.sources[0]?.path}</h2>
         <p>
@@ -216,7 +207,7 @@ const App = () => {
         </p>
         <a href="#graph-title" onClick={()=>document.getElementById("graph-title")?.focus()}>Return to change map</a>
         {draft.trim()&&<p role="status">Source selection is held while your question draft is nonempty. Save or clear it before navigating.</p>}
-        <label>Source file<select value={selected?.path??""} disabled={Boolean(draft.trim())} onChange={e=>{const source=state.sources.find(s=>s.path===e.target.value&&s.side==="head"&&s.lineCount>0)??state.sources.find(s=>s.path===e.target.value&&s.lineCount>0);if(source)openSource({snapshotId:review.snapshot.snapshotId,path:source.path,side:source.side,startLine:1,endLine:1});}}>{[...new Set(state.sources.filter(s=>s.lineCount>0).map(s=>s.path))].map(path=><option key={path}>{path}</option>)}</select></label>
+        <label>Source file<select value={selected?.path??""} disabled={Boolean(draft.trim())||storyState.questionLocked} onChange={e=>act(()=>workspace.openPath(e.target.value))}>{[...new Set(state.sources.filter(s=>s.lineCount>0).map(s=>s.path))].map(path=><option key={path}>{path}</option>)}</select></label>
       </section>
       {selected && <div className="source-grid" onFocusCapture={pauseStory} onPointerDownCapture={pauseStory} onScrollCapture={pauseStory}>
             {(["base", "head"] as const).map(side => {
@@ -227,14 +218,12 @@ const App = () => {
           <section className="conversation" onFocusCapture={pauseStory}>
             {selected?<div className="composer">
               <p className="eyebrow">Ask about this source</p>
+              {storyState.drafts.length>1&&<label>Active question draft<select value={storyState.activeDraftId} disabled={Boolean(storyState.returnFrame)||storyState.questionLocked} onChange={event=>act(()=>storyBridge.chooseDraft(event.target.value))}>{storyState.drafts.map((item,index)=><option key={item.id} value={item.id}>{index===0?'Original draft':'Exploration draft'}{item.submitted?' · submitted':''}</option>)}</select></label>}
               <h2>One question, grounded in the change</h2>
               <form
                 onSubmit={(event) => {
                   event.preventDefault();
-                  void bridge
-                    .ask(selected, draft,parentQuestionId)
-                    .then(() => {setDraft("");setParentQuestionId(undefined);})
-                    .catch(() => {});
+                  act(()=>workspace.ask());
                 }}
               >
                 <div className="range">
@@ -242,12 +231,7 @@ const App = () => {
                     Source side
                     <select
                       value={selected.side}
-                      onChange={(e) =>
-                        setSelected({
-                          ...selected,
-                          side: e.target.value as "base" | "head",
-                        })
-                      }
+                      onChange={e=>act(()=>storyBridge.setQuestionRange({side:e.target.value as "base"|"head"}))}
                     >
                       <option value="base">Before (base)</option>
                       <option value="head">After (head)</option>
@@ -259,12 +243,7 @@ const App = () => {
                       type="number"
                       min="1"
                       value={selected.startLine}
-                      onChange={(e) =>
-                        setSelected({
-                          ...selected,
-                          startLine: Number(e.target.value),
-                        })
-                      }
+                      onChange={e=>act(()=>storyBridge.setQuestionRange({startLine:Number(e.target.value)}))}
                     />
                   </label>
                   <label>
@@ -273,12 +252,7 @@ const App = () => {
                       type="number"
                       min={selected.startLine}
                       value={selected.endLine}
-                      onChange={(e) =>
-                        setSelected({
-                          ...selected,
-                          endLine: Number(e.target.value),
-                        })
-                      }
+                      onChange={e=>act(()=>storyBridge.setQuestionRange({endLine:Number(e.target.value)}))}
                     />
                   </label>
                 </div>
@@ -286,21 +260,21 @@ const App = () => {
                   {selected.side} · {selected.path}:{selected.startLine}–
                   {selected.endLine}
                 </p>
-                {parentQuestionId&&<p className="follow-up">Follow-up to question {parentQuestionId} · original snapshot {review.questions.find(question=>question.questionId===parentQuestionId)?.anchor.snapshotId}. New source: {selected.snapshotId}. <button type="button" onClick={()=>setParentQuestionId(undefined)} disabled={Boolean(draft.trim())}>Cancel follow-up</button></p>}
+                {parentQuestionId&&<p className="follow-up">Follow-up to question {parentQuestionId} · original snapshot {review.questions.find(question=>question.questionId===parentQuestionId)?.anchor.snapshotId}. New source: {selected.snapshotId}. <button type="button" onClick={()=>act(()=>storyBridge.setParentQuestion(undefined))} disabled={Boolean(draft.trim())||storyState.questionLocked}>Cancel follow-up</button></p>}
                 <label htmlFor="question">Your question</label>
                 <textarea
                   id="question"
-                  disabled={state.selecting}
+                  disabled={state.selecting||storyState.questionLocked||state.busy}
                   aria-describedby="selection question-help"
                   rows={4}
                   value={draft}
-                  onChange={(e) => setDraft(e.target.value)}
+                  onChange={(e) => act(()=>storyBridge.editDraft(e.target.value))}
                   required
                 />
                 <p id="question-help">
                   The answer must cite this pinned source and state its limits.
                 </p>
-                <button disabled={state.busy || state.selecting || !draft.trim()}>
+                <button disabled={storyState.questionLocked || state.busy || state.selecting || !draft.trim()}>
                   {state.busy ? "Saving question…" : "Save question"}
                 </button>
                 {state.error && <p role="alert">{state.error}</p>}
@@ -345,7 +319,7 @@ const App = () => {
                       {question.anchor.side} · {question.anchor.path}:
                       {question.anchor.startLine}–{question.anchor.endLine}
                     </a>
-                    <button type="button" className="quiet" disabled={Boolean(draft.trim())||state.busy} onClick={()=>{setParentQuestionId(question.questionId);document.getElementById("question")?.focus();}}>Follow up</button>
+                    <button type="button" className="quiet" disabled={Boolean(draft.trim())||state.busy||storyState.questionLocked} onClick={()=>{act(()=>storyBridge.setParentQuestion(question.questionId));document.getElementById("question")?.focus();}}>Follow up</button>
                     {attempt && (
                       <details>
                         <summary>Notification: {attempt.state}</summary>

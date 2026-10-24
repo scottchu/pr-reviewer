@@ -2,7 +2,7 @@ import {createRegistry} from '../integration/registry.ts';
 import type {AnalysisCommand,AnalysisReceipt,AnalysisView,SemanticAnchor,SemanticSource,SemanticFunctionNode,SemanticCallEdge,AnalysisJobView} from '../domain/public.ts';
 type Intent=AnalysisCommand extends infer C?C extends AnalysisCommand?Omit<C,'commandId'>:never:never;
 type Owner={generation:number;token:string;snapshotId:string;analysisId:string|undefined};
-export type SemanticView={view:AnalysisView|null;authenticated:boolean;busy:boolean;reading:boolean;uncertain:boolean;error:string;source:SemanticSource|null;sourceAnchor:SemanticAnchor|null;sourceBusy:boolean;focus:string;snippets:Readonly<Record<string,SemanticSource>>};
+export type SemanticView={view:AnalysisView|null;authenticated:boolean;busy:boolean;reading:boolean;uncertain:boolean;error:string;source:SemanticSource|null;sourceAnchor:SemanticAnchor|null;sourceBusy:boolean;sourceNavigation:'inspect'|'restore';focus:string;snippets:Readonly<Record<string,SemanticSource>>};
 export const semanticSourceKey=(anchor:Pick<SemanticAnchor,'side'|'path'|'contentHash'>)=>JSON.stringify([anchor.side,anchor.path,anchor.contentHash]);
 export const semanticExcerpt=(sources:Readonly<Record<string,SemanticSource>>,anchor:SemanticAnchor)=>sources[semanticSourceKey(anchor)]?.content.slice(anchor.start,anchor.end)??'Source excerpt loading…';
 export const semanticProjection=(view:AnalysisView|null,focus:string)=>{
@@ -20,8 +20,14 @@ export const semanticProjection=(view:AnalysisView|null,focus:string)=>{
  const nodes=selected.sort((a,b)=>rank(a)-rank(b)),ids=new Set(nodes.map(node=>node.id));
  return {nodes,edges:analysis.edges.filter(edge=>ids.has(edge.caller)&&ids.has(edge.callee)),totalNodes:relevant.size};
 };
+export const semanticIssueProjection=(view:(Pick<AnalysisView,'analysis'> & {corpus:Pick<NonNullable<AnalysisView['corpus']>,'issues'>|null})| null,focus:string,sourceAnchor:SemanticAnchor|null=null)=>{
+ const analysis=view?.analysis,selected=sourceAnchor??(analysis?.status==='analyzed'?analysis.nodes.find(node=>node.id===focus)?.body:null)??null;
+ const matches=(anchor:SemanticAnchor)=>Boolean(selected&&anchor.snapshotId===selected.snapshotId&&anchor.side===selected.side&&anchor.path===selected.path&&anchor.contentHash===selected.contentHash&&anchor.start<selected.end&&anchor.end>selected.start);
+ const unresolved=analysis?.status==='analyzed'?analysis.unresolved:[],diagnostics=analysis?.diagnostics??[],issues=view?.corpus?.issues??[];
+ return {selected,unresolved:unresolved.filter(site=>!sourceAnchor&&site.caller===focus||matches(site.anchor)),diagnostics:diagnostics.filter(item=>selected&&item.side===selected.side&&item.path===selected.path&&item.start>=selected.start&&item.start<selected.end),context:issues.filter(item=>selected&&item.side===selected.side&&item.path===selected.path),global:issues.filter(item=>!item.path||!item.side),totals:{unresolved:unresolved.length,diagnostics:diagnostics.length,context:issues.length}};
+};
 export const createAnalysisBridge=(reviewId:string)=>{
- const empty=():SemanticView=>({view:null,authenticated:false,busy:false,reading:false,uncertain:false,error:'',source:null,sourceAnchor:null,sourceBusy:false,focus:'',snippets:{}});
+ const empty=():SemanticView=>({view:null,authenticated:false,busy:false,reading:false,uncertain:false,error:'',source:null,sourceAnchor:null,sourceBusy:false,sourceNavigation:'inspect',focus:'',snippets:{}});
  let state=empty(),token='',generation=0,snapshotId='',analysisId:string|undefined,disposed=false;
  const registry=createRegistry(),listeners=new Set<()=>void>();
  let connection:object|null=null,read:{controller:AbortController;owner:Owner;done:Promise<void>;finish:()=>void}|null=null,sourceRead:{controller:AbortController;owner:Owner}|null=null;
@@ -136,11 +142,11 @@ export const createAnalysisBridge=(reviewId:string)=>{
   },
   retry:async()=>{if(!pending)throw new Error('invalid_request');const {commandId,...intent}=pending.command;return send(intent as Intent);},
   focus:(id:string)=>{publish({...state,focus:id});void warm(owner());},
-  openSource:async(anchor:SemanticAnchor)=>{
+  openSource:async(anchor:SemanticAnchor,navigation:{intent?:'inspect'|'restore'}={})=>{
    if(!analysisId&&state.view?.analysis){analysisId=state.view.analysis.analysisId;abortRead();publish({...state,reading:false});}
    const o=owner(),corpus=state.view?.corpus;if(!corpus||anchor.snapshotId!==snapshotId)throw new Error('source_unavailable');
    sourceRead?.controller.abort();const op={owner:o,controller:new AbortController()};sourceRead=op;
-   publish({...state,sourceBusy:true,error:''});
+   publish({...state,sourceBusy:true,sourceNavigation:navigation.intent??'inspect',error:''});
    try{const source=await request(o,'/api/analysis/source',sourceQuery(o,corpus.corpusId,anchor),op.controller.signal) as SemanticSource;
     if(owns(o)&&sourceRead===op&&!op.controller.signal.aborted)publish({...state,source,sourceAnchor:anchor,snippets:{...state.snippets,[semanticSourceKey(anchor)]:source}});
    }catch(error){if(owns(o)&&sourceRead===op&&!op.controller.signal.aborted)publish({...state,error:error instanceof Error?error.message:'source_unavailable'});
