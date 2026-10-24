@@ -41,3 +41,9 @@ New owned loopback http://localhost:56676/ only, strictPort, exact allowed host 
 ## Reading-clearance correction before final capture
 
 Author captures showed that end-of-page padding alone lets a fixed player cover source lines in the middle of a long evidence view. The bounded mock now reserves a real bottom rail: the review reading viewport scrolls above it; the player and safe-area clearance occupy their own space. This preserves the accepted first-viewport composition and same-canvas source identity. It is a proposed mock geometry, not a product layout/timing adoption. Recheck the existing four authored journeys after this presentation correction, including reduced-height composer and scroll-to-evidence/return; do not broaden the product suite.
+
+## Thread refinement and focus finding
+
+The supplied-capture design critique requests a visible prepared-example heading distinct from the unsent draft and a compact exact anchor cue beside the draft label at reduced height. Keep the substantive credential answer separate from the delivery boundary.
+
+The reserved-rail check also exposed intermittent keyboard focus loss: recreating a controlled ReactFlow group without retaining its measured dimensions temporarily hides that group on draft edits, moving focus to the body before Escape. Preserve the group's actual measured dimensions in the controlled node projection; do not replace this with a timeout, forced click or document-wide key policy. The existing prose keyboard journey must assert focus after typing and Escape close with the same draft retained. This is mock presentation ownership, not production lifecycle redesign.
