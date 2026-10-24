@@ -2,7 +2,7 @@
 
 Date: 2026-10-24
 
-Status: bounded correction implemented and locally verified; root independent review pending.
+Status: independent source recheck READY and affected author Chrome journey passed; draft publication authorized. Own-PR graph-first, native and deployment acceptance remain open.
 
 Parent: [slice05](plan.md). Durable contract: [story and exploration](../../../../product/review-loop/story-and-exploration.md).
 
@@ -56,3 +56,12 @@ The browser observes persisted draft readiness before compute, then confirms Rea
 Earlier failures are retained: /private/tmp/semantic-recovery-browser.log and artifacts (initial expectation incorrectly required a semantic frame before an authenticated capture transition); /private/tmp/semantic-recovery-browser-2.log and artifacts (live unload/checkpoint replaced a manually seeded current-page frame before reload). The test now waits on real persisted draft state, produces compute afterward, and seeds the legacy envelope before application startup. No arbitrary sleeps, output interception or product behavior change was used to satisfy these assertions. Original WIP remains /private/tmp/semantic-recovery-browser-wip.patch.
 
 This closes the affected author-engineering React regression gap. Independent source recheck, actual own-PR graph-first comprehension and native/deployment acceptance remain separate. No independent browser-policy denial was retried, and no user browser, pilot, native session, permission or global setting was changed.
+
+
+## Independent recheck and draft delivery receipt
+
+Date: 2026-10-24. Independent verdict: READY for bounded source engineering; cached-403 P2 closed with no remaining blocker in the narrow recheck. Exact reviewed implementation: 70f930fc9dc1a310ab8f4605bc5b7d81be1700f5. Report: /tmp/pr-reviewer-semantic-recovery-independent/recheck-70f930f.md. SHA-256: 89b280c56da6c4709d8d1c5e2d43dd910c35fcdc5f8dc25e4b84dc4045dd4a0d. Root read the complete report and the separately attributed Chrome evidence.
+
+The unchanged independent counterexample now exits0, observes one fresh semantic read, rejects unauthorized, preserves the original analysis pin and return frame, and emits no recovery-success notice. Independently rerun focused tests pass55/55; strict TypeScript, boundaries and correction whitespace checks pass. The reviewer did not run the subsequent Chrome journey. The author Chrome test/docs tail614a01f changes no application code from70f930f; this final receipt is documentation-only. The earlier47Bun/308Node result remains attributed to47e3233, not relabeled as a full run of the correction.
+
+Root subsequently authorized draft GitHub publication of this exact recovery branch against main; earlier local-only instructions describe their historical stage. No additional code/dependency changes or unchanged-test reruns accompany this receipt. Independent source readiness and the one author engineering Chrome pass do not establish actual own-PR graph-first comprehension, native host acceptance or deployment. Those gates remain open; no merge/deployment is authorized here.
