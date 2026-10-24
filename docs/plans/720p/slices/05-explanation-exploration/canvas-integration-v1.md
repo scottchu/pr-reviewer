@@ -47,3 +47,20 @@ Date: 2026-10-24
 Status: four focused application/codec tests and strict TypeScript pass; renderer/workspace integration not yet implemented
 
 New source inspection owns explicit comparison occurrence, selected raw SHA256 verification, bounded source context, cancellation/generation fences and Back. Private codec accepts optional inspection with exact anchor/hash and optional expanded flag; old records remain unchanged without it. The initial RED was the absent public owner export; focused tests then caught an invalid rename fixture that lacked the required provider comparison identity. Correcting that fixture to the real public comparison shape exercises exact old/new paths. No domain comparison change or inferred legacy partner was introduced. Post-publication canvas restore by itself is insufficient for transactional Story Resume: the accepted awaited preflight above is required before wiring and acceptance. Tests remain direct pending normal-entry registration in the integrated checkpoint.
+
+## Independent owner correction: failed restore supersedes prior read
+
+Root forwarded a concrete P2 from independent2f0 review: rejecting a missing saved fileKey before interrupting an older checksum operation lets that old completion replace the restore error with unrelated source. Every restore intent, including null/legacy or invalid frames, must fence/cancel the prior operation before any early validation and settle its busy/error state. A failed exact restore retains frame/drafts and never uses a prior pending completion as fallback. Add deterministic held-digest RED→PASS regression before repairing this owner path. This is independent source evidence, not browser or layout acceptance.
+
+## Transactional preflight and semantic integration checkpoint
+
+Date: 2026-10-24
+Status: application preflight implemented/tested; workspace/React composition pending
+
+Merged exact reviewed semantic recovery d5e8cb2 at clean9abe025, preserving B2/SDK2 and optional structural frame schema. Its55 focused semantic/recovery/exploration cases, strict and boundaries passed at that combined pin; logs semantic-combined-9abe025.log, strict-combined-9abe025.log and boundaries-combined-9abe025.log under /tmp/pr-reviewer-canvas-integration-evidence. application/analysis.ts has no subsequent task change.
+
+The new public createCanvasFrameValidator/CanvasFrameValidationPort checks the supplied immutable target without publishing. Story awaits it during private hydration for both the current frame and retained return frame, and during Resume before consumption, with its existing abort/generation/private-intent checks. Legacy absent inspection invokes no validator/read. Startup failure preserves the raw checkpoint containing first frame/both drafts under existing checkpoint blocking; successful hydration exposes the validated frame. Positive/negative/caller-abort, malformed target, stale raw bytes and copied occurrence cases are tested. The startup regression now specifically has a valid current map and invalid saved return inspection, so validating only the current map cannot pass.
+
+Architect amendment /tmp/pr-reviewer-focused-canvas-plan-review/transactional-restore-amendment.md, SHA25656fb09f0f18598e85a871995e83c13f9dbc847b4043bd086d0c76754f4566994, was fully read and reconciled. Its READY is design readiness, not an implementation verdict. The earlier weaker before-display-only report is superseded.
+
+Independent failed-restore race was reproduced RED in restore-race-red.log and fixed by fencing every restore before early validation. Atomic Story regressions were RED before the awaited port; atomic-canvas-restore-red.log preserves that result. Combined focused verification now passes65 cases, strict TypeScript and subsystem boundaries; combined-preflight-green.log/preflight-strict.log/preflight-boundaries.log retain outputs. The new canvas suite and two inherited B2 suites are added to the normal Node test inventory; the normal full entrypoint is still pending after managed wiring/renderer. No browser, production or layout acceptance follows this checkpoint.

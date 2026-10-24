@@ -1,5 +1,6 @@
 import {accessHeaders} from './local-access.ts';
 import {validateAnchor,projectGraph,graphFiles} from '../domain/public.ts';
+import type {CanvasFrameValidationPort} from './canvas.ts';
 import type {Anchor} from '../domain/public.ts';
 import type {PrivateSession,QuestionDraft,GraphFrames,StoryReturnFrame,PrivateStoryView} from './private-session.ts';
 import {createRegistry} from '../integration/registry.ts';
@@ -101,7 +102,7 @@ export const questionEvidenceProjection=(state:StoryState):QuestionEvidenceInten
 const freeze=<T>(value:T):T=>{if(value&&typeof value==='object'&&!Object.isFrozen(value)){Object.freeze(value);for(const item of Object.values(value))freeze(item);}return value;};
 const empty=(reviewId:string):StoryState=>({reviewId,snapshotId:null,snapshot:null,view:null,context:null,cursor:null,focusRevision:0,mode:'paused',elapsedMs:0,surface:'flow',hidden:false,reducedMotion:false,authenticated:false,reading:false,contextReading:false,error:'',focusError:'',evidence:null,evidenceText:'',evidenceBusy:false,drafts:[],activeDraftId:'',returnFrame:null,maps:{structural:null,semantic:null},mapRestoreId:0,pageScroll:0,viewRecoveryMessage:'',questionLocked:false,semanticSources:{},position:{x:0,y:0},viewport:{width:1024,height:768},playerSize:{width:500,height:44}});
 const defaultClock:StoryClock={now:()=>performance.now(),every:(callback,period)=>{const timer=setInterval(callback,period);return()=>clearInterval(timer);}};
-export const createStoryBridge=(reviewId:string,options:{clock?:StoryClock;semantic?:StorySemanticPort;session?:PrivateSession;selectSnapshot?:(snapshotId:string)=>Promise<Snapshot>;readSnapshot?:(snapshotId:string,signal?:AbortSignal)=>Promise<Snapshot>}={})=>{
+export const createStoryBridge=(reviewId:string,options:{canvasFrames?:CanvasFrameValidationPort;clock?:StoryClock;semantic?:StorySemanticPort;session?:PrivateSession;selectSnapshot?:(snapshotId:string)=>Promise<Snapshot>;readSnapshot?:(snapshotId:string,signal?:AbortSignal)=>Promise<Snapshot>}={})=>{
  const clock=options.clock??defaultClock,registry=createRegistry(),listeners=new Set<()=>void>();
  let state=freeze(empty(reviewId)),token='',scope='',privateIntent=0,hydrating=false,viewCheckpointBlocked=false,generation=0,versionId:string|undefined,connection:object|null=null,disposed=false;
  let recoveryNotice='';
@@ -109,8 +110,8 @@ export const createStoryBridge=(reviewId:string,options:{clock?:StoryClock;seman
  let read:AbortController|null=null,contextRead:AbortController|null=null,evidenceRead:AbortController|null=null,focusSerial=0,stopClock:(()=>void)|null=null,lastTick=0,disposeConnection:(()=>void)|null=null;
  let focusRoute:ReturnType<typeof registry.register>|null=null,pollRoute:ReturnType<typeof registry.register>|null=null;
  const readControllers=new Set<AbortController>();
- let restoreOperation:{controller:AbortController}|null=null;
- const invalidatePrivateIntent=()=>{privateIntent++;restoreOperation?.controller.abort();restoreOperation=null;return privateIntent;};
+ let restoreOperation:{controller:AbortController}|null=null,privateValidation:AbortController|null=null;
+ const invalidatePrivateIntent=()=>{privateIntent++;privateValidation?.abort();privateValidation=null;restoreOperation?.controller.abort();restoreOperation=null;return privateIntent;};
  const awaitRead=<T,>(reading:Promise<T>,signal?:AbortSignal):Promise<T>=>{if(!signal)return reading;return new Promise<T>((resolve,reject)=>{const abort=()=>reject(new Error('selection_superseded'));if(signal.aborted)abort();else signal.addEventListener('abort',abort,{once:true});void reading.then(value=>{signal.removeEventListener('abort',abort);if(signal.aborted)abort();else resolve(value);},error=>{signal.removeEventListener('abort',abort);reject(error);});});};
  const publish=(next:StoryState)=>{if(Object.keys(next).every(key=>Object.is(next[key as keyof StoryState],state[key as keyof StoryState])))return;state=freeze(next);syncClock();checkpoint();for(const listener of listeners)listener();};
  const activeDraft=()=>state.drafts.find(draft=>draft.id===state.activeDraftId)??state.drafts[0]??null;
@@ -122,7 +123,7 @@ export const createStoryBridge=(reviewId:string,options:{clock?:StoryClock;seman
  const assertCanNavigate=()=>{assertEditable();if(activeDraft()?.text.trim())throw new Error('draft_held: keep or clear the active draft before changing its source');};
  const validateMap=(snapshot:Snapshot,maps:GraphFrames)=>{const frame=maps.structural;if(!frame)return;const graph=projectGraph(snapshot),file=graph.files.find(file=>file.key===frame.fileKey);if(!file||frame.spans&&frame.spanId&&!graph.nodes.some(node=>node.kind==='hunk'&&node.id===frame.spanId&&(node.fileKey===frame.fileKey||node.path===file.oldPath||node.path===file.newPath)))throw new Error('saved_map_unavailable');};
  const restorePrivate=async(value:PrivateStoryView,expected:number)=>{
-  const capturedToken=token,validation=new AbortController();readControllers.add(validation);try{
+  const capturedToken=token,capturedIntent=privateIntent,validation=new AbortController();privateValidation=validation;readControllers.add(validation);const owns=()=>expected===generation&&!disposed&&capturedToken===token&&capturedIntent===privateIntent&&!validation.signal.aborted;try{
   if(!state.snapshot||value.reviewId!==reviewId||value.snapshotId!==state.snapshotId)throw new Error('saved_view_source_unavailable: open its retained source explicitly');
   const snapshots=new Map<string,Snapshot>([[state.snapshot.snapshotId,state.snapshot]]);
   for(const draft of value.drafts){if(!draft.anchor)continue;let snapshot=snapshots.get(draft.anchor.snapshotId);if(!snapshot){if(!options.readSnapshot)throw new Error('saved_draft_source_unavailable');snapshot=await options.readSnapshot(draft.anchor.snapshotId,validation.signal);snapshots.set(snapshot.snapshotId,snapshot);}if(!validateAnchor(snapshot.snapshotId,snapshot.sources,draft.anchor))throw new Error('saved_draft_anchor_unavailable');}
@@ -132,11 +133,13 @@ export const createStoryBridge=(reviewId:string,options:{clock?:StoryClock;seman
   if(value.returnFrame){const frame=value.returnFrame;if(!value.drafts.some(draft=>draft.id===frame.originalDraftId))throw new Error('saved_return_draft_unavailable');if(!snapshots.has(frame.snapshotId)&&options.readSnapshot)snapshots.set(frame.snapshotId,await options.readSnapshot(frame.snapshotId,validation.signal));if(!snapshots.has(frame.snapshotId))throw new Error('saved_return_source_unavailable');if(frame.versionId){const view=await request(capturedToken,`/api/story?${new URLSearchParams({reviewId,snapshotId:frame.snapshotId,versionId:frame.versionId})}`,validation.signal) as StoryView;if(!view.version||view.version.versionId!==frame.versionId||frame.cursor&&cursorAt(view,frame.cursor.index)?.stepId!==frame.cursor.stepId)throw new Error('saved_return_story_unavailable');}}
   if(expected!==generation)throw new Error('selection_superseded');
   validateMap(state.snapshot,value.maps);
+  if(value.maps.structural?.inspection){if(!options.canvasFrames)throw new Error('canvas_frame_validation_unavailable');await awaitRead(options.canvasFrames.validate(state.snapshot,value.maps.structural,validation.signal),validation.signal);if(!owns())throw new Error('selection_superseded');}
+  if(value.returnFrame?.maps.structural?.inspection){if(!options.canvasFrames)throw new Error('canvas_frame_validation_unavailable');await awaitRead(options.canvasFrames.validate(snapshots.get(value.returnFrame.snapshotId)!,value.returnFrame.maps.structural,validation.signal),validation.signal);if(!owns())throw new Error('selection_superseded');}
   const recovered=await restoreSemantic(value.maps,value.snapshotId,()=>expected===generation&&!disposed&&capturedToken===token,validation.signal);
-  if(expected!==generation||disposed||capturedToken!==token)throw new Error('selection_superseded');
+  if(!owns())throw new Error('selection_superseded');
   recoveryNotice=recovered.message;
   publish({...state,viewRecoveryMessage:recoveryNotice,drafts:value.drafts,activeDraftId:value.activeDraftId,returnFrame:value.returnFrame,maps:recovered.maps,mapRestoreId:state.mapRestoreId+1,pageScroll:value.pageScroll,cursor:value.cursor,elapsedMs:value.elapsedMs,surface:value.surface,position:clamp(state,value.position.x,value.position.y),mode:value.returnFrame?'exploring':'paused',focusRevision:state.focusRevision+1});
-  }finally{readControllers.delete(validation);}
+  }finally{if(privateValidation===validation)privateValidation=null;readControllers.delete(validation);}
  };
  const restoreSemantic=async(maps:GraphFrames,snapshotId:string,owns:()=>boolean,signal?:AbortSignal)=>{
   let frame=maps.semantic;if(!frame)return {maps,message:''};if(!options.semantic)throw new Error('analysis_unavailable');
@@ -326,6 +329,7 @@ export const createStoryBridge=(reviewId:string,options:{clock?:StoryClock;seman
    const context=await request(captured,`/api/story/context?${new URLSearchParams({reviewId,snapshotId:frame.snapshotId,contextRevision:String(view.version?.contextRevision??view.contextRevision)})}`,signal) as StoryContextView;check();
    if(context.reviewId!==reviewId||context.snapshotId!==frame.snapshotId||context.selectedRevision!==(view.version?.contextRevision??view.contextRevision))throw new Error('return_context_unavailable');
    validateMap(snapshot,frame.maps);
+   if(frame.maps.structural?.inspection){if(!options.canvasFrames)throw new Error('canvas_frame_validation_unavailable');await awaitRead(options.canvasFrames.validate(snapshot,frame.maps.structural,signal),signal);check();}
    let restored:StoryState={...state,snapshot,snapshotId:frame.snapshotId,view,context,cursor:frame.cursor,elapsedMs:frame.elapsedMs,surface:frame.surface,position:clamp(state,frame.position.x,frame.position.y),maps:frame.maps,pageScroll:frame.pageScroll,activeDraftId:original.id,returnFrame:null,mode:'paused',evidence:null,evidenceText:'',semanticSources:{}};
    if(frame.evidence)restored=await stageEvidence(restored,frame.evidence,captured,owns,signal);check();
    const recovered=await restoreSemantic(frame.maps,frame.snapshotId,owns,signal);check();restored={...restored,maps:recovered.maps,viewRecoveryMessage:recovered.message};

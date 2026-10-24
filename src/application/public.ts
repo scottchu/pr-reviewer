@@ -41,5 +41,5 @@ export type {ReviewWorkspace} from './workspace.ts';
 
 export {createHeadTestsBridge} from './head-tests.ts';
 export type {HeadTestsBridge,HeadTestsState,TestArtifactState} from './head-tests.ts';
-export {createSourceCanvas} from './canvas.ts';
-export type {SourceCanvas,SourceCanvasView,CanvasFrame,CanvasReading,CanvasSide} from './canvas.ts';
+export {createSourceCanvas,createCanvasFrameValidator} from './canvas.ts';
+export type {SourceCanvas,SourceCanvasView,CanvasFrameValidationPort,CanvasFrame,CanvasReading,CanvasSide} from './canvas.ts';
