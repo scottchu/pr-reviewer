@@ -122,7 +122,7 @@ For04, predeclare a real decision→consumer task and assess whether sourced sta
 
 ## Acceptance and test matrix
 
-All integration rows are required and currently unrun. Use controlled real Git repositories/processes for effect behavior, injected faults for precise failure boundaries, and actual React for journeys. Do not label an injected success a provider/live-host result.
+All integration rows are required. The evidence/status map below distinguishes exercised core requirements from remaining whole-slice gates. Use controlled real Git repositories/processes for effect behavior, injected faults for precise failure boundaries, and actual React for journeys. Do not label an injected success a provider/live-host result.
 
 | ID | Measurable acceptance |
 |---|---|
@@ -142,7 +142,18 @@ All integration rows are required and currently unrun. Use controlled real Git r
 | G14 understanding | Fresh reviewer freezes actual candidate graph-first account before source/diff, then compares and critiques. Record supported/provisional/unresolved confidence separately from ease, actual misconceptions and investigation route. Successful clicks/nodes/E2E do not pass this row. |
 | G15 knowledge | Actual-code reflection, durable knowledge promotion and fresh docs-only whole-current-product audit close material gaps. Native/unfamiliar-human and unresolved product limitations remain explicit, not silently passed. |
 
-Register context/analysis/seed tests in shared scripts and boundary checks before reporting aggregate tests as coverage. Run strict TypeScript/boundaries, applicable unit/storage/real-process suites, existing import/history/runtime regressions, and actual React E2E. The exact commands must be recorded from the integrated candidate; current base package scripts do not include the unincorporated pure modules. Test counts alone do not certify scope.
+Context/analysis/inventory/semantic application tests and subsystem boundaries are registered in the integrated candidate's shared scripts. Run `bun run check`, `bun run test` and `bun run test:e2e` with the approved Node/Bun executables and a new external browser-artifact directory. Preserve exact candidate identity and evidence for each run. Test counts alone do not certify scope.
+
+### Gate evidence/status map — 2026-10-24 UTC
+
+| Rows | Current evidence and owner | Remaining boundary |
+|---|---|---|
+| G01–G05 | Core owner's source-context, semantic-context/mapping/authority/runner/quota/transport suites and14 real analysis-worker tests, alongside preserved pure analyzer/declaration/context suites. Independent core and worker reviews are bounded READY. | Source/provenance/coverage adversaries and exact default transport caps are exercised.20s deadlines and64MiB quota use allowed lower-limit arithmetic/termination tests; this is not a full-input capacity or RSS guarantee. |
+| G06–G09 | Core owner's shared-lease/storage/runner/history/authority cases and6 actual owner-SIGKILL cases; independent core correction probes verify epoch fencing and retained unknown ownership. | Actual React question commit while the same verified compute process remained live is separately recorded by the UI owner; final combined browser verification remains pending the UI corrections. |
+| G10–G11 | Core clarification/CAS/history/revocation/query and managed-diagnostics tests; independent core review closed authority, witness and sanitation findings. UI owner has private navigation/late-response/application tests. | Exact delayed receipt readback remains under the UI owner's narrow correction. Core readiness does not accept that application gap. |
+| G12–G13 | UI author13 Chrome journeys and33 application regressions at58; independent reviewer2 semantic Chrome journeys. Core combined aggregate184 Node plus47 Bun tests passes. | Independent UI corrections and affected final combined browser/application recheck are required before UI readiness. |
+| G14 | Root owns fresh actual ownPR publication, source-informed task and direct candidate UI graph-first independent account/source critique. | Open; synthetic fixtures, source coverage and browser success do not establish comprehension. |
+| G15 | Core owner has promoted physical formats, identities, recovery, worker validation, React selection and receipt semantics into durable product docs. Root owns fresh whole-current-product docs-only audit/reflection. | Open until material rebuild-knowledge findings close; native/Claude/unfamiliar-human and full480p/720p limits remain explicit. |
 
 ## Real ownPR task and blind review packet v1
 
