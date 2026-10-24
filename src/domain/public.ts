@@ -395,3 +395,6 @@ export {analysisDiagnosticCode} from './semantic.ts';
 export {validateSemanticAnchor} from './semantic.ts';
 export {storyReferenceSchema,storyFocusSchema,storyContentSchema,publishStorySchema,putStoryContextSchema,storyCommandSchema,storyQuerySchema,storyContextQuerySchema,storyEvidenceQuerySchema,storyCanonical,storyReferences,validateStoryStructure,validateStorySemanticFocus} from './story.ts';
 export type {StoryReference,StoryContent,StoryCommand,StoryAuthor,StoryCapture,StoryVersion,StoryVersionSummary,StoryError,StoryReceipt,StoryEvidenceIssue,StoryEvidence,StoryEvidenceQuery,StoryQuery,StoryContextQuery,StoryView,StoryContextView} from './story.ts';
+
+export {analysisMarkerQuerySchema} from './semantic.ts';
+export type {AnalysisMarker,AnalysisMarkerQuery} from './semantic.ts';

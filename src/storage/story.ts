@@ -45,7 +45,7 @@ export const createStoryStore=({db,tx,load,authenticate,authorize,resolveEvidenc
     validateStoryStructure(command.story,snapshot);validateContext(command.reviewId,command.snapshotId,command.contextRevision,command.story);
     if(command.story.questionId&&!review.questions.some(question=>question.questionId===command.story.questionId&&question.anchor.snapshotId===command.snapshotId))fail('story_reference_invalid');
     const evidence=resolveEvidence(token,evidenceQuery(command));if(evidence.basisUnavailable||evidence.invalid.length)fail('story_reference_invalid');
-    validateStorySemanticFocus(command.story,new Map(evidence.facts.map(item=>[storyCanonical(item.reference),item.anchors])));
+    validateStorySemanticFocus(command.story,new Map(evidence.facts.map(item=>[storyCanonical(item.reference),item])));
    }
   }catch(error){validationError=errorCode(error);}
   return tx(()=>{

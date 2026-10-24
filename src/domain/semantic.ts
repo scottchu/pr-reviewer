@@ -105,6 +105,9 @@ export type AnalysisView = {
 };
 export const analysisQuerySchema = z.object({ reviewId: id, snapshotId: id, analysisId: digest.optional(), minimumGraphRevision: revision.optional(), minimumJobRevision: revision.optional() }).strict();
 export type AnalysisQuery = z.infer<typeof analysisQuerySchema>;
+export const analysisMarkerQuerySchema=z.object({reviewId:id,snapshotId:id}).strict();
+export type AnalysisMarkerQuery=z.infer<typeof analysisMarkerQuerySchema>;
+export type AnalysisMarker=Pick<AnalysisView,'reviewId'|'snapshotId'|'currentSnapshotId'|'analysisGeneration'|'graphRevision'|'selectedAnalysisId'>;
 export const semanticSourceQuerySchema = z.object({ reviewId: id, snapshotId: id, corpusId: digest, side: z.enum(["base", "head"]), path, contentHash: digest }).strict();
 export type SemanticSourceQuery = z.infer<typeof semanticSourceQuerySchema>;
 export type SemanticSource = ContextCorpus["sources"][number] & {

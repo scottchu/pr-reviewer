@@ -37,7 +37,7 @@ export type StoryVersionSummary=Omit<StoryVersion,'story'> & {title:string};
 export type StoryError='invalid_request'|'unauthorized'|'stale_attachment'|'source_unavailable'|'command_conflict'|'story_reference_invalid'|'story_structure_invalid'|'story_scope_invalid'|'story_context_conflict'|'story_conflict'|'story_author_conflict'|'story_storage_limit'|'story_version_unavailable'|'story_context_unavailable'|'revision_unavailable';
 export type StoryReceipt={commandId:string;actorId:string;state:'applied'|'rejected';reviewId:string;snapshotId:string;storyRevision:number;contextRevision:number;result:{versionId?:string;captureId?:string};error?:StoryError};
 export type StoryEvidenceIssue={reference:StoryReference;reason:string};
-export type StoryEvidence={reviewId:string;snapshotId:string;selectedAnalysisId:string|null;valid:StoryReference[];invalid:StoryEvidenceIssue[];facts:{reference:StoryReference;anchors:SemanticAnchor[]}[];basisUnavailable:boolean};
+export type StoryEvidence={reviewId:string;snapshotId:string;selectedAnalysisId:string|null;valid:StoryReference[];invalid:StoryEvidenceIssue[];facts:{reference:StoryReference;anchors:SemanticAnchor[];snapshotAnchors:Extract<StoryReference,{type:'snapshot_source'}>[]}[];basisUnavailable:boolean};
 export type StoryView={reviewId:string;snapshotId:string;currentSnapshotId:string;currentAnalysisId:string|null;storyRevision:number;contextRevision:number;seriesAuthor:StoryAuthor|null;currentVersion:StoryVersionSummary|null;version:StoryVersion|null;versions:StoryVersionSummary[];newerVersion:boolean;newerContext:boolean;historicalAnalysis:boolean;staticNeighborhoodAvailable:boolean;basisUnavailable:boolean;brokenEvidence:StoryEvidenceIssue[]};
 export type StoryContextView={reviewId:string;snapshotId:string;currentContextRevision:number;selectedRevision:number;selectedCaptureIds:string[];captures:StoryCapture[];missingKinds:('Epic'|'Ticket'|'PR')[]};
 export const storyCanonical=(value:unknown):string=>{
@@ -69,11 +69,17 @@ export const validateStoryStructure=(input:StoryContent,snapshot:Snapshot):void=
  }
  if(storyReferences(story).length>256)fail('invalid_request');
 };
-export const validateStorySemanticFocus=(story:StoryContent,facts:ReadonlyMap<string,readonly SemanticAnchor[]>):void=>{
- const matches=(reference:Extract<StoryReference,{type:'snapshot_source'|'semantic_source'}>,anchor:SemanticAnchor)=>anchor.snapshotId===reference.anchor.snapshotId&&anchor.side===reference.anchor.side&&anchor.path===reference.anchor.path&&anchor.contentHash===(reference.type==='semantic_source'?reference.anchor.contentHash:reference.contentHash)&&(reference.type==='semantic_source'?reference.anchor.start>=anchor.start&&reference.anchor.end<=anchor.end:reference.anchor.startLine>=anchor.startLine&&reference.anchor.endLine<=anchor.endLine);
- for(const claim of story.claims)if(claim.basis==='static_relationship')for(const reference of claim.references)if(reference.type==='static_node'||reference.type==='static_edge'){const anchors=facts.get(storyCanonical(reference));if(!anchors||!claim.references.some(source=>(source.type==='snapshot_source'||source.type==='semantic_source')&&anchors.some(anchor=>matches(source,anchor))))fail('story_reference_invalid');}
+export const validateStorySemanticFocus=(story:StoryContent,facts:ReadonlyMap<string,Pick<StoryEvidence['facts'][number],'anchors'|'snapshotAnchors'>>):void=>{
+ const matches=(reference:Extract<StoryReference,{type:'snapshot_source'|'semantic_source'}>,fact:Pick<StoryEvidence['facts'][number],'anchors'|'snapshotAnchors'>):boolean=>{
+  if(reference.type==='semantic_source')return fact.anchors.some(anchor=>anchor.snapshotId===reference.anchor.snapshotId&&anchor.side===reference.anchor.side&&anchor.path===reference.anchor.path&&anchor.contentHash===reference.anchor.contentHash&&reference.anchor.start>=anchor.start&&reference.anchor.end<=anchor.end);
+  return fact.snapshotAnchors.some(source=>source.anchor.snapshotId===reference.anchor.snapshotId&&source.anchor.side===reference.anchor.side&&source.anchor.path===reference.anchor.path&&source.contentHash===reference.contentHash&&reference.anchor.startLine>=source.anchor.startLine&&reference.anchor.endLine<=source.anchor.endLine);
+ };
+ for(const claim of story.claims)if(claim.basis==='static_relationship')for(const reference of claim.references)if(reference.type==='static_node'||reference.type==='static_edge'){
+  const fact=facts.get(storyCanonical(reference));
+  if(!fact||!claim.references.some(source=>(source.type==='snapshot_source'||source.type==='semantic_source')&&matches(source,fact)))fail('story_reference_invalid');
+ }
  for(const step of story.steps)if(step.focus.type==='semantic'){
-  const focus=step.focus,anchors=facts.get(storyCanonical(focus.reference));
-  if(!anchors||focus.sources.some(ref=>!anchors.some(anchor=>matches(ref,anchor))))fail('story_reference_invalid');
+  const focus=step.focus,fact=facts.get(storyCanonical(focus.reference));
+  if(!fact||focus.sources.some(ref=>!matches(ref,fact)))fail('story_reference_invalid');
  }
 };

@@ -1,8 +1,8 @@
 import { createHash, randomUUID } from "node:crypto";
 import type { DatabaseSync } from "node:sqlite";
 import { analysisCommandSchema, analysisQuerySchema, semanticSourceQuerySchema, semanticCanonical, snapshotFor, analysisDiagnosticCode } from "../domain/public.ts";
-import {validateSemanticAnchor} from "../domain/public.ts";
-import type { AnalysisCommand, AnalysisReceipt, AnalysisView, AnalysisQuery, AnalysisJobView, AnalysisInvocation, AnalysisProcess, GraphClarification, SemanticAnchor, SemanticSourceQuery, SemanticSource, Principal, Review, CorpusAccount } from "../domain/public.ts";
+import {validateSemanticAnchor,analysisMarkerQuerySchema} from "../domain/public.ts";
+import type { AnalysisMarker,AnalysisMarkerQuery,AnalysisCommand, AnalysisReceipt, AnalysisView, AnalysisQuery, AnalysisJobView, AnalysisInvocation, AnalysisProcess, GraphClarification, SemanticAnchor, SemanticSourceQuery, SemanticSource, Principal, Review, CorpusAccount } from "../domain/public.ts";
 import { contextIdentity, contextAnalysisInput, isPreparedContextWitness } from "../source-preparation/public.ts";
 import type { PreparedContextWitness } from "../source-preparation/public.ts";
 import type { ContextCorpus, ContextIssue, ContextResult } from "../source-acquisition/public.ts";
@@ -95,7 +95,9 @@ export const createAnalysisStore = ({ db, tx, load, authorize, execution, limits
     const record = <T>(reviewId: string, kind: string, id: string): T => { const row = db.prepare("SELECT body FROM analysis_records WHERE review_id=? AND kind=? AND id=?").get(reviewId, kind, id) as {
         body: string;
     } | undefined; if (!row)
-        throw new Error("analysis_record_unavailable"); return JSON.parse(row.body) as T; };
+        throw new Error("analysis_record_unavailable");
+        try{return JSON.parse(row.body) as T;}catch(error){if(error instanceof SyntaxError)throw new Error('analysis_record_unavailable');throw error;}
+    };
     const prepareRecord = (value: unknown) => {const body=semanticCanonical(value);return {body,bytes:Buffer.byteLength(body,"utf8")};};
     const retain = (job: Job, kind: string, id: string, prepared: ReturnType<typeof prepareRecord>) => {
         const {body,bytes}=prepared;const old = db.prepare("SELECT body,snapshot_id FROM analysis_records WHERE review_id=? AND kind=? AND id=?").get(job.reviewId, kind, id) as {
@@ -259,6 +261,12 @@ export const createAnalysisStore = ({ db, tx, load, authorize, execution, limits
     };
     return {
         command,
+        marker: (token:string,input:AnalysisMarkerQuery):AnalysisMarker=>{
+            const query=analysisMarkerQuerySchema.parse(input),{review}=auth(hash(token),query.reviewId);
+            if(!snapshotFor(review,query.snapshotId))throw new Error('source_unavailable');
+            const current=graph(query.reviewId,query.snapshotId);
+            return {reviewId:query.reviewId,snapshotId:query.snapshotId,currentSnapshotId:review.currentSnapshotId??review.snapshot.snapshotId,analysisGeneration:current.generation,graphRevision:current.graphRevision,selectedAnalysisId:current.selectedAnalysisId};
+        },
         query: (token: string, input: AnalysisQuery): AnalysisView => {
             const query = analysisQuerySchema.parse(input), { review } = auth(hash(token), query.reviewId);
             if (!snapshotFor(review, query.snapshotId))

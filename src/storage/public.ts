@@ -204,22 +204,71 @@ export const createStore = (filename: string,options:{importLimits?:ImportLimits
     const query=storyEvidenceQuerySchema.parse(input),principal=authenticate(token),review=load(query.reviewId);authorize(principal,review);
     const snapshot=(review.snapshots??[review.snapshot]).find(item=>item.snapshotId===query.snapshotId);if(!snapshot)throw new Error('source_unavailable');
     const references=[...new Map(query.references.map(ref=>[storyCanonical(ref),ref])).values()];
-    const selected=analysis.query(token,{reviewId:query.reviewId,snapshotId:query.snapshotId}).selectedAnalysisId;
+    const selected=analysis.marker(token,{reviewId:query.reviewId,snapshotId:query.snapshotId}).selectedAnalysisId;
+    const knownUnavailable=(error:unknown):boolean=>error instanceof Error&&['analysis_record_unavailable','source_unavailable'].includes(error.message);
+    const knownInvalid=(error:unknown):boolean=>knownUnavailable(error)||error instanceof Error&&['story_reference_invalid','story_context_unavailable'].includes(error.message);
     let view:AnalysisView|undefined,basisUnavailable=false;
-    if(query.analysisId)try{view=analysis.query(token,{reviewId:query.reviewId,snapshotId:query.snapshotId,analysisId:query.analysisId});if(view.analysis?.status!=='analyzed'||view.analysis.analysisId!==query.analysisId||view.corpus?.corpusId!==query.corpusId)throw new Error('story_reference_invalid');}catch{basisUnavailable=true;}
+    if(query.analysisId)try{
+      view=analysis.query(token,{reviewId:query.reviewId,snapshotId:query.snapshotId,analysisId:query.analysisId});
+      if(view.analysis?.status!=='analyzed'||view.analysis.analysisId!==query.analysisId||view.corpus?.corpusId!==query.corpusId){view=undefined;basisUnavailable=true;}
+    }catch(error){if(!knownUnavailable(error))throw error;basisUnavailable=true;}
     const sourceMap=new Map(snapshot.sources.map(source=>[JSON.stringify([source.side,source.path]),source]));
     const nodes=new Map(view?.analysis?.status==='analyzed'?view.analysis.nodes.map(node=>[node.id,node]):[]),edges=new Map(view?.analysis?.status==='analyzed'?view.analysis.edges.map(edge=>[edge.id,edge]):[]);
-    const sourceCache=new Map<string,SemanticSource|null>(),valid:StoryReference[]=[],invalid:StoryEvidence['invalid']=[],facts:StoryEvidence['facts']=[];
+    const sourceCache=new Map<string,SemanticSource|null>(),lfIndexes=new Map<string,number[]>(),valid:StoryReference[]=[],invalid:StoryEvidence['invalid']=[],facts:StoryEvidence['facts']=[];
+    const semanticSource=(anchor:SemanticAnchor):SemanticSource=>{
+      if(basisUnavailable||!query.corpusId||anchor.snapshotId!==query.snapshotId)throw new Error('story_reference_invalid');
+      const key=JSON.stringify([query.corpusId,anchor.side,anchor.path,anchor.contentHash]);
+      if(!sourceCache.has(key)){
+        let source:SemanticSource|null=null;
+        try{source=analysis.source(token,{reviewId:query.reviewId,snapshotId:query.snapshotId,corpusId:query.corpusId,side:anchor.side,path:anchor.path,contentHash:anchor.contentHash});}
+        catch(error){if(!knownUnavailable(error))throw error;}
+        sourceCache.set(key,source);
+      }
+      const source=sourceCache.get(key);
+      if(!source||hash(source.content)!==source.contentHash||!validateSemanticAnchor(source,anchor))throw new Error('source_unavailable');
+      return source;
+    };
+    const snapshotAnchor=(anchor:SemanticAnchor):Extract<StoryReference,{type:'snapshot_source'}>|null=>{
+      const semantic=semanticSource(anchor),key=JSON.stringify([anchor.side,anchor.path]),source=sourceMap.get(key);
+      if(!source||source.hash!==anchor.contentHash||source.content!==semantic.content||hash(source.content)!==source.hash)return null;
+      let starts=lfIndexes.get(key);
+      if(!starts){starts=[0];for(let offset=0;offset<source.content.length;offset++)if(source.content.charCodeAt(offset)===10)starts.push(offset+1);lfIndexes.set(key,starts);}
+      const line=(offset:number)=>{let low=0,high=starts.length;while(low<high){const middle=(low+high)>>>1;if(starts[middle]!<=offset)low=middle+1;else high=middle;}return low;};
+      const mapped={snapshotId:anchor.snapshotId,side:anchor.side,path:anchor.path,startLine:line(anchor.start),endLine:line(anchor.end-1)};
+      if(!validateAnchor(query.snapshotId,[source],mapped))throw new Error('source_unavailable');
+      return {type:'snapshot_source',anchor:mapped,contentHash:source.hash};
+    };
     for(const reference of references)try{
       switch(reference.type){
-        case 'snapshot_source':{const source=sourceMap.get(JSON.stringify([reference.anchor.side,reference.anchor.path]));if(!source||source.hash!==reference.contentHash||hash(source.content)!==source.hash||!validateAnchor(query.snapshotId,[source],reference.anchor))throw new Error('source_unavailable');break;}
-        case 'semantic_source':{if(basisUnavailable||!query.analysisId||query.corpusId!==reference.corpusId||reference.anchor.snapshotId!==query.snapshotId)throw new Error('story_reference_invalid');const key=JSON.stringify([reference.corpusId,reference.anchor.side,reference.anchor.path,reference.anchor.contentHash]);if(!sourceCache.has(key)){let source:SemanticSource|null=null;try{source=analysis.source(token,{reviewId:query.reviewId,snapshotId:query.snapshotId,corpusId:reference.corpusId,side:reference.anchor.side,path:reference.anchor.path,contentHash:reference.anchor.contentHash});}catch{}sourceCache.set(key,source);}const source=sourceCache.get(key);if(!source||hash(source.content)!==source.contentHash||!validateSemanticAnchor(source,reference.anchor))throw new Error('source_unavailable');break;}
-        case 'static_node':case 'static_edge':{if(basisUnavailable||!query.analysisId||reference.analysisId!==query.analysisId)throw new Error('story_reference_invalid');const node=reference.type==='static_node'?nodes.get(reference.factId):undefined,edge=reference.type==='static_edge'?edges.get(reference.factId):undefined;if(!node&&!edge)throw new Error('story_reference_invalid');const anchors:SemanticAnchor[]=node?[node.declaration,node.body]:edge?[edge.target,...edge.sites.flatMap(site=>[site.anchor,...site.linkage,...site.signatures])]:[];facts.push({reference,anchors});break;}
-        case 'capture':{const capture=story.context(token,{reviewId:query.reviewId,snapshotId:query.snapshotId,captureId:reference.captureId}).captures[0];if(!capture||capture.contentHash!==reference.contentHash||hash(capture.text)!==capture.contentHash||reference.start!==undefined&&reference.end!>capture.text.length)throw new Error('story_context_unavailable');break;}
+        case 'snapshot_source':{
+          const source=sourceMap.get(JSON.stringify([reference.anchor.side,reference.anchor.path]));
+          if(!source||source.hash!==reference.contentHash||hash(source.content)!==source.hash||!validateAnchor(query.snapshotId,[source],reference.anchor))throw new Error('source_unavailable');
+          break;
+        }
+        case 'semantic_source':{
+          if(!query.analysisId||query.corpusId!==reference.corpusId)throw new Error('story_reference_invalid');
+          semanticSource(reference.anchor);break;
+        }
+        case 'static_node':case 'static_edge':{
+          if(basisUnavailable||!query.analysisId||reference.analysisId!==query.analysisId)throw new Error('story_reference_invalid');
+          const node=reference.type==='static_node'?nodes.get(reference.factId):undefined,edge=reference.type==='static_edge'?edges.get(reference.factId):undefined;
+          if(!node&&!edge)throw new Error('story_reference_invalid');
+          const anchors:SemanticAnchor[]=node?[node.declaration,node.body]:edge?[edge.target,...edge.sites.flatMap(site=>[site.anchor,...site.linkage,...site.signatures])]:[];
+          const snapshotAnchors=anchors.flatMap(anchor=>{const mapped=snapshotAnchor(anchor);return mapped?[mapped]:[];});
+          facts.push({reference,anchors,snapshotAnchors});break;
+        }
+        case 'capture':{
+          const capture=story.context(token,{reviewId:query.reviewId,snapshotId:query.snapshotId,captureId:reference.captureId}).captures[0];
+          if(!capture||capture.contentHash!==reference.contentHash||hash(capture.text)!==capture.contentHash||reference.start!==undefined&&reference.end!>capture.text.length)throw new Error('story_context_unavailable');
+          break;
+        }
         case 'metadata':{const value=snapshot[reference.field];if(value===undefined||value==='')throw new Error('source_unavailable');break;}
-        case 'clarification':{if(basisUnavailable||reference.analysisId!==query.analysisId||!view?.clarifications.some(item=>item.clarificationId===reference.clarificationId&&item.analysisId===reference.analysisId&&item.history.some(revision=>revision.revision===reference.revision)))throw new Error('story_reference_invalid');break;}
+        case 'clarification':{
+          if(basisUnavailable||reference.analysisId!==query.analysisId||!view?.clarifications.some(item=>item.clarificationId===reference.clarificationId&&item.analysisId===reference.analysisId&&item.history.some(revision=>revision.revision===reference.revision)))throw new Error('story_reference_invalid');
+          break;
+        }
       }valid.push(reference);
-    }catch(error){invalid.push({reference,reason:error instanceof Error?error.message:'story_reference_invalid'});}
+    }catch(error){if(!knownInvalid(error))throw error;invalid.push({reference,reason:(error as Error).message});}
     return {reviewId:query.reviewId,snapshotId:query.snapshotId,selectedAnalysisId:selected,valid,invalid,facts,basisUnavailable};
   };
   story=createStoryStore({db,tx,load,authenticate,authorize,resolveEvidence:storyEvidence,...(options.storyLimits?{limits:options.storyLimits}:{})});
