@@ -401,3 +401,6 @@ export type {AnalysisMarker,AnalysisMarkerQuery} from './semantic.ts';
 
 export {analysisEvidenceQuerySchema} from './semantic.ts';
 export type {AnalysisEvidence,AnalysisEvidenceQuery} from './semantic.ts';
+
+export {headTestEffectOccupiesSlot,headTestDefinition,headTestCanonical,HEAD_TEST_DEFINITION_DIGEST,headTestCommandSchema,headTestScopeSchema,headTestQuerySchema} from "./head-tests.ts";
+export type {HeadTestDefinition,HeadTestCommand,HeadTestScope,HeadTestQuery,HeadTestTarget,HeadTestTargets,HeadTestInvocation,HeadTestJob,HeadTestReceipt,HeadTestView} from "./head-tests.ts";

@@ -2,15 +2,15 @@
 
 **Date:** 2026-10-24
 
-**Packet revision:** 2 — independent design review reconciled; bounded G2/G3 qualification recorded.
+**Packet revision:** 3 — root-assigned internal06A checkpoint implemented for independent engineering review.
 
-**Status:** Original design independently passed; exact67 runtime/source/closure prerequisite probe passed within its limits. Implementation is not dispatched. No product-job/React/CLI/own-PR acceptance is claimed.
+**Status:** Internal06A domain/store/gateway candidate is implemented under the sequencing exception below; see [checkpoint evidence](checkpoint-06a.md). Original design and exact67 G2/G3 prerequisite qualification passed their independent reviews. Full G1, product-job/React/CLI/own-PR acceptance remain open.
 
 **Parent:** [1080p round](../../plan.md), [delivery through1080p](../../../delivery-through-1080p.md).
 
 **Durable specification:** [Configured tests on a pinned head](../../../../product/review-loop/test-execution.md), revision `head-test-v1`.
 
-**Ownership:** Root owns acceptance, exact role assignment, integration, PR/main and delivery. This planning worker is the sole slice06 product-doc writer for this packet. Implementation and review role scopes are in [integration revision2](integration.md); unassigned roles are not ready dispatches.
+**Ownership:** Root owns acceptance, exact role assignment, integration, PR/main and delivery. This planning worker is the sole slice06 product-doc writer for this packet. Implementation and review role scopes are in [integration revision3](integration.md); unassigned roles are not ready dispatches.
 
 ## Intent, baseline and gap
 
@@ -136,3 +136,7 @@ Checkpoint scope: fixed read-only catalog; strict RequestTest/CancelTest and ret
 Tests: strict TypeScript and TDD for domain/store/gateway behavior; default unavailable and test-only available cases; schema/actor/source/revision/cross-family receipt rejection; exact retry/reopen/cancel; bounded pagination/queue/quota reservation; startup unfinished test records block import/analysis even without a lease row; old epochs stay fenced; known quiescent unknown history does not permanently occupy the slot; unrelated discussion remains writable. Controlled persisted-record fixtures exercise recovery only, not real process evidence. Existing relevant import/analysis/story receipt and ownership regressions must pass. No package/lock/dependency declaration changes.
 
 This deliberately internal checkpoint replaces the previous assumption that all06A work waits for its React journey. It does **not** complete06A's user-facing acceptance: React unavailable/queued/cancel,06B real processes and same CLI result,06C cancellation/restart faults, actual own-PR comprehension/visual checks and final G1 remain open. Parent retains sole integration/PR/main/pilot authority. Independent engineering review follows the committed checkpoint before root integration.
+
+## Internal06A candidate handback
+
+The [checkpoint record](checkpoint-06a.md) identifies delivered interfaces, TDD findings, verification commands, fixture boundaries and the next independent engineering review. This is internal backend progress only. The candidate adds no runner, executable source preparation, UI or CLI. Production target requests remain unavailable. Root must reconcile review findings and final predecessor acceptance before full product integration/acceptance;06B/06C and the actual06A React journey remain open.

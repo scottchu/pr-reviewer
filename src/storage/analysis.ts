@@ -159,7 +159,7 @@ export const createAnalysisStore = ({ db, tx, load, authorize, execution, limits
             if (parsed.type !== "PutGraphClarification" && principal.kind !== "user")
                 throw new Error("unauthorized");
             const current = graph(reviewId, snapshotId), base = { commandId: parsed.commandId, actorId: principal.actorId, reviewId, snapshotId, analysisGeneration: current.generation, graphRevision: current.graphRevision };
-            if(db.prepare('SELECT id FROM story_receipts WHERE id=?').get(parsed.commandId))return {...base,state:'rejected',result:{},error:'command_conflict'};
+            if(db.prepare('SELECT id FROM test_receipts WHERE id=?').get(parsed.commandId)||db.prepare('SELECT id FROM story_receipts WHERE id=?').get(parsed.commandId))return {...base,state:'rejected',result:{},error:'command_conflict'};
             const old = db.prepare("SELECT actor,fingerprint,body FROM analysis_receipts WHERE id=?").get(parsed.commandId) as {
                 actor: string;
                 fingerprint: string;
@@ -167,6 +167,7 @@ export const createAnalysisStore = ({ db, tx, load, authorize, execution, limits
             } | undefined;
             if (old)
                 return old.actor === principal.actorId && old.fingerprint === fingerprint ? JSON.parse(old.body) as AnalysisReceipt : { ...base, state: "rejected", result: {}, error: "command_conflict" };
+            if(parsed.commandId.startsWith('test-result:'))return {...base,state:'rejected',result:{},error:'command_conflict'};
             let receipt: AnalysisReceipt;
             try {
                 const snapshot = snapshotFor(review, snapshotId);

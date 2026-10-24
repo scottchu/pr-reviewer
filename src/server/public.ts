@@ -6,7 +6,7 @@ import type {PreparedSnapshotWitness} from "../source-preparation/public.ts";
 import { createServer } from "node:http";
 import type { IncomingMessage, ServerResponse } from "node:http";
 import { z } from "zod";
-import { commandSchema,importCommandSchema,storyCommandSchema,storyQuerySchema,storyContextQuerySchema,analysisCommandSchema,analysisQuerySchema,semanticSourceQuerySchema } from "../domain/public.ts";
+import { headTestCommandSchema,headTestScopeSchema,headTestQuerySchema,commandSchema,importCommandSchema,storyCommandSchema,storyQuerySchema,storyContextQuerySchema,analysisCommandSchema,analysisQuerySchema,semanticSourceQuerySchema } from "../domain/public.ts";
 import type { Principal } from "../domain/public.ts";
 import type { Store } from "../storage/public.ts";
 import { createScheduler } from "../delivery/public.ts";
@@ -65,6 +65,12 @@ export const createGateway = (store: Store, notify: Notify, options:{importArtif
       const user = () => {
         if (principal.kind !== "user") throw new Error("unauthorized");
       };
+      if(req.method==='POST'&&url.pathname==='/api/tests/targets'){
+        send(res,200,store.tests.targets(authorization.slice(7),headTestScopeSchema.parse(await readBody(req))));return;
+      }
+      if(req.method==='POST'&&url.pathname==='/api/tests/jobs'){
+        send(res,200,store.tests.query(authorization.slice(7),headTestQuerySchema.parse(await readBody(req))));return;
+      }
       if(req.method==='POST'&&url.pathname==='/api/story/commands'){
         const command=storyCommandSchema.parse(await readBody(req));
         send(res,200,store.story.command(authorization.slice(7),command));return;
@@ -155,7 +161,11 @@ export const createGateway = (store: Store, notify: Notify, options:{importArtif
         return;
       }
       if (req.method === "POST" && url.pathname === "/api/commands") {
-        const command = commandSchema.parse(await readBody(req));
+        const input = await readBody(req);
+        if (input !== null && typeof input === 'object' && 'type' in input && (input.type === 'RequestTest' || input.type === 'CancelTest')) {
+          send(res,200,store.tests.command(authorization.slice(7),headTestCommandSchema.parse(input)));return;
+        }
+        const command = commandSchema.parse(input);
         let witness:PreparedSnapshotWitness|undefined;
         if(command.type==="AddSnapshot"&&command.identityScheme==="manual_git_v1"&&principal.kind==="user")try{witness=verifyPreparedSnapshot(command.reviewId,command.snapshot,command.identityScheme);}catch{}
         const receipt = store.command(principal, command,witness);
@@ -223,6 +233,8 @@ export const createGateway = (store: Store, notify: Notify, options:{importArtif
             ? error.message
             : "invalid_request";
       const known = [
+        "test_job_unavailable","test_target_unavailable","test_target_conflict","repository_not_configured","execution_not_configured",
+        "test_queue_full","test_history_limit","test_storage_limit","test_job_conflict","invalid_test_cursor","stale_execution_owner",
         "story_version_unavailable","story_context_unavailable","story_author_conflict","command_conflict",
         "revision_unavailable","analysis_record_unavailable","analysis_job_unavailable",
         "unauthorized",

@@ -2,9 +2,9 @@
 
 **Date:** 2026-10-24
 
-**Handoff revision:** 2; exact source input `67b24f31dd322d034c0a2ec6b73006c009fba310` plus the commit containing this packet.
+**Handoff revision:** 3; exact source input `67b24f31dd322d034c0a2ec6b73006c009fba310` plus the commit containing this packet.
 
-**Status:** P1 passed the original design; G2/G3 bounded qualification is recorded in [probe](probe.md). Ready for root reconciliation and narrow qualification review, not implementation dispatch. No implementation agent is assigned or authorized by this file alone.
+**Status:** P1 and Q2 passed their bounded design/qualification scopes. Root assigned I3 internal06A, now implemented for independent review in [checkpoint](checkpoint-06a.md). Earlier I2/R1 full-slice handoffs remain prospective; I3 and R3 below govern this checkpoint. No full-slice acceptance is claimed.
 
 **Parent:** [Slice plan and gates](plan.md).
 
@@ -100,3 +100,11 @@ Editable: new head-test domain/storage values and tests; narrow existing store, 
 Implement one cohesive internal checkpoint with the fixed catalog and unavailable default, strict user-only intent/cancel, authorized exact-scope reads and durable receipts. Constructor-only TEST-ONLY available injection has no runner and returns explicit fixture provenance. Extend the existing single execution slot's kind and startup test-unknown predicate without adding a new scheduler or exposing process authority. Keep expensive effects absent, transactions short and existing import/analysis grants unchanged. Reopen preserves queued and cancelled jobs; unfinished test invocation records become unknown, never relaunch or invent success. No public clear-unknown/reset endpoint is added.
 
 Required return: exact packet commit, then candidate commit; strict check and meaningful tests with failures/limits; API/storage evidence versus unrun React/process/CLI/own-PR acceptance; changed durable interfaces and any recovery or successor implications. Source07/08 work is not assigned. Root assigns independent review of the exact candidate before integration; this executor does not push, create a PR, merge or deploy.
+
+## R3 independent internal06A review handoff
+
+Root assigns a reviewer other than the executor to the exact committed candidate. Diff base is assignment commit `01def717880b89c331f90dc7f3153f910afed835`; inherited source/qualified recipe is unchanged67 through0117. Read the durable internal06A contract and [checkpoint](checkpoint-06a.md), inspect only the backend/owning-doc diff and independently reproduce the intent/gateway tests and high-risk shared-store regressions. Read-only source review and isolated test fixtures are appropriate; no live data, UI, native, installation or product runner exercise is required or authorized by this packet.
+
+Check unavailable-by-default and immutable constructor configuration; fixed definition/digest; strict no-effect commands; current actor/attachment/epoch authorization before replay; snapshot/head attribution; cross-family IDs and old receipt compatibility; durable cancel/CAS/reopen; quota/pagination; missing-lease recovery and inconsistent quiescence; comments while queued/unknown; absence of a test launch/result authority. Seeded recovery records establish storage behavior only. Return concrete findings and READY FOR INTERNAL CHECKPOINT, CHANGES NEEDED or BLOCKED, with actual independent checks and limits. This review cannot pass full T01–T10, G1, React, real process, CLI or own-PR gates.
+
+Next consumer inputs are `store.tests.{targets,command,query}`, `HeadTest*` public values, target revision2/digest and the shared test occupancy predicate. There is deliberately no test owner/grant/claim/result port yet.06B must document those interfaces before implementation and requalify actual source/environment; it cannot reinterpret test-only queued fixtures as execution readiness. Root retains sequential integration and final G1 reconciliation.

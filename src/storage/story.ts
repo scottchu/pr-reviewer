@@ -54,7 +54,7 @@ export const createStoryStore=({db,tx,load,authenticate,authorize,resolveEvidenc
    const base:StoryReceipt={commandId:command.commandId,actorId:principal.actorId,state:'rejected',reviewId:command.reviewId,snapshotId:command.snapshotId,storyRevision:current.storyRevision,contextRevision:current.contextRevision,result:{}};
    const old=db.prepare('SELECT actor,fingerprint,body FROM story_receipts WHERE id=?').get(command.commandId) as {actor:string;fingerprint:string;body:string}|undefined;
    if(old)return old.actor===principal.actorId&&old.fingerprint===fingerprint?JSON.parse(old.body) as StoryReceipt:{...base,error:'command_conflict'};
-   if(db.prepare('SELECT id FROM receipts WHERE id=?').get(command.commandId)||db.prepare('SELECT id FROM analysis_receipts WHERE id=?').get(command.commandId)||db.prepare('SELECT id FROM import_receipts WHERE id=?').get(command.commandId))return {...base,error:'command_conflict'};
+   if(command.commandId.startsWith('test-result:')||db.prepare('SELECT id FROM test_receipts WHERE id=?').get(command.commandId)||db.prepare('SELECT id FROM receipts WHERE id=?').get(command.commandId)||db.prepare('SELECT id FROM analysis_receipts WHERE id=?').get(command.commandId)||db.prepare('SELECT id FROM import_receipts WHERE id=?').get(command.commandId))return {...base,error:'command_conflict'};
    let receipt:StoryReceipt;
    db.exec('SAVEPOINT story_value');
    try{

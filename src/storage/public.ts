@@ -1,3 +1,5 @@
+import {createHeadTestStore} from "./head-tests.ts";
+import type {HeadTestOptions} from "./head-tests.ts";
 import {createStoryStore} from './story.ts';
 import type {StoryLimits} from './story.ts';
 import {storyEvidenceQuerySchema,storyCanonical,validateSemanticAnchor} from '../domain/public.ts';
@@ -37,7 +39,7 @@ type Connection = {
   connectionId: string;
   corroborated: boolean;
 };
-export const createStore = (filename: string,options:{importLimits?:ImportLimits;analysisLimits?:AnalysisLimits;storyLimits?:StoryLimits}={}) => {
+export const createStore = (filename: string,options:{importLimits?:ImportLimits;analysisLimits?:AnalysisLimits;storyLimits?:StoryLimits;testOptions?:HeadTestOptions}={}) => {
   const db = new DatabaseSync(filename);
   db.exec(
     "PRAGMA busy_timeout=3000; PRAGMA foreign_keys=ON; PRAGMA journal_mode=WAL; CREATE TABLE IF NOT EXISTS reviews(id TEXT PRIMARY KEY, body TEXT NOT NULL); CREATE TABLE IF NOT EXISTS receipts(id TEXT PRIMARY KEY, actor TEXT NOT NULL, fingerprint TEXT NOT NULL, body TEXT NOT NULL); CREATE TABLE IF NOT EXISTS credentials(hash TEXT PRIMARY KEY, body TEXT NOT NULL); CREATE TABLE IF NOT EXISTS challenges(id TEXT PRIMARY KEY, body TEXT NOT NULL); CREATE TABLE IF NOT EXISTS preparation_inputs(review_id TEXT PRIMARY KEY REFERENCES reviews(id), body TEXT NOT NULL); CREATE TABLE IF NOT EXISTS review_import_identities(review_id TEXT PRIMARY KEY REFERENCES reviews(id),provider TEXT NOT NULL,host TEXT NOT NULL,target_project TEXT NOT NULL,change_number INTEGER NOT NULL,current_snapshot_id TEXT NOT NULL);",
@@ -120,7 +122,7 @@ export const createStore = (filename: string,options:{importLimits?:ImportLimits
         normalizationError = true;
       }
       const fingerprint = hash(canonical(normalized));
-      if(db.prepare('SELECT id FROM story_receipts WHERE id=?').get(input.commandId))return {commandId:input.commandId,actorId:principal.actorId,state:'rejected',revision:0,cursor:0,result:{},error:'command_conflict'};
+      if(db.prepare('SELECT id FROM test_receipts WHERE id=?').get(input.commandId)||db.prepare('SELECT id FROM story_receipts WHERE id=?').get(input.commandId))return {commandId:input.commandId,actorId:principal.actorId,state:'rejected',revision:0,cursor:0,result:{},error:'command_conflict'};
       const old = db
         .prepare("SELECT actor,fingerprint,body FROM receipts WHERE id=?")
         .get(input.commandId) as
@@ -139,6 +141,7 @@ export const createStore = (filename: string,options:{importLimits?:ImportLimits
           error: "command_conflict",
         };
       }
+      if(input.commandId.startsWith('test-result:'))return {commandId:input.commandId,actorId:principal.actorId,state:'rejected',revision:0,cursor:0,result:{},error:'command_conflict'};
       const review = load(input.reviewId);
       let receipt: Receipt;
       try {
@@ -199,6 +202,7 @@ export const createStore = (filename: string,options:{importLimits?:ImportLimits
     const row=db.prepare("SELECT body FROM credentials WHERE hash=?").get(hash(token)) as {body:string}|undefined;
     if(!row)throw new Error("unauthorized");return JSON.parse(row.body) as Principal;
   };
+  const tests=createHeadTestStore({db,tx,load,authenticate,authorize,execution,...(options.testOptions?{options:options.testOptions}:{})});
   let story:ReturnType<typeof createStoryStore>;
   const storyEvidence=(token:string,input:StoryEvidenceQuery):StoryEvidence=>{
     const query=storyEvidenceQuerySchema.parse(input),principal=authenticate(token),review=load(query.reviewId);authorize(principal,review);
@@ -273,6 +277,7 @@ export const createStore = (filename: string,options:{importLimits?:ImportLimits
   };
   story=createStoryStore({db,tx,load,authenticate,authorize,resolveEvidence:storyEvidence,...(options.storyLimits?{limits:options.storyLimits}:{})});
   return {
+    tests,
     imports,
     story,
     storyEvidence,
@@ -600,3 +605,5 @@ export type {AnalysisOwner,AnalysisGrant,AnalysisLimits} from './analysis.ts';
 
 export type {StoryLimits} from './story.ts';
 export type {StoryContent,StoryCommand} from '../domain/public.ts';
+
+export type {HeadTestOptions} from "./head-tests.ts";

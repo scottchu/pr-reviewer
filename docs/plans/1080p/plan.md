@@ -37,3 +37,7 @@ Before round acceptance, complete the [round reflection protocol](../../rules/ro
 ## Explicit internal06A sequencing checkpoint
 
 Root authorizes [06A internal backend engineering](slices/06-head-test-job/plan.md#root-sequencing-decision-06a-internal-backend-checkpoint) in parallel with05D UI/application presentation correction, using independently reviewed67 store/epoch/import/analysis interfaces and the Q2-qualified recipe. The backend checkpoint has no executable runner, React UI or CLI; unavailable production and explicit test-only intent fixtures stay distinct. Current67 A/B understanding is conceptually correct but burdensome with P1 presentation correction open; original-session meaningful reply/reload/Resume is independently passed per root. This is a bounded sequencing decision, not full G1/05/06 acceptance or merge authority. Root owns integration and final actual own-PR gates.
+
+## Internal06A engineering progress
+
+The root-assigned backend-only checkpoint now has a [candidate and review handoff](slices/06-head-test-job/checkpoint-06a.md): fixed unavailable catalog, test-only durable request/cancel/read fixtures, current authority/receipts and shared restart exclusion. Independent engineering review is next. This does not close the still-open full G1 predecessor gate or06 React/process/CLI/own-PR acceptance.05D presentation remains separately owned; no domain/store/server interface change from05D is assumed.
