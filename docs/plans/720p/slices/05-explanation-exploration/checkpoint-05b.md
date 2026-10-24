@@ -2,12 +2,12 @@
 
 Date: 2026-10-24
 
-Status: Dispatched; implementation and independent review pending. This is not full slice05 or720p acceptance.
+Status: Implemented at89cec07; independent review found a P2 selection-readiness defect, correction in progress. This is not full slice05 or720p acceptance.
 
 ## Named dispatch receipt
 
 - Executor: `implement_story_player`, the sole05B product writer assigned by root.
-- Model: GPT-6 Sol. Reasoning effort: high. Fresh scoped worker; substantial reactive coordination/lifecycle, exact typed fences and React accessibility justify this bounded assignment.
+- Requested model: `gpt-6.1-sol`. Requested reasoning effort: high. Effective runtime model is not independently observable here. Fresh scoped worker; substantial reactive coordination/lifecycle, exact typed fences and React accessibility justify this bounded assignment.
 - Exact starting commit: `3581fa201d4827ef43b68c258d852bd925e6cf68`.
 - Worktree: `/tmp/pr-reviewer-05-story-player`; branch: `implement-story-player`.
 - Committed input: revision3 [plan](plan.md)/[integration packet](integration.md), reviewed05A `baac411fd6c52b32daa7e7500bbd9c1f27764e4f`, docs-only predecessor reconciliation at3581fa2.
@@ -45,3 +45,12 @@ The React panel presents exact before/after evidence, per-claim basis/uncertaint
 External artifact root: `/tmp/pr-reviewer-05b-browser`. The first passing captures were made with derived code still dirty atop39f994e and are labeled as such in the JSON; a clean immutable candidate rerun follows the code commit. Controlled target: `story-browser` / `story-snapshot`, manually prepared before/head fixture with one changed source file and immutable owner context/story publication. This is actual React engineering, not the actual ownPR, a native initiating-session reply, unfamiliar-reviewer understanding or human art-direction approval. Actual pilot/main/MCP/keys/source answer key were not accessed.
 
 Required screenshots: `story.e2e.ts-desktop-React-31b63-lds-original-question-draft/story-first-step.png`, `story-chapter-account.png`, `story-desktop-panel.png`, `story-desktop-1440x1080.png`; `story.e2e.ts-coarse-pointe-cb72c--draggable-one-row-controls/story-narrow-360x740.png` and `story-player-narrow.png` beneath that root. Implementer inspected the rendered desktop panel and narrow player for restrained neutral hierarchy, meaningful red/green/yellow text, provenance separation, readable source and visible controls. Independent screenshot critique remains pending; no final visual or understanding acceptance is claimed.
+
+
+## Independent review correction in progress
+
+Original candidate: `89cec07fa3f73e85896c9379e2fbf31ac93dcf03`. Independent reviewer reproduced a P2: while the first pinned same-analysis read is pending, Next's public select call returns immediately, reports no graph, and never applies the latest cursor after the old read completes. Original private probe: `/tmp/pr-reviewer-05-player-review/race-probe.mts`. Original47 Bun/241 Node tests and2 focused Chrome journeys passed; full registered Chrome suite also passed17 tests in1.7m. These remain89 evidence and do not establish a fixed candidate. Root explicitly expanded this executor's editable scope to a narrow `application/analysis.ts` public selection-readiness correction with a real-bridge delayed-read regression; no storage/domain/process-owner change is authorized.
+
+Runtime correction: initial package-entry setup also linked `node_modules/.vite` to `/tmp/pr-reviewer-source-analysis/node_modules/.vite`, so earlier Vite cache output was shared. After the full E2E child and its teardown exited, only this worktree's exact `.vite` symlink was unlinked and replaced with a real ignored local directory. Shared cache contents were retained; no package/lock changes were made. All later browser runs use the corrected local cache. Earlier functional results remain accurately qualified; cache isolation is not retroactively claimed.
+
+Next: regression red on the real public bridge, shared exact-selection readiness with authority/disposal fences, coalesced independent findings, clean corrected candidate and affected checks. Independent READY and full05 acceptance remain open.
