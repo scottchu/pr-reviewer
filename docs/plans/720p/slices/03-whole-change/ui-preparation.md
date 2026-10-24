@@ -67,3 +67,11 @@ Focused tests are in `tests/import-panel.e2e.ts`. Existing Playwright configurat
 Initial fixture attempts: bundled Node/Vite cannot load Rolldown's native binding because of host Team-ID validation; no signing/install/bypass attempted. Bun-hosted Vite served untransformed fixture TSX, so that fixture was replaced using the existing supported Bun builder and standard Node HTTP. Bun outfile collided with CSS output; outdir fixed it. Initial remount fixture used a scheduled null render that React could batch; actual root unmount/recreation fixed the test harness. Final code/tests pass as recorded above.
 
 No full product I17/I18 journey, live provider, real process cancellation, own-PR dogfood, unfamiliar-reviewer comprehension, screen-reader, physical-touch or production deployment is claimed. Parent/shared owner owns final action/status projection policy, wiring, style integration, product E2E and durable-spec promotion before acceptance. Publication/merge/deployment are N/A to this scoped worker assignment. Exact candidate commit is supplied in the worker dispatch after preservation.
+
+## Review dispatch and recovery
+
+**Implementation candidate:** `c207c67` (public module and focused tests); pre-code handoff `0c1cdac`.
+
+**Review status:** Pending root's independent assignment. Source comparison base is `320f78f309e665e72c761e20ceb5fa26b384508d`. Review only this scoped presentation change, keeping full I17 and policy evidence separate. Root/shared owner should cherry-pick the handoff and implementation commits plus this final evidence update before wiring.
+
+**Cleanup checkpoint:** Task-local `node_modules` symlink removed with unlink; target tree was not modified. Final fixture process exited, loopback server closed and fixture directory removed. Worktree/branch retained because local commits are the parent's integration/recovery input. Screenshot/browser results and temporary Playwright config are retained at the recorded `/tmp/pr-reviewer-import-panel-*` locations for independent review; no credentials or source import results are present. Root can remove these owned review artifacts after reconciliation. Reproduction requires a task-local runtime-only dependency symlink as authorized by root, or integration into the shared worktree's existing dependencies. No unrelated artifacts were inspected or removed.
