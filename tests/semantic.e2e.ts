@@ -141,3 +141,37 @@ test('actual React explicit context cap and exact paths retain excluded inventor
  await panel.getByRole('region',{name:'Admitted corpus account',exact:true}).screenshot({path:testInfo.outputPath('explicit-bounded-context-account-detail.png')});
  writeFileSync(testInfo.outputPath('explicit-bounded-context-evidence.json'),JSON.stringify({provenance:'Actual React form, real disposable Git, Node gateway/SQLite/fixed TypeScript6 worker. Controlled manual fixture, not actual ownPR or provider evidence.',candidate:execFileSync('git',['rev-parse','HEAD'],{encoding:'utf8'}).trim(),sourceDirty:execFileSync('git',['status','--porcelain'],{encoding:'utf8'}).trim().length>0,commands,reviewId,snapshotId:snapshot.snapshotId,analysisId:facts.analysisId,accounts:admitted.corpus?.accounts,coverage:facts.coverage,inventoryDeclarations:inventory.declarations.length},null,2));
 });
+
+test('actual React unavailable worker result cannot label a corpus admitted and cannot erase prior admitted facts',async({page},testInfo)=>{
+ test.setTimeout(90000);
+ // Valid inventory has exactly 2000 declarations; the full one-hop result needs 2001 nodes.
+ // Keep this real worker limit case separate from forged projection doubles.
+ fixture.git('rm','-q','caller.ts','unknown.ts','helper.ts','inventory.ts',' spaced name.ts');
+ writeFileSync(join(fixture.root,'other.ts'),'export const other = () => 3;\n');fixture.git('add','other.ts');
+ writeFileSync(join(fixture.root,'callee.ts'),'export const callee = () => 1;\n');fixture.git('add','callee.ts');fixture.git('commit','-qm','sparse unavailable-case base');const baseSha=fixture.git('rev-parse','HEAD');
+ writeFileSync(join(fixture.root,'callee.ts'),'export const callee = () => 2;\n'+Array.from({length:1998},(_,i)=>`export const call${i} = () => callee();`).join('\n')+'\ncallee();\n');fixture.git('add','callee.ts');fixture.git('commit','-qm','dense unavailable-case head');
+ const target=pinned(baseSha,fixture.git('rev-parse','HEAD')),targetReview='semantic-unavailable-browser';fixture.store.prepare(targetReview,target);
+ const targetQuery=async()=>await api(`/api/analysis?reviewId=${targetReview}&snapshotId=${target.snapshotId}`) as AnalysisView;
+ await page.setViewportSize({width:1600,height:1100});await page.goto(new URL(`/?reviewId=${targetReview}`,uiUrl).href);await page.getByLabel('Local access token').fill(fixture.token);await page.getByRole('button',{name:'Open review',exact:true}).click();
+ const panel=page.getByRole('region',{name:'Function neighborhoods'});
+ await panel.getByText('Acquire verified pinned context',{exact:true}).click();await panel.getByLabel('Source worktree locator').fill(fixture.root);await panel.getByLabel('Declared source project').fill('scottchu/pr-reviewer');
+ const prepare=async(cap:number,both:boolean,path='callee.ts')=>{
+  await panel.getByLabel('Required before paths',{exact:true}).fill(path);await panel.getByLabel('Required after paths',{exact:true}).fill(path);
+  await panel.getByLabel('Context files per side (optional)',{exact:true}).fill(String(cap));await panel.getByRole('button',{name:'Prepare declarations',exact:true}).click();
+  await until(async()=>(await targetQuery()).jobs.at(-1)?.state==='awaiting_declarations',20000);
+  const prepared=await targetQuery(),inventory=prepared.preparation!.inventory!;expect(inventory.status).toBe('available');if(inventory.status!=='available')throw new Error('expected_valid_2000_inventory');expect(inventory.declarations).toHaveLength(path==='callee.ts'?2000:2);await expect(panel.getByText('Your previous admitted facts and notes remain below while this generation awaits your choice.',{exact:true})).toHaveCount(prepared.analysis?.status==='analyzed'?1:0);
+  for(const side of ['base','head'] as const){const declaration=inventory.declarations.find(item=>item.name===(path==='callee.ts'?'callee':'other')&&item.declaration.side===side)!;await panel.getByLabel(side==='base'?'Before declaration':'After declaration',{exact:true}).selectOption(side==='head'&&!both?'':declaration.id);}
+  await panel.getByRole('button',{name:'Analyze selected declarations',exact:true}).click();
+  await until(async()=>['admitted','unavailable','failed','unknown'].includes((await targetQuery()).jobs.at(-1)!.state),20000);return targetQuery();
+ };
+ const unavailable=await prepare(1,true);
+ expect(unavailable.jobs.at(-1)?.state).toBe('unavailable');expect(unavailable.analysis?.status).toBe('unavailable');expect(unavailable.selectedAnalysisId).toBe(null);expect(unavailable.graphRevision).toBe(0);expect(unavailable.analysis&&'limit' in unavailable.analysis?unavailable.analysis.limit:null).toBe('outputNodes');
+ writeFileSync(testInfo.outputPath('valid-unavailable-projection.json'),JSON.stringify(unavailable,null,2));
+ await panel.getByText('Complete context inventory, coverage and limitations',{exact:true}).click();
+ await expect(panel.getByRole('heading',{name:'Admitted corpus account',exact:true})).toHaveCount(0);await expect(panel.getByRole('heading',{name:'Pending preparation corpus account',exact:true})).toBeVisible();await expect(panel.getByRole('heading',{name:'Admitted static neighborhood',exact:true})).toHaveCount(0);await expect(panel.getByText('Complete prepared declaration list (2000)',{exact:true})).toBeVisible();await expect(panel.getByText('Complete admitted declaration list (2000)',{exact:true})).toHaveCount(0);await expect(panel.getByText(/Previous admitted facts remain available/)).toHaveCount(0);
+ await panel.getByRole('region',{name:'Pending preparation corpus account',exact:true}).screenshot({path:testInfo.outputPath('unavailable-preparation-account.png')});
+ const admitted=await prepare(1,true,'other.ts');expect(admitted.analysis?.status).toBe('analyzed');expect(admitted.selectedAnalysisId).toBe(admitted.analysis?.analysisId);await expect(panel.getByRole('heading',{name:'Admitted static neighborhood',exact:true})).toBeVisible();
+ const retained=await prepare(1,true);expect(retained.preparation?.result?.status).toBe('unavailable');expect(retained.analysis?.status).toBe('analyzed');expect(retained.analysis?.analysisId).toBe(admitted.analysis?.analysisId);expect(retained.corpus?.corpusId).toBe(admitted.corpus?.corpusId);expect(retained.preparation?.corpus?.corpusId).not.toBe(retained.corpus?.corpusId);
+ await expect(panel.getByRole('heading',{name:'Admitted corpus account',exact:true})).toBeVisible();await expect(panel.getByRole('heading',{name:'Pending preparation corpus account',exact:true})).toBeVisible();await expect(panel.getByText(/New analysis unavailable: budget_exceeded/)).toBeVisible();await expect(panel.getByRole('heading',{name:'Admitted static neighborhood',exact:true})).toBeVisible();
+ writeFileSync(testInfo.outputPath('unavailable-account-evidence.json'),JSON.stringify({provenance:'Actual Chrome, real Git/SQLite/gateway/fixed TypeScript6 workers through public React controls. Inventory/compute limit results are genuine; no forged analysis JSON.',candidate:execFileSync('git',['rev-parse','HEAD'],{encoding:'utf8'}).trim(),sourceDirty:execFileSync('git',['status','--porcelain'],{encoding:'utf8'}).trim().length>0,reviewId:targetReview,snapshotId:target.snapshotId,initialUnavailable:unavailable,priorAdmitted:admitted,retained},null,2));
+});

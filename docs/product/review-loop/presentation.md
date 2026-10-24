@@ -49,3 +49,7 @@ An unresolved command locks the form and exposes the unchanged-intent retry. The
 A lowered cap may exclude changed paths from prepared analysis context as well as unchanged context paths. Only explicitly submitted required paths have required acquisition status. This never removes paths from the immutable original imported snapshot or its source browser.
 
 A public query may supply a prepared corpus before any analysis is admitted. Label that current preparation account as pending preparation, not admitted facts. Other retained prepared context without an admitted analysis is a prepared corpus account. Reserve the admitted account label for the corpus accompanying the displayed admitted analysis.
+
+An analysis object can also retain an unavailable result without an admitted graph. Require its positive analyzed status before using admitted account labels or suppressing the matching preparation account; truthiness is insufficient. A newer unavailable preparation does not erase a prior displayed analyzed result: show that result's admitted corpus and the distinct preparation corpus/status separately.
+
+The same status distinction applies to declaration-list and previous-facts copy. An available prepared inventory is a prepared declaration list until it accompanies displayed analyzed facts. Do not promise that previous admitted facts remain when none exist.
