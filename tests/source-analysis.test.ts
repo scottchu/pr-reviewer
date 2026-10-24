@@ -86,6 +86,30 @@ describe("source-neighborhood-v1 fixed acceptance corpus", () => {
     expect(result.unresolved.map(site => source.source!.content.slice(site.anchor.start, site.anchor.end))).toEqual(["a()", "b()", "replacement()"]);
   });
 
+  test("P02 review regression: assertion/non-null assignment targets cannot retain definite bindings", () => {
+    for (const target of ["(target as () => number)", "(<() => number>target)", "target!", "(target satisfies () => number)"]) {
+      const source = entry("wrapped-write.ts", `function target() { return 1; } function replacement() { return 2; } ${target} = replacement; target(); replacement(); const untouched = () => { const target = () => 3; return target(); };`);
+      const request = input([source]);
+      const result = analyzed(request);
+      expect(result.edges.map(edge => [result.nodes.find(node => node.id === edge.caller)!.name, edge.target.start, edge.sites.map(site => source.source!.content.slice(site.anchor.start, site.anchor.end))])).toEqual([
+        ["<module>", source.source!.content.indexOf("function replacement"), ["replacement()"]],
+        ["untouched", source.source!.content.indexOf("target = () => 3"), ["target()"]],
+      ]);
+      expect(result.unresolved.map(site => [source.source!.content.slice(site.anchor.start, site.anchor.end), site.reason])).toEqual([["target()", "mutable_binding"]]);
+    }
+  });
+
+  test("P02/P03 review regression: namespace element writes remain uncertainty without object-method edges", () => {
+    for (const target of ["ns['target']", "(ns as any)['target']", "ns[key]"]) {
+      const implementation = entry("implementation.ts", "export function target() { return 1; }");
+      const source = entry("namespace-write.ts", `import * as ns from './implementation'; const key = 'target'; function replacement() { return 2; } ${target} = replacement; ns.target(); const obj = { target: replacement }; obj['target'] = replacement; obj.target(); replacement();`);
+      const request = input([implementation, source]);
+      const result = analyzed(request);
+      expect(siteFacts(result, request).map(fact => fact.text)).toEqual(["replacement()"]);
+      expect(result.unresolved.map(site => [source.source!.content.slice(site.anchor.start, site.anchor.end), site.reason])).toEqual([["ns.target()", "mutable_binding"], ["obj.target()", "unsupported_dispatch"]]);
+    }
+  });
+
   test("P03 aliases/default/namespace and finite explicit reexports retain linkage; missing/declaration/star ambiguity stay unknown", () => {
     const impl = entry("impl.ts", "export const named = () => 1; export default function main() { return 2; }");
     const first = entry("first.ts", "export { named as middle } from './impl';");
@@ -235,7 +259,7 @@ describe("source-neighborhood-v1 fixed acceptance corpus", () => {
     expect(analyzed({ ...request, sources: [b, a], seeds: [...request.seeds, ...request.seeds] })).toEqual(result);
     expect(JSON.stringify(request)).toBe(original);
     expect(result.parser).toBe("typescript@6.0.3");
-    expect(result.analyzer).toBe("source-neighborhood-v1.0.0");
+    expect(result.analyzer).toBe("source-neighborhood-v1.0.1");
     expect(analyzed({ ...request, sources: [entry("a.ts", "export const target = () => 2;"), b] }).analysisId).not.toBe(result.analysisId);
     expect(analyzed(input([entry("a.ts", a.source!.content, "base"), entry("b.ts", b.source!.content, "base")])).analysisId).not.toBe(result.analysisId);
     expect(analyzed({ ...request, profile: { name: "repository-static-v1", configuration: { source: { snapshotId: request.snapshotId, side: "head", path: "config.json", contentHash: hash("x"), start: 0, end: 1, startLine: 1, endLine: 1 }, paths: {} } } }).analysisId).not.toBe(result.analysisId);
@@ -285,6 +309,36 @@ describe("source-neighborhood-v1 fixed acceptance corpus", () => {
     ] });
     expect(result.neighborhoods.map(n => n.unresolvedSeed as string).sort()).toEqual(["source_unavailable", "hash_mismatch", "invalid_range", "unsupported_or_absent"].sort());
     expect(result.neighborhoods.every(n => n.nodeId === null && n.outgoingAssessment === "not_fully_analyzed")).toBe(true);
+  });
+
+  test("P15/P19 inventory bounds are separate from prepared text and preserve every coverage row", () => {
+    const prepared = entry("prepared.ts", "const target = () => 1; const caller = () => target();");
+    const exclusions: SourceEntry[] = Array.from({ length: 129 }, (_, index) => ({ side: "head", path: `excluded/${index}.ts`, commit: prepared.commit, role: "context", selected: false, exclusion: "excluded" }));
+    const request = input([prepared, ...exclusions]);
+    const result = analyzed(request);
+    expect(result.coverage).toHaveLength(130);
+    expect(result.coverage.filter(row => row.status === "excluded")).toHaveLength(129);
+    expect(result.coverage.filter(row => row.prepared)).toHaveLength(1);
+    expect(result.edges).toHaveLength(1);
+    const metadata = request.sources.map(source => ({ ...source, source: source.source ? { contentHash: source.source.contentHash, ...(source.source.objectId ? { objectId: source.source.objectId } : {}) } : null }));
+    const bytes = Buffer.byteLength(JSON.stringify(metadata));
+    expect(result.observed.inventoryBytes).toBe(bytes);
+    expect(analyzed({ ...request, budgets: { ...DEFAULT_BUDGETS, inventoryPathsPerSide: 130, inventoryBytes: bytes, filesPerSide: 1 } }).coverage).toHaveLength(130);
+    for (const budgets of [
+      { ...DEFAULT_BUDGETS, inventoryPathsPerSide: 129 },
+      { ...DEFAULT_BUDGETS, inventoryBytes: bytes - 1 },
+    ]) {
+      const exceeded = analyzeNeighborhood({ ...request, budgets });
+      noGraph(exceeded, "budget_exceeded");
+      expect(exceeded.coverage).toHaveLength(130);
+      expect(exceeded.coverage.every(row => row.parseStatus === "not_parsed" && row.examined === null)).toBe(true);
+    }
+    const prepared129 = input(Array.from({ length: 129 }, (_, index) => ({ ...entry(`prepared/${index}.ts`, "const f = () => 1;"), selected: false })));
+    const tooManyPrepared = analyzeNeighborhood(prepared129);
+    noGraph(tooManyPrepared, "budget_exceeded");
+    if (tooManyPrepared.status === "unavailable") expect(tooManyPrepared.limit).toBe("filesPerSide");
+    expect(tooManyPrepared.coverage.every(row => row.parseStatus === "not_parsed")).toBe(true);
+    for (const [name, value] of [["inventoryPathsPerSide", 4_097], ["inventoryBytes", 2 * 1024 * 1024 + 1]] as const) noGraph(analyzeNeighborhood({ ...request, budgets: { ...DEFAULT_BUDGETS, [name]: value } }), "invalid_input");
   });
 
   test("P17 unchanged/test callers require actual retained source; excluded caller remains scoped unknown", () => {

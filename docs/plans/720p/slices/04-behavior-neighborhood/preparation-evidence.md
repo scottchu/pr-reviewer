@@ -2,11 +2,11 @@
 
 **Date:** 2026-10-23
 
-**Status:** Implemented and locally verified; independent preparation review pending; pure module preparation only
+**Status:** Initial independent review required changes; corrections locally verified; correction recheck pending; pure module preparation only
 
 **Packet:** `a9b8334a94e8dcb87b90fa69f64e791031587ec2`
 
-**Verified implementation candidate:** `fa4b92a8ddbc9fa24139ef690cc2694e08571f81`. The subsequent evidence-only commit records this immutable source identity; it does not change analyzer/test/package content.
+**Initial implementation candidate:** `fa4b92a8ddbc9fa24139ef690cc2694e08571f81`. The subsequent evidence-only commit `20cc65a1bb64dee38c494b132bd114acdf5d3e9b` was independently reviewed and required changes. These historical identities are preserved; the correction below supersedes preparation readiness.
 
 **Executor scope:** `src/source-analysis/**`, `tests/source-analysis.test.ts`, slice 04 records and durable source-analysis specification; serialized `package.json` / `bun.lock` ownership for the exact runtime alias only. No integration, publication, deployment or live-client work.
 
@@ -33,7 +33,7 @@ All fixtures are synthetic in-memory modules, with supplied source SHA-256 hashe
 2. First implementation run: 17 pass / 2 fail. Two fixture expectations were corrected against the literal source: the review call starts at UTF-16 offset 63, and sorted seeds place `broken.ts` before `valid.ts`. The complete expected edge set and malformed-source rejection were preserved.
 3. Strict checking rejected use of an undeclared compiler field. Implementation switched to public `Program.getSyntacticDiagnostics`; no private-field assertion, unstable API or dependency replacement remains.
 4. Additional assignment counterexample exposed an actual false edge after shorthand destructuring. The compiler distinguishes shorthand property and value symbols; written-value lookup corrected it. The exact destructuring/for-of/parameter-shadowing test subsequently passed with zero confirmed calls. This correction is maintained in durable source knowledge.
-5. Final focused result: **23 tests passed, 0 failed, 267 assertions**. The 19 fixed corpus rows plus four focused counterexample/coordinate/ownership tests all pass. No acceptance row was dropped or converted into a positive-by-count-only criterion.
+5. Initial focused result: **23 tests passed, 0 failed, 267 assertions**. The 19 fixed corpus rows plus four focused counterexample/coordinate/ownership tests passed. The subsequent independent counterexample and correction are recorded below; this initial count did not establish complete negative-case coverage.
 
 | Corpus | Observed source behavior |
 |---|---|
@@ -59,7 +59,7 @@ All fixtures are synthetic in-memory modules, with supplied source SHA-256 hashe
 
 ## Commands and observed results
 
-- `bun test tests/source-analysis.test.ts`: pass, 23 tests / 267 assertions. Includes all P01–P19 and four additional counterexample tests.
+- Initial `bun test tests/source-analysis.test.ts`: pass, 23 tests / 267 assertions. Includes all P01–P19 and four additional counterexample tests. Latest correction results are below.
 - `PATH=/Applications/ChatGPT.app/Contents/Resources/cua_node/bin:$PATH bun run check`: pass. Existing boundary script passes its existing registered subsystems; manual new-subsystem review is separate below.
 - `PATH=/Applications/ChatGPT.app/Contents/Resources/cua_node/bin:$PATH bun run test`: pass, 11 Bun tests / 42 assertions plus 20 Node tests, no failures. This regresses the declared existing suite after the alias/lock delta; it does **not** select the new focused file.
 - `node_modules/.bin/tsc` readback: points to `../typescript/bin/tsc`; package version readback is `7.0.2`. Analysis package version readback is `6.0.3`.
@@ -72,6 +72,28 @@ No global runtime/package-manager install, analysis-side target source Git/files
 
 Manual import-boundary review: analysis implementation imports only `typescript-analysis`, `node:crypto` and its own public value module. The public module exports only analysis values and the analyzer. No acquisition/domain/storage/server/application/UI/integration internal imports, filesystem/process/network imports, compiler-system fallback, target execution or compiler-host constructor fallback exist. The virtual content host resolves only selected supplied source; a separate metadata-only host classifies known excluded targets without loading bytes. No config discovery, ambient package loading, default-library host or plugin execution path is supplied.
 
-**Readiness:** Ready for coordinator-dispatched independent preparation review, not independently approved. Keep this worktree/branch for review and integration recovery. The sole ignored artifact is its local `node_modules/`, retained for those checks; no task-owned raw logs/runtime records require separate preservation. Durable knowledge has been reconciled to source-analysis.md and read back before handoff.
+**Readiness:** Corrections ready for coordinator-dispatched independent recheck, not independently approved. Keep this worktree/branch for review and integration recovery. The sole ignored artifact is its local `node_modules/`, retained for those checks; no task-owned raw logs/runtime records require separate preservation. Durable knowledge has been reconciled to source-analysis.md and read back before handoff.
 
 **Remaining gates:** Independent source/negative-case review; shared subsystem/test registration; actual 02B/03 interfaces; same-commit unchanged-context acquisition/retention; analysis admission/job/CAS/worker timeout/cancellation/generation; managed routes; React semantic graph and graph clarification; actual own-PR graph-first critique; native/human evidence; milestone reflection/docs-only whole-product audit. Root owns dispatch/publication/integration and acceptance. No synthetic test closes these gates.
+
+## Independent-review correction and inventory clarification
+
+**Review disposition:** Changes needed against `20cc65a1bb64dee38c494b132bd114acdf5d3e9b`.
+
+**Retained independent report:** `/tmp/pr-reviewer-source-analysis-review/review-report.md`; exact probes/output remain beside that report. The reviewer checkout/artifacts were read only during correction. The maintained facts and rationale are captured here and in durable source; continuing the product does not depend on that temporary report.
+
+**Confirmed P1:** Assertion-wrapped assignment of a function binding produced a false `resolved_static` edge despite zero compiler diagnostics. Non-null assignment and namespace element assignment exposed the same missing write classification. These violated 04P-A; the initial preparation was not approved.
+
+**Failing first:** Two added regression tests failed against the original classifier while the original 23 tests remained green. They require assertion/type-assertion/non-null/satisfies assignment targets to become `mutable_binding` sites, preserve an untouched same-spelled lexical binding, reject namespace literal/asserted/dynamic element writes as certain calls and keep runtime object methods unsupported. They do not resolve a write to a replacement implementation.
+
+**Correction:** Unwrap transparent TypeScript assignment-target wrappers before inspecting the lexical binding. For true namespace-import writes, mark the actual literal member symbol uncertain; for an unknown computed key, retain uncertainty for the namespace/exported symbols. Ordinary objects/parameters are not namespace imports and gain no method edge. Analyzer version is now `source-neighborhood-v1.0.1`, keeping corrected facts distinct in analysis identity. Parser/dependency versions are unchanged.
+
+**Independent probe replay by the author:** The reviewer's unchanged source strings were executed against the corrected public port by replacing only the harness import target in memory. Assertion call `[109,117)`, non-null call `[92,100)` and namespace call `[95,106)` now each yield zero confirmed edges and exactly one `mutable_binding` site. The assertion case still has zero diagnostics. The original control retains exactly one imported call `[202,219)` plus its four `unsupported_dispatch` sites `[123,140)`, `[142,156)`, `[158,175)` and `[177,198)`. This is author revalidation, not independent correction approval.
+
+**Accepted inventory correction:** Root clarified that the known side/path ledger can exceed the prepared-source set. The original 128-entry check wrongly consumed the source allowance for content-less exclusions. New explicit lowerable limits are `inventoryPathsPerSide: 4096` and `inventoryBytes: 2097152`; `filesPerSide: 128` now counts entries carrying source, including unselected prepared entries. Prepared source still uses the existing per-file/combined byte limits. Canonical ledger metadata removes content text, preserves hash/object IDs, records absent source as null and counts the UTF-8 JSON representation of all rows. `observed.inventoryBytes` reports that measure; both new budget values participate in identity. The contract is pre-integration with no production IDs to migrate.
+
+**Budget failing first:** A new 130-path inventory with one prepared source and 129 exclusions initially returned unavailable. After separating the limits it succeeds and retains all 130 coverage rows. The tests verify 129 prepared but unselected sources still reject, exact lowered path/byte limits pass, one-over limits reject with every row unparsed/no graph, and callers cannot raise either new maximum.
+
+**Latest checks:** `bun test tests/source-analysis.test.ts` passes **26 tests / 322 assertions**, including every P01–P19 case and the three correction/contract tests. `PATH=/Applications/ChatGPT.app/Contents/Resources/cua_node/bin:$PATH bun run check` passes. Exact independent probes replay as above. Package/lock files, shared scripts and runtime integrations are unchanged by this correction; the existing-suite regression remains the previously recorded baseline, not a newly rerun correction result.
+
+**Hold:** Root dispatches correction review and integration. No publication, slice acceptance, UI/native/own-PR result or broader language-flow analysis is claimed.

@@ -1,14 +1,18 @@
 # 04P implementation and independent-review packet
 
-**Revision:** 1; dispatch pins the containing commit
+**Revision:** 2; correction recheck pins the containing commit. Initial dispatch revision 1 remains pinned at `a9b8334a94e8dcb87b90fa69f64e791031587ec2`.
 
-**Status:** Pure module implemented and locally verified; independent preparation review pending; not ready for full integration
+**Status:** Independent review required changes; corrections locally verified; independent correction recheck pending; not ready for full integration
 
 **Parent:** [Slice 04](plan.md)
 
 **Authoritative behavior:** [source-neighborhood-v1](../../../../product/review-loop/source-analysis.md)
 
 **Preparation handback:** [Execution evidence and public-port notes](preparation-evidence.md). The original dispatch packet is `a9b8334a94e8dcb87b90fa69f64e791031587ec2`; implementation changes preserve its fixed corpus and scope. Local results do not establish independent preparation approval.
+
+**Pre-integration clarification:** The complete known side/path ledger is bounded separately from prepared source. `inventoryPathsPerSide` defaults to 4,096 and `inventoryBytes` to 2 MiB combined canonical ledger metadata; `filesPerSide: 128` counts only rows carrying source, including unselected prepared rows. Content-less exclusions remain fully represented without using the prepared-source allowance. All caps may be lowered, never raised; inventory excess must reject before compiler creation with no graph. See the durable specification for the exact byte measure and updated identity semantics. No production analysis identities exist to migrate.
+
+**Correction recheck scope:** Independently reproduce the exact assertion/non-null/namespace-element write counterexamples and untouched same-spelled binding control, then check the revised inventory/prepared-source budget distinction, byte measure, preflight rejection, complete ledger and analysis identity. Preserve unknowns rather than selecting replacement implementations. The initial review's namespace/shadowing/dynamic control remains an exact fact/unknown regression. Recheck the public value contract, focused corpus and strict checks; no full UI/slice acceptance follows.
 
 ## Scope, assignment and prerequisites
 

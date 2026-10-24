@@ -22,11 +22,13 @@ export type ResolutionProfile = Readonly<{
   }>;
 }>;
 export type AnalysisBudgets = Readonly<{
+  inventoryPathsPerSide: number; inventoryBytes: number;
   filesPerSide: number; fileBytes: number; totalBytes: number; seeds: number;
   astNodes: number; invocationSites: number; outputNodes: number; outputSites: number;
   aliasPatterns: number; aliasTargets: number; reExportLinks: number;
 }>;
 export const DEFAULT_BUDGETS: AnalysisBudgets = Object.freeze({
+  inventoryPathsPerSide: 4_096, inventoryBytes: 2 * 1024 * 1024,
   filesPerSide: 128, fileBytes: 256 * 1024, totalBytes: 4 * 1024 * 1024,
   seeds: 64, astNodes: 200_000, invocationSites: 10_000, outputNodes: 2_000,
   outputSites: 4_000, aliasPatterns: 32, aliasTargets: 4, reExportLinks: 32,
@@ -85,11 +87,11 @@ export type Neighborhood = Readonly<{
   limitations: readonly string[];
 }>;
 export type AnalysisMetadata = Readonly<{
-  analyzer: "source-neighborhood-v1.0.0"; parser: string;
+  analyzer: "source-neighborhood-v1.0.1"; parser: string;
   snapshotId: string; corpusDigest: string; analysisId: string;
   corpus: AnalysisInput["corpus"]; coverage: readonly SourceCoverage[];
   diagnostics: readonly AnalysisDiagnostic[];
-  observed: Readonly<{ bytes: number; astNodes: number; invocationSites: number }>;
+  observed: Readonly<{ bytes: number; inventoryBytes: number; astNodes: number; invocationSites: number }>;
 }>;
 export type AnalysisResult = AnalysisMetadata & (
   | Readonly<{ status: "analyzed"; nodes: readonly FunctionNode[]; edges: readonly CallEdge[];

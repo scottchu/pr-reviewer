@@ -2,7 +2,7 @@ import ts from "typescript-analysis";
 import { createHash } from "node:crypto";
 import { DEFAULT_BUDGETS, type AnalysisBudgets, type AnalysisDiagnostic, type AnalysisInput, type AnalysisMetadata, type AnalysisResult, type Anchor, type CallEdge, type FunctionNode, type Neighborhood, type Seed, type Side, type SourceCoverage, type SourceEntry, type UnresolvedReason, type UnresolvedSite } from "./public.ts";
 
-const ANALYZER = "source-neighborhood-v1.0.0" as const;
+const ANALYZER = "source-neighborhood-v1.0.1" as const;
 const PARSER = `typescript@${ts.version}`;
 const ROOT = "/repository/";
 const digest = (value: string) => createHash("sha256").update(value).digest("hex");
@@ -48,8 +48,9 @@ export const analyzeNeighborhood = (input: AnalysisInput): AnalysisResult => {
   const coverage = sources.map(initialCoverage);
   const ledger = new Map(coverage.map(row => [key(row.side, row.path), row]));
   const diagnostics: AnalysisDiagnostic[] = [];
-  const observed = { bytes: 0, astNodes: 0, invocationSites: 0 };
-  const corpusDigest = digest(stable({ sources: sources.map(source => ({ ...source, source: source.source ? { contentHash: source.source.contentHash, ...(source.source.objectId ? { objectId: source.source.objectId } : {}) } : null })), corpus: input.corpus, profile: input.profile }));
+  const sourceMetadata = sources.map(source => ({ ...source, source: source.source ? { contentHash: source.source.contentHash, ...(source.source.objectId ? { objectId: source.source.objectId } : {}) } : null }));
+  const observed = { bytes: 0, inventoryBytes: Buffer.byteLength(stable(sourceMetadata), "utf8"), astNodes: 0, invocationSites: 0 };
+  const corpusDigest = digest(stable({ sources: sourceMetadata, corpus: input.corpus, profile: input.profile }));
   const analysisId = digest(stable({ contract: input.contract, analyzer: ANALYZER, parser: PARSER, snapshotId: input.snapshotId, change: input.change, commits: input.commits, corpusDigest, profile: input.profile, seeds, budgets: input.budgets }));
   const metadata = (): AnalysisMetadata => ({ analyzer: ANALYZER, parser: PARSER, snapshotId: input.snapshotId, corpusDigest, analysisId, corpus: copy(input.corpus), coverage, diagnostics: diagnostics.sort((a, b) => sourceOrder(a, b) || a.start - b.start || compare(a.code, b.code) || compare(a.message, b.message)), observed });
   const unavailable = (failure: Failure): AnalysisResult => freeze({ ...metadata(), status: "unavailable", ...failure });
@@ -85,8 +86,11 @@ export const analyzeNeighborhood = (input: AnalysisInput): AnalysisResult => {
   if (input.seeds.length > input.budgets.seeds) return budget("seeds");
   for (const side of ["base", "head"] as const) {
     const sideSources = sources.filter(source => source.side === side);
-    if (sideSources.length > input.budgets.filesPerSide) return budget("filesPerSide", sideSources[input.budgets.filesPerSide]);
+    if (sideSources.length > input.budgets.inventoryPathsPerSide) return budget("inventoryPathsPerSide", sideSources[input.budgets.inventoryPathsPerSide]);
+    const prepared = sideSources.filter(source => !!source.source);
+    if (prepared.length > input.budgets.filesPerSide) return budget("filesPerSide", prepared[input.budgets.filesPerSide]);
   }
+  if (observed.inventoryBytes > input.budgets.inventoryBytes) return budget("inventoryBytes");
   for (const source of sources) if (source.source && Buffer.byteLength(source.source.content, "utf8") > input.budgets.fileBytes) return budget("fileBytes", source);
   let accumulatedBytes = 0;
   for (const source of sources) {
@@ -186,14 +190,15 @@ export const analyzeNeighborhood = (input: AnalysisInput): AnalysisResult => {
       row.examined = 0;
       const module = addInfo(source, file, file, file, "module", "<module>");
       let exceeded: keyof AnalysisBudgets | undefined;
-      const write = (node: ts.Node): void => {
+      const unwrapTarget = (node: ts.Node): ts.Node => ts.isParenthesizedExpression(node) || ts.isAsExpression(node) || ts.isTypeAssertionExpression(node) || ts.isNonNullExpression(node) || ts.isSatisfiesExpression(node) ? unwrapTarget(node.expression) : node;
+      const write = (wrapped: ts.Node): void => {
+        const node = unwrapTarget(wrapped);
         if (ts.isIdentifier(node)) {
           const symbol = ts.isShorthandPropertyAssignment(node.parent) && node.parent.name === node
             ? state.checker.getShorthandAssignmentValueSymbol(node.parent)
             : state.checker.getSymbolAtLocation(node);
           if (symbol) state.writes.add(symbol);
-        } else if (ts.isParenthesizedExpression(node)) write(node.expression);
-        else if (ts.isArrayLiteralExpression(node)) node.elements.forEach(write);
+        } else if (ts.isArrayLiteralExpression(node)) node.elements.forEach(write);
         else if (ts.isObjectLiteralExpression(node)) for (const property of node.properties) {
           if (ts.isShorthandPropertyAssignment(property)) write(property.name);
           else if (ts.isPropertyAssignment(property)) write(property.initializer);
@@ -201,10 +206,21 @@ export const analyzeNeighborhood = (input: AnalysisInput): AnalysisResult => {
         }
         else if (ts.isSpreadElement(node)) write(node.expression);
         else if (ts.isBinaryExpression(node) && node.operatorToken.kind === ts.SyntaxKind.EqualsToken) write(node.left);
-        else if (ts.isPropertyAccessExpression(node)) {
-          const namespace = state.checker.getSymbolAtLocation(node.expression)?.declarations?.some(ts.isNamespaceImport);
-          const symbol = namespace ? state.checker.getSymbolAtLocation(node.name) : undefined;
-          if (symbol) state.writes.add(symbol);
+        else if (ts.isPropertyAccessExpression(node) || ts.isElementAccessExpression(node)) {
+          const base = unwrapTarget(node.expression);
+          const namespace = ts.isIdentifier(base) ? state.checker.getSymbolAtLocation(base) : undefined;
+          if (!namespace?.declarations?.some(ts.isNamespaceImport)) return;
+          const namespaceType = state.checker.getTypeAtLocation(base);
+          const member = ts.isPropertyAccessExpression(node) ? node.name.text
+            : ts.isStringLiteralLike(node.argumentExpression) ? node.argumentExpression.text : undefined;
+          if (member !== undefined) {
+            const symbol = namespaceType.getProperty(member);
+            if (symbol) state.writes.add(symbol);
+          } else {
+            // The computed name is unknown: no member of this namespace remains certain.
+            state.writes.add(namespace);
+            for (const symbol of namespaceType.getProperties()) state.writes.add(symbol);
+          }
         }
       };
       const visit = (node: ts.Node, owner: FunctionInfo): void => {
@@ -350,8 +366,8 @@ export const analyzeNeighborhood = (input: AnalysisInput): AnalysisResult => {
         const symbol = state.checker.getSymbolAtLocation(node.expression.expression);
         const namespace = symbol?.declarations?.find(ts.isNamespaceImport);
         const specifier = namespace ? moduleSpecifier(namespace) : undefined;
-        binding = namespace && specifier && ts.isImportClause(namespace.parent) && !namespace.parent.isTypeOnly && !state.writes.has(symbol!)
-          ? resolveExport(specifier!.text, node.expression.name.text, namespace!.getSourceFile(), source.side, [nodeAnchor(namespace!, source.side)], new Set(), 0)
+        binding = namespace && specifier && ts.isImportClause(namespace.parent) && !namespace.parent.isTypeOnly
+          ? state.writes.has(symbol!) ? failed("mutable_binding") : resolveExport(specifier.text, node.expression.name.text, namespace.getSourceFile(), source.side, [nodeAnchor(namespace, source.side)], new Set(), 0)
           : failed("unsupported_dispatch");
       } else binding = failed(node.expression.kind === ts.SyntaxKind.ImportKeyword || ts.isCallExpression(node.expression) ? "dynamic_invocation" : "unsupported_dispatch");
       if ("target" in binding && (semanticBlocks(node, source.side) || binding.linkage.some(link => {
