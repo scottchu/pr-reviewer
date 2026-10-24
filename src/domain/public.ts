@@ -411,3 +411,5 @@ export {headTestArtifactQuerySchema} from "./head-tests.ts";
 export type {HeadTestResult,HeadTestArtifact,HeadTestAdmissionReceipt,HeadTestArtifactQuery,HeadTestArtifactView} from "./head-tests.ts";
 
 export type {HeadTestProcessExecution,HeadTestVerification} from './head-tests.ts';
+
+export {headTestTargetsSchema,headTestReceiptSchema,headTestViewSchema,headTestArtifactViewSchema} from './head-test-responses.ts';
