@@ -2,7 +2,7 @@
 
 **Date:** 2026-10-24
 
-**Handoff revision:** 4; exact source input `67b24f31dd322d034c0a2ec6b73006c009fba310` plus the commit containing this packet.
+**Handoff revision:** 5; exact source input `67b24f31dd322d034c0a2ec6b73006c009fba310` plus the commit containing this packet.
 
 **Status:** R3 passed internal06A; [execution06B](execution-06b.md) is the current design/review and prospective implementation handoff. P1/Q2/R3 are bounded predecessor evidence. Q4 independent process-contract review precedes code dispatch; full-slice acceptance remains open.
 
@@ -114,3 +114,7 @@ Next consumer inputs are `store.tests.{targets,command,query}`, `HeadTest*` publ
 The [06B packet](execution-06b.md) supersedes generic I2 assumptions for the next executable work. It pins db03505/af39 and reconciliation08889d0, promotes R3, divides B1 backend/B2 React/B3 CLI/B4 integration ownership and supplies the Q4 independent design review. This planning assignment names `plan_head_test_slice06` as sole06 docs writer only, in `/tmp/pr-reviewer-06-head-test-execution-plan` on `plan-head-test-execution`. No backend/UI/CLI executor is assigned by this revision. Root names them and their exact isolated worktrees after Q4 and after required public-port stability; the source-integrating backend owner alone changes shared schemas/gateway and coordinates narrow workspace/main edits. No parallel writer touches another role's owned files.
 
 R3 is engineering readiness of intent/storage only. Q4 evaluates the new durable process authority and consumer design, not runtime availability or product acceptance. Future engineering review reproduces matrix B01–B06/C01–C02 against the actual candidate and distinguishes controlled process faults from real fixed-target/own-PR evidence. The U1 fresh graph-first reader remains uncontaminated by the source-informed verifier key. No final G1/own-PR/knowledge or07/08 readiness is implied by either review.
+
+## Q4 revision5 narrow recheck
+
+The3191ebc design candidate had two required P2 corrections: early preparation settlement lacked a valid witness variant, and fixed Git batch I/O conflicted with the general test-process I/O rule. [Execution06B revision5](execution-06b.md#q4-required-corrections-at-revision5) and its owning durable amendment specify both repairs and negative vectors. The independent reviewer should check early unavailable/error/cancel/deadline and uncertain preparation child settlement without invented identities, then verify the bounded binary Git channel still permits Q2's recipe without arbitrary public stdin/argv or log-cap bypass. No implementer assignment follows until the narrow recheck and any remaining coalesced findings are resolved by root.

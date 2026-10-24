@@ -2,7 +2,7 @@
 
 **Date:** 2026-10-24
 
-**Packet revision:** 4 — R3 internal06A ready;06B execution/consumer contract proposed for independent design review.
+**Packet revision:** 5 — R3 internal06A ready;06B execution/consumer contract proposed for independent design review.
 
 **Status:** Internal06A independently READY; [06B packet](execution-06b.md) reconciles actual db03505 and05D af39 and specifies missing executable/consumer interfaces. Q4 design review is next, not code dispatch. Full G1 and product-job/React/CLI/own-PR acceptance remain open.
 
@@ -10,7 +10,7 @@
 
 **Durable specification:** [Configured tests on a pinned head](../../../../product/review-loop/test-execution.md), revision `head-test-v1`.
 
-**Ownership:** Root owns acceptance, exact role assignment, integration, PR/main and delivery. This planning worker is the sole slice06 product-doc writer for this packet. Implementation and review role scopes are in [integration revision4](integration.md); unassigned roles are not ready dispatches.
+**Ownership:** Root owns acceptance, exact role assignment, integration, PR/main and delivery. This planning worker is the sole slice06 product-doc writer for this packet. Implementation and review role scopes are in [integration revision5](integration.md); unassigned roles are not ready dispatches.
 
 ## Intent, baseline and gap
 
@@ -144,3 +144,7 @@ The [checkpoint record](checkpoint-06a.md) identifies delivered interfaces, TDD 
 ## Revision4: execution design against delivered ports
 
 [Execution06B](execution-06b.md) is the current successor handoff and readiness record. R3 passed the internal db03505 checkpoint;05D af39 engineering/knowledge is ready but its new actual D6/D7 and full G1 remain open. The task branch reconciles both actual histories at08889d0, without new derived edits or runtime verification. Execution amendment3 is proposed for Q4 independent process-contract review before root assigns code writers. It preserves fixture provenance, exact new-head qualification, same-slot preparation/execution, journal/witness/result/cancel/restart semantics and scoped React/CLI consumers. Historical G0–G5 rows above retain their original packet context; current readiness and named-owner gaps are in the06B packet. No07/08 hierarchy or implementation is created.
+
+## Q4 correction candidate
+
+The original3191ebc packet is preserved with two P2 design findings. [Revision5](execution-06b.md#q4-required-corrections-at-revision5) supplies discriminated early-completion evidence and the fixed private binary Git channel, with observable negative vectors. This is docs-only correction for narrow independent recheck; no code dispatch, runtime evidence or full G1/06 acceptance is claimed.
