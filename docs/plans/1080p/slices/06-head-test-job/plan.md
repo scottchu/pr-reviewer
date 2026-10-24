@@ -160,3 +160,9 @@ Delivered05E7b6dc0330a1532184c061cd69ace5d2c219b9836 preserves independently REA
 Status: root accepted bounded B1 backend gate; CLI engineering assigned, integrated gateway/React acceptance remains open.
 
 Consume [B3 implementation and independent-review handoff](cli-06b.md), based on clean `e9f107d` and the latest single-local-owner decision. Historical B1 qualification and engineering evidence remain pinned; they do not establish auth integration or CLI product acceptance.
+
+## B4 combined access and consumer checkpoint
+
+Status: assigned integration preparation; B2 and product acceptance remain gated.
+
+[The B4 packet](integration-06b4.md) reconciles exact B1/CLI, single-local-owner and SDK2 inputs. The sole integrator owns narrow test-port compatibility and combined evidence; no test UI/application work is authorized here.
