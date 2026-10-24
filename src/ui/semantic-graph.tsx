@@ -1,0 +1,13 @@
+import React from 'react';
+import {ReactFlow,Background,Controls,Position,MarkerType} from '@xyflow/react';
+import type {Node,Edge} from '@xyflow/react';
+import {semanticProjection,semanticExcerpt} from '../application/public.ts';
+import type {SemanticView} from '../application/public.ts';
+import type {SemanticAnchor} from '../domain/public.ts';
+import '@xyflow/react/dist/style.css';
+export const SemanticGraph=({state,onFocus,onOpen}:{state:SemanticView;onFocus:(id:string)=>void;onOpen:(anchor:SemanticAnchor)=>void})=>{
+ const projection=semanticProjection(state.view,state.focus),rows={base:0,head:0};
+ const nodes:Node[]=projection.nodes.map(node=>({id:node.id,position:{x:node.declaration.side==='base'?0:650,y:rows[node.declaration.side]++*290},sourcePosition:Position.Bottom,targetPosition:Position.Top,draggable:false,connectable:false,deletable:false,style:{width:560,height:250},ariaLabel:`${node.declaration.side==='base'?'Before':'After'} ${node.name}, ${node.role} source.`,data:{label:<div className="semantic-node"><span className="eyebrow">{node.declaration.side==='base'?'Before':'After'} · {node.role==='context'?'unchanged context':node.role}</span><strong>{node.name}</strong><span>{node.declaration.path}:{node.declaration.startLine}–{node.declaration.endLine}</span><pre aria-label="Body excerpt, up to 330 characters">{semanticExcerpt(state.snippets,node.body).slice(0,330)}</pre><div><button className="nodrag nopan quiet" onClick={()=>onFocus(node.id)}>Focus {node.name}</button><button className="nodrag nopan" onClick={()=>onOpen(node.body)}>Inspect {node.name} body</button></div></div>}}));
+ const edges:Edge[]=projection.edges.map(edge=>({id:edge.id,source:edge.caller,target:edge.callee,label:'static call',type:'smoothstep',markerEnd:{type:MarkerType.ArrowClosed},ariaLabel:`Resolved static call, ${edge.sites.length} call sites`,style:{stroke:'#596575'}}));
+ return <><p role="status">{nodes.length} of {projection.totalNodes} nodes in the focused projection. {projection.edges.length} visible static relationships. Full admitted facts remain in the lists below. Pan or zoom the canvas; use the lists for keyboard navigation.</p><div className="semantic-columns" aria-hidden="true"><strong>1 · Before / base</strong><strong>2 · After / head</strong></div><div className="semantic-canvas" style={{height:Math.min(1000,Math.max(540,Math.max(rows.base,rows.head)*290+40))}}><ReactFlow key={`${state.view?.analysis?.analysisId}:${state.focus}`} nodes={nodes} edges={edges} defaultViewport={{x:18,y:18,zoom:1}} minZoom={0.4} maxZoom={1.5} nodesDraggable={false} nodesConnectable={false} edgesReconnectable={false} deleteKeyCode={null}><Background/><Controls showInteractive={false}/></ReactFlow></div></>;
+};

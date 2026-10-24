@@ -1,11 +1,12 @@
 import React, { useEffect, useState, useSyncExternalStore } from "react";
 import { createRoot } from "react-dom/client";
-import { createReviewBridge, createImportsBridge, questionStatus } from "../application/public.ts";
+import { createReviewBridge, createImportsBridge, createAnalysisBridge, questionStatus } from "../application/public.ts";
 import {sourceComparison} from "../domain/public.ts";
 import type { Anchor, Review, SourceView } from "../domain/public.ts";
 import "./style.css";
 import { ReviewGraph } from "./graph.tsx";
 import {Imports} from "./imports.tsx";
+import {SemanticPanel} from "./semantic-panel.tsx";
 const initialBridge = () => createReviewBridge(
   new URLSearchParams(window.location.search).get("reviewId") ?? "pr-14",
   new URLSearchParams(window.location.search).get("snapshotId")??undefined,
@@ -87,6 +88,7 @@ const SourcePane = ({
 const App = () => {
   const [bridge,setBridge]=useState(initialBridge);
   const [importsBridge]=useState(createImportsBridge);
+  const [analysisBridge,setAnalysisBridge]=useState(()=>createAnalysisBridge(new URLSearchParams(window.location.search).get("reviewId")??"pr-14"));
   const [comparisonKey,setComparisonKey]=useState<string|undefined>();
   const state = useSyncExternalStore(bridge.subscribe, bridge.getSnapshot);
   const [credential, setCredential] = useState(""),
@@ -100,6 +102,7 @@ const App = () => {
       setSelected(state.initialSelection);
   }, [state.initialSelection, selected]);
   const review = state.review;
+  useEffect(()=>{if(review)void analysisBridge.select(review.snapshot.snapshotId).catch(()=>{});},[analysisBridge,review?.snapshot.snapshotId]);
   if (!state.authenticated || !review)
     return (
       <main className="login">
@@ -112,7 +115,7 @@ const App = () => {
         <form
           onSubmit={(event) => {
             event.preventDefault();
-            void bridge.login(credential);void importsBridge.login(credential);
+            void bridge.login(credential).then(()=>{const current=bridge.getSnapshot().review;if(current)void analysisBridge.login(credential,current.snapshot.snapshotId).catch(()=>{});});void importsBridge.login(credential);
           }}
         >
           <label htmlFor="credential">Local access token</label>
@@ -146,7 +149,7 @@ const App = () => {
     <main>
       <Imports bridge={importsBridge} review={review} canOpen={!draft.trim()&&bridge.canLeaveReview()} onOpen={reviewId=>{
         if(draft.trim()||!bridge.canLeaveReview())return;
-        const next=createReviewBridge(reviewId);setSelected(null);setComparisonKey(undefined);setParentQuestionId(undefined);setBridge(next);void next.login(credential);
+        const next=createReviewBridge(reviewId);setSelected(null);setComparisonKey(undefined);setParentQuestionId(undefined);setBridge(next);const semantic=createAnalysisBridge(reviewId);setAnalysisBridge(semantic);void next.login(credential).then(()=>{const current=next.getSnapshot().review;if(current)void semantic.login(credential,current.snapshot.snapshotId).catch(()=>{});});
         const url=new URL(window.location.href);url.searchParams.set('reviewId',reviewId);url.searchParams.delete('snapshotId');url.hash='';window.history.replaceState(null,'',url);
       }}/>
       <header className="identity">
@@ -196,6 +199,7 @@ const App = () => {
       </header>
       <section className="snapshot-selection" aria-label="Snapshot history"><label>Snapshot<select value={review.snapshot.snapshotId} disabled={Boolean(draft.trim())||state.busy} onChange={event=>{void chooseSnapshot(event.target.value);}}>{(review.snapshotSummaries??[{snapshotId:review.snapshot.snapshotId,baseSha:review.snapshot.baseSha,headSha:review.snapshot.headSha}]).map(snapshot=><option key={snapshot.snapshotId} value={snapshot.snapshotId}>{snapshot.snapshotId===(review.currentSnapshotId??review.snapshot.snapshotId)?"Current":"History"} · {snapshot.headSha.slice(0,12)} · {snapshot.snapshotId.slice(0,12)}</option>)}</select></label><p role="status">{review.snapshot.snapshotId===(review.currentSnapshotId??review.snapshot.snapshotId)?"Viewing current snapshot":"Viewing historical snapshot"}. Selection is private and does not move saved source or discussion.</p>{state.error&&<p role="alert">{state.error}</p>}</section>
       {state.selecting&&<p role="status">Opening the selected snapshot. Question composition is held until its source is ready.</p>}
+      <SemanticPanel key={review.reviewId} bridge={analysisBridge}/>
       {state.graph && <ReviewGraph graph={state.graph} selectedPath={selected?.path??""} selectedFileKey={comparisonKey} onOpen={openSource}/>}
       <section className="source-identity">
         <h2>{selected?.path ?? state.sources[0]?.path}</h2>

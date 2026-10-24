@@ -225,3 +225,5 @@ export const createReviewBridge = (reviewId: string, initialSnapshotId?:string) 
 };
 export {createImportsBridge,describeImportJobs} from './imports.ts';
 export type {ImportViewJob,ImportAction} from './imports.ts';
+export {createAnalysisBridge,semanticProjection,semanticExcerpt,semanticSourceKey} from './analysis.ts';
+export type {AnalysisBridge,SemanticView} from './analysis.ts';
