@@ -6,9 +6,9 @@
 
 **Base source:** 96d0f9e31e9e6e65c2f1ccbed2a2c67ff7231b37
 
-**Verified implementation candidate:** e3e847b36cfb7252520fbd7e686c4b3f8c512e2c
+**Original implementation candidate:** e3e847b36cfb7252520fbd7e686c4b3f8c512e2c
 
-**Status:** Engineering candidate verified locally; independent review, own-PR, publication and deployment remain root-owned gates
+**Status:** Independent review found a P2 fallback defect; correction and six affected MCP checks pass locally. Original reviewer recheck, own-PR, publication and deployment remain root-owned gates
 
 **Native status:** Existing-session event receipt/context delivery/automatic reaction/meaningful native reply remain INCONCLUSIVE
 
@@ -63,3 +63,12 @@ The [experiment evidence](evidence.md) for SDK 1.32.2 remains historical at its 
 Root must still perform independent engineering and graph-first own-PR review, integrate any concurrent B1 test-inventory changes without replacing scripts, publish/merge and deploy through the established supported route. No current pilot or native configuration was touched. Actual native tool catalog, exact originating-session subscription capability, context delivery, automatic active/idle reaction and meaningful native reply remain unrun. A controlled subscription or a React fixture reply cannot pass those gates.
 
 Rollback is the pinned base dependency/source state and lockfile through the same reviewed Git delivery path. No deployment was performed, so there is no installed version to roll back from this worker. Task-local node_modules and external validation artifacts remain retained for independent review; shared dependencies, other worktrees and live processes are untouched. Root owns later cleanup after integration/recovery dependencies are satisfied.
+
+
+## Independent fallback finding and correction
+
+The review of 59850be identified reuse of one mutable server across a valid modern discovery → legacy fallback. Its independent reproduction returned -32601 for legacy initialization. The review report is retained at `/tmp/pr-reviewer-sdk-independent-review/report-59850be.md` (SHA-256 f782ea67cc28b8fbbc5debd69d94849edcc9e0c1aa93330a0821425844571c30); original reproduction/log are `/tmp/pr-reviewer-06-plan-review/sdk-fallback-59850be.mjs` and `.log`. This invalidated broad fallback compatibility despite the passing direct-mode tests.
+
+Docs-first correction commit 5387201 specifies fresh construction on every SDK factory invocation. The actual production-stdio U2-F test reproduced -32601 before repair, then passed discovery, legacy initialization/catalog, pre-attachment denial and trusted same-session attachment/inbox read after repair. The original launch binding is copied/frozen once by the transport wrapper; all mutable server/capability/attachment state is factory-local. The isolated listen fixture follows the same lifetime. Creating a disposable protocol instance does not create another native/user session.
+
+Correction verification: `node --experimental-strip-types --test tests/semantic-mcp.test.ts tests/story-mcp.test.ts` PASS, six tests; `bun run check` PASS (strict TypeScript and subsystem boundaries). Raw log: `/tmp/pr-reviewer-sdk-fallback-fix.70EWHL`. The new regression is in the already registered semantic suite; package scripts and dependencies are unchanged. The earlier 47 Bun + 352 Node and two React passes above remain attributed to the pre-correction implementation; an untouched full rerun was not repeated. Root requests the original reviewer's narrow recheck against the exact returned correction commit. No independent acceptance or deployment is claimed by this worker.

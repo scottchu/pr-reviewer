@@ -1,10 +1,10 @@
 # MCP SDK v2 upgrade
 
-**Packet revision:** 3
+**Packet revision:** 4
 
 **Date:** 2026-10-24
 
-**Status:** Independent review requires a P2 factory-lifetime correction against 59850be. Prior direct-mode checks remain historical; fallback correction and narrow recheck pending. Own-PR and native delivery acceptance remain open
+**Status:** P2 factory-lifetime correction implemented; six affected MCP tests and strict/boundary checks pass. Original reviewer recheck pending. Prior full regression/React evidence remains attributed to its earlier candidate; own-PR and native delivery acceptance remain open
 
 **Parent:** [MCP experiment](plan.md); [480p slice 02](../plan.md)
 
@@ -84,3 +84,14 @@ The real stdio server uses `serveStdio` and explicit schema objects; the owner u
 **TDD and acceptance U2-F:** Add an actual production-stdio probe → legacy regression to the already registered semantic MCP suite; reproduce the reviewed failure before repair. After repair, require a successful 2025-11-25 initialization, expected catalog, denied pre-attachment read and normal trusted attachment/read on that same connection. Preserve direct modern/legacy, listen, JSONL utility and source/revocation/receipt tests. Rerun the focused MCP suites and strict/boundary checks; the unchanged whole regression/E2E run remains attributed to its earlier candidate unless a new finding requires broader execution.
 
 **Review evidence:** `/tmp/pr-reviewer-sdk-independent-review/report-59850be.md`, SHA-256 f782ea67cc28b8fbbc5debd69d94849edcc9e0c1aa93330a0821425844571c30. Original reproduction/log: `/tmp/pr-reviewer-06-plan-review/sdk-fallback-59850be.mjs` and `.log`. Root assigns the original reviewer a narrow recheck of the new exact correction commit; worker does not claim independent acceptance or deployment.
+
+
+## Factory correction result
+
+**Docs-first correction source:** 5387201
+
+**TDD result:** New registered U2-F production-stdio regression failed before repair with `initialize` error -32601, matching the independent reproduction. It passes after fresh factory construction, including successful legacy negotiation, expected tools, denied pre-attachment read and trusted same-session attachment/read.
+
+**Changed boundary:** The outer MCP wrapper copies/freezes the original launch binding and owns only transport start/close. Every SDK factory call constructs/registers a fresh internal server with fresh capability/attached state. The former eagerly created `.server` object had no repository consumer and is no longer exposed; callers retain start/close. The isolated fixture likewise constructs its server/subscription set inside the factory.
+
+**Narrow verification:** Six MCP cases PASS; strict TypeScript and subsystem boundaries PASS. Raw log `/tmp/pr-reviewer-sdk-fallback-fix.70EWHL`. No dependency/script, HTTP/UI/auth-policy, native owner or pilot change. Full regression and React reruns were not repeated for this bounded correction; their prior evidence remains historical. Root pins this correction's exact committed head for the original reviewer, then owns remaining acceptance and deployment.

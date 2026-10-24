@@ -1,5 +1,6 @@
 import { test } from "node:test";
 import { spawn } from "node:child_process";
+import { createInterface } from "node:readline";
 import assert from "node:assert/strict";
 import { writeFileSync } from "node:fs";
 import { join, resolve } from "node:path";
@@ -165,6 +166,58 @@ test("U2 owner JSONL utility negotiates modern MCP, preserves pairing and closes
     assert.equal(stdout.includes(challenge.proof), false);
   } finally {
     if (child && child.exitCode === null) child.kill("SIGTERM");
+    await gateway.close();
+    f.cleanup();
+  }
+});
+
+
+test("U2-F actual stdio modern probe falls back to fresh legacy attachment state", { timeout: 10000 }, async () => {
+  const f = semanticFixture();
+  const gateway = createGateway(f.store, async () => ({ state: "unknown", reason: "controlled" }));
+  let child: ReturnType<typeof spawn> | undefined;
+  let lines: ReturnType<typeof createInterface> | undefined;
+  const timers = new Set<ReturnType<typeof setTimeout>>();
+  try {
+    const port = await gateway.listen(0), owner = { kind: "user" as const, actorId: "local-user" };
+    const connection = f.store.registerConnection(owner, { host: "codex", sessionId: "controlled-fallback-session", connectionId: "fallback-connection", corroborated: true });
+    const challenge = f.store.challenge(owner, "r", "codex", "controlled-fallback-session", "fallback-connection");
+    const launchRef = join(f.root, "fallback-launch.json");
+    writeFileSync(launchRef, JSON.stringify({ gatewayUrl: `http://127.0.0.1:${port}`, bootstrapToken: connection.token, challengeId: challenge.challengeId, proof: challenge.proof, reviewId: "r", host: "codex", sessionId: "controlled-fallback-session", connectionId: "fallback-connection" }), { mode: 0o600 });
+    child = spawn(process.execPath, ["--experimental-strip-types", resolve("src/mcp/main.ts")], { env: { PATH: process.env.PATH ?? "", REVIEW_MCP_LAUNCH_REF: launchRef }, stdio: ["pipe", "pipe", "pipe"] });
+    let stderr = "";
+    child.stderr!.on("data", chunk => { stderr += String(chunk); });
+    type Response = { id?: number; result?: Record<string, unknown>; error?: { code: number; message: string } };
+    const pending = new Map<number, (value: Response) => void>();
+    lines = createInterface({ input: child.stdout! });
+    lines.on("line", line => { const response = JSON.parse(line) as Response; if (typeof response.id === "number") pending.get(response.id)?.(response); });
+    const request = (id: number, method: string, params: Record<string, unknown> = {}) => new Promise<Response>((resolveResponse, reject) => {
+      const timer = setTimeout(() => { pending.delete(id); timers.delete(timer); reject(new Error(`fixture response timeout: ${method}; ${stderr}`)); }, 3000);
+      timers.add(timer);
+      pending.set(id, response => { clearTimeout(timer); timers.delete(timer); pending.delete(id); resolveResponse(response); });
+      child!.stdin!.write(JSON.stringify({ jsonrpc: "2.0", id, method, params }) + "\n");
+    });
+    const discover = await request(1, "server/discover", { _meta: { "io.modelcontextprotocol/protocolVersion": "2026-07-28", "io.modelcontextprotocol/clientInfo": { name: "controlled-fallback", version: "1" }, "io.modelcontextprotocol/clientCapabilities": {} } });
+    assert.ok(discover.result);
+    const legacy = await request(2, "initialize", { protocolVersion: "2025-11-25", capabilities: {}, clientInfo: { name: "controlled-fallback", version: "1" } });
+    assert.equal(legacy.result?.protocolVersion, "2025-11-25", JSON.stringify(legacy.error));
+    child.stdin!.write(JSON.stringify({ jsonrpc: "2.0", method: "notifications/initialized" }) + "\n");
+    const catalog = await request(3, "tools/list");
+    assert.ok((catalog.result?.tools as { name: string }[]).some(tool => tool.name === "session_attach"));
+    assert.equal((await request(4, "tools/call", { name: "inbox_read", arguments: {} })).result?.isError, true);
+    const value = (response: Response) => JSON.parse((response.result?.content as { text: string }[])[0]!.text) as Record<string, unknown>;
+    const attached = value(await request(5, "tools/call", { name: "session_attach", arguments: {} }));
+    assert.equal(attached.status, "attached");
+    assert.equal((attached.attachment as { sessionId: string }).sessionId, "controlled-fallback-session");
+    assert.deepEqual(value(await request(6, "tools/call", { name: "inbox_read", arguments: {} })).items, []);
+  } finally {
+    for (const timer of timers) clearTimeout(timer);
+    lines?.close();
+    if (child && child.exitCode === null) {
+      const closed = new Promise<void>(resolveClose => child!.once("close", () => resolveClose()));
+      child.kill("SIGTERM");
+      await closed;
+    }
     await gateway.close();
     f.cleanup();
   }

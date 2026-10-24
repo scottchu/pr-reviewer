@@ -12,11 +12,10 @@ export type LaunchBinding = {
   sessionId: string;
   connectionId: string;
 };
-export const createMcp = (launch: LaunchBinding) => {
+const createServer = (launch: LaunchBinding) => {
   let capability = launch.bootstrapToken;
   let attached = false;
   const server = new McpServer({ name: "pr-reviewer", version: "0.1.0" });
-  let handle: StdioServerHandle | undefined;
   const request = async (path: string, body?: unknown) => {
     const result = await fetch(`${launch.gatewayUrl}${path}`, {
       headers: {
@@ -140,12 +139,17 @@ export const createMcp = (launch: LaunchBinding) => {
   server.registerTool("analysis_get",{description:"Read retained static neighborhoods, exact declarations, coverage, unknowns and attributed clarifications. Static binding does not prove runtime behavior.",inputSchema:analysisQuerySchema},async input=>{normal();const parameters=new URLSearchParams(Object.entries(input).filter(([,value])=>value!==undefined).map(([key,value])=>[key,String(value)]));return output(await request(`/api/analysis?${parameters}`));});
   server.registerTool("analysis_source_get",{description:"Open exact retained context text by immutable corpus/source identity; no filesystem lookup.",inputSchema:semanticSourceQuerySchema},async input=>{normal();return output(await request("/api/analysis/source",input));});
   server.registerTool("graph_clarification_put",{description:"Append an attributed interpretation/question/correction through graph CAS. Does not edit compiler facts or wake an agent.",inputSchema:analysisCommandSchema.options[3].omit({type:true,reviewId:true})},async input=>{normal();return output(await request("/api/analysis/commands",{type:"PutGraphClarification",reviewId:launch.reviewId,...input}));});
+  return server;
+};
+
+export const createMcp = (launch: LaunchBinding) => {
+  const binding = Object.freeze({ ...launch });
+  let handle: StdioServerHandle | undefined;
   return {
-    server,
     start: () => {
       if (handle) throw new Error("MCP stdio already started");
-      handle = serveStdio(() => server);
+      handle = serveStdio(() => createServer(binding));
     },
-    close: () => handle?.close() ?? server.close(),
+    close: () => handle?.close() ?? Promise.resolve(),
   };
 };
