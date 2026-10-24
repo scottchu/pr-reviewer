@@ -12,7 +12,7 @@ Account for every changed part, trace evidence-backed before/after neighbors and
 
 | Slice | Readiness and next scope | Acceptance contribution |
 |---|---|---|
-| [03: whole change](slices/03-whole-change/plan.md) | Acquisition preparation ready against frozen boundary v1; vertical integration waits on reviewed 02 history/graph interfaces | Path → provider candidate → immutable multi-file ledger → inspect every disposition while comments continue during real import job. |
+| [03: whole change](slices/03-whole-change/plan.md) | Acquisition independently reviewed; bounded02B ports accepted/merged, full03 integration dispatched through versioned v3 packet | Path → provider candidate → immutable multi-file ledger → inspect every disposition while comments continue during real import job. |
 | 04: neighborhood | Provisional; create slice packet after 03 returns actual source/job contracts. Start with this project's TypeScript/TSX, static supported calls, explicit unresolved dynamic/ambiguous cases. | Actual one-hop base/head callers/callees, unchanged neighbors, related test source and independent graph annotation CAS. Imports alone do not prove calls. |
 | 05: explanation and exploration | Provisional; create packet from reviewed 04 facts and predeclared chapter account | Graph-led plain language why/what/how/example, provenance-separated context rail and one-row draggable controls; exploration and resume preserve cursor/selection. |
 

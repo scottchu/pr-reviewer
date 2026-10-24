@@ -4,6 +4,7 @@ This is the durable product specification: what PR Reviewer does, why, and how i
 
 - [Vision](vision.md): purpose and the experience of understanding a PR.
 - [Continuation and source import](review-loop/evolution.md): merged bootstrap graph, current immutable-history candidate and future import boundary.
+- [Durable import jobs](review-loop/import-jobs.md): accepted slice03 path/discovery/job/admission/artifact design; implementation and product evidence pending.
 - [Persistence compatibility](review-loop/persistence-compatibility.md): supported legacy/current SQLite records, migration and exact identity/retry conventions.
 - [First review loop](review-loop/README.md): user story, UI, data/command/MCP contracts and CLI delivery/recovery.
 - [Architecture](architecture.md): system relationships, technology direction and subsystem boundaries.
