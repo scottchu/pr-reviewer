@@ -198,3 +198,39 @@ test("raw tree bytes are hash-verified and invalid input is rejected before effe
     }
   } finally {f.cleanup();}
 });
+
+test("noncanonical raw Git tree modes cannot prepare regular source text", async () => {
+  const f=fixture();
+  try {
+    const blob=f.git("rev-parse",`${f.input.commits.head}:src/callee.ts`);
+    const rawGit=(args:string[],input:Buffer)=>execFileSync("git",args,{cwd:f.root,input,encoding:"utf8",stdio:["pipe","pipe","pipe"],env:{...process.env,GIT_CONFIG_NOSYSTEM:"1",GIT_CONFIG_GLOBAL:"/dev/null",GIT_NO_LAZY_FETCH:"1"}}).trim();
+    for(const mode of ["120001","100600","040001"]) {
+      const path=`invalid-${mode}.ts`;
+      const tree=rawGit(["hash-object","--literally","-t","tree","-w","--stdin"],Buffer.concat([Buffer.from(`${mode} ${path}\0`),Buffer.from(blob,"hex")]));
+      const head=rawGit(["hash-object","--literally","-t","commit","-w","--stdin"],Buffer.from(`tree ${tree}\nparent ${f.input.commits.base}\nauthor Fixture <fixture@example.invalid> 1 +0000\ncommitter Fixture <fixture@example.invalid> 1 +0000\n\nInvalid source mode fixture\n`));
+      const input={...f.input,commits:{base:f.input.commits.base,head},priorityPaths:{}};
+      const result=await loadSourceContext(input,f.effects);
+      assert.equal(result.kind,"prepared");
+      assert.equal(result.corpus?.sources.some(s=>s.side === "head" && s.path === path),false);
+      const row=result.corpus?.ledger.find(e=>e.side === "head" && e.path === path);
+      assert.equal(row?.preparation,"unsupported");assert.equal(row?.reason,"object_type");
+      assert.equal(result.corpus?.accounts.head.preparedSources,0);
+      assert.equal(result.corpus?.accounts.head.unsupportedSources,1);
+      const required=await loadSourceContext({...input,priorityPaths:{head:[path]}},f.effects);
+      assert.equal(required.kind,"unavailable");assert.ok(required.issues.some(i=>i.reason === "required_source_unavailable" && i.path === path));
+    }
+  } finally {f.cleanup();}
+});
+
+test("metadata caps below serialized empty ledger reject before effects, while the minimum remains bounded", async () => {
+  const f=fixture();
+  try {
+    let effects=0;
+    const observed:AcquisitionEffects={run:async c=>{effects++;return f.effects.run(c);}};
+    const tiny=await loadSourceContext({...f.input,priorityPaths:{},budgets:{inventoryMetadataBytes:1}},observed);
+    assert.equal(tiny.kind,"unavailable");assert.equal(tiny.corpus,null);assert.equal(effects,0);
+    const minimum=await loadSourceContext({...f.input,priorityPaths:{},budgets:{inventoryMetadataBytes:2}},f.effects);
+    assert.equal(minimum.kind,"prepared");assert.equal(minimum.corpus?.observed.ledgerMetadataBytes,2);
+    assert.equal(minimum.corpus?.ledger.length,0);assert.equal(minimum.corpus?.accounts.base.unvisitedPaths,null);
+  } finally {f.cleanup();}
+});

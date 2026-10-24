@@ -74,3 +74,23 @@ Disposable fixtures exercise unchanged caller/TSX/declaration sources, retained 
 **Recovery:** Keep this clean task branch/worktree for root's independent context recheck and later integration. No owned temporary fixture directory or raw operational log is required for recovery. The reviewer has the packet, durable specification, exact code commit and rerunnable tests; a worker checkpoint is not slice acceptance.
 
 **Accepted analysis reconciliation:** Root reports pure analyzer `04e30e5` independently ready for bounded module integration. Loader traversal-entry counts differ from analyzer known-path counts even though both default to 4096. The exact counter/metadata mapping distinction is recorded in durable acquisition knowledge. 04I must retain the loader account and separately validate the projected analyzer ledger; module acceptance does not complete that mapping.
+
+## Context review correction checkpoint
+
+**Reviewed source:** `1d11a05295a2b862935eaade466e9f4f861c07a1`
+
+**Status:** Corrections module-tested; targeted recheck required before bounded context integration
+
+Independent negative probes at `/tmp/pr-reviewer-source-acquisition-review/context-negative-probes.ts` reproduced two gaps outside the passing 25 tests. A hash-verified raw tree with mode `120001` and UTF-8 source content was incorrectly prepared as regular text. A requested metadata cap of one byte returned the two-byte JSON empty ledger. Original review identity/evidence is retained; these failures are not overridden by earlier passing tests.
+
+Correction acceptance: only explicit regular Git modes `100644`/`100755` may enter source blob preparation, with noncanonical source modes retained unsupported rather than loaded. Metadata input must allow the unavoidable two bytes for serialized `[]`, reject a smaller bound before effects, and never report ledger bytes above an accepted cap. Add real raw-tree and cap-boundary regressions before the implementation correction, rerun focused acquisition/context tests and strict TypeScript, then commit clean for the same reviewer. No scope expansion or shared writes.
+
+### Context correction outcome
+
+**Status:** Both corrections implemented and module-tested; same-reviewer targeted recheck pending
+
+The two new tests first failed against `1d11a05`: invalid raw mode retained source text, and the one-byte metadata request returned prepared. Production selection now admits only `100644`/`100755` regular modes. Actual raw Git objects created with `hash-object --literally` cover noncanonical modes `120001`, `100600` and `040001`; each known TS source row is unsupported/object_type, has no retained head text and fails explicitly if required. Tree/blob hash verification and normal symlink/submodule dispositions remain separate checks.
+
+Metadata budget validation now rejects `inventoryMetadataBytes < 2` before effects, returning unavailable/null corpus. The minimum two-byte cap is accepted; its empty ledger is exactly two bytes, with incomplete enumeration/unknown unvisited scope rather than a complete empty repository claim.
+
+Final focused command passed **27 tests** (16 original acquisition, 11 context), and the same scoped strict TypeScript command passed. Changed-file import behavior and ordinary context fixtures remain passing. Durable mode/minimum-cap knowledge is recorded in `source-acquisition.md`; public types/default maximums and all shared files are unchanged. Reviewer-owned probes/results and original source identity are retained unchanged. Owned fixture repositories were removed in `finally`; retain the clean correction worktree for root's targeted independent recheck. No runtime, pilot, package, auth or publication operation occurred.

@@ -40,7 +40,7 @@ export const loadSourceContext=async(input:ContextInput,effects:AcquisitionEffec
   const identity:ContextIdentity={provider:id.provider,host:id.host,sourceProject:id.sourceProject,targetProject:id.targetProject,number:id.number};
   const commits={base:input.commits.base,head:input.commits.head};
   const budgets={...DEFAULT_CONTEXT_BUDGETS,...input.budgets};
-  if(Object.keys(budgets).some(key=>!(key in DEFAULT_CONTEXT_BUDGETS)) || Object.entries(budgets).some(([key,n])=>!Number.isSafeInteger(n) || n < 1 || n > DEFAULT_CONTEXT_BUDGETS[key as keyof ContextBudgets])) return invalid();
+  if(budgets.inventoryMetadataBytes < 2 || Object.keys(budgets).some(key=>!(key in DEFAULT_CONTEXT_BUDGETS)) || Object.entries(budgets).some(([key,n])=>!Number.isSafeInteger(n) || n < 1 || n > DEFAULT_CONTEXT_BUDGETS[key as keyof ContextBudgets])) return invalid();
   const priorities:Record<ContextSide,string[]>={base:[],head:[]};
   for(const side of sides) {
     const values=input.priorityPaths?.[side] ?? [];
@@ -101,8 +101,9 @@ export const loadSourceContext=async(input:ContextInput,effects:AcquisitionEffec
         account.observedTreeEntries++;
         if(entry.mode === "040000") {if(!await visit(entry.objectId,path)) return false;continue;}
         const submodule=entry.mode === "160000";
+        const regular=entry.mode === "100644" || entry.mode === "100755";
         if(!sourcePath(path) && !submodule) continue;
-        const row:MutableRow={side,path,commit:commits[side],objectId:entry.objectId,mode:entry.mode,kind:submodule ? "submodule" : "source",role:/\.d\.ts$/.test(path) ? "declaration-only" : "context",change:"unknown",priority:priorities[side].includes(path),selected:false,preparation:submodule || entry.mode === "120000" ? "unsupported" : "excluded",reason:submodule ? "submodule" : entry.mode === "120000" ? "symlink" : "not_selected"};
+        const row:MutableRow={side,path,commit:commits[side],objectId:entry.objectId,mode:entry.mode,kind:submodule ? "submodule" : "source",role:/\.d\.ts$/.test(path) ? "declaration-only" : "context",change:"unknown",priority:priorities[side].includes(path),selected:false,preparation:regular ? "excluded" : "unsupported",reason:submodule ? "submodule" : entry.mode === "120000" ? "symlink" : regular ? "not_selected" : "object_type"};
         if(!addRow(row)) {issues.push({reason:"inventory_metadata_limit",side,path,limit:"inventoryMetadataBytes"});return false;}
       }
       return true;
