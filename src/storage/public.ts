@@ -1,3 +1,6 @@
+import {createAnalysisStore} from "./analysis.ts";
+import type {AnalysisLimits} from "./analysis.ts";
+import {createExecutionLease} from "./execution.ts";
 import type {ImportLimits} from "./imports.ts";
 import {createImportStore} from "./imports.ts";
 import {isPreparedSnapshotWitness,validateProviderSnapshot} from "../source-preparation/public.ts";
@@ -30,7 +33,7 @@ type Connection = {
   connectionId: string;
   corroborated: boolean;
 };
-export const createStore = (filename: string,options:{importLimits?:ImportLimits}={}) => {
+export const createStore = (filename: string,options:{importLimits?:ImportLimits;analysisLimits?:AnalysisLimits}={}) => {
   const db = new DatabaseSync(filename);
   db.exec(
     "PRAGMA busy_timeout=3000; PRAGMA foreign_keys=ON; PRAGMA journal_mode=WAL; CREATE TABLE IF NOT EXISTS reviews(id TEXT PRIMARY KEY, body TEXT NOT NULL); CREATE TABLE IF NOT EXISTS receipts(id TEXT PRIMARY KEY, actor TEXT NOT NULL, fingerprint TEXT NOT NULL, body TEXT NOT NULL); CREATE TABLE IF NOT EXISTS credentials(hash TEXT PRIMARY KEY, body TEXT NOT NULL); CREATE TABLE IF NOT EXISTS challenges(id TEXT PRIMARY KEY, body TEXT NOT NULL); CREATE TABLE IF NOT EXISTS preparation_inputs(review_id TEXT PRIMARY KEY REFERENCES reviews(id), body TEXT NOT NULL); CREATE TABLE IF NOT EXISTS review_import_identities(review_id TEXT PRIMARY KEY REFERENCES reviews(id),provider TEXT NOT NULL,host TEXT NOT NULL,target_project TEXT NOT NULL,change_number INTEGER NOT NULL,current_snapshot_id TEXT NOT NULL);",
@@ -183,10 +186,13 @@ export const createStore = (filename: string,options:{importLimits?:ImportLimits
       }
     });
   }catch(error){db.close();throw error;}
+  const execution=createExecutionLease(db);
   let imports:ReturnType<typeof createImportStore>;
-  try{imports=createImportStore({db,tx,load,save,...(options.importLimits?{limits:options.importLimits}:{})});}catch(error){db.close();throw error;}
+  try{imports=createImportStore({db,tx,load,save,execution,...(options.importLimits?{limits:options.importLimits}:{})});}catch(error){db.close();throw error;}
+  const analysis=createAnalysisStore({db,tx,load,authorize,execution,...(options.analysisLimits?{limits:options.analysisLimits}:{})});
   return {
     imports,
+    analysis,
     close: () => db.close(),
     issueUser: () => issue({ kind: "user", actorId: "local-user" }),
     authenticate: (token: string): Principal => {
@@ -505,3 +511,5 @@ export const createStore = (filename: string,options:{importLimits?:ImportLimits
 };
 export type Store = ReturnType<typeof createStore>;
 export type {ImportOwner,ImportGrant} from './imports.ts';
+
+export type {AnalysisOwner,AnalysisGrant,AnalysisLimits} from './analysis.ts';

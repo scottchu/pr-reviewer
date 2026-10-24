@@ -1,3 +1,4 @@
+import type {ExecutionLease} from './execution.ts';
 import {createHash,randomUUID} from 'node:crypto';
 import type {DatabaseSync} from 'node:sqlite';
 import {canonical,importCommandSchema,importWaitingStates,canCancelImport,importStableIdentity,createImportedReview,applyCommand} from '../domain/public.ts';
@@ -10,8 +11,8 @@ declare const grantBrand:unique symbol;
 export type ImportOwner={readonly [ownerBrand]:true};
 export type ImportGrant={readonly [grantBrand]:true};
 export type ImportLimits={maxLaunches?:number;maxRetainedSourceBytes?:number};
-type Ports={limits?:ImportLimits;db:DatabaseSync;tx:<T>(operation:()=>T)=>T;load:(id:string)=>Review;save:(review:Review)=>void};
-export const createImportStore=({db,tx,load,save,limits={}}:Ports)=>{
+type Ports={execution:ExecutionLease;limits?:ImportLimits;db:DatabaseSync;tx:<T>(operation:()=>T)=>T;load:(id:string)=>Review;save:(review:Review)=>void};
+export const createImportStore=({db,tx,load,save,execution,limits={}}:Ports)=>{
  const ceiling=limits.maxLaunches??4096,sourceQuota=limits.maxRetainedSourceBytes??64*1024*1024;
  if(!Number.isSafeInteger(ceiling)||ceiling<1||ceiling>4096||!Number.isSafeInteger(sourceQuota)||sourceQuota<1||sourceQuota>64*1024*1024)throw new Error('invalid_import_limit');
  const phaseLimit=(invocation:ImportInvocation)=>Math.min(invocation.phase==='discovery'?256:4096,ceiling);
@@ -26,6 +27,7 @@ export const createImportStore=({db,tx,load,save,limits={}}:Ports)=>{
  const owner=(value:ImportOwner)=>{const generation=owners.get(value),row=db.prepare('SELECT generation FROM import_owner WHERE id=1').get() as {generation:string}|undefined;if(!generation||row?.generation!==generation)throw new Error('stale_import_runner');return generation;};
  const grant=(value:ImportGrant)=>{const record=grants.get(value),row=db.prepare('SELECT generation FROM import_owner WHERE id=1').get() as {generation:string}|undefined;if(!record||record.generation!==row?.generation)throw new Error('stale_import_runner');const job=get(record.jobId),invocation=job.invocations.at(-1);if(!invocation||invocation.invocationId!==record.invocationId||invocation.state!=='running')throw new Error('stale_import_runner');return {job,invocation};};
  const terminal=(invocation:ImportInvocation)=>{if(invocation.processes.some(process=>process.state!=='exited'))throw new Error('import_process_unresolved');};
+ const release=(job:ImportJob,invocation:ImportInvocation)=>execution.release({kind:'import',jobId:job.jobId,invocationId:invocation.invocationId,phase:invocation.phase});
  const matching=(candidate:ProviderCandidate)=> (db.prepare('SELECT review_id,current_snapshot_id FROM review_import_identities WHERE provider=? AND host=? AND target_project=? AND change_number=? ORDER BY review_id').all(candidate.provider,candidate.host,candidate.targetProject,candidate.number) as {review_id:string;current_snapshot_id:string}[]).map(row=>({reviewId:row.review_id,currentSnapshotId:row.current_snapshot_id}));
  const view=(job:ImportJob)=>{const {credentialReference,...publicJob}=job;return publicJob;};
  const retainedBytes=(review:Review)=> (review.snapshots??[review.snapshot]).reduce((n,snapshot)=>n+encodedSourceBytes(snapshot),0);
@@ -72,7 +74,7 @@ export const createImportStore=({db,tx,load,save,limits={}}:Ports)=>{
    const generation=randomUUID();db.prepare('INSERT OR REPLACE INTO import_owner VALUES (1,?)').run(generation);
    for(const job of all()){
     const invocation=job.invocations.at(-1);
-    if(invocation?.state==='running'){invocation.state='unknown';job.state='unknown';job.reason='interrupted_invocation';update(job);}
+    if(invocation&&(invocation.state==='running'||job.state==='unknown')){execution.retain({kind:'import',jobId:job.jobId,invocationId:invocation.invocationId,phase:invocation.phase});invocation.state='unknown';job.state='unknown';job.reason='interrupted_invocation';update(job);}
     else if(['result_ready','admission_conflict'].includes(job.state)){job.state='needs_reverification';job.reason='restart_requires_reverification';update(job);}
    }
    const value=Object.freeze({}) as ImportOwner;owners.set(value,generation);return value;
@@ -83,7 +85,7 @@ export const createImportStore=({db,tx,load,save,limits={}}:Ports)=>{
     if(!['queued','acquisition_queued','reverify_queued'].includes(job.state))continue;
     try{user(job.credentialReference);}catch{job.state='failed';job.reason='unauthorized';update(job);continue;}
     const phase=job.state==='queued'?'discovery':job.state==='reverify_queued'?'reverification':'acquisition';
-    const invocation:ImportInvocation={invocationId:randomUUID(),phase,generation,state:'running',startedAt:new Date().toISOString(),processes:[]};job.invocations.push(invocation);job.state=phase==='discovery'?'discovering':phase==='acquisition'?'acquiring':'reverifying';update(job);
+    const invocation:ImportInvocation={invocationId:randomUUID(),phase,generation,state:'running',startedAt:new Date().toISOString(),processes:[]};if(!execution.acquire({kind:'import',jobId:job.jobId,invocationId:invocation.invocationId,phase}))return null;job.invocations.push(invocation);job.state=phase==='discovery'?'discovering':phase==='acquisition'?'acquiring':'reverifying';update(job);
     const result=Object.freeze({}) as ImportGrant;grants.set(result,{generation,jobId:job.jobId,invocationId:invocation.invocationId});return {job,grant:result};
    }return null;
   }),
@@ -97,7 +99,7 @@ export const createImportStore=({db,tx,load,save,limits={}}:Ports)=>{
   }),
   cancelled:(value:ImportGrant)=>{const {job}=grant(value);return job.state==='cancel_requested';},
   finishDiscovery:(value:ImportGrant,discovery:{kind:string;canonicalWorktree:string|null;candidates:readonly ProviderCandidate[]})=>tx(()=>{
-   const {job,invocation}=grant(value);terminal(invocation);if(invocation.phase!=='discovery')throw new Error('stale_import_runner');invocation.state='completed';
+   const {job,invocation}=grant(value);terminal(invocation);if(invocation.phase!=='discovery')throw new Error('stale_import_runner');release(job,invocation);invocation.state='completed';
    if(job.state==='cancel_requested'){job.state='cancelled';update(job);return;}
    user(job.credentialReference);job.discovery=discovery;job.canonicalWorktree=discovery.canonicalWorktree;job.candidates=structuredClone(discovery.candidates) as ProviderCandidate[];job.discoveryRevision=job.jobRevision+1;job.existingReviews=job.candidates.flatMap((candidate,candidateIndex)=>matching(candidate).map(review=>({...review,candidateIndex})));
    if(discovery.kind==='unique'&&job.candidates.length===1&&discovery.canonicalWorktree){job.candidate=job.candidates[0]!;job.existingReviews=matching(job.candidate);if(job.target&&!job.existingReviews.some(review=>review.reviewId===job.target!.reviewId)){job.state='failed';job.reason='review_identity_conflict';}else job.state=job.existingReviews.length&&!job.target?'choosing':'acquisition_queued';}
@@ -106,13 +108,13 @@ export const createImportStore=({db,tx,load,save,limits={}}:Ports)=>{
   }),
   finishResult:(value:ImportGrant,reference:ArtifactReference)=>tx(()=>{
    const {job,invocation}=grant(value);terminal(invocation);if(invocation.phase==='discovery'||reference.jobId!==job.jobId||reference.invocationId!==invocation.invocationId||reference.schema!=='import-result-v1'||reference.bytes>16*1024*1024)throw new Error('invalid_import_artifact');
-   if(job.state==='cancel_requested'){invocation.state='cancelled';job.state='cancelled';update(job);return false;}
+   release(job,invocation);if(job.state==='cancel_requested'){invocation.state='cancelled';job.state='cancelled';update(job);return false;}
    user(job.credentialReference);invocation.state='completed';invocation.artifact=reference;job.artifact=reference;job.state='result_ready';job.reason=null;update(job);return true;
   }),
-  fail:(value:ImportGrant,reason:string,terminationConfirmed=true)=>tx(()=>{const {job,invocation}=grant(value);if(terminationConfirmed)terminal(invocation);invocation.state=terminationConfirmed?(job.state==='cancel_requested'?'cancelled':'completed'):'unknown';job.state=!terminationConfirmed?'unknown':job.state==='cancel_requested'?'cancelled':'failed';job.reason=reason;update(job);}),
+  fail:(value:ImportGrant,reason:string,terminationConfirmed=true)=>tx(()=>{const {job,invocation}=grant(value);if(terminationConfirmed){terminal(invocation);release(job,invocation);}invocation.state=terminationConfirmed?(job.state==='cancel_requested'?'cancelled':'completed'):'unknown';job.state=!terminationConfirmed?'unknown':job.state==='cancel_requested'?'cancelled':'failed';job.reason=reason;update(job);}),
   ready:(value:ImportOwner)=>{owner(value);return all().filter(job=>job.state==='result_ready');},
   unknown:(value:ImportOwner)=>{owner(value);return all().filter(job=>job.state==='unknown');},
-  confirmQuiescent:(value:ImportOwner,jobId:string)=>tx(()=>{owner(value);const job=get(jobId);if(job.state!=='unknown')throw new Error('invalid_request');job.state=job.artifact?'needs_reverification':'failed';job.reason='interrupted_invocation_not_replayed';update(job);}),
+  confirmQuiescent:(value:ImportOwner,jobId:string)=>tx(()=>{owner(value);const job=get(jobId);if(job.state!=='unknown')throw new Error('invalid_request');const invocation=job.invocations.at(-1);if(invocation)execution.clearQuiescent('import',job.jobId,invocation.invocationId);job.state=job.artifact?'needs_reverification':'failed';job.reason='interrupted_invocation_not_replayed';update(job);}),
   admit:(value:ImportOwner,jobId:string,snapshot:Snapshot,witness:PreparedSnapshotWitness):ImportReceipt=>{
    // Expensive content checks and witness lookup precede the short owning transaction.
    const observed=get(jobId),fingerprint=hash(canonical({jobId,target:observed.target,reviewId:observed.reviewId,snapshot}));const observedReview=observed.target?load(observed.reviewId):null;const alreadyRetained=observedReview&&(observedReview.snapshots??[observedReview.snapshot]).some(retained=>retained.snapshotId===snapshot.snapshotId);const exceedsBudget=(observedReview?retainedBytes(observedReview):0)+(alreadyRetained?0:encodedSourceBytes(snapshot))>sourceQuota;let verified=false;try{validateProviderSnapshot(snapshot);verified=isPreparedSnapshotWitness(witness,observed.reviewId,snapshot,jobId);}catch{}

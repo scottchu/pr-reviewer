@@ -4,7 +4,7 @@
 
 **Date:** 2026-10-24
 
-**Direction:** Bounded slice04 integration design; implementation not delivered
+**Direction:** Bounded slice04 core candidate implemented and self-tested; React, independent integration review and full acceptance remain open
 
 **Scope:** Verified pinned TypeScript/TSX context, static one-hop neighborhoods, readable comparison and durable source clarifications. Story playback and execution comparison are later scope.
 

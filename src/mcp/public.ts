@@ -1,7 +1,7 @@
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
 import { z } from "zod";
-import { anchorSchema } from "../domain/public.ts";
+import { anchorSchema,analysisCommandSchema,analysisQuerySchema,semanticSourceQuerySchema } from "../domain/public.ts";
 export type LaunchBinding = {
   gatewayUrl: string;
   bootstrapToken: string;
@@ -133,6 +133,9 @@ export const createMcp = (launch: LaunchBinding) => {
       );
     },
   );
+  server.registerTool("analysis_get",{description:"Read retained static neighborhoods, exact declarations, coverage, unknowns and attributed clarifications. Static binding does not prove runtime behavior.",inputSchema:analysisQuerySchema.shape},async input=>{normal();const parameters=new URLSearchParams(Object.entries(input).filter(([,value])=>value!==undefined).map(([key,value])=>[key,String(value)]));return output(await request(`/api/analysis?${parameters}`));});
+  server.registerTool("analysis_source_get",{description:"Open exact retained context text by immutable corpus/source identity; no filesystem lookup.",inputSchema:semanticSourceQuerySchema.shape},async input=>{normal();return output(await request("/api/analysis/source",input));});
+  server.registerTool("graph_clarification_put",{description:"Append an attributed interpretation/question/correction through graph CAS. Does not edit compiler facts or wake an agent.",inputSchema:analysisCommandSchema.options[3].omit({type:true,reviewId:true}).shape},async input=>{normal();return output(await request("/api/analysis/commands",{type:"PutGraphClarification",reviewId:launch.reviewId,...input}));});
   return {
     server,
     start: () => server.connect(new StdioServerTransport()),
