@@ -4,7 +4,7 @@
 
 **Packet revision:** 1
 
-**Status:** Implementation-ready; no whole-slice acceptance
+**Status:** Implemented and module-tested; independent context review pending; no whole-slice acceptance
 
 **Parent:** [Slice 03](plan.md)
 
@@ -46,4 +46,31 @@ Root reconciled the accepted analysis contract: inventory is separately bounded 
 
 ## Evidence
 
-Pending implementation.
+Recorded below.
+
+## Implementation and observed checks
+
+**Docs-first commits:** `9263829774eb9c120dc0465d459330e3390cc3a9`, then accepted separate inventory/prepared-source reconciliation `f60c86e`
+
+**Status:** Bounded port implemented and module-tested; independent context review pending
+
+**Public port:** `loadSourceContext(input, effects)` and `DEFAULT_CONTEXT_BUDGETS` via `src/source-acquisition/public.ts`; implementation `context.ts`. No analyzer/compiler dependency or cross-subsystem internal import was added. Existing import code/runner behavior is unchanged.
+
+**Actual checks:** The first four context tests failed on missing public exports. Final combined focused run passed **25 tests** (9 context, 16 changed-file acquisition). Scoped strict TypeScript passed with the integration worktree's existing TypeScript 7/type declarations. No package/lock/node_modules or shared test scripts were written.
+
+```sh
+/Applications/ChatGPT.app/Contents/Resources/cua_node/bin/node --experimental-strip-types --test tests/source-acquisition.test.ts tests/source-context.test.ts
+/Applications/ChatGPT.app/Contents/Resources/cua_node/bin/node /tmp/pr-reviewer-02-graph-history/node_modules/typescript/bin/tsc --ignoreConfig --noEmit --strict --noUncheckedIndexedAccess --exactOptionalPropertyTypes --target ES2023 --module NodeNext --moduleResolution NodeNext --allowImportingTsExtensions --skipLibCheck --types node --typeRoots /tmp/pr-reviewer-02-graph-history/node_modules/@types src/source-acquisition/public.ts src/source-acquisition/provider.ts src/source-acquisition/git.ts src/source-acquisition/runner.ts src/source-acquisition/context.ts tests/source-acquisition.test.ts tests/source-context.test.ts
+```
+
+Disposable fixtures exercise unchanged caller/TSX/declaration sources, retained side/commit/hash/object identity, exact BOM/CRLF/Unicode, canonical priority/dirty-checkout digest invariance, binary/symlink/submodule/empty sources, lowered prepared-source/file/total/tree/entry/metadata bounds, required-source failure, missing promised commit/tree/blob without helper execution or retrieval, and injected blob/tree type/hash failures. Caller input stays unfrozen; returned values are frozen. Invalid inputs perform no effects. All owned fixture repositories are removed by the tests.
+
+**Real repository observation:** Read-only context load used `/Users/scottchu/projects/personal/pr-reviewer` with final PR 20 base `aeadce0ace7f509160d0630ee18c75d74e4537b2`, head `df171b2ce8aee0c2e72249fc68138cf2f0e507d6`, declared provider/project/change identity and the earlier verified snapshot `ae71e85853117f8eff6e12d6743afbb35e7924b536896106f7f163d44c478346`. Both sides enumerated completely: 95 tree entries, 25 verified tree objects and 3719 tree bytes each; 27 prepared TS/TSX sources per side, 54 unchanged entries, 255566 combined retained bytes, 15979 ledger metadata bytes, no exclusions/missing/unsupported. Corpus `dc32a4345ad1423c4f4bfe790dac1622ea01273c55204b02e9bb639ff884caf8`. Required `src/domain/public.ts` retained object `f46ccd3fcef2f5946a905fb171225a497f3a3da8` and content hash `c90785f414e4cfd13184607db105bb45df32c8d0a1e425f71770846ca5b3ce2f` on both sides with distinct commits. No new provider-authentication, caller-resolution, graph, UI or admission result is implied.
+
+**Knowledge reconciliation:** Durable public values, provenance, selection/coverage/budget policies, source retention, adapter mapping and verified limits are in new `docs/product/review-loop/source-acquisition.md`. This source document was written before derived code and updated from observed findings; shared source-analysis/evolution/map documents remain outside scope.
+
+**04I/03 integration requests:** Register the context test with existing shared test commands; link the durable acquisition doc from the appropriate map; join exact retained text to all known ledger rows by side/path through public ports; preserve boundary/missing/excluded rows and incomplete inventory accounts; validate declared provider and both commits against authorized snapshot before admission. Keep acquisition corpusId, analyzer corpusDigest and review snapshotId distinct. No source traversal or compiler fallback may read the live checkout. Actual source-query retention/authorization, job/process lifecycle, graph/UI and own-PR review remain open.
+
+**Recovery:** Keep this clean task branch/worktree for root's independent context recheck and later integration. No owned temporary fixture directory or raw operational log is required for recovery. The reviewer has the packet, durable specification, exact code commit and rerunnable tests; a worker checkpoint is not slice acceptance.
+
+**Accepted analysis reconciliation:** Root reports pure analyzer `04e30e5` independently ready for bounded module integration. Loader traversal-entry counts differ from analyzer known-path counts even though both default to 4096. The exact counter/metadata mapping distinction is recorded in durable acquisition knowledge. 04I must retain the loader account and separately validate the projected analyzer ledger; module acceptance does not complete that mapping.
