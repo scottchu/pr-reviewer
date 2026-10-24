@@ -4,7 +4,7 @@
 
 **Date:** 2026-10-24
 
-**Status:** Contract committed before tests/code; implementation and independent review pending
+**Status:** Contract committed before tests/code; implementation locally verified; independent amendment review pending
 
 **Parent:** [Slice 04](plan.md)
 
@@ -28,3 +28,7 @@ Root assigns a fresh reviewer the exact candidate, this committed packet, author
 ## Baseline
 
 Existing Bun 1.4.2 focused suite at exact base: 26 pass, 0 fail, 322 assertions. No runtime/package installation was performed. Compatibility and new-test evidence will be recorded after implementation.
+
+## Implementation handback
+
+Contract milestone: `46ae8ae`. Implementation candidate: `8a2837b`. The amendment exports the public inventory port and readonly value types, shares the existing preflight/virtual host/declaration scan, and returns before semantic call binding. No existing analyzer version/profile/fact identity changes were required. See [reconciled execution evidence](preparation-evidence.md#04d-declaration-inventory-amendment) for actual commands, red/green result, compatibility digest, limits and retained review artifacts. This packet is ready for root's fresh independent review dispatch; that review has not run here.
