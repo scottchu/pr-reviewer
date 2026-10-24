@@ -8,7 +8,7 @@ import type {AnalysisBridge} from './analysis.ts';
 type Step=StoryContent['steps'][number];
 type Chapter=StoryContent['chapters'][number];
 type SourceReference=Extract<StoryReference,{type:'snapshot_source'|'semantic_source'}>;
-export type StorySemanticPort=Pick<AnalysisBridge,'select'|'focus'|'getSnapshot'> & Partial<Pick<AnalysisBridge,'openSource'|'closeSource'>>;
+export type StorySemanticPort=Pick<AnalysisBridge,'select'|'focus'|'getSnapshot'> & Partial<Pick<AnalysisBridge,'openSource'|'closeSource'|'refresh'>>;
 export type StoryClock={now:()=>number;every:(callback:()=>void,period:number)=>()=>void};
 type Cursor=Readonly<{versionId:string;chapterId:string;stepId:string;index:number}>;
 export type StoryState=Readonly<{
@@ -141,8 +141,14 @@ export const createStoryBridge=(reviewId:string,options:{clock?:StoryClock;seman
  const restoreSemantic=async(maps:GraphFrames,snapshotId:string,owns:()=>boolean,signal?:AbortSignal)=>{
   let frame=maps.semantic;if(!frame)return {maps,message:''};if(!options.semantic)throw new Error('analysis_unavailable');
   const check=()=>{if(!owns())throw new Error('selection_superseded');};check();
-  const observed=options.semantic.getSnapshot().view;let message='',normalizedId:string|null=null;
-  if(frame.analysisId&&observed?.reviewId===reviewId&&observed.snapshotId===snapshotId&&observed.selectedAnalysisId===null&&observed.analysis?.status==='unavailable'&&observed.analysis.analysisId===frame.analysisId&&observed.jobs.some(job=>job.analysisId===frame!.analysisId&&job.state==='unavailable')){
+  let observed=options.semantic.getSnapshot().view,message='',normalizedId:string|null=null;
+  const isUnavailable=()=>Boolean(frame?.analysisId&&observed?.reviewId===reviewId&&observed.snapshotId===snapshotId&&observed.selectedAnalysisId===null&&observed.analysis?.status==='unavailable'&&observed.analysis.analysisId===frame.analysisId&&observed.jobs.some(job=>job.analysisId===frame!.analysisId&&job.state==='unavailable'));
+  if(isUnavailable()){
+   // Retained diagnostics identify a recovery candidate, never current authority.
+   // A failed/superseded read must leave the private frame and drafts untouched.
+   if(!options.semantic.refresh)throw new Error('analysis_revalidation_unavailable');
+   observed=await awaitRead(options.semantic.refresh(),signal)??null;check();
+   if(!isUnavailable())throw new Error('analysis_record_unavailable');
    normalizedId=frame.analysisId;frame={...frame,analysisId:null};maps={...maps,semantic:frame};message='Saved unavailable analysis was not admitted; restored its diagnostic view without a historical analysis pin.';
   }
   await awaitRead(options.semantic.select(snapshotId,frame.analysisId??undefined),signal);check();
