@@ -2,11 +2,13 @@
 
 **Revision:** 1; dispatch pins the containing commit
 
-**Status:** Ready for pure module dispatch with explicitly serialized dependency ownership; not ready for full integration
+**Status:** Pure module implemented and locally verified; independent preparation review pending; not ready for full integration
 
 **Parent:** [Slice 04](plan.md)
 
 **Authoritative behavior:** [source-neighborhood-v1](../../../../product/review-loop/source-analysis.md)
+
+**Preparation handback:** [Execution evidence and public-port notes](preparation-evidence.md). The original dispatch packet is `a9b8334a94e8dcb87b90fa69f64e791031587ec2`; implementation changes preserve its fixed corpus and scope. Local results do not establish independent preparation approval.
 
 ## Scope, assignment and prerequisites
 
