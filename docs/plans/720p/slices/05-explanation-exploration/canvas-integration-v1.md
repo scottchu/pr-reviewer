@@ -1,0 +1,42 @@
+# Focused source canvas integration v1
+
+Date: 2026-10-24
+Status: authorized reversible preproduction implementation packet; layout adoption, fresh UI-first understanding, merge and deployment unaccepted
+Round: [1080p current execution scope](../../../1080p/plan.md), correcting [05 source/exploration](plan.md) and [04 neighborhood](../04-behavior-neighborhood/plan.md)
+Design input: exact accepted canvas reading/comments/interaction constraints from bc4b59e; preview code a263482 source engineering READY, final preview receipt245879a
+Application base: B2 dccedc0, retaining public codecs/B4/SDK2 and existing73 application-test checkpoint
+Workspace: /tmp/pr-reviewer-focused-source-canvas; branch integrate-focused-source-canvas
+
+## Outcome and preservation
+
+The first preproduction vertical chunk reads actual retained snapshot source inside its existing graph group. A reviewer chooses a changed file/span, uses keyboard Focus or zoom, reads Before/base left and After/head right (stacked at390px), follows an evidenced unchanged neighbor and returns to the exact earlier frame. Saved question/reply links focus retained source in this canvas. Reading never changes a question anchor or draft; only an explicit Ask about selected lines delegates to the existing guarded draft transition. Story playback pauses on reading; its existing exploration/Resume, private recovery and unresolved-question protections remain authoritative.
+
+This integrates actual public review/source/graph projections, not the local mock reducers, fixture controls, prose-comment backend or invented graph facts. Snapshot structural reading is first. Existing admitted semantic source can use exact corpus/hash/UTF16 spans inside its graph presentation, with honest loading/unavailable state and no fabricated legacy question anchor. No parser/backend/test execution redesign. Tests and other subsystem panels remain provisional checkpoints, with later whole-canvas composition separately gated; completing this source journey does not adopt every mock layout or all A–E at once.
+
+Production/main/live pilot, PR29 source/runtime, preview56671/56672 and private Serve routes remain untouched. New private UI/gateway ports56674/56675 and task-local data are reserved for this candidate; root alone assigns any new Tailscale route after local readiness. Do not modify application/analysis.ts or application/story.ts; the separately reviewed semantic recovery patch is not incorporated until root assigns integration. Narrow UI callback/canvas routing may consume existing public methods without changing those owners.
+
+## Public mapping and bounded ownership
+
+Add a small application canvas inspection owner, exported through application/public. It consumes authorized immutable Review/View source/graph values and semantic read snapshots only through centrally declared workspace registry routes. UI observes this public store and emits inspection/focus/context/Back/viewport intents. It owns no HTTP/domain commands or participant/process effects. Replaced review/snapshot/access scopes abort/fence selected read validation and clear obsolete inspection; late reads cannot publish to another scope. No direct component cross-subsystem subscription or per-node timer.
+
+Structural source resolves the selected graph node/file occurrence using existing graph fileKey and public sourceComparison; Before/After partners come from that exact comparison identity. Ambiguous copies require the occurrence key; missing/empty/unprepared source gets a reason node without an anchor. Existing graph IDs and comparison/contains/document-reference evidence remain unchanged. Related context comes only from admitted graph edges; absent semantic analysis does not become a caller/callee leaf or invented unchanged neighbor.
+
+Inspection captures exact snapshot/side/path/range plus original content hash, validates source membership and inclusive LF lines, and verifies selected source bytes with SHA256 before publication. Context rendering is bounded, with explicit omitted lines and an intentional More context action. Semantic inspection delegates reads to the existing AnalysisBridge public operation; validated returned snapshot/corpus/hash/side/path/UTF16 offsets remain separate from question eligibility. It cannot reinterpret context-only semantic source as snapshot source. Safe failed reads preserve the prior valid frame and draft while showing the gap.
+
+## Private frame compatibility
+
+Accepted narrow additive extension: structural GraphFrames may include optional inspection {anchor, contentHash}. New code accepts legacy records with this field absent and restores overview. New persisted inspection is strictly coded with the existing private-view envelope version; no receipt, credential, domain write, automatic record migration or clear. Old strict readers may reject the additional field and preserve the record as quarantined; rollback does not silently reinterpret or delete it. Reading the extended frame validates exact snapshot, existing graph occurrence, source availability, inclusive span and original raw checksum again before displaying source. Keeping the extra field without read validation is insufficient.
+
+Workspace managed capture/restore routes synchronize the new inspection with existing story map frames. Re-entering a restore must not write an intermediate empty inspection over its saved frame. Back captures a bounded16-frame stack. Story Resume restores its original persisted map, reading span, viewport and draft; malformed/missing/stale/foreign inspection displays an explicit unavailable state and never chooses another source. Unresolved commands keep existing private recovery fences. Hash calculation is bounded/cancellable by generation publication fencing; it grants no new source access.
+
+## TDD and actual acceptance
+
+Before renderer changes add application tests for paired/renamed/copied occurrence identity, absent sides, exact raw hash, changed source/foreign snapshot rejection, invalid ranges, scope replacement/late validation, independent draft/no mutations, bounded Back and frame capture/restore. Private codec tests round-trip new/legacy inspection, preserve incompatible/malformed records and verify checksum/source validation on restore. Register new suites and the two inherited B2 suites in the normal Node test list; register B2 browser tests and the new canvas journey in the normal Playwright list. Necessary test registration is the only package edit; no dependency/lock changes. Confirm actual normal-entry output includes new cases.
+
+Actual installed Chrome uses an isolated owned gateway/data root and existing public preparation/store/gateway boundaries, with pinned real own-PR source. Cover keyboard focus, readable actual Before/After text in graph nodes, source links, evidenced unchanged neighbor, Back/Resume/reload, explicit anchored question save and independent nonempty draft. Retained semantic fixtures may supplement exact-offset/unavailable behavior; they do not qualify a production target or native session. A full own-PR/history/comprehension gate remains root-owned. Record source/build/base/head/snapshot identity, no accidental notification, teardown diagnostics, desktop390px screenshots and a separate readability critique. No real test process or agent wake is required.
+
+## Editable scope and review handoff
+
+New application canvas module/public export, narrow workspace registry wiring, optional private structural inspection codec; new React canvas/source components/styles, structural/semantic panel callback composition and narrow main source destination; owning05 docs and application/unit/actual React tests. No storage/domain/server/MCP/CLI/test-jobs or dependency/lock edits. Existing B2 renderer is a retained checkpoint, not final adopted UI. Preserve semantic recovery owner files until root assigns integration.
+
+Commit the packet before derived changes, then implementation and tested evidence in meaningful checkpoints. Root may commission a bounded packet/source review once this exact packet is committed. Before candidate acceptance, independently review correctness and actual UI-first understanding without bypassing the existing browser-policy denial; preserve source engineering, author tests, screenshots, human layout adoption and deployment as different evidence. Later source findings produce docs-first bounded corrections and affected checks. This assignment authorizes an inspectable preproduction candidate only, not merge/deploy/adoption.
