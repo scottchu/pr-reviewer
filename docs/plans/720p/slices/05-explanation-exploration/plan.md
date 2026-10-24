@@ -116,3 +116,7 @@ Prior passkey/login deferrals are superseded by this correction. Required succes
 
 
 The pre-existing failed-compute selection/reload defect is tracked in the [bounded semantic recovery correction](semantic-recovery-fix.md). Its source checks do not replace UI-first or native acceptance.
+
+## Reviewer-experience design reset
+
+The user rejected the functional preview as the UX target and requested original-reference dissection and design specifications first. [Design review packet v1](reviews/reviewer-experience-design-v1.md) is the next design gate; earlier implementation/check receipts remain bounded engineering history. Do not continue UI composition from those receipts. Independent specification review precedes the next authorized inspectable mockup and its separate adoption decision.

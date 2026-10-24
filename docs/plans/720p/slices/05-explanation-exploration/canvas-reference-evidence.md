@@ -6,7 +6,9 @@
 
 **Parent:** [Canvas correction packet](canvas-reading-mockup.md)
 
-## Preserved reference inventory
+## Historical first-pass reference inventory
+
+The inventory below records what the earlier pass had inspected; it is superseded where noted by the located ZIP/image readback below.
 
 | Reference | What was actually inspected | What it establishes / limit |
 |---|---|---|
@@ -35,4 +37,17 @@ The drift arose in the documented delivery decomposition and rendered source des
 
 [Canvas reading](../../../../product/review-loop/canvas-reading.md) now makes overview → focus → inline diff → neighbor → return one graph interaction. The mockup packet requires inspectable desktop/narrow states and layout feedback before production UI adoption. Preserve backend/source/authority/recovery work and historical receipts. Basic source detail belongs to current 04/05 correction; 4K adds scale/performance/refinement.
 
-No new mockup, browser journey, host call, test run, product acceptance or deployment occurred. The missing exact historical mockup files are not a blocker to documenting this explicit user correction, but prevent claims of pixel-faithful restoration. The next author must show the concrete new preview instead of assuming reference familiarity establishes visual approval.
+No new mockup, browser journey, host call, test run, product acceptance or deployment occurred. At that earlier pass, unlocated historical mockup files prevented claims of pixel-faithful restoration. The next author must show the concrete new preview instead of assuming reference familiarity establishes visual approval.
+
+
+## Located original reference and UX reset
+
+Date: 2026-10-24. Status: supplied-image/source dissection only; no new browser/runtime inspection.
+
+The user-supplied original ZIP is now read: `/Users/scottchu/.codex-workspaces/artifacts/pr-diff-teacher-2026-10-23/pr-diff-teacher-mockup.zip`, SHA-256 `068710789c2f369e22ee4960754211dbf800b1c6ec6935375c90462b14dbc9ff`; 45 entries include source and five reference captures. Its README explicitly names the selected third generated concept. That exact existing PNG was located and viewed, along with all five archived captures and the user's rejected mobile screenshot. This does not prove that the selected older concept is one of the three later 2026-10-23 canvas variants; keep those reference generations distinct.
+
+The [durable dissection](../../../../product/review-reference-dissection.md) records exact paths, source behaviors, limits and the [retained concept](../../../../product/references/selected-lesson-graph-diff.png). The PNG SHA-256 is `c80e90c774111022d981797d8664f28ec40d8a30c60f45cfd6899443b49997ce`; the retained copy is byte-identical. No browser-chrome/private-profile screenshot is copied into the repository.
+
+The earlier work had not read this ZIP. Treating a functional 8474 mock with correct selection/return checks as visual continuation was not justified by that evidence. The user has now explicitly rejected its hierarchy. Preserve the functional receipts but supersede that preview as a UX target; the issue is meaningful explanation before operations, not just dark styling or replacing buttons with icons.
+
+The [reviewer-experience specification](../../../../product/review-experience.md) begins with a source-grounded PR25 question and follows its actual request/header/unchanged-refresh evidence. It carries later same-canvas, contextual-comment, one-row-player and exact-return corrections. Replay timing remains an explicit original/current discrepancy for design review. The next gate is independent specification review, then an authorized inspectable mock; no further UI composition follows merely from functional success.

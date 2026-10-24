@@ -3,6 +3,9 @@
 This is the durable product specification: what PR Reviewer does, why, and how its responsibilities and behavior fit together. A fresh agent should be able to derive the accepted delivered behavior from this knowledge, without reconstructing old execution plans or chat.
 
 - [Vision](vision.md): purpose and the experience of understanding a PR.
+- [Reviewer experience](review-experience.md): reference-grounded coherent journey and proposed design acceptance before further UI implementation.
+- [Original reference dissection](review-reference-dissection.md): located visual/source evidence, rejected-preview drift and later corrections.
+
 - [Continuation and source import](review-loop/evolution.md): merged structural graph/immutable history and the bounded import candidate.
 - [Durable import jobs](review-loop/import-jobs.md): implemented slice03 path/discovery/job/admission/artifact candidate, exact compatibility and separately pending final acceptance.
 - [Pinned source context](review-loop/source-acquisition.md): bounded unchanged source acquisition and complete coverage accounting.
