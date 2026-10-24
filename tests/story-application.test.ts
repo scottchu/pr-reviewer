@@ -110,7 +110,7 @@ test('D1/D2 presentation deduplicates exact claim IDs and resolves complete scop
  await load(f,fetcher,bridge,authored(f));const presentation=storyPresentation(bridge.getSnapshot())!;
  assert.equal(presentation.details.filter(item=>item.claim.id==='what').length,0);
  assert.equal(presentation.details.filter(item=>item.claim.id==='why').length,1);
- assert.equal(presentation.groups.flatMap(group=>group.files).length,1);
+ assert.equal(presentation.groups.flatMap(group=>group.files).length,1);assert.equal(presentation.groups.at(-1)!.title,'Unexplained');assert.equal(presentation.groups.at(-1)!.files.length,0);
  assert.equal(presentation.groups[0]!.files[0]!.label,'value.ts');
  assert.equal(presentation.groups[0]!.files[0]!.account.fileKey,f.fileKey);
  const state=bridge.getSnapshot(),version=state.view!.version!,story={...version.story,scope:[...version.story.scope,{type:'unexplained' as const,fileKey:'unknown-exact-id',reason:'Not authored'}]};

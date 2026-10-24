@@ -83,7 +83,7 @@ export const storyPresentation=(state:StoryState)=>{
  const details=detailIds.flatMap(({label,id})=>{if(shown.has(id))return [];shown.add(id);const claim=version.story.claims.find(claim=>claim.id===id);return claim?[{label,claim}]:[];});
  const files=state.snapshot?graphFiles(state.snapshot):[];
  const rows=version.story.scope.map(account=>{const file=files.find(file=>file.key===account.fileKey);return {account,label:!file?'Retained file identity unavailable':file.oldPath&&file.newPath&&file.oldPath!==file.newPath?`${file.oldPath} → ${file.newPath}`:file.newPath??file.oldPath??'Metadata',status:file?.status??'unavailable'};});
- const groups=[...version.story.chapters.map(chapter=>({id:`chapter:${chapter.id}`,title:chapter.title,meaning:version.story.claims.find(claim=>claim.id===chapter.what)??null,files:rows.filter(row=>row.account.type==='explained'&&row.account.chapterId===chapter.id)})),{id:'unexplained',title:'Unexplained',meaning:null,files:rows.filter(row=>row.account.type==='unexplained')}].filter(group=>group.files.length);
+ const groups=[...version.story.chapters.map(chapter=>({id:`chapter:${chapter.id}`,title:chapter.title,meaning:version.story.claims.find(claim=>claim.id===chapter.what)??null,files:rows.filter(row=>row.account.type==='explained'&&row.account.chapterId===chapter.id)})),{id:'unexplained',title:'Unexplained',meaning:null,files:rows.filter(row=>row.account.type==='unexplained')}].filter(group=>group.files.length||group.id==='unexplained');
  return {details,groups};
 };
 export type QuestionEvidenceIntent=Readonly<{kind:'ready';evidence:Extract<StoryReference,{type:'snapshot_source'}>;draft:QuestionDraft;anchor:Anchor;confirmationRequired:boolean;mismatch:boolean}>;
