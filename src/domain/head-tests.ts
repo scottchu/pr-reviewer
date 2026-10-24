@@ -82,7 +82,7 @@ export type HeadTestInvocation = Readonly<{invocationId: string; phase: "prepare
 export type HeadTestJob = Readonly<{
   schema: "head-test-job-v1"; jobId: string; reviewId: string; snapshotId: string;
   repository: string; sourceProject: string; baseSha: string; headSha: string;
-  actorId: string; target: HeadTestTarget; provenance: "test_only_configuration" | "test_only_execution" | "qualified_local_configuration"; qualificationId?: string; preparation?: Readonly<{sourceManifestId:string;closureManifestId:string;sourceAccountId:string;treeId:string;runtimeSha256:string}>;
+  actorId: string; target: HeadTestTarget; provenance: "test_only_configuration" | "test_only_execution" | "qualified_local_configuration"; qualificationId?: string; preparation?: Readonly<{sourceManifestId:string;closureManifestId:string;sourceAccountId:string;treeId:string;runtimeSha256:string;environmentId:string}>;
   createdAt: string; updatedAt: string; jobRevision: number;
   state: "queued" | "preparing" | "running" | "cancel_requested" | "cancelled" | "passed" | "failed" | "timed_out" | "unavailable" | "error" | "unknown";
   reason: string | null; effectDisposition: "none" | "unresolved" | "quiescent";
@@ -105,7 +105,7 @@ export type HeadTestResult=Readonly<{
  schema:'head-test-result-v1';resultId:string;jobId:string;invocationId:string;
  intent:Readonly<{reviewId:string;snapshotId:string;actorId:string;repository:string;baseSha:string;headSha:string;targetDigest:string;qualificationId:string|null}>;
  coverage:'no_process_execution'|'partial_preparation'|'prepared_execution';stage:string;
- evidence:Readonly<{treeId:string|null;sourceManifestId:string|null;closureManifestId:string|null;sourceAccountId:string|null;runtimeSha256:string|null;absentReason:'not_completed'}>;
+ evidence:Readonly<{treeId:string|null;sourceManifestId:string|null;closureManifestId:string|null;sourceAccountId:string|null;runtimeSha256:string|null;environmentId:string|null;absentReason:'not_completed'}>;
  processes:readonly Readonly<{ordinal:number;role:string;state:string;exitCode:number|null;signal:string|null}>[];
  state:'passed'|'failed'|'cancelled'|'timed_out'|'unavailable'|'error';reason:string;
  preparation:HeadTestJob['preparation']|null;preparationAbsence:'not_completed'|null;

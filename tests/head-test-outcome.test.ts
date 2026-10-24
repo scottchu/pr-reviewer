@@ -16,7 +16,7 @@ test('B04 actual fixed fixture result atomically releases lease with replayable 
   assert.throws(()=>f.store.tests.complete(grant,{} as HeadTestOutcomeWitness),/invalid_test_witness/);
   const admitted=f.store.tests.complete(grant,witness);assert.deepEqual(f.store.tests.complete(grant,witness),admitted);
   const job=f.store.tests.query(f.token,{reviewId:'review',snapshotId:'head-snapshot',jobId:receipt.jobId}).selectedJob!;
-  assert.equal(job.state,'passed');assert.equal(job.result!.coverage,'prepared_execution');assert.equal(job.result!.execution!.collectionObserved,true);assert.equal(job.invocations[0]!.quiescence,'confirmed');assert.equal(JSON.stringify(job).includes(input.executionRoot),false);
+  assert.equal(job.state,'passed');assert.match(job.preparation!.environmentId,/^[a-f0-9]{64}$/);assert.equal(job.result!.evidence.environmentId,job.preparation!.environmentId);assert.equal(job.result!.coverage,'prepared_execution');assert.equal(job.result!.execution!.collectionObserved,true);assert.equal(job.invocations[0]!.quiescence,'confirmed');assert.equal(JSON.stringify(job).includes(input.executionRoot),false);
   const output=job.result!.artifacts.find(item=>item.label==='test_root.stderr')!;
   const query={reviewId:'review',snapshotId:'head-snapshot',jobId:job.jobId,artifactId:output.artifactId};
   const artifact=await f.store.tests.artifact(f.token,query);assert.match(artifact.text,/4 pass/);assert.equal(artifact.complete,true);
