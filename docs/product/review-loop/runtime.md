@@ -129,3 +129,12 @@ The semantic MCP transport exposes analysis_get, analysis_source_get and graph_c
 ### Imported review authorization handoff
 
 Opening an imported review through the actual React action must initialize both its review and semantic query scope without a reload. Mounting the new review bridge and interval polling must preserve the explicit workspace-open request until its authoritative result is available. Verify the resulting semantic query carries the imported review and exact snapshot scope without an owner credential, then verify declaration preparation is enabled. This handoff check does not imply that acquisition, inventory or analysis will succeed within their independent limits.
+
+
+## MCP SDK compatibility
+
+**Decision date:** 2026-10-24
+
+**Candidate implementation:** Exact `@modelcontextprotocol/client` and `@modelcontextprotocol/server` 2.4.0, core 2.4.0 transitively locked; existing Node 24; modern `serveStdio` lifecycle with legacy compatibility.
+
+The upgrade preserves trusted launch pairing and existing tools, including denial before attachment, exact source authorization and idempotent command receipts. The owner JSONL utility pins 2026-07-28; a mismatched server fails negotiation with no fallback. `serveStdio` constructs fresh SDK server/attachment state on each factory invocation from the same immutable launch/session binding, including modern discovery followed by legacy fallback on one transport. Only the negotiated instance is pinned; discarded probes cannot carry state or modified protocol handlers into it. Its close handle tears down the instance/transport; input EOF closes the connection. Controlled modern attachment/source/receipt/revocation and explicit legacy 2025-11-25 operations are independently tested. Isolated fixtures exercise modern `listen` and legacy resource subscribe/unsubscribe through the same supported stdio entry over an in-memory transport. Isolated subscription/listen fixtures do not expose production inbox resources or establish native-session context delivery, automatic turns or meaningful replies. Actual native connection and own-PR acceptance remain separate. See the [upgrade packet](../../plans/480p/slices/02-review-continuation/mcp-listen-experiment/sdk-main-delivery.md) for current implementation/evidence status. Existing CLI delivery and pilot state remain unchanged by the upgrade.

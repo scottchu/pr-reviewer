@@ -11,8 +11,8 @@ import {
 } from "node:fs";
 import { tmpdir } from "node:os";
 import { join, resolve } from "node:path";
-import { Client } from "@modelcontextprotocol/sdk/client/index.js";
-import { StdioClientTransport } from "@modelcontextprotocol/sdk/client/stdio.js";
+import { Client } from "@modelcontextprotocol/client";
+import { StdioClientTransport } from "@modelcontextprotocol/client/stdio";
 import type { LaunchBinding } from "../src/mcp/public.ts";
 import type { Review, Anchor } from "../src/domain/public.ts";
 let root: string,
@@ -114,7 +114,7 @@ test.beforeAll(async () => {
   };
   const launchRef = join(root, "mcp-launch.json");
   writeFileSync(launchRef, JSON.stringify(launch), { mode: 0o600 });
-  client = new Client({ name: "controlled-browser-agent", version: "1.0.0" });
+  client = new Client({ name: "controlled-browser-agent", version: "1.0.0" }, { versionNegotiation: { mode: { pin: "2026-07-28" } } });
   await client.connect(
     new StdioClientTransport({
       command: process.execPath,
@@ -380,7 +380,7 @@ test('02B real PR21 two heads: restart, historical MCP answer, explicit selectio
  // Restart before attachment/answer delivery. This is not an addressed-launch race;
  // the independent delivery fault test covers durable claimed/unknown restart.
  await stop();await start();await page.reload();await expect(page.getByText(question.text,{exact:true})).toBeVisible();
- const connection=await api('/api/connections',{host:'codex',sessionId:'controlled-history-session',connectionId:'controlled-history-connection',corroborated:true}),challenge=await api('/api/challenges',{reviewId:'pr-21',host:'codex',sessionId:'controlled-history-session',connectionId:'controlled-history-connection'});const launchRef=join(root,'history-mcp.json');writeFileSync(launchRef,JSON.stringify({gatewayUrl,bootstrapToken:connection.token,challengeId:challenge.challengeId,proof:challenge.proof,reviewId:'pr-21',host:'codex',sessionId:'controlled-history-session',connectionId:'controlled-history-connection'}),{mode:0o600});client=new Client({name:'controlled-history-browser',version:'1.0.0'});await client.connect(new StdioClientTransport({command:process.execPath,args:['--experimental-strip-types',resolve('src/mcp/main.ts')],env:{PATH:process.env.PATH??'',REVIEW_MCP_LAUNCH_REF:launchRef}}));await tool('session_attach');
+ const connection=await api('/api/connections',{host:'codex',sessionId:'controlled-history-session',connectionId:'controlled-history-connection',corroborated:true}),challenge=await api('/api/challenges',{reviewId:'pr-21',host:'codex',sessionId:'controlled-history-session',connectionId:'controlled-history-connection'});const launchRef=join(root,'history-mcp.json');writeFileSync(launchRef,JSON.stringify({gatewayUrl,bootstrapToken:connection.token,challengeId:challenge.challengeId,proof:challenge.proof,reviewId:'pr-21',host:'codex',sessionId:'controlled-history-session',connectionId:'controlled-history-connection'}),{mode:0o600});client=new Client({name:'controlled-history-browser',version:'1.0.0'}, {versionNegotiation:{mode:'legacy'}});await client.connect(new StdioClientTransport({command:process.execPath,args:['--experimental-strip-types',resolve('src/mcp/main.ts')],env:{PATH:process.env.PATH??'',REVIEW_MCP_LAUNCH_REF:launchRef}}));await tool('session_attach');
  const added=buildSnapshot({...spec,headSha:newHead}),nextSpec=join(root,'next-snapshot.json');writeFileSync(nextSpec,JSON.stringify({...spec,headSha:newHead}));const admissionEnv={...process.env,REVIEW_DATA_DIR:root,REVIEW_SOURCE_SPEC:nextSpec,REVIEW_EXPECTED_SNAPSHOT_ID:oldId,REVIEW_COMMAND_ID:'browser-history-add'};const receipt=JSON.parse(execFileSync(process.execPath,['--experimental-strip-types','scripts/add-snapshot.ts'],{env:admissionEnv,encoding:'utf8'})) as Record<string,unknown>;expect(JSON.parse(execFileSync(process.execPath,['--experimental-strip-types','scripts/add-snapshot.ts'],{env:admissionEnv,encoding:'utf8'}))).toEqual(receipt);expect(receipt.state).toBe('applied');await expect(page.getByText(/Viewing historical snapshot/)).toBeVisible();expect(await page.getByRole('combobox',{name:'Snapshot',exact:true}).inputValue()).toBe(oldId);
  await page.getByRole('combobox',{name:'Snapshot',exact:true}).selectOption(added.snapshotId);await expect(page.getByText(/Viewing current snapshot/)).toBeVisible();
  const read=await tool('question_get',{questionId:question.questionId});expect((read.snapshot as Review['snapshot']).headSha).toBe(oldHead);
