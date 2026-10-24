@@ -13,11 +13,12 @@ export const initialScene=():Scene=>({
  threads:[{id:'agent-code',author:'agent',anchor:{kind:'code',side:'head',path:'src/application/review.ts',startLine:30,endLine:30},body:'Simulated agent note: this call site points to the added header helper; runtime delivery remains unobserved.',draft:'',replies:[]},{id:'human-code',author:'human',anchor:{kind:'code',side:'head',path:'src/application/review.ts',startLine:30,endLine:30},body:'Does the explicit credential path still send a Bearer header?',draft:'',replies:[]},{id:'agent-prose',author:'agent',anchor:{kind:'prose',contentId:explanation.id,version:explanation.version,contentHash:explanation.contentHash,start,end:start+phrase.length,quote:phrase},body:'Source observation only: this account does not establish live delivery.',draft:'',replies:[]}]
 });
 export type Intent=
- |{type:'viewport';viewport:Viewport}|{type:'focus';group:Group;origin?:Frame}|{type:'back'}|{type:'resume'}|{type:'expand'}|{type:'select';anchor:CodeAnchor}|{type:'draft';text:string}
+ |{type:'restore';frame:Frame}|{type:'viewport';viewport:Viewport}|{type:'focus';group:Group;origin?:Frame}|{type:'back'}|{type:'resume'}|{type:'expand'}|{type:'select';anchor:CodeAnchor}|{type:'draft';text:string}
  |{type:'thread';id:string|null}|{type:'comment';id:string;anchor:CommentAnchor}|{type:'reply';threadId:string;text:string}|{type:'saveReply';threadId:string}|{type:'story';cursor:number};
 export const transition=(state:Scene,intent:Intent):Scene=>{
  const frame=state.frame;
  switch(intent.type){
+  case 'restore':return {...state,frame:structuredClone(intent.frame),back:[],resume:null,activeThread:null,notice:'Restored the retained authored canvas frame.'};
   case 'viewport':return {...state,frame:{...frame,viewport:intent.viewport}};
   case 'expand':return {...state,frame:{...frame,expanded:!frame.expanded}};
   case 'draft':return {...state,frame:{...frame,draft:{...frame.draft,text:intent.text}}};
