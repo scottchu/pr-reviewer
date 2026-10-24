@@ -4,7 +4,7 @@
 
 **Date:** 2026-10-24
 
-**Status:** Published packages verified; docs-first implementation ready; native delivery acceptance remains open
+**Status:** Engineering candidate verified locally: strict/boundary, 47 Bun + 352 Node tests and two actual React journeys pass. Independent review, own-PR and native delivery acceptance remain open
 
 **Parent:** [MCP experiment](plan.md); [480p slice 02](../plan.md)
 
@@ -51,3 +51,10 @@ Root assigns another reviewer against exact candidate/base and this committed pa
 ## Required return and stop conditions
 
 Return exact candidate/versions, tests and failures, dependency/script comparison, runtime limits, review packet, rollback/recovery and directly affected durable knowledge. Missing native connection remains INCONCLUSIVE and does not block isolated SDK compatibility work. Repeated network permission denial stops the affected action without bypass. Unavailable published packages would block migration; actual registry evidence currently establishes publication. Preserve existing source/data/processes and unrelated work.
+
+
+## Implementation reconciliation
+
+Direct dependencies are client/server 2.4.0; core 2.4.0 is an exact transitive dependency. Public server/client reexports supply protocol/error/fixture APIs, so no direct core or internal import is required. The old monolith is removed from live source/tests. Historical v1 fixture/evidence remains pinned to its original base/dependency instructions; it is not a current normal regression entrypoint. New listen and legacy checks live in the already registered semantic MCP suite, with an adjacent isolated fixture, so package scripts stay byte-identical to base.
+
+The real stdio server uses `serveStdio` and explicit schema objects; the owner utility pins modern protocol; story and historical browser clients retain explicit legacy negotiation. Future resources/native wake remain excluded. [Final upgrade evidence](sdk-upgrade-evidence.md) retains actual commands, failures, corrected fixture assumptions, source identities and remaining root-owned gates.

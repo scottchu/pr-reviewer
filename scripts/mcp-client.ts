@@ -1,5 +1,5 @@
-import { Client } from "@modelcontextprotocol/sdk/client/index.js";
-import { StdioClientTransport } from "@modelcontextprotocol/sdk/client/stdio.js";
+import { Client } from "@modelcontextprotocol/client";
+import { StdioClientTransport } from "@modelcontextprotocol/client/stdio";
 import { createInterface } from "node:readline";
 import { resolve } from "node:path";
 // Local owner utility: JSONL in, MCP tool results out. Keeps one trusted transport alive.
@@ -8,7 +8,7 @@ if (!launchRef) throw new Error("REVIEW_MCP_LAUNCH_REF is required");
 const client = new Client({
   name: "pr-reviewer-local-owner-client",
   version: "0.1.0",
-});
+}, { versionNegotiation: { mode: { pin: "2026-07-28" } } });
 await client.connect(
   new StdioClientTransport({
     command: process.execPath,

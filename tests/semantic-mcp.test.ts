@@ -1,9 +1,10 @@
 import { test } from "node:test";
+import { spawn } from "node:child_process";
 import assert from "node:assert/strict";
 import { writeFileSync } from "node:fs";
 import { join, resolve } from "node:path";
-import { Client } from "@modelcontextprotocol/sdk/client/index.js";
-import { StdioClientTransport } from "@modelcontextprotocol/sdk/client/stdio.js";
+import { Client } from "@modelcontextprotocol/client";
+import { StdioClientTransport } from "@modelcontextprotocol/client/stdio";
 import { createGateway } from "../src/server/public.ts";
 import type { AnalysisReceipt, AnalysisView } from "../src/domain/public.ts";
 import { semanticFixture, eventually } from "./semantic-fixture.ts";
@@ -12,7 +13,7 @@ test("actual stdio SDK semantic tools enforce attachment, exact evidence, retry,
   const f = semanticFixture();
   let notifications = 0;
   const gateway = createGateway(f.store, async () => { notifications++; return { state: "unknown", reason: "controlled" }; });
-  const client = new Client({ name: "controlled-semantic-sdk", version: "1.0.0" });
+  const client = new Client({ name: "controlled-semantic-sdk", version: "1.0.0" }, { versionNegotiation: { mode: { pin: "2026-07-28" }, probe: { timeoutMs: 1000, maxRetries: 0 } } });
   const query = () => f.store.analysis.query(f.token, { reviewId: "r", snapshotId: f.snapshot.snapshotId });
   const call = (name: string, args: Record<string, unknown> = {}) => client.callTool({ name, arguments: args });
   const value = async <T>(name: string, args: Record<string, unknown> = {}): Promise<T> => {
@@ -29,6 +30,7 @@ test("actual stdio SDK semantic tools enforce attachment, exact evidence, retry,
     const launchRef = join(f.root, "controlled-mcp-launch.json");
     writeFileSync(launchRef, JSON.stringify({ gatewayUrl: `http://127.0.0.1:${port}`, bootstrapToken: connection.token, challengeId: challenge.challengeId, proof: challenge.proof, reviewId: "r", host: "codex", sessionId: "controlled-semantic-session", connectionId: "controlled-semantic-connection" }), { mode: 0o600 });
     await client.connect(new StdioClientTransport({ command: process.execPath, args: ["--experimental-strip-types", resolve("src/mcp/main.ts")], env: { PATH: process.env.PATH ?? "", REVIEW_MCP_LAUNCH_REF: launchRef } }));
+    assert.equal(client.getNegotiatedProtocolVersion(), "2026-07-28");
     const names = (await client.listTools()).tools.map(tool => tool.name);
     for (const name of ["analysis_get", "analysis_source_get", "graph_clarification_put"]) assert.ok(names.includes(name));
     assert.equal(names.some(name => /request_analysis|select.*declaration|context.*acqui/i.test(name)), false);
@@ -71,6 +73,98 @@ test("actual stdio SDK semantic tools enforce attachment, exact evidence, retry,
     assert.equal(notifications, 0);
   } finally {
     await client.close();
+    await gateway.close();
+    f.cleanup();
+  }
+});
+
+test("U3 modern SDK listen acknowledges exact filter, reads separately, cancels and tears down", { timeout: 5000 }, async () => {
+  const { subscriptionFixture } = await import("./mcp-subscription-fixture.ts");
+  const f = subscriptionFixture(true);
+  try {
+    await f.connect();
+    assert.equal(f.client.getNegotiatedProtocolVersion(), "2026-07-28");
+    const subscription = await f.client.listen({ resourceSubscriptions: [f.uri] });
+    assert.deepEqual(subscription.honoredFilter, { resourceSubscriptions: [f.uri] });
+    assert.equal(f.responses.some(message => "method" in message && message.method === "notifications/subscriptions/acknowledged"), true);
+    await f.emit("pr-reviewer-fixture://other/inbox");
+    assert.deepEqual(f.received, []);
+    await f.emit();
+    assert.deepEqual(f.received, [f.uri]);
+    const resource = await f.client.readResource({ uri: f.received[0]! });
+    assert.deepEqual(resource.contents, [{ uri: f.uri, mimeType: "application/json", text: '{"eventId":"e1","questionId":"q1"}' }]);
+    await subscription.close();
+    await subscription.close();
+    assert.equal(await subscription.closed, "local");
+    assert.equal(f.requests.some(message => "method" in message && message.method === "notifications/cancelled"), true);
+    await f.emit();
+    assert.deepEqual(f.received, [f.uri]);
+    const controller = new AbortController();
+    const aborted = await f.client.listen({ resourceSubscriptions: [f.uri] }, { signal: controller.signal });
+    controller.abort();
+    assert.equal(await aborted.closed, "local");
+    // Local abort settlement is not a remote cancellation acknowledgement.
+    // A later ordered round trip fences teardown before testing future events.
+    await f.client.readResource({ uri: f.uri });
+    await f.emit();
+    assert.deepEqual(f.received, [f.uri]);
+    const closing = await f.client.listen({ resourceSubscriptions: [f.uri] });
+    await f.closeServer();
+    assert.equal(await closing.closed, "graceful");
+    await assert.rejects(f.client.readResource({ uri: f.uri }), /Not connected/);
+  } finally { await f.close(); }
+});
+
+test("U3 legacy protocol retains subscribe/unsubscribe and explicitly rejects modern listen", { timeout: 5000 }, async () => {
+  const { subscriptionFixture } = await import("./mcp-subscription-fixture.ts");
+  const { SdkError, SdkErrorCode } = await import("@modelcontextprotocol/client");
+  const f = subscriptionFixture(false);
+  try {
+    await f.connect();
+    assert.equal(f.client.getNegotiatedProtocolVersion(), "2025-11-25");
+    await assert.rejects(f.client.listen({ resourceSubscriptions: [f.uri] }), error => error instanceof SdkError && error.code === SdkErrorCode.MethodNotSupportedByProtocolVersion);
+    await assert.rejects(f.client.subscribeResource({ uri: "pr-reviewer-fixture://other/inbox" }), /outside fixture scope/);
+    await f.emit();
+    assert.deepEqual(f.received, []);
+    await f.client.subscribeResource({ uri: f.uri });
+    await f.emit();
+    assert.deepEqual(f.received, [f.uri]);
+    assert.equal((await f.client.readResource({ uri: f.uri })).contents.length, 1);
+    await f.client.unsubscribeResource({ uri: f.uri });
+    await f.emit();
+    assert.deepEqual(f.received, [f.uri]);
+  } finally { await f.close(); }
+});
+
+
+test("U2 owner JSONL utility negotiates modern MCP, preserves pairing and closes at input EOF", { timeout: 10000 }, async () => {
+  const f = semanticFixture();
+  const gateway = createGateway(f.store, async () => ({ state: "unknown", reason: "controlled" }));
+  let child: ReturnType<typeof spawn> | undefined;
+  try {
+    const port = await gateway.listen(0);
+    const owner = { kind: "user" as const, actorId: "local-user" };
+    const connection = f.store.registerConnection(owner, { host: "codex", sessionId: "controlled-owner-utility", connectionId: "utility-connection", corroborated: true });
+    const challenge = f.store.challenge(owner, "r", "codex", "controlled-owner-utility", "utility-connection");
+    const launchRef = join(f.root, "owner-utility-launch.json");
+    writeFileSync(launchRef, JSON.stringify({ gatewayUrl: `http://127.0.0.1:${port}`, bootstrapToken: connection.token, challengeId: challenge.challengeId, proof: challenge.proof, reviewId: "r", host: "codex", sessionId: "controlled-owner-utility", connectionId: "utility-connection" }), { mode: 0o600 });
+    child = spawn(process.execPath, ["--experimental-strip-types", resolve("scripts/mcp-client.ts")], { env: { PATH: process.env.PATH ?? "", REVIEW_MCP_LAUNCH_REF: launchRef }, stdio: ["pipe", "pipe", "pipe"] });
+    let stdout = "", stderr = "";
+    child.stdout!.on("data", chunk => { stdout += String(chunk); });
+    child.stderr!.on("data", chunk => { stderr += String(chunk); });
+    const exit = new Promise<number | null>((resolveExit, reject) => { child!.once("error", reject); child!.once("close", resolveExit); });
+    child.stdin!.end('invalid-json\n{"name":"session_attach"}\n{"name":"inbox_read"}\n');
+    assert.equal(await exit, 0, stderr);
+    const results = stdout.trim().split("\n").map(line => JSON.parse(line) as Record<string, unknown>);
+    assert.equal(results.length, 3);
+    assert.equal(results[0]?.isError, true);
+    const text = (result: Record<string, unknown>) => JSON.parse((result.content as { text: string }[])[0]!.text) as Record<string, unknown>;
+    assert.equal(text(results[1]!).status, "attached");
+    assert.deepEqual(text(results[2]!).items, []);
+    assert.equal(stdout.includes(connection.token), false);
+    assert.equal(stdout.includes(challenge.proof), false);
+  } finally {
+    if (child && child.exitCode === null) child.kill("SIGTERM");
     await gateway.close();
     f.cleanup();
   }
