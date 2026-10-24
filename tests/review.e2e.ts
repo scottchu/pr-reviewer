@@ -10,6 +10,7 @@ import {
   rmSync,
 } from "node:fs";
 import { tmpdir } from "node:os";
+import {reserveBrowserPorts} from "./browser-ports.ts";
 import { join, resolve } from "node:path";
 import { Client } from "@modelcontextprotocol/client";
 import { StdioClientTransport } from "@modelcontextprotocol/client/stdio";
@@ -21,7 +22,7 @@ let root: string,
   gatewayUrl: string,
   uiUrl: string,
   launch: LaunchBinding;
-let stderr = "";
+let stderr = "",uiPort=0,gatewayPort=0;
 const delay = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 const api = async (path: string, body?: unknown) => {
   const response = await fetch(`${gatewayUrl}${path}`, {
@@ -42,8 +43,8 @@ const start = async () => {
       env: {
         ...process.env,
         REVIEW_DATA_DIR: root,
-        REVIEW_UI_PORT: "5284",
-        REVIEW_GATEWAY_PORT: "5285",
+        REVIEW_UI_PORT: String(uiPort),
+        REVIEW_GATEWAY_PORT: String(gatewayPort),
         REVIEW_CODEX_BIN: join(root, "controlled-codex"),
       },
       stdio: ["ignore", "pipe", "pipe"],
@@ -83,6 +84,7 @@ const tool = async (name: string, args: Record<string, unknown> = {}) => {
   return JSON.parse(content[0]?.text ?? "{}") as Record<string, unknown>;
 };
 test.beforeAll(async () => {
+  const ports=await reserveBrowserPorts();uiPort=ports[0]!;gatewayPort=ports[1]!;
   root = mkdtempSync(join(tmpdir(), "pr-reviewer-browser-"));
   writeFileSync(
     join(root, "controlled-codex"),

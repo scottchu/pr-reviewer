@@ -4,18 +4,20 @@ import type {ChildProcess} from 'node:child_process';
 import {mkdtempSync,mkdirSync,writeFileSync,readFileSync,existsSync,rmSync} from 'node:fs';
 import {tmpdir} from 'node:os';
 import {join} from 'node:path';
+import {reserveBrowserPorts} from './browser-ports.ts';
 import {providerFixture} from './provider-fixture.ts';
 import type {Review,ImportJob} from '../src/domain/public.ts';
-let root:string,child:ChildProcess,uiUrl:string,gatewayUrl:string,fixture:ReturnType<typeof providerFixture>,providerState:string;let stderr='';
+let root:string,child:ChildProcess,uiUrl:string,gatewayUrl:string,fixture:ReturnType<typeof providerFixture>,providerState:string;let stderr='',uiPort=0,gatewayPort=0;
 const delay=(ms:number)=>new Promise(resolve=>setTimeout(resolve,ms));
 const start=async()=>{
- child=spawn(process.execPath,['--experimental-strip-types','scripts/dev.ts'],{env:{...process.env,PATH:`${join(root,'bin')}:${process.env.PATH??''}`,REVIEW_DATA_DIR:root,REVIEW_UI_PORT:'6084',REVIEW_GATEWAY_PORT:'6085'},stdio:['ignore','pipe','pipe']});child.stderr?.on('data',data=>{stderr+=String(data);});
+ child=spawn(process.execPath,['--experimental-strip-types','scripts/dev.ts'],{env:{...process.env,PATH:`${join(root,'bin')}:${process.env.PATH??''}`,REVIEW_DATA_DIR:root,REVIEW_UI_PORT:String(uiPort),REVIEW_GATEWAY_PORT:String(gatewayPort)},stdio:['ignore','pipe','pipe']});child.stderr?.on('data',data=>{stderr+=String(data);});
  for(let i=0;i<150;i++){if(child.exitCode!==null)throw new Error(stderr);if(existsSync(join(root,'runtime.json'))){const runtime=JSON.parse(readFileSync(join(root,'runtime.json'),'utf8'));if(runtime.status==='running'){uiUrl=runtime.uiUrl;gatewayUrl=runtime.gatewayUrl;return;}}await delay(100);}throw new Error('candidate startup timeout');
 };
 const stop=async()=>{if(child.exitCode!==null)return;await new Promise<void>(resolve=>{child.once('exit',()=>resolve());child.kill('SIGTERM');});};
 const api=async(path:string,body?:unknown)=>{const response=await fetch(`${gatewayUrl}${path}`,{headers:{'Content-Type':'application/json'},...(body?{method:'POST',body:JSON.stringify(body)}:{})});const value=await response.json() as unknown;expect(response.ok,JSON.stringify(value)).toBe(true);return value;};
 const jobs=async()=>await api('/api/imports') as Omit<ImportJob,'credentialReference'>[];
 test.beforeAll(async()=>{
+ const ports=await reserveBrowserPorts();uiPort=ports[0];gatewayPort=ports[1];
  root=mkdtempSync(join(tmpdir(),'pr-reviewer-import-browser-'));fixture=providerFixture();providerState=join(root,'provider-state.json');writeFileSync(providerState,JSON.stringify({...fixture.candidate,delay:0}));mkdirSync(join(root,'bin'),{mode:0o700});
  writeFileSync(join(root,'bin','gh'),`#!${process.execPath}\nconst {readFileSync}=require('node:fs');const candidate=JSON.parse(readFileSync(${JSON.stringify(providerState)},'utf8'));const endpoint=process.argv.at(-1);const pull={number:candidate.number,html_url:candidate.url,title:candidate.title,state:candidate.state,head:{ref:candidate.sourceBranch,sha:candidate.headSha,repo:{full_name:candidate.sourceProject}},base:{ref:candidate.targetBranch,sha:candidate.targetTipSha,repo:{full_name:candidate.targetProject}}};const value=endpoint.includes('/compare/')?{merge_base_commit:{sha:candidate.baseSha}}:endpoint.includes('/pulls?')?[pull]:endpoint==='repos/team/repo'?{full_name:'team/repo',default_branch:'main'}:pull;setTimeout(()=>process.stdout.write(JSON.stringify(value)),candidate.delay);\n`,{mode:0o700});await start();
 });
