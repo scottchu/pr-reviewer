@@ -88,7 +88,11 @@ export const validateEnvelope=(value:unknown,request:WorkerRequest):WorkerEnvelo
  requireValid(result.observed.astNodes<=input.budgets.astNodes&&result.observed.invocationSites<=input.budgets.invocationSites);
  const nodes=result.status==='available'?result.declarations:result.nodes;
  requireValid(nodes.length<=input.budgets.outputNodes);const nodeMap=new Map<string,FunctionNode>();
- for(const n of nodes){checkAnchor(n.declaration);checkAnchor(n.body);const source=sourceMap.get(sourceKey(n.declaration))!;requireValid(!nodeMap.has(n.id)&&n.id===digest([input.snapshotId,n.declaration,n.kind])&&n.role===source.role&&sourceKey(n.body)===sourceKey(n.declaration)&&n.body.start>=n.declaration.start&&n.body.end<=n.declaration.end);nodeMap.set(n.id,n);}
+ const coverageMap=new Map(result.coverage.map(row=>[sourceKey(row),row]));
+ for(const n of nodes){checkAnchor(n.declaration);checkAnchor(n.body);const source=sourceMap.get(sourceKey(n.declaration))!,row=coverageMap.get(sourceKey(n.declaration))!;
+  requireValid(source.selected&&!source.exclusion&&/\.tsx?$/.test(source.path)&&row.status==='scanned'&&row.parseStatus==='parsed');
+  if(result.status==='available')requireValid(source.role!=='declaration-only'&&!source.path.endsWith('.d.ts'));
+  requireValid(!nodeMap.has(n.id)&&n.id===digest([input.snapshotId,n.declaration,n.kind])&&n.role===source.role&&sourceKey(n.body)===sourceKey(n.declaration)&&n.body.start>=n.declaration.start&&n.body.end<=n.declaration.end);nodeMap.set(n.id,n);}
  if(result.status==='available'){requireValid(result.observed.declarations===nodes.length);requireValid(result.coverage.every(c=>c.resolved===null&&c.unresolved===null));return envelope;}
  const edgeMap=new Map(result.edges.map(e=>[e.id,e])),unresolvedMap=new Map(result.unresolved.map(s=>[s.id,s]));requireValid(edgeMap.size===result.edges.length&&unresolvedMap.size===result.unresolved.length);
  let siteCount=result.unresolved.length;const sites=new Set<string>();

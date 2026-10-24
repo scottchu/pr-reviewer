@@ -113,3 +113,15 @@ test('bounded repeated anchors cannot make parent validation repeatedly rescan s
  const changed=JSON.parse(JSON.stringify(envelope));for(const edge of changed.result.edges)for(const site of edge.sites)site.signatures=Array.from({length:2000},()=>edge.target);
  const root=mkdtempSync(join(tmpdir(),'pr-reviewer-worker-bounded-')),entryPath=join(root,'fixture.cjs');try{writeFileSync(entryPath,emit(changed));const start=Date.now();await assert.rejects(runAnalysisWorker(compute,observations().port,{entryPath}),/analysis_worker_/);assert.ok(Date.now()-start<5000);}finally{rmSync(root,{recursive:true,force:true});}
 });
+
+test('canonical declaration IDs cannot move selectable members into unscanned or declaration-only sources',async()=>{
+ const {listNeighborhoodDeclarations}=await import('../src/source-analysis/public.ts');
+ for(const excluded of [{path:'unselected.ts',selected:false},{path:'declaration.ts',selected:true,role:'declaration-only' as const},{path:'declaration.d.ts',selected:true}]){
+  const extra={...input.sources[0]!,...excluded},rich={...input,sources:[input.sources[0]!,extra]},real=listNeighborhoodDeclarations(rich);assert.equal(real.status,'available');if(real.status!=='available')throw Error('fixture');
+  const bad=structuredClone(real) as any,n=bad.declarations[0];for(const a of [n.declaration,n.body])a.path=extra.path;n.role=extra.role;
+  const stable=(value:any):string=>Array.isArray(value)?`[${value.map(stable).join(',')}]`:value&&typeof value==='object'?`{${Object.keys(value).sort().map(key=>`${JSON.stringify(key)}:${stable(value[key])}`).join(',')}}`:JSON.stringify(value);
+  n.id=createHash('sha256').update(stable([rich.snapshotId,n.declaration,n.kind])).digest('hex');
+  const inventoryRequest:WorkerRequest={...request,input:rich};const original=(await runAnalysisWorker(inventoryRequest,observations().port)).envelope;
+  const root=mkdtempSync(join(tmpdir(),'pr-reviewer-worker-eligibility-')),entryPath=join(root,'fixture.cjs');try{writeFileSync(entryPath,emit({...original,result:bad}));await assert.rejects(runAnalysisWorker(inventoryRequest,observations().port,{entryPath}),/analysis_worker_/);}finally{rmSync(root,{recursive:true,force:true});}
+ }
+});
