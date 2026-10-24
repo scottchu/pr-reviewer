@@ -9,6 +9,7 @@ export type View = {
   review: Review | null;
   error: string;
   busy: boolean;
+  selecting: boolean;
   authenticated: boolean;
 };
 export const questionStatus = (review: Review, questionId: string) => {
@@ -36,6 +37,7 @@ export const createReviewBridge = (reviewId: string, initialSnapshotId?:string) 
     review: null,
     error: "",
     busy: false,
+    selecting: false,
     authenticated: false,
   };
   const listeners = new Set<() => void>();
@@ -46,6 +48,12 @@ export const createReviewBridge = (reviewId: string, initialSnapshotId?:string) 
   const publish = (next: View) => {
     state = next;
     for (const listener of listeners) listener();
+  };
+  const interruptSelection=()=>{
+    if(state.selecting){
+      selectedSnapshotId=state.review?.snapshot.snapshotId??selectedSnapshotId;
+      publish({...state,selecting:false});
+    }
   };
   const request = async (
     path: string,
@@ -111,7 +119,7 @@ export const createReviewBridge = (reviewId: string, initialSnapshotId?:string) 
     const route = registry.register(
       "review-committed-to-view",
       reviewId,
-      () => Boolean(token) && !state.busy,
+      () => Boolean(token) && !state.busy && !state.selecting,
       () => {
         void refresh();
       },
@@ -122,6 +130,7 @@ export const createReviewBridge = (reviewId: string, initialSnapshotId?:string) 
       clearInterval(timer);
       route.dispose();
       generation++;
+      interruptSelection();
       inflight?.abort();
     };
   };
@@ -135,6 +144,7 @@ export const createReviewBridge = (reviewId: string, initialSnapshotId?:string) 
     login: async (value: string) => {
       token = value.trim();
       generation++;
+      interruptSelection();
       await refresh();
     },
     selectSnapshot:async(snapshotId:string)=>{
@@ -142,12 +152,18 @@ export const createReviewBridge = (reviewId: string, initialSnapshotId?:string) 
       const previous=state.review?.snapshot.snapshotId??selectedSnapshotId;
       selectedSnapshotId=snapshotId;
       const expected=++generation;
-      const review=await refresh();
-      if(expected!==generation)throw new Error("selection_superseded");
-      if(!review){selectedSnapshotId=previous;throw new Error(state.error||"source_unavailable");}
-      return review;
+      publish({...state,selecting:true});
+      try{
+        const review=await refresh();
+        if(expected!==generation)throw new Error("selection_superseded");
+        if(!review){selectedSnapshotId=previous;throw new Error(state.error||"source_unavailable");}
+        return review;
+      }finally{
+        if(expected===generation)publish({...state,selecting:false});
+      }
     },
     ask: async (anchor: Anchor, text: string, parentQuestionId?:string): Promise<Receipt> => {
+      if(state.selecting)throw new Error("selection_in_progress");
       if (state.busy) throw new Error("submission_in_progress");
       const fingerprint = JSON.stringify({ anchor, text,...(parentQuestionId?{parentQuestionId}:{}) });
       if (pending && pending.fingerprint !== fingerprint)

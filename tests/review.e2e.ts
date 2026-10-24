@@ -389,12 +389,12 @@ test('controlled overlapping history choices preserve displayed source and inter
  const projection=(id:string):Review=>({reviewId:'controlled-history',snapshot:{snapshotId:id,repository:'fixture/controlled',prUrl:'https://example.invalid/controlled-history',prNumber:1,baseSha:'a'.repeat(40),headSha:id.slice(0,40),sources:[{side:'head',path:'source.md',content:`Source visible for snapshot ${id[0]}\n`,lineCount:1,hash:'0'.repeat(64)}]},snapshotSummaries:ids.map(snapshotId=>({snapshotId,baseSha:'a'.repeat(40),headSha:snapshotId.slice(0,40)})),currentSnapshotId:ids[2]!,revision:1,questions:[],replies:[],inbox:[],attempts:[],attachment:null});
  await page.route('**/api/reviews/controlled-history?**',async route=>{
   const id=new URL(route.request().url()).searchParams.get('snapshotId')??ids[0]!;requests.push(id);
-  if(deferred&&id!==ids[0])await delay(id===ids[1]?500:300);
+  if(deferred&&id!==ids[0])await delay(id===ids[1]?1600:1100);
   try{await route.fulfill({json:projection(id)});}catch{/* Superseded request was aborted by the actual bridge. */}
  });
  await page.route('**/api/commands',async route=>{captured=route.request().postDataJSON() as Record<string,unknown>;await route.fulfill({json:{state:'rejected',error:'controlled_probe_only'}});});
  const url=new URL(uiUrl);url.searchParams.set('reviewId','controlled-history');await page.goto(url.toString());await page.getByLabel('Local access token').fill(token);await page.getByRole('button',{name:'Open review'}).click();
- const select=page.getByRole('combobox',{name:'Snapshot',exact:true});await select.selectOption(ids[1]!);await expect.poll(()=>requests.includes(ids[1]!)).toBe(true);await select.selectOption(ids[2]!);await expect(select).toHaveValue(ids[2]!);
+ const select=page.getByRole('combobox',{name:'Snapshot',exact:true});await select.selectOption(ids[1]!);await expect.poll(()=>requests.includes(ids[1]!)).toBe(true);await select.selectOption(ids[2]!);const compositionHeld=await page.getByLabel('Your question').isDisabled();await expect(select).toHaveValue(ids[2]!);expect(compositionHeld).toBe(true);
  await expect(page.locator('.source-grid code')).toHaveText(['Source visible for snapshot 3']);deferred=false;const beforePoll=requests.length;await expect.poll(()=>requests.length).toBeGreaterThan(beforePoll);
  await expect(select).toHaveValue(ids[2]!);await expect(page.locator('.source-grid code')).toHaveText(['Source visible for snapshot 3']);
  await page.getByLabel('Your question').fill('Controlled source consistency probe');await page.getByRole('button',{name:'Save question'}).click();await expect(page.getByText('controlled_probe_only',{exact:true}).last()).toBeVisible();

@@ -185,6 +185,7 @@ const App = () => {
         </div>
       </header>
       <section className="snapshot-selection" aria-label="Snapshot history"><label>Snapshot<select value={review.snapshot.snapshotId} disabled={Boolean(draft.trim())||state.busy} onChange={event=>{void chooseSnapshot(event.target.value);}}>{(review.snapshotSummaries??[{snapshotId:review.snapshot.snapshotId,baseSha:review.snapshot.baseSha,headSha:review.snapshot.headSha}]).map(snapshot=><option key={snapshot.snapshotId} value={snapshot.snapshotId}>{snapshot.snapshotId===(review.currentSnapshotId??review.snapshot.snapshotId)?"Current":"History"} · {snapshot.headSha.slice(0,12)} · {snapshot.snapshotId.slice(0,12)}</option>)}</select></label><p role="status">{review.snapshot.snapshotId===(review.currentSnapshotId??review.snapshot.snapshotId)?"Viewing current snapshot":"Viewing historical snapshot"}. Selection is private and does not move saved source or discussion.</p>{state.error&&<p role="alert">{state.error}</p>}</section>
+      {state.selecting&&<p role="status">Opening the selected snapshot. Question composition is held until its source is ready.</p>}
       {state.graph && selected && <ReviewGraph graph={state.graph} selectedPath={selected.path} onOpen={openSource}/>}
       <section className="source-identity">
         <h2>{selected?.path ?? state.sources[0]?.path}</h2>
@@ -270,6 +271,7 @@ const App = () => {
                 <label htmlFor="question">Your question</label>
                 <textarea
                   id="question"
+                  disabled={state.selecting}
                   aria-describedby="selection question-help"
                   rows={4}
                   value={draft}
@@ -279,7 +281,7 @@ const App = () => {
                 <p id="question-help">
                   The answer must cite this pinned source and state its limits.
                 </p>
-                <button disabled={state.busy || !draft.trim()}>
+                <button disabled={state.busy || state.selecting || !draft.trim()}>
                   {state.busy ? "Saving question…" : "Save question"}
                 </button>
                 {state.error && <p role="alert">{state.error}</p>}

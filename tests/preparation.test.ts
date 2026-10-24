@@ -10,7 +10,7 @@ import {buildSnapshot,verifyPreparedSnapshot} from '../src/source-preparation/pu
 import type {PreparedSnapshotWitness} from '../src/source-preparation/public.ts';
 import type {Snapshot,Command} from '../src/domain/public.ts';
 import {createStore} from '../src/storage/public.ts';
-import {canonical,normalizeCommand} from '../src/domain/public.ts';
+import {canonical,normalizeCommand,inlineDocumentLinks,resolveDocumentDestination,documentHeadingLine} from '../src/domain/public.ts';
 const spec={prNumber:21,prUrl:'https://github.com/scottchu/pr-reviewer/pull/21',baseSha:'bdce918b4ab0563d698d3fcf9c1df1e19c1be68f',paths:['src/ui/graph.tsx']};
 const old=buildSnapshot({...spec,headSha:'501917502a67caa513a923523b40d2084e53074f'}),next=buildSnapshot({...spec,headSha:'857fb072aaba095b9dadbfac4dcf11ff914eacdc'});
 const owner={kind:'user' as const,actorId:'local-user'};
@@ -56,4 +56,12 @@ test('documented manual-v1 source/identity vectors and persisted legacy retry fi
   const path=join(root,'legacy.sqlite'),store=createStore(path);store.prepare('compat-review',one);store.close();const db=new DatabaseSync(path);const row=JSON.parse((db.prepare('SELECT body FROM reviews').get() as {body:string}).body);delete row.snapshots;delete row.currentSnapshotId;row.revision=2;row.questions=[{questionId:'legacy-question',anchor:command.anchor,text:'Why?',actorId:'local-user',revision:2,createdAt:'2020-01-01T00:00:00.000Z',working:false}];db.prepare('UPDATE reviews SET body=?').run(JSON.stringify(row));const receipt={commandId:command.commandId,actorId:'local-user',state:'applied',revision:2,cursor:2,result:{questionId:'legacy-question'}};db.prepare('INSERT INTO receipts VALUES (?,?,?,?)').run(command.commandId,'local-user',fingerprint,JSON.stringify(receipt));db.close();
   const migrated=createStore(path);try{assert.deepEqual(migrated.command(owner,reversed({...command,text:'Why?'}) as Command),receipt);assert.equal(migrated.review(owner,'compat-review').questions.length,1);assert.equal(migrated.command(owner,{...command,text:'Changed'}).error,'command_conflict');}finally{migrated.close();}
  }finally{if(previous===undefined)delete process.env.GIT_DIR;else process.env.GIT_DIR=previous;rmSync(root,{recursive:true,force:true});}
+});
+
+test('documented manual Markdown identity vectors preserve heading, duplicate, start and unsupported-form conventions',()=>{
+ const target='# Intro\n# Topic\n# Topic\n';
+ const link=inlineDocumentLinks('one\ntwo\nthree\n[go](b.md#topic)\n');assert.deepEqual(link,[{destination:'b.md#topic',line:4}]);const resolved=resolveDocumentDestination('docs/a.md',link[0]!.destination);assert.deepEqual(resolved,{path:'docs/b.md',fragment:'topic'});assert.equal(documentHeadingLine(target,resolved.fragment),2);
+ for(const destination of ['b.md','b.md#'])assert.equal(documentHeadingLine(target,resolveDocumentDestination('docs/a.md',destination).fragment),1);
+ for(const fragment of ['topic-1','Topic'])assert.throws(()=>documentHeadingLine(target,fragment),/heading fragment unresolved/);
+ assert.deepEqual(inlineDocumentLinks('[go][topic]\n<a href="b.md">go</a>\n![go](b.md)\n'),[]);assert.equal(documentHeadingLine('# Foo  Bar!\n','foo--bar'),1);assert.throws(()=>documentHeadingLine('# Foo  Bar!\n','foo-bar'),/heading fragment unresolved/);
 });
