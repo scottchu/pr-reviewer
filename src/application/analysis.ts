@@ -142,15 +142,17 @@ export const createAnalysisBridge=(reviewId:string)=>{
   },
   retry:async()=>{if(!pending)throw new Error('invalid_request');const {commandId,...intent}=pending.command;return send(intent as Intent);},
   focus:(id:string)=>{publish({...state,focus:id});void warm(owner());},
-  openSource:async(anchor:SemanticAnchor,navigation:{intent?:'inspect'|'restore'}={})=>{
+  openSource:async(anchor:SemanticAnchor,navigation:{intent?:'inspect'|'restore';signal?:AbortSignal}={})=>{
+   if(navigation.signal?.aborted)throw new Error('selection_superseded');
    if(!analysisId&&state.view?.analysis){analysisId=state.view.analysis.analysisId;abortRead();publish({...state,reading:false});}
    const o=owner(),corpus=state.view?.corpus;if(!corpus||anchor.snapshotId!==snapshotId)throw new Error('source_unavailable');
    sourceRead?.controller.abort();const op={owner:o,controller:new AbortController()};sourceRead=op;
+   const cancel=()=>{op.controller.abort();if(sourceRead===op){sourceRead=null;if(owns(o))publish({...state,sourceBusy:false});}};navigation.signal?.addEventListener('abort',cancel,{once:true});
    publish({...state,sourceBusy:true,sourceNavigation:navigation.intent??'inspect',error:''});
    try{const source=await request(o,'/api/analysis/source',sourceQuery(o,corpus.corpusId,anchor),op.controller.signal) as SemanticSource;
     if(owns(o)&&sourceRead===op&&!op.controller.signal.aborted)publish({...state,source,sourceAnchor:anchor,snippets:{...state.snippets,[semanticSourceKey(anchor)]:source}});
    }catch(error){if(owns(o)&&sourceRead===op&&!op.controller.signal.aborted)publish({...state,error:error instanceof Error?error.message:'source_unavailable'});
-   }finally{if(sourceRead===op){sourceRead=null;if(owns(o))publish({...state,sourceBusy:false});}}
+   }finally{navigation.signal?.removeEventListener('abort',cancel);if(sourceRead===op){sourceRead=null;if(owns(o))publish({...state,sourceBusy:false});}}
   },
   closeSource:()=>{sourceRead?.controller.abort();sourceRead=null;publish({...state,source:null,sourceAnchor:null,sourceBusy:false});},
   connect:()=>{
