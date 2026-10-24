@@ -67,3 +67,18 @@ Record own-PR and candidate provenance, session/attachment identity, capability 
 ## Current capability and next evidence
 
 The local candidate implements the shared contracts, controlled CLI notification and actual MCP protocol read/reply. A real own-PR operation also observed UI Save, native CLI enqueue acknowledgement, actual existing-owner live SDK MCP inbox/question/reply and authoritative UI answer/evidence readback. The owner answered after explicit steering; no automatic queued turn was observed, and native tool-catalog registration remains unverified. SDK protocol operations cannot be relabeled as native registered-tool invocation or proof that the CLI caused the reply. Codex owner pairing corroborates its exact existing metadata within the local-user trust boundary; Claude owner provisioning remains unavailable in the observed environment. Continue actual host-path verification independently; do not replace unknown native capability with fixture success. The runtime guide and contracts define current operation without requiring historical plans.
+
+
+## Active Codex delivery and MCP subscription feasibility
+
+**Decision date:** 2026-10-24
+
+**Accepted direction:** Use existing-owner active-turn steering as specified in [delivery](review-loop/delivery.md). The original attached session remains the destination. Unconditional queue delivery is not active-turn steering.
+
+**Observed host limit:** Codex CLI 0.164.0 generates `turn/steer` with required `expectedTurnId`, but the default `app-server proxy` did not answer bounded read-only initialization probes. No supported owner route or active-turn observation was established by those probes. No live message was submitted. A schema is protocol evidence; a working authenticated owner connection and matching active-turn readback remain separate prerequisites.
+
+**MCP feasibility:** The declared SDK 1.32.2 supports the 2025-11-25 protocol and `subscribeResource` / `unsubscribeResource`, corresponding to `resources/subscribe` and `resources/unsubscribe`. A server may advertise resource subscriptions and emit `notifications/resources/updated`. The current PR Reviewer server registers tools only; it does not register resources or subscription handlers. A bounded future seam could expose an authorized review-inbox resource and emit a change hint after the addressed inbox transaction commits. The client then reads the durable inbox and authoritative question/source, and submits a reply through the existing command/receipt boundary. The hint must not become authoritative payload or a second work queue.
+
+The newer SDK v2 `listen(filter)` API uses `subscriptions/listen` under protocol 2026-07-28, resolves after an acknowledgement, and rejects on a 2025 protocol connection. It is not available merely because a current documentation page describes it. No SDK upgrade, new dependency, resource implementation or new wake service is adopted here. Sources: [SDK v1](https://ts.sdk.modelcontextprotocol.io/), [v2 subscriptions](https://ts.sdk.modelcontextprotocol.io/v2/clients/subscriptions.html), [v2 Client.listen](https://ts.sdk.modelcontextprotocol.io/v2/api/@modelcontextprotocol/client/client/client.html#listen).
+
+Any future subscription belongs in the declared integration layer and managed subscription registry, scoped to authenticated attachment/review/generation with bounded state, teardown on disconnect/revoke, and independent diagnostics. Resource-change delivery does not prove that native Codex subscribes, wakes an idle conversation, starts a model turn, or exposes the native MCP tool catalog. Those host capabilities require independent negotiated and observed evidence. Explicit inbox reads remain available when hints are unsupported.

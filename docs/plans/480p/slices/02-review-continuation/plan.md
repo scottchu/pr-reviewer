@@ -119,3 +119,7 @@ The original packet was planning-only; subsequent implementation and review rece
 **02B identity refinement:** Root accepted a source-preparation public boundary: extract existing manual schema/builder/safe Git reader; gateway verifies manual_git_v1 outside transactions and supplies a review/manifest-bound nonserialized witness. Preserve legacy ordered IDs and property-order-independent verification. Raw JSON is not trusted acquisition. Add forged/mismatched witness, tampered new ID/content, missing-object and preserved-legacy-ID regressions. Source-acquisition-v1 adapter remains a declared successor gate, with no narrowing or imported internal implementation.
 
 **Final bounded disposition:** See [02B review receipts](review-receipts-02b.md): cumulative engineering and whole-current-product documentation sufficiency accepted at e068502, actual PR22 029→e068 continuation/navigation accepted with controlled-host/source/semantic limits. Final receipt reconciliation is docs-only and separate from that code candidate and reviewed target. Root owns publication/merge/runtime update. Full slice/native dual-host/human/480p acceptance remains open.
+
+## Active-turn Codex correction
+
+The [versioned Codex steering correction packet](codex-steer-correction.md) supersedes unconditional queue delivery for active Codex work. Existing native delivery receipts remain historical; owner-route and active-turn evidence must be independently established. The packet also records MCP subscription feasibility without adopting a new subscription or wake service.
