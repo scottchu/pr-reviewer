@@ -19,7 +19,11 @@ The app binds UI `http://127.0.0.1:5184` and gateway `http://127.0.0.1:5185`. Ov
 
 The data directory must be private to its OS user, outside every Git repository (including other checkouts and Git metadata) and outside `.decompozr`. The app prepares PR 14 directly from its immutable Git objects, verifies source bounds and hashes, and preserves SQLite and `snapshot.json` there. No reviewed code or install hook executes. `bun run prepare:source` can perform the same bounded preparation separately. A data-root ownership lock prevents competing runtimes. Only an absent prior PID allows stale-lock recovery; uncertainty is preserved.
 
-After both listeners are ready, `runtime.json` records source commit and dirty-state disclosure, PID/start identity, loopback addresses and the mode-0600 local-user credential reference. Enter that credential's token into the app's password field. It stays in the bridge's memory; no credential is embedded in source or notification arguments. Protect the data root and do not paste credential contents into chat or Git.
+After both listeners are ready, `runtime.json` records source commit and dirty-state disclosure, PID/start identity and loopback addresses. Open its UI URL directly: review, retained snapshot history and graph load without login, token entry or credential paste. The browser sends ordinary owner requests without Authorization. Runtime startup does not create or read `local-user.json`; any existing credential file and credential rows remain preserved.
+
+The single-user gateway derives `{kind: "user", actorId: "local-user"}` for requests without Authorization. It supplies trusted local-owner access through storage interfaces for story, semantic and import operations, including durable job ownership, without exposing or manufacturing a browser credential. Retained owner jobs remain visible and actionable even when originally created under an older owner credential. Explicit Bearer requests continue to resolve their actual stored bootstrap/agent identity; malformed, unknown and stale credentials cannot fall back to local-owner access. Attachment, initiating-session, generation and scoped reply checks remain operational routing requirements.
+
+This is a single local-owner policy behind the established loopback/Host/private tailnet boundary. It makes no Tailscale identity or multi-user authorization claim and adds no login replacement. Private drafts/recovery use a stable origin-and-local-owner scope. Preserve older credential-scoped recovery records; never silently retarget an unresolved command or require credential re-entry. An incompatible old private record stays blocked with an explicit legacy-recovery message; authoritative saved history is still loaded.
 
 From the same worktree and with the same data-root environment:
 
@@ -31,7 +35,7 @@ Stop checks PID/start time and the supervisor command before signaling it. The s
 
 ## Optional private tailnet preview
 
-The owner may explicitly request access through the existing Tailscale tailnet. Keep both application listeners on loopback and proxy only the UI origin with Tailscale Serve; the UI already forwards authenticated `/api` requests to the gateway. Preserve the app's local-user login and all unrelated Serve routes. Do not enable Funnel or expose the gateway separately.
+The owner may explicitly request access through the existing Tailscale tailnet. Keep both application listeners on loopback and proxy only the UI origin with Tailscale Serve; the UI already forwards `/api` requests to the gateway. Owner access requires no application login. Preserve all unrelated Serve routes. Do not enable Funnel or expose the gateway separately.
 
 Before changing routing, retain the current Serve configuration, select an unused HTTPS port and record the exact task-owned handler and rollback command in private runtime evidence. The current pilot selects HTTPS 8472 forwarding to `http://127.0.0.1:5184`. The device's verified MagicDNS hostname is `mac-mini.duckbill-ionian.ts.net`; this is an operational endpoint, not an application identity or participant-session proof.
 
@@ -42,7 +46,7 @@ tailscale serve --bg --https=8472 http://127.0.0.1:5184
 tailscale serve status --json
 ```
 
-Verify HTTPS, application assets, unauthenticated API rejection and an authenticated source query through this endpoint, then compare existing handlers and Funnel configuration with the retained baseline. Keep credentials out of URLs and logs. Host-side HTTPS checks do not prove access from another device or a completed browser/participant journey. Remove only this mapping with `tailscale serve --https=8472 off` when retiring the preview; stopping the app does not remove Serve automatically.
+Verify HTTPS, application assets and a credential-free owner source query through this endpoint, then compare existing handlers and Funnel configuration with the retained baseline. Keep credentials out of URLs and logs. Host-side HTTPS checks do not prove access from another device or a completed browser/participant journey. Remove only this mapping with `tailscale serve --https=8472 off` when retiring the preview; stopping the app does not remove Serve automatically.
 
 ## Attach the exact existing Codex session
 
@@ -96,7 +100,7 @@ Preparation bounds each Git output/blob read to 1 MiB and validates strict UTF-8
 
 ## Admit another pinned head without moving history
 
-With an isolated candidate already running, prepare a private source specification for the same verified PR. Set `REVIEW_SOURCE_SPEC` to that file, `REVIEW_EXPECTED_SNAPSHOT_ID` to current read from the authoritative review, and `REVIEW_COMMAND_ID` to one stable unique command identity. Run `node --experimental-strip-types scripts/add-snapshot.ts` with the same `REVIEW_DATA_DIR`. The utility builds source outside ingress, reads the local credential privately and sends AddSnapshot; it prints only the receipt. An unchanged retry uses the same command ID. A rejected receipt is durable; correcting rejected input needs a new command ID. Inspect a stale expected-current conflict rather than overwriting automatically.
+With an isolated candidate already running, prepare a private source specification for the same verified PR. Set `REVIEW_SOURCE_SPEC` to that file, `REVIEW_EXPECTED_SNAPSHOT_ID` to current read from the authoritative review, and `REVIEW_COMMAND_ID` to one stable unique command identity. Run `node --experimental-strip-types scripts/add-snapshot.ts` with the same `REVIEW_DATA_DIR`. The utility builds source outside ingress, sends AddSnapshot without an owner credential; it prints only the receipt. An unchanged retry uses the same command ID. A rejected receipt is durable; correcting rejected input needs a new command ID. Inspect a stale expected-current conflict rather than overwriting automatically.
 
 The gateway independently reconstructs the manual manifest from local immutable Git objects before apply. Encoded JSON including metadata is limited to 8 MiB, distinct from per-read/source budgets. Unsupported schemes, forged IDs/content and unavailable required Git objects cannot admit new source. Exact already-retained snapshots and existing receipts remain idempotent when acquisition later becomes unavailable. This route has no provider discovery, import job UI or automatic source refresh.
 
@@ -104,7 +108,7 @@ The browser holds its selected snapshot while current advances. Explicit selecti
 
 ## Controlled browser review captures
 
-For an already running isolated candidate, `node --experimental-strip-types scripts/capture-review.ts` uses existing Chrome through the project Playwright dependency. Set private `REVIEW_DATA_DIR` and a unique external `REVIEW_CAPTURE_DIR`. The helper reads the login credential locally, signs in through actual React controls, captures the actual graph and its accessibility tree, and emits separate nonsecret candidate/target identity metadata. It does not reuse a personal browser session or imply native participant acceptance.
+For an already running isolated candidate, `node --experimental-strip-types scripts/capture-review.ts` uses existing Chrome through the project Playwright dependency. Set private `REVIEW_DATA_DIR` and a unique external `REVIEW_CAPTURE_DIR`. The helper opens a fresh credential-free browser, captures the actual graph and its accessibility tree, and emits separate nonsecret candidate/target identity metadata. It does not reuse a personal browser session or imply native participant acceptance.
 
 By default it captures only the graph before source drilldown. Optional `REVIEW_CAPTURE_PATH`, `REVIEW_CAPTURE_SIDE` and one-based `REVIEW_CAPTURE_START`/`REVIEW_CAPTURE_END` open a requested source through the actual UI and capture source identity and panes. `REVIEW_CAPTURE_FOCUS` selects a file in the complete index without opening source. `REVIEW_CAPTURE_CONTEXT`, `REVIEW_CAPTURE_SPANS` and `REVIEW_CAPTURE_UNRESOLVED` set to `1` expose those actual graph views. Root keeps separate diff/source captures and source-informed answer keys out of a fresh graph reviewer's first packet until its account is frozen. Artifact paths are operational evidence, never source-of-truth policy.
 
@@ -124,4 +128,4 @@ The semantic MCP transport exposes analysis_get, analysis_source_get and graph_c
 
 ### Imported review authorization handoff
 
-Opening an imported review through the actual React action must initialize both its review and semantic query authorization without a reload. Mounting the new review bridge and interval polling must preserve the explicit login request until its authoritative result is available. Verify the resulting semantic query carries the imported review and exact snapshot scope, then verify declaration preparation is enabled. This handoff check does not imply that acquisition, inventory or analysis will succeed within their independent limits.
+Opening an imported review through the actual React action must initialize both its review and semantic query scope without a reload. Mounting the new review bridge and interval polling must preserve the explicit workspace-open request until its authoritative result is available. Verify the resulting semantic query carries the imported review and exact snapshot scope without an owner credential, then verify declaration preparation is enabled. This handoff check does not imply that acquisition, inventory or analysis will succeed within their independent limits.

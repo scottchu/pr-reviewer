@@ -8,7 +8,7 @@
 
 **Schedule:** User-requested autonomous delivery through 1080p tonight (2026-10-23); report unfulfilled external/human gates honestly.
 
-**Authorization:** Bounded implementation, tests, agent review and PR delivery through slices 01–08; root coordinates standing merge/local-pilot authority. No new production hosting or authentication changes. Passkey is a known issue deferred to the last follow-up.
+**Authorization:** Bounded implementation, tests, agent review and PR delivery through slices 01–08; root coordinates standing merge/local-pilot authority. No new production hosting. The accepted 2026-10-24 single-owner correction removes manual login/token entry while preserving stored data, participant routing and network boundaries; see the [correction packet](480p/slices/01-review-loop/single-user-access/plan.md).
 
 ## Goal and current gap
 
@@ -108,4 +108,4 @@ All code must be tested, preferably through TDD. Each slice needs domain/interfa
 
 Use [delivery through 1080p](delivery-through-1080p.md) as the current execution contract. Slice 02 bootstraps actual graph review before continuation; slice 03 acquisition preparation can run in parallel under separate ownership. Both native hosts and human evaluation remain acceptance requirements without blocking unrelated engineering. TypeScript/TSX is the bounded initial 04 analysis scope; parser precision and target runner/comparison details are resolved in their committed packets, not inferred from current tests.
 
-Every new PR/MR follows [graph-first understanding review](../rules/graph-first-review.md), including any separate planning PR after a versioned bootstrap candidate exists. Passkey remains a known issue deferred to the last follow-up; preserve login and data now. 4K scope is provisional and outside the requested endpoint. The retained Playground prototype remains a read-only reference, never an application restoration source. Hosted agents, generalized ownership, remote workers and external PR posting remain deferred.
+Every new PR/MR follows [graph-first understanding review](../rules/graph-first-review.md), including any separate planning PR after a versioned bootstrap candidate exists. The single-owner access correction supersedes the former passkey/login follow-up; preserve data, credentials, exact-session routing and the existing network boundary. 4K scope is provisional and outside the requested endpoint. The retained Playground prototype remains a read-only reference, never an application restoration source. Hosted agents, generalized ownership, remote workers and external PR posting remain deferred.

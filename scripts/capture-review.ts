@@ -2,20 +2,18 @@ import { chromium } from '@playwright/test';
 import { readFileSync, mkdirSync, writeFileSync } from 'node:fs';
 import { join, resolve } from 'node:path';
 // Controlled real-browser evidence, not the user's personal browser session.
-// Runtime credentials are read locally and never written to capture artifacts.
+// The fresh browser opens the single-owner workspace without credentials.
 const root=process.env.REVIEW_DATA_DIR, output=process.env.REVIEW_CAPTURE_DIR;
 if(!root||!output)throw new Error('REVIEW_DATA_DIR and unique REVIEW_CAPTURE_DIR required');
 const runtime=JSON.parse(readFileSync(join(root,'runtime.json'),'utf8')) as {uiUrl:string;gatewayUrl:string;reviewId:string;sourceCommit:string;sourceDirty:boolean};
-const token=(JSON.parse(readFileSync(join(root,'local-user.json'),'utf8')) as {token:string}).token;
 mkdirSync(output,{recursive:true,mode:0o700});
 const browser=await chromium.launch({executablePath:'/Applications/Google Chrome.app/Contents/MacOS/Google Chrome',headless:true});
 try {
  const page=await browser.newPage({viewport:{width:1600,height:1200}});
  const targetUrl=new URL(runtime.uiUrl);targetUrl.searchParams.set("reviewId",runtime.reviewId);
  await page.goto(targetUrl.toString());
- await page.getByLabel('Local access token').fill(token);await page.getByRole('button',{name:'Open review'}).click();
  await page.locator('.react-flow__node').first().waitFor();
- const response=await fetch(`${runtime.gatewayUrl}/api/reviews/${encodeURIComponent(runtime.reviewId)}`,{headers:{Authorization:`Bearer ${token}`}});
+ const response=await fetch(`${runtime.gatewayUrl}/api/reviews/${encodeURIComponent(runtime.reviewId)}`);
  if(!response.ok)throw new Error(`authorized query ${response.status}`);
  const review=await response.json() as {snapshot:{snapshotId:string;prUrl:string;baseSha:string;headSha:string}};
  writeFileSync(join(output,'identity.json'),JSON.stringify({candidate:{sourceCommit:runtime.sourceCommit,dirty:runtime.sourceDirty,worktree:resolve('.')},target:{reviewId:runtime.reviewId,...Object.fromEntries(Object.entries(review.snapshot).filter(([key])=>['snapshotId','prUrl','baseSha','headSha'].includes(key)))}},null,2));

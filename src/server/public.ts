@@ -59,42 +59,45 @@ export const createGateway = (store: Store, notify: Notify, options:{importArtif
         return;
       }
       const authorization = req.headers.authorization;
-      if (!authorization?.startsWith("Bearer "))
+      if (authorization!==undefined&&!authorization.startsWith("Bearer "))
         throw new Error("unauthorized");
-      const principal = store.authenticate(authorization.slice(7));
+      // Network reachability is the established single-owner boundary. Explicit
+      // participant credentials never fall back to that owner's authority.
+      const access=authorization===undefined?store.localOwner:authorization.slice(7);
+      const principal = store.authenticate(access);
       const user = () => {
         if (principal.kind !== "user") throw new Error("unauthorized");
       };
       if(req.method==='POST'&&url.pathname==='/api/story/commands'){
         const command=storyCommandSchema.parse(await readBody(req));
-        send(res,200,store.story.command(authorization.slice(7),command));return;
+        send(res,200,store.story.command(access,command));return;
       }
       if(req.method==='GET'&&url.pathname==='/api/story'){
         const values=Object.fromEntries(url.searchParams);
-        send(res,200,store.story.query(authorization.slice(7),storyQuerySchema.parse({...values,...(values.minimumStoryRevision!==undefined?{minimumStoryRevision:Number(values.minimumStoryRevision)}:{}),...(values.minimumContextRevision!==undefined?{minimumContextRevision:Number(values.minimumContextRevision)}:{})})));return;
+        send(res,200,store.story.query(access,storyQuerySchema.parse({...values,...(values.minimumStoryRevision!==undefined?{minimumStoryRevision:Number(values.minimumStoryRevision)}:{}),...(values.minimumContextRevision!==undefined?{minimumContextRevision:Number(values.minimumContextRevision)}:{})})));return;
       }
       if(req.method==='GET'&&url.pathname==='/api/story/context'){
         const values=Object.fromEntries(url.searchParams);
-        send(res,200,store.story.context(authorization.slice(7),storyContextQuerySchema.parse({...values,...(values.contextRevision!==undefined?{contextRevision:Number(values.contextRevision)}:{})})));return;
+        send(res,200,store.story.context(access,storyContextQuerySchema.parse({...values,...(values.contextRevision!==undefined?{contextRevision:Number(values.contextRevision)}:{})})));return;
       }
       if(req.method==="POST"&&url.pathname==="/api/analysis/commands"){
         const input=analysisCommandSchema.parse(await readBody(req));
         if(input.type!=="PutGraphClarification")user();
-        const receipt=store.analysis.command(authorization.slice(7),input);
+        const receipt=store.analysis.command(access,input);
         if(receipt.state==="applied"&&input.type!=="PutGraphClarification")analysisRunner.wake();
         send(res,200,receipt);return;
       }
       if(req.method==="GET"&&url.pathname==="/api/analysis"){
         const values=Object.fromEntries(url.searchParams),query=analysisQuerySchema.parse({...values,...(values.minimumGraphRevision!==undefined?{minimumGraphRevision:Number(values.minimumGraphRevision)}:{}),...(values.minimumJobRevision!==undefined?{minimumJobRevision:Number(values.minimumJobRevision)}:{})});
-        send(res,200,store.analysis.query(authorization.slice(7),query));return;
+        send(res,200,store.analysis.query(access,query));return;
       }
       if(req.method==="POST"&&url.pathname==="/api/analysis/source"){
-        send(res,200,store.analysis.source(authorization.slice(7),semanticSourceQuerySchema.parse(await readBody(req))));return;
+        send(res,200,store.analysis.source(access,semanticSourceQuerySchema.parse(await readBody(req))));return;
       }
-      if(req.method==="GET"&&url.pathname==="/api/imports"){user();send(res,200,store.imports.list(authorization.slice(7)));return;}
+      if(req.method==="GET"&&url.pathname==="/api/imports"){user();send(res,200,store.imports.list(access));return;}
       if(req.method==="POST"&&url.pathname==="/api/imports/commands"){
         user();if(!importRunner)throw new Error("source_unavailable");
-        const receipt=store.imports.command(authorization.slice(7),importCommandSchema.parse(await readBody(req)));
+        const receipt=store.imports.command(access,importCommandSchema.parse(await readBody(req)));
         if(receipt.state==="applied")importRunner.wake();send(res,200,receipt);return;
       }
       if (req.method === "GET" && url.pathname === "/api/reviews") {

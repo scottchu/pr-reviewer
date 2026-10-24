@@ -1,7 +1,6 @@
 import {createImportArtifacts} from "../src/import-artifacts/public.ts";
 import { execFileSync, spawn } from "node:child_process";
 import type { ChildProcess } from "node:child_process";
-import { readFileSync, existsSync } from "node:fs";
 import { randomUUID } from "node:crypto";
 import { createStore } from "../src/storage/public.ts";
 import { createGateway } from "../src/server/public.ts";
@@ -25,15 +24,6 @@ const uiPort = port("REVIEW_UI_PORT", 5184),
 if (uiPort === gatewayPort) throw new Error("UI and gateway ports must differ");
 const store = createStore(paths.database);
 store.recover();
-let token: string;
-if (existsSync(paths.user)) {
-  token = (JSON.parse(readFileSync(paths.user, "utf8")) as { token: string })
-    .token;
-  store.authenticate(token);
-} else {
-  token = store.issueUser();
-  writePrivate(paths.user, { token });
-}
 const gateway = createGateway(
   store,
   createCliNotifier({
@@ -59,7 +49,6 @@ const manifest: Runtime = {
   gatewayUrl: `http://127.0.0.1:${gatewayPort}`,
   uiUrl: `http://127.0.0.1:${uiPort}/?reviewId=${reviewId}`,
   reviewId,
-  userCredentialRef: paths.user,
   sourceCommit: execFileSync("git", ["rev-parse", "HEAD"], {
     encoding: "utf8",
   }).trim(),
@@ -120,7 +109,7 @@ try {
   if (!response.ok) throw new Error("gateway health failed");
   writePrivate(paths.runtime, manifest);
   console.log(
-    `PR Reviewer ${manifest.uiUrl}\nRuntime manifest: ${paths.runtime}\nLocal login credential reference: ${paths.user}`,
+    `PR Reviewer ${manifest.uiUrl}\nRuntime manifest: ${paths.runtime}`,
   );
   process.on("SIGTERM", () => {
     void shutdown().then(() => process.exit(0));

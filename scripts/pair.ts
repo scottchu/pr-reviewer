@@ -8,9 +8,6 @@ const root = dataRoot();
 const runtime = JSON.parse(
   readFileSync(files(root).runtime, "utf8"),
 ) as Runtime;
-const user = JSON.parse(readFileSync(runtime.userCredentialRef, "utf8")) as {
-  token: string;
-};
 const host = process.env.REVIEW_HOST ?? "codex";
 if (host !== "codex" && host !== "claude")
   throw new Error("REVIEW_HOST must be codex or claude");
@@ -61,7 +58,6 @@ const request = async (path: string, body: unknown) => {
   const response = await fetch(`${runtime.gatewayUrl}${path}`, {
     method: "POST",
     headers: {
-      Authorization: `Bearer ${user.token}`,
       "Content-Type": "application/json",
     },
     body: JSON.stringify(body),

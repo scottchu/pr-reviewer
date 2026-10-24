@@ -94,9 +94,14 @@ const App = () => {
   const storyFocus=storyProjection(storyState),activeDraft=storyState.drafts.find(draft=>draft.id===storyState.activeDraftId);
   const selected=activeDraft?.anchor??null,draft=activeDraft?.text??'',comparisonKey=activeDraft?.comparisonKey,parentQuestionId=activeDraft?.parentQuestionId;
   const state=useSyncExternalStore(bridge.subscribe,bridge.getSnapshot);
-  const [credential,setCredential]=useState(''),[onlySelectedDiscussion,setOnlySelectedDiscussion]=useState(false),[interactionError,setInteractionError]=useState('');
+  const [onlySelectedDiscussion,setOnlySelectedDiscussion]=useState(false),[interactionError,setInteractionError]=useState('');
   const act=(action:()=>unknown)=>{try{const result=action();if(result instanceof Promise)void result.catch(error=>setInteractionError(error instanceof Error?error.message:'interaction_failed'));setInteractionError('');}catch(error){setInteractionError(error instanceof Error?error.message:'interaction_failed');}};
-  useEffect(()=>workspace.connect(),[workspace]);
+  useEffect(()=>{
+    const disconnect=workspace.connect();
+    void workspace.open().catch(error=>setInteractionError(error instanceof Error?error.message:'workspace_unavailable'));
+    return disconnect;
+  },[workspace]);
+  useEffect(()=>{void importsBridge.open();},[importsBridge]);
   useEffect(()=>{const current=state.review;if(!state.authenticated||!current)return;const url=new URL(window.location.href);url.searchParams.set('reviewId',current.reviewId);url.searchParams.set('snapshotId',current.snapshot.snapshotId);window.history.replaceState(null,'',url);},[state.authenticated,state.review?.reviewId,state.review?.snapshot.snapshotId]);
   useEffect(()=>{const scroll=()=>storyBridge.setPageScroll(window.scrollY);window.addEventListener('scroll',scroll,{passive:true});return()=>window.removeEventListener('scroll',scroll);},[storyBridge]);
   useEffect(()=>{if(storyState.mapRestoreId)requestAnimationFrame(()=>window.scrollTo({top:storyState.pageScroll}));},[storyBridge,storyState.mapRestoreId]);
@@ -105,30 +110,10 @@ const App = () => {
   const review=state.review;
   if (!state.authenticated || !review)
     return (
-      <main className="login">
+      <main className="workspace-loading">
         <p className="eyebrow">Local review workspace</p>
         <h1>PR Reviewer</h1>
-        <p>
-          Open the local-user credential reference printed by the runtime. Enter
-          its token to access this task’s review.
-        </p>
-        <form
-          onSubmit={(event) => {
-            event.preventDefault();
-            act(()=>workspace.login(credential));void importsBridge.login(credential);
-          }}
-        >
-          <label htmlFor="credential">Local access token</label>
-          <input
-            id="credential"
-            type="password"
-            autoComplete="off"
-            value={credential}
-            onChange={(e) => setCredential(e.target.value)}
-          />
-          <button>Open review</button>
-        </form>
-        {state.error && <p role="alert">{state.error}</p>}
+        {state.error ? <><p role="alert">{state.error}</p><button onClick={()=>act(()=>workspace.open())}>Retry opening workspace</button></> : <p role="status">Opening review…</p>}
       </main>
     );
   const attachment = review.attachment;
@@ -144,7 +129,7 @@ const App = () => {
   return (
     <main>
       <Imports bridge={importsBridge} review={review} canOpen={workspace.canLeaveReview()} onOpen={reviewId=>{
-        if(!workspace.canLeaveReview())return;const next=createReviewWorkspace(reviewId);workspace.logout();setWorkspace(next);act(()=>next.login(credential));
+        if(!workspace.canLeaveReview())return;const next=createReviewWorkspace(reviewId);workspace.logout();setWorkspace(next);
         const url=new URL(window.location.href);url.searchParams.set('reviewId',reviewId);url.searchParams.delete('snapshotId');url.hash='';window.history.replaceState(null,'',url);
       }}/>
       <header className="identity">
@@ -196,7 +181,6 @@ const App = () => {
       {state.selecting&&<p role="status">Opening the selected snapshot. Question composition is held until its source is ready.</p>}
       {interactionError&&<p role="alert">{interactionError}</p>}
       {state.recovery.state!=='none'&&<section className="question-recovery" aria-label="Question recovery"><h2>Unresolved question</h2><p role="status">{state.recovery.message}</p>{state.recovery.commandId&&<p>Original source: {state.recovery.snapshotId} · saved command {state.recovery.commandId}</p>}{['awaiting_ack','accepted_awaiting_readback','storage_unavailable'].includes(state.recovery.state)&&<button disabled={state.busy} onClick={()=>act(()=>bridge.recoverPendingQuestion())}>Recover saved question</button>}</section>}
-      <button type="button" className="quiet" onClick={()=>{workspace.logout();setCredential('');}}>Log out</button>
       <StoryPanel key={`story:${review.reviewId}`} bridge={storyBridge}/>
       <div onFocusCapture={pauseStory} onPointerDownCapture={pauseStory} onScrollCapture={pauseStory}><SemanticPanel key={`semantic:${review.reviewId}`} bridge={analysisBridge} onGraphState={captureSemantic} graphRestore={storyState.maps.semantic?{id:storyState.mapRestoreId,frame:storyState.maps.semantic}:undefined}/></div>
       {state.graph && <div onFocusCapture={pauseStory} onPointerDownCapture={pauseStory}><ReviewGraph graph={state.graph} selectedPath={storyFocus?.sources[0]?.reference.anchor.path??selected?.path??""} selectedFileKey={storyFocus?.comparisonKey??comparisonKey} storyFocus={storyFocus?.graphFocus} onStateChange={captureStructural} restore={storyState.maps.structural?{id:storyState.mapRestoreId,frame:storyState.maps.structural}:undefined} onOpen={openSource}/></div>}

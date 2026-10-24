@@ -36,6 +36,12 @@ test(
       ) as { status: string; pid: number };
       assert.equal(manifest.status, "running");
       assert.equal(manifest.pid, child.pid);
+      assert.equal(existsSync(join(root,'local-user.json')),false,'startup does not create a human credential');
+      assert.equal('userCredentialRef' in manifest,false);
+      assert.equal((await fetch('http://127.0.0.1:5485/api/reviews')).status,200);
+      const {get}=await import('node:http');
+      const hostStatus=await new Promise<number|undefined>((resolve,reject)=>{get('http://127.0.0.1:5484/',{headers:{Host:'untrusted.example.invalid'}},response=>{response.resume();resolve(response.statusCode);}).on('error',reject);});
+      assert.equal(hostStatus,403);
       assert.throws(() =>
         execFileSync(process.execPath, ["scripts/dev.ts"], {
           env: { ...env, REVIEW_DATA_DIR: other },
@@ -79,6 +85,20 @@ test(
       assert.equal(stopped.status, "stopped");
       assert.ok(existsSync(join(root, "review.sqlite")));
       assert.ok(!existsSync(join(root, "runtime.lock")));
+      // Existing legacy credentials are preserved but are no longer a startup prerequisite.
+      const legacy='{"token":"retained-legacy-value"}\n';
+      writeFileSync(join(root,'local-user.json'),legacy,{mode:0o600});
+      const restarted=spawn(process.execPath,['scripts/dev.ts'],{env,stdio:'ignore'});
+      try{
+        let running=false;
+        for(let i=0;i<100;i++){if(restarted.exitCode!==null)break;const current=JSON.parse(readFileSync(join(root,'runtime.json'),'utf8')) as {status:string;pid:number};if(current.status==='running'&&current.pid===restarted.pid){running=true;break;}await delay(50);}
+        assert.equal(running,true,'restart must not authenticate the legacy owner credential');
+        assert.equal(readFileSync(join(root,'local-user.json'),'utf8'),legacy);
+        assert.equal((await fetch('http://127.0.0.1:5485/api/reviews')).status,200);
+        execFileSync(process.execPath,['scripts/stop.ts'],{env,stdio:'pipe'});
+        for(let i=0;i<100&&restarted.exitCode===null;i++)await delay(25);
+        assert.equal(restarted.exitCode,0);
+      }finally{if(restarted.exitCode===null)restarted.kill('SIGTERM');}
     } finally {
       if (child.exitCode === null) child.kill("SIGTERM");
       rmSync(root, { recursive: true, force: true });

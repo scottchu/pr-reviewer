@@ -113,3 +113,7 @@ The assigned implementer releases sole product/code writer ownership to root aft
 ## Current successor sequencing amendment
 
 The [autonomous execution plan](../../../delivery-through-1080p.md#sequencing-amendment-and-readiness) replaces the former blanket slice02 implementation block. Independently accepted immutable-source/receipt/storage/inbox interfaces may support bounded history and graph engineering while actual native-host, own-PR and unfamiliar-human gates stay open. Historical review receipts retain their original disposition; this amendment changes future sequencing, not past evidence. Slice02's current packet records ready/blocked capabilities and must reconcile actual changes before integration.
+
+## Single-user access correction
+
+The accepted 2026-10-24 correction removes manual owner login/token entry while retaining participant routing and the existing network boundary. See the versioned [implementation and review packet](single-user-access/plan.md). Earlier login/passkey requirements are superseded for this single-user runtime; prior evidence remains historical.
