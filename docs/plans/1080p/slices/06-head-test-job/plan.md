@@ -154,3 +154,9 @@ The original3191ebc packet is preserved with two P2 design findings. [Revision5]
 Delivered05E7b6dc0330a1532184c061cd69ace5d2c219b9836 preserves independently READY code882 and qualified whole-product knowledge. Task merge10bc29e09efbf6ee0433ef4ad527af73d4e5fec3 preserves06A db035; [execution revision6](execution-06b.md#revision6-delivered05e-and-preserved-q4-review) records the exact merge/conflict and evidence limits. The [durable dependency](../../../../product/review-loop/test-execution.md#delivered-process-evidence-dependency-05e) requires truthful journal identity, explicit pre-spawn proof, conservative legacy/missing-journal recovery, fresh group-absence checks and store minimum validation without replay. Q4 revision5 review and its two corrected witness/data-channel findings retain their exact original pins.
 
 [I6 names B1](execution-06b.md#i6-named-b1-implementation-assignment) with fixed scope, task roots, source/runtime inputs and first combined regression checks; root consumes narrow independent reconciliation review before implementation. B2/B3 remain unassigned. Root reports actual af39 D6 accepted and D7 PASS, but the corrected05E new-head own-PR gate remains pending. This independent preparation does not pass full G1 or accept06.
+
+## B3 credential-free owner CLI assignment
+
+Status: root accepted bounded B1 backend gate; CLI engineering assigned, integrated gateway/React acceptance remains open.
+
+Consume [B3 implementation and independent-review handoff](cli-06b.md), based on clean `e9f107d` and the latest single-local-owner decision. Historical B1 qualification and engineering evidence remain pinned; they do not establish auth integration or CLI product acceptance.
