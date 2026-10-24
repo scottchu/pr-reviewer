@@ -53,3 +53,10 @@ Status: root instructed this executor to pause new UI composition/visual polish.
 The final experience must keep everything in one canvas; zoom/focused lens reveals inline diff/code while graph context remains. A separate file inspector/standalone panel is not accepted final UX. Preserve the existing provisional HeadTests panel, actual fixture journey/screenshots and application bridge for reconciliation. Continue independent application/domain checks only; root owns revised mocks/spec and reauthorization of composition. This correction supersedes the section-based presentation above, without discarding durable command/recovery/byte-port work.
 
 [Paused application checkpoint](checkpoint-ui-06b.md) pins delivered source, actual tests, superseded UI evidence, open gates and recovery.
+
+## B2.3 same-canvas dependency reconciliation
+
+Date: 2026-10-24
+Status: docs-only reconciliation; no production composition resumed.
+
+Root dispatched a separate isolated unified-canvas preview from committed c9230830fddbe0624132eee8423beb2c546d71c1. Its owning05 packet is canvas-reading-mockup.md plus canvas-preview-implementation.md. Future B2 presentation must place configured target/job/result/output context in that same graph-connected canvas, with inline diff/code and exact return; preserve current application/recovery ports as inputs. The retained standalone panel and5-case fixture browser receipt are superseded composition evidence, not user layout adoption. Wait for the inspectable preview and root/user feedback before deriving production UI. No test execution, backend, source or application files change in this reconciliation.

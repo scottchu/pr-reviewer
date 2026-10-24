@@ -40,3 +40,11 @@ Status: UI composition and visual polish paused after the user required a unifie
 The bridge uses the shared browser-safe response codecs from the domain public interface. It additionally verifies all canonical result identity fields and SHA256 over the canonical result body. Complete viewed artifacts receive a SHA256 check over the original assembled bytes before final text publication. The display cap is 1MiB, including source-evidence artifacts that may be larger; reaching the cap is explicit and does not claim complete artifact inspection.
 
 Test-intent storage has its own origin/review/access-scope key and versioned record. The normal local owner uses a stable nonsecret scope; explicit existing legacy access uses its fingerprint and explicit Authorization, with no fallback to local-owner authority. Access fingerprinting cannot delay or reorder the existing review login request. Workspace review-scope-to-head-test-view and bridge head-test-committed-to-authorized-view routes own scope propagation/polling. The bridge uses separate request, selected-job and artifact abort slots with a 10-second default request bound; polling is 500ms by default and creates no mutation. Replacing scope preserves pending original intent while clearing visible history/artifacts.
+
+## Same-canvas reconciliation before future composition
+
+Date: 2026-10-24
+Accepted correction source: c9230830fddbe0624132eee8423beb2c546d71c1, docs/product/review-loop/canvas-reading.md (root-owned contract, not yet merged into this B2 tree).
+Status: accepted direction; inspectable canvas preview and concrete layout adoption required before production composition.
+
+Target availability, durable test job/result identity, output and question context must be graph-connected presentations inside the same canvas. Zoom/focused lenses reveal inline diff/code while preserving neighborhood and exact return. A separate test panel or file inspector cannot become the primary reading/evidence destination. Reuse the retained B2 application bridge and recovery boundaries only after that preview is reviewed; these engineering ports do not imply adoption of the standalone HeadTests component or its main.tsx placement. No live test result may be invented to fill the mockup.
