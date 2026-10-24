@@ -3,13 +3,13 @@ import type {DatabaseSync} from 'node:sqlite';
 import {z} from 'zod';
 import {headTestCanonical,processQuiescenceEligible,HEAD_TEST_DEFINITION_DIGEST} from '../domain/public.ts';
 import type {HeadTestJob,Principal,Review} from '../domain/public.ts';
-import {isHeadTestQuiescence,isHeadTestProcessQuiescence,readHeadTestQuiescence} from '../test-jobs/public.ts';
-import type {HeadTestQuiescenceWitness} from '../test-jobs/public.ts';
+import {isHeadTestQuiescence,isHeadTestProcessQuiescence,readHeadTestQuiescence,isHeadTestPreparation,inspectHeadTestPreparation} from '../test-jobs/public.ts';
+import type {HeadTestQuiescenceWitness,HeadTestPreparationWitness,HeadTestQualification} from '../test-jobs/public.ts';
 import type {ExecutionLease} from './execution.ts';
 import type {HeadTestOwner,HeadTestGrant,HeadTestJournal,HeadTestProcess,HeadTestStoredJob as Job,HeadTestPrivateInvocation} from './head-test-contracts.ts';
 const processSchema=z.object({ordinal:z.number().int().min(1).max(34),role:z.enum(['git_prepare','runtime_version','test_root']),state:z.enum(['requested','started','exited']),intentDigest:z.string().regex(/^[a-f0-9]{64}$/),inputCount:z.number().int().min(0).max(8192),inputBytes:z.number().int().min(0).max(8192*65),pid:z.number().int().positive().max(Number.MAX_SAFE_INTEGER).optional(),startIdentity:z.string().min(1).max(1024).optional(),spawnDisposition:z.literal('not_spawned').optional(),exitCode:z.number().int().nullable().optional(),signal:z.string().max(64).nullable().optional()}).strict();
-type Ports=Readonly<{db:DatabaseSync;tx:<T>(operation:()=>T)=>T;execution:ExecutionLease;rows:()=>readonly {job:Job}[];get:(id:string)=>Job;put:(job:Job)=>unknown;publicJob:(job:Job)=>HeadTestJob;load:(id:string)=>Review;authorize:(principal:Principal,review:Review)=>void;fixtureExecution:boolean}>;
-export const createHeadTestOwnerStore=({db,tx,execution,rows,get,put,publicJob,load,authorize,fixtureExecution}:Ports)=>{
+type Ports=Readonly<{db:DatabaseSync;tx:<T>(operation:()=>T)=>T;execution:ExecutionLease;rows:()=>readonly {job:Job}[];get:(id:string)=>Job;put:(job:Job)=>unknown;publicJob:(job:Job)=>HeadTestJob;load:(id:string)=>Review;authorize:(principal:Principal,review:Review)=>void;fixtureExecution:boolean;configuration:Readonly<{qualification:HeadTestQualification;qualificationId:string;repository:string;donor:string}>|null}>;
+export const createHeadTestOwnerStore=({db,tx,execution,rows,get,put,publicJob,load,authorize,fixtureExecution,configuration}:Ports)=>{
  db.exec('CREATE TABLE IF NOT EXISTS test_owner(id INTEGER PRIMARY KEY CHECK(id=1),generation TEXT NOT NULL)');
  const owners=new WeakMap<object,string>(),grants=new WeakMap<object,{generation:string;jobId:string;invocationId:string}>();
  const generation=()=> (db.prepare('SELECT generation FROM test_owner WHERE id=1').get() as {generation:string}|undefined)?.generation;
@@ -18,6 +18,7 @@ export const createHeadTestOwnerStore=({db,tx,execution,rows,get,put,publicJob,l
  const credential=(job:Job)=>{const row=db.prepare('SELECT body FROM credentials WHERE hash=?').get(job.credentialReference) as {body:string}|undefined;if(!row)throw new Error('unauthorized');const principal=JSON.parse(row.body) as Principal,review=load(job.reviewId);authorize(principal,review);if(principal.kind!=='user'||principal.actorId!==job.actorId)throw new Error('unauthorized');const snapshot=(review.snapshots??[review.snapshot]).find(item=>item.snapshotId===job.snapshotId);if(!snapshot||snapshot.headSha!==job.headSha||snapshot.repository!==job.repository)throw new Error('source_unavailable');};
  const active=(job:Job)=>{credential(job);if(job.cancellation)throw new Error('test_cancelled');if(job.stopReason)throw new Error('test_stopped');};
  const update=(job:Job)=>{const next={...job,jobRevision:job.jobRevision+1,updatedAt:new Date().toISOString()};put(next);return next;};
+ const unclaimed=(job:Job,state:'unavailable'|'error',reason:string)=>{const next={...job,state,reason,reservedBytes:0};return update({...next,retainedBytes:Buffer.byteLength(headTestCanonical(publicJob(next)))});};
  const changeInvocation=(job:Job,invocation:HeadTestPrivateInvocation)=>({...job,invocations:job.invocations.map(item=>item.invocationId===invocation.invocationId?invocation:item)});
  const unknownJob=(job:Job,reason:string)=>update({...job,state:'unknown',reason,effectDisposition:'unresolved',invocations:job.invocations.map(item=>item.state==='running'?{...item,state:'unknown',quiescence:'unresolved'}:item)});
  const journal=(job:Job):HeadTestJournal=>({jobId:job.jobId,jobRevision:job.jobRevision,invocation:structuredClone(job.invocations.at(-1)!)});
@@ -26,12 +27,22 @@ export const createHeadTestOwnerStore=({db,tx,execution,rows,get,put,publicJob,l
   claim:(value:HeadTestOwner):{job:HeadTestJob;grant:HeadTestGrant}|null=>tx(()=>{
    const id=owner(value);
    for(const {job} of rows()){
-    if(job.state!=='queued'||job.provenance!=='test_only_execution'||!fixtureExecution)continue;
-    try{active(job);if(job.target.digest!==HEAD_TEST_DEFINITION_DIGEST)throw new Error('test_target_conflict');}catch(error){update({...job,state:'error',reason:error instanceof Error?error.message:'unauthorized',reservedBytes:0});continue;}
+    if(job.state!=='queued'||job.provenance==='test_only_configuration'||job.provenance==='test_only_execution'&&!fixtureExecution)continue;
+    if(job.provenance==='qualified_local_configuration'&&(!configuration||configuration.qualificationId!==job.qualificationId||configuration.qualification.headSha!==job.headSha)){unclaimed(job,'unavailable','qualification_required');continue;}
+    try{active(job);if(job.target.digest!==HEAD_TEST_DEFINITION_DIGEST)throw new Error('test_target_conflict');}catch(error){unclaimed(job,'error',error instanceof Error?error.message:'unauthorized');continue;}
     const invocation:HeadTestPrivateInvocation={invocationId:randomUUID(),phase:'prepare',state:'running',quiescence:'unresolved',processJournalVersion:1,processes:[],filesystemRoots:[]};
     if(!execution.acquire({kind:'test',jobId:job.jobId,invocationId:invocation.invocationId,phase:'prepare'}))return null;
     const next=update({...job,state:'preparing',effectDisposition:'unresolved',invocations:[...job.invocations,invocation]});const token=Object.freeze({}) as HeadTestGrant;grants.set(token,{generation:id,jobId:job.jobId,invocationId:invocation.invocationId});return {job:publicJob(next),grant:token};
    }return null;
+  }),
+  input:(value:HeadTestGrant)=>{const {job,invocation}=grant(value);return {job:publicJob(job),invocationId:invocation.invocationId};},
+  resolveHeadTestSource:(value:HeadTestGrant)=>{const {job}=grant(value);active(job);if(job.provenance==='test_only_execution')return null;if(!configuration||job.qualificationId!==configuration.qualificationId||job.headSha!==configuration.qualification.headSha)throw new Error('qualification_required');return structuredClone(configuration);},
+  registerRoot:(value:HeadTestGrant)=>tx(()=>{const {job,invocation}=grant(value);active(job);if(invocation.phase!=='prepare'||invocation.filesystemRoots?.length!==0)throw new Error('test_preparation_conflict');const rootId=randomUUID();update(changeInvocation(job,{...invocation,filesystemRoots:[rootId]}));return rootId;}),
+  prepared:(value:HeadTestGrant,witness:HeadTestPreparationWitness)=>tx(()=>{
+   const {job,invocation}=grant(value);active(job);if(invocation.phase!=='prepare'||!isHeadTestPreparation(witness,publicJob(job),invocation.invocationId,invocation.filesystemRoots??[],journal(job)))throw new Error('invalid_test_witness');
+   const prepared=inspectHeadTestPreparation(witness);if(!invocation.processes||invocation.processes.some(item=>item.state!=='exited'||!processQuiescenceEligible(item)))throw new Error('test_process_unresolved');
+   execution.advance({kind:'test',jobId:job.jobId,invocationId:invocation.invocationId,phase:'prepare'},'execute');
+   return publicJob(update({...changeInvocation(job,{...invocation,phase:'execute'}),preparation:{sourceManifestId:prepared.source.sourceManifestId,closureManifestId:prepared.closure.closureManifestId,sourceAccountId:prepared.account.sourceAccountId,treeId:prepared.source.manifest.treeId,runtimeSha256:prepared.runtimeSha256}}));
   }),
   control:(value:HeadTestGrant)=>{const {job}=grant(value);let authorized=true;try{credential(job);}catch{authorized=false;}return {jobId:job.jobId,jobRevision:job.jobRevision,cancelled:job.cancellation!==null,authorized,stopReason:job.stopReason??null};},
   recordStop:(value:HeadTestGrant,reason:string)=>tx(()=>{const {job}=grant(value);if(!/^[a-z][a-z0-9_]{0,63}$/.test(reason))throw new Error('invalid_test_reason');if(!job.stopReason)update({...job,stopReason:reason});}),
@@ -55,7 +66,7 @@ export const createHeadTestOwnerStore=({db,tx,execution,rows,get,put,publicJob,l
      if(observation.state==='started'&&(observation.pid===undefined||observation.exitCode!==undefined||observation.spawnDisposition!==undefined))throw new Error('invalid_test_observation');
      if(observation.spawnDisposition!==undefined&&(!processQuiescenceEligible(observation)||old.state!=='requested'||old.pid!==undefined||old.startIdentity!==undefined))throw new Error('invalid_test_observation');
     }
-    const next=old?processes.map(item=>item.ordinal===old.ordinal?{...item,...observation,observationDigest}:item):[...processes,{...observation,observationDigest}];update(changeInvocation(job,{...invocation,processes:next}));return {disposition:'recorded' as const};
+    const next=old?processes.map(item=>item.ordinal===old.ordinal?{...item,...observation,observationDigest}:item):[...processes,{...observation,observationDigest}];update({...changeInvocation(job,{...invocation,processes:next}),...(observation.role==='test_root'&&observation.state==='started'&&job.state==='preparing'?{state:'running' as const}:{})});return {disposition:'recorded' as const};
    });
   },
   markUnknown:(value:HeadTestGrant,reason:string)=>tx(()=>{const {job}=grant(value);if(!/^[a-z][a-z0-9_]{0,63}$/.test(reason))throw new Error('invalid_test_reason');unknownJob(job,reason);}),

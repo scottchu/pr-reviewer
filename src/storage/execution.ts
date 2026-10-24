@@ -41,6 +41,7 @@ export const createExecutionLease = (db: DatabaseSync) => {
         assertCurrent: check,
         acquire: (next: Occupant) => { check(); if (occupant() || unresolved())
             return false; db.prepare("INSERT INTO execution_lease VALUES (1,?)").run(JSON.stringify(next)); return true; },
+        advance: (expected: Occupant, phase: string) => { check(); const current=occupant(); if(!current||JSON.stringify(current)!==JSON.stringify(expected))throw new Error('execution_lease_conflict'); db.prepare('UPDATE execution_lease SET body=? WHERE id=1').run(JSON.stringify({...current,phase})); },
         retain: (next: Occupant) => { check(); if (!occupant())
             db.prepare("INSERT INTO execution_lease VALUES (1,?)").run(JSON.stringify(next)); },
         release: (expected: Occupant) => { check(); const current = occupant(); if (!current || JSON.stringify(current) !== JSON.stringify(expected))

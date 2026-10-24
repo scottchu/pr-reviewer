@@ -56,3 +56,4 @@ export const copyHeadTestClosure=async({source,donor,check}:{source:string;donor
  if(!sourcePackage.equals(await regular(join(source,'package.json'),1024*1024,check))||!donorPackage.equals(await regular(join(donor,'package.json'),1024*1024,check))||!sourceLock.equals(await regular(join(source,'bun.lock'),8*1024*1024,check))||!donorLock.equals(await regular(join(donor,'bun.lock'),8*1024*1024,check)))throw new Error('environment_changed');
  const manifest={schema:'head-closure-v1' as const,packages};return {manifest,closureManifestId:headDigest(headTestCanonical(manifest)),metadata};
 };
+export const readHeadRegular=regular;

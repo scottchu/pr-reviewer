@@ -135,3 +135,7 @@ Independent report `/tmp/pr-reviewer-06-plan-review/review-692dbca.md`, SHA-256 
 ## B1 materialization progress
 
 [Bounded preparation components](checkpoint-06b-preparation.md) now have source/closure/Git process regression evidence and a separate exact17b local preparation observation. They do not yet create production qualification/preparation witnesses or result/artifact consumer ports; those remain the next B1 work. The owner checkpoint's independent P2 closure keeps its17b pin.
+
+## B1 qualification and prepared transition progress
+
+[Exact qualification/prepared checkpoint](checkpoint-06b-qualification.md) adds private witness/configuration construction and same-lease transition with34 bounded checks and an exact2bd prerequisite qualification observation. Full result/artifact/coordinator and B2/B3 consumer readiness remain pending.

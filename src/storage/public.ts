@@ -1,4 +1,4 @@
-import {createHeadTestStore} from "./head-tests.ts";
+import {createHeadTestStore,validateHeadTestOptions} from "./head-tests.ts";
 import type {HeadTestOptions} from "./head-tests.ts";
 import {createStoryStore} from './story.ts';
 import type {StoryLimits} from './story.ts';
@@ -40,6 +40,7 @@ type Connection = {
   corroborated: boolean;
 };
 export const createStore = (filename: string,options:{importLimits?:ImportLimits;analysisLimits?:AnalysisLimits;storyLimits?:StoryLimits;testOptions?:HeadTestOptions}={}) => {
+  validateHeadTestOptions(options.testOptions);
   const db = new DatabaseSync(filename);
   db.exec(
     "PRAGMA busy_timeout=3000; PRAGMA foreign_keys=ON; PRAGMA journal_mode=WAL; CREATE TABLE IF NOT EXISTS reviews(id TEXT PRIMARY KEY, body TEXT NOT NULL); CREATE TABLE IF NOT EXISTS receipts(id TEXT PRIMARY KEY, actor TEXT NOT NULL, fingerprint TEXT NOT NULL, body TEXT NOT NULL); CREATE TABLE IF NOT EXISTS credentials(hash TEXT PRIMARY KEY, body TEXT NOT NULL); CREATE TABLE IF NOT EXISTS challenges(id TEXT PRIMARY KEY, body TEXT NOT NULL); CREATE TABLE IF NOT EXISTS preparation_inputs(review_id TEXT PRIMARY KEY REFERENCES reviews(id), body TEXT NOT NULL); CREATE TABLE IF NOT EXISTS review_import_identities(review_id TEXT PRIMARY KEY REFERENCES reviews(id),provider TEXT NOT NULL,host TEXT NOT NULL,target_project TEXT NOT NULL,change_number INTEGER NOT NULL,current_snapshot_id TEXT NOT NULL);",

@@ -77,12 +77,12 @@ export type HeadTestCommand = z.infer<typeof headTestCommandSchema>;
 export type HeadTestScope = z.infer<typeof headTestScopeSchema>;
 export type HeadTestQuery = z.infer<typeof headTestQuerySchema>;
 export type HeadTestTarget = Readonly<{targetId: string; revision: number; digest: string; definition: HeadTestDefinition}>;
-export type HeadTestTargets = Readonly<HeadTestScope & {headSha: string; targets: readonly (HeadTestTarget & {availability: "available" | "unavailable"; reason: "test_only_configuration" | "execution_not_configured" | "repository_not_configured"})[]}>;
+export type HeadTestTargets = Readonly<HeadTestScope & {headSha: string; targets: readonly (HeadTestTarget & {availability: "available" | "unavailable"; reason: "test_only_configuration" | "execution_not_configured" | "repository_not_configured" | "qualification_required" | "qualified_local_configuration" | "test_only_execution"})[]}>;
 export type HeadTestInvocation = Readonly<{invocationId: string; phase: "prepare" | "execute"; state: "running" | "unknown" | "completed"; quiescence: "unresolved" | "confirmed"; processCount?: number}>;
 export type HeadTestJob = Readonly<{
   schema: "head-test-job-v1"; jobId: string; reviewId: string; snapshotId: string;
   repository: string; sourceProject: string; baseSha: string; headSha: string;
-  actorId: string; target: HeadTestTarget; provenance: "test_only_configuration" | "test_only_execution";
+  actorId: string; target: HeadTestTarget; provenance: "test_only_configuration" | "test_only_execution" | "qualified_local_configuration"; qualificationId?: string; preparation?: Readonly<{sourceManifestId:string;closureManifestId:string;sourceAccountId:string;treeId:string;runtimeSha256:string}>;
   createdAt: string; updatedAt: string; jobRevision: number;
   state: "queued" | "preparing" | "running" | "cancel_requested" | "cancelled" | "passed" | "failed" | "timed_out" | "unavailable" | "error" | "unknown";
   reason: string | null; effectDisposition: "none" | "unresolved" | "quiescent";

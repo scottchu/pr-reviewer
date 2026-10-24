@@ -1,3 +1,5 @@
+import {readHeadTestConfiguration} from '../test-jobs/public.ts';
+import type {HeadTestConfiguration} from '../test-jobs/public.ts';
 import {createHeadTestOwnerStore} from './head-test-owner.ts';
 import type {HeadTestStoredJob as StoredJob} from './head-test-contracts.ts';
 import {createHash, randomUUID} from 'node:crypto';
@@ -6,7 +8,7 @@ import {headTestEffectOccupiesSlot, headTestCanonical, headTestCommandSchema, he
 import type {HeadTestCommand, HeadTestJob, HeadTestQuery, HeadTestReceipt, HeadTestScope, HeadTestTargets, HeadTestTarget, HeadTestView, Principal, Review, Snapshot} from '../domain/public.ts';
 import type {ExecutionLease} from './execution.ts';
 
-export type HeadTestOptions = Readonly<{testOnlyAvailable?: true; testOnlyExecution?: true; maxPending?: number; maxJobsPerReview?: number; maxRetainedBytes?: number}>;
+export type HeadTestOptions = Readonly<{testOnlyAvailable?: true; testOnlyExecution?: true; configuration?: HeadTestConfiguration; maxPending?: number; maxJobsPerReview?: number; maxRetainedBytes?: number}>;
 type Ports = Readonly<{db: DatabaseSync; tx: <T>(operation: () => T) => T; load: (id: string) => Review; authenticate: (token: string) => Principal; authorize: (principal: Principal, review: Review) => void; execution: ExecutionLease; options?: HeadTestOptions}>;
 const hash = (value: string) => createHash('sha256').update(value).digest('hex');
 const reserveBytes = 2 * 1024 * 1024;
@@ -19,7 +21,14 @@ const configuredRepository = (snapshot: Snapshot): boolean => {
     (!candidate || candidate.provider === 'github' && candidate.host === 'github.com' && candidate.sourceProject === 'scottchu/pr-reviewer' && candidate.targetProject === snapshot.repository && candidate.headSha === snapshot.headSha && candidate.baseSha === snapshot.baseSha && candidate.number === snapshot.prNumber && candidate.url === snapshot.prUrl);
 };
 
+export const validateHeadTestOptions=(options:HeadTestOptions={})=>{
+ if(options.configuration&&!readHeadTestConfiguration(options.configuration)||options.configuration&&(options.testOnlyExecution||options.testOnlyAvailable)||options.testOnlyAvailable&&options.testOnlyExecution||options.testOnlyAvailable!==undefined&&options.testOnlyAvailable!==true||options.testOnlyExecution!==undefined&&options.testOnlyExecution!==true)throw new Error('invalid_test_configuration');
+ for(const [value,ceiling] of [[options.maxPending??8,8],[options.maxJobsPerReview??256,256],[options.maxRetainedBytes??64*1024*1024,64*1024*1024]] as const)if(!Number.isSafeInteger(value)||value<1||value>ceiling)throw new Error('invalid_test_limit');
+};
+
 export const createHeadTestStore = ({db, tx, load, authenticate, authorize, execution, options = {}}: Ports) => {
+  const configuration=options.configuration?readHeadTestConfiguration(options.configuration):null;
+  if(options.configuration&&!configuration||configuration&&(options.testOnlyExecution||options.testOnlyAvailable))throw new Error('invalid_test_configuration');
   const fixtureExecution = options.testOnlyExecution === true, testOnlyAvailable = options.testOnlyAvailable === true || fixtureExecution;
   const maxPending = options.maxPending ?? 8, maxJobs = options.maxJobsPerReview ?? 256, quota = options.maxRetainedBytes ?? 64 * 1024 * 1024;
   for (const [value, ceiling] of [[maxPending, 8], [maxJobs, 256], [quota, 64 * 1024 * 1024]] as const)
@@ -59,7 +68,7 @@ export const createHeadTestStore = ({db, tx, load, authenticate, authorize, exec
   });
   const targets = (token: string, input: HeadTestScope): HeadTestTargets => {
     const scope = headTestScopeSchema.parse(input), {snapshot} = auth(token, scope), configured = configuredRepository(snapshot);
-    return {...scope, headSha: snapshot.headSha, targets: [{...target(), availability: configured && testOnlyAvailable ? 'available' : 'unavailable', reason: !configured ? 'repository_not_configured' : testOnlyAvailable ? 'test_only_configuration' : 'execution_not_configured'}]};
+    return {...scope, headSha: snapshot.headSha, targets: [{...target(), availability: configured && (testOnlyAvailable||configuration?.qualification.headSha===snapshot.headSha) ? 'available' : 'unavailable', reason: !configured ? 'repository_not_configured' : fixtureExecution ? 'test_only_execution' : testOnlyAvailable ? 'test_only_configuration' : configuration?.qualification.headSha===snapshot.headSha ? 'qualified_local_configuration' : configuration ? 'qualification_required' : 'execution_not_configured'}]};
   };
   const command = (token: string, input: HeadTestCommand): HeadTestReceipt => {
     const parsed = headTestCommandSchema.parse(input), fingerprint = hash(headTestCanonical(parsed));
@@ -81,13 +90,14 @@ export const createHeadTestStore = ({db, tx, load, authenticate, authorize, exec
         if (parsed.targetId !== 'review-source-core-v1') throw new Error('test_target_unavailable');
         if (parsed.expectedTargetRevision !== 2) throw new Error('test_target_conflict');
         if (!configuredRepository(snapshot)) throw new Error('repository_not_configured');
-        if (!testOnlyAvailable) throw new Error('execution_not_configured');
+        if (!testOnlyAvailable && !configuration) throw new Error('execution_not_configured');
+        if (!testOnlyAvailable && configuration?.qualification.headSha!==snapshot.headSha) throw new Error('qualification_required');
         const existing = rows().map(row => row.job), sameReview = existing.filter(item => item.reviewId === scope.reviewId);
         if (existing.filter(item => headTestEffectOccupiesSlot(item) || !terminal.has(item.state) && item.state !== 'unknown').length >= maxPending) throw new Error('test_queue_full');
         if (sameReview.length >= maxJobs) throw new Error('test_history_limit');
         if (sameReview.reduce((bytes, item) => bytes + item.reservedBytes + item.retainedBytes, 0) + reserveBytes > quota) throw new Error('test_storage_limit');
         const now = new Date().toISOString();
-        job = {schema: 'head-test-job-v1', jobId: randomUUID(), ...scope, repository: snapshot.repository, sourceProject: snapshot.candidate?.sourceProject ?? snapshot.repository, baseSha: snapshot.baseSha, headSha: snapshot.headSha, actorId: principal.actorId, credentialReference: hash(token), target: target(), provenance: fixtureExecution ? 'test_only_execution' : 'test_only_configuration', createdAt: now, updatedAt: now, jobRevision: 1, state: 'queued', reason: null, effectDisposition: 'none', cancellation: null, invocations: [], reservedBytes: reserveBytes, retainedBytes: 0};
+        job = {schema: 'head-test-job-v1', jobId: randomUUID(), ...scope, repository: snapshot.repository, sourceProject: snapshot.candidate?.sourceProject ?? snapshot.repository, baseSha: snapshot.baseSha, headSha: snapshot.headSha, actorId: principal.actorId, credentialReference: hash(token), target: target(), provenance: fixtureExecution ? 'test_only_execution' : testOnlyAvailable ? 'test_only_configuration' : 'qualified_local_configuration', ...(!testOnlyAvailable&&configuration?{qualificationId:configuration.qualificationId}:{}), createdAt: now, updatedAt: now, jobRevision: 1, state: 'queued', reason: null, effectDisposition: 'none', cancellation: null, invocations: [], reservedBytes: reserveBytes, retainedBytes: 0};
         disposition = 'queued'; put(job);
       } else {
         job = previous!;
@@ -125,5 +135,5 @@ export const createHeadTestStore = ({db, tx, load, authenticate, authorize, exec
     const matching = (db.prepare("SELECT rowid AS sequence,body FROM test_jobs WHERE rowid>? AND json_extract(body,'$.reviewId')=? AND json_extract(body,'$.snapshotId')=? ORDER BY rowid LIMIT 33").all(after, scope.reviewId, scope.snapshotId) as {sequence: number; body: string}[]).map(row => ({sequence: row.sequence, job: JSON.parse(row.body) as StoredJob})), page = matching.slice(0, 32);
     return {...scope, jobs: page.map(row => publicJob(row.job)), selectedJob: null, nextCursor: matching.length > 32 ? Buffer.from(headTestCanonical({v: 1, ...scope, after: page.at(-1)!.sequence})).toString('base64url') : null};
   };
-  return {targets, command, query, ...createHeadTestOwnerStore({db,tx,load,authorize,execution,rows,get,put,publicJob,fixtureExecution})};
+  return {targets, command, query, ...createHeadTestOwnerStore({db,tx,load,authorize,execution,rows,get,put,publicJob,fixtureExecution,configuration})};
 };
