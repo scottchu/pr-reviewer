@@ -26,3 +26,12 @@ Next: commit exact public return-frame/draft/recovery/storage/error contracts, t
 ## Contract checkpoint
 
 The exact05C application/frame/draft/private-storage/recovery ports, error/quarantine behavior, scope/fingerprint/clear ordering, quota meaning and selected-source/issue presentation are now derived in [durable knowledge](../../../../product/review-loop/story-and-exploration.md#exact05c-application-frame-and-private-storage-derivation). Implementation follows that committed authority. Ordinary view persistence is best effort; mandatory pending write/readback gates every mutation. No body/credential persistence or new durable server subsystem is authorized. Next: failing tests for storage/credential/receipt identity and one-owner frame/draft transitions.
+
+
+## Internal application-core checkpoint
+
+Status: Coherent application core prepared for bounded independent inspection; full05C UI/fault journeys remain in progress, not accepted.
+
+Strict TypeScript/subsystem checks and22 focused tests passed:4 private-envelope/quota/scope cases,4 real gateway recovery cases,2 one-owner exploration/reload cases and12 retained05B controller cases. Initial red was the absent private-session module. Real gateway tests then exposed the existing nullable eventId/no-active-attachment receipt; durable meaning was corrected before accepting that path. The server/core was unchanged. These Node gateway tests demonstrate actual commit/drop-ack and read-only accepted-receipt reconciliation, but do not substitute for the required actual Chrome reload/one-event/controlled-notify journey.
+
+Implemented application ports now include mandatory pending write/readback/fingerprint before mutation, exact same-credential explicit recovery, actual question receipt/readback matching, conservative accepted/clear faults, quarantine/locked states, view submitted-ID guards and bounded best-effort view persistence. The original22 tests are not full lifecycle/negative coverage; additional stale-generation/HTTP/request-bound/fault cases and actual UI wiring follow. The sameStoryBridge holds draft identities, first exploration return frame, cursor/elapsed/maps/scroll and explicit draft choice. Main and graph capture/restore UI have not yet migrated in this internal checkpoint; no returned-frame visual claim is made. Root may inspect exact committed core while the sole executor continues bounded UI work.

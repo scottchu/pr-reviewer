@@ -1,16 +1,20 @@
+import {validateAnchor,projectGraph} from '../domain/public.ts';
+import type {Anchor} from '../domain/public.ts';
+import type {PrivateSession,QuestionDraft,GraphFrames,StoryReturnFrame,PrivateStoryView} from './private-session.ts';
 import {createRegistry} from '../integration/registry.ts';
 import type {Snapshot,StoryContent,StoryView,StoryContextView,StoryReference,SemanticSource} from '../domain/public.ts';
 import type {AnalysisBridge} from './analysis.ts';
 type Step=StoryContent['steps'][number];
 type Chapter=StoryContent['chapters'][number];
 type SourceReference=Extract<StoryReference,{type:'snapshot_source'|'semantic_source'}>;
-export type StorySemanticPort=Pick<AnalysisBridge,'select'|'focus'|'getSnapshot'>;
+export type StorySemanticPort=Pick<AnalysisBridge,'select'|'focus'|'getSnapshot'> & Partial<Pick<AnalysisBridge,'openSource'|'closeSource'>>;
 export type StoryClock={now:()=>number;every:(callback:()=>void,period:number)=>()=>void};
 type Cursor=Readonly<{versionId:string;chapterId:string;stepId:string;index:number}>;
 export type StoryState=Readonly<{
  reviewId:string;snapshotId:string|null;snapshot:Snapshot|null;view:StoryView|null;context:StoryContextView|null;
- cursor:Cursor|null;focusRevision:number;mode:'paused'|'playing'|'ended';elapsedMs:number;surface:'flow'|'diff';hidden:boolean;reducedMotion:boolean;
+ cursor:Cursor|null;focusRevision:number;mode:'paused'|'playing'|'ended'|'exploring';elapsedMs:number;surface:'flow'|'diff';hidden:boolean;reducedMotion:boolean;
  authenticated:boolean;reading:boolean;contextReading:boolean;error:string;focusError:string;evidence:StoryReference|null;evidenceText:string;evidenceBusy:boolean;
+ drafts:readonly QuestionDraft[];activeDraftId:string;returnFrame:StoryReturnFrame|null;maps:GraphFrames;mapRestoreId:number;pageScroll:number;viewRecoveryMessage:string;questionLocked:boolean;
  semanticSources:Readonly<Record<string,SemanticSource>>;position:Readonly<{x:number;y:number}>;viewport:Readonly<{width:number;height:number}>;playerSize:Readonly<{width:number;height:number}>;
 }>;
 export type StoryIntent=
@@ -73,15 +77,36 @@ export const storyProjection=(state:StoryState):StoryProjection|null=>{
  return {chapter:item.chapter,step:item.step,claims:item.step.claimIds.flatMap(id=>{const claim=version.story.claims.find(claim=>claim.id===id);return claim?[claim]:[];}),index:cursor.index,total:steps.length,comparisonKey:key,graphFocus:key?{intentId:`${version.versionId}:${state.focusRevision}`,fileKey:key,...(focus.type==='structural'&&focus.hunkId?{hunkId:focus.hunkId}:{})}:undefined,sources:refs.map(ref=>excerpt(state,ref))};
 };
 const freeze=<T>(value:T):T=>{if(value&&typeof value==='object'&&!Object.isFrozen(value)){Object.freeze(value);for(const item of Object.values(value))freeze(item);}return value;};
-const empty=(reviewId:string):StoryState=>({reviewId,snapshotId:null,snapshot:null,view:null,context:null,cursor:null,focusRevision:0,mode:'paused',elapsedMs:0,surface:'flow',hidden:false,reducedMotion:false,authenticated:false,reading:false,contextReading:false,error:'',focusError:'',evidence:null,evidenceText:'',evidenceBusy:false,semanticSources:{},position:{x:0,y:0},viewport:{width:1024,height:768},playerSize:{width:500,height:44}});
+const empty=(reviewId:string):StoryState=>({reviewId,snapshotId:null,snapshot:null,view:null,context:null,cursor:null,focusRevision:0,mode:'paused',elapsedMs:0,surface:'flow',hidden:false,reducedMotion:false,authenticated:false,reading:false,contextReading:false,error:'',focusError:'',evidence:null,evidenceText:'',evidenceBusy:false,drafts:[],activeDraftId:'',returnFrame:null,maps:{structural:null,semantic:null},mapRestoreId:0,pageScroll:0,viewRecoveryMessage:'',questionLocked:false,semanticSources:{},position:{x:0,y:0},viewport:{width:1024,height:768},playerSize:{width:500,height:44}});
 const defaultClock:StoryClock={now:()=>performance.now(),every:(callback,period)=>{const timer=setInterval(callback,period);return()=>clearInterval(timer);}};
-export const createStoryBridge=(reviewId:string,options:{clock?:StoryClock;semantic?:StorySemanticPort}={})=>{
+export const createStoryBridge=(reviewId:string,options:{clock?:StoryClock;semantic?:StorySemanticPort;session?:PrivateSession;selectSnapshot?:(snapshotId:string)=>Promise<Snapshot>;readSnapshot?:(snapshotId:string)=>Promise<Snapshot>}={})=>{
  const clock=options.clock??defaultClock,registry=createRegistry(),listeners=new Set<()=>void>();
- let state=freeze(empty(reviewId)),token='',generation=0,versionId:string|undefined,connection:object|null=null,disposed=false;
+ let state=freeze(empty(reviewId)),token='',scope='',hydrating=false,viewCheckpointBlocked=false,generation=0,versionId:string|undefined,connection:object|null=null,disposed=false;
  let contextTarget:number|'current'|null=null;
  let read:AbortController|null=null,contextRead:AbortController|null=null,evidenceRead:AbortController|null=null,focusSerial=0,stopClock:(()=>void)|null=null,lastTick=0,disposeConnection:(()=>void)|null=null;
  let focusRoute:ReturnType<typeof registry.register>|null=null,pollRoute:ReturnType<typeof registry.register>|null=null;
- const publish=(next:StoryState)=>{if(Object.keys(next).every(key=>Object.is(next[key as keyof StoryState],state[key as keyof StoryState])))return;state=freeze(next);syncClock();for(const listener of listeners)listener();};
+ const publish=(next:StoryState)=>{if(Object.keys(next).every(key=>Object.is(next[key as keyof StoryState],state[key as keyof StoryState])))return;state=freeze(next);syncClock();checkpoint();for(const listener of listeners)listener();};
+ const activeDraft=()=>state.drafts.find(draft=>draft.id===state.activeDraftId)??state.drafts[0]??null;
+ const makeDraft=(snapshot:Snapshot):QuestionDraft=>{const source=snapshot.sources.find(source=>source.side==='head'&&source.lineCount>0)??snapshot.sources.find(source=>source.lineCount>0);return {id:crypto.randomUUID(),anchor:source?{snapshotId:snapshot.snapshotId,side:source.side,path:source.path,startLine:1,endLine:1}:null,text:'',submitted:false};};
+ const privateView=():PrivateStoryView|null=>state.snapshotId&&state.drafts.length?{reviewId,snapshotId:state.snapshotId,versionId:state.view?.version?.versionId??null,cursor:state.cursor,elapsedMs:state.elapsedMs,surface:state.surface,position:state.position,pageScroll:state.pageScroll,maps:state.maps,activeDraftId:state.activeDraftId,drafts:[...state.drafts],returnFrame:state.returnFrame}:null;
+ const checkpoint=()=>{const value=privateView();if(!options.session||!scope||hydrating||viewCheckpointBlocked||!value)return;const result=options.session.saveView(scope,value);if(result.message!==state.viewRecoveryMessage)state=freeze({...state,viewRecoveryMessage:result.message});};
+ const replaceDraft=(draft:QuestionDraft)=>publish({...state,drafts:state.drafts.map(current=>current.id===draft.id?draft:current)});
+ const assertEditable=()=>{if(state.questionLocked)throw new Error('submission_pending: reconcile the unresolved question first');};
+ const assertCanNavigate=()=>{assertEditable();if(activeDraft()?.text.trim())throw new Error('draft_held: keep or clear the active draft before changing its source');};
+ const restorePrivate=async(value:PrivateStoryView,expected:number)=>{
+  const capturedToken=token;
+  if(!state.snapshot||value.reviewId!==reviewId||value.snapshotId!==state.snapshotId)throw new Error('saved_view_source_unavailable: open its retained source explicitly');
+  const snapshots=new Map<string,Snapshot>([[state.snapshot.snapshotId,state.snapshot]]);
+  for(const draft of value.drafts){if(!draft.anchor)continue;let snapshot=snapshots.get(draft.anchor.snapshotId);if(!snapshot){if(!options.readSnapshot)throw new Error('saved_draft_source_unavailable');snapshot=await options.readSnapshot(draft.anchor.snapshotId);snapshots.set(snapshot.snapshotId,snapshot);}if(!validateAnchor(snapshot.snapshotId,snapshot.sources,draft.anchor))throw new Error('saved_draft_anchor_unavailable');}
+  if(value.versionId!==state.view?.version?.versionId){if(value.versionId)await refresh('explicit',value.versionId,true);else if(state.view?.version)throw new Error('saved_story_unavailable');}
+  if(expected!==generation)throw new Error('selection_superseded');
+  if(value.cursor){const exact=cursorAt(state.view,value.cursor.index);if(!exact||JSON.stringify(exact)!==JSON.stringify(value.cursor))throw new Error('saved_story_cursor_unavailable');}
+  if(value.returnFrame){const frame=value.returnFrame;if(!value.drafts.some(draft=>draft.id===frame.originalDraftId))throw new Error('saved_return_draft_unavailable');if(!snapshots.has(frame.snapshotId)&&options.readSnapshot)snapshots.set(frame.snapshotId,await options.readSnapshot(frame.snapshotId));if(!snapshots.has(frame.snapshotId))throw new Error('saved_return_source_unavailable');if(frame.versionId){const view=await request(capturedToken,`/api/story?${new URLSearchParams({reviewId,snapshotId:frame.snapshotId,versionId:frame.versionId})}`,new AbortController().signal) as StoryView;if(!view.version||view.version.versionId!==frame.versionId||frame.cursor&&cursorAt(view,frame.cursor.index)?.stepId!==frame.cursor.stepId)throw new Error('saved_return_story_unavailable');}}
+  if(expected!==generation)throw new Error('selection_superseded');
+  publish({...state,drafts:value.drafts,activeDraftId:value.activeDraftId,returnFrame:value.returnFrame,maps:value.maps,mapRestoreId:state.mapRestoreId+1,pageScroll:value.pageScroll,cursor:value.cursor,elapsedMs:value.elapsedMs,surface:value.surface,position:clamp(state,value.position.x,value.position.y),mode:value.returnFrame?'exploring':'paused',focusRevision:state.focusRevision+1});
+  await restoreSemantic(value.maps);
+ };
+ const restoreSemantic=async(maps:GraphFrames)=>{const expected=generation,revision=state.focusRevision,snapshotId=state.snapshotId,frame=maps.semantic;if(!frame||!options.semantic||!state.snapshotId)return;await options.semantic.select(state.snapshotId,frame.analysisId??undefined);if(expected!==generation||revision!==state.focusRevision||snapshotId!==state.snapshotId)throw new Error('selection_superseded');options.semantic.focus(frame.focus);if(frame.sourceAnchor)await options.semantic.openSource?.(frame.sourceAnchor);else options.semantic.closeSource?.();};
  const syncClock=()=>{
   const active=Boolean(connection)&&!disposed&&state.mode==='playing'&&!state.hidden&&Boolean(token);
   if(!active){stopClock?.();stopClock=null;return;}if(stopClock)return;
@@ -120,7 +145,7 @@ export const createStoryBridge=(reviewId:string,options:{clock?:StoryClock;seman
    if(view.reviewId!==reviewId||view.snapshotId!==snapshotId||(requestedVersionId&&view.version?.versionId!==requestedVersionId))throw new Error('story_selection_mismatch');
    const changed=replace||state.view?.version?.versionId!==view.version?.versionId;
    versionId=view.version?.versionId;
-   publish({...state,view,authenticated:true,error:'',...(changed?{cursor:cursorAt(view,0),focusRevision:state.focusRevision+1,context:null,mode:'paused' as const,elapsedMs:0,evidence:null,evidenceText:'',evidenceBusy:false,semanticSources:{}}:{})});
+   publish({...state,view,authenticated:true,error:'',...(changed?{cursor:cursorAt(view,0),focusRevision:state.focusRevision+1,context:null,mode:state.returnFrame?'exploring' as const:'paused' as const,elapsedMs:0,evidence:null,evidenceText:'',evidenceBusy:false,semanticSources:{}}:{})});
    if(changed)focusRoute?.emit();
    if(changed)await readContext(view.version?.contextRevision??view.contextRevision);
    else if(!state.context&&!contextRead)await readContext(contextTarget==='current'?undefined:contextTarget??view.version?.contextRevision??view.contextRevision);
@@ -168,19 +193,13 @@ export const createStoryBridge=(reviewId:string,options:{clock?:StoryClock;seman
   pollRoute=registry.register('story-committed-to-authorized-view',scope,()=>authorized()&&Boolean(state.snapshotId)&&!read&&!state.evidenceBusy,()=>{void refresh('poll');});
   focusRoute=registry.register('story-focus-to-coordinated-view',scope,()=>authorized()&&Boolean(state.cursor),()=>{void coordinate();});
  };
- const intent=(intent:StoryIntent)=>{const previous=state.focusRevision;publish(storyTransition(state,intent));if(previous!==state.focusRevision)focusRoute?.emit();};
+ const intent=(intent:StoryIntent)=>{if(state.mode==='exploring'&&['replay','previous','next','chapter'].includes(intent.type)){publish({...state,error:'resume_required: resume the saved story before story navigation'});return;}const previous=state.focusRevision;publish(storyTransition(state,intent));if(previous!==state.focusRevision){options.semantic?.closeSource?.();focusRoute?.emit();}};
  const select=async(snapshot:Snapshot)=>{
   if(state.snapshotId===snapshot.snapshotId)return;
-  interrupt();versionId=undefined;contextTarget=null;publish({...empty(reviewId),snapshot:structuredClone(snapshot),snapshotId:snapshot.snapshotId,authenticated:Boolean(token),reducedMotion:state.reducedMotion,hidden:state.hidden,viewport:state.viewport,playerSize:state.playerSize});
+  const retained=state.returnFrame?{drafts:state.drafts,activeDraftId:state.activeDraftId,returnFrame:state.returnFrame,mode:'exploring' as const}:null;const draft=makeDraft(snapshot);interrupt();versionId=undefined;contextTarget=null;publish({...empty(reviewId),...(retained??{drafts:[draft],activeDraftId:draft.id}),questionLocked:state.questionLocked,snapshot:structuredClone(snapshot),snapshotId:snapshot.snapshotId,authenticated:Boolean(token),reducedMotion:state.reducedMotion,hidden:state.hidden,viewport:state.viewport,playerSize:state.playerSize});
   wireRoutes();if(token&&!disposed)await refresh();
  };
- return {
-  getSnapshot:()=>state,subscribe:(listener:()=>void)=>{listeners.add(listener);return()=>{listeners.delete(listener);};},intent,
-  login:async(value:string,snapshot:Snapshot)=>{interrupt();disposed=false;token=value.trim();versionId=undefined;contextTarget=null;publish({...empty(reviewId),snapshot:structuredClone(snapshot),snapshotId:snapshot.snapshotId,reducedMotion:state.reducedMotion,hidden:state.hidden,viewport:state.viewport,playerSize:state.playerSize});wireRoutes();if(token)await refresh();},
-  logout:()=>{interrupt();token='';versionId=undefined;contextTarget=null;publish(empty(reviewId));wireRoutes();},select,refresh:()=>refresh(),
-  openVersion:async(nextVersionId?:string)=>{interrupt();publish({...state,mode:'paused',reading:false,contextReading:false,evidenceBusy:false});wireRoutes();await refresh('explicit',nextVersionId??null,true);},
-  openCurrentContext:async()=>{intent({type:'pause',reason:'context'});await readContext();},
-  openEvidence:async(reference:StoryReference)=>{
+ const bridgeOpenEvidence=async(reference:StoryReference)=>{
    if(!token||!state.snapshotId||disposed)return;
    intent({type:'pause',reason:'evidence'});evidenceRead?.abort();const controller=new AbortController();evidenceRead=controller;const expected=generation,selectedVersion=state.view?.version,selectedStep=state.cursor?.stepId,capturedToken=token;
    const owns=()=>!disposed&&generation===expected&&state.cursor?.stepId===selectedStep&&state.view?.version?.versionId===selectedVersion?.versionId&&evidenceRead===controller&&!controller.signal.aborted;
@@ -199,7 +218,32 @@ export const createStoryBridge=(reviewId:string,options:{clock?:StoryClock;seman
     if(owns())publish({...state,evidenceText:text});
    }catch(error){if(owns())publish({...state,evidenceText:error instanceof Error?error.message:'Exact evidence unavailable.'});}
    finally{if(evidenceRead===controller){evidenceRead=null;if(owns())publish({...state,evidenceBusy:false});else if(expected===generation&&!disposed)publish({...state,evidenceBusy:false});}}
+  };
+ return {
+  getSnapshot:()=>state,subscribe:(listener:()=>void)=>{listeners.add(listener);return()=>{listeners.delete(listener);};},intent,
+  login:async(value:string,snapshot:Snapshot)=>{
+   interrupt();disposed=false;hydrating=true;viewCheckpointBlocked=false;scope='';token=value.trim();versionId=undefined;contextTarget=null;const draft=makeDraft(snapshot);publish({...empty(reviewId),drafts:[draft],activeDraftId:draft.id,questionLocked:state.questionLocked,snapshot:structuredClone(snapshot),snapshotId:snapshot.snapshotId,reducedMotion:state.reducedMotion,hidden:state.hidden,viewport:state.viewport,playerSize:state.playerSize});const expected=generation;
+   try{const view=token?await refresh():undefined;if(!view||expected!==generation)return;if(options.session){const nextScope=await options.session.scope(token);if(expected!==generation)return;scope=nextScope;const saved=options.session.readView(scope);if(saved.kind==='record'&&saved.record?.value){const value=saved.record.value;try{await restorePrivate({...value,drafts:value.drafts.map(draft=>saved.record!.submitted.includes(draft.id)?{...draft,text:'',submitted:true}:draft)},expected);if(saved.record.omitted.length)publish({...state,viewRecoveryMessage:'Oversize saved draft text is unavailable after reload.'});}catch(error){if(expected===generation){viewCheckpointBlocked=true;publish({...state,viewRecoveryMessage:error instanceof Error?error.message:'saved_view_unavailable'});}}}else if(saved.kind!=='none'&&saved.kind!=='record')publish({...state,viewRecoveryMessage:`view_${saved.kind}`});}}
+   finally{if(expected===generation){hydrating=false;checkpoint();}}
   },
+  logout:()=>{interrupt();scope='';hydrating=false;token='';versionId=undefined;contextTarget=null;publish(empty(reviewId));wireRoutes();},select,refresh:()=>refresh(),
+  activeDraft,getPrivateView:privateView,assertCanNavigate,
+  resetPrivateView:()=>{assertEditable();options.session?.clearView();viewCheckpointBlocked=false;publish({...state,viewRecoveryMessage:''});checkpoint();},
+  setQuestionGuard:(locked:boolean)=>{if(state.questionLocked!==locked)publish({...state,questionLocked:locked});},
+  editDraft:(text:string)=>{assertEditable();const draft=activeDraft();if(!draft)return;if(draft.submitted){const next={...draft,id:crypto.randomUUID(),text,submitted:false};publish({...state,drafts:state.drafts.map(item=>item.id===draft.id?next:item),activeDraftId:next.id});}else replaceDraft({...draft,text});},
+  selectSource:(anchor:Anchor,comparisonKey?:string)=>{assertEditable();const draft=activeDraft();if(!draft||!state.snapshot||!validateAnchor(state.snapshot.snapshotId,state.snapshot.sources,anchor))throw new Error('invalid_anchor');if(draft.text.trim()&&(JSON.stringify(anchor)!==JSON.stringify(draft.anchor)||comparisonKey!==draft.comparisonKey))throw new Error('draft_held: source selection is held while the active draft is nonempty');const {comparisonKey:old,...rest}=draft;replaceDraft({...rest,anchor:structuredClone(anchor),...(comparisonKey?{comparisonKey}:{})});intent({type:'pause',reason:'source'});},
+  setQuestionRange:(patch:Partial<Pick<Anchor,'side'|'startLine'|'endLine'>>)=>{assertEditable();const draft=activeDraft();if(!draft?.anchor)return;replaceDraft({...draft,anchor:{...draft.anchor,...patch}});intent({type:'pause',reason:'question'});},
+  setParentQuestion:(parentQuestionId?:string)=>{assertCanNavigate();const draft=activeDraft();if(!draft)return;const {parentQuestionId:previous,...rest}=draft;replaceDraft({...rest,...(parentQuestionId?{parentQuestionId}:{})});},
+  confirmDraft:(draftId:string)=>{publish({...state,drafts:state.drafts.map(draft=>draft.id===draftId?{...draft,text:'',submitted:true}:draft)});},
+  chooseDraft:async(draftId:string)=>{assertEditable();if(state.returnFrame)throw new Error('resume_required');const draft=state.drafts.find(draft=>draft.id===draftId);if(!draft)throw new Error('draft_unavailable');if(draft.anchor&&draft.anchor.snapshotId!==state.snapshotId){if(!options.selectSnapshot)throw new Error('source_unavailable');const drafts=state.drafts,snapshot=await options.selectSnapshot(draft.anchor.snapshotId);await select(snapshot);publish({...state,drafts,activeDraftId:draft.id});}else publish({...state,activeDraftId:draft.id});},
+  updateGraphFrame:(kind:'structural'|'semantic',frame:GraphFrames['structural']|GraphFrames['semantic'])=>{if(JSON.stringify(state.maps[kind])===JSON.stringify(frame))return;publish({...state,maps:{...state.maps,[kind]:structuredClone(frame)}});},
+  setPageScroll:(pageScroll:number)=>{if(Number.isFinite(pageScroll)&&pageScroll>=0&&Math.abs(state.pageScroll-pageScroll)>1)publish({...state,pageScroll});},
+  enterExploration:()=>{assertEditable();if(state.returnFrame)return;const original=activeDraft();if(!original||!state.snapshotId)throw new Error('source_unavailable');const frame:StoryReturnFrame={snapshotId:state.snapshotId,versionId:state.view?.version?.versionId??null,cursor:state.cursor,elapsedMs:state.elapsedMs,surface:state.surface,position:state.position,pageScroll:state.pageScroll,maps:state.maps,originalDraftId:original.id,evidence:state.evidence};const retained=state.drafts.find(draft=>draft.id!==original.id),draft=retained??{...original,id:crypto.randomUUID(),text:'',submitted:false};publish({...state,returnFrame:frame,drafts:[original,draft],activeDraftId:draft.id,mode:'exploring'});},
+  resumeStory:async()=>{assertEditable();const frame=state.returnFrame;if(!frame)return;if(frame.snapshotId!==state.snapshotId){if(!options.selectSnapshot)throw new Error('source_unavailable');await select(await options.selectSnapshot(frame.snapshotId));}if(frame.versionId!==state.view?.version?.versionId)await refresh('explicit',frame.versionId,true);if(frame.versionId!==state.view?.version?.versionId||frame.cursor&&cursorAt(state.view,frame.cursor.index)?.stepId!==frame.cursor.stepId)throw new Error('return_story_unavailable');const original=state.drafts.find(draft=>draft.id===frame.originalDraftId);if(!original)throw new Error('return_draft_unavailable');publish({...state,cursor:frame.cursor,elapsedMs:frame.elapsedMs,surface:frame.surface,position:clamp(state,frame.position.x,frame.position.y),maps:frame.maps,mapRestoreId:state.mapRestoreId+1,pageScroll:frame.pageScroll,activeDraftId:original.id,returnFrame:null,mode:'paused',focusRevision:state.focusRevision+1});await restoreSemantic(frame.maps);if(frame.evidence)await bridgeOpenEvidence(frame.evidence);},
+  askAboutStep:()=>{assertCanNavigate();const projection=storyProjection(state),source=projection?.sources.find(source=>source.reference.type==='snapshot_source');if(!source||source.reference.type!=='snapshot_source')throw new Error('question_anchor_unavailable: semantic context is not a snapshot question anchor');const draft=activeDraft();if(draft)replaceDraft({...draft,anchor:source.reference.anchor,...(projection?.comparisonKey?{comparisonKey:projection.comparisonKey}:{})});intent({type:'pause',reason:'question'});},
+  openVersion:async(nextVersionId?:string)=>{assertEditable();if(state.returnFrame)throw new Error('resume_required');interrupt();publish({...state,mode:'paused',reading:false,contextReading:false,evidenceBusy:false});wireRoutes();await refresh('explicit',nextVersionId??null,true);},
+  openCurrentContext:async()=>{intent({type:'pause',reason:'context'});await readContext();},
+  openEvidence:bridgeOpenEvidence,
   connect:()=>{
    disposeConnection?.();disposed=false;const owned={};connection=owned;
    wireRoutes();const stopPoll=clock.every(()=>pollRoute?.emit(),700);syncClock();focusRoute?.emit();let active=true;
