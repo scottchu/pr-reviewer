@@ -2,7 +2,7 @@
 
 **Date:** 2026-10-24
 
-**Status:** Design correction prepared; mockup unbuilt and unreviewed
+**Status:** Design correction committed; current preview dispatched separately; this amendment does not claim a completed or reviewed mockup
 
 **Parent:** [Slice 05](plan.md); also corrects [slice 04 source reading](../04-behavior-neighborhood/plan.md)
 
@@ -17,6 +17,12 @@ The user expected the prior mockup direction to survive delivery: everything is 
 At inspected main `e3b270e5f49a9215452b0b86702946043e979059`, semantic nodes are fixed summary cards; `src/ui/semantic-graph.tsx` offers Inspect body, and `src/ui/semantic-panel.tsx` scrolls/focuses a separate semantic inspector. The source contracts permitted separate panes and explicit inspection, while the roadmap put semantic zoom under 4K. Those narrower delivery choices did not carry the original canvas interaction into acceptance. This is a product gap, not merely a missing cosmetic pass. The [reference/evidence record](canvas-reference-evidence.md) distinguishes preserved screenshots, historical mockup discussion and unlocated image assets.
 
 Existing backend/domain/source/recovery work remains valid within its prior evidence. Bounded previous graph/source comprehension results remain historical results for their actual task; none proves the newly explicit in-canvas reading journey. Basic inline diff disclosure is a correction to 04/05, not a reason to wait for 4K09.
+
+## Separate subsystem previews and current comment amendment
+
+The user additionally requests a separate interactive mockup for each user-facing system. The [subsystem map](subsystem-mockups.md) gives staged canvas, story, import/history, discussion/participant and test/evidence scenarios with shared identities and an integrated check. This canvas scenario remains first and continues now; no all-subsystem planning/completion gate is added.
+
+The [floating-comment contract](../../../../product/review-loop/canvas-comments.md) is part of this current preview: select code or review prose, activate Comment, see the quoted anchor, author marker and contextual thread/reply, then change lens and return. C9–C10 extend the original C1–C8 below. Reuse the preview author's existing component/state model; no parallel implementation is requested. Full discussion density/version/delivery states receive their own separately inspectable scenario later. Prose/backend limits remain explicit in both.
 
 ## Execution sequence and scope
 
@@ -40,14 +46,16 @@ This packet authorizes no runtime/dependency/production mutation by the design a
 | C6 Honest missing state | Demonstrate an unavailable counterpart or unresolved relationship, with provenance and scoped limitation visible at both overview and focus. | A missing side becomes invented source/equivalence, or test presence becomes a passing result. |
 | C7 Narrow same model | At a representative 390px viewport, show focused comparison with labeled stacked source nodes, reachable neighbors and return, without document-wide overflow or a disconnected file viewer. | Mobile swaps to a different source model, hides side identity, loses selection or requires tiny targets. |
 | C8 Readability and input | Desktop and narrow screenshots show restrained hierarchy, readable source, relation direction and focused attention. Keyboard focus/read/return and text selection work without accidental canvas pan. | A working control is used as proof of visual quality; critical source, relations or controls overlap or become too small. |
+| C9 Selected text and contextual thread | Select code and prose separately; the nearby Comment action opens a draft with its exact quoted anchor. A floating marker identifies the human/agent thread initiator, opens contextual messages and permits a labeled local-only preview reply. Code retains source identity; prose retains content ID/version/hash/selection. | Comments are detached from their selected text, visual position becomes anchor authority, human/agent authors are ambiguous, or a mock reply/prose comment claims real persistence/delivery. |
+| C10 Stable and reachable comments | Change zoom/lens and return with the same selected text/thread/draft. Show two nearby markers clustered with a truthful thread count; open one without covering source or losing the other draft. Keyboard/touch and 390px placement retain context. | Reflow retargets a comment, cluster counts imply messages/unread activity, bubbles obscure reading, or only hover/pointer geometry exposes the thread. |
 
 Show a single coherent design through these states, not unrelated attractive screenshots. Record candidate/source identities and demonstrated interactions. A fixture-backed preview is valid layout evidence when labeled; it does not pass actual own-PR product dogfood, native host delivery, persistence, or human comprehension. No mockup result exists yet.
 
 ## Implementation and independent-review handoffs
 
-The mockup author reads this packet, the durable canvas contract, presentation principles, semantic/source identity and story frame contracts. Editable scope is its assigned preview files and slice-local evidence; backend and other authors' UI files remain read-only unless the coordinator explicitly changes ownership. Return the committed preview, launch/stop instructions, target provenance, all eight check outcomes and screenshots/limits. Stop only affected work on missing source or a material unresolved interaction; ordinary visual decisions are explored in the inspectable preview.
+The mockup author reads this packet, the durable canvas contract, presentation principles, semantic/source identity and story frame contracts. Editable scope is its assigned preview files and slice-local evidence; backend and other authors' UI files remain read-only unless the coordinator explicitly changes ownership. Return the committed preview, launch/stop instructions, target provenance, C1–C10 outcomes and screenshots/limits. Stop only affected work on missing source or a material unresolved interaction; ordinary visual decisions are explored in the inspectable preview.
 
-Assign a fresh reviewer who has not read the private expected account. Start with actual candidate UI/graph and the bounded question, freeze the account, then compare pinned source and critique understanding effort under the graph-first rule. The reviewer checks C1–C8 and distinguishes screenshot/layout, automated engineering, actual host and human evidence. This design author has already seen source/design and cannot supply that fresh blind account.
+Assign a fresh reviewer who has not read the private expected account. Start with actual candidate UI/graph and the bounded question, freeze the account, then compare pinned source and critique understanding effort under the graph-first rule. The reviewer checks C1–C10 and distinguishes screenshot/layout, automated engineering, actual host and human evidence. This design author has already seen source/design and cannot supply that fresh blind account.
 
 ## Dependencies and affected owners
 
@@ -60,4 +68,4 @@ Assign a fresh reviewer who has not read the private expected account. Start wit
 
 The design task uses isolated branch `reconcile-in-canvas-source-reading` from main `e3b270e5f49a9215452b0b86702946043e979059`. It edits durable product docs and affected plans only. Retained prototype/archive are read-only; no application, dependencies, tests, runtime, credentials or other writer files are changed. No task runtime artifacts were created. The worktree is retained for coordinator incorporation; primary main is preserved.
 
-Verification passed: source readback, 152 local Markdown target-path checks across 13 changed/new documents, documentation-only/owned-path checks and `git diff --check`. The link check verifies local target files, not external URLs or every fragment. Mockup/visual, product E2E, native delivery, human comprehension, deployment and a new whole-product knowledge audit are unrun. The coordinator records the final design commit/review and dispatches the next inspectable mockup; no request to rebuild a generalized platform follows from this correction.
+Initial c923 verification passed: source readback, 152 local Markdown target-path checks across 13 changed/new documents, documentation-only/owned-path checks and `git diff --check`. The subsystem/comment amendment has its own verification recorded with the amendment commit. The link check verifies local target files, not external URLs or every fragment. Mockup/visual, product E2E, native delivery, human comprehension, deployment and a new whole-product knowledge audit are unrun. The coordinator records the final design commit/review and dispatches the next inspectable mockup; no request to rebuild a generalized platform follows from this correction.

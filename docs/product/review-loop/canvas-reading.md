@@ -47,6 +47,10 @@ On entering a focused lens or following a neighbor, capture the prior viewport, 
 
 Lens and viewport are private presentation state, not domain graph edits. Reuse existing application-owned frame/draft/recovery semantics and managed subscriptions. Any additional persisted frame field requires a documented compatibility update and tests before implementation; this contract does not introduce an unversioned storage shape. Domain authorization, command deduplication, graph CAS, durable inbox, host delivery and external-effect recovery remain unchanged.
 
+## Contextual comments on selected content
+
+The [canvas comment contract](canvas-comments.md) applies to selected review prose as well as code. Show the Comment action beside the selection, then an anchor-adjacent floating thread marker with human/agent author identity. Open the thread/reply in context; pan, zoom, lens changes and return never change its anchor. Use a reserved marker lane and counted clusters to prevent overlap, with keyboard/touch and narrow-layout access. Prose requires stable owning content/version/selection identity; unsupported prose persistence stays explicitly preview-only, not a fabricated source anchor or Saved result.
+
 ## Narrow layout and accessibility
 
 A narrow viewport uses the same graph identities and reading lens. A focused comparison may stack before above after inside its graph group, keeping both labeled sides available and a compact neighborhood/return cue. The canvas can pan to neighbors; a labeled navigation list may focus those same nodes for keyboard and screen-reader use. Do not replace the graph model with a disconnected mobile file viewer or a before/after toggle that hides comparison meaning.
@@ -54,6 +58,8 @@ A narrow viewport uses the same graph identities and reading lens. A focused com
 At focused reading size, code, line labels, question controls and status must be legible. Manage overflow inside source nodes rather than stretching the document horizontally. Preserve visible focus, text equivalents for color, accessible names and coarse-pointer targets. Inspect desktop and narrow screenshots for hierarchy, whitespace, readable code and preserved relationship context separately from automated interaction tests. A working wheel handler or passing browser test is not visual approval or comprehension evidence.
 
 ## Acceptance and implementation boundaries
+
+The [subsystem mockup map](../../plans/720p/slices/05-explanation-exploration/subsystem-mockups.md) assigns separate inspectable scenarios for canvas/source, story, import/history, discussion/participants and tests/evidence, joined by this same model. The current canvas preview continues without waiting for all other scenarios.
 
 The next [inspectable React mockup packet](../../plans/720p/slices/05-explanation-exploration/canvas-reading-mockup.md) demonstrates overview, focused inline diff, an unchanged neighbor, anchored questioning, exact return and a narrow alternative on one pinned real own-PR change. It must be shown before another production UI composition is adopted. The user correction establishes the model; the mockup establishes whether its concrete layout is usable.
 
