@@ -82,3 +82,12 @@ The local candidate implements the shared contracts, controlled CLI notification
 The newer SDK v2 `listen(filter)` API uses `subscriptions/listen` under protocol 2026-07-28, resolves after an acknowledgement, and rejects on a 2025 protocol connection. It is not available merely because a current documentation page describes it. No SDK upgrade, new dependency, resource implementation or new wake service is adopted here. Sources: [SDK v1](https://ts.sdk.modelcontextprotocol.io/), [v2 subscriptions](https://ts.sdk.modelcontextprotocol.io/v2/clients/subscriptions.html), [v2 Client.listen](https://ts.sdk.modelcontextprotocol.io/v2/api/@modelcontextprotocol/client/client/client.html#listen).
 
 Any future subscription belongs in the declared integration layer and managed subscription registry, scoped to authenticated attachment/review/generation with bounded state, teardown on disconnect/revoke, and independent diagnostics. Resource-change delivery does not prove that native Codex subscribes, wakes an idle conversation, starts a model turn, or exposes the native MCP tool catalog. Those host capabilities require independent negotiated and observed evidence. Explicit inbox reads remain available when hints are unsupported.
+
+
+## MCP SDK v2 compatibility upgrade
+
+**Decision date:** 2026-10-24
+
+**Accepted direction:** Upgrade the declared MCP boundary to published split `@modelcontextprotocol/client`, `@modelcontextprotocol/server` and required public `core` packages at 2.4.0. npm registry publication was verified independently of documentation availability. Implementation and acceptance are tracked in the [upgrade packet](../plans/480p/slices/02-review-continuation/mcp-listen-experiment/sdk-upgrade-plan.md).
+
+The server must retain all existing authenticated tool contracts and per-connection attachment state, while the supported stdio entrypoint handles both modern 2026-07-28 and legacy 2025 protocol connections. Its shutdown handle owns the transport and connection teardown. The controlled local client may explicitly negotiate modern protocol; older-host compatibility must be tested separately. SDK capability is distinct from configured server resources and native host behavior. No production resource, event subscription, automatic native wake or CLI replacement is adopted by this dependency upgrade. Earlier SDK 1.32.2 experiment results remain historical evidence for that exact version.

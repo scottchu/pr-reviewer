@@ -125,3 +125,12 @@ The semantic MCP transport exposes analysis_get, analysis_source_get and graph_c
 ### Imported review authorization handoff
 
 Opening an imported review through the actual React action must initialize both its review and semantic query authorization without a reload. Mounting the new review bridge and interval polling must preserve the explicit login request until its authoritative result is available. Verify the resulting semantic query carries the imported review and exact snapshot scope, then verify declaration preparation is enabled. This handoff check does not imply that acquisition, inventory or analysis will succeed within their independent limits.
+
+
+## MCP SDK compatibility
+
+**Decision date:** 2026-10-24
+
+**Target:** Published split MCP SDK packages 2.4.0, existing Node 24, supported modern stdio lifecycle with legacy compatibility.
+
+The upgrade preserves trusted launch pairing and existing tools, including denial before attachment, exact source authorization and idempotent command receipts. A controlled modern client negotiates 2026-07-28; explicit legacy tests exercise 2025 resource subscription compatibility. Isolated subscription/listen fixtures do not expose production inbox resources or establish native-session context delivery, automatic turns or meaningful replies. Actual native connection and own-PR acceptance remain separate. See the [upgrade packet](../../plans/480p/slices/02-review-continuation/mcp-listen-experiment/sdk-upgrade-plan.md) for current implementation/evidence status. Existing CLI delivery and pilot state remain unchanged by the upgrade.
