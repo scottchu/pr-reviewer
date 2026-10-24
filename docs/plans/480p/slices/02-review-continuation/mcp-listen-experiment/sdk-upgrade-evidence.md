@@ -6,6 +6,8 @@
 
 **Base source:** 96d0f9e31e9e6e65c2f1ccbed2a2c67ff7231b37
 
+**Verified implementation candidate:** e3e847b36cfb7252520fbd7e686c4b3f8c512e2c
+
 **Status:** Engineering candidate verified locally; independent review, own-PR, publication and deployment remain root-owned gates
 
 **Native status:** Existing-session event receipt/context delivery/automatic reaction/meaningful native reply remain INCONCLUSIVE

@@ -1,6 +1,6 @@
 # MCP SDK v2 upgrade
 
-**Packet revision:** 1
+**Packet revision:** 2
 
 **Date:** 2026-10-24
 
@@ -58,3 +58,16 @@ Return exact candidate/versions, tests and failures, dependency/script compariso
 Direct dependencies are client/server 2.4.0; core 2.4.0 is an exact transitive dependency. Public server/client reexports supply protocol/error/fixture APIs, so no direct core or internal import is required. The old monolith is removed from live source/tests. Historical v1 fixture/evidence remains pinned to its original base/dependency instructions; it is not a current normal regression entrypoint. New listen and legacy checks live in the already registered semantic MCP suite, with an adjacent isolated fixture, so package scripts stay byte-identical to base.
 
 The real stdio server uses `serveStdio` and explicit schema objects; the owner utility pins modern protocol; story and historical browser clients retain explicit legacy negotiation. Future resources/native wake remain excluded. [Final upgrade evidence](sdk-upgrade-evidence.md) retains actual commands, failures, corrected fixture assumptions, source identities and remaining root-owned gates.
+
+
+## Independent-review handoff v2: frozen candidate
+
+**Implementation candidate:** e3e847b36cfb7252520fbd7e686c4b3f8c512e2c
+
+**Diff base:** 96d0f9e31e9e6e65c2f1ccbed2a2c67ff7231b37
+
+**Docs-first packet:** 79d2e19
+
+**Review scope:** U1-U5, exact frozen source above and its evidence, read-only; root assigns a fresh reviewer. The following receipt update changes only documentation metadata. Reproduce the normal entrypoint and focused protocol/React checks as appropriate; preserve the disclosed first browser reload failure and cancellation-race limitation. Production code and dependencies are frozen at the implementation candidate. Own-PR/native acceptance and root delivery remain open, not implied by this readiness packet.
+
+**Worker checkpoint:** Knowledge reconciled to participant-adapters.md and runtime.md and local links verified. Unique candidate and review dependencies remain in this clean task worktree; private node_modules and external test/E2E logs are retained for root review. No worker process remains active. Writer is released to root after final status readback.
