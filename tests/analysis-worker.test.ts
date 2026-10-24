@@ -58,3 +58,31 @@ test('journal failure cannot mint authority and missing executable is a bounded 
  await assert.rejects(fixture('setTimeout(()=>{},30000)',{timeoutMs:100},{recordProcess:row=>{if(row.state==='started')throw Error('journal');},cancelled:()=>false}),/termination_unknown/);
  const o=observations();await assert.rejects(runAnalysisWorker(request,o.port,{executable:'/nonexistent/owner-fixture'}),/failed/);assert.deepEqual(o.rows.map(r=>r.state),['requested','exited']);
 });
+
+test('actual heap exhaustion is a known resource failure with sanitized diagnostics',async()=>{
+ const o=observations();await assert.rejects(fixture('const a=[];while(true)a.push(new Array(1000000).fill(1));',{timeoutMs:5000},o.port),error=>{assert.match(String(error),/analysis_worker_failed/);assert.equal(String(error).includes('heap'),false);return true;});assert.equal(o.rows.at(-1)?.state,'exited');assert.equal(o.rows.at(-1)?.reason,'analysis_worker_failed');
+});
+
+test('fixed child environment discards preloads and credential-bearing ambient values',async()=>{
+ const envelope=(await runAnalysisWorker(request,observations().port)).envelope;
+ const saved={NODE_OPTIONS:process.env.NODE_OPTIONS,AWS_SECRET_ACCESS_KEY:process.env.AWS_SECRET_ACCESS_KEY};
+ try{process.env.NODE_OPTIONS='--require=/nonexistent/private-preload';process.env.AWS_SECRET_ACCESS_KEY='worker-test-private';const out=await fixture(`if(process.env.NODE_OPTIONS||process.env.AWS_SECRET_ACCESS_KEY)process.exit(9);${emit(envelope)}`);assert.ok(isAnalysisWorkerWitness(out.witness,request,out.envelope));}
+ finally{for(const key of ['NODE_OPTIONS','AWS_SECRET_ACCESS_KEY'] as const){if(saved[key]===undefined)delete process.env[key];else process.env[key]=saved[key];}}
+});
+
+test('inherited pipes after leader exit settle as unknown without guessing descendant ownership',async()=>{
+ const root=mkdtempSync(join(tmpdir(),'pr-reviewer-worker-pipes-')),pidFile=join(root,'pid');let pid:number|undefined;
+ try{const o=observations();const running=fixture(`const {spawn}=require('node:child_process');const {writeFileSync}=require('node:fs');const c=spawn(process.execPath,['-e',"process.on('SIGTERM',()=>{});setTimeout(()=>{},30000)"],{stdio:'inherit'});writeFileSync(${JSON.stringify(pidFile)},String(c.pid));process.on('SIGTERM',()=>process.exit(0));setTimeout(()=>{},30000);`,{timeoutMs:200},o.port);
+ const started=Date.now();await assert.rejects(running,/termination_unknown/);assert.ok(Date.now()-started<2000);pid=Number(readFileSync(pidFile,'utf8'));assert.doesNotThrow(()=>process.kill(pid!,0));assert.equal(o.rows.at(-1)?.reason,'termination_unknown');const count=o.rows.length;await new Promise(r=>setTimeout(r,50));assert.equal(o.rows.length,count);
+ }finally{if(!pid&&existsSync(pidFile))pid=Number(readFileSync(pidFile,'utf8'));if(pid)try{process.kill(pid,'SIGKILL');}catch{}rmSync(root,{recursive:true,force:true});}
+});
+
+test('compute references and source anchors cannot be forged in otherwise valid frames',async()=>{
+ const inventory=(await runAnalysisWorker(request,observations().port)).envelope;if(inventory.phase!=='inventory'||inventory.result.status!=='available')throw Error('fixture');const d=inventory.result.declarations.find(d=>d.name==='caller')!.declaration;
+ const compute:WorkerRequest={...request,phase:'compute',input:{...input,seeds:[{side:d.side,path:d.path,contentHash:d.contentHash,start:d.start,end:d.end}]}};
+ const base=(await runAnalysisWorker(compute,observations().port)).envelope;
+ const root=mkdtempSync(join(tmpdir(),'pr-reviewer-worker-compute-')),entryPath=join(root,'fixture.cjs');try{
+ const mutations=[(e:any)=>e.result.edges[0].callee='0'.repeat(64),(e:any)=>e.result.edges[0].id='0'.repeat(64),(e:any)=>e.result.edges[0].sites[0].anchor.contentHash='0'.repeat(64),(e:any)=>e.result.edges[0].sites[0].anchor.end=100000,(e:any)=>e.result.neighborhoods[0].outgoing=[],(e:any)=>e.result.nodes[0].body.side='base',(e:any)=>e.result.edges.push(e.result.edges[0])];
+ for(const mutate of mutations){const envelope=structuredClone(base);mutate(envelope);writeFileSync(entryPath,emit(envelope));await assert.rejects(runAnalysisWorker(compute,observations().port,{entryPath}),/analysis_worker_/);}
+ }finally{rmSync(root,{recursive:true,force:true});}
+});
