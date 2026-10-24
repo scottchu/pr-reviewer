@@ -29,3 +29,9 @@ The first view presents complete prepared documents in two independently scrolli
 Submission uses one application-owned command identity. An interrupted acknowledgement retains it for an unchanged retry; changing the unresolved submission is rejected until reconciled. The bridge reads at the accepted receipt's revision before clearing the draft. React Strict Mode remount and bridge route tests verify teardown/reconnect; rendering never schedules CLI work. Polling changes only view snapshots, while durable inbox delivery remains gateway-owned.
 
 The controlled-host screenshot was inspected against design-system guideline revision `6cfe720df1a981e8ce8bb053927aea20d12f105d`: neutral hierarchy, readable source/discussion, explicit status/limits, text change markers, visible source attribution and focus treatment. Automated keyboard/source-link interaction passed. This is implementer visual review, not human comprehension or physical touch/screen-reader acceptance.
+
+## Review read ownership
+
+Explicit login and command receipt readback own their in-flight review request. A managed background poll must skip every in-flight read, including another poll, rather than aborting or replacing it. This preserves the login result used to initialize the semantic review scope when the owner opens an imported review. A later successful background review projection cannot substitute for that explicit authorization handoff.
+
+Foreground operations retain latest-intent ownership: a newer explicit credential or snapshot choice may supersede an older request, and generation/publication fences still reject stale responses. The polling guard belongs only to the managed background route; it must not drop an authoritative login, selection or receipt readback. Disposal still aborts owned reads and tears down polling.

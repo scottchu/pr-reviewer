@@ -275,3 +275,119 @@ test('disposing an in-flight source choice releases loading and remount observes
  }) as typeof fetch;
  try{const bridge=createReviewBridge('r');await bridge.login('token');const dispose=bridge.connect();const choice=bridge.selectSnapshot('newest').then(()=>null,error=>error);dispose();assert.match(String(await choice),/selection_superseded/);assert.equal(bridge.getSnapshot().selecting,false);const remount=bridge.connect();await new Promise(resolve=>setTimeout(resolve,10));remount();assert.equal(requests.at(-1),'s');assert.equal(bridge.getSnapshot().review?.snapshot.snapshotId,'s');}finally{globalThis.fetch=original;}
 });
+
+// Derives from presentation.md: foreground read ownership is separate from route timing.
+for (const emission of ['connection', 'interval'] as const) {
+  test(`background ${emission} preserves the explicit login result used by an imported-review handoff`, async (context) => {
+    const original = globalThis.fetch;
+    context.mock.timers.enable({ apis: ['setInterval'] });
+    let reads = 0, complete!: (response: Response) => void;
+    let loginSignal: AbortSignal | null | undefined;
+    globalThis.fetch = (async (_input: Parameters<typeof fetch>[0], init?: Parameters<typeof fetch>[1]) => {
+      if (++reads !== 1) return Response.json(review);
+      loginSignal = init?.signal;
+      return new Promise<Response>((resolve, reject) => {
+        complete = resolve;
+        loginSignal?.addEventListener('abort', () => reject(new DOMException('Aborted', 'AbortError')), { once: true });
+      });
+    }) as typeof fetch;
+    const bridge = createReviewBridge('r');
+    let dispose: (() => void) | undefined;
+    try {
+      if (emission === 'interval') dispose = bridge.connect();
+      const login = bridge.login('user-token');
+      if (emission === 'connection') dispose = bridge.connect();
+      context.mock.timers.tick(1400);
+      assert.equal(reads, 1, 'background emissions cannot start another read while login owns its request');
+      assert.equal(loginSignal?.aborted, false);
+      complete(Response.json(review));
+      await login;
+      assert.equal(bridge.getSnapshot().authenticated, true);
+      assert.equal(bridge.getSnapshot().review?.snapshot.snapshotId, 's', 'login continuation can initialize the exact semantic scope');
+      context.mock.timers.tick(700);
+      assert.equal(reads, 2, 'polling resumes after the foreground request settles');
+    } finally {
+      dispose?.();
+      assert.equal(bridge.diagnostics().length, 0);
+      context.mock.timers.reset();
+      globalThis.fetch = original;
+    }
+  });
+}
+
+test('background intervals preserve one slow background projection instead of repeatedly aborting it', async (context) => {
+  const original = globalThis.fetch;
+  context.mock.timers.enable({ apis: ['setInterval'] });
+  let reads = 0, complete!: (response: Response) => void;
+  let heldSignal: AbortSignal | null | undefined;
+  globalThis.fetch = (async (_input: Parameters<typeof fetch>[0], init?: Parameters<typeof fetch>[1]) => {
+    if (++reads === 1) return Response.json(review);
+    heldSignal = init?.signal;
+    return new Promise<Response>((resolve, reject) => {
+      complete = resolve;
+      heldSignal?.addEventListener('abort', () => reject(new DOMException('Aborted', 'AbortError')), { once: true });
+    });
+  }) as typeof fetch;
+  const bridge = createReviewBridge('r');
+  let dispose: (() => void) | undefined;
+  try {
+    await bridge.login('user-token');
+    dispose = bridge.connect();
+    context.mock.timers.tick(2100);
+    assert.equal(reads, 2);
+    assert.equal(heldSignal?.aborted, false);
+    const committed = new Promise<void>(resolve => {
+      const unsubscribe = bridge.subscribe(() => {
+        if (bridge.getSnapshot().review?.revision === 2) { unsubscribe(); resolve(); }
+      });
+    });
+    complete(Response.json({ ...review, revision: 2 }));
+    await committed;
+    assert.equal(bridge.getSnapshot().review?.revision, 2);
+  } finally {
+    dispose?.();
+    assert.equal(bridge.diagnostics().length, 0);
+    context.mock.timers.reset();
+    globalThis.fetch = original;
+  }
+});
+
+test('background connection and timer preserve authoritative revocation receipt readback', async (context) => {
+  const original = globalThis.fetch;
+  context.mock.timers.enable({ apis: ['setInterval'] });
+  const attachment = { attachmentId: 'a', actorId: 'agent', host: 'codex' as const, sessionId: 'session', connectionId: 'connection', generation: 1, active: true };
+  let reads = 0, complete!: (response: Response) => void;
+  let heldSignal: AbortSignal | null | undefined;
+  let markRead!: () => void;
+  const reading = new Promise<void>(resolve => { markRead = resolve; });
+  globalThis.fetch = (async (_input: Parameters<typeof fetch>[0], init?: Parameters<typeof fetch>[1]) => {
+    if (init?.method === 'POST') return Response.json({ state: 'applied', revision: 2 });
+    if (++reads === 1) return Response.json({ ...review, attachment });
+    heldSignal = init?.signal;
+    markRead();
+    return new Promise<Response>((resolve, reject) => {
+      complete = resolve;
+      heldSignal?.addEventListener('abort', () => reject(new DOMException('Aborted', 'AbortError')), { once: true });
+    });
+  }) as typeof fetch;
+  const bridge = createReviewBridge('r');
+  let dispose: (() => void) | undefined;
+  try {
+    await bridge.login('user-token');
+    const revoking = bridge.revoke();
+    await reading;
+    dispose = bridge.connect();
+    context.mock.timers.tick(1400);
+    assert.equal(reads, 2, 'receipt readback remains the only active projection');
+    assert.equal(heldSignal?.aborted, false);
+    complete(Response.json({ ...review, revision: 2, attachment: { ...attachment, active: false } }));
+    await revoking;
+    assert.equal(bridge.getSnapshot().review?.revision, 2);
+    assert.equal(bridge.getSnapshot().review?.attachment?.active, false);
+  } finally {
+    dispose?.();
+    assert.equal(bridge.diagnostics().length, 0);
+    context.mock.timers.reset();
+    globalThis.fetch = original;
+  }
+});

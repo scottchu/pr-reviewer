@@ -119,7 +119,7 @@ export const createReviewBridge = (reviewId: string, initialSnapshotId?:string) 
     const route = registry.register(
       "review-committed-to-view",
       reviewId,
-      () => Boolean(token) && !state.busy && !state.selecting,
+      () => Boolean(token) && !state.busy && !state.selecting && !inflight,
       () => {
         void refresh();
       },
