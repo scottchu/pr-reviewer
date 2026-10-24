@@ -2,9 +2,9 @@
 
 **Date:** 2026-10-24
 
-**Handoff revision:** 1; exact source input `67b24f31dd322d034c0a2ec6b73006c009fba310` plus the commit containing this packet.
+**Handoff revision:** 2; exact source input `67b24f31dd322d034c0a2ec6b73006c009fba310` plus the commit containing this packet.
 
-**Status:** Ready for independent plan review only. No implementation agent is assigned or authorized by this file alone.
+**Status:** P1 passed the original design; G2/G3 bounded qualification is recorded in [probe](probe.md). Ready for root reconciliation and narrow qualification review, not implementation dispatch. No implementation agent is assigned or authorized by this file alone.
 
 **Parent:** [Slice plan and gates](plan.md).
 
@@ -31,7 +31,7 @@ Initial storage support is additive: existing records/receipt meanings are retai
 
 Boundary checker additions are only the test-owned edges needed above. The gateway may import test-jobs/public; application/UI may not import storage/process internals. Any extraction of existing process helpers must preserve fixed acquisition and semantic authorities and their independently tested behavior. No widening of `Command` to a public arbitrary executable is permitted. Maintain explicit functional/immutable inputs and testable effect ports; no new reactive library or package split.
 
-## Implementation handoff I1
+## Implementation handoff I2
 
 **Requested endpoint:** Complete T01–T09 and provide evidence for T10 through06A–06C; do not accept the slice or deliver main/pilot yourself.
 
@@ -41,7 +41,7 @@ Boundary checker additions are only the test-owned edges needed above. The gatew
 
 **Editable scope after assignment:** New test domain/storage/runner/application/CLI and React components/tests; narrow existing store/shared lease/gateway/workspace/integration boundary checker changes; this slice and its owning durable docs. Existing package scripts may change only for an explicitly required CLI/check/test entry under the sole integration writer; no new dependency/runtime/lock change without documented need. Do not edit05 evidence or another agent's worktree. No native adapters/auth/passkey/pilot/global configuration changes.
 
-**Inputs/readiness:** G0 review and committed assignment, reconciled G1 source/owner boundaries;06A can retain G2/G3 unavailable explicitly.06B requires qualified exact runtime flags, source/dependency copy/environment contract and amended definition digest.06C requires06B committed interfaces and real result/termination observations. No source fallback, install or external effects to satisfy a blocked environment.
+**Inputs/readiness:** G0 review and committed assignment, reconciled G1 source/owner boundaries;06A preserves unavailable production configuration as unavailable; it rejects production requests before queuing while that configuration is unavailable. Use a separately injected TEST-ONLY available registry for the queued/cancel/no-runner journey, explicitly without environment proof.06B consumes the observed target revision2, exact runtime flags, source/dependency copy/environment recipe and digest from the durable specification/probe; fresh checks bind the actual implementation target head.06C requires06B committed interfaces and real result/termination observations. No source fallback, install or external effects to satisfy a blocked environment.
 
 **Steps:** Implement the numbered vertical chunks in the parent sequentially, with public values and short owner transitions tested before effects. Each commit updates the slice's observed outcome and durable design before the next consumer begins. At each chunk exercise actual React behavior stated in its row, plus strict checks/relevant tests. Reserve full actual own-PR comprehension for the fresh reviewer; implementer dogfood does not consume that role.
 
@@ -84,3 +84,9 @@ Root reconciles engineering and product findings, promotes learning to durable k
 After06 acceptance, update the1080p07/08 dependency rows with delivered exact target-definition schema/revision, source/environment manifests, job/result/artifact IDs and query/CLI semantics, lease/quiescence and authority interfaces, verified limits/test assets and remaining gates.07 must establish two separately qualified pinned environments and explicit incompatibility;08 must design subscribed terminal-event eligibility later. No base/head comparison, terminal-event inbox, agent wake, correction workflow or automatic successor readiness is implemented here. Create their individual slice plans only when root plans those actual deliveries.
 
 Root alone records PR/merge/pilot version/health/use and retained rollback. The planning author returns a locally committed docs-only packet and retained worktree for review/integration; publication/deployment is not part of this handoff.
+
+## Prerequisite executor and narrow review handback Q2
+
+Root assigned the original planning owner only the bounded G2/G3 engineering probe on source67, in external task-owned storage, with docs-only promotion on this branch. That work ran the existing direct Bun binary, nonsecret option traps and exactly the four configured tests against a complete raw-object source tree and copied local two-package closure. It changed no application/test/config/package/lock source, pilot, native session, global setting or shared dependency content. [Probe](probe.md) contains exact identities, results, artifact retention and limits. The assignment ends at this committed handback; it is not I2 implementation authority.
+
+A fresh or already independent P1 reviewer may read the changed durable recipe, recorded probe and raw manifests/logs to check: actual invocation collects four files, `--config=` syntax and empty config binding, disabled install/dotenv controls, complete source/raw object identity, non-script manifest equality, copy/donor hashes, isolated caches and honest provenance limits. Verify target-definition digest and note the observed fast successful process supplies no active cancellation/lease/restart/UI/CLI evidence. Return qualified evidence-ready or concrete changes needed; root assigns the actual executor and run root afterward.

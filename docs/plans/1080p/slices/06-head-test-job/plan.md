@@ -2,15 +2,15 @@
 
 **Date:** 2026-10-24
 
-**Packet revision:** 1 — design and role handoffs for independent plan review.
+**Packet revision:** 2 — independent design review reconciled; bounded G2/G3 qualification recorded.
 
-**Status:** Planning complete; implementation not dispatched. No target/environment/process/React/CLI acceptance is claimed.
+**Status:** Original design independently passed; exact67 runtime/source/closure prerequisite probe passed within its limits. Implementation is not dispatched. No product-job/React/CLI/own-PR acceptance is claimed.
 
 **Parent:** [1080p round](../../plan.md), [delivery through1080p](../../../delivery-through-1080p.md).
 
 **Durable specification:** [Configured tests on a pinned head](../../../../product/review-loop/test-execution.md), revision `head-test-v1`.
 
-**Ownership:** Root owns acceptance, exact role assignment, integration, PR/main and delivery. This planning worker is the sole slice06 product-doc writer for this packet. Implementation and review role scopes are in [integration revision1](integration.md); unassigned roles are not ready dispatches.
+**Ownership:** Root owns acceptance, exact role assignment, integration, PR/main and delivery. This planning worker is the sole slice06 product-doc writer for this packet. Implementation and review role scopes are in [integration revision2](integration.md); unassigned roles are not ready dispatches.
 
 ## Intent, baseline and gap
 
@@ -25,8 +25,8 @@ Source baseline is immutable `67b24f31dd322d034c0a2ec6b73006c009fba310`. Existin
 | Decision / observation | Status and effect |
 |---|---|
 | Select `review-source-core-v1` only | Proposed initial delivery: exact declared four-file Bun stage, cwd isolated root. Optional Node production target deferred to avoid enlarging the first effect surface. Real process regression tests remain required engineering verification. |
-| Complete raw-object execution tree without linked Git metadata | Proposed isolation policy; avoids checkout hooks/filters/export transformations and live-worktree mutation. Complete object/source qualification remains unrun. |
-| Existing two-package closure, task-owned copy | Proposed no-install policy; package metadata and bytes must qualify. Never link shared writable dependencies or run package scripts. |
+| Complete raw-object execution tree without linked Git metadata | Qualified on exact67 by the bounded raw-object probe; avoids checkout hooks/filters/export transformations and live-worktree mutation. Production preparation remains unimplemented. |
+| Existing two-package closure, task-owned copy | Observed copied existing closure qualified on exact67; fresh metadata/content/copy checks remain mandatory per run. Never link shared writable dependencies or run package scripts. |
 | Script-only donor manifest drift | Root accepted in-scope design choice for review: exact lock plus canonical entire package.json minus only scripts must match. Record full manifests and exact changed script keys. Any other mismatch is unavailable. |
 | Single shared import/analysis/test effect slot | Required boundary. Extend atomic lease, epoch checks and unfinished scan; unknown test effects participate. Discussion remains independent. |
 | Trusted configured local target | Accepted scope; not an OS sandbox, kernel network prohibition or hard RSS guarantee. No credential/network/native/installation grant. |
@@ -34,7 +34,7 @@ Source baseline is immutable `67b24f31dd322d034c0a2ec6b73006c009fba310`. Existin
 
 Read-only preparation `/tmp/pr-reviewer-720p-reflection-evidence/slice06-readiness.md`, SHA256 `504c92a7ab0b6da47923c1652059648b06c64d00b715021675c593fe1fbb74c7`, was read fully as a proposal. Its79307d9 source snapshot and incomplete source-preparation assumptions are not authority or test proof. The durable specification above supersedes its optional-target/materialization/metadata choices for review; this tracked packet preserves required knowledge without depending on that temporary file.
 
-At67, direct read-only inspection found:
+Initial planning inspection at67 found the following; later qualification is recorded in G2/G3 and probe.md:
 
 - The exact four-file Bun first stage in package.json; dependency version declarations zod4.6.7 and typescript-analysis alias6.0.3; source-core imports resolve by inspection to those packages and local source. This is not execution or exhaustive future-head qualification.
 - 210 tracked entries, all mode100644; no tracked root .gitattributes/.gitmodules/.npmrc/bunfig.toml/.tool-versions among inspected names. A future head must be checked afresh.
@@ -46,17 +46,17 @@ At67, direct read-only inspection found:
 
 | Gate | Current status | Owner and next action / blocked dependency |
 |---|---|---|
-| G0 committed design/role packet and independent plan review | This revision ready for that review only | Root pins this packet commit and assigns fresh plan reviewer; resolve material findings before code. |
+| G0 committed design/role packet and independent plan review | P1 PASS at5f12904; nonblocking P3 clarified below | [Probe/review reconciliation](probe.md) records the exact report. Root reviews this qualification amendment before execution-dependent assignment; no implementation dispatch implied. |
 | G1 predecessor identity and composition |67 captured; engineering/knowledge inputs qualified; final05 actual own-PR understanding/answer/merge pending | Root reconciles final05 outcome and exact new implementation base. Broken source/auth/storage/composition contracts block dependent writers. Independent06 planning may proceed; predecessor completion alone never implies06 readiness. |
-| G2 existing runtime and target qualification | Metadata only; no direct-Bun safety-option evidence | Assigned bounded prerequisite executor after G0: qualify fixed runtime flags excluding autoinstall/config/env loading, pinned target/import graph and object completeness; record exact accepted vector/digest before executor dispatch. Unsupported behavior → unavailable, no weaker fallback. |
-| G3 existing closure provenance and isolated copy | Lock/non-script metadata compatible; actual closure/copy unqualified | Same executor: qualify donor contents/provenance/containment and copy recipe against exact head. Missing/unverifiable material blocks real run, not pure policy preparation. No install/network authority. |
+| G2 existing runtime and target qualification | Qualified exact existing Bun1.4.2 and source67 in the bounded probe | [Observed recipe and identities](probe.md); target revision2/digest is durable. Root/independent reviewer reconciles the amendment; another source/runtime must pass fresh checks. No product runner proven. |
+| G3 existing closure provenance and isolated copy | Measured local closure qualified and copied without mutation; exact core target passed | [Probe](probe.md) retains complete manifests and limitations. This is owner-qualified installed content, not vendor archive/historical-install attestation. New closure/head metadata needs fresh qualification; no install/network authority. |
 | G4 exact runner/storage/interface roles | Version1 proposed in durable spec and integration packet; executor names/worktrees unassigned | Root assigns one integration writer and isolated chunk worktree against exact committed packet; no concurrent shared-store/UI/package writers. |
 | G5 own-PR candidate/target/verifier packet | Planned slice06 task branch/PR, no invented URL or pins | Root creates/selects actual qualifying PR, clean candidate and provider-verified base/head before UI dogfood; separate source-informed verifier key from fresh graph reviewer. |
 | G6 implementation/engineering/React/CLI/visual evidence | Not run | Assigned implementer and independent reviewers record actual source/env/outcome evidence, fix/recheck affected acceptance. |
 | G7 durable knowledge, successor inputs and milestone reflection | Not run for06 | Integration owner promotes findings, root assigns fresh whole-current-product docs-only audit, returns exact interfaces/evidence to round07 row before later planning. |
 | G8 merge/pilot verification | N/A to planning; required later through established root route | Root alone handles PR-only merge and existing pilot update/rollback/version/health/usability once applicable gates pass. No operational mutation by this worker. |
 
-The first prerequisite probe has a maximum30 minutes of targeted local qualification, one production target and no install/network/secret/global-config changes. Pass requires supported exact direct-runtime options, complete trusted local source and a verified existing closure recipe within declared bounds. Fail means a demonstrated unsupported condition; inconclusive means missing evidence or effort cap. Either leaves real execution blocked and returns the precise input/owner. Update durable policy before dependent code if qualification changes any proposed limit/flag/identity rule. Do not substitute unmeasured metadata agreement for qualification.
+The completed [prerequisite probe](probe.md) used less than the maximum30 minutes of targeted local qualification, one production target and no install/network/secret/global-config changes. Pass requires supported exact direct-runtime options, complete trusted local source and a verified existing closure recipe within declared bounds. Fail means a demonstrated unsupported condition; inconclusive means missing evidence or effort cap. Either leaves real execution blocked and returns the precise input/owner. Update durable policy before dependent code if qualification changes any proposed limit/flag/identity rule. Do not substitute unmeasured metadata agreement for qualification.
 
 ## Execution sequence and measurable acceptance
 
@@ -94,7 +94,7 @@ Pass evidence on a naturally passing own PR remains pass evidence only. Controll
 
 Keep reviewer A and raw evidence immutable, retain B/fixes/revalidation beside this slice. A source-aware engineer cannot later supply the fresh blind account. UI coverage, graph coverage, fixture results and same-agent dogfood do not establish unfamiliar-reviewer comprehension or native/human effects. Unresolved01/04/05/720p native/human gates remain independently named.
 
-## Scope, return and checkpoints
+## Initial planning scope, return and checkpoints
 
 No app/tests/config/scaffold/package/lock/dependency writes in this planning phase. No prototype/native MCP/pilot/passkey/host/security/network/global-setting/private-key work. Source07/08 changes remain future and provisional. Root may resolve reversible choices within these boundaries; material missing execution authority, new destinations/runtime, external repositories or credential use pauses affected work.
 
@@ -104,7 +104,7 @@ Required planning return: exact committed docs-only head, changed paths, checks,
 
 Planning verification is recorded after the checks below; it is documentation validation only. At handback, implementation remains blocked on G0 review/assignment and the corresponding runtime/predecessor gates, not on generic permission.
 
-## Planning verification and retained state
+## Initial planning verification and retained state
 
 - `git diff --check`: passed for this docs-only packet.
 - Changed-file Markdown link check:58 local file links across six changed/new Markdown files, zero missing targets. The first broad regex check also matched deliberate malformed-link fixture examples in unchanged persistence-compatibility knowledge; those examples were preserved, and the final check excluded code spans/fences and scoped the actual changes. No whole-repository anchor-validation claim is made.
@@ -112,3 +112,9 @@ Planning verification is recorded after the checks below; it is documentation va
 - Final checkpoint: all new knowledge is in the three tracked slice/product documents and narrow index/round links. External preparation and donor installation were read only and retained. This worktree remains the review/integration recovery location; there are no task runtime artifacts to clean.
 
 These checks establish document integrity and the planning handback only. Independent plan review, runtime/closure qualifications, actual product checks and final predecessor gates remain open as recorded above.
+
+## Revision2 prerequisite handback
+
+The [bounded probe and P1 review record](probe.md) preserves exact raw evidence, source/runtime/target/environment identities and the qualified local recipe. Runtime flags, explicit owner-empty config and XDG directories resolve the previously open G2 choice without enabling installs, secrets, broader targets or new executables. Target revision2 supersedes the unqualified revision1 proposal. G3 qualification is deliberately local installed-content attribution, not external authenticity. The P3 unavailable-versus-test-only-queued distinction is explicit in06A and I2.
+
+Root retains predecessor/PR/assignment/delivery gates. A narrow independent check of this evidence/recipe is the next appropriate handoff before execution-dependent implementation; this amendment supplies no product code. Initial planning observations and checks above remain historical, not a claim that the probe did no runtime work. Probe-owned copies/cache/evidence are retained separately for that review and documented in probe.md.

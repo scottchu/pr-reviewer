@@ -2,11 +2,11 @@
 
 **Date:** 2026-10-24
 
-**Contract revision:** `head-test-v1`, proposed design for independent plan review.
+**Contract revision:** `head-test-v1`, qualification amendment2; original design independently reviewed, bounded runtime/source/environment recipe observed.
 
 **Accepted intent:** Run a useful configured check on a retained snapshot's pinned head, keep discussion usable, inspect the same attributed result through React and the owner CLI, and retain honest cancellation/restart uncertainty.
 
-**Implementation status:** Not implemented or execution-qualified by this document. The source/environment/owned-process qualifications below are prerequisites, not evidence of success.
+**Implementation status:** Product jobs are not implemented. A bounded prerequisite probe qualified the exact67 source, existing Bun binary and copied local closure described below; this is not product-job/UI/CLI/lease/cancel/restart/own-PR acceptance. Another head or changed environment needs fresh qualification.
 
 **Parents:** [Review loop](README.md), [shared owner and semantic recovery](semantic-storage.md), [import jobs](import-jobs.md), [story and exploration](story-and-exploration.md), [reactive ownership](../reactive-design.md).
 
@@ -26,7 +26,7 @@ There is one production target in v1. The registry is owner configuration derive
 
 | Field | Value and meaning |
 |---|---|
-| targetId / revision | `review-source-core-v1` / `1` |
+| targetId / revision | `review-source-core-v1` / `2` (revision1 was the unqualified proposal) |
 | Repository | GitHub host `github.com`, target and source project `scottchu/pr-reviewer`; fork/external source projects unsupported |
 | Purpose | Domain anchors/receipts, managed registry, structural graph and bounded source-analysis regression checks |
 | Declared test vector | `test`, `tests/domain.test.ts`, `tests/registry.test.ts`, `tests/graph.test.ts`, `tests/source-analysis.test.ts` |
@@ -37,11 +37,77 @@ There is one production target in v1. The registry is owner configuration derive
 
 The vector must exactly equal the first literal stage of the pinned package.json `scripts.test`, ending before its declared `&&` Node stage. This comparison validates an explicit known literal, never parses arbitrary shell into authority. Missing/changed/indirect declarations are `target_incompatible`. The rest of that script does not run. The optional two-file Node owned-process target from preparation is deferred: actual process regressions are implementation verification, not a second required production target.
 
-Resolve the existing Bun installation independently of the target checkout and repository-controlled version files; record the resolved executable's content digest, observed version, real path privately and platform/architecture. The observed local shim names Bun 1.4.2; its installed binary exists, but that observation does not establish an executable qualification. The existing Node 24 at `/Applications/ChatGPT.app/Contents/Resources/cua_node/bin/node` remains the gateway/CLI and controlled verification runtime, not another production target. No new runtime or installer is selected.
+Resolve the existing Bun installation independently of the target checkout and repository-controlled version files. The qualified executable is `/Users/scottchu/.asdf/installs/bun/1.4.2/bin/bun`, observed version1.4.2, SHA-256 `35d20dd0263e5c950194434b925454fdfa9ba6e4467da960410fa05b08a7a5b5`, on Darwin arm64. Reverify its real path/content before execution; the asdf shim is never launched from the source tree. The existing Node24 at `/Applications/ChatGPT.app/Contents/Resources/cua_node/bin/node` remains the gateway/CLI and controlled verification runtime, not another production target. No runtime install or upgrade is selected.
 
-Before enabling the target, qualify the installed Bun's direct invocation with automatic package installation disabled and automatic environment/config loading excluded. Record the exact supported runtime safety flags as part of the target-definition revision/digest before dispatching execution-dependent code; do not guess support, invoke a shell shim against source configuration, or fall back to weaker flags. This is the one bounded runtime-option readiness probe, not permission to launch an arbitrary target. All target files/imports must resolve from pinned source plus the declared closure, never an ancestor node_modules or user cache. Unsupported runtime options or resolution behavior makes the target unavailable. The source test vector above remains unchanged after any explicitly recorded runtime prefix flags.
+The exact qualified argument order is `test`, `--no-install`, `--no-env-file`, `--config=<owned-empty-bunfig>`, followed by the four literal test paths above. The config argument is one array element with `=`. The private owner substitutes only its newly created regular empty config file; no caller supplies a template or path. Keep this config outside executable source, exclusively owned, zero bytes and hash `e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855`; validate it before/after run. Direct-runtime help and controlled tests establish these flags on this binary. A separated `--config` path placed before `test` exited0 without running tests in the probe and is expressly unsupported. Exit0 alone cannot prove test collection/execution.
+
+Use fresh private HOME, TMPDIR, XDG_CONFIG_HOME and XDG_CACHE_HOME; LANG=C, LC_ALL=C, TZ=UTC, CI=1, NO_COLOR=1; PATH contains only the qualified Bun binary directory. Explicit empty config suppressed a cwd preload trap, while the no-config control loaded it; `--no-env-file` suppressed a dotenv trap, while the enabled control failed its absence assertion. A synthetic missing package failed with `--no-install` and created no node_modules. No install command or network permission was used; syscall-level network denial was not tested. The empty home/config binding, not access to the real user's files, excludes ambient global configuration.
+
+All target imports must resolve from pinned source plus the declared closure, never ancestor node_modules or user cache. The fixed head's four-file run and conservative import account used local domain/registry/source-analysis modules plus Bun/Node built-ins, zod and typescript-analysis; no app/server/active dogfood harness ran. This is qualification of trusted configured source, not a universal import parser or hostile-code containment. Bun treats test arguments as selection patterns: a new head must also rule out additional matching test paths rather than assume unchanged strings select only these four files. Unsupported options, extra matching paths, changed executable content or resolution behavior makes the target unavailable. The recorded source package stage remains the literal declaration check; safety flags do not authorize a package-script stage.
 
 A target definition includes schema version, repository scope, targetId/revision, vector, cwd, runtime policy, closure recipe, environment policy and effective bounds. Its digest uses SHA-256 of UTF-8 canonical JSON with recursively lexically sorted object keys, array order preserved, no whitespace, no undefined/NaN/infinite values. The same recipe applies to the new manifests below, not existing acquisition/semantic identity recipes. Target definition revision is immutable; changed content requires a new revision, never replacement under an old digest.
+
+### Qualified target definition
+
+Revision2 has canonical definition digest `c8b3c8001ff71830ccf50405d6a50fe671c9943a4f5a4934616ce82dc043a940`. The value below is configuration knowledge, not an implementation or generic template system. `argvTemplate` has exactly one private owned-config role substitution described above. Canonicalize using the preceding recipe; do not hash Markdown formatting. `head-test-env-v1` means the exact allowlist and owned-root bindings above. Closure recipe `existing-copy-v1` means the verification/copy/metadata rules below, with no symlinks or installs.
+
+```json
+{
+  "schema": "head-test-target-v1",
+  "targetId": "review-source-core-v1",
+  "revision": 2,
+  "repository": {
+    "host": "github.com",
+    "targetProject": "scottchu/pr-reviewer",
+    "sourceProject": "scottchu/pr-reviewer"
+  },
+  "argvTemplate": [
+    "test",
+    "--no-install",
+    "--no-env-file",
+    "--config=<owned-empty-bunfig>",
+    "tests/domain.test.ts",
+    "tests/registry.test.ts",
+    "tests/graph.test.ts",
+    "tests/source-analysis.test.ts"
+  ],
+  "cwd": ".",
+  "runtime": {
+    "role": "qualified-existing-bun",
+    "version": "1.4.2",
+    "sha256": "35d20dd0263e5c950194434b925454fdfa9ba6e4467da960410fa05b08a7a5b5"
+  },
+  "config": {
+    "role": "owned-empty-bunfig",
+    "bytes": 0,
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "closure": {
+    "recipe": "existing-copy-v1",
+    "packages": {
+      "zod": "4.6.7",
+      "typescript-analysis": "typescript@6.0.3"
+    },
+    "metadata": "exact-lock-and-entire-package-minus-scripts"
+  },
+  "environmentPolicy": "head-test-env-v1",
+  "limits": {
+    "prepareMs": 30000,
+    "totalMs": 120000,
+    "sourceFiles": 8192,
+    "sourceFileBytes": 8388608,
+    "sourceBytes": 67108864,
+    "closureFiles": 32768,
+    "closureFileBytes": 33554432,
+    "closureBytes": 67108864,
+    "outputBytes": 1048576,
+    "encodedResultBytes": 2097152,
+    "gitLaunches": 32,
+    "runtimeVersionLaunches": 1,
+    "testLaunches": 1
+  }
+}
+```
 
 ## Complete source and isolated existing environment
 
@@ -61,6 +127,16 @@ Construct the environment from an allowlist: `LANG=C`, `LC_ALL=C`, `TZ=UTC`, `CI
 
 Source and closure preparation is a bounded owned effect under the same lease as execution. It is not background prefetch or installation. Qualification failure retains its reason and no test launch. Source copying and hashing can fail or be slow; these bounds are policy values requiring actual tests, not performance measurements.
 
+### Observed qualification and limits
+
+The complete local67b24f31dd322d034c0a2ec6b73006c009fba310 tree `ee8224dfa95603f81db92106812c029234f28b1c` contained210 regular files /2,507,950 bytes. Four protected raw Git reads verified and materialized it without checkout, filters, linked Git metadata or network acquisition. The complete source manifest digest is `748eb61389b9a25f7b4caf1e3e3e30c8080116e73ba8113157710662cc229355`.
+
+The owner-designated existing local donor supplied zod4.6.7 and typescript-analysis6.0.3:980 regular files /30,495,771 bytes. Before/copy/after inventories agreed, no symlinks were followed, and no donor content was changed. Closure manifest digest is `1533684bf324dcdf02be928b17c7f3d7f331e337eb5ad4e7d62127180f6d741f`. Metadata matched the exact-lock/entire-manifest-minus-scripts rule; only `scripts.test` differed. This qualifies the measured existing installed bytes for this trusted local target. It does not attest vendor archive integrity or reconstruct a historical package install. Missing that measured local provenance remains unavailable; vendor authenticity is not silently inferred.
+
+Preparation measured0.498s, with0.384s for copy plus inventory validation. The exact target observed47 passed tests,0 failed and495 expectations across four files, exit0,6,727 output bytes. Source and copied dependency inventories were unchanged; the donor still matched. The owned process group was absent after wait. These are bounded observations, not crash/cancel/escaped-descendant guarantees or proof of the future runner's total deadline. The phases were probed separately.
+
+Bun generated85 transpiler cache files /11,674,800 bytes under the private XDG_CACHE_HOME, with no unexpected source/dependency overlays. A private runtime cache is an expected disposable overlay; never link it to a shared tree. The probe did not establish a hard temporary-disk or RSS bound. The normalized source/closure/runtime/environment manifest digest is `617f41e6adb2c419d20253d520f2c190081e3ef7de65b50d5ff3f74aab61e702`. Full source/closure manifests and output are retained with the slice probe evidence. These exact identities demonstrate qualification, not automatic availability of future heads or package contents.
+
 ## Public values and authority
 
 All IDs are nonempty bounded strings of at most128 characters, revisions nonnegative integers, object/content hashes validated against their algorithm, and all public inputs strict (unknown fields reject). Authenticated user commands use the existing ingress/short transaction owner. Test receipts occupy the existing global command collision domain, including review, import, analysis and story receipts; reserve `test-result:` for private result admission. Check current authorization before replay as well as before mutation. Same command/actor/canonical payload returns the original receipt; changed payload/actor or cross-family ID reuse is `command_conflict`.
@@ -68,7 +144,7 @@ All IDs are nonempty bounded strings of at most128 characters, revisions nonnega
 | Public operation | Contract |
 |---|---|
 | Configured targets | Authorized reviewId/snapshotId → bounded registry summaries with targetId/revision/digest, vector/cwd/policy summaries and `available`, `qualification_required` or `unavailable` plus reason. This read never creates an execution tree or launches a process. Availability metadata cannot substitute for the fresh pre-spawn checks. |
-| RequestTest | commandId, reviewId, snapshotId, targetId, expectedTargetRevision. User only; capture exact retained repository/source/head, definition and active credential reference, then atomically create queued job and receipt. No path, shell, argv, cwd, environment, URL, executable or side override. |
+| RequestTest | commandId, reviewId, snapshotId, targetId, expectedTargetRevision. User only; reject an unavailable/unqualified production registry configuration without queuing, then capture exact retained repository/source/head, definition and active credential reference and atomically create queued job and receipt. A test-only available configuration can exercise queued intent without qualifying a production environment; fresh preparation still validates every accepted run. No path, shell, argv, cwd, environment, URL, executable or side override. |
 | CancelTest | commandId, jobId, expectedJobRevision. User only; current owner authorization and exact job CAS. Queued cancel prevents claim; active cancel records intent. Stale CAS is `test_job_conflict`. |
 | Test jobs | Authorized reviewId/snapshotId, optional exact jobId and minimumJobRevision. Return bounded summaries and selected exact job/result. A minimum requires exact jobId; wrong scope or unmet minimum is an explicit rejection. Paginate with stable opaque cursor, at most32 summaries per page. Reading history never spawns. |
 | Test artifact | Authorized reviewId/snapshotId/jobId/artifactId → immutable manifest and bounded plain bytes, optionally bounded offset/length within the known artifact. No raw path or URL. |
@@ -116,7 +192,7 @@ Publish artifacts atomically under owner-generated IDs, then commit a validated 
 |---|---|
 | Shared execution | One import/analysis/test invocation; at most8 pending test jobs across this owner, including unresolved occupancy; reject ninth before creating receipt/job/effect |
 | Source tree | At most8192 regular files, 8MiB per blob, 64MiB total bytes; complete tree or unavailable, no partial executable tree |
-| Dependency closure | At most32768 regular files, 32MiB per file, 64MiB total copied bytes; initial two-package closure fits observed metadata only, not an executed qualification |
+| Dependency closure | At most32768 regular files, 32MiB per file, 64MiB total copied bytes; initial two-package closure was copied and exercised within these bounds in the scoped prerequisite probe; production enforcement remains unimplemented |
 | Deadline | 120s total prepare+execute from claim; preparation at most30s within it; monotonic runtime timing, durable wall timestamps for evidence, never restart the clock after a phase |
 | Output | 1MiB combined stdout/stderr bytes in observed arrival order, preserving channel/chunk ordinal; overflow stops the process and retains an explicitly incomplete bounded prefix |
 | Result artifacts | 2MiB total encoded UTF-8 result/manifest/output per job; 64MiB retained test evidence per review, separately from source/semantic budgets |
