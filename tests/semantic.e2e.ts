@@ -7,7 +7,7 @@ import {createServer} from 'node:net';
 import {semanticFixture} from './semantic-fixture.ts';
 import {createGateway} from '../src/server/public.ts';
 import {buildSnapshot} from '../src/source-preparation/public.ts';
-import type {AnalysisView,Review,Snapshot} from '../src/domain/public.ts';
+import type {AnalysisView,AnalysisCommand,Review,Snapshot} from '../src/domain/public.ts';
 let fixture:ReturnType<typeof semanticFixture>,gateway:ReturnType<typeof createGateway>,ui:ChildProcess,uiUrl:string,gatewayUrl:string,snapshot:Snapshot,stderr='';
 test.use({actionTimeout:10000,screenshot:'only-on-failure'});
 test.describe.configure({mode:'serial'});
@@ -19,6 +19,7 @@ const until=async(check:()=>Promise<boolean>,timeout=12000)=>{const end=Date.now
 const pinned=(baseSha:string,headSha:string)=>{const previous=process.env.GIT_DIR;process.env.GIT_DIR=join(fixture.root,'.git');try{return buildSnapshot({prNumber:1,prUrl:'https://github.com/scottchu/pr-reviewer/pull/1',baseSha,headSha,path:'callee.ts',title:'Controlled semantic navigation fixture'});}finally{if(previous===undefined)delete process.env.GIT_DIR;else process.env.GIT_DIR=previous;}};
 test.beforeAll(async()=>{
  fixture=semanticFixture();
+ writeFileSync(join(fixture.root,' spaced name.ts'),'export const spaced = () => 7;\n');
  writeFileSync(join(fixture.root,'helper.ts'),'export const helper = (value:number) => value + 10;\n');
  writeFileSync(join(fixture.root,'caller.ts'),'import {callee} from "./callee";\nexport const caller = (object:any) => callee(object);\n');
  writeFileSync(join(fixture.root,'inventory.ts'),Array.from({length:800},(_,i)=>`export const inventory${i} = (value:number) => { let result=value; ${"result=result+1;".repeat(8)} return result + ${i}; };`).join('\n')+'\n');
@@ -105,4 +106,38 @@ test('actual React history navigation fences delayed graph, annotation and sourc
  });
  await panel.getByText(/All admitted function nodes/).click();await panel.getByRole('listitem',{name:'Function head caller const-arrow',exact:true}).getByRole('button',{name:/Inspect full body/}).click();await until(async()=>sourceCaptured);await snapshots.selectOption(current);await expect(panel.getByText('No admitted static facts for this selection.',{exact:false})).toBeVisible();releaseSource();await page.unroute('**/api/analysis/source');await expect(panel.getByRole('region',{name:'Retained semantic source'})).toHaveCount(0);await expect(snapshots).toHaveValue(current);
  writeFileSync(testInfo.outputPath('semantic-delayed-response-evidence.json'),JSON.stringify({provenance:'Actual Chrome route-delayed responses from the real gateway. Commands committed once and exact original command was retried; no fake graph/result values.',snapshot:snapshot.snapshotId,current,annotationCommandIds:commands.map(command=>(command as {commandId:string}).commandId),historicalGraphRevision:before.graphRevision,notes:before.clarifications.length},null,2));
+});
+
+test('actual React explicit context cap and exact paths retain excluded inventory and a scoped analysis',async({page},testInfo)=>{
+ await page.setViewportSize({width:1600,height:1100});await page.goto(`${uiUrl}&snapshotId=${snapshot.snapshotId}`);await page.getByLabel('Local access token').fill(fixture.token);await page.getByRole('button',{name:'Open review',exact:true}).click();
+ const panel=page.getByRole('region',{name:'Function neighborhoods'});
+ await panel.getByText('Acquire verified pinned context',{exact:true}).click();
+ await panel.getByLabel('Source worktree locator').fill(fixture.root);await panel.getByLabel('Declared source project').fill('scottchu/pr-reviewer');
+ const cap=panel.getByLabel('Context files per side (optional)',{exact:true}),base=panel.getByLabel('Required before paths',{exact:true}),head=panel.getByLabel('Required after paths',{exact:true});
+ const commands:AnalysisCommand[]=[];page.on('request',request=>{if(request.url().endsWith('/api/analysis/commands'))commands.push(request.postDataJSON() as AnalysisCommand);});
+ await expect(cap).toHaveValue('');await expect(base).toHaveValue('');await expect(head).toHaveValue('');
+ await cap.fill('129');await panel.getByRole('button',{name:'Prepare declarations',exact:true}).click();
+ expect(await cap.evaluate(element=>(element as HTMLInputElement).validity.rangeOverflow)).toBe(true);expect(commands).toHaveLength(0);
+ const before=await query();
+ await cap.fill('1');await base.fill('callee.ts\ncaller.ts');await panel.getByRole('button',{name:'Prepare declarations',exact:true}).click();
+ await expect(panel.getByRole('alert')).toHaveText('invalid_request');expect(commands).toHaveLength(1);expect((await query()).jobs).toHaveLength(before.jobs.length);
+ await cap.fill('4');await base.fill(' spaced name.ts\ncallee.ts\ncaller.ts\nhelper.ts\ncallee.ts');await head.fill('helper.ts\ncaller.ts\ncallee.ts\n spaced name.ts');
+ await page.getByLabel('Your question').fill('UNSENT draft retains original source while context is bounded');const originalSource=await page.getByLabel('Source file').inputValue();
+ await panel.getByRole('button',{name:'Prepare declarations',exact:true}).click();await until(async()=>(await query()).jobs.at(-1)?.state==='awaiting_declarations');
+ const pending=await query(),context=pending.preparation!.corpus!,inventory=pending.preparation!.inventory!;
+ expect(commands[1]).toMatchObject({type:'RequestAnalysis',snapshotId:snapshot.snapshotId,contextFilesPerSide:4,priorityPaths:{base:[' spaced name.ts','callee.ts','caller.ts','helper.ts','callee.ts'],head:['helper.ts','caller.ts','callee.ts',' spaced name.ts']}});
+ expect(pending.analysis?.analysisId).toBe(before.analysis?.analysisId);expect(pending.jobs.at(-1)?.contextFilesPerSide).toBe(4);expect(context.budgets.filesPerSide).toBe(4);
+ for(const side of ['base','head'] as const){expect(context.accounts[side].preparedSources).toBe(4);expect(context.accounts[side].knownSourcePaths).toBe(6);expect(context.accounts[side].excludedSources).toBe(2);expect(context.ledger.some(row=>row.side===side&&row.path==='inventory.ts'&&row.preparation==='excluded'&&row.reason==='source_limit')).toBe(true);}
+ await panel.getByText('Complete context inventory, coverage and limitations',{exact:true}).click();await expect(panel.getByRole('heading',{name:'Pending preparation corpus account',exact:true})).toBeVisible();await expect(panel.getByText('base: complete enumeration · 4 prepared · 6 known source paths · 2 excluded · 0 missing · 0 unsupported · unvisited 0',{exact:true})).toBeVisible();await panel.getByText('Complete context inventory, coverage and limitations',{exact:true}).click();
+ expect(inventory.status).toBe('available');if(inventory.status!=='available')throw new Error('bounded_inventory_unavailable');
+ for(const side of ['base','head'] as const){const declaration=inventory.declarations.find(item=>item.name==='callee'&&item.declaration.side===side)!;await panel.getByLabel(side==='base'?'Before declaration':'After declaration',{exact:true}).selectOption(declaration.id);}
+ await panel.getByRole('button',{name:'Analyze selected declarations',exact:true}).click();await until(async()=>(await query()).jobs.at(-1)?.state==='admitted');
+ const admitted=await query(),facts=admitted.analysis!;expect(facts.status).toBe('analyzed');if(facts.status!=='analyzed')throw new Error('bounded_analysis_unavailable');
+ expect(facts.edges.filter(edge=>facts.nodes.find(node=>node.id===edge.caller)?.name==='caller')).toHaveLength(2);expect(facts.coverage.filter(row=>row.status==='excluded'&&!row.prepared&&row.examined===null)).toHaveLength(4);expect(facts.unresolved.some(site=>site.reason==='unsupported_dispatch')).toBe(true);
+ expect(facts.neighborhoods.every(item=>item.incomingScope==='supplied_files_only')).toBe(true);await expect(panel.getByText(/Search scope: supplied_files_only/)).toHaveCount(2);await expect(page.getByLabel('Your question')).toHaveValue('UNSENT draft retains original source while context is bounded');await expect(page.getByLabel('Source file')).toHaveValue(originalSource);
+ await panel.getByText('Complete context inventory, coverage and limitations',{exact:true}).click();await expect(panel.getByRole('heading',{name:'Admitted corpus account',exact:true})).toBeVisible();await expect(panel.getByText('Context file cap per side: 4.',{exact:true})).toBeVisible();
+ await page.screenshot({path:testInfo.outputPath('explicit-bounded-context-account.png'),fullPage:true});
+ await panel.getByText('Acquire verified pinned context',{exact:true}).locator('..').screenshot({path:testInfo.outputPath('explicit-bounded-context-form.png')});
+ await panel.getByRole('region',{name:'Admitted corpus account',exact:true}).screenshot({path:testInfo.outputPath('explicit-bounded-context-account-detail.png')});
+ writeFileSync(testInfo.outputPath('explicit-bounded-context-evidence.json'),JSON.stringify({provenance:'Actual React form, real disposable Git, Node gateway/SQLite/fixed TypeScript6 worker. Controlled manual fixture, not actual ownPR or provider evidence.',candidate:execFileSync('git',['rev-parse','HEAD'],{encoding:'utf8'}).trim(),sourceDirty:execFileSync('git',['status','--porcelain'],{encoding:'utf8'}).trim().length>0,commands,reviewId,snapshotId:snapshot.snapshotId,analysisId:facts.analysisId,accounts:admitted.corpus?.accounts,coverage:facts.coverage,inventoryDeclarations:inventory.declarations.length},null,2));
 });

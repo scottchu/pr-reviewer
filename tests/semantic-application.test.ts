@@ -113,7 +113,7 @@ test('held evidence pins its admitted analysis; a newer preparation receipt is c
   const login=bridge.login('owner','s');f.calls[0]!.resolve(view('s',{analysis,corpus,selectedAnalysisId:analysis.analysisId}));await login;
   const open=bridge.openSource(anchor);f.calls[1]!.resolve({...anchor,corpusId:corpus.corpusId,content:'held evidence'});await open;
   const stale=bridge.refresh();assert.match(f.calls[2]!.url,/analysisId=bbbb/);f.calls[2]!.resolve(view('s',{analysis:{...analysis,analysisId:'d'.repeat(64)}}));await assert.rejects(stale,/selection_mismatch/);assert.equal(bridge.getSnapshot().view?.analysis?.analysisId,analysis.analysisId);
-  const next=bridge.requestContext('/same','p');f.calls[3]!.resolve({...receipt,jobId:'new-job',jobRevision:100});await tick();assert.match(f.calls[4]!.url,/analysisId=bbbb/);assert.doesNotMatch(f.calls[4]!.url,/minimumJobRevision/);f.calls[4]!.resolve(view('s',{analysis,corpus,analysisGeneration:2,jobs:[jobView('new-job',100),jobView('newer-job',1,2)]}));await next;
+  const next=bridge.requestContext('/same','p',{contextFilesPerSide:3,priorityPaths:{base:['callee.ts'],head:['callee.ts']}});assert.equal(JSON.parse(f.calls[3]!.options?.body as string).contextFilesPerSide,3);f.calls[3]!.resolve({...receipt,jobId:'new-job',jobRevision:100});await tick();assert.match(f.calls[4]!.url,/analysisId=bbbb/);assert.doesNotMatch(f.calls[4]!.url,/minimumJobRevision/);f.calls[4]!.resolve(view('s',{analysis,corpus,analysisGeneration:2,jobs:[jobView('new-job',100),jobView('newer-job',1,2)]}));await next;
   assert.equal(bridge.getSnapshot().source?.content,'held evidence');assert.equal(bridge.getSnapshot().view?.analysis?.analysisId,analysis.analysisId);assert.equal(bridge.getSnapshot().uncertain,false);
  }finally{f.restore();}
 });
@@ -200,4 +200,51 @@ test('a late accepted old-snapshot receipt stays accepted through a later retry 
   const retry=bridge.retry();assert.equal(f.calls[3]!.options?.body,originalCommand);f.calls[3]!.resolve({error:'projection_pending'},400);await assert.rejects(retry,/projection_pending/);
   assert.equal(bridge.getSnapshot().uncertain,true);assert.equal(bridge.getSnapshot().view?.snapshotId,'new');
  }finally{f.restore();}
+});
+
+test('context request preserves omitted default versus explicit cap and exact per-side priorities', async () => {
+ const f=controlledFetch(),bridge=createAnalysisBridge('r');
+ try{
+  const login=bridge.login('owner','s');f.calls[0]!.resolve(view());await login;
+  const cases=[undefined,{contextFilesPerSide:128},{contextFilesPerSide:3,priorityPaths:{base:[' spaced name.ts','callee.ts','callee.ts'],head:['callee.ts',' spaced name.ts']}}];
+  for(const settings of cases){
+   const sending=bridge.requestContext('/source','p',settings),call=f.calls.at(-1)!;
+   const command=JSON.parse(call.options?.body as string) as Extract<AnalysisCommand,{type:'RequestAnalysis'}>;
+   assert.equal(command.contextFilesPerSide,settings?.contextFilesPerSide);
+   assert.equal('contextFilesPerSide' in command,settings?.contextFilesPerSide!==undefined);
+   assert.deepEqual(command.priorityPaths,settings?.priorityPaths);
+   call.resolve(receipt);await tick();f.calls.at(-1)!.resolve(view('s',{analysisGeneration:1}));await sending;
+  }
+ }finally{f.restore();}
+});
+
+test('bounded-context retry captures immutable exact paths/cap and keeps its original historical scope', async () => {
+ const f=controlledFetch(),bridge=createAnalysisBridge('r');
+ try{
+  const login=bridge.login('owner','s');f.calls[0]!.resolve(view());await login;
+  const settings={contextFilesPerSide:3,priorityPaths:{base:[' spaced name.ts','callee.ts','callee.ts'],head:['callee.ts']}};
+  const first=bridge.requestContext('/source','p',settings),body=f.calls[1]!.options?.body;
+  assert.deepEqual(JSON.parse(body as string).priorityPaths,settings.priorityPaths);
+  settings.contextFilesPerSide=1;settings.priorityPaths.base.reverse();settings.priorityPaths.head.push('changed.ts');
+  f.calls[1]!.reject(new Error('lost_ack'));await assert.rejects(first,/lost_ack/);
+  await assert.rejects(bridge.requestContext('/source','p',settings),/unchanged/);
+  const selected=bridge.select('new');f.calls[2]!.resolve(view('new'));await selected;
+  const retry=bridge.retry();assert.equal(f.calls[3]!.options?.body,body);f.calls[3]!.resolve(receipt);await tick();
+  assert.match(f.calls[4]!.url,/snapshotId=s/);f.calls[4]!.resolve(view('s',{analysisGeneration:1}));await retry;
+  assert.equal(bridge.getSnapshot().view?.snapshotId,'new');assert.equal(bridge.getSnapshot().uncertain,false);
+ }finally{f.restore();}
+});
+
+test('context controls send invalid cap/path/count to authoritative gateway validation without creating work', async () => {
+ const fixture=semanticFixture(),gateway=createGateway(fixture.store,async()=>({state:'unknown',reason:'controlled application test'}));
+ const original=globalThis.fetch,url=`http://127.0.0.1:${await gateway.listen(0)}`;
+ globalThis.fetch=((input:Parameters<typeof fetch>[0],options?:Parameters<typeof fetch>[1])=>original(new URL(String(input),url),options)) as typeof fetch;
+ try{
+  const bridge=createAnalysisBridge('r');await bridge.login(fixture.token,fixture.snapshot.snapshotId);
+  for(const settings of [{contextFilesPerSide:129},{contextFilesPerSide:1,priorityPaths:{base:['callee.ts','caller.ts']}},{priorityPaths:{head:['../unsafe.ts']}}]){
+   await assert.rejects(bridge.requestContext(fixture.root,'scottchu/pr-reviewer',settings),/invalid_request/);
+   assert.equal(bridge.getSnapshot().busy,false);assert.equal(bridge.getSnapshot().uncertain,false);
+   await bridge.refresh();assert.equal(bridge.getSnapshot().view?.jobs.length,0);assert.equal(bridge.getSnapshot().view?.analysisGeneration,0);
+  }
+ }finally{globalThis.fetch=original;await gateway.close();fixture.cleanup();}
 });

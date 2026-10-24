@@ -112,7 +112,7 @@ export const createAnalysisBridge=(reviewId:string)=>{
   login:async(value:string,nextSnapshotId=snapshotId)=>{interrupt();token=value.trim();snapshotId=nextSnapshotId;analysisId=undefined;pending=null;disposed=false;publish(empty());if(token&&snapshotId)await refresh(owner());},
   logout:()=>{interrupt();token='';pending=null;publish(empty());},select,
   refresh:()=>refresh(owner()),send,
-  requestContext:(worktree:string,sourceProject:string)=>send({type:'RequestAnalysis',reviewId,snapshotId,expectedAnalysisGeneration:state.view?.analysisGeneration??0,...(worktree.trim()?{worktree:worktree.trim()}:{}),...(sourceProject.trim()?{sourceProject:sourceProject.trim()}:{} )}),
+  requestContext:(worktree:string,sourceProject:string,context:Pick<Extract<AnalysisCommand,{type:'RequestAnalysis'}>,'contextFilesPerSide'|'priorityPaths'>={})=>send({type:'RequestAnalysis',reviewId,snapshotId,expectedAnalysisGeneration:state.view?.analysisGeneration??0,...(worktree.trim()?{worktree:worktree.trim()}:{}),...(sourceProject.trim()?{sourceProject:sourceProject.trim()}:{}),...(context.contextFilesPerSide===undefined?{}:{contextFilesPerSide:context.contextFilesPerSide}),...(context.priorityPaths===undefined?{}:{priorityPaths:structuredClone(context.priorityPaths)})}),
   chooseDeclarations:(declarationIds:string[])=>{
    const preparation=state.view?.preparation,job=state.view?.jobs.find(job=>job.jobId===preparation?.jobId);
    if(!job?.corpusId||!job.inventoryId)throw new Error('inventory_unavailable');
