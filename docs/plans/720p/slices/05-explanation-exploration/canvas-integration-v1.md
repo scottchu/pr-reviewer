@@ -44,7 +44,7 @@ Commit the packet before derived changes, then implementation and tested evidenc
 ## Pure-owner checkpoint before semantic integration
 
 Date: 2026-10-24
-Status: four focused application/codec tests and strict TypeScript pass; renderer/workspace integration not yet implemented
+Status: historical pure-owner checkpoint; superseded by the later structural renderer checkpoint below (four focused application/codec cases passed at that time)
 
 New source inspection owns explicit comparison occurrence, selected raw SHA256 verification, bounded source context, cancellation/generation fences and Back. Private codec accepts optional inspection with exact anchor/hash and optional expanded flag; old records remain unchanged without it. The initial RED was the absent public owner export; focused tests then caught an invalid rename fixture that lacked the required provider comparison identity. Correcting that fixture to the real public comparison shape exercises exact old/new paths. No domain comparison change or inferred legacy partner was introduced. Post-publication canvas restore by itself is insufficient for transactional Story Resume: the accepted awaited preflight above is required before wiring and acceptance. Tests remain direct pending normal-entry registration in the integrated checkpoint.
 
@@ -55,7 +55,7 @@ Root forwarded a concrete P2 from independent2f0 review: rejecting a missing sav
 ## Transactional preflight and semantic integration checkpoint
 
 Date: 2026-10-24
-Status: application preflight implemented/tested; workspace/React composition pending
+Status: historical preflight checkpoint; workspace/React pending statements superseded by the later managed wiring and structural renderer checkpoints below
 
 Merged exact reviewed semantic recovery d5e8cb2 at clean9abe025, preserving B2/SDK2 and optional structural frame schema. Its55 focused semantic/recovery/exploration cases, strict and boundaries passed at that combined pin; logs semantic-combined-9abe025.log, strict-combined-9abe025.log and boundaries-combined-9abe025.log under /tmp/pr-reviewer-canvas-integration-evidence. application/analysis.ts has no subsequent task change.
 
@@ -70,7 +70,7 @@ Managed restore tests may inject an already constructed public SourceCanvas thro
 ## Managed workspace checkpoint
 
 Date: 2026-10-24
-Status: application wiring tested; React canvas journey remains pending
+Status: historical wiring checkpoint; React pending statement superseded by the later structural renderer checkpoint below
 
 Workspace now exports its public canvas owner and a distinct inspectSource read intent. Existing openSource retains guarded question selection. Three declared routes own authorized review→canvas values, canvas→private structural frame capture and Story frame→canvas restore. Capture requires fully ready access, exact review/story/canvas snapshot, no read error/busy state and no active restore. A restore owner serial fences stale completion; scope replacement resets readiness and cancels old reads before another account can render. Initial and busy frame events cannot replace a validated saved inspection. Teardown is idempotent and removes all new routes/listeners/read state.
 
@@ -107,4 +107,14 @@ Independent managed-wiring recheck05b9ab0 READY: /tmp/pr-reviewer-focused-canvas
 
 Visual self-review used actual desktop and390px screenshots retained under /tmp/pr-reviewer-canvas-integration-evidence/renderer-e2e. It caught width measurement before authorized content arrived; observing the mounted graph now produces real stacked nodes, verified by geometry assertions. Desktop Before/After remain simultaneously legible at100% focus; long code lines require internal horizontal scroll. Counterpart context is file-level and independently positioned around its retained change, so it is not synchronized to an equivalent function/line. Narrow comparison stacks on the same graph and provides explicit Before/After focus; long source and the question node require deliberate internal scroll/pan. The fixed existing story player can cross the narrow reading area, and the context/action toolbar remains dense. These are recorded readability limits, not accepted final layout. DecompozR DESIGN.md and governance principles informed neutral hierarchy, source-status words, visible keyboard focus and44px controls; its Svelte package is not used.
 
-Remaining: candidate launch with exact source/build manifest, independent combined source review, semantic/whole-canvas presentation, inherited browser selector reconciliation, fresh UI-first comprehension, physical device review, actual own-PR acceptance and user layout adoption. No merge, deployment or production acceptance.
+Remaining at that test checkpoint: candidate launch and exact manifest (completed by the final launch receipt below), independent combined source review, semantic/whole-canvas presentation, inherited browser selector reconciliation, fresh UI-first comprehension, physical device review, actual own-PR acceptance and user layout adoption. No merge, deployment or production acceptance.
+
+## Launch and source-review receipt at5edd337
+
+Renderer/source pin5edd337d4de46f2d5085d7e8c3f15a335654a41f is clean and remains the running source. Node19934 owns loopback gateway56675; Bun20159 owns loopback UI56674. Private data /tmp/pr-reviewer-focused-source-canvas-runtime is outside Git and mode0700. Startup first rejected its ordinary directory permissions; correcting only this task-owned directory to0700 satisfied the existing runtime invariant. Exact additional Vite host mac-mini.duckbill-ionian.ts.net is allowed, with no allow-all or global configuration. Root alone created private Serve8475→56674 and verified HTTPS HTML, actual main-module JavaScript and API200; earlier8473/8474 routes remain unchanged. Inspectable URL: https://mac-mini.duckbill-ionian.ts.net:8475/?reviewId=pr-25 (local http://127.0.0.1:56674/?reviewId=pr-25). No Funnel or worker network write.
+
+Actual owned-runtime author Chrome smoke reads source at both desktop/390px, with zero page errors, zero failed HTTP responses and no document overflow. Runtime has no attachment, saved question or controlled story; Story correctly says unavailable. Its source is actual manual PR25 preparation, not a live agent account. The controlled author story remains browser-test-only. Runtime manifest and smoke JSON/screenshots are under /tmp/pr-reviewer-canvas-integration-evidence. Candidate source/build/reviewed source identities remain separate.
+
+Independent renderer review of5edd337 has two concrete P2 findings (source confirmed, not independent browser reproduction): overlapping authored-reference reads do not reserve a newer workspace intent before awaiting, so an older reference can defeat the newer one; an origin context-card action incorrectly invokes the neighbor-only intent for a primary origin node. Existing5edd runtime is not relabeled fixed. Finish this docs checkpoint, then retain failing application/Chrome regressions and apply bounded corrections with affected checks and a new source/runtime identity. No broad redesign or semantic expansion.
+
+Durable knowledge promoted to canvas-reading, architecture, presentation, persistence-compatibility and story-and-exploration. The architecture includes code-informed whole-current-product responsibility/lifecycle reflection with rejected competing-writer/UI-policy alternatives. Fresh whole-product docs-only audit remains root-coordinated and independent of pending source fixes.
