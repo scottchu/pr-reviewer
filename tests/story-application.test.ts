@@ -140,6 +140,8 @@ test('D4 malformed, unmapped semantic, stale hash and unavailable snapshot evide
  await load(f,fetcher,bridge,authored(f));await bridge.openEvidence({...f.source,contentHash:'f'.repeat(64)});assert.equal(questionEvidenceProjection(bridge.getSnapshot()).kind,'unavailable');
  const state=bridge.getSnapshot(),semantic={type:'semantic_source' as const,corpusId:'c'.repeat(64),anchor:{snapshotId:'snapshot',side:'head' as const,path:'value.ts',contentHash:f.source.contentHash,start:0,end:10,startLine:1,endLine:1}};
  assert.equal(questionEvidenceProjection({...state,evidence:semantic}).kind,'unavailable');
+ assert.equal(questionEvidenceProjection({...state,snapshotId:'different-active-snapshot',evidence:f.source}).kind,'unavailable');
+ assert.equal(questionEvidenceProjection({...state,evidence:{...f.source,anchor:{...f.source.anchor,snapshotId:'historical-source'}}}).kind,'unavailable');
  assert.equal(questionEvidenceProjection({...state,evidence:{...f.source,anchor:{...f.source.anchor,endLine:999}}}).kind,'unavailable');
  }finally{bridge.logout();fetcher.restore();f.cleanup();}
 });

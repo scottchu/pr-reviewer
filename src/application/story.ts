@@ -92,6 +92,7 @@ export const questionEvidenceProjection=(state:StoryState):QuestionEvidenceInten
  if(state.questionLocked)return {kind:'blocked',reason:'Reconcile the unresolved question before changing its anchor.'};
  if(draft?.submitted)return {kind:'blocked',reason:'This draft was submitted. Start a new question explicitly before changing its anchor.'};
  if(!state.authenticated||!draft||!state.snapshot||reference?.type!=='snapshot_source')return {kind:'unavailable',reason:'This evidence has no question-eligible retained snapshot range. Inspection leaves your question unchanged.'};
+ if(reference.anchor.snapshotId!==state.snapshotId||state.snapshot.snapshotId!==state.snapshotId)return {kind:'unavailable',reason:'Inspected evidence belongs to a different snapshot. Return to its review snapshot explicitly; this action cannot navigate or retarget across snapshots.'};
  const source=state.snapshot.sources.find(source=>source.side===reference.anchor.side&&source.path===reference.anchor.path&&source.hash===reference.contentHash);
  if(!source||!validateAnchor(state.snapshot.snapshotId,state.snapshot.sources,reference.anchor))return {kind:'unavailable',reason:'The exact retained snapshot evidence is unavailable. No question anchor has been substituted.'};
  return {kind:'ready',evidence:reference,draft,anchor:reference.anchor,confirmationRequired:Boolean(draft.text.trim()),mismatch:JSON.stringify(draft.anchor)!==JSON.stringify(reference.anchor)};
