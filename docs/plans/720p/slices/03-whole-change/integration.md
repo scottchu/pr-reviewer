@@ -112,7 +112,7 @@ Return concrete findings with severity/source/evidence/acceptance IDs, actual ch
 
 Return committed source and worktree/branch, actual public job/admission/effect/artifact interfaces, reviewed acquisition identity, planned-versus-executed matrix, exact process/React/own-PR evidence, unresolved limits, artifact ownership/recovery and durable-source promotion. Contribute actual provenance/read/job/result ports and limitations to slice04 without implementing it. Register shared documentation maps only when root assigns that scope; planning cannot edit them here.
 
-02B acceptance/reconciliation and scoped integration dispatch are complete in v3. Remaining gates are all 03 derived code/tests, actual PR/candidate/task, independent engineering/graph critique, whole-product docs audit and applicable live provider/native/human evidence. This packet completes design readiness, not product implementation or acceptance.
+At v3 dispatch the derived03 code/tests and review gates were pending. The [consolidated03 receipt](checkpoint.md) now records bounded4f engineering/own-PR delivery and remaining full-round/provider/native/human limits; this packet retains the original prospective acceptance rather than rewriting it as retroactive evidence.
 
 
 ## Dispatched compatibility clarifications

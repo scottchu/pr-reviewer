@@ -4,7 +4,7 @@
 
 **Date:** 2026-10-24 UTC
 
-**Status:** Runnable integration checkpoint; actual own-PR/full fault-matrix/independent integrated review and acceptance pending
+**Status:** Bounded03 engineering and representative own-PR import/continuation/navigation accepted at4f18625; documentation-only receipt, root merge and separate pilot delivery follow. Full720p/native/human gates remain open.
 
 **Parent:** [720p round](../../plan.md)
 
@@ -14,13 +14,13 @@
 
 **Owner:** Root coordinates inputs, assigns the integration executor and independent reviewers, and owns publication/merge/pilot delivery
 
-## Outcome and current gap
+## Outcome and original dispatch gap
 
 Enter a repository/worktree path, explicitly resolve ambiguity, acquire the actual PR/MR comparison and inspect a complete changed-file/hunk ledger with truthful unsupported material. Existing comments remain usable while real acquisition runs. Initial import creates an authenticated durable review; continuation adds an immutable snapshot without retargeting old discussion, draft or session.
 
 Reviewed acquisition preparation exists at `6127f760b2fd0da609d088241c65c7c51c1f89c6`, with provider/base/head/source/object/disposition/hunk/count public values. Its independent integration-ready disposition was supplied by root; this planning task inspected the pinned interface and fixes, not reran that review. Root subsequently reported context-loader `d2def8823c5249808ac83b4cdc35a7f71efa7bb7` independently module-integration-ready. It remains outside basic slice03 scope and is not a prerequisite for whole-change import; any later context integration consumes its exact reviewed public port.
 
-02B code `e0685025218b52d506adc5b7351f055dcd7ea7dd` has independent cumulative engineering, whole-current-product docs-only sufficiency and actual PR22 continuation/navigation acceptance. Final docs-only receipt `3ba33b07b6ebea014ade934acc40f23f222fa066` is merged through PR22 into main `a5043c5f8a5c6ceeaceca42937f3c1aa6b12b263`. [Accepted predecessor receipts](../../../480p/slices/02-review-continuation/review-receipts-02b.md) retain precise source/candidate/journey identities and native/human/semantic limits. Polling cannot interrupt an explicit source selection; selected/current/question identities stay separate. Full job lifecycle, acquisition-v1 verification, authenticated initial creation and provider ledger UI are still new work.
+02B code `e0685025218b52d506adc5b7351f055dcd7ea7dd` has independent cumulative engineering, whole-current-product docs-only sufficiency and actual PR22 continuation/navigation acceptance. Final docs-only receipt `3ba33b07b6ebea014ade934acc40f23f222fa066` is merged through PR22 into main `a5043c5f8a5c6ceeaceca42937f3c1aa6b12b263`. [Accepted predecessor receipts](../../../480p/slices/02-review-continuation/review-receipts-02b.md) retain precise source/candidate/journey identities and native/human/semantic limits. Polling cannot interrupt an explicit source selection; selected/current/question identities stay separate. At v3 dispatch those job/admission/ledger capabilities were new work; their delivered bounded evidence is now reconciled in [the final03 receipt](checkpoint.md).
 
 ## Readiness and selected design
 
@@ -44,7 +44,7 @@ Keep the8MiB public JSON envelope unchanged. Use owned generated artifact IDs an
 | 03-F | Fresh independent graph-first reviewer freezes a source-anchored account before source inspection, then corrects it and critiques ease of understanding. Inventory counts/screenshots/E2E are insufficient alone; no semantic callers/callees or human proof is implied. |
 | 03-K | Whole-current-product reflection promotes actual behavior/interfaces/rationale/limits to durable source; a fresh docs-only audit closes material knowledge gaps before milestone acceptance. |
 
-The [I01–I20 matrix](integration.md#predeclared-test-and-fault-matrix) maps concrete tests and review tasks to these outcomes. It is planned, not executed. Independent review and real own-PR dogfood remain required; applicable native-host/GitLab/human gaps stay explicitly open.
+The [I01–I20 matrix](integration.md#predeclared-test-and-fault-matrix) predeclared the checks; [the final03 receipt](checkpoint.md) records actual execution, independent bounded acceptance and remaining limits. Independent review and real own-PR dogfood remain required; applicable native-host/GitLab/human gaps stay explicitly open.
 
 ## Own-PR task readiness
 
@@ -52,7 +52,7 @@ Initial source target is [PR19](https://github.com/scottchu/pr-reviewer/pull/19)
 
 Before presentation implementation, use the verifier-only source account in integration.md and independently validate its ledger expectations; the graph-first reviewer receives the task only. Final own-PR acceptance should use the actual integration PR with separately pinned candidate/build/base/head and a source-informed account declared before the run. If target identity changes, rerun affected checks; historical PR19 counts never become evidence for the new PR.
 
-## Exact predecessor contribution and adapter gaps
+## Original predecessor contribution and adapter gaps at v3 dispatch
 
 - Public source-preparation owns manual schema, pinned Git builder and nonserialized review/exact-manifest witness. Raw transport data cannot authorize source admission. Acquisition-v1 is a new adapter, not an existing accepted scheme.
 - AddSnapshot accepts local-user identity, commandId, reviewId, expectedCurrentSnapshotId, identityScheme and snapshot; current candidate schema only allows manual_git_v1. Its current store validates before short transaction, then checks source membership/CAS atomically and keeps receipts. Provider addition must preserve that boundary and extend schema deliberately.
@@ -101,6 +101,8 @@ The first derived boundary now exercises trusted provider preparation with real 
 The next foundation checkpoint adds the bounded asynchronous coordinator and tracked fixed-executable process effect. Normal tests pass:11 Bun tests and63 Node tests; strict compiler and subsystem checks pass. The coordinator control-flow tests use controlled GitHub metadata over real disposable Git; they do not establish live-provider/React acceptance. Real child tests separately observe request/start/exit, output bounds and cancellation. Independent early review found that storage could complete an invocation with an unresolved requested/started journal; a failing-first regression now guards discovery/result/confirmed failure/cancellation and retains the effects slot until terminal observations. Artifact implementation remains held for its independent filesystem correction/recheck; only its agreed port is consumed here. Gateway/React and the full I01–I20 evidence remain active work.
 
 
-## Reviewable combined checkpoint
+## Final bounded delivery
 
-[The current checkpoint](checkpoint.md) records the combined gateway/runner/artifact/React ledger/history implementation, exact prerequisite inputs/early corrections,11 Bun +87 Node checks and11 actual Chrome journeys, with immutable external artifact identities. It explicitly lists unrun integrated fault/provider/own-PR/audit gates. Root may publish the reviewable PR now; publication is needed for actual-own-PR I16/I19 and is not acceptance. Product knowledge now includes exact job tables/commands/readbacks/receipt fingerprints, provider representation, process uncertainty, startup coexistence and the actual-code rewrite rationale. No04 implementation is derived from provisional03 completion.
+[The consolidated receipt](checkpoint.md) supersedes the original0a86 checkpoint: it preserves the256-launch failure, independent corrections, clean d75/original0a graph/import/I16 identity and clean4f/published4f continuation/reply/follow-up/restart identity. Combined checks passed11 Bun+114 Node and11 actual Chrome journeys; independent engineering and graph/source rechecks accepted the bounded delivery, and cumulative docs-only knowledge audit qualified YES. Root handles publication/merge and separately assigned pilot deployment. No full720p understanding, actual rebuild, native automatic delivery/catalog, Claude or human acceptance is implied.
+
+[Successor04](../04-behavior-neighborhood/plan.md) receives exact public interfaces/constraints and the remaining structural/answer-quality gaps; it still needs the verified merged03 base and root dispatch.
