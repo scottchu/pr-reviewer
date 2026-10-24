@@ -28,13 +28,13 @@ test.beforeAll(async()=>{
  writeFileSync(join(fixture.root,'callee.ts'),callee(2));fixture.git('add','callee.ts');fixture.git('commit','-qm','semantic head');snapshot=pinned(baseSha,fixture.git('rev-parse','HEAD'));
  fixture.store.prepare(reviewId,snapshot);gateway=createGateway(fixture.store,async()=>({state:'unknown',reason:'No attached participant in this controlled browser fixture.'}));gatewayUrl=`http://127.0.0.1:${await gateway.listen(0)}`;
  const reservation=createServer();await new Promise<void>(resolve=>reservation.listen(0,'127.0.0.1',resolve));const address=reservation.address();if(!address||typeof address==='string')throw new Error('missing_ui_port');const port=address.port;await new Promise<void>(resolve=>reservation.close(()=>resolve()));
- ui=spawn('/Users/scottchu/.asdf/shims/bun',['scripts/ui.ts'],{cwd:process.cwd(),env:{...process.env,REVIEW_UI_PORT:String(port),REVIEW_GATEWAY_URL:gatewayUrl},stdio:['ignore','pipe','pipe']});
+ ui=spawn(process.env.REVIEW_BUN_BIN??'/Users/scottchu/.asdf/installs/bun/1.4.2/bin/bun',['scripts/ui.ts'],{cwd:process.cwd(),env:{...process.env,REVIEW_UI_PORT:String(port),REVIEW_GATEWAY_URL:gatewayUrl},stdio:['ignore','pipe','pipe']});
  ui.stderr?.on('data',data=>{stderr+=String(data);});let ready=false;ui.stdout?.on('data',data=>{if(String(data).includes('PR_REVIEWER_UI_READY'))ready=true;});await until(async()=>{if(ui.exitCode!==null)throw new Error(stderr);return ready;});uiUrl=`http://127.0.0.1:${port}/?reviewId=${reviewId}`;
 });
 test.afterAll(async()=>{if(ui&&ui.exitCode===null)await new Promise<void>(resolve=>{ui.once('exit',()=>resolve());ui.kill('SIGTERM');});if(gateway)await gateway.close();fixture?.cleanup();});
 test('real React, Git, SQLite and Node worker: explicit both-side neighbors, exact context evidence, notes, draft return and immutable history',async({page},testInfo)=>{
  const browserModules:string[]=[];page.on('request',request=>browserModules.push(request.url()));
- test.setTimeout(90000);await page.setViewportSize({width:1600,height:1100});await page.goto(uiUrl);await page.getByLabel('Local access token').fill(fixture.token);await page.getByRole('button',{name:'Open review',exact:true}).click();
+ test.setTimeout(90000);await page.setViewportSize({width:1600,height:1100});await page.goto(uiUrl);
  const panel=page.getByRole('region',{name:'Function neighborhoods'});
  await expect(panel).toBeVisible();await panel.getByText('Acquire verified pinned context',{exact:true}).click();await panel.getByLabel('Source worktree locator').fill(fixture.root);await panel.getByLabel('Declared source project').fill('scottchu/pr-reviewer');await panel.getByRole('button',{name:'Prepare declarations',exact:true}).click();
  await until(async()=>(await query()).jobs.at(-1)?.state==='awaiting_declarations');await expect(panel.getByLabel('Before declaration')).toBeVisible();
@@ -75,13 +75,13 @@ test('real React, Git, SQLite and Node worker: explicit both-side neighbors, exa
  const previous=process.env.GIT_DIR;process.env.GIT_DIR=join(fixture.root,'.git');try{const added=await api('/api/commands',{type:'AddSnapshot',commandId:'semantic-browser-new-head',reviewId,expectedCurrentSnapshotId:snapshot.snapshotId,identityScheme:'manual_git_v1',snapshot:next}) as {state:string};expect(added.state).toBe('applied');}finally{if(previous===undefined)delete process.env.GIT_DIR;else process.env.GIT_DIR=previous;}
  await expect(page.getByRole('combobox',{name:'Snapshot',exact:true})).toHaveValue(snapshot.snapshotId);await expect(page.getByLabel('Your question')).toHaveValue('UNSENT original source draft');await expect(panel.getByText(/The unchanged caller receives helper/)).toBeVisible();
  await page.getByLabel('Your question').fill('');await page.getByRole('combobox',{name:'Snapshot',exact:true}).selectOption(next.snapshotId);await expect(panel.getByText('No admitted static facts for this selection.',{exact:false})).toBeVisible();await page.getByRole('combobox',{name:'Snapshot',exact:true}).selectOption(snapshot.snapshotId);await expect(panel.getByText(/The unchanged caller receives helper/)).toBeVisible();
- await page.reload();await page.getByLabel('Local access token').fill(fixture.token);await page.getByRole('button',{name:'Open review',exact:true}).click();await expect(panel.getByText(/The unchanged caller receives helper/)).toBeVisible();expect((await query()).analysis?.analysisId).toBe(facts.analysisId);
+ await page.reload();await expect(panel.getByText(/The unchanged caller receives helper/)).toBeVisible();expect((await query()).analysis?.analysisId).toBe(facts.analysisId);
  await panel.getByText(`All admitted function nodes (${facts.nodes.length})`,{exact:true}).click();await panel.getByRole('listitem',{name:'Function head helper const-arrow',exact:true}).getByRole('button',{name:/Inspect full body/}).click();await expect(panel.getByRole('region',{name:'Retained semantic source'}).getByLabel('Exact retained source')).toContainText('value + 10');
  expect(browserModules.filter(url=>/\/src\/(?:source-analysis|analysis-jobs)\/|node_modules\/(?:\.vite\/deps\/)?typescript[-_]analysis/.test(url))).toEqual([]);
  writeFileSync(testInfo.outputPath('semantic-candidate-evidence.json'),JSON.stringify({provenance:'Controlled synthetic real Git, actual Node gateway/SQLite/TypeScript6 child and Chrome React. Manual pinned AddSnapshot history; not live provider, actual ownPR or native session acceptance.',candidate:execFileSync('git',['rev-parse','HEAD'],{encoding:'utf8'}).trim(),sourceDirty:execFileSync('git',['status','--porcelain'],{encoding:'utf8'}).split('\n').some(line=>line&&line.slice(3)!=='node_modules'),reviewId,original:snapshot.snapshotId,current:next.snapshotId,analysisId:facts.analysisId,graphRevision:(await query()).graphRevision,overlap:{startedObservedAt,questionCreatedAt:question.createdAt,questionReadableAt,liveAfterCommitAt,exitObservedAt,processBefore,processDuring,identityBefore,identityDuring},observedOutstanding:outstanding.jobs.at(-1),retainedNotes:(await query()).clarifications,browserModules},null,2));
 });
 test('actual React history navigation fences delayed graph, annotation and source responses; exact annotation retry stays in its original scope',async({page},testInfo)=>{
- test.setTimeout(60000);await page.setViewportSize({width:1600,height:1100});await page.goto(`${uiUrl}&snapshotId=${snapshot.snapshotId}`);await page.getByLabel('Local access token').fill(fixture.token);await page.getByRole('button',{name:'Open review',exact:true}).click();
+ test.setTimeout(60000);await page.setViewportSize({width:1600,height:1100});await page.goto(`${uiUrl}&snapshotId=${snapshot.snapshotId}`);
  const panel=page.getByRole('region',{name:'Function neighborhoods'}),snapshots=page.getByRole('combobox',{name:'Snapshot',exact:true});await expect(panel.getByRole('heading',{name:'Admitted static neighborhood'})).toBeVisible();
  const current=(await api(`/api/reviews/${reviewId}`) as Review).currentSnapshotId!;
  let graphCaptured=false,releaseGraph=()=>{};const graphGate=new Promise<void>(resolve=>{releaseGraph=resolve;});
@@ -109,7 +109,7 @@ test('actual React history navigation fences delayed graph, annotation and sourc
 });
 
 test('actual React explicit context cap and exact paths retain excluded inventory and a scoped analysis',async({page},testInfo)=>{
- await page.setViewportSize({width:1600,height:1100});await page.goto(`${uiUrl}&snapshotId=${snapshot.snapshotId}`);await page.getByLabel('Local access token').fill(fixture.token);await page.getByRole('button',{name:'Open review',exact:true}).click();
+ await page.setViewportSize({width:1600,height:1100});await page.goto(`${uiUrl}&snapshotId=${snapshot.snapshotId}`);
  const panel=page.getByRole('region',{name:'Function neighborhoods'});
  await panel.getByText('Acquire verified pinned context',{exact:true}).click();
  await panel.getByLabel('Source worktree locator').fill(fixture.root);await panel.getByLabel('Declared source project').fill('scottchu/pr-reviewer');
@@ -152,7 +152,7 @@ test('actual React unavailable worker result cannot label a corpus admitted and 
  writeFileSync(join(fixture.root,'callee.ts'),'export const callee = () => 2;\n'+Array.from({length:1998},(_,i)=>`export const call${i} = () => callee();`).join('\n')+'\ncallee();\n');fixture.git('add','callee.ts');fixture.git('commit','-qm','dense unavailable-case head');
  const target=pinned(baseSha,fixture.git('rev-parse','HEAD')),targetReview='semantic-unavailable-browser';fixture.store.prepare(targetReview,target);
  const targetQuery=async()=>await api(`/api/analysis?reviewId=${targetReview}&snapshotId=${target.snapshotId}`) as AnalysisView;
- await page.setViewportSize({width:1600,height:1100});await page.goto(new URL(`/?reviewId=${targetReview}`,uiUrl).href);await page.getByLabel('Local access token').fill(fixture.token);await page.getByRole('button',{name:'Open review',exact:true}).click();
+ await page.setViewportSize({width:1600,height:1100});await page.goto(new URL(`/?reviewId=${targetReview}`,uiUrl).href);
  const panel=page.getByRole('region',{name:'Function neighborhoods'});
  await panel.getByText('Acquire verified pinned context',{exact:true}).click();await panel.getByLabel('Source worktree locator').fill(fixture.root);await panel.getByLabel('Declared source project').fill('scottchu/pr-reviewer');
  const prepare=async(cap:number,both:boolean,path='callee.ts')=>{

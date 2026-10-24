@@ -32,3 +32,15 @@ test('unresolved process journals prevent completion, confirmed cancellation and
  f.store.imports.recordProcess(claim.grant,{ordinal:1,executable:'git',state:'exited',exitCode:null,signal:'SIGTERM'});f.store.imports.fail(claim.grant,'import_cancelled',true);assert.equal(f.store.imports.list(token)[0]?.state,'cancelled');assert.ok(f.store.imports.claim(owner));
  }finally{f.close();}
 });
+
+test('local owner manages retained legacy imports and new owner-reference jobs survive restart without a credential',()=>{
+ const root=mkdtempSync(join(tmpdir(),'pr-reviewer-owner-import-')),filename=join(root,'db');let store=createStore(filename);
+ try{
+  const token=store.issueUser(),legacy=store.imports.command(token,{type:'RequestImport',commandId:'legacy-owner-import',path:'/retained/locator'});
+  assert.equal(store.imports.list(store.localOwner)[0]?.jobId,legacy.jobId);
+  assert.equal(store.imports.command(store.localOwner,{type:'CancelImport',commandId:'cancel-legacy-owner-import',jobId:legacy.jobId!}).state,'applied');
+  const added=store.imports.command(store.localOwner,{type:'RequestImport',commandId:'credential-free-import',path:'/local/locator'});assert.equal(added.state,'applied');store.close();store=createStore(filename);
+  assert.equal(store.imports.list(store.localOwner).length,2);assert.equal(store.authenticate(token).actorId,'local-user');
+  const runner=store.imports.beginOwner(),claim=store.imports.claim(runner)!;assert.equal(claim.job.jobId,added.jobId);assert.equal(claim.job.credentialReference,'local-owner:v1');
+ }finally{store.close();rmSync(root,{recursive:true,force:true});}
+});

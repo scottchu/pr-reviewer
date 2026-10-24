@@ -1,3 +1,4 @@
+import {localOwnerSession,accessHeaders} from './local-access.ts';
 import {sourceViews,projectGraph,validateAnchor,commandSchema,storyCanonical} from '../domain/public.ts';
 import type {Anchor,Receipt,Review,Snapshot} from '../domain/public.ts';
 import type {View} from './public.ts';
@@ -15,7 +16,7 @@ export const createReviewBridge=(reviewId:string,initialSnapshotId?:string,optio
  const recovery=():QuestionRecovery=>{
   if(pendingAccess==='quarantined')return {state:'quarantined',message:'Saved question recovery is corrupt or unsupported. It is quarantined; no replacement question can be sent.',busy:state.busy};
   if(pendingAccess==='storage_unavailable')return {state:'storage_unavailable',message:'Question recovery storage is unavailable. No uncheckpointed question will be sent.',busy:state.busy};
-  if(pendingAccess==='locked'||pending&&(!scope||pending.scope!==scope||pending.origin!==session.origin))return {state:'locked',message:'An unresolved question is locked. Re-enter its original credential and authorized review to recover it explicitly.',busy:state.busy};
+  if(pendingAccess==='locked'||pending&&(!scope||pending.scope!==scope||pending.origin!==session.origin))return {state:'locked',message:'An unresolved question is locked. A legacy or different-owner recovery record requires explicit reconciliation; its command has been preserved.',busy:state.busy};
   if(!pending)return {...noRecovery(),busy:state.busy};
   const command=parsePendingCommand(pending);return {state:pending.phase,message:pending.phase==='awaiting_ack'?'Question acknowledgement is unresolved. Explicit recovery reuses the unchanged saved command.':'Question accepted; exact question readback is still required.',busy:state.busy,reviewId:pending.reviewId,snapshotId:command.anchor.snapshotId,draftId:pending.draftId,commandId:command.commandId};
  };
@@ -26,7 +27,7 @@ export const createReviewBridge=(reviewId:string,initialSnapshotId?:string,optio
   const ownedSignal=controller?(signal?AbortSignal.any([signal,controller.signal]):controller.signal):signal;
   try{
    if(ownedSignal?.aborted)throw new Error('selection_superseded');
-   const response=await fetch(path,{headers:{Authorization:`Bearer ${captured}`,'Content-Type':'application/json'},...(body===undefined?{}:{method:'POST',body:typeof body==='string'?body:JSON.stringify(body)}),...(ownedSignal?{signal:ownedSignal}:{})});
+   const response=await fetch(path,{headers:{...accessHeaders(captured),'Content-Type':'application/json'},...(body===undefined?{}:{method:'POST',body:typeof body==='string'?body:JSON.stringify(body)}),...(ownedSignal?{signal:ownedSignal}:{})});
    const value=await response.json() as unknown;if(ownedSignal?.aborted)throw new Error('selection_superseded');if(!response.ok)throw new Error(String((value as {error?:string}).error??'request_failed'));return value;
   }finally{if(controller)readControllers.delete(controller);}
  };
@@ -95,7 +96,7 @@ export const createReviewBridge=(reviewId:string,initialSnapshotId?:string,optio
   getSnapshot:()=>state,subscribe:(listener:()=>void)=>{listeners.add(listener);return()=>listeners.delete(listener);},
   canLeaveReview:()=>!state.busy&&!state.selecting&&!pending&&pendingAccess==='none',getQuestionRecovery:()=>state.recovery,
   connect:()=>{const route=registry.register('review-committed-to-view',reviewId,()=>Boolean(token)&&!state.busy&&!state.selecting&&!inflight,()=>{void refresh();});const timer=setInterval(()=>route.emit(),700);route.emit();return()=>{clearInterval(timer);route.dispose();generation++;abortReads();operation=null;const canceled=inflight;inflight=null;interruptSelection();canceled?.abort();publish({...state,busy:false});};},
-  login:async(value:string)=>{abortReads();token=value.trim();scope='';generation++;operation=null;inflight?.abort();inflight=null;interruptSelection();publish({...empty(),recovery:{state:'locked',message:'Authorizing private recovery…',busy:false}});const expected=generation,captured=token,review=await refresh();if(review&&owns(expected,captured))await hydrateRecovery(expected,captured);},
+  login:async(value:string=localOwnerSession)=>{abortReads();token=value.trim();scope='';generation++;operation=null;inflight?.abort();inflight=null;interruptSelection();publish({...empty(),recovery:{state:'locked',message:'Loading private recovery…',busy:false}});const expected=generation,captured=token,review=await refresh();if(review&&owns(expected,captured))await hydrateRecovery(expected,captured);},
   logout:()=>{generation++;abortReads();operation=null;token='';scope='';inflight?.abort();inflight=null;pendingAccess=pending?'locked':pendingAccess;let error='';try{session.clearView();}catch(cause){error=cause instanceof Error?cause.message:'view_storage_unavailable';}publish({...empty(),error});},
   readSnapshot:async(snapshotId:string,signal?:AbortSignal):Promise<Snapshot>=>{const expected=generation,captured=token;if(!captured||!state.authenticated)throw new Error('unauthorized');const review=await request(captured,`/api/reviews/${encodeURIComponent(reviewId)}?snapshotId=${encodeURIComponent(snapshotId)}`,undefined,signal) as Review;if(!owns(expected,captured)||signal?.aborted)throw new Error('selection_superseded');if(review.reviewId!==reviewId||review.snapshot.snapshotId!==snapshotId)throw new Error('source_unavailable');return review.snapshot;},
   selectSnapshot:async(snapshotId:string)=>{

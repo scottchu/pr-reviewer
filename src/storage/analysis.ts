@@ -1,3 +1,5 @@
+import {accessReference,localPrincipal,isLocalOwner} from './access.ts';
+import type {StorageAccess} from './access.ts';
 import {processQuiescenceEligible} from '../domain/public.ts';
 import { createHash, randomUUID } from "node:crypto";
 import type { DatabaseSync } from "node:sqlite";
@@ -73,7 +75,7 @@ export const createAnalysisStore = ({ db, tx, load, authorize, execution, limits
         body: string;
     } | undefined; return row ? JSON.parse(row.body) as Graph : { generation: 0, graphRevision: 0, selectedAnalysisId: null }; };
     const saveGraph = (reviewId: string, snapshotId: string, value: Graph) => db.prepare("INSERT INTO analysis_graphs VALUES (?,?,?) ON CONFLICT(review_id,snapshot_id) DO UPDATE SET body=excluded.body").run(reviewId, snapshotId, JSON.stringify(value));
-    const credential = (reference: string) => { const row = db.prepare("SELECT body FROM credentials WHERE hash=?").get(reference) as {
+    const credential = (reference: string) => { const local=localPrincipal(reference);if(local)return local; const row = db.prepare("SELECT body FROM credentials WHERE hash=?").get(reference) as {
         body: string;
     } | undefined; if (!row)
         throw new Error("unauthorized"); return JSON.parse(row.body) as Principal; };
@@ -147,8 +149,8 @@ export const createAnalysisStore = ({ db, tx, load, authorize, execution, limits
     const clarificationRows = (reviewId: string, snapshotId: string) => (db.prepare("SELECT body FROM graph_clarifications WHERE review_id=? AND snapshot_id=? ORDER BY rowid").all(reviewId, snapshotId) as {
         body: string;
     }[]).map(row => JSON.parse(row.body) as GraphClarification);
-    const command = (token: string, input: AnalysisCommand): AnalysisReceipt => {
-        const reference = hash(token), parsed = analysisCommandSchema.parse(input), fingerprint = hash(semanticCanonical(parsed));
+    const command = (token: StorageAccess, input: AnalysisCommand): AnalysisReceipt => {
+        const reference = accessReference(token), parsed = analysisCommandSchema.parse(input), fingerprint = hash(semanticCanonical(parsed));
         return tx(() => {
             let job: Job | undefined, reviewId = "reviewId" in parsed ? parsed.reviewId : "", snapshotId = "snapshotId" in parsed ? parsed.snapshotId : "";
             if ("jobId" in parsed) {
@@ -226,7 +228,7 @@ export const createAnalysisStore = ({ db, tx, load, authorize, execution, limits
                     result = { clarificationId: clarification.clarificationId };
                 }
                 else {
-                    if (!job || job.credentialReference !== reference || job.actorId !== principal.actorId)
+                    if (!job || (!isLocalOwner(token)&&job.credentialReference !== reference) || job.actorId !== principal.actorId)
                         throw new Error("unauthorized");
                     if (job.jobRevision !== parsed.expectedJobRevision)
                         throw new Error("analysis_job_conflict");
@@ -262,21 +264,21 @@ export const createAnalysisStore = ({ db, tx, load, authorize, execution, limits
     };
     return {
         command,
-        marker: (token:string,input:AnalysisMarkerQuery):AnalysisMarker=>{
-            const query=analysisMarkerQuerySchema.parse(input),{review}=auth(hash(token),query.reviewId);
+        marker: (token:StorageAccess,input:AnalysisMarkerQuery):AnalysisMarker=>{
+            const query=analysisMarkerQuerySchema.parse(input),{review}=auth(accessReference(token),query.reviewId);
             if(!snapshotFor(review,query.snapshotId))throw new Error('source_unavailable');
             const current=graph(query.reviewId,query.snapshotId);
             return {reviewId:query.reviewId,snapshotId:query.snapshotId,currentSnapshotId:review.currentSnapshotId??review.snapshot.snapshotId,analysisGeneration:current.generation,graphRevision:current.graphRevision,selectedAnalysisId:current.selectedAnalysisId};
         },
-        evidence: (token:string,input:AnalysisEvidenceQuery):AnalysisEvidence=>{
-            const query=analysisEvidenceQuerySchema.parse(input),{review}=auth(hash(token),query.reviewId);
+        evidence: (token:StorageAccess,input:AnalysisEvidenceQuery):AnalysisEvidence=>{
+            const query=analysisEvidenceQuerySchema.parse(input),{review}=auth(accessReference(token),query.reviewId);
             if(!snapshotFor(review,query.snapshotId))throw new Error('source_unavailable');
             const admitted=all().find(job=>job.reviewId===query.reviewId&&job.snapshotId===query.snapshotId&&job.analysisId===query.analysisId&&job.state==='admitted');
             if(!admitted?.corpusId)throw new Error('analysis_record_unavailable');
             return {reviewId:query.reviewId,snapshotId:query.snapshotId,analysisId:query.analysisId,corpus:account(corpus(admitted)),analysis:record<AnalysisResult>(query.reviewId,'analysis',query.analysisId),clarifications:clarificationRows(query.reviewId,query.snapshotId).filter(item=>item.analysisId===query.analysisId)};
         },
-        query: (token: string, input: AnalysisQuery): AnalysisView => {
-            const query = analysisQuerySchema.parse(input), { review } = auth(hash(token), query.reviewId);
+        query: (token: StorageAccess, input: AnalysisQuery): AnalysisView => {
+            const query = analysisQuerySchema.parse(input), { review } = auth(accessReference(token), query.reviewId);
             if (!snapshotFor(review, query.snapshotId))
                 throw new Error("source_unavailable");
             const current = graph(query.reviewId, query.snapshotId), jobs = all().filter(job => job.reviewId === query.reviewId && job.snapshotId === query.snapshotId);
@@ -289,8 +291,8 @@ export const createAnalysisStore = ({ db, tx, load, authorize, execution, limits
                 throw new Error("analysis_record_unavailable");
             return { reviewId: query.reviewId, snapshotId: query.snapshotId, currentSnapshotId: review.currentSnapshotId ?? review.snapshot.snapshotId, analysisGeneration: current.generation, graphRevision: current.graphRevision, selectedAnalysisId: current.selectedAnalysisId, jobs: jobs.map(publicJob), preparation: pending ? { jobId: pending.jobId, corpus: pending.corpusId ? account(corpus(pending)) : pending.failureAccount, inventory: pending.inventoryId ? record<DeclarationInventoryResult>(query.reviewId, "inventory", pending.inventoryId) : null, result: pending.analysisId ? record<AnalysisResult>(query.reviewId, "analysis", pending.analysisId) : null } : null, corpus: chosen?.corpusId ? account(corpus(chosen)) : chosen?.failureAccount ?? null, inventory: chosen?.inventoryId ? record<DeclarationInventoryResult>(query.reviewId, "inventory", chosen.inventoryId) : null, analysis: chosen?.analysisId ? record<AnalysisResult>(query.reviewId, "analysis", chosen.analysisId) : null, clarifications: clarificationRows(query.reviewId, query.snapshotId).filter(item => item.analysisId === selected) };
         },
-        source: (token: string, input: SemanticSourceQuery): SemanticSource => {
-            const query = semanticSourceQuerySchema.parse(input), { review } = auth(hash(token), query.reviewId);
+        source: (token: StorageAccess, input: SemanticSourceQuery): SemanticSource => {
+            const query = semanticSourceQuerySchema.parse(input), { review } = auth(accessReference(token), query.reviewId);
             if (!snapshotFor(review, query.snapshotId))
                 throw new Error("source_unavailable");
             const source = record<CorpusRecord>(query.reviewId, "corpus", query.corpusId).corpus;

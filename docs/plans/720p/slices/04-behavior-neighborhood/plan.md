@@ -44,3 +44,9 @@ Reviewed028 technical interfaces may support05 implementation before04 merge, af
 ## Current bounded acceptance
 
 The [combined7b6 receipt](../05-explanation-exploration/acceptance-7b6.md) supersedes historical open-G14 coordination above, without changing those original accounts or their failed dispositions. Static/source scope, current authored understanding and meaningful question/return are independently evidenced within the stated task; overall effort remains workable, not effortless. No full-round/native/human or delivery acceptance is implied.
+
+## 2026-10-24 single-owner access input
+
+**Accepted correction:** The durable runtime/access specification now removes manual owner login/token entry. Credential-free workspace opening uses a server-derived local-user principal and trusted storage access; retained history, legacy credential rows/receipts and exact-session agent attachment/generation fences remain. New import/analysis jobs use a stable internal local-owner reference; the local owner can manage its older credential-scoped jobs. Browser private state uses origin/local-owner scope and preserves incompatible legacy records without automatic rekey/replay. See [runtime policy](../../../../product/review-loop/runtime.md) and [correction packet](../../../480p/slices/01-review-loop/single-user-access/plan.md).
+
+Prior passkey/login deferrals are superseded by this correction. Required successor work must use credential-free normal owner calls; old programmatic credential APIs remain compatibility seams. Implementer HTTP, storage, runtime and actual React/reload checks are recorded in the packet; they do not close this slice's independent review, own-PR, native or comprehension gates. Existing pilot routing and data are preserved; deployment remains the coordinator's separate gate.
