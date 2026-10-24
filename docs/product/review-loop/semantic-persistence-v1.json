@@ -184,7 +184,8 @@
               "a.ts"
             ]
           },
-          "failureAccount": null
+          "failureAccount": null,
+          "contextFilesPerSide": 1
         }
       }
     ],
@@ -199,5 +200,26 @@
       "pidToKill": null,
       "jobRevision": 13
     }
+  },
+  "loweredContextRequest": {
+    "command": {
+      "type": "RequestAnalysis",
+      "commandId": "capped-context-example",
+      "reviewId": "review-example",
+      "snapshotId": "semantic-data-vector-v1",
+      "expectedAnalysisGeneration": 1,
+      "worktree": "/private/example/repository",
+      "sourceProject": "example/review",
+      "priorityPaths": {
+        "head": [
+          "a.ts"
+        ]
+      },
+      "contextFilesPerSide": 1
+    },
+    "fingerprint": "4420ce7b4d520bf636c9afc7aad7f28683c318be6dcceff149f6fecce309500e",
+    "expectedEffectiveLoaderFilesPerSide": 1,
+    "expectedCorpusId": "601ba2201ea742a1e70bad923550ca60480d86a3c0ccd323b1bf8d3449d4c27d",
+    "legacyJobMemberAbsentMeans": 128
   }
 }

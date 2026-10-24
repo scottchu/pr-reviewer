@@ -47,6 +47,8 @@ Normalize compute seeds by exact side/path/contentHash/start/end identity, dedup
 
 Each budget is a safe integer from0 through its maximum. This differs from loader budgets, which are positive and require inventoryMetadataBytes≥2. Lowering a budget changes request identity. The source/context/worker transport budgets remain independent.
 
+RequestAnalysis.contextFilesPerSide is an owner acquisition input, not a member of the pure inventory/compute input or a new analyzer profile. It lowers only the loader's filesPerSide budget before trusted corpus preparation. The loader's complete expanded budgets/ledger and source hashes then derive the unchanged normalized pure input. The existing data vector uses loader cap1, so its excluded z.ts row and unchanged pure budget defaults also cover this distinction. [Persistence fixtures](semantic-persistence-v1.json) include a capped command fingerprint and show the optional persisted member; absence retains128 for legacy jobs. Explicit128 versus omission remains distinct command identity even when their prepared corpus is identical.
+
 ## Exact hash objects
 
 The following member names are exact; object construction order is irrelevant here because semantic canonical JSON sorts keys:
