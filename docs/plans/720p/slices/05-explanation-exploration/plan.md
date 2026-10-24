@@ -1,6 +1,6 @@
 # Slice05: follow an explanation and explore
 
-**Packet revision:** 1
+**Packet revision:** 2
 
 **Date:** 2026-10-24
 
@@ -20,7 +20,7 @@ A tired reviewer follows a concise whole-PR account, understands why/what/how wi
 
 The committed04 core candidate has immutable analysis/context, exact declaration IDs, authorized queries, graph clarification CAS and a shared process lease. It has no story authoring, story revisions, player or exploration/resume protocol. The separate04 UI is in progress and has not been inspected uncommitted. Independent core/UI/full04 acceptance remains open. These facts make design possible, not05 implementation ready.
 
-Predecessor PR23 graph-first review found useful whole-change inventory but burdensome manual lifecycle/policy synthesis: structural edges and repeated header excerpts obscured durable job ownership, non-replay, admission safeguards and rationale. Dense source lines increased drilldown effort. A controlled SDK reply preserved anchors/transport but did not answer the original question. Slice05 must improve the meaningful account and relevant answer rather than promote those engineering successes into comprehension.
+Predecessor PR23 graph-first review found useful whole-change inventory but burdensome manual lifecycle/policy synthesis: structural edges and repeated header excerpts obscured durable job ownership, non-replay, admission safeguards and rationale. Dense source lines increased drilldown effort. A controlled SDK reply preserved persisted anchors, attribution and history but did not answer the original question. Its retained-MCP-transport result was false; this evidence establishes neither retained transport nor native delivery. Slice05 must improve the meaningful account and relevant answer rather than promote those engineering successes into comprehension.
 
 ## Accepted scope and concrete choices
 
@@ -28,7 +28,7 @@ Predecessor PR23 graph-first review found useful whole-change inventory but burd
 - A provenance-separated context rail retains owner-supplied Epic/Ticket/PR captures beside authored understanding. Missing/stale material is explicit; no automatic external fetch, enrichment or invented business rationale.
 - Public owner/attached-agent publication through normal domain/store/gateway/MCP boundaries. Reuse existing addressed AskQuestion→CLI→same-session MCP for explanation requests; publication does not automatically answer a question or wake an agent.
 - One-row slim draggable previous/replay-pause/next/step/chapter player, synchronized graph/source/story and accessible keyboard controls. Basic mobile Flow/Diff shares state; reading pauses and exploration/resume preserve cursor and original draft.
-- Independent source/context/story/graph/job revisions; exact retry, stale publication, history/readback, private session recovery and lifecycle teardown. No source/graph pointer changes from background publication or job/import completion.
+- Independent source/context/story/graph/job revisions; exact retry, stale publication, history/readback, private session recovery and lifecycle teardown. Add the missing public review-bridge recovery seam: persist exact unresolved AskQuestion identity/payload before sending, explicitly recover with the same authorized credential after reload, and retain accepted-awaiting-readback state until confirmed. No source/graph pointer changes from background publication or job/import completion.
 
 No new model runtime/API key, forked participant, library, distributed service, scheduler or executable graph/content language. No test execution (06), base/head runs (07), automatic correction inbox/enrichment (08), advanced semantic zoom or4K polish. Full native Codex/Claude and unfamiliar-human acceptance remain separate open gates; known passkey work stays last. No build/install/runtime action belongs to this planning task.
 
@@ -62,9 +62,9 @@ Use existing own PR23, https://github.com/scottchu/pr-reviewer/pull/23, comparis
 
 Task: **“A reviewer imports a new head while discussing the existing review. Explain what can continue, when new source becomes authoritative, and what happens if acquisition or its acknowledgement is uncertain. Identify one unchanged consumer or shared boundary, one supporting change, and one conclusion we cannot draw.”** Follow the story, investigate a supporting source or unknown not fully narrated, then resume. Ask the responsible attached participant one concrete question about that behavior and judge whether its persisted answer addresses it, with source and limits.
 
-Source-informed verifier preparation (held separately from the blind reviewer): confirm baseline manual/history behavior versus added durable import; short transactions around asynchronous work; effect ownership and unknown/no-replay; prepared artifact versus witness-backed admission; immutable old questions/drafts/source; supporting UI/tests/docs and absence of test-execution proof. Candidate anchor locations are `src/import-jobs/coordinator.ts`, `src/storage/imports.ts`, `src/source-preparation/public.ts`, `src/application/imports.ts` and domain/ledger tests. Verify exact spans and before/after examples at the target pins before creating presentation content. This is a selected task and prospective account outline, not a claim that this planner revalidated every target source statement. If any expectation differs, correct the key/source understanding before UI implementation; do not train the answer key on generated story output.
+Before presentation implementation, an independent source-informed verifier privately derives the expected account, exact before/after spans, supporting scope and known limits from the pinned target. Store that answer key in a separate local review artifact outside Git, with a SHA-256 digest and target identity recorded in the evidence manifest. The normative plan supplies the task and assessment rubric, not the expected answer. Exclude the key, verifier notes and answer-bearing source preparation from the blind reviewer package and UI capture dataset; the reviewer receives only the task, product vision, candidate/target identity and actual product access. Freeze the key before evaluating generated story output; source corrections produce a new key digest with a reason, never silently fit expectations to the story. No key is created or comprehension result claimed by this planning revision.
 
-The final05 PR also receives its own actual immutable-target task and source-verifier key before presentation/review. Prefer its changed story publication or exploration/resume behavior and a real unchanged consumer/source boundary. Existing PR23 is an early representative case, not a substitute for final ownPR dogfood. Assign a fresh reviewer without plans/code/expected answers; freeze actual story/graph-first account, then allow source comparison. Meaningful-answer, native delivery and human acceptance remain separately recorded.
+The final05 PR receives a different private source-verifier key for its own immutable target and task, frozen before presentation/review, and a fresh reviewer who has not seen that key. Its task must exercise the delivered behavior and a real supporting or unchanged source boundary. Existing PR23 is an early representative case, not a substitute for final ownPR dogfood. Assign a fresh reviewer without plans/code/expected answers; freeze actual story/graph-first account, then allow source comparison. Meaningful-answer, native delivery and human acceptance remain separately recorded.
 
 ## Whole-slice acceptance
 
