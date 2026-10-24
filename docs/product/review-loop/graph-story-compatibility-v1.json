@@ -1,0 +1,495 @@
+{
+  "graphCases": [
+    {
+      "name": "manual-single-no-ledger",
+      "snapshot": {
+        "snapshotId": "S",
+        "repository": "example/repo",
+        "prUrl": "https://example.test/repo/pull/1",
+        "prNumber": 1,
+        "baseSha": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "headSha": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+        "sources": [
+          {
+            "path": "a.md",
+            "side": "base",
+            "content": "old\n",
+            "hash": "01d09d19c2139a46aebfb577780d123d7396e97201bc7ead210a2ebff8239dee",
+            "lineCount": 1
+          },
+          {
+            "path": "a.md",
+            "side": "head",
+            "content": "new\n",
+            "hash": "7aa7a5359173d05b63cfd682e3c38487f3cb4f7f1d60659fe59fab1505977d4c",
+            "lineCount": 1
+          }
+        ]
+      },
+      "fileKeys": [
+        "[0,\"a.md\",\"a.md\"]"
+      ],
+      "nodes": [
+        {
+          "id": "[\"S\",\"base\",\"a.md\"]",
+          "kind": "file",
+          "side": "base",
+          "path": "a.md"
+        },
+        {
+          "id": "[\"[\\\"S\\\",\\\"base\\\",\\\"a.md\\\"]\",1,1]",
+          "kind": "hunk",
+          "side": "base",
+          "path": "a.md"
+        },
+        {
+          "id": "[\"S\",\"head\",\"a.md\"]",
+          "kind": "file",
+          "side": "head",
+          "path": "a.md"
+        },
+        {
+          "id": "[\"[\\\"S\\\",\\\"head\\\",\\\"a.md\\\"]\",1,1]",
+          "kind": "hunk",
+          "side": "head",
+          "path": "a.md"
+        }
+      ]
+    },
+    {
+      "name": "manual-first-occurrence-and-head-only-fallback",
+      "snapshot": {
+        "snapshotId": "S",
+        "repository": "example/repo",
+        "prUrl": "https://example.test/repo/pull/1",
+        "prNumber": 1,
+        "baseSha": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "headSha": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+        "sources": [
+          {
+            "path": "z.md",
+            "side": "head",
+            "content": "z\n",
+            "hash": "c865f6c5ab8d1b0bcd383a5e1e3879d22681c96bf462c269b7581d523fbe70ab",
+            "lineCount": 1
+          },
+          {
+            "path": "a.md",
+            "side": "base",
+            "content": "old\n",
+            "hash": "01d09d19c2139a46aebfb577780d123d7396e97201bc7ead210a2ebff8239dee",
+            "lineCount": 1
+          },
+          {
+            "path": "a.md",
+            "side": "head",
+            "content": "new\n",
+            "hash": "7aa7a5359173d05b63cfd682e3c38487f3cb4f7f1d60659fe59fab1505977d4c",
+            "lineCount": 1
+          }
+        ]
+      },
+      "fileKeys": [
+        "[0,\"z.md\",\"z.md\"]",
+        "[1,\"a.md\",\"a.md\"]"
+      ],
+      "nodes": [
+        {
+          "id": "[\"S\",\"head\",\"z.md\"]",
+          "kind": "file",
+          "side": "head",
+          "path": "z.md"
+        },
+        {
+          "id": "[\"S\",\"base\",\"a.md\"]",
+          "kind": "file",
+          "side": "base",
+          "path": "a.md"
+        },
+        {
+          "id": "[\"[\\\"S\\\",\\\"base\\\",\\\"a.md\\\"]\",1,1]",
+          "kind": "hunk",
+          "side": "base",
+          "path": "a.md"
+        },
+        {
+          "id": "[\"S\",\"head\",\"a.md\"]",
+          "kind": "file",
+          "side": "head",
+          "path": "a.md"
+        },
+        {
+          "id": "[\"[\\\"S\\\",\\\"head\\\",\\\"a.md\\\"]\",1,1]",
+          "kind": "hunk",
+          "side": "head",
+          "path": "a.md"
+        }
+      ]
+    },
+    {
+      "name": "manual-explicit-added-ledger",
+      "snapshot": {
+        "snapshotId": "S",
+        "repository": "example/repo",
+        "prUrl": "https://example.test/repo/pull/1",
+        "prNumber": 1,
+        "baseSha": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "headSha": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+        "sources": [
+          {
+            "path": "c.md",
+            "side": "head",
+            "content": "new\n",
+            "hash": "7aa7a5359173d05b63cfd682e3c38487f3cb4f7f1d60659fe59fab1505977d4c",
+            "lineCount": 1
+          }
+        ],
+        "changedFiles": [
+          {
+            "status": "added",
+            "oldPath": null,
+            "newPath": "c.md",
+            "dispositions": []
+          }
+        ]
+      },
+      "fileKeys": [
+        "[0,null,\"c.md\"]"
+      ],
+      "nodes": [
+        {
+          "id": "[\"S\",\"head\",\"c.md\"]",
+          "kind": "file",
+          "side": "head",
+          "path": "c.md"
+        },
+        {
+          "id": "[\"[\\\"S\\\",\\\"head\\\",\\\"c.md\\\"]\",1,1]",
+          "kind": "hunk",
+          "side": "head",
+          "path": "c.md"
+        }
+      ]
+    },
+    {
+      "name": "manual-explicit-empty-ledger",
+      "snapshot": {
+        "snapshotId": "S",
+        "repository": "example/repo",
+        "prUrl": "https://example.test/repo/pull/1",
+        "prNumber": 1,
+        "baseSha": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "headSha": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+        "sources": [
+          {
+            "path": "z.md",
+            "side": "head",
+            "content": "z\n",
+            "hash": "c865f6c5ab8d1b0bcd383a5e1e3879d22681c96bf462c269b7581d523fbe70ab",
+            "lineCount": 1
+          }
+        ],
+        "changedFiles": []
+      },
+      "fileKeys": [],
+      "nodes": [
+        {
+          "id": "[\"S\",\"head\",\"z.md\"]",
+          "kind": "file",
+          "side": "head",
+          "path": "z.md"
+        }
+      ]
+    },
+    {
+      "name": "provider-modified-original-copy-and-absent-base",
+      "snapshot": {
+        "snapshotId": "S",
+        "repository": "example/repo",
+        "prUrl": "https://example.test/repo/pull/1",
+        "prNumber": 1,
+        "baseSha": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "headSha": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+        "sources": [
+          {
+            "path": "a.md",
+            "side": "base",
+            "content": "old\n",
+            "hash": "01d09d19c2139a46aebfb577780d123d7396e97201bc7ead210a2ebff8239dee",
+            "lineCount": 1
+          },
+          {
+            "path": "a.md",
+            "side": "head",
+            "content": "new\n",
+            "hash": "7aa7a5359173d05b63cfd682e3c38487f3cb4f7f1d60659fe59fab1505977d4c",
+            "lineCount": 1
+          },
+          {
+            "path": "a.md",
+            "side": "base",
+            "content": "old\n",
+            "hash": "01d09d19c2139a46aebfb577780d123d7396e97201bc7ead210a2ebff8239dee",
+            "lineCount": 1
+          },
+          {
+            "path": "b.md",
+            "side": "head",
+            "content": "new\n",
+            "hash": "7aa7a5359173d05b63cfd682e3c38487f3cb4f7f1d60659fe59fab1505977d4c",
+            "lineCount": 1
+          },
+          {
+            "path": "c.md",
+            "side": "head",
+            "content": "new\n",
+            "hash": "7aa7a5359173d05b63cfd682e3c38487f3cb4f7f1d60659fe59fab1505977d4c",
+            "lineCount": 1
+          }
+        ],
+        "changedFiles": [
+          {
+            "status": "modified",
+            "oldPath": "a.md",
+            "newPath": "a.md",
+            "dispositions": [],
+            "coverage": "text",
+            "hunks": [
+              {
+                "id": "H1",
+                "oldStart": 1,
+                "oldLines": 1,
+                "newStart": 1,
+                "newLines": 1
+              }
+            ]
+          },
+          {
+            "status": "copied",
+            "oldPath": "a.md",
+            "newPath": "b.md",
+            "dispositions": [],
+            "coverage": "text",
+            "hunks": [
+              {
+                "id": "H2",
+                "oldStart": 1,
+                "oldLines": 1,
+                "newStart": 1,
+                "newLines": 1
+              }
+            ]
+          },
+          {
+            "status": "added",
+            "oldPath": null,
+            "newPath": "c.md",
+            "dispositions": [],
+            "coverage": "text",
+            "hunks": [
+              {
+                "id": "H3",
+                "oldStart": 0,
+                "oldLines": 0,
+                "newStart": 1,
+                "newLines": 1
+              }
+            ]
+          }
+        ],
+        "candidate": {
+          "provider": "github",
+          "host": "example.test",
+          "sourceProject": "example/repo",
+          "targetProject": "example/repo",
+          "number": 1,
+          "url": "https://example.test/repo/pull/1",
+          "title": "Identity fixture",
+          "state": "open",
+          "sourceBranch": "feature",
+          "targetBranch": "main",
+          "baseSha": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+          "headSha": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+          "targetTipSha": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+          "baselineMethod": "github_compare_merge_base"
+        }
+      },
+      "fileKeys": [
+        "[0,\"a.md\",\"a.md\"]",
+        "[1,\"a.md\",\"b.md\"]",
+        "[2,null,\"c.md\"]"
+      ],
+      "nodes": [
+        {
+          "id": "[\"[0,\\\"a.md\\\",\\\"a.md\\\"]\",\"[\\\"S\\\",\\\"base\\\",\\\"a.md\\\"]\"]",
+          "kind": "file",
+          "side": "base",
+          "path": "a.md",
+          "fileKey": "[0,\"a.md\",\"a.md\"]"
+        },
+        {
+          "id": "[\"[0,\\\"a.md\\\",\\\"a.md\\\"]\",\"H1\",\"base\"]",
+          "kind": "hunk",
+          "side": "base",
+          "path": "a.md",
+          "fileKey": "[0,\"a.md\",\"a.md\"]"
+        },
+        {
+          "id": "[\"[0,\\\"a.md\\\",\\\"a.md\\\"]\",\"[\\\"S\\\",\\\"head\\\",\\\"a.md\\\"]\"]",
+          "kind": "file",
+          "side": "head",
+          "path": "a.md",
+          "fileKey": "[0,\"a.md\",\"a.md\"]"
+        },
+        {
+          "id": "[\"[0,\\\"a.md\\\",\\\"a.md\\\"]\",\"H1\",\"head\"]",
+          "kind": "hunk",
+          "side": "head",
+          "path": "a.md",
+          "fileKey": "[0,\"a.md\",\"a.md\"]"
+        },
+        {
+          "id": "[\"[1,\\\"a.md\\\",\\\"b.md\\\"]\",\"[\\\"S\\\",\\\"base\\\",\\\"a.md\\\"]\"]",
+          "kind": "file",
+          "side": "base",
+          "path": "a.md",
+          "fileKey": "[1,\"a.md\",\"b.md\"]"
+        },
+        {
+          "id": "[\"[1,\\\"a.md\\\",\\\"b.md\\\"]\",\"H2\",\"base\"]",
+          "kind": "hunk",
+          "side": "base",
+          "path": "a.md",
+          "fileKey": "[1,\"a.md\",\"b.md\"]"
+        },
+        {
+          "id": "[\"[1,\\\"a.md\\\",\\\"b.md\\\"]\",\"[\\\"S\\\",\\\"head\\\",\\\"b.md\\\"]\"]",
+          "kind": "file",
+          "side": "head",
+          "path": "b.md",
+          "fileKey": "[1,\"a.md\",\"b.md\"]"
+        },
+        {
+          "id": "[\"[1,\\\"a.md\\\",\\\"b.md\\\"]\",\"H2\",\"head\"]",
+          "kind": "hunk",
+          "side": "head",
+          "path": "b.md",
+          "fileKey": "[1,\"a.md\",\"b.md\"]"
+        },
+        {
+          "id": "[\"[2,null,\\\"c.md\\\"]\",\"[\\\"S\\\",\\\"head\\\",\\\"c.md\\\"]\"]",
+          "kind": "file",
+          "side": "head",
+          "path": "c.md",
+          "fileKey": "[2,null,\"c.md\"]"
+        },
+        {
+          "id": "[\"[2,null,\\\"c.md\\\"]\",\"H3\",\"head\"]",
+          "kind": "hunk",
+          "side": "head",
+          "path": "c.md",
+          "fileKey": "[2,null,\"c.md\"]"
+        }
+      ]
+    }
+  ],
+  "storyReceiptVectors": [
+    {
+      "name": "owner-context-selection",
+      "principal": {
+        "kind": "user",
+        "actorId": "U"
+      },
+      "command": {
+        "type": "PutStoryContext",
+        "commandId": "ctx-1",
+        "reviewId": "R",
+        "snapshotId": "S",
+        "expectedContextRevision": 0,
+        "action": {
+          "type": "select",
+          "captureIds": [
+            "C2",
+            "C1"
+          ]
+        }
+      },
+      "canonicalPreimage": "{\"command\":{\"action\":{\"captureIds\":[\"C2\",\"C1\"],\"type\":\"select\"},\"commandId\":\"ctx-1\",\"expectedContextRevision\":0,\"reviewId\":\"R\",\"snapshotId\":\"S\",\"type\":\"PutStoryContext\"},\"principal\":{\"actorId\":\"U\",\"kind\":\"user\"}}",
+      "fingerprint": "76b40f045856091a6c86b4700595b27302ba3ee766c5943b920dfaacd602f084"
+    },
+    {
+      "name": "agent-publication",
+      "principal": {
+        "kind": "agent",
+        "actorId": "A",
+        "reviewId": "R",
+        "attachmentId": "AT",
+        "generation": 3
+      },
+      "command": {
+        "type": "PublishStory",
+        "commandId": "pub-1",
+        "reviewId": "R",
+        "snapshotId": "S",
+        "expectedStoryRevision": 0,
+        "contextRevision": 0,
+        "story": {
+          "title": " Unknown ",
+          "captureIds": [],
+          "chapters": [
+            {
+              "id": "ch",
+              "title": "Limits",
+              "why": "c",
+              "what": "c",
+              "how": "c",
+              "example": {
+                "scenarioKind": "illustrative",
+                "input": "c",
+                "before": "c",
+                "after": "c"
+              },
+              "stepIds": [
+                "st"
+              ]
+            }
+          ],
+          "steps": [
+            {
+              "id": "st",
+              "headline": "Unknown",
+              "claimIds": [
+                "c"
+              ],
+              "focus": {
+                "type": "none"
+              }
+            }
+          ],
+          "claims": [
+            {
+              "id": "c",
+              "text": " Unknown ",
+              "basis": "unknown",
+              "references": [],
+              "uncertainty": "No source account."
+            }
+          ],
+          "scope": [
+            {
+              "type": "unexplained",
+              "fileKey": "[0,\"a.md\",\"a.md\"]",
+              "reason": "No source account."
+            }
+          ],
+          "limitations": [
+            "Unexplained."
+          ]
+        }
+      },
+      "canonicalPreimage": "{\"command\":{\"commandId\":\"pub-1\",\"contextRevision\":0,\"expectedStoryRevision\":0,\"reviewId\":\"R\",\"snapshotId\":\"S\",\"story\":{\"captureIds\":[],\"chapters\":[{\"example\":{\"after\":\"c\",\"before\":\"c\",\"input\":\"c\",\"scenarioKind\":\"illustrative\"},\"how\":\"c\",\"id\":\"ch\",\"stepIds\":[\"st\"],\"title\":\"Limits\",\"what\":\"c\",\"why\":\"c\"}],\"claims\":[{\"basis\":\"unknown\",\"id\":\"c\",\"references\":[],\"text\":\" Unknown \",\"uncertainty\":\"No source account.\"}],\"limitations\":[\"Unexplained.\"],\"scope\":[{\"fileKey\":\"[0,\\\"a.md\\\",\\\"a.md\\\"]\",\"reason\":\"No source account.\",\"type\":\"unexplained\"}],\"steps\":[{\"claimIds\":[\"c\"],\"focus\":{\"type\":\"none\"},\"headline\":\"Unknown\",\"id\":\"st\"}],\"title\":\" Unknown \"},\"type\":\"PublishStory\"},\"principal\":{\"actorId\":\"A\",\"attachmentId\":\"AT\",\"generation\":3,\"kind\":\"agent\",\"reviewId\":\"R\"}}",
+      "fingerprint": "64649b193aaea457451dc7d959b86a6c3d3218bafdfb4183054cd0050886a7bb",
+      "changedGenerationFingerprint": "33c92d95400c5315f73c6365861943e59efbfaa467e90b51ee73e60e4824f688"
+    }
+  ]
+}

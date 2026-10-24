@@ -1,0 +1,294 @@
+{
+  "pendingAwaitingAck": {
+    "schema": 1,
+    "origin": "https://review.example:7443",
+    "scope": "c32dba39d6d0a60deccbfaa1cbd6bf5842dee07b20f6cdafed24b3e499ccf08f",
+    "reviewId": "R",
+    "draftId": "D1",
+    "phase": "awaiting_ack",
+    "request": "{\"anchor\":{\"endLine\":1,\"path\":\"a.md\",\"side\":\"head\",\"snapshotId\":\"S\",\"startLine\":1},\"commandId\":\"ask-1\",\"parentQuestionId\":\"Q0\",\"reviewId\":\"R\",\"text\":\" Why? \",\"type\":\"AskQuestion\"}",
+    "fingerprint": "98d7c5487165f1366d8ee33a3824ad4da5cfdb58bfd1d1131d32766c9bbe71b1"
+  },
+  "pendingAcceptedUnaddressed": {
+    "schema": 1,
+    "origin": "https://review.example:7443",
+    "scope": "c32dba39d6d0a60deccbfaa1cbd6bf5842dee07b20f6cdafed24b3e499ccf08f",
+    "reviewId": "R",
+    "draftId": "D1",
+    "phase": "accepted_awaiting_readback",
+    "request": "{\"anchor\":{\"endLine\":1,\"path\":\"a.md\",\"side\":\"head\",\"snapshotId\":\"S\",\"startLine\":1},\"commandId\":\"ask-1\",\"parentQuestionId\":\"Q0\",\"reviewId\":\"R\",\"text\":\" Why? \",\"type\":\"AskQuestion\"}",
+    "fingerprint": "98d7c5487165f1366d8ee33a3824ad4da5cfdb58bfd1d1131d32766c9bbe71b1",
+    "receipt": {
+      "commandId": "ask-1",
+      "actorId": "U",
+      "state": "applied",
+      "revision": 7,
+      "cursor": 2,
+      "result": {
+        "questionId": "Q1",
+        "eventId": null
+      }
+    }
+  },
+  "pendingAcceptedAddressed": {
+    "schema": 1,
+    "origin": "https://review.example:7443",
+    "scope": "c32dba39d6d0a60deccbfaa1cbd6bf5842dee07b20f6cdafed24b3e499ccf08f",
+    "reviewId": "R",
+    "draftId": "D1",
+    "phase": "accepted_awaiting_readback",
+    "request": "{\"anchor\":{\"endLine\":1,\"path\":\"a.md\",\"side\":\"head\",\"snapshotId\":\"S\",\"startLine\":1},\"commandId\":\"ask-1\",\"parentQuestionId\":\"Q0\",\"reviewId\":\"R\",\"text\":\" Why? \",\"type\":\"AskQuestion\"}",
+    "fingerprint": "98d7c5487165f1366d8ee33a3824ad4da5cfdb58bfd1d1131d32766c9bbe71b1",
+    "receipt": {
+      "commandId": "ask-1",
+      "actorId": "U",
+      "state": "applied",
+      "revision": 7,
+      "cursor": 2,
+      "result": {
+        "questionId": "Q1",
+        "eventId": "E1"
+      }
+    }
+  },
+  "ordinaryTwoDrafts": {
+    "schema": 1,
+    "origin": "https://review.example:7443",
+    "scope": "c32dba39d6d0a60deccbfaa1cbd6bf5842dee07b20f6cdafed24b3e499ccf08f",
+    "submitted": [
+      "D1"
+    ],
+    "omitted": [],
+    "value": {
+      "reviewId": "R",
+      "snapshotId": "T",
+      "versionId": null,
+      "cursor": null,
+      "elapsedMs": 0,
+      "surface": "flow",
+      "position": {
+        "x": 0,
+        "y": 0
+      },
+      "pageScroll": 50,
+      "maps": {
+        "structural": null,
+        "semantic": null
+      },
+      "activeDraftId": "D2",
+      "drafts": [
+        {
+          "id": "D1",
+          "anchor": {
+            "snapshotId": "S",
+            "side": "head",
+            "path": "a.md",
+            "startLine": 1,
+            "endLine": 1
+          },
+          "comparisonKey": "[0,\"a.md\",\"a.md\"]",
+          "parentQuestionId": "Q0",
+          "text": "",
+          "submitted": true
+        },
+        {
+          "id": "D2",
+          "anchor": {
+            "snapshotId": "T",
+            "side": "head",
+            "path": "b.md",
+            "startLine": 2,
+            "endLine": 3
+          },
+          "comparisonKey": "[1,\"a.md\",\"b.md\"]",
+          "text": "Explore separately.",
+          "submitted": false
+        }
+      ],
+      "returnFrame": {
+        "snapshotId": "S",
+        "versionId": "V1",
+        "cursor": {
+          "versionId": "V1",
+          "chapterId": "ch",
+          "stepId": "st",
+          "index": 0
+        },
+        "elapsedMs": 1250,
+        "surface": "diff",
+        "position": {
+          "x": 24,
+          "y": 48
+        },
+        "pageScroll": 500,
+        "maps": {
+          "structural": {
+            "fileKey": "[0,\"a.md\",\"a.md\"]",
+            "context": false,
+            "spans": true,
+            "spanId": "[\"[\\\"S\\\",\\\"head\\\",\\\"a.md\\\"]\",1,1]",
+            "viewport": {
+              "x": 0,
+              "y": 12,
+              "zoom": 1
+            }
+          },
+          "semantic": {
+            "analysisId": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+            "focus": "F1",
+            "viewport": {
+              "x": -10,
+              "y": 20,
+              "zoom": 1.25
+            },
+            "fullSource": true,
+            "sourceAnchor": {
+              "snapshotId": "S",
+              "side": "head",
+              "path": "a.md",
+              "contentHash": "7aa7a5359173d05b63cfd682e3c38487f3cb4f7f1d60659fe59fab1505977d4c",
+              "start": 0,
+              "end": 3,
+              "startLine": 1,
+              "endLine": 1
+            },
+            "corpusId": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+          }
+        },
+        "originalDraftId": "D1",
+        "evidence": {
+          "type": "snapshot_source",
+          "anchor": {
+            "snapshotId": "S",
+            "side": "head",
+            "path": "a.md",
+            "startLine": 1,
+            "endLine": 1
+          },
+          "contentHash": "7aa7a5359173d05b63cfd682e3c38487f3cb4f7f1d60659fe59fab1505977d4c"
+        }
+      }
+    }
+  },
+  "ordinaryOmittedDraft": {
+    "schema": 1,
+    "origin": "https://review.example:7443",
+    "scope": "c32dba39d6d0a60deccbfaa1cbd6bf5842dee07b20f6cdafed24b3e499ccf08f",
+    "submitted": [
+      "D1"
+    ],
+    "omitted": [
+      "D2"
+    ],
+    "value": {
+      "reviewId": "R",
+      "snapshotId": "T",
+      "versionId": null,
+      "cursor": null,
+      "elapsedMs": 0,
+      "surface": "flow",
+      "position": {
+        "x": 0,
+        "y": 0
+      },
+      "pageScroll": 50,
+      "maps": {
+        "structural": null,
+        "semantic": null
+      },
+      "activeDraftId": "D2",
+      "drafts": [
+        {
+          "id": "D1",
+          "anchor": {
+            "snapshotId": "S",
+            "side": "head",
+            "path": "a.md",
+            "startLine": 1,
+            "endLine": 1
+          },
+          "comparisonKey": "[0,\"a.md\",\"a.md\"]",
+          "parentQuestionId": "Q0",
+          "text": "",
+          "submitted": true
+        },
+        {
+          "id": "D2",
+          "anchor": {
+            "snapshotId": "T",
+            "side": "head",
+            "path": "b.md",
+            "startLine": 2,
+            "endLine": 3
+          },
+          "comparisonKey": "[1,\"a.md\",\"b.md\"]",
+          "text": "",
+          "submitted": false
+        }
+      ],
+      "returnFrame": {
+        "snapshotId": "S",
+        "versionId": "V1",
+        "cursor": {
+          "versionId": "V1",
+          "chapterId": "ch",
+          "stepId": "st",
+          "index": 0
+        },
+        "elapsedMs": 1250,
+        "surface": "diff",
+        "position": {
+          "x": 24,
+          "y": 48
+        },
+        "pageScroll": 500,
+        "maps": {
+          "structural": {
+            "fileKey": "[0,\"a.md\",\"a.md\"]",
+            "context": false,
+            "spans": true,
+            "spanId": "[\"[\\\"S\\\",\\\"head\\\",\\\"a.md\\\"]\",1,1]",
+            "viewport": {
+              "x": 0,
+              "y": 12,
+              "zoom": 1
+            }
+          },
+          "semantic": {
+            "analysisId": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+            "focus": "F1",
+            "viewport": {
+              "x": -10,
+              "y": 20,
+              "zoom": 1.25
+            },
+            "fullSource": true,
+            "sourceAnchor": {
+              "snapshotId": "S",
+              "side": "head",
+              "path": "a.md",
+              "contentHash": "7aa7a5359173d05b63cfd682e3c38487f3cb4f7f1d60659fe59fab1505977d4c",
+              "start": 0,
+              "end": 3,
+              "startLine": 1,
+              "endLine": 1
+            },
+            "corpusId": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+          }
+        },
+        "originalDraftId": "D1",
+        "evidence": {
+          "type": "snapshot_source",
+          "anchor": {
+            "snapshotId": "S",
+            "side": "head",
+            "path": "a.md",
+            "startLine": 1,
+            "endLine": 1
+          },
+          "contentHash": "7aa7a5359173d05b63cfd682e3c38487f3cb4f7f1d60659fe59fab1505977d4c"
+        }
+      }
+    }
+  }
+}
