@@ -25,3 +25,11 @@ A separate owner qualification probe against2bd364cfeeab66640444e57cec3843930063
 ## Next required B1 outcome
 
 Finish actual fixed target execution against fresh verified inputs; bounded plain artifacts and discriminated no-process/partial/prepared outcomes; exact same-job result/receipt admission, query/artifact gateway ports; cancellation/unknown and owned shutdown coordination. Supply committed complete consumer contracts before B2/B3 starts. Preserve existing05E safeguards and later root-supplied normal-test entrypoint reconciliation. Production composition stays unconfigured until the final source/qualification and coordinator gates are met. Full G1, actual own-PR/React/CLI/fault/visual/knowledge and delivery remain separate.
+
+## Resolver correction after independent 69d review
+
+**Status:** Required P2 correction implemented; original69d counterexample retained; narrow independent recheck pending.
+
+The independent reviewer demonstrated that copied tsconfig paths could redirect an approved bare package import to an unaccounted local module. The source-only composed preparation/configuration probe did not execute target code. The bounded correction rejects unsupported resolver configuration before issuing a witness and records accepted config identities; it preserves the supported current root config and config-free fixtures. Required checks are the original real-preparation alias regression plus supported-config, baseUrl, extends, nested/alternate config and package-resolution controls. This changes qualification accounting, not target execution authority.
+
+The original composed counterexample was copied into the repository regression and observed RED on69d (`resolution-red.log`, Missing expected rejection). With the bounded resolver guard it passes;5 focused tests pass, including supported root config and the listed unsupported controls (`resolution-green.log`). Strict TypeScript, subsystem boundaries and diff whitespace checks pass. Accepted root config/package hashes now participate in the source-account digest; earlier account/qualification IDs remain historical and require fresh qualification rather than reuse. No target code ran in these checks. Logs remain in /tmp/pr-reviewer-06-execution/evidence. Independent original report: /tmp/pr-reviewer-06-plan-review/review-69d6016.md.
