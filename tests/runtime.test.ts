@@ -324,3 +324,14 @@ test('literal encoded-hash Git target and fenced examples preserve exact documen
  assert.equal(snapshot.documentReferences?.length,1);assert.equal(snapshot.documentReferences[0]?.target?.path,'b#section');assert.ok(snapshot.sources.some(s=>s.path==='b#section'&&s.content==='# Actual target\n'));assert.equal(snapshot.sources.some(s=>s.path==='b'),false);
  }finally{if(oldGit===undefined)delete process.env.GIT_DIR;else process.env.GIT_DIR=oldGit;rmSync(root,{recursive:true,force:true});}
 });
+
+test('pre-setup-record DB recovery retains explicitly selected unsupported sides',async()=>{
+ const {buildSnapshot,prepareSource}=await import('../scripts/prepare.ts');const {createStore}=await import('../src/storage/public.ts');const {mkdirSync}=await import('node:fs');
+ const root=mkdtempSync(join(tmpdir(),'pr-reviewer-legacy-unsupported-')),repo=join(root,'source'),data=join(root,'data'),oldGit=process.env.GIT_DIR,oldSpec=process.env.REVIEW_SOURCE_SPEC;mkdirSync(repo);mkdirSync(data);
+ const git=(...args:string[])=>execFileSync('git',['-C',repo,...args],{encoding:'utf8',stdio:['ignore','pipe','pipe']}).trim();
+ try{
+ git('init','-q');writeFileSync(join(repo,'a.md'),'# Before\n');git('add','.');git('-c','user.name=Fixture','-c','user.email=fixture@example.invalid','commit','-qm','base');const baseSha=git('rev-parse','HEAD');writeFileSync(join(repo,'a.md'),'# After\n');writeFileSync(join(repo,'binary.bin'),Buffer.from([0,1]));git('add','.');git('-c','user.name=Fixture','-c','user.email=fixture@example.invalid','commit','-qm','head');const headSha=git('rev-parse','HEAD');process.env.GIT_DIR=join(repo,'.git');delete process.env.REVIEW_SOURCE_SPEC;
+ const snapshot=buildSnapshot({prNumber:21,prUrl:'https://github.com/scottchu/pr-reviewer/pull/21',baseSha,headSha,paths:['a.md','binary.bin']}),store=createStore(join(data,'review.sqlite')),owner={kind:'user' as const,actorId:'local-user'};store.prepare('pr-21',snapshot);store.command(owner,{type:'AskQuestion',commandId:'retain-legacy-unsupported',reviewId:'pr-21',text:'Keep this question',anchor:{snapshotId:snapshot.snapshotId,side:'head',path:'a.md',startLine:1,endLine:1}});store.close();
+ assert.deepEqual(prepareSource(data),snapshot);const reopened=createStore(join(data,'review.sqlite'));assert.equal(reopened.review(owner,'pr-21').questions.length,1);reopened.close();
+ }finally{if(oldGit===undefined)delete process.env.GIT_DIR;else process.env.GIT_DIR=oldGit;if(oldSpec===undefined)delete process.env.REVIEW_SOURCE_SPEC;else process.env.REVIEW_SOURCE_SPEC=oldSpec;rmSync(root,{recursive:true,force:true});}
+});

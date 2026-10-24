@@ -119,7 +119,7 @@ export const prepareSource = (root: string) => {
       if (reviews[0]) {
         const snapshot = persisted.review(owner, reviews[0].reviewId).snapshot;
         const stored=persisted.preparedInput(reviews[0].reviewId);
-        const explicitPaths=snapshot.changedFiles?[...new Set(snapshot.changedFiles.flatMap(file=>file.dispositions).filter(d=>d.state==="prepared"&&d.reason==="verified Git blob").map(d=>d.path))]:null;
+        const explicitPaths=snapshot.changedFiles?[...new Set(snapshot.changedFiles.flatMap(file=>file.dispositions).filter(d=>d.state==="unsupported"||d.state==="missing"||(d.state==="prepared"&&d.reason==="verified Git blob")).map(d=>d.path))]:null;
         retained = inputSchema.parse(stored??{
           prNumber: snapshot.prNumber,
           prUrl: snapshot.prUrl,
