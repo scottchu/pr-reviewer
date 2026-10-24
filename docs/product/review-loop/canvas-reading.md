@@ -64,3 +64,7 @@ The [subsystem mockup map](../../plans/720p/slices/05-explanation-exploration/su
 The next [inspectable React mockup packet](../../plans/720p/slices/05-explanation-exploration/canvas-reading-mockup.md) demonstrates overview, focused inline diff, an unchanged neighbor, anchored questioning, exact return and a narrow alternative on one pinned real own-PR change. It must be shown before another production UI composition is adopted. The user correction establishes the model; the mockup establishes whether its concrete layout is usable.
 
 Preserve current source acquisition/analysis, immutable storage, jobs, authentication, MCP/CLI, question/reply and recovery work. The correction changes their presentation and source-navigation destination. Keep isolated application checks running while the affected UI composition is paused. Do not relabel earlier engineering or bounded understanding receipts as proof of this newly clarified interaction. No new host capability, live execution result or human acceptance is established by this specification.
+
+## Learned interaction constraints
+
+The local subsystem previews identified exact-version prose lookup, active-offset highlighting, explicit read-to-pause behavior, source-scoped private drafts and measured reflow as essential constraints. See [canvas interaction constraints and preview limits](canvas-interaction-constraints.md) for durable behavior and rationale. Their author-informed Chrome/source checks do not establish production integration, unfamiliar-reviewer comprehension or layout adoption.
