@@ -100,4 +100,22 @@ export type AnalysisResult = AnalysisMetadata & (
       detail: string; limit?: keyof AnalysisBudgets; triggeringSource?: Readonly<{ side: Side; path: string }> }>
 );
 
-export { analyzeNeighborhood } from "./analyze.ts";
+/** Same supplied source contract without an invented declaration seed. */
+export type DeclarationInventoryInput = Omit<AnalysisInput, "seeds">;
+export type NeighborhoodDeclaration = Readonly<Omit<FunctionNode, "kind"> & {
+  kind: "function" | "const-arrow" | "const-function";
+}>;
+export type DeclarationInventoryMetadata = Readonly<{
+  inventory: "source-declarations-v1.0.0"; parser: string;
+  snapshotId: string; corpusDigest: string; inventoryId: string;
+  corpus: AnalysisInput["corpus"]; coverage: readonly SourceCoverage[];
+  diagnostics: readonly AnalysisDiagnostic[];
+  observed: AnalysisMetadata["observed"] & Readonly<{ declarations: number }>;
+}>;
+export type DeclarationInventoryResult = DeclarationInventoryMetadata & (
+  | Readonly<{ status: "available"; declarations: readonly NeighborhoodDeclaration[] }>
+  | Readonly<{ status: "unavailable"; reason: "invalid_identity" | "invalid_input" | "budget_exceeded" | "parser_failure";
+      detail: string; limit?: keyof AnalysisBudgets; triggeringSource?: Readonly<{ side: Side; path: string }> }>
+);
+
+export { analyzeNeighborhood, listNeighborhoodDeclarations } from "./analyze.ts";

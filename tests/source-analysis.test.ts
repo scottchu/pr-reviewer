@@ -1,7 +1,7 @@
 import { describe, expect, spyOn, test } from "bun:test";
 import { createHash } from "node:crypto";
 import ts from "typescript-analysis";
-import { analyzeNeighborhood, DEFAULT_BUDGETS, type AnalysisInput, type AnalysisResult, type Seed, type Side, type SourceEntry } from "../src/source-analysis/public.ts";
+import { listNeighborhoodDeclarations, analyzeNeighborhood, DEFAULT_BUDGETS, type DeclarationInventoryInput, type AnalysisInput, type AnalysisResult, type Seed, type Side, type SourceEntry } from "../src/source-analysis/public.ts";
 
 // Controlled synthetic source, never acquired Git or runtime provenance.
 const hash = (content: string) => createHash("sha256").update(content).digest("hex");
@@ -415,4 +415,171 @@ describe("source-neighborhood-v1 fixed acceptance corpus", () => {
     expect(limited.coverage.find(c => c.path === "z.ts")).toMatchObject({ status: "pending", examined: null, resolved: null, unresolved: null, reason: "not_scanned_after_invocationSites" });
     if (limited.status === "unavailable") expect(limited.triggeringSource).toEqual({ side: "head", path: "a.ts" });
   });
+});
+
+
+const inventoryInput = (sources: readonly SourceEntry[]): DeclarationInventoryInput => {
+  const { seeds: _seeds, ...request } = input(sources);
+  return request;
+};
+const availableInventory = (request: DeclarationInventoryInput) => {
+  const result = listNeighborhoodDeclarations(request);
+  expect(result.status).toBe("available");
+  if (result.status !== "available") throw new Error(JSON.stringify(result));
+  return result;
+};
+const canonical = (value: unknown): string => Array.isArray(value) ? `[${value.map(canonical).join(",")}]`
+  : value && typeof value === "object" ? `{${Object.entries(value).sort(([a], [b]) => a < b ? -1 : a > b ? 1 : 0).map(([key, item]) => `${JSON.stringify(key)}:${canonical(item)}`).join(",")}}`
+  : JSON.stringify(value) ?? "null";
+
+describe("04D bounded declaration selection", () => {
+  test("exact implementation spans include nested/TSX and exclude contexts, signatures and declaration-only source", () => {
+    const source = entry("component.tsx", 'export function outer() { function nested() { return 1; } return nested(); } const first = () => <div />, second = function named() { return 2; }; function overload(x: number): number; function overload(x: number) { return x; } const ignored = [() => 1]; let mutable = () => 1; class C { method() {} } export default function() { return 1; }');
+    const sources = [source, entry("types.d.ts", "declare function declared(): void; function bodyInDeclarationFile() {}"), entry("only.ts", "function hidden() {}", "head", "declaration-only")];
+    const result = availableInventory(inventoryInput(sources));
+    expect(result.declarations.map(node => [node.name, node.kind])).toEqual([["outer", "function"], ["nested", "function"], ["first", "const-arrow"], ["second", "const-function"], ["overload", "function"]]);
+    expect(result.declarations.map(node => source.source!.content.slice(node.declaration.start, node.declaration.end))).toEqual(['export function outer() { function nested() { return 1; } return nested(); }', 'function nested() { return 1; }', 'first = () => <div />', 'second = function named() { return 2; }', 'function overload(x: number) { return x; }']);
+    for (const declaration of result.declarations) {
+      const analysis = analyzed(input(sources, [{ ...declaration.declaration }]));
+      expect(analysis.neighborhoods[0]!.nodeId).toBe(declaration.id);
+      expect(analysis.nodes.find(node => node.id === declaration.id)).toEqual(declaration);
+    }
+    expect(result.observed.declarations).toBe(5);
+    expect(result.coverage[0]).toMatchObject({ prepared: true, selected: true, parseStatus: "parsed", status: "scanned", examined: 1, resolved: null, unresolved: null });
+  });
+
+  test("same-name, shadowed and both-side declarations retain exact separate identity; source order immutable", () => {
+    const head = entry("same.ts", "function same() { const same = () => 2; return same(); }");
+    const base = entry("same.ts", head.source!.content, "base", "context");
+    const request = inventoryInput([head, base]);
+    const before = structuredClone(request);
+    const result = availableInventory(request);
+    expect(result.declarations.map(node => [node.declaration.side, node.name, node.role])).toEqual([["base", "same", "context"], ["base", "same", "context"], ["head", "same", "changed"], ["head", "same", "changed"]]);
+    expect(new Set(result.declarations.map(node => node.id)).size).toBe(4);
+    expect(availableInventory({ ...request, sources: [base, head] })).toEqual(result);
+    expect(request).toEqual(before);
+    expect(Object.isFrozen(request)).toBe(false);
+    expect(Object.isFrozen(result.declarations[0]!.body)).toBe(true);
+    expect(Object.isFrozen(result.coverage)).toBe(true);
+    expect(() => { (result.declarations as unknown as unknown[]).push({}); }).toThrow();
+    const frozen = Object.freeze({ ...request, sources: Object.freeze(request.sources.map(source => Object.freeze({ ...source, source: Object.freeze({ ...source.source! }) }))) });
+    expect(listNeighborhoodDeclarations(frozen)).toEqual(result);
+  });
+
+  test("full inventory identity is independently canonicalized and changes with every request identity domain", () => {
+    const source = entry("identity.ts", "const target = () => 1;");
+    const request = inventoryInput([source]);
+    const result = availableInventory(request);
+    const sources = request.sources.map(source => ({ ...source, source: source.source ? { contentHash: source.source.contentHash, ...(source.source.objectId ? { objectId: source.source.objectId } : {}) } : null }));
+    expect(result.inventory).toBe("source-declarations-v1.0.0");
+    expect(result.parser).toBe("typescript@6.0.3");
+    expect(result.inventoryId).toBe(hash(canonical({ inventory: result.inventory, parser: result.parser, contract: request.contract, snapshotId: request.snapshotId, change: request.change, commits: request.commits, corpus: request.corpus, sources, profile: request.profile, budgets: request.budgets })));
+    const variants: DeclarationInventoryInput[] = [
+      { ...request, snapshotId: "another" }, { ...request, change: { ...request.change, changeId: "2" } },
+      { ...request, corpus: { ...request.corpus, head: { ...request.corpus.head, acquisition: "other" } } },
+      { ...request, sources: [entry("identity.ts", "const target = () => 2;")] },
+      { ...request, sources: [{ ...source, role: "context" }] },
+      { ...request, sources: [{ ...source, selected: false }] },
+      { ...request, sources: [{ ...source, source: { ...source.source!, objectId: "c".repeat(40) } }] },
+      { ...request, budgets: { ...request.budgets, outputNodes: 1 } },
+      { ...request, profile: { ...request.profile, configuration: { source: { ...result.declarations[0]!.declaration }, paths: {} } } },
+      inventoryInput([entry("identity.ts", source.source!.content, "base")]),
+    ];
+    expect(new Set([result.inventoryId, ...variants.map(value => availableInventory(value).inventoryId)]).size).toBe(variants.length + 1);
+  });
+
+  test("BOM/astral Unicode/CRLF retain UTF16 spans and exact body lines; malformed files have no choices", () => {
+    const source = entry("unicode.ts", '\uFEFF// 😀\r\nconst café = () => {\r\n return "好";\r\n};\r\n');
+    const broken = entry("broken.ts", "function broken( { !!!");
+    const result = availableInventory(inventoryInput([source, broken]));
+    expect(result.declarations).toHaveLength(1);
+    const node = result.declarations[0]!;
+    const start = source.source!.content.indexOf("café");
+    expect(node.declaration).toMatchObject({ start, end: source.source!.content.indexOf("}") + 1, startLine: 2, endLine: 4 });
+    expect(node.body).toMatchObject({ start: source.source!.content.indexOf("{"), end: source.source!.content.indexOf("}") + 1, startLine: 2, endLine: 4 });
+    expect(node.declaration.contentHash).toBe(hash(source.source!.content));
+    expect(result.coverage[0]).toMatchObject({ parseStatus: "failed", status: "parse_failed", examined: null });
+    expect(result.diagnostics.some(diagnostic => diagnostic.path === "broken.ts")).toBe(true);
+    expect(result.observed.bytes).toBe(Buffer.byteLength(source.source!.content + broken.source!.content));
+  });
+
+  test("prepared, selected, parsed and scanned differ; missing prepared bytes cannot produce guessed members", () => {
+    const selected = entry("selected.ts", "const select = () => 1;");
+    const unselected = { ...entry("unselected.ts", "const skip = () => 2;"), selected: false };
+    const missing: SourceEntry = { side: "head", path: "missing.ts", commit: "b".repeat(40), role: "context", selected: true, exclusion: "missing" };
+    const excluded = { ...entry("excluded.ts", "const skip = () => 3;"), exclusion: "excluded" as const };
+    const result = availableInventory(inventoryInput([unselected, selected, missing, excluded, entry("unsupported.js", "const skip = () => 4;")]));
+    expect(result.declarations.map(node => node.name)).toEqual(["select"]);
+    expect(result.coverage.map(row => [row.path, row.prepared, row.selected, row.parseStatus, row.status])).toEqual([["excluded.ts", true, true, "not_parsed", "excluded"], ["missing.ts", false, true, "not_parsed", "missing"], ["selected.ts", true, true, "parsed", "scanned"], ["unselected.ts", true, false, "not_parsed", "not_selected"], ["unsupported.js", true, true, "not_parsed", "unsupported"]]);
+    expect(availableInventory(inventoryInput([missing])).declarations).toEqual([]);
+    expect(availableInventory(inventoryInput([])).declarations).toEqual([]);
+    // Structural callers may retain analysis-only fields; seeds never influence inventory.
+    expect(listNeighborhoodDeclarations(input([selected]))).toEqual(availableInventory(inventoryInput([selected])));
+  });
+
+  test("exact 2000 declaration cap excludes module/callback contexts and 2001 fails the whole index", () => {
+    const sources = (count: number) => [entry("many.ts", Array.from({ length: count }, (_, i) => `const f${i} = () => ${i};`).join("\n"))];
+    const at = availableInventory(inventoryInput(sources(2000)));
+    expect(at.declarations).toHaveLength(2000);
+    expect(at.observed.declarations).toBe(2000);
+    const over = listNeighborhoodDeclarations(inventoryInput(sources(2001)));
+    expect(over).toMatchObject({ status: "unavailable", reason: "budget_exceeded", limit: "outputNodes", observed: { declarations: 2001 }, triggeringSource: { side: "head", path: "many.ts" } });
+    expect("declarations" in over).toBe(false);
+    const small = inventoryInput([entry("small.ts", "const one = () => 1; const two = () => 2;")]);
+    expect(availableInventory({ ...small, budgets: { ...DEFAULT_BUDGETS, outputNodes: 2 } }).observed.declarations).toBe(2);
+    expect(listNeighborhoodDeclarations({ ...small, budgets: { ...DEFAULT_BUDGETS, outputNodes: 1 } })).toMatchObject({ status: "unavailable", limit: "outputNodes", observed: { declarations: 2 } });
+  });
+
+  test("lowered preflight/source/metadata/AST/site bounds retain observations but never a partial selectable index", () => {
+    const request = inventoryInput([entry("a.ts", "const first = () => missing();"), entry("z.ts", "const second = () => 2;")]);
+    const at = availableInventory(request);
+    const caps = { fileBytes: Math.max(...request.sources.map(source => Buffer.byteLength(source.source!.content))), totalBytes: at.observed.bytes, inventoryBytes: at.observed.inventoryBytes, inventoryPathsPerSide: 2, filesPerSide: 2, astNodes: at.observed.astNodes, invocationSites: 1 };
+    for (const [limit, cap] of Object.entries(caps)) {
+      expect(listNeighborhoodDeclarations({ ...request, budgets: { ...DEFAULT_BUDGETS, [limit]: cap } }).status).toBe("available");
+      const over = listNeighborhoodDeclarations({ ...request, budgets: { ...DEFAULT_BUDGETS, [limit]: cap - 1 } });
+      expect(over).toMatchObject({ status: "unavailable", reason: "budget_exceeded", limit });
+      expect("declarations" in over).toBe(false);
+      expect(over.coverage).toHaveLength(2);
+      if (!["astNodes", "invocationSites"].includes(limit)) expect(over.coverage.every(row => row.parseStatus === "not_parsed")).toBe(true);
+    }
+    const partial = listNeighborhoodDeclarations({ ...request, budgets: { ...DEFAULT_BUDGETS, astNodes: 1 } });
+    expect(partial.coverage[1]).toMatchObject({ selected: true, prepared: true, parseStatus: "parsed", status: "pending", examined: null, reason: "not_scanned_after_astNodes" });
+    expect(listNeighborhoodDeclarations({ ...request, budgets: { ...DEFAULT_BUDGETS, outputNodes: 2001 } })).toMatchObject({ status: "unavailable", reason: "invalid_input" });
+    expect(listNeighborhoodDeclarations({ ...request, sources: [request.sources[0]!, request.sources[0]!] })).toMatchObject({ status: "unavailable", reason: "invalid_identity" });
+    expect(listNeighborhoodDeclarations({ ...request, sources: [{ ...request.sources[0]!, source: { content: "wrong", contentHash: request.sources[0]!.source!.contentHash } }] })).toMatchObject({ status: "unavailable", reason: "invalid_identity" });
+  });
+
+  test("inventory never reads ambient filesystem/config/network and never binds unsupported imports", () => {
+    const reads = [spyOn(ts.sys, "readFile"), spyOn(ts.sys, "fileExists"), spyOn(ts.sys, "directoryExists"), spyOn(ts.sys, "getCurrentDirectory"), spyOn(ts.sys, "writeFile"), spyOn(globalThis, "fetch")];
+    try {
+      const result = availableInventory(inventoryInput([entry("src/use.ts", "import { target } from './domain/public'; const selected = () => target();")]));
+      expect(result.declarations.map(node => node.name)).toEqual(["selected"]);
+      expect(result.coverage[0]).toMatchObject({ examined: 1, resolved: null, unresolved: null });
+      for (const read of reads) expect(read).not.toHaveBeenCalled();
+    } finally { for (const read of reads) read.mockRestore(); }
+  });
+  test("known metadata inventory exceeds prepared-source allowance without dropping exclusions", () => {
+    const missing: SourceEntry[] = Array.from({ length: 129 }, (_, index) => ({ side: "head", path: `missing-${index}.ts`, commit: "b".repeat(40), role: "context", selected: false, exclusion: "missing" }));
+    const result = availableInventory(inventoryInput([entry("selected.ts", "const chosen = () => 1;"), ...missing]));
+    expect(result.coverage).toHaveLength(130);
+    expect(result.declarations.map(node => node.name)).toEqual(["chosen"]);
+    expect(result.coverage.filter(row => row.prepared)).toHaveLength(1);
+    const unselected = Array.from({ length: 129 }, (_, index) => ({ ...entry(`prepared-${index}.ts`, ""), selected: false }));
+    const over = listNeighborhoodDeclarations(inventoryInput(unselected));
+    expect(over).toMatchObject({ status: "unavailable", reason: "budget_exceeded", limit: "filesPerSide" });
+    expect(over.coverage).toHaveLength(129);
+    expect(over.coverage.every(row => row.parseStatus === "not_parsed")).toBe(true);
+    expect("declarations" in over).toBe(false);
+  });
+
+  test("preflight failures retain unparsed immutable coverage and no selectable partial index", () => {
+    const request = inventoryInput([entry("selected.ts", "const chosen = () => 1;")]);
+    const result = listNeighborhoodDeclarations({ ...request, budgets: { ...DEFAULT_BUDGETS, fileBytes: 0 } });
+    expect(result).toMatchObject({ status: "unavailable", reason: "budget_exceeded", limit: "fileBytes", inventory: "source-declarations-v1.0.0", observed: { astNodes: 0, invocationSites: 0, declarations: 0 } });
+    expect(result.coverage[0]).toMatchObject({ prepared: true, selected: true, parseStatus: "not_parsed", status: "budget_exceeded", examined: null, resolved: null, unresolved: null });
+    expect("declarations" in result).toBe(false);
+    expect(Object.isFrozen(result.coverage[0])).toBe(true);
+    expect(Object.isFrozen(result.corpus.head)).toBe(true);
+  });
+
 });

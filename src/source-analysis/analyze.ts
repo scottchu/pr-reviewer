@@ -1,8 +1,9 @@
 import ts from "typescript-analysis";
 import { createHash } from "node:crypto";
-import { DEFAULT_BUDGETS, type AnalysisBudgets, type AnalysisDiagnostic, type AnalysisInput, type AnalysisMetadata, type AnalysisResult, type Anchor, type CallEdge, type FunctionNode, type Neighborhood, type Seed, type Side, type SourceCoverage, type SourceEntry, type UnresolvedReason, type UnresolvedSite } from "./public.ts";
+import { DEFAULT_BUDGETS, type DeclarationInventoryInput, type DeclarationInventoryMetadata, type DeclarationInventoryResult, type NeighborhoodDeclaration, type AnalysisBudgets, type AnalysisDiagnostic, type AnalysisInput, type AnalysisMetadata, type AnalysisResult, type Anchor, type CallEdge, type FunctionNode, type Neighborhood, type Seed, type Side, type SourceCoverage, type SourceEntry, type UnresolvedReason, type UnresolvedSite } from "./public.ts";
 
 const ANALYZER = "source-neighborhood-v1.0.1" as const;
+const INVENTORY = "source-declarations-v1.0.0" as const;
 const PARSER = `typescript@${ts.version}`;
 const ROOT = "/repository/";
 const digest = (value: string) => createHash("sha256").update(value).digest("hex");
@@ -42,9 +43,11 @@ type Binding = { target: FunctionInfo; linkage: Anchor[]; signatures: Anchor[] }
 type Failure = { reason: "invalid_identity" | "invalid_input" | "budget_exceeded" | "parser_failure"; detail: string; limit?: keyof AnalysisBudgets; triggeringSource?: { side: Side; path: string } };
 const failed = (reason: UnresolvedReason, candidates: Anchor[] = []): Binding => ({ reason, candidates });
 
-export const analyzeNeighborhood = (input: AnalysisInput): AnalysisResult => {
+// One host/preflight/declaration scan; inventory returns before semantic call binding.
+const run = (input: AnalysisInput | DeclarationInventoryInput, inventory: boolean): AnalysisResult | DeclarationInventoryResult => {
   const sources = [...input.sources].sort(sourceOrder);
-  const seeds = [...new Map(input.seeds.map(seed => [seedKey(seed), seed])).values()].sort((a, b) => sourceOrder(a, b) || a.start - b.start || a.end - b.end || compare(a.contentHash, b.contentHash));
+  const requestedSeeds = !inventory && "seeds" in input ? input.seeds : [];
+  const seeds = [...new Map(requestedSeeds.map(seed => [seedKey(seed), seed])).values()].sort((a, b) => sourceOrder(a, b) || a.start - b.start || a.end - b.end || compare(a.contentHash, b.contentHash));
   const coverage = sources.map(initialCoverage);
   const ledger = new Map(coverage.map(row => [key(row.side, row.path), row]));
   const diagnostics: AnalysisDiagnostic[] = [];
@@ -52,10 +55,14 @@ export const analyzeNeighborhood = (input: AnalysisInput): AnalysisResult => {
   const observed = { bytes: 0, inventoryBytes: Buffer.byteLength(stable(sourceMetadata), "utf8"), astNodes: 0, invocationSites: 0 };
   const corpusDigest = digest(stable({ sources: sourceMetadata, corpus: input.corpus, profile: input.profile }));
   const analysisId = digest(stable({ contract: input.contract, analyzer: ANALYZER, parser: PARSER, snapshotId: input.snapshotId, change: input.change, commits: input.commits, corpusDigest, profile: input.profile, seeds, budgets: input.budgets }));
-  const metadata = (): AnalysisMetadata => ({ analyzer: ANALYZER, parser: PARSER, snapshotId: input.snapshotId, corpusDigest, analysisId, corpus: copy(input.corpus), coverage, diagnostics: diagnostics.sort((a, b) => sourceOrder(a, b) || a.start - b.start || compare(a.code, b.code) || compare(a.message, b.message)), observed });
-  const unavailable = (failure: Failure): AnalysisResult => freeze({ ...metadata(), status: "unavailable", ...failure });
+  let declarationCount = 0;
+  const inventoryId = digest(stable({ inventory: INVENTORY, parser: PARSER, contract: input.contract, snapshotId: input.snapshotId, change: input.change, commits: input.commits, corpus: input.corpus, sources: sourceMetadata, profile: input.profile, budgets: input.budgets }));
+  const analysisMetadata = (): AnalysisMetadata => ({ analyzer: ANALYZER, parser: PARSER, snapshotId: input.snapshotId, corpusDigest, analysisId, corpus: copy(input.corpus), coverage, diagnostics: diagnostics.sort((a, b) => sourceOrder(a, b) || a.start - b.start || compare(a.code, b.code) || compare(a.message, b.message)), observed });
+  const inventoryMetadata = (): DeclarationInventoryMetadata => ({ inventory: INVENTORY, parser: PARSER, snapshotId: input.snapshotId, corpusDigest, inventoryId, corpus: copy(input.corpus), coverage, diagnostics: diagnostics.sort((a, b) => sourceOrder(a, b) || a.start - b.start || compare(a.code, b.code) || compare(a.message, b.message)), observed: { ...observed, declarations: declarationCount } });
+  const metadata = (): AnalysisMetadata | DeclarationInventoryMetadata => inventory ? inventoryMetadata() : analysisMetadata();
+  const unavailable = (failure: Failure): AnalysisResult | DeclarationInventoryResult => freeze({ ...metadata(), status: "unavailable", ...failure });
   const invalid = (detail: string) => unavailable({ reason: "invalid_identity", detail });
-  const budget = (limit: keyof AnalysisBudgets, source?: SourceEntry): AnalysisResult => {
+  const budget = (limit: keyof AnalysisBudgets, source?: SourceEntry): AnalysisResult | DeclarationInventoryResult => {
     if (source) {
       const row = ledger.get(key(source.side, source.path))!;
       row.status = "budget_exceeded";
@@ -82,8 +89,8 @@ export const analyzeNeighborhood = (input: AnalysisInput): AnalysisResult => {
   for (const seed of seeds) if (!["base", "head"].includes(seed.side) || !validPath(seed.path) || !hashLike(seed.contentHash)) return invalid("Invalid seed identity");
   const config = input.profile.configuration;
   if (config && (!hashLike(config.source.contentHash) || !validPath(config.source.path) || config.source.snapshotId !== input.snapshotId || !["base", "head"].includes(config.source.side) || !Number.isSafeInteger(config.source.start) || !Number.isSafeInteger(config.source.end) || config.source.start < 0 || config.source.end <= config.source.start || config.source.startLine < 1 || config.source.endLine < config.source.startLine)) return invalid("Invalid pinned configuration source");
-  if (!input.seeds.length) return unavailable({ reason: "invalid_input", detail: "At least one declaration seed is required" });
-  if (input.seeds.length > input.budgets.seeds) return budget("seeds");
+  if (!inventory && !requestedSeeds.length) return unavailable({ reason: "invalid_input", detail: "At least one declaration seed is required" });
+  if (!inventory && requestedSeeds.length > input.budgets.seeds) return budget("seeds");
   for (const side of ["base", "head"] as const) {
     const sideSources = sources.filter(source => source.side === side);
     if (sideSources.length > input.budgets.inventoryPathsPerSide) return budget("inventoryPathsPerSide", sideSources[input.budgets.inventoryPathsPerSide]);
@@ -116,6 +123,7 @@ export const analyzeNeighborhood = (input: AnalysisInput): AnalysisResult => {
     const end = node.end;
     return { snapshotId: input.snapshotId, side: source.side, path: source.path, contentHash: source.source!.contentHash, start, end, startLine: file.getLineAndCharacterOfPosition(start).line + 1, endLine: file.getLineAndCharacterOfPosition(Math.max(start, end - 1)).line + 1 };
   };
+  const selectable = (info: FunctionInfo): info is FunctionInfo & { value: NeighborhoodDeclaration } => info.value.kind !== "module" && info.value.kind !== "callback" && info.value.role !== "declaration-only" && !info.declaration.getSourceFile().isDeclarationFile;
   const addInfo = (source: SourceEntry, file: ts.SourceFile, declaration: ts.Node, body: ts.ConciseBody | ts.SourceFile, kind: FunctionNode["kind"], name: string): FunctionInfo => {
     const declarationAnchor = anchor(source, file, declaration);
     const value: FunctionNode = { id: digest(stable([input.snapshotId, declarationAnchor, kind])), name, kind, declaration: declarationAnchor, body: anchor(source, file, body), role: source.role };
@@ -234,6 +242,10 @@ export const analyzeNeighborhood = (input: AnalysisInput): AnalysisResult => {
         } else if (ts.isFunctionLike(node) && "body" in node && node.body && (ts.isBlock(node.body as ts.Node) || ts.isExpression(node.body as ts.Node))) {
           current = addInfo(source, file, node, node.body as ts.ConciseBody, "callback", `<callback@${node.getStart(file)}>`);
         }
+        if (inventory && current !== owner && selectable(current)) {
+          declarationCount++;
+          if (declarationCount > input.budgets.outputNodes) { exceeded = "outputNodes"; return; }
+        }
         if (ts.isJsxElement(node) || ts.isJsxSelfClosingElement(node) || ts.isJsxFragment(node)) current.jsx = true;
         if (ts.isBinaryExpression(node) && node.operatorToken.kind >= ts.SyntaxKind.FirstAssignment && node.operatorToken.kind <= ts.SyntaxKind.LastAssignment) write(node.left);
         if ((ts.isForInStatement(node) || ts.isForOfStatement(node)) && !ts.isVariableDeclarationList(node.initializer)) write(node.initializer);
@@ -252,6 +264,8 @@ export const analyzeNeighborhood = (input: AnalysisInput): AnalysisResult => {
       if (exceeded) return budget(exceeded, source);
       row.status = "scanned";
     }
+
+    if (inventory) return freeze({ ...inventoryMetadata(), status: "available", declarations: nodes.filter(selectable).map(info => info.value).sort((a, b) => anchorOrder(a.declaration, b.declaration) || compare(a.kind, b.kind)) });
 
     for (const [side, state] of functionsBySide) for (const [fileName, file] of state.files) {
       const source = sourceMap.get(key(side, fileName.slice(ROOT.length)))!;
@@ -414,8 +428,12 @@ export const analyzeNeighborhood = (input: AnalysisInput): AnalysisResult => {
         limitations: ["static-binding-is-not-runtime-execution", "test-path-classification-is-not-execution-evidence", ...(incomplete(seed.side) ? ["incomplete-incoming-source-scope"] : []), ...(info?.jsx ? ["framework-invocation-not-analyzed"] : [])],
       };
     });
-    return freeze({ ...metadata(), status: "analyzed", nodes: nodes.map(info => info.value).sort((a, b) => anchorOrder(a.declaration, b.declaration) || compare(a.kind, b.kind)), edges, unresolved: unresolved.sort((a, b) => anchorOrder(a.anchor, b.anchor) || compare(a.syntax, b.syntax)), neighborhoods });
+    return freeze({ ...analysisMetadata(), status: "analyzed", nodes: nodes.map(info => info.value).sort((a, b) => anchorOrder(a.declaration, b.declaration) || compare(a.kind, b.kind)), edges, unresolved: unresolved.sort((a, b) => anchorOrder(a.anchor, b.anchor) || compare(a.syntax, b.syntax)), neighborhoods });
   } catch (error) {
     return unavailable({ reason: "parser_failure", detail: error instanceof Error ? error.message : String(error) });
   }
 };
+
+// The fixed mode determines both success and failure metadata; no compiler state escapes.
+export const analyzeNeighborhood = (input: AnalysisInput): AnalysisResult => run(input, false) as AnalysisResult;
+export const listNeighborhoodDeclarations = (input: DeclarationInventoryInput): DeclarationInventoryResult => run(input, true) as DeclarationInventoryResult;
