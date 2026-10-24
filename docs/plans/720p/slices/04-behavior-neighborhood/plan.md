@@ -2,13 +2,13 @@
 
 **Date:** 2026-10-24 UTC
 
-**Status:** Core integration dispatched from accepted03 merge70280d8. See the incorporated [integration packet](integration.md) and its dated dispatch record. Full04 acceptance remains open.
+**Status:** Reviewed technical candidate028b6b9; G14 presentation CHANGES NEEDED. Root adopted combined04+05 delivery in draft PR24; no04 merge or full-slice acceptance. See [current checkpoint](checkpoint.md).
 
 **Parent:** [720p round](../../plan.md)
 
 **Predecessor:** [Bounded03 receipt](../03-whole-change/checkpoint.md)
 
-**Reconciled packet:** Exact Git resource7f96644c94b860deb15eec33ac2b0daf81ab55cf:docs/plans/720p/slices/04-behavior-neighborhood/integration.md, retained in /tmp/pr-reviewer-semantic-graph-plan. Its durable semantic-graph.md and integration.md are two separately committed planner files, not incorporated or overwritten by this receipt. Root incorporates their reviewed history/content before deriving04 code, then resolves this reference to the incorporated packet. This page contributes delivered03 inputs, not a competing04 specification.
+**Reconciled packet:** The [incorporated integration packet](integration.md) retains original04 dispatch/module history. Its current status and measured successor contribution are reconciled in the [028 checkpoint](checkpoint.md) and [05 revision3 handoff](../05-explanation-exploration/integration.md).
 
 ## Accepted03 contribution
 
@@ -35,3 +35,7 @@ The fresh reviewer found scope and exact-source navigation useful but graph-only
 ## Dispatch and acceptance
 
 The integration packet records merged03 source/base, assigned isolated owner/worktree, exact packet incorporations and core ownership before04 derived writes. Preserve old native/pilot credentials/data/routes and existing IDs. The versioned packet owns detailed04 scope, TDD/process/UI/own-PR/graph-first checks; maintain docs-first derivation, actual-code reflection and a fresh whole-current-product docs-only audit before the next accepted milestone. This receipt starts no analyzer, context job, source execution or new dependency.
+
+## Case-specific successor readiness — revision3
+
+Reviewed028 technical interfaces may support05 implementation before04 merge, after committed05 packet review and scoped root assignment. G14 remains open with the complete original task and frozen actualA/B evidence. PR24 stays draft through the combined04+05 MVP; fresh final-target story/graph-first understanding followed by source comparison is required before merge. This replaces only the05 accepted04-merge prerequisite for this delivery; it does not declare04 accepted or unlock06. See the [checkpoint](checkpoint.md) for exact evidence, required explanation/whole-scope/span-triage improvements and preserved native/human limits.

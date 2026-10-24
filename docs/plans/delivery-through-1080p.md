@@ -1,8 +1,8 @@
 # Autonomous delivery through 1080p
 
-**Date:** 2026-10-23
+**Date:** 2026-10-24
 
-**Plan revision:** 1; the dispatch pins the commit containing this packet
+**Plan revision:** 2; combined04+05 dependency amendment, preserving original baseline history
 
 **Status:** Active delivery plan; engineering continuation ready by capability, full product acceptance incomplete
 
@@ -16,13 +16,19 @@
 
 Deliver the connected review journey: continue/history → path-selected multi-file PR/MR → source-backed graph → short explanation/exploration → configured test → base/head comparison → retained correction/enrichment. At the endpoint a reviewer can challenge a claim and explain its supporting source/execution evidence and limits. Every new PR/MR receives actual graph-first review and qualitative ease-of-understanding critique. The target date is an execution priority, not permission to relabel unmet acceptance.
 
-| Observed baseline | Evidence and limit |
+| Initial baseline (2026-10-23; historical) | Evidence and limit |
 |---|---|
 | Main `bdce918b4ab0563d698d3fcf9c1df1e19c1be68f` | PR 19 merged first runnable React/Node 24/SQLite/CLI/MCP milestone; PR 20 documents private Tailscale Serve pilot. |
 | Independently accepted code `e24ce7c465857f5f277f3926b01342628b7ddee7` | [Review receipt](480p/slices/01-review-loop/reviews/implementation-e24ce7c.md): 19 tests, strict checks and two actual Chrome E2Es. Controlled host evidence, not full native host acceptance. |
 | Prepared one-file source, question/reply and persistence | [Implementation evidence](480p/slices/01-review-loop/implementation-evidence.md); PR 14 controlled route and PR 19 manual source/save. No implemented graph, general import, story, jobs or comparisons. |
 | Private local pilot | [Runtime contract](../product/review-loop/runtime.md): host-side HTTPS/authentication verified. Another-device browser use remains unverified. Preserve its existing data/processes/routes. |
 | Open 480p gates | Complete exact-session Codex route, actual Claude route, complete native own-PR dogfood and unfamiliar-human evaluation. Native Code Mode negotiation failed; do not substitute SDK checks or controlled tools. Current read-only runtime verification reports gateway/TLS 200, unauthenticated 401 and authenticated 200; normal Chrome control timed out enabling focus before navigation, and Claude was absent in standard paths/current processes. These facts do not prove UI/graph/native acceptance. |
+
+### Current reconciled delivery state
+
+Main and the retained pilot are70280d8 after accepted03 merge/rollout; continuation/history, structural graph and durable multi-file import are implemented. Draft PR24 technical candidate028b6b9 adds reviewed bounded semantic neighborhoods, explicit caps/coverage and exact source/clarification navigation. Actual graph-firstA→sourceB finds useful static relationships but CHANGES NEEDED for the complete user/lifecycle/whole-scope explanation task. [04 checkpoint](720p/slices/04-behavior-neighborhood/checkpoint.md) records exact source/build/evidence and preserves native/Claude/human limits. The historical table above is not a current claim that graph/import/jobs are absent.
+
+Root adopted sequenceB: [05 revision3](720p/slices/05-explanation-exploration/plan.md) may implement on reviewed028 before04 merge after committed packet review and scoped assignment. Keep PR24 draft and combine04+05; G14 stays open until a fresh final-target story/graph-first account and source comparison establish the meaningful bounded outcome before merge. This explicit case-specific replacement of the accepted04-merge prerequisite does not lower acceptance, authorize06 code, change main/pilot, or turn technical tests into comprehension.
 
 ## Sequencing amendment and readiness
 
@@ -32,22 +38,22 @@ Root assigns an implementation owner and independent reviewers to committed pack
 
 | Order | Work and ownership | Ready inputs / blocking boundary | Delivered evidence |
 |---|---|---|---|
-| 1 | Continuation executor: slice 02A minimal graph bootstrap, then 02B history/follow-up | [Packet v1](480p/slices/02-review-continuation/plan.md), merged interfaces; assign isolated workspace before code. Native completion does not gate structural graph/history. | Actual React UI/graph, old/new immutable discussions, regression tests, independent graph-first/source review. |
+| 1 (delivered) | Continuation: slice02 structural graph/history/follow-up | Merged03 baseline70280d8 includes reviewed continuation interfaces; retained [packet](480p/slices/02-review-continuation/plan.md) records evidence. | Actual React UI/graph, old/new immutable discussions, regression tests, independent graph-first/source review. |
 | Parallel with 1 | Importer agent: slice 03 source acquisition/domain preparation | [Packet v1](720p/slices/03-whole-change/plan.md), frozen [boundary v1](../product/review-loop/evolution.md#import-boundary-v1). Separate owned source files; no shared gateway/store/UI/package/lockfile writes. | Pure candidate discovery/import-result implementation and fixtures; actual provider evidence only where authenticated tooling exists. Integration waits on agreed history contract. |
 | Parallel with 1 | Host-evidence owner, if independently assigned | Existing-session contracts and actual supported tooling; no global settings edits, session replacement or invented evidence | Bounded repair/revalidation of the native route or precise external blocker. Preserve independent Codex/Claude statuses. |
-| 2 | Integration owner: finish slice 03 vertical importer/job/UI | Reviewed history and importer contracts; own-PR multi-file task | Actual path discovery → pinned complete ledger → UI/source/graph; comments progress during real import job. |
-| 3 | Slice 04: evidence-backed TypeScript/TSX neighborhood | Slice 03 snapshots/coverage; explicit parser and bounded resolution contract before code | Before/after one-hop callers/callees including unchanged code; unresolved relations truthful; graph annotation CAS. |
-| 4 | Slice 05: minimal story and exploration | Reviewed graph facts and prospective chapter account | One-row draggable previous/replay-pause/next/chapter player; explore and resume without losing state. |
+| 2 (delivered) | Slice03 vertical importer/job/UI | Merged/live70280d8; ownPR bounded import/continuation accepted, native/human limits separate | Actual path discovery → pinned complete ledger → UI/source/graph; comments progress during real import job. |
+| 3 (technical candidate) | Slice04: evidence-backed TypeScript/TSX neighborhood | Reviewed028 technical ports; actual whole-task G14 CHANGES NEEDED, carried explicitly into combined04+05 | Before/after one-hop callers/callees including unchanged code; unresolved relations truthful; graph annotation CAS. |
+| 4 (next) | Slice05: minimal story and exploration | [Revision3 handoffs](720p/slices/05-explanation-exploration/integration.md), reviewed028 before04 merge under adopted exception; independent plan review and assignment before code | One-row draggable previous/replay-pause/next/chapter player; explore and resume without losing state. |
 | 5 | Slice 06: configured head test jobs | Agreed repository target/environment and isolated execution source; no arbitrary shell | Actual bounded process outcomes/cancellation and continued discussion; source/environment/artifact provenance. |
 | 6 | Slice 07: base/head evidence comparison | Head-runner evidence; target valid on both pinned sides or explicit incompatibility | Separate worktrees/results; mismatches and missing outcomes visible, no unsupported causal claim. |
 | 7 | Slice 08: retained correction and bounded enrichment | Proven graph/write/job/inbox contracts | Corrections survive agent revision and reopen; subscribed terminal events deliver without reply/update wake loops. |
 | Last | Passkey known-issue follow-up | After 01–08 engineering delivery/review; separately scoped diagnosis and source decisions | Preserve login/data/credentials until a reviewed plan exists; no auth change authorized by this plan. |
 
-The [720p round](720p/plan.md) and [1080p round](1080p/plan.md) keep later scope concise. Create/refine each individual 04–08 slice and both handoff packets immediately before its implementation, from actual predecessor results. No speculative whole hierarchy is generated now.
+The [720p round](720p/plan.md) and [1080p round](1080p/plan.md) keep later scope concise. 04/05 packets now exist. Refine later individual06–08 scope and both handoffs only from actual delivered predecessor results immediately before implementation; this amendment creates no later hierarchy. No speculative whole hierarchy is generated now.
 
-## Graph bootstrap and first PR order
+## Initial graph bootstrap order (historical, already implemented)
 
-The existing app cannot graph-review a planning PR today. Do not silently waive this requirement or label a diagram in Markdown as product use.
+This initial sequence addressed the then-absent graph and is retained as delivery history. Structural graph/import and bounded semantic candidate now exist; current work follows the combined04+05 amendment above. No Markdown diagram substitutes for actual product review.
 
 1. Commit this source packet locally and dispatch 02A from its exact commit in an isolated worktree. Default to one combined source-plus-bootstrap implementation PR against main; root may push the planning branch for recovery without opening a separate planning PR. No ceremonial planning-PR dependency is required.
 2. Build and test the minimum read-only React Flow projection from manually pinned source manifests. In 02A, file/hunk/contains/comparison/document-reference edges are permitted only with actual provenance. Full semantic callers/callees remain 04. The planned bootstrap task is to understand the planning changes and their dependencies, not infer executable calls.
@@ -79,21 +85,21 @@ A runtime/data owner is exclusive per candidate. Use separate external data root
 |---|---|---|
 | Reviewed slice 01 interfaces can support additive history | Confirmed baseline interfaces; history design is new and testable | 02 owner tests migration, old-anchor reply and retry/unknown preservation before integration. |
 | Existing provider tooling can discover the target | Unverified per provider/host; affects only that provider route | 03 owner inspect existing authenticated tools; unavailable route stays explicit, no global install. |
-| Bounded TypeScript/TSX analysis is useful for our source | Selected initial language scope; relationship precision unproven | 04 packet defines supported calls, resolution/unknown cases and labeled reference corpus before parser work. |
+| Bounded TypeScript/TSX analysis is useful for our source | Observed useful028 constructor/unchanged-context relationships with honest limits; whole-change understanding still incomplete |05 adds attributed source-backed explanation, responsibility accounts and bounded exploration; preserve04 G14 finding until fresh combined acceptance. |
 | Existing repo tests can be safe configured targets | Provisional until 06 packet inspects declarations | Select nonrecursive bounded targets; stop for new execution destinations or permission needs. |
 | Agent critique can guide usability iteration | Accepted evidence type with limits | Never label it unfamiliar-human or causal-efficacy evidence. |
 
 Only material scope/security/destination changes or unavailable external authority need the user. Record unresolved external/human items for morning while continuing independent ready work. An inconclusive check never unlocks its own dependent claim.
 
-## Planning handback and temporary state
+## Current planning handback and retained history
 
-This documentation task owns `/tmp/pr-reviewer-1080p-plan-WVz7oM/worktree`, branch `plan-autonomous-delivery-through-1080p`, based on main bdce918. Initial main/worktree inspection was clean and no local `.decompozr` runtime directory existed; the separate retained pilot was neither read for secrets nor modified. The task creates no runtime processes, application artifacts or credentials. Retain this worktree/branch for root's local committed packet and PR delivery; do not remove the sole unpushed handoff. Source reconciliation is in this plan, the updated roadmap/rules and durable evolution contract. Validation and exact commit are supplied in the handback.
+Revision2 reconciles the adopted combined04+05 delivery through the narrow documentation task on `plan-combined-neighborhood-story-delivery`, based028. The original02 bootstrap and bdce audit records below are historical evidence, not current dispatch blockers. Root owns publication/integration and retained private evidence. This amendment writes no application, runtime, credential or network state; exact commit and checks accompany its handback.
 
 ## Initial docs-only audit contribution
 
 An independent auditor inspected only durable product/rule docs at main bdce918, without plans/code/history. Verdict: qualified, not unconditional rebuild-ready; no actual rebuild. Before 480p reflection can pass, close: durable default PR14 immutable target/task/account (currently plan-only); exact inbox read/working/consumption and revision behavior; definitive notification failure/retry policy; multiple reply/evidence/limitations validation semantics; bounded comparison/absent-side behavior; remaining stale adapter/reactive implementation metadata. Existing atomicity, exact-session, unknown-no-replay, generation, export recovery and managed-route knowledge were substantially covered. The implementation owner derives and verifies these corrections from actual behavior and source intent; never paste code as knowledge. This is a knowledge-closure task, not a reason to stop independent 02A implementation.
 
-Current read-only runtime report is retained at `/tmp/pr-reviewer-live-route-e096n9ne/operational-readback.md` with `sha256.json`; root owns its provenance/retention. Planning did not rerun those observations or alter the pilot.
+The initial read-only runtime report is retained at `/tmp/pr-reviewer-live-route-e096n9ne/operational-readback.md` with `sha256.json`; root owns its provenance/retention. Planning did not rerun those observations or alter the pilot.
 
 ## Planning validation
 
