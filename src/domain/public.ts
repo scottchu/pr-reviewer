@@ -385,3 +385,6 @@ export const snapshotReviewIdentity=(snapshot:Snapshot):string=>canonical(snapsh
 
 export {importCommandSchema,importWaitingStates,canCancelImport,importStableIdentity,createImportedReview} from './imports.ts';
 export type {ImportCommand,ImportTarget,ImportState,ImportJob,ImportInvocation,ImportReceipt,ProcessObservation,ArtifactReference} from './imports.ts';
+
+export {analysisCommandSchema,analysisQuerySchema,semanticSourceQuerySchema,semanticAnchorSchema} from './semantic.ts';
+export type {AnalysisCommand,AnalysisReceipt,AnalysisView,AnalysisQuery,AnalysisJobView,AnalysisState,AnalysisPhase,AnalysisInvocation,AnalysisProcess,GraphClarification,SemanticAnchor,SemanticSourceQuery,SemanticSource,CorpusAccount} from './semantic.ts';
