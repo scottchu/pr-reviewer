@@ -34,3 +34,5 @@ Source amendment: cc50132, consumed through a task merge before acceptance work.
 Status: C9–C10 added to the current preview; other subsystem examples remain separately staged.
 
 Read canvas-comments.md and subsystem-mockups.md. The current scenario adds selected-code and immutable prose selection, local-only human/agent threads/replies, content-adjacent badges, collapsed-group clustering, an accessible locate list and keyboard/touch alternatives. Prose anchors include stable ID/version/hash and exact UTF-16 offsets/quote; no prose AskQuestion/persistence schema is implied. Code keeps exact pinned commit/side/path/line identity within the explicit preview source set. Reserved marker lanes and in-node threads avoid covering content. This is the small canvas-context demonstration, not the complete discussion subsystem mockup.
+
+[Inspectable preview receipt](canvas-preview-evidence.md) records the running endpoint, immutable source/build, C1–C10 evidence, critique and feedback gate.
