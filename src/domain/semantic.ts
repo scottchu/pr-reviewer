@@ -22,6 +22,7 @@ export type AnalysisProcess = {
     state: "requested" | "started" | "exited";
     pid?: number;
     startIdentity?: string;
+    spawnDisposition?: 'not_spawned';
     exitCode?: number | null;
     signal?: string | null;
     reason?: string;

@@ -56,7 +56,7 @@ test('leader exit never accepts valid output while owned descendants remain',asy
 
 test('journal failure cannot mint authority and missing executable is a bounded known failure',async()=>{
  await assert.rejects(fixture('setTimeout(()=>{},30000)',{timeoutMs:100},{recordProcess:row=>{if(row.state==='started')throw Error('journal');},cancelled:()=>false}),/termination_unknown/);
- const o=observations();await assert.rejects(runAnalysisWorker(request,o.port,{executable:'/nonexistent/owner-fixture'}),/failed/);assert.deepEqual(o.rows.map(r=>r.state),['requested','exited']);
+ const o=observations();await assert.rejects(runAnalysisWorker(request,o.port,{executable:'/nonexistent/owner-fixture'}),/failed/);assert.deepEqual(o.rows.map(r=>r.state),['requested','exited']);assert.equal(o.rows[1]?.spawnDisposition,'not_spawned');assert.equal(o.rows[1]?.pid,undefined);
  for(const port of [{recordProcess:()=>{throw Error('private-path:/tmp/secret');},cancelled:()=>false},{recordProcess:()=>{},cancelled:()=>{throw Error('private-path:/tmp/secret');}}])await assert.rejects(runAnalysisWorker(request,port),error=>{assert.equal(String(error),'Error: analysis_worker_observation');return true;});
 });
 

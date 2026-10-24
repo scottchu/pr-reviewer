@@ -401,3 +401,6 @@ export type {AnalysisMarker,AnalysisMarkerQuery} from './semantic.ts';
 
 export {analysisEvidenceQuerySchema} from './semantic.ts';
 export type {AnalysisEvidence,AnalysisEvidenceQuery} from './semantic.ts';
+
+export {processQuiescenceEligible} from './process.ts';
+export type {ProcessQuiescenceRecord} from './process.ts';

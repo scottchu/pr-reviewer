@@ -27,3 +27,32 @@ Sole executor `plan_head_test_slice06`, branch `fix-journal-loss-lease-exclusion
 Root assigns a reviewer other than this executor to exact candidate/diff base and this packet. Review read-only by default; reproduce real process E1/E2 and attack E3/E4 with isolated fixtures and existing tools. Inspect all coordinator and store paths that infer quiescence, not just adapter rejection. Return concrete findings/severity/evidence and READY FOR BOUNDED CORRECTION, CHANGES NEEDED or BLOCKED. Native/live-own-PR/visual outcomes remain root gates; no same-agent acceptance claim.
 
 06B successor input: consume the corrected process-journal evidence rules before implementing test-owner recovery. Its retained design at0b9002f remains separate and no06 code dispatch occurs here. Root reconciles the exact delivered interface/compatibility changes into the06B packet after this correction's independent review.
+
+## Candidate implementation and observed verification
+
+Documentation-first assignment commit: `6b36180a28d1b217ed4e4bb5870acaf85dca266f`. The next commit containing this record is the corrective candidate; root pins its exact SHA for independent review. The full independent negative report was read and its SHA-256 verified: `/tmp/pr-reviewer-720p-reflection-evidence/af39-journal-question/report.md`, `dd5b7590f9825f0bd2329ff0ff17c69e879155ab5ed9cff726a811c215c47bf2`.
+
+Both actual adapters now repeat observed pid/startIdentity in terminal observations, and emit optional `spawnDisposition: not_spawned` only on definitive pre-start spawn failure without a PID. The pure domain/public `processQuiescenceEligible` and import-jobs/public `processQuiescent` separate journal eligibility from live group absence. Import and analysis coordinators share that predicate; stores independently reject incomplete minimum journal evidence and contradictory not_spawned writes. No lease format, existing receipt, source/history value or authority is replaced. No reason string is used to infer quiescence.
+
+| Evidence | Outcome and scope |
+|---|---|
+| E1/E2 initial RED | Three new actual adapter→store→coordinator regressions failed on af39-derived source: context, Node worker and import all changed unknown→failed while their owned descendant remained alive. `/tmp/pr-reviewer-05e-evidence/initial-red.log`. No DB tampering; requested/terminal callbacks delegated normally, started callback alone failed. |
+| E1/E2 corrected real-process coverage | Six cases cover lost started and lost terminal writes for all three paths. Across repeated ticks, the actual live descendant retains unknown and blocks the competing subsystem claim; terminal identity is retained when writable. After verified fixture cleanup/group absence, a later tick permits an unrelated claim without replay. All pass. |
+| E3/E4 focused coverage | Two family cases exercise empty, requested-only, legacy exited/no-PID, definitive not_spawned and contradictory evidence through public owner ports. Actual missing executable produces explicit not_spawned; a requested-write failure produces no helper marker/launch. Existing worker missing-executable assertion now checks the new field. All nine focused tests pass. |
+| Existing expectation correction | The first affected run had67 passes/1 failure: an existing semantic-storage test called confirmQuiescent on a requested-only row and expected release. That expectation contradicted the accepted write-ahead/uncertainty boundary. It now expects process_unresolved and a blocked import; separate explicit/real-positive tests establish supported release. The failed run remains at `affected-tests.log`. |
+| Final affected suite |71 passed,0 failed,0 skipped, approximately10.6s. Covers nine focused cases plus existing acquisition/worker cancellation, descendants/inherited pipes, runner stop, import/semantic owner crash, process limits, shared store grants, replaced epoch, result admission and diagnostics. Log `/tmp/pr-reviewer-05e-evidence/affected-final.log`. |
+| Strict/boundary/docs | Strict TypeScript, existing import-boundary checker, `git diff --check` and changed-document local file links passed. No package/lock/config changes. |
+
+Final affected command, from the isolated corrective worktree:
+
+```sh
+/Applications/ChatGPT.app/Contents/Resources/cua_node/bin/node --unhandled-rejections=strict --experimental-strip-types --test tests/journal-loss.test.ts tests/import-process.test.ts tests/import-jobs.test.ts tests/import-faults.test.ts tests/import-limits.test.ts tests/import-runner.test.ts tests/analysis-worker.test.ts tests/semantic-faults.test.ts tests/semantic-storage.test.ts tests/semantic-authority.test.ts tests/semantic-runner.test.ts tests/semantic-diagnostics.test.ts
+```
+
+Tests used existing Node24 and package-entry links from the designated existing dependency donor, with no install/shared-cache links. New fixtures record exact owned process identities, stop their runner, kill only their identity-matching fixture processes when needed, await absence and remove their own root. Successful assertions verify group absence before the later claim. No live own-PR runtime, native session, browser, MCP, network installation, global setting or shared donor was changed. The original probe artifacts and06 worktrees remain retained unchanged.
+
+## Remaining review and successor gates
+
+Ready for independent bounded engineering review, not accepted. Review must retain the ambiguous legacy barrier and reproduce both original coupled paths; a missing PID can no longer be treated as no launch. There is no public recovery override or guessed-PID kill. Positive absence establishes stopped effects only, not lost source/analysis success. Actual resource exhaustion/disk failure and every OS schedule were not exhaustively simulated; injected callback failures with real descendants establish this specific repaired boundary. New real own-PR candidate comprehension/D7, combined live gateway shutdown/reopen and deployment remain root-owned/unrun here.
+
+06B must consume this additive evidence contract and the actual corrected candidate after independent review, while retaining its separate test-result/unknown semantics. No06 source is merged or implemented in this branch. Retain this clean candidate/worktree and evidence for independent reproduction and integration; root alone handles PR/main/delivery.

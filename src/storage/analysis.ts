@@ -1,3 +1,4 @@
+import {processQuiescenceEligible} from '../domain/public.ts';
 import { createHash, randomUUID } from "node:crypto";
 import type { DatabaseSync } from "node:sqlite";
 import { analysisCommandSchema, analysisQuerySchema, semanticSourceQuerySchema, semanticCanonical, snapshotFor, analysisDiagnosticCode } from "../domain/public.ts";
@@ -359,6 +360,7 @@ export const createAnalysisStore = ({ db, tx, load, authorize, execution, limits
             if (observation.executable !== (invocation.phase === "context" ? "git" : "node"))
                 throw new Error("analysis_phase_conflict");
             const old = invocation.processes.find(process => process.ordinal === observation.ordinal);
+            if (observation.spawnDisposition === 'not_spawned' && (!processQuiescenceEligible(observation) || old?.state !== 'requested' || old.pid !== undefined || old.startIdentity !== undefined)) throw new Error('invalid_analysis_observation');
             if (observation.state === "requested") {
                 if (old || observation.ordinal !== invocation.processes.length + 1 || invocation.processes.length >= (invocation.phase === "context" ? launchLimit : 1) || invocation.processes.some(process => process.state !== "exited"))
                     throw new Error("analysis_process_limit");
@@ -433,6 +435,6 @@ export const createAnalysisStore = ({ db, tx, load, authorize, execution, limits
         },
         unknown: (value: AnalysisOwner) => { owner(value); return all().filter(job => job.state === "unknown").map(publicJob); },
         confirmQuiescent: (value: AnalysisOwner, jobId: string) => tx(() => { owner(value); const job = get(jobId), invocation = job.invocations.at(-1); if (job.state !== "unknown" || !invocation)
-            throw new Error("invalid_request"); execution.clearQuiescent("analysis", job.jobId, invocation.invocationId); job.state = "failed"; job.reason = "interrupted_invocation_not_replayed"; update(job); }),
+            throw new Error("invalid_request"); if(invocation.processes.some(process=>!processQuiescenceEligible(process)))throw new Error("analysis_process_unresolved"); execution.clearQuiescent("analysis", job.jobId, invocation.invocationId); job.state = "failed"; job.reason = "interrupted_invocation_not_replayed"; update(job); }),
     };
 };
