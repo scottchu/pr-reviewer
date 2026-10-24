@@ -33,3 +33,7 @@ Passkey is a known issue deferred to the final follow-up after this endpoint's e
 ## Mandatory round reflection and rebuild-readiness gate
 
 Before round acceptance, complete the [round reflection protocol](../../rules/round-reflection.md): an assigned agent reflects on actual code/structure and the best design if rebuilding now, promotes learned knowledge into durable product docs, then a fresh auditor evaluates whole-current-product rebuild readiness using product/rule docs only, excluding plans, chat and application code. Correct material gaps before passing; an audit is not an actual reimplementation claim. Keep native/human/execution gates independent. This gate remains unrun for this round and does not stop independent ready implementation.
+
+## Explicit internal06A sequencing checkpoint
+
+Root authorizes [06A internal backend engineering](slices/06-head-test-job/plan.md#root-sequencing-decision-06a-internal-backend-checkpoint) in parallel with05D UI/application presentation correction, using independently reviewed67 store/epoch/import/analysis interfaces and the Q2-qualified recipe. The backend checkpoint has no executable runner, React UI or CLI; unavailable production and explicit test-only intent fixtures stay distinct. Current67 A/B understanding is conceptually correct but burdensome with P1 presentation correction open; original-session meaningful reply/reload/Resume is independently passed per root. This is a bounded sequencing decision, not full G1/05/06 acceptance or merge authority. Root owns integration and final actual own-PR gates.
