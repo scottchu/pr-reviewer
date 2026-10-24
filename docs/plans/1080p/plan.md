@@ -18,6 +18,12 @@ Challenge a claim, execute a configured bounded check without stopping review, c
 
 Create each slice page and versioned implementation/independent-review packets only when predecessor interfaces and the concrete task are known. Before its UI work, select a real PR/trigger and source-backed expected account in a separate verifier packet. Use strict TypeScript, tested domain policy, real process evidence, actual React E2E and every-PR graph-first critique. No test job may hold a database transaction or serialize unrelated comments behind process execution.
 
+## Delivered720p predecessor knowledge and dispatch limit
+
+The [05C handoff](../720p/slices/05-explanation-exploration/checkpoint-05c.md#independent-knowledge-recheck-and-current-gates) pins delivered public story/claim/source/version/reference, draft/frame/recovery and shared job/lease boundaries. Its bounded engineering code is5b6789f; whole-current-product design rebuild readiness is independently qualified YES at knowledgec0a8945 after closing F1–F3 (122 standalone docs-derived checks). Root's actual reviewed/imported own-PR target remains48d6cf1, separately from later evidence-only delivery. The qualified knowledge result does not establish an actual rebuild/source-conformance/product-test/native/own-PR/human/deployment outcome or accept full05/720p/original04 G14. The actual-UI Resume AbortError observation remains UNCONFIRMED under independent diagnosis.
+
+An external06 readiness proposal is retained at `/tmp/pr-reviewer-720p-reflection-evidence/slice06-readiness.md`; no06 implementation packet/dispatch is adopted here. Root must settle its concrete configured target/environment/isolation/task and assign versioned implementation/independent-review roles before derived code. This successor reconciliation creates no execution controls, runtime effects or extra hierarchy.
+
 ## Exit and known limits
 
 Exit requires 06–08 source/environment/result identity, cancellation/unknown recovery, comparison honesty, retained correction and no wake loops; independent review and actual own-PR graph-first critique must pass. Earlier 480p/720p native/human acceptance gaps remain open until actually resolved. Record implemented/tested/merged/pilot-verified status separately; do not call 1080p fully accepted solely because these three slices pass engineering tests.
