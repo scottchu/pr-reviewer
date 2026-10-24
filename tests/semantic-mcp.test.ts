@@ -38,7 +38,7 @@ test("actual stdio SDK semantic tools enforce attachment, exact evidence, retry,
     assert.equal(attached.status, "attached");
     assert.equal((await value<AnalysisView>("analysis_get", scope)).analysis, null);
 
-    assert.equal(f.store.analysis.command(f.token, f.request).state, "applied");
+    assert.equal(f.store.analysis.command(f.token, { ...f.request, contextFilesPerSide: 2, priorityPaths: { base: ["callee.ts", "caller.ts"], head: ["callee.ts", "caller.ts"] } }).state, "applied");
     await eventually(() => query().jobs[0]?.state === "awaiting_declarations");
     const choosing = query(), inventory = choosing.preparation!.inventory!, job = choosing.jobs[0]!;
     assert.equal(inventory.status, "available");
@@ -46,6 +46,8 @@ test("actual stdio SDK semantic tools enforce attachment, exact evidence, retry,
     f.store.analysis.command(f.token, { type: "SelectAnalysisDeclarations", commandId: "sdk-owner-choice", jobId: job.jobId, expectedJobRevision: job.jobRevision, corpusId: job.corpusId!, inventoryId: job.inventoryId!, declarationIds: [inventory.declarations.find(item => item.name === "callee" && item.declaration.side === "head")!.id] });
     await eventually(() => query().jobs[0]?.state === "admitted");
     const admitted = await value<AnalysisView>("analysis_get", { ...scope, minimumGraphRevision: query().graphRevision });
+    assert.equal(admitted.jobs[0]!.contextFilesPerSide, 2);
+    assert.equal(admitted.corpus!.budgets.filesPerSide, 2);
     assert.equal(admitted.analysis?.status, "analyzed");
     if (admitted.analysis?.status !== "analyzed") throw new Error("analysis_unavailable");
     const primary = admitted.analysis.nodes.find(node => node.name === "callee" && node.declaration.side === "head")!.declaration;
