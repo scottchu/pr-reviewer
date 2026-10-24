@@ -4,10 +4,12 @@ These documents define development and acceptance rules across all delivery roun
 
 | Rule | Responsibility |
 |---|---|
+| [Round reflection](round-reflection.md) | Code-informed redesign reflection followed by fresh docs-only rebuild-readiness audit after every fidelity round. |
 | [Documentation as source](documentation.md) | Durable product knowledge, derivation, slice learning and reimplementation completeness. |
 | [Development](development.md) | Strict TypeScript, functional preferences, React-specific design and appropriate pattern selection; no chosen lint/format tool. |
 | [Agent handoffs](agent-handoffs.md) | Implementation and independent-review assignments, scope, evidence, return and downstream contribution. |
 | [Own-PR dogfood](own-pr-dogfood.md) | Real-PR acceptance, candidate versus reviewed-target identity and revalidation. |
+| [Graph-first review](graph-first-review.md) | Actual UI/graph understanding before source inspection, preserved accounts and qualitative critique for every PR/MR. |
 | [Comprehension](comprehension.md) | Prospective evaluation and evidence limits; default rubric and thresholds remain proposals. |
 
 [AGENTS.md](../../AGENTS.md) remains the agent entry point for Git isolation, PR-only delivery and standing repository constraints. Product contracts such as attachment identity and stream ownership belong to [product knowledge](../product/README.md), and their workflow enforcement links here rather than duplicating them.

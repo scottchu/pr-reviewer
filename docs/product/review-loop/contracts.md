@@ -74,7 +74,7 @@ Start/stop instructions create task-local state and a restrictive runtime manife
 
 ## Derived local implementation decisions
 
-**Status:** Implementation in progress; native-host acceptance remains separate
+**Status:** First code milestone independently accepted and merged; native-host acceptance remains separate
 
 The bounded implementation uses one SQLite-owned JSON aggregate per review plus normalized receipts and credentials. All aggregate, revision, inbox and notification mutations share a synchronous `BEGIN IMMEDIATE` transaction; the transaction returns before external delivery. This keeps atomic recovery simple without introducing a second writer or event projection. Queries read authoritative aggregates and report `projection_pending` for a requested revision greater than the committed revision.
 

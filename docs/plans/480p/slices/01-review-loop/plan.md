@@ -82,7 +82,7 @@ At implementation dispatch, follow the execution and handoff packets: (1) derive
 
 The effort boundary is one behavior, one snapshot, one responsible conversation and one complete question/reply journey. Stop dependent work and revise the source contract if host behavior contradicts the probe, identity/source evidence cannot be verified, or the agreed expected account is wrong or incomplete. Preserve accepted questions and unknown invocation references for reconciliation; do not broaden into a new host, analyzer, runner or permissions workaround to finish the slice.
 
-The [implementation evidence](implementation-evidence.md) records passing strict checks, domain/interface/process tests and a controlled-host React/stdio MCP journey against PR 14. Full 01-A through 01-G acceptance remains unmet: actual native-host tool integration, real-host own-PR dogfood and unfamiliar-reviewer comprehension remain explicit gates. Independent code delivery is accepted for `e24ce7c465857f5f277f3926b01342628b7ddee7` in the [final review receipt](reviews/implementation-e24ce7c.md). This is a task-branch test candidate, not a deployed release.
+The [implementation evidence](implementation-evidence.md) records passing strict checks, domain/interface/process tests and a controlled-host React/stdio MCP journey against PR 14. Full 01-A through 01-G acceptance remains unmet: actual native-host tool integration, real-host own-PR dogfood and unfamiliar-reviewer comprehension remain explicit gates. Independent code delivery is accepted for `e24ce7c465857f5f277f3926b01342628b7ddee7` in the [final review receipt](reviews/implementation-e24ce7c.md). The first milestone was subsequently merged in PR19 and a private main-source pilot documented in PR20; the historical checks remain attributed to their exact candidate. This is not evidence that native/human acceptance passed.
 
 ## Agent handoffs and successor contribution
 
@@ -109,3 +109,7 @@ Then update [slice 02](../02-review-continuation/plan.md) with the actual snapsh
 ## Writer handback and milestone disposition
 
 The assigned implementer releases sole product/code writer ownership to root after the documentation-only final review receipt. The exact independently reviewed code candidate is `e24ce7c465857f5f277f3926b01342628b7ddee7`; 19 domain/interface/process tests, strict checks and both Chrome journeys independently passed. Root owns PR 19 delivery, the authorized runnable milestone/local pilot and remaining acceptance. No full slice acceptance or slice 02 readiness is granted.
+
+## Current successor sequencing amendment
+
+The [autonomous execution plan](../../../delivery-through-1080p.md#sequencing-amendment-and-readiness) replaces the former blanket slice02 implementation block. Independently accepted immutable-source/receipt/storage/inbox interfaces may support bounded history and graph engineering while actual native-host, own-PR and unfamiliar-human gates stay open. Historical review receipts retain their original disposition; this amendment changes future sequencing, not past evidence. Slice02's current packet records ready/blocked capabilities and must reconcile actual changes before integration.

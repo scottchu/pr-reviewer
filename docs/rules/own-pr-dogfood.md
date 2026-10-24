@@ -1,8 +1,8 @@
 # Dogfood every slice on our own PR
 
-**Requirement status:** Accepted: every product slice must be dogfoodable using our own PR
+**Requirement status:** Accepted: every product slice must be dogfoodable using our own PR; every new PR/MR receives actual UI and graph-first understanding review before delivery
 
-**Execution status:** No product slice or dogfood session has run
+**Execution status:** Slice 01 controlled-host PR 14 and bounded PR 19 tasks ran; full native-host dogfood and unfamiliar-human acceptance remain open. Graph-first review is a new prospective requirement, not historical evidence.
 
 **Parent:** [Shared rules](README.md)
 
@@ -16,9 +16,11 @@ Every roadmap row has an own-PR task. Before implementing that slice, refine the
 
 The candidate must complete the task through its real UI and supported adapters, using decompozr/design-system guideline and design-principle conformance. Record observations, evidence, failures and unresolved gaps. A passing same-agent run establishes scoped self-use; it does not establish unfamiliar-reviewer comprehension, native/device acceptance outside the exercised environment or broad reliability.
 
+Every new PR/MR also follows [graph-first understanding review](graph-first-review.md), including documentation changes. Actual UI/graph use, graph-first and source-corrected accounts, and an explicit ease-of-understanding critique are required; automated UI checks alone do not satisfy it.
+
 ## Bootstrap and source identity
 
-The repository is documentation-only today. [Probe 00](../plans/480p/probes/00-host-contract.md) is host feasibility, not product delivery or product dogfood, and needs no PR. There is no claim that the current repository can review itself yet.
+The first runnable milestone is merged in PR 19, with evidence in the [slice 01 record](../plans/480p/slices/01-review-loop/implementation-evidence.md). It supports bounded prepared source and discussion; it has no graph. [Probe 00](../plans/480p/probes/00-host-contract.md) remains host evidence, not product dogfood. The [graph bootstrap sequence](../plans/delivery-through-1080p.md#graph-bootstrap-and-first-pr-order) closes the graph prerequisite without inventing an earlier capability.
 
 Slice 01 introduces the first runnable candidate. It may consume a manually acquired, verified snapshot of its own actual PR, including a changed-document passage that explains the implemented behavior if that is the selected question. Pin the actual comparison baseline/head, preserve before/after content and make the question answerable from those sources. Manual acquisition is an explicit bootstrap input, not an implemented importer. Changed documentation cannot establish unsupported code analysis or repository test execution. Slice 03 replaces manual acquisition with the product import journey.
 

@@ -1,0 +1,49 @@
+# Review continuation, graph bootstrap and source-import boundary
+
+**Direction:** Accepted bounded implementation scope derived from the 2026-10-23 autonomous delivery request
+
+**Implementation:** Planned; slice 01 remains the observed baseline
+
+**Parents:** [Review loop](README.md), [architecture](../architecture.md)
+
+## User outcomes
+
+Reopen the same review, retain its original question and answer, inspect a newer pinned head explicitly, and ask a new question without moving old evidence. Use a small graph to orient within the prepared source and inspect the precise evidence behind its relationships. Subsequently enter a repository/worktree path to discover and import the corresponding GitHub PR or GitLab MR, preserving every changed-file disposition.
+
+The first graph is intentionally limited to source structure. Full before/after one-hop callers/callees arrive in slice 04. No edge may imply more than its actual evidence. A graph-review account and a source-corrected account remain distinct under the [review protocol](../../rules/graph-first-review.md).
+
+## Immutable snapshot history
+
+A review has one stable identity tied to provider host/project/change identity. It retains immutable snapshots keyed by snapshotId; each records actual comparison base/head and content-hashed source manifest. Adding a snapshot never overwrites source, questions, replies, graph evidence or notification history. Different provider/project/change identity rejects as a different review, even if the branch or number matches.
+
+The server exposes currentSnapshotId plus snapshot summaries. The existing single-snapshot query shape remains a compatibility projection: `snapshot` is the selected immutable snapshot, defaulting to currentSnapshotId. An explicit snapshotId query selects retained history; absent IDs return a typed missing-source result. All questions retain their original anchor; the UI filters/labels historical discussion visibly. Question reads and reply validation resolve the question's snapshot, not the current selection. An authorized late answer on an old snapshot is valid if its original attachment/generation and evidence remain valid.
+
+`AddSnapshot` accepts an immutable verified manifest, command identity and expectedCurrentSnapshotId. Source acquisition/hash verification happens outside the dispatcher transaction; commit validates repository/change identity, records snapshot and atomically advances currentSnapshotId with a receipt. An identical existing snapshot is idempotent and does not silently rewind current selection. A different concurrent expected-current value rejects with a typed conflict and no partial mutation. The authoritative store never trusts only an external export file. Adding a snapshot produces no agent wake event.
+
+Selecting history in the browser is private view state, not shared graph focus or a new domain command. Preserve selection/draft until an explicit choice; never carry an unresolved question submission onto a different snapshot. Follow-up uses a new anchored question with an optional immutable parentQuestionId in the same review; cross-snapshot follow-up states both identities rather than moving the parent's anchor. Existing command retries, receipts, cursor and unknown notification identity survive restart and source addition.
+
+Migrate a pre-history aggregate by retaining its one snapshot and all original IDs, credentials, receipts, cursor and attempts. Migration is additive/idempotent and runs under the existing owner; a failed migration leaves recoverable original data. Test on copies before any owner-approved update of the active pilot. Never delete or reset the pilot database to make migration pass.
+
+## Bootstrap graph
+
+Expose a read-only graph projection through the review application's public query boundary. Stable node IDs derive from snapshot/side/path and optional exact hunk/span, never viewport positions. Nodes show before-left/after-right and change labels in text as well as color; each opens the immutable source view and preserves discussion identity. React Flow is the accepted renderer. Keyboard-accessible source/relationship controls and a textual relationship list offer the same evidence path.
+
+Bootstrap edges are `comparison`, `contains` or `document_reference`, with an explicit label, source anchors and evidence method. Comparison links pair verified old/new paths (including rename metadata when available); containment references manifest/hunk ownership; document references need an actual link span and resolved target in the pinned repository objects. Missing, external or unavailable targets stay unresolved. Manually curated relationships are labeled as such, checked against pinned source and never presented as parser-produced call facts. Unsupported material remains an inspectable disposition. No source edge means not analyzed unless the relevant analyzer explicitly established a leaf.
+
+The bootstrap may use a bounded owner-prepared multi-file manifest, built from verified Git objects without provider discovery, fetch or target execution. Include the complete changed-path inventory for its selected PR; show unsupported, missing or deliberately unprepared content with reason. Preparation is not general import and does not claim semantic coverage. Render an honest useful document graph for documentation PRs and file/hunk structure for code PRs. A graph incapable of explaining the selected task produces a review finding.
+
+Read-only projection changes require no graph mutation protocol. Slice 04 later introduces annotations with a graph revision independent of unrelated discussion revisions, atomic CAS and source validation. Keep provenance-kind fields extensible without treating future semantic analysis as already delivered.
+
+## Import boundary v1
+
+The source-acquisition subsystem owns a pure validated import result; review-domain commands own admission. Import code must not open the review database or write UI state. Public inputs are a canonical local worktree path and an explicit resolved provider candidate when discovery is ambiguous. Public results carry provider kind (`github`/`gitlab`), host, source/target project, PR/MR number/URL/state, comparison base/head, content-derived snapshot identity, source entries and complete changed-file/hunk dispositions with unsupported reasons. Paths are repository-relative; provider credentials, remote URL credentials and host session metadata never enter the manifest.
+
+Resolve path/branch/remotes through Git read-only commands and existing authenticated `gh`/`glab` or existing connector capabilities. Never interpolate repository values into shell programs; pass argument arrays. Do not silently install tools or assume a host. For forks, match both source project/branch and target project. Return explicit zero, one or multiple matches; show candidates and require an explicit selection when ambiguous. Detached/default branches without a unique association remain unresolved. Authentication/tool availability gates only the affected provider route. Never guess the latest PR/MR.
+
+Use the provider's actual comparison baseline semantics, not a guessed branch tip. Verify available commit objects and object type; fetch only missing verified refs into task-owned source storage when authorized and supported, without switching or changing the user's checkout. Read blobs without executing hooks, submodules or source code. Enforce bounded file/byte/hunk budgets; retain a truthful oversized/binary/submodule/missing disposition rather than silently dropping coverage. Strict UTF-8/blob rules from slice 01 remain applicable to selectable text.
+
+The importer may produce a validated result while history/graph work proceeds. Only the integration owner maps it to `AddSnapshot`/initial preparation through durable ingress after contract tests agree. Import itself becomes a durable bounded job in slice 03: accepted request, process launch and result admission are separate. A job cannot hold a database transaction while acquiring source. Stable invocation identity and uncertain-launch reconciliation apply from first use.
+
+## Preserved authentication boundary
+
+Passkey usability is a known issue deferred to the final follow-up after slices 01–08. Preserve existing login, credentials, stored reviews and exact-session pairing now. No authentication redesign or iCloud-plugin modification is a prerequisite for graph, history, import, story or evidence work. Deferral does not authorize disabling existing access controls.
