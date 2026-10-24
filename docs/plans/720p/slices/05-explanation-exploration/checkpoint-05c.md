@@ -38,3 +38,6 @@ Implemented application ports now include mandatory pending write/readback/finge
 
 
 Independent core review found a P2 at76: workspace loginA awaited a correctly fenced review login, then read the current loginB view and restarted child bridges with credentialA. Root accepted a composition generation/credential/disposal correction within the existing application scope. The durable owner fence above is recorded before the fix; real overlapping login/logout/late-promise regressions are required.76 remains an immutable incomplete core checkpoint, not a re-labeled pass.
+
+
+Independent core76 review also reproduced a P2: resume consumed the return frame before awaiting exact semantic/source restoration; an unavailable retained record then left no retryable frame. Root accepted staging/readiness plus generation/intent fences before frame consumption, within the existing return-frame contract. Original76 checks remain qualified; correction tests must preserve the frame/exploration draft after rejection and after a superseding intent.
