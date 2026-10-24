@@ -1,4 +1,5 @@
-import {isPreparedSnapshotWitness} from "../source-preparation/public.ts";
+import {createImportStore} from "./imports.ts";
+import {isPreparedSnapshotWitness,validateProviderSnapshot} from "../source-preparation/public.ts";
 import type {PreparedSnapshotWitness} from "../source-preparation/public.ts";
 import { DatabaseSync } from "node:sqlite";
 import {
@@ -78,6 +79,7 @@ export const createStore = (filename: string) => {
     return token;
   };
   const validateSnapshot=(snapshot:Snapshot) => {
+    if(snapshot.candidate){validateProviderSnapshot(snapshot);return;}
     if(!snapshotSchema.safeParse(snapshot).success||Buffer.byteLength(JSON.stringify(snapshot),"utf8")>8*1024*1024)throw new Error("source_unavailable");
     const keys=new Set<string>();
     for(const source of snapshot.sources){
@@ -88,8 +90,6 @@ export const createStore = (filename: string) => {
     }
     const url=new URL(snapshot.prUrl);
     if(url.username||url.password)throw new Error("source_unavailable");
-    const candidate=snapshot.candidate;
-    if(candidate&&(candidate.baseSha!==snapshot.baseSha||candidate.headSha!==snapshot.headSha||candidate.targetProject!==snapshot.repository||candidate.number!==snapshot.prNumber||candidate.url!==snapshot.prUrl||candidate.host!==url.host))throw new Error("source_unavailable");
     for(const reference of snapshot.documentReferences??[])if(!validateAnchor(snapshot.snapshotId,snapshot.sources,reference.source)||(reference.target&&!validateAnchor(snapshot.snapshotId,snapshot.sources,reference.target)))throw new Error("source_unavailable");
     for(const file of snapshot.changedFiles??[])for(const disposition of file.dispositions)if(disposition.state==="prepared"&&!snapshot.sources.some(source=>source.path===disposition.path&&source.side===disposition.side))throw new Error("source_unavailable");
   };
@@ -178,6 +178,7 @@ export const createStore = (filename: string) => {
     });
   }catch(error){db.close();throw error;}
   return {
+    imports:createImportStore({db,tx,load,save}),
     close: () => db.close(),
     issueUser: () => issue({ kind: "user", actorId: "local-user" }),
     authenticate: (token: string): Principal => {

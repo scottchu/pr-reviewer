@@ -3,7 +3,8 @@ import { join } from "node:path";
 const allowed: Record<string, string[]> = {
   domain: [],
   storage: ["domain","source-preparation"],
-  "source-preparation":["domain"],
+  "source-preparation":["domain","source-acquisition"],
+  "source-acquisition":[],
   delivery: ["domain", "storage"],
   server: ["domain", "storage", "delivery", "integration", "source-preparation"],
   mcp: ["domain"],

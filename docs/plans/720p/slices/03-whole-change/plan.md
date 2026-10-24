@@ -91,3 +91,8 @@ Relative-file links passed; staged whitespace and allowed-file checks passed bef
 
 
 **Acquisition incorporation:** Exact reviewed source2c8879cc then6127f760 was applied as local4553ee3/39ff7e2, preserving the v3 plan instead of importing old773 planning ancestry. Sixteen focused acquisition tests pass on installed Node24.21.0/Git2.56.0; gh2.103.0 is available, no glab installation performed. This is module evidence, not job/UI acceptance. Root’s separate pilot owner deployed merged02B a5043c5 with preserved original gen3/rev6/question/reply/inbox/attempt/credentials and actual graph/history/source99 readback; no additional wake/auth/route change. Private deployment report remains `/var/folders/7q/rjwxsm_s54s17s8mn083p71h0000gn/T/pr-reviewer-slice01-u3qgyrnv/deployment-pr22-20261024T031313Z/deployment-report.md`; native automatic turn/catalog limits remain unchanged.
+
+
+### Integration foundation checkpoint (not slice acceptance)
+
+The first derived boundary now exercises trusted provider preparation with real disposable Git, exact repeated-copy source preservation, zero-line empty text, unsupported binary ledger, opaque job/review/manifest witnesses and the deterministic durable vector. The existing SQLite owner now retains import intents, credential-verifier references, job receipts, private generation-bound claims/process observations and atomic verified create/continue admission. Four focused tests pass, along with strict TypeScript/boundaries. No asynchronous runner, gateway/UI journey or complete fault matrix is claimed by this foundation. Those remain implementation work before a reviewable slice checkpoint.

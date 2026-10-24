@@ -120,7 +120,7 @@ export const createGateway = (store: Store, notify: Notify) => {
       if (req.method === "POST" && url.pathname === "/api/commands") {
         const command = commandSchema.parse(await readBody(req));
         let witness:PreparedSnapshotWitness|undefined;
-        if(command.type==="AddSnapshot"&&principal.kind==="user")try{witness=verifyPreparedSnapshot(command.reviewId,command.snapshot,command.identityScheme);}catch{}
+        if(command.type==="AddSnapshot"&&command.identityScheme==="manual_git_v1"&&principal.kind==="user")try{witness=verifyPreparedSnapshot(command.reviewId,command.snapshot,command.identityScheme);}catch{}
         const receipt = store.command(principal, command,witness);
         if (receipt.state === "applied") {
           if (command.type === "AskQuestion") deliveryRoute.emit();

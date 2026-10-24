@@ -21,7 +21,8 @@ export const documentReferenceSchema=z.object({destination:z.string(),source:anc
 export type DocumentReference=z.infer<typeof documentReferenceSchema>;
 export const providerCandidateSchema=z.object({provider:z.enum(["github","gitlab"]),host:z.string().min(1),sourceProject:z.string().min(1),targetProject:z.string().min(1),number:z.number().int().positive(),url:z.url(),title:z.string(),state:z.string(),sourceBranch:z.string(),targetBranch:z.string(),baseSha:shaSchema,headSha:shaSchema,targetTipSha:shaSchema,baselineMethod:z.enum(["github_compare_merge_base","gitlab_diff_refs"])}).strict();
 export type ProviderCandidate=z.infer<typeof providerCandidateSchema>;
-export const snapshotSchema=z.object({title:z.string().optional(),snapshotId:z.string().min(1),repository:z.string().min(1),prUrl:z.url(),prNumber:z.number().int().positive(),baseSha:shaSchema,headSha:shaSchema,sources:z.array(sourceSchema).min(1).max(512),changedFiles:z.array(changedFileSchema).optional(),documentReferences:z.array(documentReferenceSchema).optional(),candidate:providerCandidateSchema.optional(),counts:z.object({changedPaths:z.number().int().nonnegative(),preparedSides:z.number().int().nonnegative(),unsupportedSides:z.number().int().nonnegative(),missingSides:z.number().int().nonnegative(),hunks:z.number().int().nonnegative(),bytes:z.number().int().nonnegative()}).strict().optional()}).strict();
+const providerSourceSchema=sourceSchema.extend({content:z.string(),lineCount:z.number().int().nonnegative(),objectId:shaSchema});
+export const snapshotSchema=z.object({title:z.string().optional(),snapshotId:z.string().min(1),repository:z.string().min(1),prUrl:z.url(),prNumber:z.number().int().positive(),baseSha:shaSchema,headSha:shaSchema,sources:z.array(z.union([sourceSchema,providerSourceSchema])).max(1024),changedFiles:z.array(changedFileSchema).optional(),documentReferences:z.array(documentReferenceSchema).optional(),candidate:providerCandidateSchema.optional(),counts:z.object({changedPaths:z.number().int().nonnegative(),preparedSides:z.number().int().nonnegative(),unsupportedSides:z.number().int().nonnegative(),missingSides:z.number().int().nonnegative(),hunks:z.number().int().nonnegative(),bytes:z.number().int().nonnegative()}).strict().optional()}).strict().refine(value=>value.candidate!==undefined||(value.sources.length>=1&&value.sources.length<=512&&value.sources.every(source=>source.content.length>0&&source.lineCount>0)),"manual sources must be selectable text");
 export type Snapshot=z.infer<typeof snapshotSchema>;
 export type SnapshotSummary=Pick<Snapshot,"snapshotId"|"baseSha"|"headSha"|"title">;
 export type Attachment = {
@@ -111,7 +112,7 @@ export type Receipt = {
   error?: string;
 };
 export const commandSchema = z.discriminatedUnion("type", [
-  z.object({type:z.literal("AddSnapshot"),commandId:z.string().min(1).max(128),reviewId:z.string(),expectedCurrentSnapshotId:z.string().min(1),identityScheme:z.literal("manual_git_v1"),snapshot:snapshotSchema}).strict(),
+  z.object({type:z.literal("AddSnapshot"),commandId:z.string().min(1).max(128),reviewId:z.string(),expectedCurrentSnapshotId:z.string().min(1),identityScheme:z.enum(["manual_git_v1","acquisition_v1"]),snapshot:snapshotSchema}).strict(),
   z
     .object({
       type: z.literal("AskQuestion"),
@@ -381,3 +382,6 @@ export { inlineDocumentLinks, resolveDocumentDestination, documentHeadingLine } 
 
 export const snapshotFor=(review:Review,snapshotId:string):Snapshot|undefined=>(review.snapshots??[review.snapshot]).find(snapshot=>snapshot.snapshotId===snapshotId);
 export const snapshotReviewIdentity=(snapshot:Snapshot):string=>canonical(snapshot.candidate?{provider:snapshot.candidate.provider,host:snapshot.candidate.host,targetProject:snapshot.candidate.targetProject,number:snapshot.candidate.number,url:snapshot.candidate.url}:{provider:"github",host:new URL(snapshot.prUrl).host,targetProject:snapshot.repository,number:snapshot.prNumber,url:snapshot.prUrl});
+
+export {importCommandSchema,importWaitingStates,canCancelImport,importStableIdentity,createImportedReview} from './imports.ts';
+export type {ImportCommand,ImportTarget,ImportState,ImportJob,ImportInvocation,ImportReceipt,ProcessObservation,ArtifactReference} from './imports.ts';
