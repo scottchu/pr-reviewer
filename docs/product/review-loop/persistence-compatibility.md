@@ -36,7 +36,7 @@ The migration discriminator is missing history members, not an absent version nu
 
 For example, a legacy body with snapshot S, revision 6, question Q anchored to S and unknown attempt I becomes the same body plus snapshots=[S] and currentSnapshotId=S. Q, I, their cursor/generation, receipt rows and credential hashes remain unchanged. A malformed second review cannot leave the first review half-converted. After admitting T, current becomes T while S/Q/I remain retained. Repeated original setup verifies S against history and exports T, without rewinding current.
 
-Private local-user.json contains only the bearer token reference used by the runtime; source-input.json and snapshot.json are regenerable setup/current exports. Runtime/PID/lock and MCP launch files are local operational references, not a substitute for SQLite authority. Preserve them separately during owner-approved backup; never publish their credential contents.
+Private local-user.json contains the plaintext local bearer in its token member; runtime.json carries the reference to that private file. The file is never public protocol output. source-input.json and snapshot.json are regenerable setup/current exports. Runtime/PID/lock and MCP launch files are local operational references, not a substitute for SQLite authority. Preserve them separately during owner-approved backup; never publish their credential contents.
 
 ## Manual source identity v1
 

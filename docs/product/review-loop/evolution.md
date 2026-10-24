@@ -2,7 +2,7 @@
 
 **Direction:** Accepted bounded implementation scope derived from the 2026-10-23 autonomous delivery request
 
-**Implementation:** Graph bootstrap is merged; immutable continuation/history is implemented in the current bounded candidate. Slice acceptance and native/human gates remain open.
+**Implementation:** Graph bootstrap is merged; immutable continuation/history has independent bounded engineering and actual own-PR continuation/navigation acceptance. Full slice/round and native/human gates remain open.
 
 **Parents:** [Review loop](README.md), [architecture](../architecture.md)
 
@@ -141,3 +141,10 @@ The importer-v1 algorithm remains distinct: provider host/target/source projects
 **Best rebuild design now:** Keep the atomic aggregate for this bounded local review and extract preparation as its own effect boundary with pure domain admission policy. This preserves one consistency boundary for source addition, discussion and receipts, and makes actual pinned-source verification independently testable. A normalized snapshot table could reduce write/read amplification for large histories, but requires a deliberate schema migration and equivalent atomic query semantics; repeated immutable source in the current aggregate is a known scaling cost, not a reason to add a second writer now. Public selected-source queries already avoid sending all history bodies to React/MCP. No unlimited-history performance claim is made.
 
 The witness separates verified acquisition from raw transport without serializing a forgeable authority flag. Versioned identity adapters preserve compatibility better than recomputing IDs from parsed object order or forcing all providers into the legacy manual hash. Future acquisition and analysis must enter through verified public ports, preserve exact provenance and use independent job identity; they cannot turn setup input persistence into an import job or silently retarget historical anchors. These are accepted current boundaries, not evidence that the successor routes already run.
+
+
+## Observed continuation presentation limits
+
+The accepted bounded journey distinguishes durable current, private selected snapshot and immutable question source: an original-head question remains answerable after another head is admitted, while a separate follow-up can explicitly anchor the newer head without moving its parent. Complete discussion exposes both source identities and the parent relation. The snapshot URL restores the selected immutable snapshot on reload; it does not persist every file/span/viewport choice. Precise evidence is reopened through the saved question/reply link. Draft holding and graph focus remain separate from those durable relations.
+
+Independent graph-first investigation found the file inventory and structural source navigation useful and honest, but establishing admission → verification → persistence → selection → discussion policy still required multiple source views. Literal document edges do not prepare that semantic account. Repetitive import/type previews and first-hunk defaults provide limited prioritization, and raw snapshot/parent IDs impose comparison work. These are retained presentation limits; bounded history acceptance does not establish full prepared semantic understanding or unfamiliar-human comprehension. Source assertions, external test receipts, controlled participant replies and native turn evidence remain distinct.

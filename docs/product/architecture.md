@@ -2,7 +2,7 @@
 
 **Status:** Accepted direction, documented for further refinement
 
-**Implementation:** Bounded React/SQLite/CLI/MCP milestone and read-only source graph merged. Immutable continuation/history is implemented in an isolated engineering candidate. Native Codex/Claude journey, full slice and unfamiliar-human acceptance remain separately open.
+**Implementation:** Bounded React/SQLite/CLI/MCP milestone and read-only source graph merged. Immutable continuation/history has bounded independent engineering and actual own-PR navigation acceptance. Native Codex/Claude journey, full slice and unfamiliar-human acceptance remain separately open.
 
 ## From vision to system
 

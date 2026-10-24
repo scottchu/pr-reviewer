@@ -2,7 +2,7 @@
 
 **Packet revision:** 1
 
-**Status:** Acquisition preparation ready for parallel dispatch; vertical integration waits on reviewed slice 02 interfaces
+**Status:** Acquisition preparation independently reviewed; bounded02B public ports accepted, vertical integration follows its separately versioned root-dispatched packet
 
 **Parent:** [720p round](../../plan.md)
 
@@ -54,10 +54,13 @@ Return commit/worktree, public result schema, actual command/environment/test ou
 
 ## Delivered predecessor engineering contribution: 02B
 
-**Status:** Candidate ports implemented and tested; independent 02B review and actual new own-PR task pending. See [checkpoint contract/evidence](../../../480p/slices/02-review-continuation/checkpoint-02b.md). Reconcile the reviewed final commit before shared integration.
+**Status:** Bounded02B ports independently accepted at e0685025218b52d506adc5b7351f055dcd7ea7dd, with actual PR22 same-review continuation/navigation and whole-current-product docs-only knowledge gate accepted. See [checkpoint contract/evidence](../../../480p/slices/02-review-continuation/checkpoint-02b.md). Reconcile that reviewed code identity and the subsequent docs-only receipt before shared integration; root owns dispatch of the next versioned implementation packet.
 
 AddSnapshot now accepts owner command identity, reviewId, expectedCurrentSnapshotId, declared identity scheme and immutable snapshot. Storage requires a nonserialized review/exact-manifest verification witness for new source, then applies permission/review membership/CAS atomically; queries accept optional retained snapshotId and return selected source plus history summaries/current ID. Question reads/replies use the question's original snapshot. Source addition never wakes a participant or retargets a draft/question. Setup persistence and original preparation input are recovery metadata, not import jobs/history admission.
 
 The new source-preparation public boundary owns manual schema, pinned Git builder, explicit-selection reconstruction and manual_git_v1 verification. Gateway invokes verification outside transactions; raw HTTP input is not a trusted acquisition result. Acquisition-v1 needs its own verified adapter through that boundary before admission; do not recompute IDs from parsed JSON order or import source-acquisition internals into storage. Preserve the independently reviewed acquisition algorithm, provider host/source+target projects/change/baseline identity, source object IDs, rename/copy paths/modes, per-side dispositions, hunks/coverage/counts. Shared schemas represent those fields but the manual adapter intentionally does not verify the acquisition scheme.
 
 Encoded command JSON is bounded to 8 MiB including metadata/overhead; this differs from acquisition content budgets. An oversized prepared result needs a deliberately specified artifact/result boundary, never silent truncation. Complete inventory, selected input, prepared source and analyzed links remain distinct. Global first-120 manual reference analysis has no exact omitted-path/link-count ledger. Maintain complete immutable facts/anchors while rendering bounded readable file/span/context focus; expansion cannot shrink everything into miniature fit-all graphs. Full03 job/UI/provider/native/human evidence remains unrun.
+
+
+**Accepted predecessor receipt:** [02B final review](../../../480p/slices/02-review-continuation/review-receipts-02b.md) closes bounded engineering, docs-only sufficiency and actual own-PR continuation/navigation at code e068502. Original PR22 target029 and later e068 share base cd8715ad; snapshots remain immutable. Final receipt commit changes documentation only. No native queued-turn/catalog, Claude, unfamiliar-human or whole480p acceptance follows. The root-provided next integration packet is 2b7feec2a4528d4d57e42e29b28cbf364d5dc875; reconcile its permissions, ready acquisition result and required verified-adapter/job/ingress/UI gates before implementing. Context/analysis preparation does not waive basic03 evidence. Preserve selected/current/question identity separation, source read ownership and bounded readable projection as source coverage grows.
