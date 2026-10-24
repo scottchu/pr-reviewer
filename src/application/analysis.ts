@@ -25,7 +25,7 @@ export const createAnalysisBridge=(reviewId:string)=>{
  let state=empty(),token='',generation=0,snapshotId='',analysisId:string|undefined,disposed=false;
  const registry=createRegistry(),listeners=new Set<()=>void>();
  let connection:object|null=null,read:{controller:AbortController;owner:Owner}|null=null,sourceRead:{controller:AbortController;owner:Owner}|null=null;
- let pending:{command:AnalysisCommand;fingerprint:string;receipt?:AnalysisReceipt}|null=null;
+ let pending:{command:AnalysisCommand;fingerprint:string;receipt?:AnalysisReceipt;jobGeneration?:number}|null=null;
  let operation:object|null=null;
  const warmControllers=new Set<AbortController>();
  const publish=(next:SemanticView)=>{state=next;for(const listener of listeners)listener();};
@@ -50,17 +50,24 @@ export const createAnalysisBridge=(reviewId:string)=>{
    if(owns(o)&&!controller.signal.aborted&&state.view?.corpus?.corpusId===corpus.corpusId)publish({...state,snippets:{...state.snippets,[key]:source}});
   }}catch{/* Explicit source navigation reports read errors; excerpts remain visibly unavailable. */}finally{warmControllers.delete(controller);}
  };
- const refresh=async(o:Owner,mode:'explicit'|'poll'='explicit',minimum?:AnalysisReceipt)=>{
+ const confirmsReceipt=(view:AnalysisView,receipt:AnalysisReceipt,jobGeneration?:number)=>{
+  if(receipt.reviewId!==reviewId||view.reviewId!==receipt.reviewId||view.snapshotId!==receipt.snapshotId||view.graphRevision<receipt.graphRevision||view.analysisGeneration<receipt.analysisGeneration)return false;
+  if(!receipt.jobId)return true;
+  const job=view.jobs.find(job=>job.jobId===receipt.jobId);
+  return Boolean(job&&receipt.jobRevision!==undefined&&job.reviewId===receipt.reviewId&&job.snapshotId===receipt.snapshotId&&job.jobRevision>=receipt.jobRevision&&job.generation<=receipt.analysisGeneration&&(jobGeneration===undefined||job.generation===jobGeneration));
+ };
+ const refresh=async(o:Owner,mode:'explicit'|'poll'='explicit',minimum?:AnalysisReceipt,jobGeneration?:number)=>{
   if(!owns(o)||!o.token||!o.snapshotId||(mode==='poll'&&(read||state.busy||state.sourceBusy)))return;
   o={...o,analysisId};abortRead();const currentRead={owner:o,controller:new AbortController()};read=currentRead;
   const current=()=>owns(o)&&read===currentRead&&!currentRead.controller.signal.aborted;
   publish({...state,reading:true});
   try{
-   const params=new URLSearchParams({reviewId,snapshotId:o.snapshotId,...(o.analysisId?{analysisId:o.analysisId}:{}),...(minimum?{minimumGraphRevision:String(minimum.graphRevision),...(minimum.jobRevision!==undefined?{minimumJobRevision:String(minimum.jobRevision)}:{})}:{})});
+   const params=new URLSearchParams({reviewId,snapshotId:o.snapshotId,...(o.analysisId?{analysisId:o.analysisId}:{}),...(minimum?{minimumGraphRevision:String(minimum.graphRevision)}:{})});
    const view=await request(o,`/api/analysis?${params}`,undefined,currentRead.controller.signal) as AnalysisView;
    if(current()){
     // A server response cannot change private source or snapshot selection.
     if(view.reviewId!==reviewId||view.snapshotId!==o.snapshotId||(o.analysisId&&view.analysis?.analysisId!==o.analysisId))throw new Error('selection_mismatch');
+    if(minimum&&!confirmsReceipt(view,minimum,jobGeneration))throw new Error('readback_pending');
     const same=state.view?.analysis?.analysisId===view.analysis?.analysisId;
     publish({...state,view,authenticated:true,error:'',focus:same?state.focus:'',snippets:same?state.snippets:{}});void warm(o);return view;
    }
@@ -71,23 +78,26 @@ export const createAnalysisBridge=(reviewId:string)=>{
   if(disposed||!token)throw new Error('unauthorized');if(state.busy)throw new Error('submission_in_progress');
   const fingerprint=JSON.stringify(intent);
   if(pending&&pending.fingerprint!==fingerprint)throw new Error('analysis_submission_unknown: retry the unchanged intent');
-  pending??={command:{...intent,commandId:crypto.randomUUID()} as AnalysisCommand,fingerprint};
+  const targetJob='jobId' in intent?state.view?.jobs.find(job=>job.jobId===intent.jobId):undefined;
+  pending??={command:{...intent,commandId:crypto.randomUUID()} as AnalysisCommand,fingerprint,...(targetJob?{jobGeneration:targetJob.generation}:{})};
   const submission=pending,o=owner(),op={};operation=op;const current=()=>owns(o)&&operation===op;
   abortRead();publish({...state,busy:true,reading:false,error:''});
   try{
    const receipt=await request(o,'/api/analysis/commands',submission.command) as AnalysisReceipt;
+   // Preserve an observed receipt for this credential/intent even when private
+   // navigation disposed its presentation owner. Never touch a replaced intent.
+   if(pending===submission&&o.token===token)submission.receipt=receipt;
    if(!current())throw new Error('submission_superseded');
-   submission.receipt=receipt;
    if(receipt.state==='rejected'){if(pending===submission)pending=null;throw new Error(receipt.error??'rejected');}
-   let result:AnalysisView|undefined;
-   if(receipt.snapshotId===o.snapshotId&&o.analysisId&&receipt.jobId){
-    const params=new URLSearchParams({reviewId,snapshotId:receipt.snapshotId,minimumGraphRevision:String(receipt.graphRevision),...(receipt.jobRevision!==undefined?{minimumJobRevision:String(receipt.jobRevision)}:{})});
-    await request(o,`/api/analysis?${params}`);
-    const {jobRevision,...graphMinimum}=receipt;result=await refresh(o,'explicit',graphMinimum);
-   }else result=receipt.snapshotId===o.snapshotId?await refresh(o,'explicit',receipt):await request(o,`/api/analysis?${new URLSearchParams({reviewId,snapshotId:receipt.snapshotId,minimumGraphRevision:String(receipt.graphRevision),...(receipt.jobRevision!==undefined?{minimumJobRevision:String(receipt.jobRevision)}:{})})}`) as AnalysisView;
-   if(!current()||!result||result.snapshotId!==receipt.snapshotId)throw new Error('readback_pending');
+   // Job revisions are local to the receipt's exact job. The query minimum
+   // addresses a chosen/latest job, so it cannot confirm a different old job.
+   const jobGeneration=submission.command.type==='CancelAnalysis'?submission.jobGeneration:receipt.analysisGeneration;
+   const result=receipt.snapshotId===o.snapshotId
+    ?await refresh(o,'explicit',receipt,jobGeneration)
+    :await request(o,`/api/analysis?${new URLSearchParams({reviewId,snapshotId:receipt.snapshotId,minimumGraphRevision:String(receipt.graphRevision)})}`) as AnalysisView;
+   if(!current()||!result||!confirmsReceipt(result,receipt,jobGeneration))throw new Error('readback_pending');
    if(pending===submission)pending=null;publish({...state,uncertain:false});return receipt;
-  }catch(error){if(current()){if(error instanceof Error&&'definitive' in error&&error.definitive&&pending===submission)pending=null;publish({...state,uncertain:Boolean(pending),error:error instanceof Error?error.message:'request_failed'});}throw error;
+  }catch(error){if(current()){if(submission.receipt?.state!=='applied'&&error instanceof Error&&'definitive' in error&&error.definitive&&pending===submission)pending=null;publish({...state,uncertain:Boolean(pending),error:error instanceof Error?error.message:'request_failed'});}throw error;
   }finally{if(current()){operation=null;publish({...state,busy:false});}}
  };
  const select=async(nextSnapshotId:string,nextAnalysisId?:string)=>{

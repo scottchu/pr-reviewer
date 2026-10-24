@@ -1,7 +1,10 @@
 import {test} from 'node:test';
+import {writeFileSync} from 'node:fs';
+import {semanticFixture,eventually} from './semantic-fixture.ts';
+import {createGateway} from '../src/server/public.ts';
 import assert from 'node:assert/strict';
 import {createAnalysisBridge,semanticProjection} from '../src/application/public.ts';
-import type {AnalysisView,AnalysisReceipt,AnalysisCommand,SemanticAnchor} from '../src/domain/public.ts';
+import type {AnalysisView,AnalysisReceipt,AnalysisCommand,SemanticAnchor,AnalysisJobView} from '../src/domain/public.ts';
 const view=(snapshotId='s',patch:Partial<AnalysisView>={}):AnalysisView=>({reviewId:'r',snapshotId,currentSnapshotId:'current',analysisGeneration:0,graphRevision:0,selectedAnalysisId:null,jobs:[],preparation:null,corpus:null,inventory:null,analysis:null,clarifications:[],...patch});
 const receipt:AnalysisReceipt={commandId:'assigned',actorId:'owner',state:'applied',reviewId:'r',snapshotId:'s',analysisGeneration:1,graphRevision:0,result:{}};
 const anchor:SemanticAnchor={snapshotId:'s',side:'head',path:'same.ts',contentHash:'a'.repeat(64),start:0,end:1,startLine:1,endLine:1};
@@ -12,6 +15,7 @@ const controlledFetch=()=>{
  return {calls,restore:()=>{globalThis.fetch=original;}};
 };
 const tick=()=>new Promise<void>(resolve=>setImmediate(resolve));
+const jobView=(jobId:string,jobRevision:number,generation=1):AnalysisJobView=>({jobId,jobRevision,generation,reviewId:'r',snapshotId:'s',state:'superseded',reason:null,corpusId:null,inventoryId:null,analysisId:null,declarationIds:[],invocations:[],contextIssues:[],admission:null});
 test('semantic credentials and selection fence late reads even when transport ignores abort',async()=>{
  const f=controlledFetch(),bridge=createAnalysisBridge('r');
  try{
@@ -83,7 +87,7 @@ test('retry a retained old-snapshot annotation reads its receipt scope without m
   const first=bridge.requestContext('/old','p');f.calls[1]!.reject(new Error('connection_lost'));await assert.rejects(first);
   const select=bridge.select('new');f.calls[2]!.resolve(view('new'));await select;
   const retry=bridge.retry();f.calls[3]!.resolve({...receipt,snapshotId:'s',graphRevision:3});await tick();
-  assert.match(f.calls[4]!.url,/snapshotId=s/);f.calls[4]!.resolve(view('s',{graphRevision:3}));await retry;
+  assert.match(f.calls[4]!.url,/snapshotId=s/);f.calls[4]!.resolve(view('s',{graphRevision:3,analysisGeneration:1}));await retry;
   assert.equal(bridge.getSnapshot().view?.snapshotId,'new');assert.equal(bridge.getSnapshot().uncertain,false);
  }finally{f.restore();}
 });
@@ -109,7 +113,7 @@ test('held evidence pins its admitted analysis; a newer preparation receipt is c
   const login=bridge.login('owner','s');f.calls[0]!.resolve(view('s',{analysis,corpus,selectedAnalysisId:analysis.analysisId}));await login;
   const open=bridge.openSource(anchor);f.calls[1]!.resolve({...anchor,corpusId:corpus.corpusId,content:'held evidence'});await open;
   const stale=bridge.refresh();assert.match(f.calls[2]!.url,/analysisId=bbbb/);f.calls[2]!.resolve(view('s',{analysis:{...analysis,analysisId:'d'.repeat(64)}}));await assert.rejects(stale,/selection_mismatch/);assert.equal(bridge.getSnapshot().view?.analysis?.analysisId,analysis.analysisId);
-  const next=bridge.requestContext('/same','p');f.calls[3]!.resolve({...receipt,jobId:'new-job',jobRevision:100});await tick();assert.match(f.calls[4]!.url,/minimumJobRevision=100/);assert.doesNotMatch(f.calls[4]!.url,/analysisId=/);f.calls[4]!.resolve(view('s',{analysis,corpus,analysisGeneration:2}));await tick();assert.match(f.calls[5]!.url,/analysisId=bbbb/);assert.doesNotMatch(f.calls[5]!.url,/minimumJobRevision=/);f.calls[5]!.resolve(view('s',{analysis,corpus,analysisGeneration:2}));await next;
+  const next=bridge.requestContext('/same','p');f.calls[3]!.resolve({...receipt,jobId:'new-job',jobRevision:100});await tick();assert.match(f.calls[4]!.url,/analysisId=bbbb/);assert.doesNotMatch(f.calls[4]!.url,/minimumJobRevision/);f.calls[4]!.resolve(view('s',{analysis,corpus,analysisGeneration:2,jobs:[jobView('new-job',100),jobView('newer-job',1,2)]}));await next;
   assert.equal(bridge.getSnapshot().source?.content,'held evidence');assert.equal(bridge.getSnapshot().view?.analysis?.analysisId,analysis.analysisId);assert.equal(bridge.getSnapshot().uncertain,false);
  }finally{f.restore();}
 });
@@ -129,5 +133,71 @@ test('slow background body reads remain bounded while committed polling continue
   const login=bridge.login('owner','s');f.calls[0]!.resolve(view('s',{analysis,corpus}));await login;assert.equal(f.calls.length,2);
   const read=bridge.refresh();f.calls[2]!.resolve(view('s',{analysis,corpus}));await read;assert.equal(f.calls.filter(call=>call.url==='/api/analysis/source').length,1);
   f.calls[1]!.resolve({...anchor,corpusId:corpus.corpusId,content:'complete body'});await tick();assert.equal(Object.keys(bridge.getSnapshot().snippets).length,1);
+ }finally{f.restore();}
+});
+
+test('an accepted receipt survives definitive readback failure and retries its exact command against its own old job',async()=>{
+ const f=controlledFetch(),bridge=createAnalysisBridge('r');
+ try{
+  const login=bridge.login('owner','s');f.calls[0]!.resolve(view());await login;
+  const first=bridge.requestContext('/source','p'),command=f.calls[1]!.options?.body;
+  const accepted={...receipt,jobId:'older-job',jobRevision:99};f.calls[1]!.resolve(accepted);await tick();f.calls[2]!.resolve({error:'revision_unavailable'},400);await assert.rejects(first,/revision_unavailable/);
+  assert.equal(bridge.getSnapshot().uncertain,true,'an accepted command remains recoverable after readback400');
+  const retry=bridge.retry();assert.equal(f.calls[3]!.options?.body,command);f.calls[3]!.resolve(accepted);await tick();assert.doesNotMatch(f.calls[4]!.url,/minimumJobRevision/);
+  f.calls[4]!.resolve(view('s',{analysisGeneration:2,jobs:[jobView('older-job',103),jobView('newer-job',1,2)]}));assert.deepEqual(await retry,accepted);assert.equal(bridge.getSnapshot().uncertain,false);
+ }finally{f.restore();}
+});
+test('an unrelated large job revision cannot acknowledge an accepted old-job receipt',async()=>{
+ const f=controlledFetch(),bridge=createAnalysisBridge('r');
+ try{
+  const login=bridge.login('owner','s');f.calls[0]!.resolve(view());await login;
+  const send=bridge.requestContext('/source','p');f.calls[1]!.resolve({...receipt,jobId:'older-job',jobRevision:99});await tick();
+  f.calls[2]!.resolve(view('s',{analysisGeneration:2,jobs:[jobView('older-job',98),jobView('newer-job',1000,2)]}));await assert.rejects(send,/readback_pending/);assert.equal(bridge.getSnapshot().uncertain,true);assert.deepEqual(bridge.getSnapshot().view?.jobs,[]);
+ }finally{f.restore();}
+});
+
+test('real gateway confirms the exact delayed accepted job after a newer same-snapshot request', {timeout:20000},async()=>{
+ const fixture=semanticFixture(),gateway=createGateway(fixture.store,async()=>({state:'unknown' as const,reason:'Controlled semantic receipt race.'}));
+ const base=`http://127.0.0.1:${await gateway.listen(0)}`,original=globalThis.fetch,bridge=createAnalysisBridge('r');
+ let held:AnalysisReceipt|null=null,release=()=>{};const gate=new Promise<void>(resolve=>{release=resolve;});
+ const reads:{url:string;status:number}[]=[];
+ globalThis.fetch=(async(input,options)=>{
+  const url=String(input),response=await original(url.startsWith('/')?base+url:url,options);
+  if(url.startsWith('/api/analysis?'))reads.push({url,status:response.status});
+  if(url==='/api/analysis/commands'&&JSON.parse(String(options?.body)).type==='SelectAnalysisDeclarations'){held=await response.clone().json() as AnalysisReceipt;await gate;}
+  return response;
+ }) as typeof fetch;
+ const query=()=>fixture.store.analysis.query(fixture.token,{reviewId:'r',snapshotId:fixture.snapshot.snapshotId});
+ try{
+  await bridge.login(fixture.token,fixture.snapshot.snapshotId);await bridge.requestContext(fixture.root,'scottchu/pr-reviewer');await eventually(()=>query().jobs.at(-1)?.state==='awaiting_declarations',15000);await bridge.refresh();
+  const inventory=query().preparation?.inventory;assert.equal(inventory?.status,'available');if(inventory?.status!=='available')throw new Error('inventory_unavailable');
+  const choosing=bridge.chooseDeclarations([inventory.declarations.find(item=>item.name==='callee'&&item.declaration.side==='head')!.id]).then(value=>({receipt:value,error:null}),error=>({receipt:null,error:String(error)}));
+  await eventually(()=>held!==null,15000);const accepted=held as unknown as AnalysisReceipt;
+  // A concurrent public owner command advances the generation. The pending B job
+  // is intentionally not separately woken; no storage internals or fact JSON are used.
+  const replacement=fixture.store.analysis.command(fixture.token,{...fixture.request,commandId:'replacement-before-acknowledgement',expectedAnalysisGeneration:1});assert.equal(replacement.state,'applied');
+  const before=query();assert.ok(before.jobs.find(job=>job.jobId===replacement.jobId)!.jobRevision<accepted.jobRevision!);
+  release();const result=await choosing,after=query();
+  if(process.env.REVIEW_SEMANTIC_RECEIPT_EVIDENCE)writeFileSync(process.env.REVIEW_SEMANTIC_RECEIPT_EVIDENCE,JSON.stringify({provenance:'Real Git, Node gateway, SQLite and fixed analysis worker; concurrent public owner RequestAnalysis before held command response.',accepted,result,uncertain:bridge.getSnapshot().uncertain,jobs:after.jobs.map(job=>({jobId:job.jobId,generation:job.generation,jobRevision:job.jobRevision,state:job.state})),reads},null,2));
+  assert.equal(result.error,null);assert.equal(result.receipt?.commandId,accepted.commandId);assert.equal(bridge.getSnapshot().uncertain,false);assert.equal(bridge.getSnapshot().view?.analysisGeneration,2);assert.ok(reads.every(read=>!read.url.includes('minimumJobRevision')));
+ }finally{release();bridge.logout();globalThis.fetch=original;await gateway.close();fixture.cleanup();}
+});
+test('cancelling an older unknown job confirms its captured job generation independently of current snapshot generation',async()=>{
+ const f=controlledFetch(),bridge=createAnalysisBridge('r');
+ try{
+  const old={...jobView('old-unknown',80),state:'unknown' as const};
+  const login=bridge.login('owner','s');f.calls[0]!.resolve(view('s',{analysisGeneration:2,jobs:[old,jobView('new-job',1,2)]}));await login;
+  const cancel=bridge.cancel(old);f.calls[1]!.resolve({...receipt,analysisGeneration:2,jobId:old.jobId,jobRevision:81});await tick();
+  f.calls[2]!.resolve(view('s',{analysisGeneration:2,jobs:[{...old,jobRevision:81},jobView('new-job',1,2)]}));await cancel;assert.equal(bridge.getSnapshot().uncertain,false);
+ }finally{f.restore();}
+});
+test('a late accepted old-snapshot receipt stays accepted through a later retry HTTP rejection',async()=>{
+ const f=controlledFetch(),bridge=createAnalysisBridge('r');
+ try{
+  const login=bridge.login('owner','s');f.calls[0]!.resolve(view());await login;
+  const first=bridge.requestContext('/old','p').catch(error=>String(error)),originalCommand=f.calls[1]!.options?.body;
+  const select=bridge.select('new');f.calls[2]!.resolve(view('new'));await select;f.calls[1]!.resolve(receipt);assert.match(String(await first),/superseded/);
+  const retry=bridge.retry();assert.equal(f.calls[3]!.options?.body,originalCommand);f.calls[3]!.resolve({error:'projection_pending'},400);await assert.rejects(retry,/projection_pending/);
+  assert.equal(bridge.getSnapshot().uncertain,true);assert.equal(bridge.getSnapshot().view?.snapshotId,'new');
  }finally{f.restore();}
 });
