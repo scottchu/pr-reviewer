@@ -4,7 +4,7 @@
 
 **Date:** 2026-10-24
 
-**Status:** Docs-first combined-delivery packet ready for scoped independent plan review; code waits for that review and root assignment, not04 merge.04 G14 remains OPEN / CHANGES NEEDED; PR24 remains draft.
+**Status:** Revision3 packet independently READY; [05A core checkpoint](checkpoint-05a.md) prepared under named root dispatch, awaiting independent core review before05B.04 G14 remains OPEN / CHANGES NEEDED; PR24 remains draft.
 
 **Parent:** [720p round](../../plan.md), [roadmap slice05](../../../roadmap.md#720p-understand-the-whole-pr)
 

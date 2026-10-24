@@ -137,3 +137,12 @@ const analysisDiagnosticCodes = new Set([
     "analysis_worker_owner_option", "analysis_worker_observation", "analysis_worker_cancelled", "analysis_worker_failed", "analysis_worker_timeout",
 ]);
 export const analysisDiagnosticCode = (value: string | null): string | null => value === null ? null : analysisDiagnosticCodes.has(value) ? value : "analysis_failed";
+
+/** Exact parser-coordinate validation; source is a retained owning-corpus value. */
+export const validateSemanticAnchor = (source: {snapshotId:string;side:"base"|"head";path:string;contentHash:string;content:string},anchor:SemanticAnchor):boolean => {
+ if(source.snapshotId!==anchor.snapshotId||source.side!==anchor.side||source.path!==anchor.path||source.contentHash!==anchor.contentHash||!Number.isSafeInteger(anchor.start)||!Number.isSafeInteger(anchor.end)||anchor.start<0||anchor.end<=anchor.start||anchor.end>source.content.length)return false;
+ const starts=[0];
+ for(let index=0;index<source.content.length;index++){const code=source.content.charCodeAt(index);if(code===13){if(source.content.charCodeAt(index+1)===10)index++;starts.push(index+1);}else if(code===10||code===0x2028||code===0x2029)starts.push(index+1);}
+ const line=(offset:number)=>{let low=0,high=starts.length;while(low<high){const middle=(low+high)>>>1;if(starts[middle]!<=offset)low=middle+1;else high=middle;}return low;};
+ return anchor.startLine===line(anchor.start)&&anchor.endLine===line(Math.max(anchor.start,anchor.end-1));
+};

@@ -1,0 +1,20 @@
+import {test} from 'node:test';
+import assert from 'node:assert/strict';
+import {createGateway} from '../src/server/public.ts';
+import type {StoryReceipt,StoryView,StoryContextView} from '../src/domain/public.ts';
+import {storyFixture} from './story-fixture.ts';
+test('S01-S05 gateway owns story/context ingress with exact retry and no question wake',async()=>{const f=storyFixture();let notifications=0;const gateway=createGateway(f.store,async()=>{notifications++;return {state:'unknown',reason:'controlled fixture'};});try{
+ const port=await gateway.listen(0);const origin=`http://127.0.0.1:${port}`;
+ const request=(path:string,body?:unknown,token=f.token)=>fetch(origin+path,{headers:{Authorization:`Bearer ${token}`,'Content-Type':'application/json'},...(body?{method:'POST',body:JSON.stringify(body)}:{})});
+ const scope='reviewId=r&snapshotId=snapshot';
+ const context=await request('/api/story/commands',{type:'PutStoryContext',commandId:'context',reviewId:'r',snapshotId:'snapshot',expectedContextRevision:0,action:{type:'create',capture:{kind:'PR',title:'Retained owner text',text:'<script>not executable</script>'}}});assert.equal(context.status,200);assert.equal((await context.json() as StoryReceipt).state,'applied');
+ const supplied=await (await request(`/api/story/context?${scope}`)).json() as StoryContextView;assert.equal(supplied.captures[0]!.text,'<script>not executable</script>');assert.deepEqual(supplied.missingKinds,['Epic','Ticket']);
+ const command=f.publish({contextRevision:1});const receipt=await (await request('/api/story/commands',command)).json() as StoryReceipt;assert.equal(receipt.state,'applied');
+ assert.deepEqual(await (await request('/api/story/commands',command)).json(),receipt);
+ const view=await (await request(`/api/story?${scope}&minimumStoryRevision=1&minimumContextRevision=1`)).json() as StoryView;assert.equal(view.version!.versionId,receipt.result.versionId);assert.equal(view.version!.story.title,'Value changes');
+ assert.equal((await request(`/api/story?${scope}&minimumStoryRevision=2`)).status,400);
+ assert.equal((await request(`/api/story?${scope}&unexpected=true`)).status,400);
+ assert.equal((await request('/api/story/commands',{...command,actorId:'forgery'})).status,400);
+ assert.equal((await request(`/api/story?${scope}`,undefined,'wrong')).status,401);
+ assert.equal(notifications,0);assert.equal(f.store.review({kind:'user',actorId:'local-user'},'r').questions.length,0);
+}finally{await gateway.close();f.cleanup();}});

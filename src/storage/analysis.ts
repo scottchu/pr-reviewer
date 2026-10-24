@@ -1,6 +1,7 @@
 import { createHash, randomUUID } from "node:crypto";
 import type { DatabaseSync } from "node:sqlite";
 import { analysisCommandSchema, analysisQuerySchema, semanticSourceQuerySchema, semanticCanonical, snapshotFor, analysisDiagnosticCode } from "../domain/public.ts";
+import {validateSemanticAnchor} from "../domain/public.ts";
 import type { AnalysisCommand, AnalysisReceipt, AnalysisView, AnalysisQuery, AnalysisJobView, AnalysisInvocation, AnalysisProcess, GraphClarification, SemanticAnchor, SemanticSourceQuery, SemanticSource, Principal, Review, CorpusAccount } from "../domain/public.ts";
 import { contextIdentity, contextAnalysisInput, isPreparedContextWitness } from "../source-preparation/public.ts";
 import type { PreparedContextWitness } from "../source-preparation/public.ts";
@@ -137,35 +138,8 @@ export const createAnalysisStore = ({ db, tx, load, authorize, execution, limits
                     throw new Error("analysis_declaration_conflict"); const { side, path, contentHash, start, end } = declaration.declaration; return { side, path, contentHash, start, end }; }) } };
     };
     const anchorValidator = (corpus: ContextCorpus) => {
-        const sources = new Map(corpus.sources.map(source => [`${source.side}:${source.path}`, source])), indexes = new Map<string, number[]>();
-        return (anchor: SemanticAnchor) => {
-            const key = `${anchor.side}:${anchor.path}`, source = sources.get(key);
-            if (!source || source.contentHash !== anchor.contentHash || anchor.snapshotId !== corpus.snapshotId || anchor.start < 0 || anchor.end <= anchor.start || anchor.end > source.content.length)
-                return false;
-            let starts = indexes.get(key);
-            if (!starts) {
-                starts = [0];
-                for (let index = 0; index < source.content.length; index++) {
-                    const code = source.content.charCodeAt(index);
-                    if (code === 13) {
-                        if (source.content.charCodeAt(index + 1) === 10)
-                            index++;
-                        starts.push(index + 1);
-                    }
-                    else if (code === 10 || code === 0x2028 || code === 0x2029)
-                        starts.push(index + 1);
-                }
-                indexes.set(key, starts);
-            }
-            const line = (offset: number) => { let low = 0, high = starts.length; while (low < high) {
-                const middle = (low + high) >>> 1;
-                if (starts[middle]! <= offset)
-                    low = middle + 1;
-                else
-                    high = middle;
-            } return low; };
-            return anchor.startLine === line(anchor.start) && anchor.endLine === line(Math.max(anchor.start, anchor.end - 1));
-        };
+        const sources = new Map(corpus.sources.map(source => [`${source.side}:${source.path}`, source]));
+        return (anchor: SemanticAnchor) => {const source=sources.get(`${anchor.side}:${anchor.path}`);return !!source&&validateSemanticAnchor({...source,snapshotId:corpus.snapshotId},anchor);};
     };
     const clarificationRows = (reviewId: string, snapshotId: string) => (db.prepare("SELECT body FROM graph_clarifications WHERE review_id=? AND snapshot_id=? ORDER BY rowid").all(reviewId, snapshotId) as {
         body: string;
@@ -183,6 +157,7 @@ export const createAnalysisStore = ({ db, tx, load, authorize, execution, limits
             if (parsed.type !== "PutGraphClarification" && principal.kind !== "user")
                 throw new Error("unauthorized");
             const current = graph(reviewId, snapshotId), base = { commandId: parsed.commandId, actorId: principal.actorId, reviewId, snapshotId, analysisGeneration: current.generation, graphRevision: current.graphRevision };
+            if(db.prepare('SELECT id FROM story_receipts WHERE id=?').get(parsed.commandId))return {...base,state:'rejected',result:{},error:'command_conflict'};
             const old = db.prepare("SELECT actor,fingerprint,body FROM analysis_receipts WHERE id=?").get(parsed.commandId) as {
                 actor: string;
                 fingerprint: string;

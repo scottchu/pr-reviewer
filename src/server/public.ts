@@ -6,7 +6,7 @@ import type {PreparedSnapshotWitness} from "../source-preparation/public.ts";
 import { createServer } from "node:http";
 import type { IncomingMessage, ServerResponse } from "node:http";
 import { z } from "zod";
-import { commandSchema,importCommandSchema,analysisCommandSchema,analysisQuerySchema,semanticSourceQuerySchema } from "../domain/public.ts";
+import { commandSchema,importCommandSchema,storyCommandSchema,storyQuerySchema,storyContextQuerySchema,analysisCommandSchema,analysisQuerySchema,semanticSourceQuerySchema } from "../domain/public.ts";
 import type { Principal } from "../domain/public.ts";
 import type { Store } from "../storage/public.ts";
 import { createScheduler } from "../delivery/public.ts";
@@ -65,6 +65,18 @@ export const createGateway = (store: Store, notify: Notify, options:{importArtif
       const user = () => {
         if (principal.kind !== "user") throw new Error("unauthorized");
       };
+      if(req.method==='POST'&&url.pathname==='/api/story/commands'){
+        const command=storyCommandSchema.parse(await readBody(req));
+        send(res,200,store.story.command(authorization.slice(7),command));return;
+      }
+      if(req.method==='GET'&&url.pathname==='/api/story'){
+        const values=Object.fromEntries(url.searchParams);
+        send(res,200,store.story.query(authorization.slice(7),storyQuerySchema.parse({...values,...(values.minimumStoryRevision!==undefined?{minimumStoryRevision:Number(values.minimumStoryRevision)}:{}),...(values.minimumContextRevision!==undefined?{minimumContextRevision:Number(values.minimumContextRevision)}:{})})));return;
+      }
+      if(req.method==='GET'&&url.pathname==='/api/story/context'){
+        const values=Object.fromEntries(url.searchParams);
+        send(res,200,store.story.context(authorization.slice(7),storyContextQuerySchema.parse({...values,...(values.contextRevision!==undefined?{contextRevision:Number(values.contextRevision)}:{})})));return;
+      }
       if(req.method==="POST"&&url.pathname==="/api/analysis/commands"){
         const input=analysisCommandSchema.parse(await readBody(req));
         if(input.type!=="PutGraphClarification")user();
@@ -211,6 +223,7 @@ export const createGateway = (store: Store, notify: Notify, options:{importArtif
             ? error.message
             : "invalid_request";
       const known = [
+        "story_version_unavailable","story_context_unavailable","story_author_conflict","command_conflict",
         "revision_unavailable","analysis_record_unavailable","analysis_job_unavailable",
         "unauthorized",
         "stale_attachment",

@@ -4,7 +4,7 @@
 
 **Date:** 2026-10-24
 
-**Status:** Combined04+05 dependency amendment committed; awaiting scoped independent packet review and root assignment before code.04 G14 remains CHANGES NEEDED and PR24 remains draft.
+**Status:** Revision3 packet independently READY; named 05A core dispatch and local candidate recorded in [05A checkpoint](checkpoint-05a.md). Independent core review precedes05B.04 G14 remains CHANGES NEEDED and PR24 remains draft.
 
 **Parent:** [Slice05 plan](plan.md)
 
@@ -80,7 +80,7 @@ After review, promote actual schema meanings, behavior, rationale, resource/reco
 
 ## Acceptance and evidence
 
-All05 rows are planned/unrun. The actual candidate/target/version and responsible verifier must accompany each result. Strict TypeScript and boundary checks plus all relevant existing regression tests are required; register new tests before reporting aggregate coverage.
+The [05A checkpoint](checkpoint-05a.md) records focused S01-S06 core engineering evidence. All whole-product05 rows remain unaccepted; later player/browser/recovery/understanding checks are unrun. The actual candidate/target/version and responsible verifier must accompany each result. Strict TypeScript and boundary checks plus all relevant existing regression tests are required; register new tests before reporting aggregate coverage.
 
 | ID | Observable outcome and mandatory checks |
 |---|---|

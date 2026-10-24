@@ -35,6 +35,7 @@ export const createImportStore=({db,tx,load,save,execution,limits={}}:Ports)=>{
   const reference=hash(token),principal=user(reference),parsed=importCommandSchema.parse(input),fingerprint=hash(canonical(parsed));
   return tx(()=>{
    user(reference);
+   if(db.prepare('SELECT id FROM story_receipts WHERE id=?').get(parsed.commandId))return {commandId:parsed.commandId,actorId:principal.actorId,state:'rejected',jobId:null,jobRevision:0,result:{},error:'command_conflict'};
    const old=db.prepare('SELECT actor,fingerprint,body FROM import_receipts WHERE id=?').get(parsed.commandId) as {actor:string;fingerprint:string;body:string}|undefined;
    if(old)return old.actor===principal.actorId&&old.fingerprint===fingerprint?JSON.parse(old.body) as ImportReceipt:{commandId:parsed.commandId,actorId:principal.actorId,state:'rejected',jobId:null,jobRevision:0,result:{},error:'command_conflict'};
    let job:ImportJob|undefined,receipt:ImportReceipt;
