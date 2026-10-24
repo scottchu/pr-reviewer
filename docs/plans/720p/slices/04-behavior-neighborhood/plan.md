@@ -2,7 +2,7 @@
 
 **Date:** 2026-10-24 UTC
 
-**Status:** Preparation reconciled with accepted bounded03 candidate4f1862547e3d9c04188eed7674f9720edfc328b5. Root03 merge/verified clean base and explicit04 owner dispatch remain required; no04 integration is implemented here.
+**Status:** Core integration dispatched from accepted03 merge70280d8. See the incorporated [integration packet](integration.md) and its dated dispatch record. Full04 acceptance remains open.
 
 **Parent:** [720p round](../../plan.md)
 
@@ -12,7 +12,7 @@
 
 ## Accepted03 contribution
 
-The implemented/reviewed source is4f1862547e3d9c04188eed7674f9720edfc328b5. Root supplies PR23 merge commit and verified integration base after publication; do not substitute the unmerged planning worktree. Independent engineering /tmp/pr-reviewer-03-independent-review/final-4f18625/review.md, cumulative docs-only /tmp/pr-reviewer-03-docs-rebuild-audit/recheck-4f18625.md and actual own-PR graph/source/journey /tmp/pr-reviewer-semantic-review-pr23/final-recheck-4f18625.md establish the bounded predecessor scope. Final receipt-only head differs from the actual runtime4f candidate.
+The implemented/reviewed source is4f1862547e3d9c04188eed7674f9720edfc328b5. PR23 merged as70280d8db162bd52ab68159da93221b342e7aabd, verified clean as the integration base. Independent engineering /tmp/pr-reviewer-03-independent-review/final-4f18625/review.md, cumulative docs-only /tmp/pr-reviewer-03-docs-rebuild-audit/recheck-4f18625.md and actual own-PR graph/source/journey /tmp/pr-reviewer-semantic-review-pr23/final-recheck-4f18625.md establish the bounded predecessor scope. Final receipt-only head differs from the actual runtime4f candidate.
 
 | Public boundary | Required inherited contract |
 |---|---|
@@ -34,4 +34,4 @@ The fresh reviewer found scope and exact-source navigation useful but graph-only
 
 ## Dispatch and acceptance
 
-Root records merged03 source/base, assigned isolated owner/worktree, exact packet/module incorporations and ownership before04 shared writes. Preserve old native/pilot credentials/data/routes and existing IDs. The versioned packet owns detailed04 scope, TDD/process/UI/own-PR/graph-first checks; maintain docs-first derivation, actual-code reflection and a fresh whole-current-product docs-only audit before the next accepted milestone. This receipt starts no analyzer, context job, source execution or new dependency.
+The integration packet records merged03 source/base, assigned isolated owner/worktree, exact packet incorporations and core ownership before04 derived writes. Preserve old native/pilot credentials/data/routes and existing IDs. The versioned packet owns detailed04 scope, TDD/process/UI/own-PR/graph-first checks; maintain docs-first derivation, actual-code reflection and a fresh whole-current-product docs-only audit before the next accepted milestone. This receipt starts no analyzer, context job, source execution or new dependency.

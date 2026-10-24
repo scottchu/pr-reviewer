@@ -4,7 +4,7 @@
 
 **Date:** 2026-10-24
 
-**Status:** Design ready for reconciliation; full04 implementation blocked on final accepted03 interfaces and root dispatch
+**Status:** Core integration dispatched; accepted03 gate satisfied. Implementation, UI and full04 acceptance remain open.
 
 **Parent:** [720p round](../../plan.md)
 
@@ -167,3 +167,21 @@ Give the next slice actual admitted graph/corpus/analysis identities, evidence/s
 Planner workspace: `/tmp/pr-reviewer-semantic-graph-plan`, branch `plan-semantic-graph-integration`, base50c8f7addec4459e1fd67d0ea139559ea73b61c4. Only this new packet and new durable semantic-graph.md are writable. Preserve local branch/worktree for root handoff; no push/PR/merge, installs, runtime experiments, pilot/session/auth/route changes or delegates. Development planning is applicable; build/release/install/update/uninstall are N/A for this design-only task. Implementation deployment remains root's separate normal delivery responsibility.
 
 Relative links are checked only to files present in this base. Companion module sources absent here are deliberately referenced by exact commit/path above; final integration adds/reconciles live document links and map registration. Validate allowed changed paths and whitespace before committing. No runtime/UI/whole-slice acceptance is claimed by these documentation checks.
+
+## Accepted dispatch record — 2026-10-24 UTC
+
+**Owner:** Root coordinates acceptance/publication. The assigned `integrate_behavior_neighborhood` executor is the sole04 core/shared product writer in `/tmp/pr-reviewer-04-behavior-core`, branch `integrate-retained-behavior-neighborhood`. It may commit locally; push, PR, merge and deployment remain root-owned. No nested delegation is assigned.
+
+**Accepted predecessor:** Actual code `4f1862547e3d9c04188eed7674f9720edfc328b5`; final documentation/receipt head `aeef4a4e39db5eabc763a5a70190e2f076755180`. PR23 merged at2026-10-24T05:07:38Z as `70280d8db162bd52ab68159da93221b342e7aabd`. Primary main and origin/main were verified clean at that exact integration base before this new worktree was created.
+
+**Independent receipts:** Engineering `/tmp/pr-reviewer-03-independent-review/final-4f18625/review.md`; cumulative docs-only `/tmp/pr-reviewer-03-docs-rebuild-audit/recheck-aeef4a4.md`; actual ownPR graph/source `/tmp/pr-reviewer-semantic-review-pr23/final-recheck-4f18625.md`; retained accepted03 account [checkpoint](../03-whole-change/checkpoint.md).
+
+**Packet mapping:** Ordered planner commits47e8b503 and7f96644c were incorporated first as e729d08 and38705e9. Reviewed module deltas below are next; their shared script/package conflicts preserve accepted03 interfaces and pins.
+
+**Reserved core scope:** Source-preparation context/witness; semantic domain/storage/query/command ports and migration; analysis-jobs worker/coordinator; narrow shared import execution lease/process adapter; gateway/MCP wiring; package/lock/test and boundary registration; core/fault tests; durable product and slice evidence reconciliation. A separate root-assigned UI owner receives stable committed types/fixtures before editing reserved React/application files. No competing UI schema is authorized.
+
+**Protected runtime:** The existing pilot, ports5184/5185/28241, PID82017, routes, Tailscale, authentication, credentials and global settings are outside this executor's scope. Only new private task roots and unused ports may support tests. The author worktree remains for integration/review.
+
+**Carried limits:** Representative import290 launches, new-head/history/source-followup and restart passed in03. Controlled reply persistence was not a meaningful answer; Notified was not received/consumed. The structural graph still required manual policy synthesis. Full native/Claude/unfamiliar-human480p and720p acceptance remain open independently. Static neighbors must not be presented as lifecycle or causal understanding.
+
+**Stage1 endpoint:** Commit incorporated modules and baseline checks, then stable typed public04 command/query/application boundaries and isolated fixtures for a separate04U owner. Continue G01–G11 core/fault work; G12–G15 and full04 acceptance remain root-coordinated open gates.
