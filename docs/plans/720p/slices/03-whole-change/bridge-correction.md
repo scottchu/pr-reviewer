@@ -46,4 +46,4 @@ Use existing Node 24 and Bun. Actual-HTTP fixtures may bind random loopback port
 
 ## Execution evidence
 
-Not yet run. No implementation or test change preceded this committed packet.
+Baseline actual-HTTP run (Node 24): 11 tests, 10 failed and 1 passed. Failures reproduce old-credential job replacement, same-token login view retention, old command ownership, disposal/reconnect and polling/read ordering, plus login retaining unknown recovery. The passing case covers ordinary definitive/domain rejection recovery. Raw task log: `/tmp/pr-reviewer-import-bridge-lifetime-red.log`. No implementation or test change preceded packet commit `40ed731`.
