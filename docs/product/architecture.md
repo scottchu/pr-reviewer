@@ -94,7 +94,7 @@ Use a [functional core with reactive coordination](reactive-design.md): pure dom
 
 ## Commands, jobs and conversation turns
 
-User and agent are authenticated participants using the same permitted actions through different entry points. Server-derived identity determines the actor; a supplied participant or conversation string is not proof of identity. Workers use scoped execution identities.
+The single local owner enters the established local/Tailscale workspace without application login; the gateway derives its local-user principal. Agents retain authenticated, scoped participant entry points. Server-derived identity determines the actor; a supplied participant or conversation string is not proof of identity. The local-owner policy does not claim Tailscale identity. Workers use scoped execution identities.
 
 Every domain write uses durable command ingress: comments, replies, graph edits, shared focus, test requests, cancellation, attachment/inbox changes and internal results. Authorized reads go directly through the read model. Local hover and viewport stay private.
 

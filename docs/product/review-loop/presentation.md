@@ -32,11 +32,11 @@ The controlled-host screenshot was inspected against design-system guideline rev
 
 ## Review read ownership
 
-Explicit login and command receipt readback own their in-flight review request. A managed background poll must skip every in-flight read, including another poll, rather than aborting or replacing it. This preserves the login result used to initialize the semantic review scope when the owner opens an imported review. A later successful background review projection cannot substitute for that explicit authorization handoff.
+Explicit workspace opening and command receipt readback own their in-flight review request. A managed background poll must skip every in-flight read, including another poll, rather than aborting or replacing it. This preserves the workspace-open result used to initialize the semantic review scope when the owner opens an imported review. A later successful background review projection cannot substitute for that explicit workspace handoff.
 
-Foreground operations retain latest-intent ownership: a newer explicit credential or snapshot choice may supersede an older request, and generation/publication fences still reject stale responses. The polling guard belongs only to the managed background route; it must not drop an authoritative login, selection or receipt readback. Disposal still aborts owned reads and tears down polling.
+Foreground operations retain latest-intent ownership: a newer explicit opening or snapshot choice may supersede an older request, and generation/publication fences still reject stale responses. The polling guard belongs only to the managed background route; it must not drop an authoritative opening, selection or receipt readback. Disposal still aborts owned reads and tears down polling.
 
-Disposal releases the canceled read's ownership slot immediately, even when its transport ignores or delays abort settlement. Reconnection or a new explicit login can own a fresh request without waiting for that obsolete transport. The disposed request's generation and controller identity remain fenced: a late success/failure cannot publish into the new lifetime or clear a newer request slot. Only actual disposal releases a canceled slot this way; background polling still cannot interrupt an active foreground read.
+Disposal releases the canceled read's ownership slot immediately, even when its transport ignores or delays abort settlement. Reconnection or a new explicit opening can own a fresh request without waiting for that obsolete transport. The disposed request's generation and controller identity remain fenced: a late success/failure cannot publish into the new lifetime or clear a newer request slot. Only actual disposal releases a canceled slot this way; background polling still cannot interrupt an active foreground read.
 
 ## Explicit bounded context controls
 
@@ -53,3 +53,7 @@ A public query may supply a prepared corpus before any analysis is admitted. Lab
 An analysis object can also retain an unavailable result without an admitted graph. Require its positive analyzed status before using admitted account labels or suppressing the matching preparation account; truthiness is insufficient. A newer unavailable preparation does not erase a prior displayed analyzed result: show that result's admitted corpus and the distinct preparation corpus/status separately.
 
 The same status distinction applies to declaration-list and previous-facts copy. An available prepared inventory is a prepared declaration list until it accompanies displayed analyzed facts. Do not promise that previous admitted facts remain when none exist.
+
+## Single-owner opening
+
+Mount opens the review/application workspace and imports automatically without a token field, login form or logout control. While loading, show a bounded loading state; errors expose retrying the same workspace-open operation. Switching to an imported review uses the same credential-free operation with a new lifecycle generation. Browser requests carry no owner Bearer. Generation, cancellation and exact source scope still fence obsolete responses and unresolved commands.

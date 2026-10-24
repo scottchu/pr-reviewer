@@ -44,9 +44,9 @@ Use the provider's actual comparison baseline semantics, not a guessed branch ti
 
 The importer may produce a validated result while history/graph work proceeds. Only the integration owner maps it to `AddSnapshot`/initial preparation through durable ingress after contract tests agree. Import itself becomes a durable bounded job in slice 03: accepted request, process launch and result admission are separate. A job cannot hold a database transaction while acquiring source. Stable invocation identity and uncertain-launch reconciliation apply from first use.
 
-## Preserved authentication boundary
+## Single local-owner access
 
-Passkey usability is a known issue deferred to the final follow-up after slices 01–08. Preserve existing login, credentials, stored reviews and exact-session pairing now. No authentication redesign or iCloud-plugin modification is a prerequisite for graph, history, import, story or evidence work. Deferral does not authorize disabling existing access controls.
+The 2026-10-24 user correction supersedes the former deferred passkey/login requirement. The existing local/Tailscale workspace opens without manual credentials. The gateway derives the local owner while explicit participant credentials keep exact-session and attachment-generation routing checks. See [runtime access policy](runtime.md). Stored history and credentials, loopback/Host policy and the existing private Serve route are preserved. No alternate login or multi-user identity design is introduced.
 
 ## Bootstrap derivation contract (02A)
 
