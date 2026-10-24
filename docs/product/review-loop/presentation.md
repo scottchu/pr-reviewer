@@ -16,6 +16,10 @@ Show a PR/base/head identity header and the [persistent review canvas](canvas-re
 
 Keyboard users can select or specify an exact source span, reach the labeled composer, submit once and follow evidence links. Announce state updates politely without moving focus; errors associate with their fields. Submission preserves the draft until acceptance/readback or explicit rejection and avoids duplicate actions while in flight. No responsive layout can hide source attribution or uncertainty.
 
+## Floating anchored comments
+
+Apply [canvas comments](canvas-comments.md): selecting review code or prose exposes a nearby Comment action; an anchor-adjacent marker identifies its human/agent author and opens contextual thread/reply. Preserve anchors through zoom, lenses, node scroll and return. Reserve a marker lane, cluster overlapping threads with honest counts and keep keyboard/touch access and reading unobstructed. Existing source-anchor support and new prose/version selection are separate; mock-only prose/replies cannot claim persisted or delivered state.
+
 ## Integration acceptance
 
 Test the actual React controls in a real browser: labeled input, click and keyboard submission, disabled/busy behavior, props updates, repeated mount/unmount and listener cleanup. Inspect that only one application intent is emitted and no duplicate notification is caused by rendering. Review visual output against the guidelines and principles separately from automated behavior checks.

@@ -86,6 +86,8 @@ flowchart TB
 
 These are logical boundaries, not a requirement for separate services. A subsystem exposes a narrow public interface; consumers do not reach into its internals. Domain policy is tested independently of UI and transport adapters.
 
+User-facing systems receive [separate inspectable mockups](../plans/720p/slices/05-explanation-exploration/subsystem-mockups.md) for canvas/source, story/exploration, discussion/participants, import/history and tests/evidence. They share the persistent canvas, immutable content identities and public application boundaries; database/queue/registry internals are not separate user interfaces. [Anchor-adjacent comments](review-loop/canvas-comments.md) apply to selected code or prose with explicit actor and version identity; unsupported prose persistence remains a declared capability gap.
+
 ## Existing-session and functional boundaries
 
 Support [Codex and Claude participant adapters](participant-adapters.md). The session initiating attachment in the current project is the exact responsible session; preserve its host owner, work and permissions. Both integrations are part of 480p, with independent probe and real own-PR evidence. A clone on another machine does not imply shared runtime state or access to a session on this machine.
