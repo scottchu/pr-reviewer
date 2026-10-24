@@ -7,6 +7,7 @@ This is the durable product specification: what PR Reviewer does, why, and how i
 - [Durable import jobs](review-loop/import-jobs.md): implemented slice03 path/discovery/job/admission/artifact candidate, exact compatibility and separately pending final acceptance.
 - [Pinned source context](review-loop/source-acquisition.md): bounded unchanged source acquisition and complete coverage accounting.
 - [Semantic persistence and recovery](review-loop/semantic-storage.md): exact semantic record/identity/quota/command/query/lifecycle contracts.
+- [Semantic protocol values](review-loop/semantic-data.md): complete normalized hash inputs, fixed defaults, anchors/fact IDs and machine-readable conformance/recovery fixtures.
 - [Static source analysis](review-loop/source-analysis.md): exact supported declarations, static facts and honest unknowns.
 - [Retained semantic neighborhoods](review-loop/semantic-graph.md): slice04 integration contract and independent source/graph identities.
 - [Persistence compatibility](review-loop/persistence-compatibility.md): supported legacy/current SQLite records, migration and exact identity/retry conventions.

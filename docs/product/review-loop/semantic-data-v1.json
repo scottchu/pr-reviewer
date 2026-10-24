@@ -1,0 +1,434 @@
+{
+  "version": "semantic-data-vector-v1",
+  "meaning": "Protocol conformance data from a controlled Git fixture; these bytes do not grant admission authority.",
+  "loader": {
+    "hashInput": {
+      "contract": "pinned-typescript-context-v1",
+      "profile": "pinned-typescript-context-v1",
+      "provenance": "declared-provider-verified-git",
+      "snapshotId": "semantic-data-vector-v1",
+      "identity": {
+        "provider": "github",
+        "host": "github.com",
+        "sourceProject": "example/review",
+        "targetProject": "example/review",
+        "number": 1
+      },
+      "commits": {
+        "base": "08bb74213c374293a731285d4af188bbea4a637b",
+        "head": "417a18ca9a3b9c709fe44d7868ee7d3469161ece"
+      },
+      "budgets": {
+        "filesPerSide": 1,
+        "fileBytes": 262144,
+        "totalBytes": 4194304,
+        "inventoryEntriesPerSide": 4096,
+        "inventoryMetadataBytes": 2097152,
+        "treeObjectsPerSide": 256,
+        "treeBytesPerSide": 1048576,
+        "timeoutMs": 15000
+      },
+      "priorityPaths": {
+        "base": [],
+        "head": [
+          "a.ts"
+        ]
+      },
+      "accounts": {
+        "base": {
+          "commit": "08bb74213c374293a731285d4af188bbea4a637b",
+          "inventory": "repository-enumeration",
+          "enumeration": "complete",
+          "knownSourcePaths": 0,
+          "knownBoundaryPaths": 0,
+          "observedTreeEntries": 0,
+          "treeObjectsRead": 1,
+          "treeBytesRead": 0,
+          "unvisitedPaths": 0,
+          "preparedSources": 0,
+          "excludedSources": 0,
+          "missingSources": 0,
+          "unsupportedSources": 0
+        },
+        "head": {
+          "commit": "417a18ca9a3b9c709fe44d7868ee7d3469161ece",
+          "inventory": "repository-enumeration",
+          "enumeration": "complete",
+          "knownSourcePaths": 2,
+          "knownBoundaryPaths": 0,
+          "observedTreeEntries": 2,
+          "treeObjectsRead": 1,
+          "treeBytesRead": 64,
+          "unvisitedPaths": 0,
+          "preparedSources": 1,
+          "excludedSources": 1,
+          "missingSources": 0,
+          "unsupportedSources": 0
+        }
+      },
+      "ledger": [
+        {
+          "side": "head",
+          "path": "a.ts",
+          "commit": "417a18ca9a3b9c709fe44d7868ee7d3469161ece",
+          "objectId": "f2bb66b87a1d870c3b9ef07b43ec578cc035ac12",
+          "mode": "100644",
+          "kind": "source",
+          "role": "changed",
+          "change": "changed",
+          "priority": true,
+          "selected": true,
+          "preparation": "prepared",
+          "reason": "text"
+        },
+        {
+          "side": "head",
+          "path": "z.ts",
+          "commit": "417a18ca9a3b9c709fe44d7868ee7d3469161ece",
+          "objectId": "a9008d365059f2aeb26b8fd8dbd6ec38ac77b6bd",
+          "mode": "100644",
+          "kind": "source",
+          "role": "changed",
+          "change": "changed",
+          "priority": false,
+          "selected": false,
+          "preparation": "excluded",
+          "reason": "source_limit"
+        }
+      ],
+      "sources": [
+        {
+          "side": "head",
+          "path": "a.ts",
+          "commit": "417a18ca9a3b9c709fe44d7868ee7d3469161ece",
+          "role": "changed",
+          "selected": true,
+          "contentHash": "bb94d8ad1fc171c85a13c5102fdf32a5bc28adc7cf2280e699cece7ccfed37de",
+          "objectId": "f2bb66b87a1d870c3b9ef07b43ec578cc035ac12",
+          "lineCount": 2
+        }
+      ],
+      "observed": {
+        "sourceBytes": 120,
+        "ledgerMetadataBytes": 565
+      }
+    },
+    "sourceContents": [
+      {
+        "side": "head",
+        "path": "a.ts",
+        "content": "﻿export const callee = () => \"😀\";\r\nexport const caller = (object: any) => { object.runtime(); return callee(); };\r\n"
+      }
+    ],
+    "issues": [],
+    "expected": {
+      "corpusId": "601ba2201ea742a1e70bad923550ca60480d86a3c0ccd323b1bf8d3449d4c27d",
+      "ledgerMetadataBytes": 565,
+      "reservedMetadataBytes": 628
+    }
+  },
+  "semantic": {
+    "inventoryInput": {
+      "contract": "source-neighborhood-v1",
+      "snapshotId": "semantic-data-vector-v1",
+      "change": {
+        "repository": "example/review",
+        "provider": "github",
+        "changeId": "1"
+      },
+      "commits": {
+        "base": "08bb74213c374293a731285d4af188bbea4a637b",
+        "head": "417a18ca9a3b9c709fe44d7868ee7d3469161ece"
+      },
+      "corpus": {
+        "base": {
+          "commit": "08bb74213c374293a731285d4af188bbea4a637b",
+          "inventory": "repository-enumeration",
+          "acquisition": "pinned-typescript-context-v1"
+        },
+        "head": {
+          "commit": "417a18ca9a3b9c709fe44d7868ee7d3469161ece",
+          "inventory": "repository-enumeration",
+          "acquisition": "pinned-typescript-context-v1"
+        }
+      },
+      "sources": [
+        {
+          "side": "head",
+          "path": "a.ts",
+          "commit": "417a18ca9a3b9c709fe44d7868ee7d3469161ece",
+          "role": "changed",
+          "selected": true,
+          "source": {
+            "content": "﻿export const callee = () => \"😀\";\r\nexport const caller = (object: any) => { object.runtime(); return callee(); };\r\n",
+            "contentHash": "bb94d8ad1fc171c85a13c5102fdf32a5bc28adc7cf2280e699cece7ccfed37de",
+            "objectId": "f2bb66b87a1d870c3b9ef07b43ec578cc035ac12"
+          }
+        },
+        {
+          "side": "head",
+          "path": "z.ts",
+          "commit": "417a18ca9a3b9c709fe44d7868ee7d3469161ece",
+          "role": "changed",
+          "selected": false,
+          "exclusion": "excluded"
+        }
+      ],
+      "profile": {
+        "name": "repository-static-v1"
+      },
+      "budgets": {
+        "inventoryPathsPerSide": 4096,
+        "inventoryBytes": 2097152,
+        "filesPerSide": 128,
+        "fileBytes": 262144,
+        "totalBytes": 4194304,
+        "seeds": 64,
+        "astNodes": 200000,
+        "invocationSites": 10000,
+        "outputNodes": 2000,
+        "outputSites": 4000,
+        "aliasPatterns": 32,
+        "aliasTargets": 4,
+        "reExportLinks": 32
+      }
+    },
+    "computeInput": {
+      "contract": "source-neighborhood-v1",
+      "snapshotId": "semantic-data-vector-v1",
+      "change": {
+        "repository": "example/review",
+        "provider": "github",
+        "changeId": "1"
+      },
+      "commits": {
+        "base": "08bb74213c374293a731285d4af188bbea4a637b",
+        "head": "417a18ca9a3b9c709fe44d7868ee7d3469161ece"
+      },
+      "corpus": {
+        "base": {
+          "commit": "08bb74213c374293a731285d4af188bbea4a637b",
+          "inventory": "repository-enumeration",
+          "acquisition": "pinned-typescript-context-v1"
+        },
+        "head": {
+          "commit": "417a18ca9a3b9c709fe44d7868ee7d3469161ece",
+          "inventory": "repository-enumeration",
+          "acquisition": "pinned-typescript-context-v1"
+        }
+      },
+      "sources": [
+        {
+          "side": "head",
+          "path": "a.ts",
+          "commit": "417a18ca9a3b9c709fe44d7868ee7d3469161ece",
+          "role": "changed",
+          "selected": true,
+          "source": {
+            "content": "﻿export const callee = () => \"😀\";\r\nexport const caller = (object: any) => { object.runtime(); return callee(); };\r\n",
+            "contentHash": "bb94d8ad1fc171c85a13c5102fdf32a5bc28adc7cf2280e699cece7ccfed37de",
+            "objectId": "f2bb66b87a1d870c3b9ef07b43ec578cc035ac12"
+          }
+        },
+        {
+          "side": "head",
+          "path": "z.ts",
+          "commit": "417a18ca9a3b9c709fe44d7868ee7d3469161ece",
+          "role": "changed",
+          "selected": false,
+          "exclusion": "excluded"
+        }
+      ],
+      "profile": {
+        "name": "repository-static-v1"
+      },
+      "budgets": {
+        "inventoryPathsPerSide": 4096,
+        "inventoryBytes": 2097152,
+        "filesPerSide": 128,
+        "fileBytes": 262144,
+        "totalBytes": 4194304,
+        "seeds": 64,
+        "astNodes": 200000,
+        "invocationSites": 10000,
+        "outputNodes": 2000,
+        "outputSites": 4000,
+        "aliasPatterns": 32,
+        "aliasTargets": 4,
+        "reExportLinks": 32
+      },
+      "seeds": [
+        {
+          "side": "head",
+          "path": "a.ts",
+          "contentHash": "bb94d8ad1fc171c85a13c5102fdf32a5bc28adc7cf2280e699cece7ccfed37de",
+          "start": 49,
+          "end": 113
+        }
+      ]
+    },
+    "sourceMetadata": [
+      {
+        "side": "head",
+        "path": "a.ts",
+        "commit": "417a18ca9a3b9c709fe44d7868ee7d3469161ece",
+        "role": "changed",
+        "selected": true,
+        "source": {
+          "contentHash": "bb94d8ad1fc171c85a13c5102fdf32a5bc28adc7cf2280e699cece7ccfed37de",
+          "objectId": "f2bb66b87a1d870c3b9ef07b43ec578cc035ac12"
+        }
+      },
+      {
+        "side": "head",
+        "path": "z.ts",
+        "commit": "417a18ca9a3b9c709fe44d7868ee7d3469161ece",
+        "role": "changed",
+        "selected": false,
+        "exclusion": "excluded",
+        "source": null
+      }
+    ],
+    "expected": {
+      "inventoryBytes": 415,
+      "corpusDigest": "adecbd0386cee40c90f990913864a42914682a5a5528ba007c93145d7a217313",
+      "inventoryId": "f778487157458f5f5963387bd8d71948fa751c798fbf9775509fc3ca761ba761",
+      "analysisId": "b40ac25418f1e748dff368e41b30348a8703b7c7778e6b43dd64e341837aa2cd",
+      "nodes": [
+        {
+          "id": "c3012c9086552788a30e8d5d792efa610032b70e48c69e42ee2b28be96080a95",
+          "name": "<module>",
+          "kind": "module",
+          "declaration": {
+            "snapshotId": "semantic-data-vector-v1",
+            "side": "head",
+            "path": "a.ts",
+            "contentHash": "bb94d8ad1fc171c85a13c5102fdf32a5bc28adc7cf2280e699cece7ccfed37de",
+            "start": 0,
+            "end": 116,
+            "startLine": 1,
+            "endLine": 2
+          },
+          "body": {
+            "snapshotId": "semantic-data-vector-v1",
+            "side": "head",
+            "path": "a.ts",
+            "contentHash": "bb94d8ad1fc171c85a13c5102fdf32a5bc28adc7cf2280e699cece7ccfed37de",
+            "start": 0,
+            "end": 116,
+            "startLine": 1,
+            "endLine": 2
+          },
+          "role": "changed"
+        },
+        {
+          "id": "ec3f96424e4fa3212424e3b5fe83678ff31dafcd7145a05031a1c9da1102f70f",
+          "name": "callee",
+          "kind": "const-arrow",
+          "declaration": {
+            "snapshotId": "semantic-data-vector-v1",
+            "side": "head",
+            "path": "a.ts",
+            "contentHash": "bb94d8ad1fc171c85a13c5102fdf32a5bc28adc7cf2280e699cece7ccfed37de",
+            "start": 14,
+            "end": 33,
+            "startLine": 1,
+            "endLine": 1
+          },
+          "body": {
+            "snapshotId": "semantic-data-vector-v1",
+            "side": "head",
+            "path": "a.ts",
+            "contentHash": "bb94d8ad1fc171c85a13c5102fdf32a5bc28adc7cf2280e699cece7ccfed37de",
+            "start": 29,
+            "end": 33,
+            "startLine": 1,
+            "endLine": 1
+          },
+          "role": "changed"
+        },
+        {
+          "id": "cebe5506b242daf6f0eeeff54ab71f8a41576c177feca676e4153ed48308d31b",
+          "name": "caller",
+          "kind": "const-arrow",
+          "declaration": {
+            "snapshotId": "semantic-data-vector-v1",
+            "side": "head",
+            "path": "a.ts",
+            "contentHash": "bb94d8ad1fc171c85a13c5102fdf32a5bc28adc7cf2280e699cece7ccfed37de",
+            "start": 49,
+            "end": 113,
+            "startLine": 2,
+            "endLine": 2
+          },
+          "body": {
+            "snapshotId": "semantic-data-vector-v1",
+            "side": "head",
+            "path": "a.ts",
+            "contentHash": "bb94d8ad1fc171c85a13c5102fdf32a5bc28adc7cf2280e699cece7ccfed37de",
+            "start": 75,
+            "end": 113,
+            "startLine": 2,
+            "endLine": 2
+          },
+          "role": "changed"
+        }
+      ],
+      "edges": [
+        {
+          "id": "d49019ff285a059fb408e21946d12883512565d0fd92a09c573a29d38483cae0",
+          "caller": "cebe5506b242daf6f0eeeff54ab71f8a41576c177feca676e4153ed48308d31b",
+          "callee": "ec3f96424e4fa3212424e3b5fe83678ff31dafcd7145a05031a1c9da1102f70f",
+          "target": {
+            "snapshotId": "semantic-data-vector-v1",
+            "side": "head",
+            "path": "a.ts",
+            "contentHash": "bb94d8ad1fc171c85a13c5102fdf32a5bc28adc7cf2280e699cece7ccfed37de",
+            "start": 14,
+            "end": 33,
+            "startLine": 1,
+            "endLine": 1
+          },
+          "sites": [
+            {
+              "anchor": {
+                "snapshotId": "semantic-data-vector-v1",
+                "side": "head",
+                "path": "a.ts",
+                "contentHash": "bb94d8ad1fc171c85a13c5102fdf32a5bc28adc7cf2280e699cece7ccfed37de",
+                "start": 102,
+                "end": 110,
+                "startLine": 2,
+                "endLine": 2
+              },
+              "conditional": false,
+              "linkage": [],
+              "signatures": []
+            }
+          ],
+          "method": "ts-static-binding-v1",
+          "certainty": "resolved_static"
+        }
+      ],
+      "unresolved": [
+        {
+          "id": "6b789fa4b46837ce6f7bb22c9ba77d8a1c72250ec71d5094085725c9c0b78bca",
+          "caller": "cebe5506b242daf6f0eeeff54ab71f8a41576c177feca676e4153ed48308d31b",
+          "anchor": {
+            "snapshotId": "semantic-data-vector-v1",
+            "side": "head",
+            "path": "a.ts",
+            "contentHash": "bb94d8ad1fc171c85a13c5102fdf32a5bc28adc7cf2280e699cece7ccfed37de",
+            "start": 77,
+            "end": 93,
+            "startLine": 2,
+            "endLine": 2
+          },
+          "syntax": "CallExpression",
+          "reason": "unsupported_dispatch",
+          "candidates": []
+        }
+      ]
+    }
+  }
+}
