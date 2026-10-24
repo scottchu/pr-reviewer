@@ -2,7 +2,7 @@
 
 **Date:** 2026-10-24 UTC
 
-**Status:** Implementation in progress; no full04 acceptance claimed.
+**Status:** UI checkpoint implemented and verified locally; full04 acceptance remains open.
 
 **Parent:** [Integration packet](integration.md), Stage1 core/04U handoff.
 
@@ -58,4 +58,15 @@ These lessons are sent to the core/root owner for durable product-doc promotion;
 
 ## Remaining gates and evidence limits
 
-The source/build in the initial browser record is the frozen d9b3a03 base plus explicitly dirty task source, not a deployed release. A clean committed-source rerun follows this checkpoint. The real-Git fixture is synthetic. New-head history uses the authorized manual AddSnapshot path, not live provider discovery/import. Actual ownPR dogfood/import, fresh graph-first comprehension/source critique, independent engineering, whole-product docs-only audit/reflection, PR/merge/deployment/live verification and inherited native/Claude/human gates remain root-owned and open. Screenshot inspection checks concrete presentation; it does not establish human art-direction acceptance.
+The source/build in the initial browser record is the frozen d9b3a03 base plus explicitly dirty task source, not a deployed release. The clean committed-source rerun passed; its separate evidence is recorded below. The real-Git fixture is synthetic. New-head history uses the authorized manual AddSnapshot path, not live provider discovery/import. Actual ownPR dogfood/import, fresh graph-first comprehension/source critique, independent engineering, whole-product docs-only audit/reflection, PR/merge/deployment/live verification and inherited native/Claude/human gates remain root-owned and open. Screenshot inspection checks concrete presentation; it does not establish human art-direction acceptance.
+
+
+## Clean committed-source checkpoint
+
+**Candidate source:** 58a0345ff20d4edb9c1b00828b5778a6b409b0e0.
+
+**Observed state:** Browser evidence records sourceDirty=false, excluding only the declared task-local dependency symlink. Strict TypeScript and subsystem boundaries passed. All13 actual Chrome tests passed in56.8 seconds, including the existing controlled review/import/graph/history journeys and the two new semantic journeys. The focused application command passed33 Node tests, including11 new semantic checks.
+
+**Evidence root:** `/tmp/pr-reviewer-04-semantic-ui-clean-evidence-20261024T060000Z`. The semantic candidate/delayed-response records and captures use the same named test subdirectories above. Existing suite captures and controlled source identities are separate files in this root; their existing provider/native evidence limits remain unchanged.
+
+**Retention:** Keep the task branch/worktree and both named UI evidence roots for root integration and independent review. The borrowed node_modules symlink is removed after verification; no new dependency installation or shared runtime mutation occurred. Test-owned gateway/UI processes closed and disposable fixture roots were removed by their test lifecycles. This checkpoint has no push, PR, merge or deployment authority.
