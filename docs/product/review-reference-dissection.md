@@ -17,7 +17,7 @@ The [review experience specification](review-experience.md) derives the next des
 
 ![Original selected lesson/graph/diff concept; illustrative content](references/selected-lesson-graph-diff.png)
 
-The concept is a useful hierarchy reference, not a pixel target for the new canvas. Dark color is incidental to the mechanism. The precise selected image is now located; earlier “reference images unlocated” statements describe the earlier investigation only.
+The selected concept’s dark editor-style visual foundation, typography, hierarchy and quiet chrome are the baseline for the next mockup, not an invitation to choose a new palette or light-card treatment. Restoring colors alone is insufficient to restore its UX. Later compact behavior groups, the slim one-row player and same-canvas source reading supersede those specific older arrangements; exact geometry and token choices remain proposed until the mockup is inspected. The precise selected image is now located; earlier “reference images unlocated” statements describe the earlier investigation only.
 
 ## What the original makes easier
 
