@@ -18,7 +18,7 @@ export const createReviewWorkspace=(reviewId:string,initialSnapshotId?:string,op
  return {
   review,analysis,story,canLeaveReview:canLeave,
   connect:()=>{
-   if(confirmedRoute)throw new Error('duplicate_route');disposed=false;generation++;
+   if(confirmedRoute)throw new Error('duplicate_route');disposed=false;
    confirmedRoute=registry.register('question-confirmed-to-exact-draft',reviewId,()=>review.getSnapshot().authenticated,()=>story.confirmDraft(confirmedDraft));
    const guard=registry.register('question-recovery-to-draft-guard',reviewId,()=>true,()=>story.setQuestionGuard(review.getSnapshot().busy||review.getQuestionRecovery().state!=='none'));
    for(const kind of ['structural','semantic'] as const)mapRoutes.set(kind,registry.register(`${kind}-map-view-to-private-frame`,reviewId,()=>Boolean(mapInput&&mapInput.kind===kind&&!disposed&&credential&&review.getSnapshot().authenticated&&story.getSnapshot().authenticated&&review.getSnapshot().review?.snapshot.snapshotId===mapInput.snapshotId&&story.getSnapshot().snapshotId===mapInput.snapshotId),()=>{if(mapInput)story.updateGraphFrame(kind,mapInput.frame);}));

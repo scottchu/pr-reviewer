@@ -97,6 +97,7 @@ const App = () => {
   const [credential,setCredential]=useState(''),[onlySelectedDiscussion,setOnlySelectedDiscussion]=useState(false),[interactionError,setInteractionError]=useState('');
   const act=(action:()=>unknown)=>{try{const result=action();if(result instanceof Promise)void result.catch(error=>setInteractionError(error instanceof Error?error.message:'interaction_failed'));setInteractionError('');}catch(error){setInteractionError(error instanceof Error?error.message:'interaction_failed');}};
   useEffect(()=>workspace.connect(),[workspace]);
+  useEffect(()=>{const current=state.review;if(!state.authenticated||!current)return;const url=new URL(window.location.href);url.searchParams.set('reviewId',current.reviewId);url.searchParams.set('snapshotId',current.snapshot.snapshotId);window.history.replaceState(null,'',url);},[state.authenticated,state.review?.reviewId,state.review?.snapshot.snapshotId]);
   useEffect(()=>{const scroll=()=>storyBridge.setPageScroll(window.scrollY);window.addEventListener('scroll',scroll,{passive:true});return()=>window.removeEventListener('scroll',scroll);},[storyBridge]);
   useEffect(()=>{if(storyState.mapRestoreId)requestAnimationFrame(()=>window.scrollTo({top:storyState.pageScroll}));},[storyBridge,storyState.mapRestoreId]);
   const captureStructural=useCallback((frame:import('../application/public.ts').GraphFrames['structural'])=>workspace.captureMap('structural',state.review?.snapshot.snapshotId??null,frame),[workspace,state.review?.snapshot.snapshotId,storyState.snapshotId]);
@@ -132,7 +133,7 @@ const App = () => {
     );
   const attachment = review.attachment;
   const chooseSnapshot=async(snapshotId:string)=>{
-    try{await workspace.selectSnapshot(snapshotId);const url=new URL(window.location.href);url.searchParams.set("snapshotId",snapshotId);window.history.replaceState(null,"",url);}catch{}
+    try{await workspace.selectSnapshot(snapshotId);}catch{}
   };
   const pauseStory=()=>storyBridge.intent({type:"pause",reason:"reading"});
   const openSource=async(anchor:Anchor,fileKey?:string)=>{
