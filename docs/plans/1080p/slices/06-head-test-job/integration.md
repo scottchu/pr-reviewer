@@ -2,9 +2,11 @@
 
 **Date:** 2026-10-24
 
-**Handoff revision:** 5; exact source input `67b24f31dd322d034c0a2ec6b73006c009fba310` plus the commit containing this packet.
+**Handoff revision:** 6; exact combined source input `10bc29e09efbf6ee0433ef4ad527af73d4e5fec3` plus this committed packet.
 
-**Status:** R3 passed internal06A; [execution06B](execution-06b.md) is the current design/review and prospective implementation handoff. P1/Q2/R3 are bounded predecessor evidence. Q4 independent process-contract review precedes code dispatch; full-slice acceptance remains open.
+**Status:** R3 passed internal06A and Q4 revision5 passed at0b9002f. Delivered05E is reconciled; narrow successor review precedes B1 code dispatch. Full-slice acceptance remains open.
+
+**Owner:** `plan_head_test_slice06` is the named B1 backend integrator in [I6](execution-06b.md#i6-named-b1-implementation-assignment); root owns acceptance and dispatch. B2/B3 remain unassigned.
 
 **Parent:** [Slice plan and gates](plan.md).
 
@@ -31,7 +33,7 @@ Initial storage support is additive: existing records/receipt meanings are retai
 
 Boundary checker additions are only the test-owned edges needed above. The gateway may import test-jobs/public; application/UI may not import storage/process internals. Any extraction of existing process helpers must preserve fixed acquisition and semantic authorities and their independently tested behavior. No widening of `Command` to a public arbitrary executable is permitted. Maintain explicit functional/immutable inputs and testable effect ports; no new reactive library or package split.
 
-## Implementation handoff I2
+## Implementation handoff I2 (historical; I6 controls current B1 scope)
 
 **Requested endpoint:** Complete T01–T09 and provide evidence for T10 through06A–06C; do not accept the slice or deliver main/pilot yourself.
 
@@ -118,3 +120,9 @@ R3 is engineering readiness of intent/storage only. Q4 evaluates the new durable
 ## Q4 revision5 narrow recheck
 
 The3191ebc design candidate had two required P2 corrections: early preparation settlement lacked a valid witness variant, and fixed Git batch I/O conflicted with the general test-process I/O rule. [Execution06B revision5](execution-06b.md#q4-required-corrections-at-revision5) and its owning durable amendment specify both repairs and negative vectors. The independent reviewer should check early unavailable/error/cancel/deadline and uncertain preparation child settlement without invented identities, then verify the bounded binary Git channel still permits Q2's recipe without arbitrary public stdin/argv or log-cap bypass. No implementer assignment follows until the narrow recheck and any remaining coalesced findings are resolved by root.
+
+## Revision6 successor and assignment
+
+[Execution revision6](execution-06b.md#revision6-delivered05e-and-preserved-q4-review) records delivered7b6dc03, actual merge10bc29e, the single export-append conflict resolution, preserved Q4 review pins and the required05E journal/quiescence contract. [I6](execution-06b.md#i6-named-b1-implementation-assignment) supersedes I2 for B1 only: exact source-object repository, existing runtime/copied-closure recipe, new private task roots and transient loopback observations are named. Combined inherited06A/05E checks are the first implementation task, not claimed planning evidence.
+
+A missing PID, missing journal/version, requested-only row or legacy exited/no-PID row remains unknown; explicit definitive not_spawned and fresh owned-group absence have separate evidentiary meanings. Preserve test-specific unknown outcomes and all three Q4 completion witnesses. Actual af39 D6 accepted/D7 PASS stays pinned to af39; corrected05E own-PR/full G1 remains root-owned and pending. No test runner, UI or CLI has been delivered by this amendment.

@@ -2,15 +2,15 @@
 
 **Date:** 2026-10-24
 
-**Packet revision:** 5 — R3 internal06A ready;06B execution/consumer contract proposed for independent design review.
+**Packet revision:** 6.
 
-**Status:** Internal06A independently READY; [06B packet](execution-06b.md) reconciles actual db03505 and05D af39 and specifies missing executable/consumer interfaces. Q4 design review is next, not code dispatch. Full G1 and product-job/React/CLI/own-PR acceptance remain open.
+**Status:** Internal06A independently READY; Q4 revision5 design PASS at0b9002f. [06B packet](execution-06b.md) reconciles delivered05E at10bc29e and names B1 for narrow successor review before code dispatch. Full G1 and product-job/React/CLI/own-PR acceptance remain open.
 
 **Parent:** [1080p round](../../plan.md), [delivery through1080p](../../../delivery-through-1080p.md).
 
 **Durable specification:** [Configured tests on a pinned head](../../../../product/review-loop/test-execution.md), revision `head-test-v1`.
 
-**Ownership:** Root owns acceptance, exact role assignment, integration, PR/main and delivery. This planning worker is the sole slice06 product-doc writer for this packet. Implementation and review role scopes are in [integration revision5](integration.md); unassigned roles are not ready dispatches.
+**Ownership:** Root owns acceptance, exact role assignment, integration, PR/main and delivery. This planning worker is the sole slice06 product-doc writer for this packet. Implementation and review role scopes are in [integration revision6](integration.md); unassigned roles are not ready dispatches.
 
 ## Intent, baseline and gap
 
@@ -148,3 +148,9 @@ The [checkpoint record](checkpoint-06a.md) identifies delivered interfaces, TDD 
 ## Q4 correction candidate
 
 The original3191ebc packet is preserved with two P2 design findings. [Revision5](execution-06b.md#q4-required-corrections-at-revision5) supplies discriminated early-completion evidence and the fixed private binary Git channel, with observable negative vectors. This is docs-only correction for narrow independent recheck; no code dispatch, runtime evidence or full G1/06 acceptance is claimed.
+
+## Revision6: corrected process dependency and named backend assignment
+
+Delivered05E7b6dc0330a1532184c061cd69ace5d2c219b9836 preserves independently READY code882 and qualified whole-product knowledge. Task merge10bc29e09efbf6ee0433ef4ad527af73d4e5fec3 preserves06A db035; [execution revision6](execution-06b.md#revision6-delivered05e-and-preserved-q4-review) records the exact merge/conflict and evidence limits. The [durable dependency](../../../../product/review-loop/test-execution.md#delivered-process-evidence-dependency-05e) requires truthful journal identity, explicit pre-spawn proof, conservative legacy/missing-journal recovery, fresh group-absence checks and store minimum validation without replay. Q4 revision5 review and its two corrected witness/data-channel findings retain their exact original pins.
+
+[I6 names B1](execution-06b.md#i6-named-b1-implementation-assignment) with fixed scope, task roots, source/runtime inputs and first combined regression checks; root consumes narrow independent reconciliation review before implementation. B2/B3 remain unassigned. Root reports actual af39 D6 accepted and D7 PASS, but the corrected05E new-head own-PR gate remains pending. This independent preparation does not pass full G1 or accept06.

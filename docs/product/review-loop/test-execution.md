@@ -2,7 +2,7 @@
 
 **Date:** 2026-10-24
 
-**Contract revision:** `head-test-v1`, execution amendment3 proposed for review; qualification amendment2 and internal06A independently reviewed.
+**Contract revision:** `head-test-v1`, execution amendment3 passed Q4 design review at0b9002f; delivered05E process-evidence dependency reconciled before B1 assignment. Qualification amendment2 and internal06A retain their independent pins.
 
 **Accepted intent:** Run a useful configured check on a retained snapshot's pinned head, keep discussion usable, inspect the same attributed result through React and the owner CLI, and retain honest cancellation/restart uncertainty.
 
@@ -229,7 +229,7 @@ Gateway POST `/api/commands` dispatches strict RequestTest/CancelTest to this sa
 
 ## Execution amendment3: owner ports and production qualification
 
-**Design status:** Proposed06B execution contract for independent review before implementation. The internal06A ports above are delivered; the ports in this amendment are not. Target definition revision2 and its digest remain unchanged. This amendment specifies orchestration and evidence semantics, not another executable target.
+**Design status:** Q4 passed the bounded06B execution design at0b9002f; the delivered05E process-evidence dependency below is reconciled for root review before implementation. The internal06A ports above are delivered; the ports in this amendment are not. Target definition revision2 and its digest remain unchanged. This amendment specifies orchestration and evidence semantics, not another executable target.
 
 Keep `store.tests.targets/command/query` and their exact accepted-receipt behavior. Extend job schema additively with optional preparation/result identities and owner-private invocation journals; absence means not observed, never synthetic success. Old06A jobs keep `test_only_configuration` provenance permanently and are never eligible for a production claim, even after a qualified configuration is supplied. Explicit new intent under qualified production configuration creates `qualified_local_configuration` provenance and captures its immutable qualificationId. Fixture-process verification uses a separate constructor-only fixture composition and clearly attributed fixture jobs; neither fixture injection is selectable by a production request or target ID.
 
@@ -257,6 +257,16 @@ The following names and meanings define06B's public subsystem seam; values are s
 | `diagnostics(owner)` | Bounded sanitized active/latest job IDs, phases/revisions, owner-fenced/failure codes and route counts. No tokens, locators, raw process identity or output dump. |
 
 TestOwner/TestGrant membership cannot be recreated from JSON, an import/analysis grant or child output. A grant binds shared epoch, test-owner generation, job/invocation, exact captured source/definition/qualification and phase progression. `prepared` advances the existing membership rather than minting an externally forgeable replacement. A stale epoch or replaced owner rejects all journal, admission and lease mutations. Current credential authority is checked at every owner operation: revocation prevents new effects and successful admission, while the still-current owner may persist defensive stop/exit observations and a non-success outcome for its existing obligation. This narrowly scoped safety settlement does not restore user authority. After losing the epoch, the old coordinator may stop only its still-owned live child handle/group under verified identity; it cannot persist a release or admit into the new store. Preserve privately observed exit until safe reconciliation instead of hiding it behind an authorization error.
+
+### Delivered process-evidence dependency: 05E
+
+The shared import/semantic implementation now follows the [05E journal-loss contract](import-jobs.md#journal-loss-quiescence-correction-05e): domain/public `ProcessQuiescenceRecord` and `processQuiescenceEligible` describe minimum retained evidence; import-jobs/public `processQuiescent` additionally performs the fresh read-only owned-group absence check. Both adapters repeat actual observed PID/startIdentity in terminal observations even if the earlier started write failed, and both stores reject insufficient minimum evidence before confirmation. Reuse these meanings for test process journals without widening fixed acquisition authority or importing another subsystem's internals.
+
+The test owner must preserve optional `spawnDisposition: not_spawned` only for an actual definitive spawn-error observation before start and with no child PID. The store rejects contradictory identity/history: the marker can only terminate a requested row with no earlier observed PID/startIdentity. Missing fields, a reason string, exit0 or a legacy exited/no-PID row cannot supply this proof. Unknown/future disposition values remain ineligible. A positive safe observed PID on started/exited records permits a fresh group-absence check; it is not absence evidence by itself and never authorizes a guessed/reused-identity signal. A live group retains exclusion after leader exit. Retain observed identity again on terminal write; terminal-write failure leaves preceding requested/started evidence unresolved.
+
+For test jobs, claim atomically records private `processJournalVersion: 1` and an empty ordered process list before any effect. Only that recognized write-ahead contract can support an empty-journal no-instrumented-launch conclusion; an absent journal/version on inherited or partial records is unknown, not an empty-journal proof. Earlier unresolved observations cannot be hidden by later complete rows. During quiescence reconciliation the test store checks minimum evidence, current grant/epoch and exact invocation; the owner supplies fresh OS observations outside the transaction. No public field, serialized witness or child JSON can assert proof. The same rules apply to protected Git, runtime-version and test-root obligations, including the early-completion variants below.
+
+Keep test outcome distinct from import/analysis's interrupted-failed presentation: verified stopped effects with a lost test outcome remain unknown with confirmed quiescence, while the exact shared slot may be released. No replay, guessed result or automatic retry follows. Unknown requested/spawn acknowledgement retains the barrier; genuinely definitive nonlaunch and positive owned absence remain recoverable. Preserve06A exact receipts, captured source/definition, quota accounting and permanent fixture provenance. The learned verification requirement is the full adapter→store→later coordinator tick/reopen→competing claim path, with both live-descendant blocking and positive-absence recovery; adapter-only rejection tests are insufficient.
 
 ### Preparation, process and witness boundary
 
