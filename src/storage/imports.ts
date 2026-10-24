@@ -1,3 +1,5 @@
+import {accessReference,localPrincipal,isLocalOwner} from './access.ts';
+import type {StorageAccess} from './access.ts';
 import {processQuiescenceEligible} from '../domain/public.ts';
 import type {ExecutionLease} from './execution.ts';
 import {createHash,randomUUID} from 'node:crypto';
@@ -24,7 +26,7 @@ export const createImportStore=({db,tx,load,save,execution,limits={}}:Ports)=>{
  const get=(id:string)=>{const row=db.prepare('SELECT body FROM import_jobs WHERE id=?').get(id) as {body:string}|undefined;if(!row)throw new Error('invalid_request');return JSON.parse(row.body) as ImportJob;};
  const put=(job:ImportJob)=>{db.prepare('INSERT INTO import_jobs VALUES (?,?) ON CONFLICT(id) DO UPDATE SET body=excluded.body').run(job.jobId,JSON.stringify(job));};
  const update=(job:ImportJob)=>{job.jobRevision++;job.updatedAt=new Date().toISOString();put(job);};
- const user=(reference:string):Principal=>{const row=db.prepare('SELECT body FROM credentials WHERE hash=?').get(reference) as {body:string}|undefined;const principal=row?JSON.parse(row.body) as Principal:null;if(!principal||principal.kind!=='user')throw new Error('unauthorized');return principal;};
+ const user=(reference:string):Principal=>{const local=localPrincipal(reference);if(local)return local;const row=db.prepare('SELECT body FROM credentials WHERE hash=?').get(reference) as {body:string}|undefined;const principal=row?JSON.parse(row.body) as Principal:null;if(!principal||principal.kind!=='user')throw new Error('unauthorized');return principal;};
  const owner=(value:ImportOwner)=>{execution.assertCurrent();const generation=owners.get(value),row=db.prepare('SELECT generation FROM import_owner WHERE id=1').get() as {generation:string}|undefined;if(!generation||row?.generation!==generation)throw new Error('stale_import_runner');return generation;};
  const grant=(value:ImportGrant)=>{execution.assertCurrent();const record=grants.get(value),row=db.prepare('SELECT generation FROM import_owner WHERE id=1').get() as {generation:string}|undefined;if(!record||record.generation!==row?.generation)throw new Error('stale_import_runner');const job=get(record.jobId),invocation=job.invocations.at(-1);if(!invocation||invocation.invocationId!==record.invocationId||invocation.state!=='running')throw new Error('stale_import_runner');return {job,invocation};};
  const terminal=(invocation:ImportInvocation)=>{if(invocation.processes.some(process=>process.state!=='exited'))throw new Error('import_process_unresolved');};
@@ -32,8 +34,8 @@ export const createImportStore=({db,tx,load,save,execution,limits={}}:Ports)=>{
  const matching=(candidate:ProviderCandidate)=> (db.prepare('SELECT review_id,current_snapshot_id FROM review_import_identities WHERE provider=? AND host=? AND target_project=? AND change_number=? ORDER BY review_id').all(candidate.provider,candidate.host,candidate.targetProject,candidate.number) as {review_id:string;current_snapshot_id:string}[]).map(row=>({reviewId:row.review_id,currentSnapshotId:row.current_snapshot_id}));
  const view=(job:ImportJob)=>{const {credentialReference,...publicJob}=job;return publicJob;};
  const retainedBytes=(review:Review)=> (review.snapshots??[review.snapshot]).reduce((n,snapshot)=>n+encodedSourceBytes(snapshot),0);
- const command=(token:string,input:ImportCommand):ImportReceipt=>{
-  const reference=hash(token),principal=user(reference),parsed=importCommandSchema.parse(input),fingerprint=hash(canonical(parsed));
+ const command=(token:StorageAccess,input:ImportCommand):ImportReceipt=>{
+  const reference=accessReference(token),principal=user(reference),parsed=importCommandSchema.parse(input),fingerprint=hash(canonical(parsed));
   return tx(()=>{
    user(reference);
    if(db.prepare('SELECT id FROM test_receipts WHERE id=?').get(parsed.commandId)||db.prepare('SELECT id FROM story_receipts WHERE id=?').get(parsed.commandId))return {commandId:parsed.commandId,actorId:principal.actorId,state:'rejected',jobId:null,jobRevision:0,result:{},error:'command_conflict'};
@@ -47,7 +49,7 @@ export const createImportStore=({db,tx,load,save,execution,limits={}}:Ports)=>{
      const now=new Date().toISOString();job={jobId:randomUUID(),actorId:principal.actorId,credentialReference:reference,path:parsed.path,canonicalWorktree:null,state:'queued',jobRevision:1,createdAt:now,updatedAt:now,reviewId:parsed.target?.reviewId??randomUUID(),target:parsed.target??null,candidate:null,candidates:[],discoveryRevision:0,discovery:null,existingReviews:[],invocations:[],artifact:null,admissionCommandId:`import-admit:${randomUUID()}`,admission:null,reason:null};
      if(parsed.target)load(parsed.target.reviewId);put(job);
     }else{
-     job=get(parsed.jobId);if(job.actorId!==principal.actorId||job.credentialReference!==reference)throw new Error('unauthorized');
+     job=get(parsed.jobId);if(job.actorId!==principal.actorId||(!isLocalOwner(token)&&job.credentialReference!==reference))throw new Error('unauthorized');
      if(parsed.type==='ChooseImportCandidate'){
       if(job.state!=='choosing'||job.discoveryRevision!==parsed.discoveryRevision||!job.candidates[parsed.candidateIndex])throw new Error('stale_import_choice');
       const candidate=job.candidates[parsed.candidateIndex]!;job.existingReviews=matching(candidate);
@@ -72,7 +74,7 @@ export const createImportStore=({db,tx,load,save,execution,limits={}}:Ports)=>{
  };
  return {
   command,
-  list:(token:string)=>{const reference=hash(token),principal=user(reference);return all().filter(job=>job.actorId===principal.actorId&&job.credentialReference===reference).map(view);},
+  list:(token:StorageAccess)=>{const reference=accessReference(token),principal=user(reference);return all().filter(job=>job.actorId===principal.actorId&&(isLocalOwner(token)||job.credentialReference===reference)).map(view);},
   beginOwner:():ImportOwner=>tx(()=>{
    execution.assertCurrent();const generation=randomUUID();db.prepare('INSERT OR REPLACE INTO import_owner VALUES (1,?)').run(generation);
    for(const job of all()){

@@ -1,3 +1,4 @@
+import {localOwnerSession,accessHeaders} from './local-access.ts';
 import {createRegistry} from '../integration/registry.ts';
 import type {ImportCommand,ImportJob,ImportReceipt} from '../domain/public.ts';
 export type ImportViewJob=Omit<ImportJob,'credentialReference'>;
@@ -20,7 +21,7 @@ export const createImportsBridge=()=>{
  const abortRead=()=>{const previous=inflight;inflight=null;previous?.controller.abort();};
  const request=async(expected:Owner,path:string,body?:unknown,signal?:AbortSignal)=>{
   const response=await fetch(path,{
-   headers:{Authorization:`Bearer ${expected.token}`,'Content-Type':'application/json'},
+   headers:{...accessHeaders(expected.token),'Content-Type':'application/json'},
    ...(body?{method:'POST',body:JSON.stringify(body)}:{}),...(signal?{signal}:{})
   });
   const value=await response.json() as unknown;
@@ -85,14 +86,17 @@ export const createImportsBridge=()=>{
    if(state.busy)publish({...state,busy:false,uncertain:Boolean(pending)});
   };
  };
+ const login=async(value:string=localOwnerSession)=>{
+   generation++;token=value.trim();disposed=false;abortRead();pending=null;activeCommand=null;
+   publish(emptyView());await refresh(owner());
+  };
+
  return {
   getSnapshot:()=>state,
   subscribe:(listener:()=>void)=>{listeners.add(listener);return()=>listeners.delete(listener);},
   importFrom:async(path:string,review?:import('../domain/public.ts').Review)=>send({type:'RequestImport',path,...(review?{target:{reviewId:review.reviewId,expectedCurrentSnapshotId:review.currentSnapshotId??review.snapshot.snapshotId}}:{})}),
-  login:async(value:string)=>{
-   generation++;token=value.trim();disposed=false;abortRead();pending=null;activeCommand=null;
-   publish(emptyView());await refresh(owner());
-  },
+  open:()=>login(),
+  login,
   send,
   retry:async()=>{if(!pending)throw new Error('invalid_request');const {commandId,...intent}=pending.command;return send(intent as Intent);},
   connect,

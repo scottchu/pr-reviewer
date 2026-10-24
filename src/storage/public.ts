@@ -1,5 +1,7 @@
 import {createHeadTestStore,validateHeadTestOptions} from "./head-tests.ts";
 import type {HeadTestOptions} from "./head-tests.ts";
+import {localOwnerAccess,accessReference,localPrincipal} from './access.ts';
+import type {StorageAccess} from './access.ts';
 import {createStoryStore} from './story.ts';
 import type {StoryLimits} from './story.ts';
 import {storyEvidenceQuerySchema,storyCanonical,validateSemanticAnchor} from '../domain/public.ts';
@@ -199,13 +201,14 @@ export const createStore = (filename: string,options:{importLimits?:ImportLimits
   let imports:ReturnType<typeof createImportStore>;
   try{imports=createImportStore({db,tx,load,save,execution,...(options.importLimits?{limits:options.importLimits}:{})});}catch(error){db.close();throw error;}
   const analysis=createAnalysisStore({db,tx,load,authorize,execution,...(options.analysisLimits?{limits:options.analysisLimits}:{})});
-  const authenticate = (token: string): Principal => {
-    const row=db.prepare("SELECT body FROM credentials WHERE hash=?").get(hash(token)) as {body:string}|undefined;
+  const authenticate = (token: StorageAccess): Principal => {
+    const owner=localPrincipal(accessReference(token));if(owner)return owner;
+    const row=db.prepare("SELECT body FROM credentials WHERE hash=?").get(accessReference(token)) as {body:string}|undefined;
     if(!row)throw new Error("unauthorized");return JSON.parse(row.body) as Principal;
   };
   const tests=createHeadTestStore({db,tx,load,authenticate,authorize,execution,...(options.testOptions?{options:options.testOptions}:{})});
   let story:ReturnType<typeof createStoryStore>;
-  const storyEvidence=(token:string,input:StoryEvidenceQuery):StoryEvidence=>{
+  const storyEvidence=(token:StorageAccess,input:StoryEvidenceQuery):StoryEvidence=>{
     const query=storyEvidenceQuerySchema.parse(input),principal=authenticate(token),review=load(query.reviewId);authorize(principal,review);
     const snapshot=(review.snapshots??[review.snapshot]).find(item=>item.snapshotId===query.snapshotId);if(!snapshot)throw new Error('source_unavailable');
     const references=[...new Map(query.references.map(ref=>[storyCanonical(ref),ref])).values()];
@@ -285,13 +288,8 @@ export const createStore = (filename: string,options:{importLimits?:ImportLimits
     analysis,
     close: () => db.close(),
     issueUser: () => issue({ kind: "user", actorId: "local-user" }),
-    authenticate: (token: string): Principal => {
-      const row = db
-        .prepare("SELECT body FROM credentials WHERE hash=?")
-        .get(hash(token)) as { body: string } | undefined;
-      if (!row) throw new Error("unauthorized");
-      return JSON.parse(row.body) as Principal;
-    },
+    authenticate,
+    localOwner:localOwnerAccess,
     preparedInput: (reviewId:string):unknown|null => {
       const row=db.prepare("SELECT body FROM preparation_inputs WHERE review_id=?").get(reviewId) as {body:string}|undefined;
       return row?JSON.parse(row.body):null;

@@ -327,17 +327,14 @@ details code {
   color: #6c7478;
   padding: 24px 0;
 }
-.login {
+.workspace-loading {
   max-width: 520px;
   margin: 10vh auto;
 }
-.login p {
+.workspace-loading p {
   margin: 12px 0;
 }
-.login input {
-  width: 100%;
-  margin-bottom: 12px;
-}
+
 footer {
   margin-top: 40px;
   border-top: 1px solid #d4d7d6;

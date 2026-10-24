@@ -1,3 +1,4 @@
+import {localOwnerSession,accessHeaders} from './local-access.ts';
 import {createRegistry} from '../integration/registry.ts';
 import type {AnalysisCommand,AnalysisReceipt,AnalysisView,SemanticAnchor,SemanticSource,SemanticFunctionNode,SemanticCallEdge,AnalysisJobView} from '../domain/public.ts';
 type Intent=AnalysisCommand extends infer C?C extends AnalysisCommand?Omit<C,'commandId'>:never:never;
@@ -46,7 +47,7 @@ export const createAnalysisBridge=(reviewId:string)=>{
  const abortRead=()=>{read?.controller.abort();read?.finish();read=null;};
  const interrupt=()=>{generation++;abortRead();sourceRead?.controller.abort();sourceRead=null;for(const c of warmControllers)c.abort();warmControllers.clear();operation=null;};
  const request=async(o:Owner,path:string,body?:unknown,signal?:AbortSignal)=>{
-  const response=await fetch(path,{headers:{Authorization:`Bearer ${o.token}`,'Content-Type':'application/json'},...(body?{method:'POST',body:JSON.stringify(body)}:{}),...(signal?{signal}:{})});
+  const response=await fetch(path,{headers:{...accessHeaders(o.token),'Content-Type':'application/json'},...(body?{method:'POST',body:JSON.stringify(body)}:{}),...(signal?{signal}:{})});
   const value=await response.json() as unknown;
   if(!response.ok)throw Object.assign(new Error(String((value as {error?:string}).error??'request_failed')),{definitive:[400,401,403].includes(response.status)});
   return value;
@@ -132,7 +133,7 @@ export const createAnalysisBridge=(reviewId:string)=>{
  };
  return {
   getSnapshot:()=>state,subscribe:(listener:()=>void)=>{listeners.add(listener);return()=>listeners.delete(listener);},
-  login:async(value:string,nextSnapshotId=snapshotId)=>{interrupt();token=value.trim();snapshotId=nextSnapshotId;analysisId=undefined;pending=null;disposed=false;publish(empty());if(token&&snapshotId)await refresh(owner());},
+  login:async(value:string=localOwnerSession,nextSnapshotId=snapshotId)=>{interrupt();token=value.trim();snapshotId=nextSnapshotId;analysisId=undefined;pending=null;disposed=false;publish(empty());if(token&&snapshotId)await refresh(owner());},
   logout:()=>{interrupt();token='';pending=null;publish(empty());},select,
   refresh:()=>refresh(owner()),send,
   requestContext:(worktree:string,sourceProject:string,context:Pick<Extract<AnalysisCommand,{type:'RequestAnalysis'}>,'contextFilesPerSide'|'priorityPaths'>={})=>send({type:'RequestAnalysis',reviewId,snapshotId,expectedAnalysisGeneration:state.view?.analysisGeneration??0,...(worktree.trim()?{worktree:worktree.trim()}:{}),...(sourceProject.trim()?{sourceProject:sourceProject.trim()}:{}),...(context.contextFilesPerSide===undefined?{}:{contextFilesPerSide:context.contextFilesPerSide}),...(context.priorityPaths===undefined?{}:{priorityPaths:structuredClone(context.priorityPaths)})}),

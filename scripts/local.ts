@@ -95,7 +95,7 @@ export type Runtime = {
   instanceId: string;
   gatewayUrl: string;
   uiUrl: string;
-  userCredentialRef: string;
+  userCredentialRef?: string; // Legacy manifests only; preserved, never required.
   sourceCommit: string;
   sourceDirty: boolean;
   reviewId: string;

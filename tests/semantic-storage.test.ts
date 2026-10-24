@@ -91,3 +91,14 @@ test("bounded pending choices and shared epoch cannot be reset by the other runn
   const owner=f.store.analysis.beginOwner(),claim=f.store.analysis.claim(owner);assert.ok(claim);f.store.imports.beginOwner();assert.equal(f.store.analysis.cancelled(claim.grant),false);f.store.analysis.fail(claim.grant,"known_no_effect_failure",true);assert.ok(f.store.analysis.claim(owner));
  }finally{f.cleanup();}
 });
+
+// SU-B: retained owner work remains actionable after removing the credential UI.
+test('local owner can manage legacy credential-scoped analysis without rewriting stored credentials',()=>{
+ const f=setup();try{
+  const created=f.store.analysis.command(f.token,{type:"RequestAnalysis",commandId:"legacy-owner-analysis",reviewId:"r",snapshotId:snapshot.snapshotId,expectedAnalysisGeneration:0,worktree:f.root,sourceProject:"owner/repo"});assert.equal(created.state,'applied');
+  const query=f.store.analysis.query(f.store.localOwner,{reviewId:'r',snapshotId:snapshot.snapshotId}),job=query.jobs[0]!;
+  const receipt=f.store.analysis.command(f.store.localOwner,{type:'CancelAnalysis',commandId:'local-owner-cancel',jobId:job.jobId,expectedJobRevision:job.jobRevision});assert.equal(receipt.state,'applied');
+  assert.equal(f.store.authenticate(f.token).actorId,'local-user');
+  assert.throws(()=>f.store.authenticate({principal:{kind:'user',actorId:'local-user'}}),/unauthorized/);
+ }finally{f.cleanup();}
+});

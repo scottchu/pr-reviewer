@@ -85,3 +85,30 @@ test('history HTTP admits verified bounded large manifest, rejects oversized enc
  const oversized=await request('/api/commands',{...add,commandId:'too-big',snapshot:{...next,sources:[{...next.sources[0],content:'x'.repeat(8*1024*1024)}]}});assert.equal(oversized.status,400);assert.equal(oversized.body.error,'invalid_request');assert.equal(store.review(owner,'r').currentSnapshotId,next.snapshotId);assert.equal(store.review(owner,'r').snapshotSummaries?.length,2);
  }finally{await gateway.close();store.close();if(previous===undefined)delete process.env.GIT_DIR;else process.env.GIT_DIR=previous;rmSync(root,{recursive:true,force:true});}
 });
+
+// SU-A/B/C: docs/product/review-loop/runtime.md single-local-owner policy.
+test('single local owner reads and writes without a Bearer while explicit invalid credentials never escalate',async()=>{
+ const root=mkdtempSync(join(tmpdir(),'pr-reviewer-local-owner-')),store=createStore(join(root,'db'));
+ const content='export const value = 1;\n',snapshot={snapshotId:'local-source',repository:'local',prUrl:'https://github.com/scottchu/pr-reviewer/pull/14',prNumber:14,baseSha:'a',headSha:'b',sources:[{side:'head' as const,path:'value.ts',content,hash:createHash('sha256').update(content).digest('hex'),lineCount:1}]};
+ store.prepare('r',snapshot);const oldToken=store.issueUser();
+ store.imports.command(oldToken,{type:'RequestImport',commandId:'old-owner-import',path:'/retained/locator'});
+ const {createImportArtifacts}=await import('../src/import-artifacts/public.ts');
+ const gateway=createGateway(store,async()=>({state:'unknown',reason:'controlled'}),{importArtifacts:createImportArtifacts(root)}),port=await gateway.listen(0);
+ const call=async(path:string,body?:unknown,authorization?:string)=>{const response=await fetch(`http://127.0.0.1:${port}${path}`,{headers:{'Content-Type':'application/json',...(authorization?{Authorization:authorization}:{})},...(body?{method:'POST',body:JSON.stringify(body)}:{})});return {status:response.status,body:await response.json() as Record<string,unknown>};};
+ try{
+  assert.deepEqual((await call('/api/self')).body,{kind:'user',actorId:'local-user'});
+  assert.equal((await call('/api/reviews')).status,200);assert.equal((await call('/api/reviews/r')).status,200);
+  assert.equal((await call('/api/analysis?reviewId=r&snapshotId=local-source')).status,200);
+  assert.equal((await call('/api/story?reviewId=r&snapshotId=local-source')).status,200);
+  assert.equal((await call('/api/story/context?reviewId=r&snapshotId=local-source')).status,200);
+  const jobs=await call('/api/imports');assert.equal(jobs.status,200);const job=(jobs.body as unknown as {jobId:string}[])[0]!;assert.ok(job.jobId);
+  assert.equal((await call('/api/imports/commands',{type:'RequestImport',commandId:'new-owner-import',path:'/local/locator'})).body.state,'applied');
+  const command={type:'AskQuestion',commandId:'local-owner-question',reviewId:'r',anchor:{snapshotId:'local-source',path:'value.ts',side:'head',startLine:1,endLine:1},text:'Saved without a login'};
+  const receipt=await call('/api/commands',command);assert.equal(receipt.status,200);assert.equal(receipt.body.state,'applied');assert.equal(receipt.body.actorId,'local-user');
+  assert.deepEqual((await call('/api/commands',command)).body,receipt.body);
+  const readback=await call('/api/reviews/r');assert.equal((readback.body.questions as {text:string}[])[0]?.text,command.text);
+  for(const authorization of ['Bearer wrong','Basic anything','Bearer '])assert.equal((await call('/api/reviews/r',undefined,authorization)).status,401);
+  const connection=store.registerConnection({kind:'user',actorId:'local-user'},{host:'codex',sessionId:'original',connectionId:'original-connection',corroborated:true});
+  assert.equal((await call('/api/reviews/r',undefined,`Bearer ${connection.token}`)).status,401);
+ }finally{await gateway.close();store.close();rmSync(root,{recursive:true,force:true});}
+});

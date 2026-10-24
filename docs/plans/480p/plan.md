@@ -6,7 +6,7 @@
 
 **Owner:** Maintainer owns material decisions; slice owners deliver and reconcile evidence
 
-**Authorization:** Autonomous delivery through 1080p with committed bounded packets; existing private local pilot authority only. Preserve login, data, sessions and network routes.
+**Authorization:** Autonomous delivery through 1080p with committed bounded packets; existing private local pilot authority only. The accepted single-owner access correction removes manual login/token entry; preserve data, credentials, exact-session routing and network routes.
 
 ## Outcome and scope
 

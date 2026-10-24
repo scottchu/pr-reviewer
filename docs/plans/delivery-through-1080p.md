@@ -51,7 +51,7 @@ Root assigns an implementation owner and independent reviewers to committed pack
 | 5 | Slice 06: configured head test jobs | Agreed repository target/environment and isolated execution source; no arbitrary shell | Actual bounded process outcomes/cancellation and continued discussion; source/environment/artifact provenance. |
 | 6 | Slice 07: base/head evidence comparison | Head-runner evidence; target valid on both pinned sides or explicit incompatibility | Separate worktrees/results; mismatches and missing outcomes visible, no unsupported causal claim. |
 | 7 | Slice 08: retained correction and bounded enrichment | Proven graph/write/job/inbox contracts | Corrections survive agent revision and reopen; subscribed terminal events deliver without reply/update wake loops. |
-| Last | Passkey known-issue follow-up | After 01–08 engineering delivery/review; separately scoped diagnosis and source decisions | Preserve login/data/credentials until a reviewed plan exists; no auth change authorized by this plan. |
+| Accepted correction | Single-owner access | [Versioned correction packet](480p/slices/01-review-loop/single-user-access/plan.md); implemented candidate and evidence remain separate from deployment | Remove manual login/token entry. Preserve data/credentials, exact-session participant routing and existing private network boundary; no login replacement. |
 
 The [720p round](720p/plan.md) and [1080p round](1080p/plan.md) keep later scope concise. 04/05 now have bounded acceptance receipts, and06 has a separately owned packet/workstream. Reconcile actual delivered predecessor results before each dependent implementation/acceptance; keep07/08 details provisional. This closeout creates no new slice hierarchy. No speculative whole hierarchy is generated now.
 
@@ -108,3 +108,7 @@ The initial read-only runtime report is retained at `/tmp/pr-reviewer-live-route
 ## Planning validation
 
 The planning executor checked all repository Markdown relative file targets: no missing files. `git diff --check` passed. Scope inspection contains only AGENTS.md and docs; no derived application/test/configuration, runtime, credential or network changes. PR20 source IDs were checked against local merge parents and its three-file diff; remote PR provenance and prospective answer-key verification remain run-time review inputs. This is documentation validation, not product/browser/graph acceptance.
+
+## 2026-10-24 single-owner correction reconciliation
+
+The user explicitly removed the manual access-token/login requirement for this single-user local/Tailscale tool. The former passkey-final requirement and historical unauthenticated401 evidence above do not define current owner behavior. Candidate5cf0bc6 derives the local owner and opens React without credentials; its [evidence](480p/slices/01-review-loop/single-user-access/evidence.md) records source and browser checks. Existing explicit agent/bootstrap authentication, attachment/generation and exact initiating-session checks remain. Root owns independent review, actual own-PR task, PR delivery and preserving-data deployment/live acceptance through the existing private URL. No new route, public hosting/Funnel or global setting is authorized by this correction.

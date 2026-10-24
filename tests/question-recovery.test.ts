@@ -15,3 +15,11 @@ test('S11 clearing cannot remove a quarantined body whose unchanged fingerprint 
 
 test('S11 exact request bytes fit while one fewer byte fails; ordinary stale saves preserve submitted ID and the unrelated draft',async()=>{const m=memory(),scope=await credentialScope('http://local','token'),record=await pending(scope),bytes=new TextEncoder().encode(record.request).length,session=createPrivateSession({storage:m.storage,origin:'http://local',limits:{requestBytes:bytes}});session.writePending(record);assert.throws(()=>createPrivateSession({storage:memory().storage,origin:'http://local',limits:{requestBytes:bytes-1}}).writePending(record),/question_request_too_large/);session.saveView(scope,view);session.invalidateDraft(scope,'draft-original');session.saveView(scope,view);const recovered=session.readView(scope).record!.value!;assert.equal(recovered.drafts[0]!.text,'');assert.equal(recovered.drafts[0]!.submitted,true);assert.equal(recovered.drafts[1]!.text,'Separate exploration');});
 test('S11 shape-valid inconsistent draft identities are quarantined before private hydration',async()=>{const m=memory(),session=createPrivateSession({storage:m.storage,origin:'http://local'}),scope=await session.scope('token');session.saveView(scope,view);const raw=JSON.parse(m.values.get(PRIVATE_VIEW_KEY)!);raw.value.activeDraftId='missing-draft';m.values.set(PRIVATE_VIEW_KEY,JSON.stringify(raw));assert.equal(session.readView(scope).kind,'quarantined');assert.equal(session.saveView(scope,view).saved,false);assert.equal(JSON.parse(m.values.get(PRIVATE_VIEW_KEY)!).value.activeDraftId,'missing-draft');});
+
+test('single-owner browser scope is stable per origin without a bearer and preserves legacy-scope separation',async()=>{
+ const origin='https://local-owner.example:8472',scope=await credentialScope(origin,'local-owner:v1');
+ assert.equal(scope,await requestFingerprint(`pr-reviewer-local-owner-scope-v1\0${new TextEncoder().encode(origin).length}:${origin}`));
+ assert.equal(scope,await credentialScope(origin,'local-owner:v1'));
+ assert.notEqual(scope,await credentialScope(origin,'legacy-owner-token'));
+ assert.notEqual(scope,await credentialScope('http://127.0.0.1:5184','local-owner:v1'));
+});

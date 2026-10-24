@@ -1,3 +1,4 @@
+import {accessHeaders} from './local-access.ts';
 import {validateAnchor,projectGraph,graphFiles} from '../domain/public.ts';
 import type {Anchor} from '../domain/public.ts';
 import type {PrivateSession,QuestionDraft,GraphFrames,StoryReturnFrame,PrivateStoryView} from './private-session.ts';
@@ -164,7 +165,7 @@ export const createStoryBridge=(reviewId:string,options:{clock?:StoryClock;seman
  const interrupt=()=>{generation++;focusSerial++;invalidatePrivateIntent();for(const controller of readControllers)controller.abort();readControllers.clear();read?.abort();read=null;contextRead?.abort();contextRead=null;evidenceRead?.abort();evidenceRead=null;stopClock?.();stopClock=null;};
  const request=async(capturedToken:string,path:string,signal:AbortSignal,query?:Record<string,string>)=>{
   const controller=new AbortController();readControllers.add(controller);const ownedSignal=AbortSignal.any([signal,controller.signal]);
-  try{if(ownedSignal.aborted)throw new Error('selection_superseded');const response=await awaitRead(fetch(path,{headers:{Authorization:`Bearer ${capturedToken}`,...(query?{'Content-Type':'application/json'}:{})},signal:ownedSignal,...(query?{method:'POST',body:JSON.stringify(query)}:{})}),ownedSignal);const body=await response.json() as unknown;if(ownedSignal.aborted)throw new Error('selection_superseded');if(!response.ok)throw new Error(String((body as {error?:string}).error??'request_failed'));return body;}finally{readControllers.delete(controller);}
+  try{if(ownedSignal.aborted)throw new Error('selection_superseded');const response=await awaitRead(fetch(path,{headers:{...accessHeaders(capturedToken),...(query?{'Content-Type':'application/json'}:{})},signal:ownedSignal,...(query?{method:'POST',body:JSON.stringify(query)}:{})}),ownedSignal);const body=await response.json() as unknown;if(ownedSignal.aborted)throw new Error('selection_superseded');if(!response.ok)throw new Error(String((body as {error?:string}).error??'request_failed'));return body;}finally{readControllers.delete(controller);}
  };
  const readContext=async(contextRevision?:number)=>{
   if(disposed||!token||!state.snapshotId)return;

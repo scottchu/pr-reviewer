@@ -1,3 +1,4 @@
+import {localOwnerSession} from './local-access.ts';
 import {z} from 'zod';
 import {anchorSchema,commandSchema,storyReferenceSchema,semanticAnchorSchema} from '../domain/public.ts';
 import type {Receipt} from '../domain/public.ts';
@@ -26,7 +27,7 @@ export type QuestionRecovery=Readonly<{state:'none'|'locked'|'quarantined'|'awai
 export type PrivateSession=ReturnType<typeof createPrivateSession>;
 export const encodedBytes=(text:string)=>new TextEncoder().encode(text).length;
 export const requestFingerprint=async(request:string)=>Array.from(new Uint8Array(await crypto.subtle.digest('SHA-256',new TextEncoder().encode(request))),value=>value.toString(16).padStart(2,'0')).join('');
-export const credentialScope=(origin:string,credential:string)=>{const bearer=credential.trim();return requestFingerprint(`pr-reviewer-credential-scope-v1\0${encodedBytes(origin)}:${origin}${encodedBytes(bearer)}:${bearer}`);};
+export const credentialScope=(origin:string,credential:string)=>{const bearer=credential.trim();if(bearer===localOwnerSession)return requestFingerprint(`pr-reviewer-local-owner-scope-v1\0${encodedBytes(origin)}:${origin}`);return requestFingerprint(`pr-reviewer-credential-scope-v1\0${encodedBytes(origin)}:${origin}${encodedBytes(bearer)}:${bearer}`);};
 export const parsePendingCommand=(record:PendingQuestion)=>{
  const command=commandSchema.parse(JSON.parse(record.request));
  if(command.type!=='AskQuestion'||command.reviewId!==record.reviewId)throw new Error('pending_quarantined');
