@@ -4,7 +4,7 @@
 
 **Date:** 2026-10-24
 
-**Status:** Revision3 packet independently READY; named 05A core dispatch and local candidate recorded in [05A checkpoint](checkpoint-05a.md). 05A core atbaac411 is independently READY. Named05B [dispatch/checkpoint](checkpoint-05b.md) produced correctedcdc0c7e with author engineering passed; independent recheck is pending, so05C is not yet unlocked.04 G14 remains CHANGES NEEDED and PR24 remains draft.
+**Status:** Revision3 packet independently READY; named 05A core dispatch and local candidate recorded in [05A checkpoint](checkpoint-05a.md). 05A core atbaac411 is independently READY. Named05B [dispatch/checkpoint](checkpoint-05b.md) produced correctedcdc0c7e, independently READY for bounded05B and its05C extension seam.05C requires its next named root dispatch and contract reconciliation before code.04 G14 remains CHANGES NEEDED and PR24 remains draft.
 
 **Parent:** [Slice05 plan](plan.md)
 
@@ -125,4 +125,4 @@ For06 return exact story/version/claim/source/reference identities, authorized r
 
 ## 05B corrected candidate reconciliation for the05C gate
 
-The [05B checkpoint](checkpoint-05b.md) pins exactcdc0c7e public controller/projection/clock/route contracts, all four89 independent P2 findings, corrected evidence and remaining seams. Root's narrow correction authority included `application/analysis.ts` shared same-key readiness and `ui/graph.tsx` explicit story file/hunk focus. The original89 report remains CHANGES NEEDED. Author strict/all-tests and14 affected actual Chrome journeys passed on the corrected clean candidate; independently READY is still required before05C consumes it. The checkpoint records actual legacy draft/manual-map ownership and missing public return-frame/draft/write-ahead APIs; predecessor code completion does not imply exploration/recovery readiness or whole05 acceptance.
+The [05B checkpoint](checkpoint-05b.md) pins exactcdc0c7e public controller/projection/clock/route contracts, all four89 independent P2 findings, corrected evidence and remaining seams. Root's narrow correction authority included `application/analysis.ts` shared same-key readiness and `ui/graph.tsx` explicit story file/hunk focus. The original89 report remains CHANGES NEEDED. Author strict/all-tests and14 affected actual Chrome journeys passed on the corrected clean candidate. Independent recheck now reports READY at exactcdc0c7e with all four P2 findings closed; the checkpoint pins its report/digest and separate independent checks.05C consumes that reviewed seam only after its root assignment and contract reconciliation. The checkpoint records actual legacy draft/manual-map ownership and missing public return-frame/draft/write-ahead APIs; predecessor code completion does not imply exploration/recovery readiness or whole05 acceptance.
