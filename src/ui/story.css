@@ -5,3 +5,7 @@
 @media(max-width:700px) and (pointer:coarse){.story-player>button{flex-basis:44px;min-width:44px;height:44px}.story-player select{min-height:44px}}
 
 .story-exploration-controls{display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin:12px 0}.story-exploration-controls>p{flex-basis:100%;margin:0}
+
+.story-question-anchors{margin:12px 0;font-size:13px;overflow-wrap:anywhere}.story-question-anchors p{margin:5px 0}.story-anchor-confirm{padding:12px;background:#f2f5f7;border:1px solid #c8d1d8}.story-anchor-confirm button{margin:6px 8px 0 0}.story-focus-ranges{font-size:12px;color:#59636d}.story-scope>details{padding:8px 0;border-top:1px solid #dde0e2}.story-scope li{margin:12px 0}.story-scope code{font-size:12px;overflow-wrap:anywhere}.story-content{margin:20px 0}.story-source-disclosure summary{font-size:14px}
+
+.story-heading>div:first-child{min-width:0}.story-surfaces{flex-shrink:0}.story-surfaces button{white-space:nowrap}

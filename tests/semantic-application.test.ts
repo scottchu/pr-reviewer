@@ -266,3 +266,14 @@ test('S09 source restore projects owned navigation without changing the exact au
   const explicit=bridge.openSource(anchor);assert.equal(bridge.getSnapshot().sourceNavigation,'inspect');f.calls[2]!.resolve({...anchor,corpusId:corpus.corpusId,content:'source'});await explicit;assert.equal(bridge.getSnapshot().sourceAnchor,anchor);
  }finally{f.restore();}
 });
+
+test('D3 relationship presentation names caller and callee without changing admitted edges or inferring order',async()=>{
+ const {semanticRelationshipProjection}=await import('../src/application/public.ts');
+ const node=(id:string)=>({id,name:`name-${id}`,kind:'function',role:'context',declaration:anchor,body:anchor});
+ const nodes=[node('a'),node('b')],edges=[{id:'a-b',caller:'a',callee:'b',sites:[]},{id:'b-a',caller:'b',callee:'a',sites:[]}];
+ const analysis={status:'analyzed',analysisId:'b'.repeat(64),nodes,edges,neighborhoods:[{nodeId:'a'}],unresolved:[]} as unknown as NonNullable<AnalysisView['analysis']>;
+ const projected=semanticRelationshipProjection(view('s',{analysis}),'a');
+ assert.deepEqual(projected.edges.map(item=>item.edge),edges);assert.equal(projected.edges[0]!.label,'name-a → name-b · static call');
+ assert.deepEqual(projected.nodes.find(item=>item.node.id==='a')!.incoming,['name-b']);assert.deepEqual(projected.nodes.find(item=>item.node.id==='a')!.outgoing,['name-b']);
+ assert.equal(semanticRelationshipProjection(null,'a').edges.length,0);
+});

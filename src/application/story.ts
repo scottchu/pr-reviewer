@@ -1,4 +1,4 @@
-import {validateAnchor,projectGraph} from '../domain/public.ts';
+import {validateAnchor,projectGraph,graphFiles} from '../domain/public.ts';
 import type {Anchor} from '../domain/public.ts';
 import type {PrivateSession,QuestionDraft,GraphFrames,StoryReturnFrame,PrivateStoryView} from './private-session.ts';
 import {createRegistry} from '../integration/registry.ts';
@@ -75,6 +75,27 @@ export const storyProjection=(state:StoryState):StoryProjection|null=>{
  const focus=item.step.focus,refs=focus.type==='sources'||focus.type==='semantic'?focus.sources:[];
  const key=focus.type==='sources'||focus.type==='structural'?focus.fileKey:undefined;
  return {chapter:item.chapter,step:item.step,claims:item.step.claimIds.flatMap(id=>{const claim=version.story.claims.find(claim=>claim.id===id);return claim?[claim]:[];}),index:cursor.index,total:steps.length,comparisonKey:key,graphFocus:key?{intentId:`${version.versionId}:${state.focusRevision}`,fileKey:key,...(focus.type==='structural'&&focus.hunkId?{hunkId:focus.hunkId}:{})}:undefined,sources:refs.map(ref=>excerpt(state,ref))};
+};
+export const storyPresentation=(state:StoryState)=>{
+ const projection=storyProjection(state),version=state.view?.version;if(!projection||!version)return null;
+ const shown=new Set(projection.claims.map(claim=>claim.id));
+ const chapter=projection.chapter,detailIds=[{label:'Why',id:chapter.why},{label:'What changes',id:chapter.what},{label:'How it works',id:chapter.how},{label:'Example input',id:chapter.example.input},{label:'Example before',id:chapter.example.before},{label:'Example after',id:chapter.example.after}];
+ const details=detailIds.flatMap(({label,id})=>{if(shown.has(id))return [];shown.add(id);const claim=version.story.claims.find(claim=>claim.id===id);return claim?[{label,claim}]:[];});
+ const files=state.snapshot?graphFiles(state.snapshot):[];
+ const rows=version.story.scope.map(account=>{const file=files.find(file=>file.key===account.fileKey);return {account,label:!file?'Retained file identity unavailable':file.oldPath&&file.newPath&&file.oldPath!==file.newPath?`${file.oldPath} → ${file.newPath}`:file.newPath??file.oldPath??'Metadata',status:file?.status??'unavailable'};});
+ const groups=[...version.story.chapters.map(chapter=>({id:`chapter:${chapter.id}`,title:chapter.title,meaning:version.story.claims.find(claim=>claim.id===chapter.what)??null,files:rows.filter(row=>row.account.type==='explained'&&row.account.chapterId===chapter.id)})),{id:'unexplained',title:'Unexplained',meaning:null,files:rows.filter(row=>row.account.type==='unexplained')}].filter(group=>group.files.length||group.id==='unexplained');
+ return {details,groups};
+};
+export type QuestionEvidenceIntent=Readonly<{kind:'ready';evidence:Extract<StoryReference,{type:'snapshot_source'}>;draft:QuestionDraft;anchor:Anchor;confirmationRequired:boolean;mismatch:boolean}>;
+export const questionEvidenceProjection=(state:StoryState):QuestionEvidenceIntent|Readonly<{kind:'blocked'|'unavailable';reason:string}>=>{
+ const draft=state.drafts.find(draft=>draft.id===state.activeDraftId),reference=state.evidence;
+ if(state.questionLocked)return {kind:'blocked',reason:'Reconcile the unresolved question before changing its anchor.'};
+ if(draft?.submitted)return {kind:'blocked',reason:'This draft was submitted. Start a new question explicitly before changing its anchor.'};
+ if(!state.authenticated||!draft||!state.snapshot||reference?.type!=='snapshot_source')return {kind:'unavailable',reason:'This evidence has no question-eligible retained snapshot range. Inspection leaves your question unchanged.'};
+ if(reference.anchor.snapshotId!==state.snapshotId||state.snapshot.snapshotId!==state.snapshotId)return {kind:'unavailable',reason:'Inspected evidence belongs to a different snapshot. Return to its review snapshot explicitly; this action cannot navigate or retarget across snapshots.'};
+ const source=state.snapshot.sources.find(source=>source.side===reference.anchor.side&&source.path===reference.anchor.path&&source.hash===reference.contentHash);
+ if(!source||!validateAnchor(state.snapshot.snapshotId,state.snapshot.sources,reference.anchor))return {kind:'unavailable',reason:'The exact retained snapshot evidence is unavailable. No question anchor has been substituted.'};
+ return {kind:'ready',evidence:reference,draft,anchor:reference.anchor,confirmationRequired:Boolean(draft.text.trim()),mismatch:JSON.stringify(draft.anchor)!==JSON.stringify(reference.anchor)};
 };
 const freeze=<T>(value:T):T=>{if(value&&typeof value==='object'&&!Object.isFrozen(value)){Object.freeze(value);for(const item of Object.values(value))freeze(item);}return value;};
 const empty=(reviewId:string):StoryState=>({reviewId,snapshotId:null,snapshot:null,view:null,context:null,cursor:null,focusRevision:0,mode:'paused',elapsedMs:0,surface:'flow',hidden:false,reducedMotion:false,authenticated:false,reading:false,contextReading:false,error:'',focusError:'',evidence:null,evidenceText:'',evidenceBusy:false,drafts:[],activeDraftId:'',returnFrame:null,maps:{structural:null,semantic:null},mapRestoreId:0,pageScroll:0,viewRecoveryMessage:'',questionLocked:false,semanticSources:{},position:{x:0,y:0},viewport:{width:1024,height:768},playerSize:{width:500,height:44}});
@@ -260,6 +281,13 @@ export const createStoryBridge=(reviewId:string,options:{clock?:StoryClock;seman
   setQuestionGuard:(locked:boolean)=>{if(locked)invalidatePrivateIntent();if(state.questionLocked!==locked)publish({...state,questionLocked:locked});},
   editDraft:(text:string)=>{invalidatePrivateIntent();assertEditable();const draft=activeDraft();if(!draft)return;if(draft.submitted){const next={...draft,id:crypto.randomUUID(),text,submitted:false};publish({...state,drafts:state.drafts.map(item=>item.id===draft.id?next:item),activeDraftId:next.id});}else replaceDraft({...draft,text});},
   selectSource:(anchor:Anchor,comparisonKey?:string)=>{invalidatePrivateIntent();assertEditable();const draft=activeDraft();if(!draft||!state.snapshot||!validateAnchor(state.snapshot.snapshotId,state.snapshot.sources,anchor))throw new Error('invalid_anchor');if(draft.text.trim()&&(JSON.stringify(anchor)!==JSON.stringify(draft.anchor)||comparisonKey!==draft.comparisonKey))throw new Error('draft_held: source selection is held while the active draft is nonempty');const {comparisonKey:old,...rest}=draft;replaceDraft({...rest,anchor:structuredClone(anchor),...(comparisonKey?{comparisonKey}:{})});intent({type:'pause',reason:'source'});},
+  adoptEvidence:(proposal:QuestionEvidenceIntent,confirmed=false)=>{
+   assertEditable();const current=questionEvidenceProjection(state);
+   if(current.kind!=='ready')throw new Error(current.reason);
+   if(JSON.stringify(current)!==JSON.stringify(proposal))throw new Error('evidence_question_superseded: inspect and confirm the current draft again');
+   if(current.confirmationRequired&&!confirmed)throw new Error('anchor_confirmation_required');
+   invalidatePrivateIntent();const {comparisonKey:old,...draft}=current.draft;replaceDraft({...draft,anchor:structuredClone(current.anchor)});intent({type:'pause',reason:'question'});
+  },
   setQuestionRange:(patch:Partial<Pick<Anchor,'side'|'startLine'|'endLine'>>)=>{invalidatePrivateIntent();assertEditable();const draft=activeDraft();if(!draft?.anchor)return;replaceDraft({...draft,anchor:{...draft.anchor,...patch}});intent({type:'pause',reason:'question'});},
   setParentQuestion:(parentQuestionId?:string)=>{invalidatePrivateIntent();assertCanNavigate();const draft=activeDraft();if(!draft)return;const {parentQuestionId:previous,...rest}=draft;replaceDraft({...rest,...(parentQuestionId?{parentQuestionId}:{})});},
   confirmDraft:(draftId:string)=>{publish({...state,drafts:state.drafts.map(draft=>draft.id===draftId?{...draft,text:'',submitted:true}:draft)});},

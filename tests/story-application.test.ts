@@ -103,3 +103,45 @@ for(const ending of ['edit','logout','dispose','new-source'] as const)test(`S12 
   reads[0]!.resolve(Response.json(source));await turn();if(ending==='new-source')assert.deepEqual(semantic.getSnapshot().sourceAnchor,newerAnchor);else assert.equal(semantic.getSnapshot().source,null);if(ending!=='logout')assert.equal(bridge.getSnapshot().returnFrame,frame);else assert.deepEqual(bridge.getSnapshot().drafts,[]);
  }finally{disconnect();bridge.logout();semantic.logout();globalThis.fetch=original;f.cleanup();}
 });
+
+// D1–D4: the authored account and explicit question intent stay application policy.
+test('D1/D2 presentation deduplicates exact claim IDs and resolves complete scope through retained file identity',async()=>{
+ const {storyPresentation}=await import('../src/application/public.ts');const f=storyFixture(),fetcher=deferredFetch(),bridge=createStoryBridge('r');try{
+ await load(f,fetcher,bridge,authored(f));const presentation=storyPresentation(bridge.getSnapshot())!;
+ assert.equal(presentation.details.filter(item=>item.claim.id==='what').length,0);
+ assert.equal(presentation.details.filter(item=>item.claim.id==='why').length,1);
+ assert.equal(presentation.groups.flatMap(group=>group.files).length,1);assert.equal(presentation.groups.at(-1)!.title,'Unexplained');assert.equal(presentation.groups.at(-1)!.files.length,0);
+ assert.equal(presentation.groups[0]!.files[0]!.label,'value.ts');
+ assert.equal(presentation.groups[0]!.files[0]!.account.fileKey,f.fileKey);
+ const state=bridge.getSnapshot(),version=state.view!.version!,story={...version.story,scope:[...version.story.scope,{type:'unexplained' as const,fileKey:'unknown-exact-id',reason:'Not authored'}]};
+ const unknown=storyPresentation({...state,view:{...state.view!,version:{...version,story}}})!.groups.at(-1)!;
+ assert.equal(unknown.title,'Unexplained');assert.equal(unknown.files[0]!.label,'Retained file identity unavailable');
+ const renamed={...f.snapshot,changedFiles:[{status:'renamed' as const,oldPath:'old.ts',newPath:'new.ts',dispositions:[]}]};
+ const renamedKey=JSON.stringify([0,'old.ts','new.ts']),renamedStory={...version.story,scope:version.story.scope.map(account=>({...account,fileKey:renamedKey}))};
+ const renamedGroup=storyPresentation({...state,snapshot:renamed,view:{...state.view!,version:{...version,story:renamedStory}}})!.groups[0]!;
+ assert.equal(renamedGroup.files[0]!.label,'old.ts → new.ts');assert.equal(renamedGroup.files[0]!.status,'renamed');assert.equal(renamedGroup.files.length,1);
+ }finally{bridge.logout();fetcher.restore();f.cleanup();}
+});
+test('D4 explicit evidence adoption previews mismatch, confirms nonempty draft, preserves parent and rejects stale/pending/submitted intents',async()=>{
+ const {questionEvidenceProjection}=await import('../src/application/public.ts');const f=storyFixture(),fetcher=deferredFetch(),bridge=createStoryBridge('r');try{
+ await load(f,fetcher,bridge,authored(f));bridge.setParentQuestion('parent');bridge.editDraft('Original preserved text');bridge.enterExploration();bridge.editDraft('Exploration retained text');
+ const frame=bridge.getSnapshot().returnFrame,original=bridge.getSnapshot().drafts.find(d=>d.id===frame!.originalDraftId);
+ await bridge.openEvidence(f.source);let ready=questionEvidenceProjection(bridge.getSnapshot());assert.equal(ready.kind,'ready');if(ready.kind!=='ready')throw new Error('ready required');
+ const first=ready;assert.equal(first.confirmationRequired,true);assert.throws(()=>bridge.adoptEvidence(first),/confirmation_required/);
+ bridge.editDraft('A newer exploration draft');assert.throws(()=>bridge.adoptEvidence(first,true),/superseded/);
+ ready=questionEvidenceProjection(bridge.getSnapshot());if(ready.kind!=='ready')throw new Error('ready required');bridge.adoptEvidence(ready,true);
+ assert.equal(bridge.activeDraft()!.text,'A newer exploration draft');assert.equal(bridge.activeDraft()!.parentQuestionId,'parent');assert.deepEqual(bridge.getSnapshot().returnFrame,frame);assert.deepEqual(bridge.getSnapshot().drafts.find(d=>d.id===original!.id),original);
+ bridge.setQuestionGuard(true);assert.equal(questionEvidenceProjection(bridge.getSnapshot()).kind,'blocked');assert.throws(()=>bridge.adoptEvidence(ready,true),/submission_pending/);bridge.setQuestionGuard(false);
+ bridge.confirmDraft(bridge.activeDraft()!.id);assert.equal(questionEvidenceProjection(bridge.getSnapshot()).kind,'blocked');
+ }finally{bridge.logout();fetcher.restore();f.cleanup();}
+});
+test('D4 malformed, unmapped semantic, stale hash and unavailable snapshot evidence never become question anchors',async()=>{
+ const {questionEvidenceProjection}=await import('../src/application/public.ts');const f=storyFixture(),fetcher=deferredFetch(),bridge=createStoryBridge('r');try{
+ await load(f,fetcher,bridge,authored(f));await bridge.openEvidence({...f.source,contentHash:'f'.repeat(64)});assert.equal(questionEvidenceProjection(bridge.getSnapshot()).kind,'unavailable');
+ const state=bridge.getSnapshot(),semantic={type:'semantic_source' as const,corpusId:'c'.repeat(64),anchor:{snapshotId:'snapshot',side:'head' as const,path:'value.ts',contentHash:f.source.contentHash,start:0,end:10,startLine:1,endLine:1}};
+ assert.equal(questionEvidenceProjection({...state,evidence:semantic}).kind,'unavailable');
+ assert.equal(questionEvidenceProjection({...state,snapshotId:'different-active-snapshot',evidence:f.source}).kind,'unavailable');
+ assert.equal(questionEvidenceProjection({...state,evidence:{...f.source,anchor:{...f.source.anchor,snapshotId:'historical-source'}}}).kind,'unavailable');
+ assert.equal(questionEvidenceProjection({...state,evidence:{...f.source,anchor:{...f.source.anchor,endLine:999}}}).kind,'unavailable');
+ }finally{bridge.logout();fetcher.restore();f.cleanup();}
+});
