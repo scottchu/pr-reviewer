@@ -4,7 +4,7 @@
 
 **Packet revision:** 1
 
-**Status:** Implementation-ready; bounded filesystem module only
+**Status:** Implemented and focused-tested; independent review pending; bounded filesystem module only
 
 **Parent:** [Slice 03 integration](integration.md), acceptance I08/I09
 
@@ -48,4 +48,46 @@ Run focused Node 24 tests and scoped strict TypeScript with existing declaration
 
 ## Evidence
 
-Pending implementation.
+Recorded below.
+
+## Implemented checkpoint and evidence
+
+**Status:** Implemented and focused-tested; independent filesystem review pending
+
+**Docs-first source:** `eff910b478b5226a57fa0dc16914d2829ea2fb03`
+
+**Runtime:** Node `24.21.0`, Darwin, current UID `501`; installed O_NOFOLLOW/O_NONBLOCK/O_DIRECTORY flags are available. Same-directory no-clobber link publication and directory fsync succeeded on actual disposable local directories. No reboot, power-loss or hostile same-UID namespace-isolation experiment is claimed.
+
+**Public API:** `src/import-artifacts/public.ts` exports `createImportArtifacts`, `MAX_IMPORT_ARTIFACT_BYTES`, `isImportArtifactError`, `ArtifactReference`, `ImportArtifacts` and typed error values. The constructor returns write/read functions as specified above. Errors are sanitized `ImportArtifactError` values with a fixed code; they do not include source/private paths or raw filesystem diagnostics. Read returns unknown JSON only. Owner registration and source-preparation validation/witness authority remain outside this module.
+
+The module validates canonical existing private root and each mapped parent, holds directory descriptors and checks identities around operations. Created directories are 0700 and files 0600; preexisting unsafe modes are rejected without modification. Final names derive only from validated UUID IDs. File reads reject special files, symlinks and hard-linked aliases before content is consumed. One descriptor supplies bounded bytes, stat stability, length, digest and content checks. The wrapper binding must match the strict reference and owner's expected job/invocation. Writer values must be actual JSON data; accessor/custom serialization/cyclic/non-JSON values reject before filesystem effects instead of silently changing the value.
+
+Ordinary prepublication failure removes only the confirmed owned temp file. After a final link has appeared, a later failure returns publication_unknown and leaves the final file for owner reconciliation; no final artifact is deleted automatically. A crashed temp name is not accepted by the final-ID mapping. Files existing on disk still create no job receipt, acquisition witness or source admission.
+
+### Actual checks
+
+The initial four tests failed with ERR_MODULE_NOT_FOUND before implementation. Final focused command:
+
+```sh
+/Applications/ChatGPT.app/Contents/Resources/cua_node/bin/node --experimental-strip-types --test tests/import-artifacts.test.ts
+```
+
+**Observed:** 13 tests passed, 0 failed. Actual temporary filesystem fixtures cover exact value/ref/digest roundtrip through a new port instance; private modes; unsafe existing root/parent rejection without chmod; traversal/absolute/foreign IDs and extra reference fields; symlink file/parent/root, directory-as-file and hardlink rejection; length/digest/envelope-binding mismatch; strict invalid UTF-8/JSON; partial temp invisibility; eight concurrent complete publications; a final-name creation race preserving existing bytes; read-time byte-identical inode replacement rejection; prepublication fsync failure leaving no final; and postpublication directory fsync failure retaining the complete final while reporting unknown.
+
+Collision/replacement/fsync tests schedule controlled faults through the real Node FileHandle prototype in the isolated test process, restoring it afterward. They still perform actual file/link/rename/read operations; they establish those tested ordering cases, not universal adversarial race prevention. Foreign-UID ownership validation is implemented through actual stat UID checks, but no privileged chown or foreign-user fixture was attempted.
+
+The exact 16777216-byte encoded envelope was written/read successfully. A result whose complete envelope was exactly one byte larger rejected as too_large without truncation. A value containing 5 MiB of quote characters encoded above the independent 8 MiB public command cap and below 16 MiB, roundtripped through the artifact. This is artifact-only I08 evidence; actual admission via a registered reference remains the shared integration owner's check. Lowered read caps reject oversized references before reading; raised configuration rejects.
+
+Scoped strict TypeScript passed without package/lock/test-script changes:
+
+```sh
+/Applications/ChatGPT.app/Contents/Resources/cua_node/bin/node /tmp/pr-reviewer-02-graph-history/node_modules/typescript/bin/tsc --ignoreConfig --noEmit --strict --noUncheckedIndexedAccess --exactOptionalPropertyTypes --target ES2023 --module NodeNext --moduleResolution NodeNext --allowImportingTsExtensions --skipLibCheck --types node --typeRoots /tmp/pr-reviewer-02-graph-history/node_modules/@types src/import-artifacts/public.ts src/import-artifacts/storage.ts tests/import-artifacts.test.ts
+```
+
+Only Node built-ins and the subsystem's public types are imported. Shared owner must register `import-artifacts: []` in boundary rules, add the focused test to the normal test command and integrate the public artifact port outside admission transactions. No shared module or runtime is changed by this branch.
+
+### Durable knowledge contribution and recovery
+
+Shared owner has the exact envelope/digest/cap recipe and accepted single-owner/private-root/public-Node-API limits. Promote the tested public meanings, no-clobber publication, same-descriptor verification, failure/unknown semantics, reference-versus-witness distinction and restart/content-identity limits into import-jobs.md before accepting slice03. The worker's source scope deliberately excludes that shared product file.
+
+Retain the clean new task worktree/branch for root's independent review and later integration. All owned test fixtures and file handles are removed/closed in finally; no raw source/credential log or pilot data was written. The older acquisition/context worktree remains untouched. Full I08 registered-reference admission, I09 application authorization, durable jobs/process restart/re-verification, React journey and own-PR graph critique remain open integration gates.
