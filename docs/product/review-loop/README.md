@@ -44,3 +44,6 @@ The bounded continuation/graph implementation and future import boundary are dis
 A saved anchored question produces one correctly attributed persisted answer from the exact attached session via MCP, visible through the app read model. Identical command retries do not duplicate state; altered payload reuse, invalid anchors and stale/revoked attachment generations reject without partial writes. Agent MCP calls progress during its own turn. Unknown notification outcomes never trigger blind redispatch. Tests cover these behaviors plus keyboard interaction, React controls following the design guidelines and principles and own-PR use. An unfamiliar-reviewer evaluation remains separate evidence; no engineering result is labeled human comprehension.
 
 The [slice plan](../../plans/480p/slices/01-review-loop/plan.md) sequences delivery and records 01-A through 01-G results. Its checklist is not a substitute for this maintained product specification. Learning and detailed interface changes return here before slice acceptance.
+
+
+The merged/manual runtime baseline and the isolated slice03 import candidate are distinct. The candidate now implements repository-path import; its exact operations, limits, persisted recovery and pending acceptance are maintained in [durable import jobs](import-jobs.md). No unrun live-provider/native/human or whole-round gate is implied.
