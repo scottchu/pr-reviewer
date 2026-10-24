@@ -6,6 +6,8 @@
 
 **Packet:** `a9b8334a94e8dcb87b90fa69f64e791031587ec2`
 
+**Verified implementation candidate:** `fa4b92a8ddbc9fa24139ef690cc2694e08571f81`. The subsequent evidence-only commit records this immutable source identity; it does not change analyzer/test/package content.
+
 **Executor scope:** `src/source-analysis/**`, `tests/source-analysis.test.ts`, slice 04 records and durable source-analysis specification; serialized `package.json` / `bun.lock` ownership for the exact runtime alias only. No integration, publication, deployment or live-client work.
 
 **Workspace:** `/tmp/pr-reviewer-source-analysis`, branch `analyze-pinned-typescript-neighborhoods`. Clean starting identity was the packet commit; primary main remained clean at `cd8715ad2f848c444f952919ce019e7b1e913538`. No task-owned runtime records were present before writes. Other worktrees and local services are outside scope.
