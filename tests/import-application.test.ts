@@ -19,6 +19,13 @@ const hold=()=>{
  const entered=deferred<void>(),released=deferred<void>();
  return {entered:entered.promise,release:()=>released.resolve(),wait:async()=>{entered.resolve();await released.promise;}};
 };
+const waitForView=async(bridge:ReturnType<typeof createImportsBridge>,ready:()=>boolean)=>{
+ if(ready())return;
+ await new Promise<void>((resolve,reject)=>{
+  const timer=setTimeout(()=>{unsubscribe();reject(new Error('view_timeout'));},3000);
+  const unsubscribe=bridge.subscribe(()=>{if(ready()){clearTimeout(timer);unsubscribe();resolve();}});
+ });
+};
 type ResponseHook=(path:string,init:RequestInit|undefined,response:Response)=>Promise<Response>;
 
 // Real gateway reads reproduce the reported bug. The command-only HTTP fixture
@@ -60,7 +67,7 @@ const fixture=async()=>{
  }};
 };
 
-test('late old-credential gateway GET cannot overwrite the new credential view',async()=>{
+test('late old-credential gateway GET cannot overwrite the new credential view',{timeout:10_000},async()=>{
  const f=await fixture(),gate=hold();
  try{
   const old=f.store.issueUser(),current=f.store.issueUser();
@@ -73,7 +80,7 @@ test('late old-credential gateway GET cannot overwrite the new credential view',
  }finally{gate.release();await f.close();}
 });
 
-test('explicit same-token login resets the view and stale read errors cannot publish after it or logout',async()=>{
+test('explicit same-token login resets the view and stale read errors cannot publish after it or logout',{timeout:10_000},async()=>{
  const f=await fixture(),gate=hold();
  try{
   const token=f.store.issueUser();f.seed(token,'/first');await f.bridge.login(token);
@@ -89,7 +96,7 @@ test('explicit same-token login resets the view and stale read errors cannot pub
  }finally{gate.release();await f.close();}
 });
 
-for(const outcome of ['receipt','error','definitive'] as const)test(`late old command ${outcome} cannot release a new credential command or retain its old retry`,async()=>{
+for(const outcome of ['receipt','error','definitive'] as const)test(`late old command ${outcome} cannot release a new credential command or retain its old retry`,{timeout:10_000},async()=>{
  const f=await fixture(),oldGate=hold(),newGate=hold();
  try{
   const old=f.store.issueUser(),current=f.store.issueUser();await f.bridge.login(old);
@@ -114,7 +121,7 @@ for(const outcome of ['receipt','error','definitive'] as const)test(`late old co
  }finally{oldGate.release();newGate.release();await f.close();}
 });
 
-test('disposal fences a pending GET; reconnect rereads and an old disposer cannot tear it down',async()=>{
+test('disposal fences a pending GET; reconnect rereads and an old disposer cannot tear it down',{timeout:10_000},async()=>{
  const f=await fixture(),gate=hold();let dispose:(()=>void)|undefined;
  try{
   const token=f.store.issueUser(),job=f.seed(token,'/before');
@@ -125,14 +132,14 @@ test('disposal fences a pending GET; reconnect rereads and an old disposer canno
   assert.equal(f.bridge.getSnapshot(),snapshot,'disposed reads do not publish even when transport finishes');
   f.seed(token,'/after');dispose=f.bridge.connect();first();
   assert.equal(f.bridge.diagnostics().length,1);
-  await delay(650);
+  await waitForView(f.bridge,()=>f.bridge.getSnapshot().jobs.length===2);
   assert.equal(f.bridge.getSnapshot().jobs.length,2);assert.ok(f.bridge.getSnapshot().jobs.some(item=>item.jobId===job));
   assert.equal(f.bridge.getSnapshot().authenticated,true);
   assert.throws(()=>f.bridge.connect(),/duplicate_route/);
  }finally{dispose?.();gate.release();await f.close();}
 });
 
-test('disposed command cannot publish; reconnect reads its server commit and explicit retry retains identity',async()=>{
+test('disposed command cannot publish; reconnect reads its server commit and explicit retry retains identity',{timeout:10_000},async()=>{
  const f=await fixture(),gate=hold();let dispose:(()=>void)|undefined;
  try{
   const token=f.store.issueUser();await f.bridge.login(token);const first=f.bridge.connect();
@@ -141,14 +148,14 @@ test('disposed command cannot publish; reconnect reads its server commit and exp
   assert.equal(f.bridge.getSnapshot().busy,false);assert.equal(f.bridge.getSnapshot().uncertain,true);
   const snapshot=f.bridge.getSnapshot();gate.release();await sent;
   assert.equal(f.bridge.getSnapshot(),snapshot);
-  dispose=f.bridge.connect();await delay(650);
+  dispose=f.bridge.connect();await waitForView(f.bridge,()=>f.bridge.getSnapshot().jobs[0]?.path==='/committed-while-disposed');
   assert.equal(f.bridge.getSnapshot().jobs[0]?.path,'/committed-while-disposed');assert.equal(f.commands.length,1,'reconnect does not replay');
   await f.bridge.retry();assert.equal(f.commands.length,2);assert.equal(f.commands[0]?.command.commandId,f.commands[1]?.command.commandId);
   assert.equal(f.bridge.getSnapshot().uncertain,false);assert.equal(f.store.imports.list(token).length,1);
  }finally{dispose?.();gate.release();await f.close();}
 });
 
-test('polling cannot replace a slow explicit login read',async()=>{
+test('polling cannot replace a slow explicit login read',{timeout:10_000},async()=>{
  const f=await fixture(),gate=hold();let dispose:(()=>void)|undefined;
  try{
   const token=f.store.issueUser();f.seed(token,'/current');
@@ -159,7 +166,7 @@ test('polling cannot replace a slow explicit login read',async()=>{
  }finally{dispose?.();gate.release();await f.close();}
 });
 
-test('an older same-credential poll cannot rewind a command readback',async()=>{
+test('an older same-credential poll cannot rewind a command readback',{timeout:10_000},async()=>{
  const f=await fixture(),gate=hold();let dispose:(()=>void)|undefined;
  try{
   const token=f.store.issueUser();await f.bridge.login(token);dispose=f.bridge.connect();
@@ -169,7 +176,7 @@ test('an older same-credential poll cannot rewind a command readback',async()=>{
  }finally{dispose?.();gate.release();await f.close();}
 });
 
-test('current unknown retry uses one exact command; changed intent is blocked and relogin resets recovery',async()=>{
+test('current unknown retry uses one exact command; changed intent is blocked and relogin resets recovery',{timeout:10_000},async()=>{
  const f=await fixture();
  try{
   const token=f.store.issueUser();await f.bridge.login(token);
@@ -183,7 +190,7 @@ test('current unknown retry uses one exact command; changed intent is blocked an
  }finally{await f.close();}
 });
 
-test('definitive HTTP and domain rejections release pending intent for a corrected command',async()=>{
+test('definitive HTTP and domain rejections release pending intent for a corrected command',{timeout:10_000},async()=>{
  const f=await fixture();
  try{
   const token=f.store.issueUser();await f.bridge.login(token);
@@ -193,4 +200,55 @@ test('definitive HTTP and domain rejections release pending intent for a correct
   await assert.rejects(f.bridge.send({type:'CancelImport',jobId:crypto.randomUUID()}));assert.equal(f.bridge.getSnapshot().uncertain,false);
   await f.bridge.importFrom('/normal');assert.equal(f.bridge.getSnapshot().busy,false);assert.equal(f.bridge.getSnapshot().error,'');
  }finally{await f.close();}
+});
+
+test('late definitive old command failure cannot clear a newer unknown retry',{timeout:10_000},async()=>{
+ const f=await fixture(),gate=hold();
+ try{
+  const old=f.store.issueUser(),current=f.store.issueUser();await f.bridge.login(old);
+  let loseNew=true;
+  f.setHook(async(_path,init,response)=>{
+   if(init?.method!=='POST')return response;
+   if((init.headers as Record<string,string>).Authorization===`Bearer ${old}`){await gate.wait();return Response.json({error:'old_unauthorized'},{status:401});}
+   if(loseNew){loseNew=false;throw new Error('new_lost_ack');}return response;
+  });
+  const previous=f.bridge.importFrom('/old').catch(error=>error);await gate.entered;
+  await f.bridge.login(current);await assert.rejects(f.bridge.importFrom('/new'),/new_lost_ack/);
+  const snapshot=f.bridge.getSnapshot();gate.release();await previous;
+  assert.equal(f.bridge.getSnapshot(),snapshot);assert.equal(snapshot.uncertain,true);assert.equal(snapshot.error,'new_lost_ack');
+  await assert.rejects(f.bridge.importFrom('/different'),/import_submission_unknown/);
+  await f.bridge.retry();assert.equal(f.commands[1]?.command.commandId,f.commands[2]?.command.commandId);
+  assert.equal(f.store.imports.list(current).length,1);
+ }finally{gate.release();await f.close();}
+});
+
+test('same-credential reconnect retry owns busy and recovery independently from its original command',{timeout:10_000},async()=>{
+ const f=await fixture(),oldGate=hold(),retryGate=hold();let dispose:(()=>void)|undefined;
+ try{
+  const token=f.store.issueUser();await f.bridge.login(token);const first=f.bridge.connect();let posts=0;
+  f.setHook(async(_path,init,response)=>{
+   if(init?.method==='POST'){
+    const ordinal=++posts;if(ordinal===1)await oldGate.wait();
+    if(ordinal===2){await retryGate.wait();throw new Error('retry_lost_ack');}
+   }return response;
+  });
+  const original=f.bridge.importFrom('/one-intent');await oldGate.entered;first();dispose=f.bridge.connect();
+  const retry=f.bridge.retry().catch(error=>error);await retryGate.entered;
+  oldGate.release();await original;
+  assert.equal(f.bridge.getSnapshot().busy,true);assert.equal(f.bridge.getSnapshot().uncertain,true);
+  retryGate.release();assert.match(String(await retry),/retry_lost_ack/);assert.equal(f.bridge.getSnapshot().uncertain,true);
+  await f.bridge.retry();assert.equal(new Set(f.commands.map(item=>item.command.commandId)).size,1);
+  assert.equal(f.store.imports.list(token).length,1);assert.equal(f.bridge.getSnapshot().busy,false);
+ }finally{dispose?.();oldGate.release();retryGate.release();await f.close();}
+});
+
+test('a disposed read stays fenced after reconnect has published a newer same-token projection',{timeout:10_000},async()=>{
+ const f=await fixture(),gate=hold();let dispose:(()=>void)|undefined;
+ try{
+  const token=f.store.issueUser();f.seed(token,'/before');const first=f.bridge.connect();let once=true;
+  f.setHook(async(_path,_init,response)=>{if(once){once=false;await gate.wait();}return response;});
+  const original=f.bridge.login(token);await gate.entered;first();f.seed(token,'/after');
+  dispose=f.bridge.connect();await waitForView(f.bridge,()=>f.bridge.getSnapshot().jobs.length===2);assert.equal(f.bridge.getSnapshot().jobs.length,2);
+  gate.release();await original;assert.equal(f.bridge.getSnapshot().jobs.length,2);
+ }finally{dispose?.();gate.release();await f.close();}
 });
