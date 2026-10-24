@@ -8,7 +8,7 @@ Rebuilding the current product includes opening a copy of its supported earlier 
 
 ## SQLite aggregate formats
 
-The delivered files use SQLite user_version 0 with JSON text records; there is no numeric application schema discriminator. The following physical tables and column names are compatibility facts. Keys and values are text; JSON bodies use the member names below. Extra retained JSON members survive an additive migration and are not automatically interpreted as new authority.
+The delivered files use SQLite user_version 0 with JSON text records; there is no numeric application schema discriminator. The following physical tables and column names are compatibility facts. Identity keys and JSON bodies are text; added revision/byte columns described below are integers. JSON bodies use the member names below. Extra retained JSON members survive an additive migration and are not automatically interpreted as new authority.
 
 | Table / key | Other columns and meaning |
 |---|---|
@@ -109,3 +109,44 @@ Normative data vectors (origin `docs/a.md`, same-side target `docs/b.md` text `#
 | Target heading `# Foo  Bar!`, requested fragment foo--bar | Matches that heading's exact line; fragment foo-bar does not match. |
 
 All successful target anchors retain the origin's source side and the final immutable snapshot ID. Identity construction substitutes pending only in snapshotId members, as defined above. These vectors specify compatibility behavior; they do not claim richer Markdown/semantic analysis or an actual provider operation.
+
+
+## Story table compatibility
+
+These additive tables share the existing SQLite connection and `reviews.id` membership. Create missing tables without resetting earlier review/semantic/import data; user_version remains0. Column order is part of supported physical compatibility because delivered inserts use it. All listed non-ID columns are required; authoritative IDs are nonempty. The JSON bodies and IDs remain immutable except the small head pointer/counter body.
+
+| Table | Columns in physical order | Keys and membership |
+|---|---|---|
+| story_heads | review_id, snapshot_id, body | Primary key (review_id,snapshot_id); review_id references reviews.id. |
+| story_captures | id, review_id, snapshot_id, body, bytes | Primary key id (captureId); review_id references reviews.id. |
+| story_contexts | review_id, snapshot_id, revision, body, bytes | Primary key (review_id,snapshot_id,revision); review_id references reviews.id. |
+| story_versions | id, review_id, snapshot_id, revision, body, bytes | Primary key id (versionId), unique (review_id,snapshot_id,revision); review_id references reviews.id. |
+| story_receipts | id, actor, fingerprint, body | Primary key id (commandId). actor is authenticated actorId; fingerprint binds the full principal and command. |
+
+`revision` and `bytes` are integers. `bytes` is the UTF-8 length of the exact compact canonical JSON body, without a newline; it is not source text length, character count or digest length. Bodies recursively sort object member names, preserve array order and exact text, and omit absent optional members. No numeric schema discriminator is stored inside these story rows.
+
+| Body | Complete member/absence meaning |
+|---|---|
+| Head | storyRevision, contextRevision, currentVersionId, seriesAuthor. Both counters are nonnegative integers. currentVersionId is a string or explicit null; seriesAuthor is the initial full user/agent principal or explicit null. Missing head means both revisions0 and both nullable members null. |
+| Capture | captureId, kind (Epic/Ticket/PR), title, text, actorId, createdAt, contentHash, freshness; optional originUrl and supersedesCaptureId are absent when not supplied. contentHash is lowercase SHA-256 of exact capture text UTF-8. freshness is captured with an origin URL, otherwise unknown. createdAt is server-issued UTC ISO text. |
+| Context | Exactly captureIds, an ordered unique array of retained IDs from this review/snapshot. Revision0 implicitly means an empty array and requires no row. A later explicit empty selection has its own positive revision/row. |
+| Version | reviewId, snapshotId, versionId, storyRevision, contextRevision, contentHash, author, createdAt, previousVersionId, story. previousVersionId is explicit null for the first version, otherwise the preceding current ID. story is the complete strict authored value in the [story contract](story-and-exploration.md#immutable-story-and-context-values); optional questionId and paired analysisId/corpusId remain absent when unused. contentHash covers canonical story payload only, not server metadata. |
+| Story receipt | commandId, actorId, state (applied/rejected), reviewId, snapshotId, storyRevision, contextRevision, result; error is absent on success and supplied on rejection. result always exists: captureId for context create, versionId for publication, or an empty object for context selection/rejection. It is not a legacy review revision/cursor receipt. |
+
+A user author is exactly kind=user and actorId. An agent author also retains reviewId, attachmentId and generation with kind=agent. Preserve the full principal in version.author and head.seriesAuthor; do not rebuild agent authority from actorId alone. The first successful publication establishes seriesAuthor, which stays unchanged when a user appends a correction. Current-version author may differ from seriesAuthor; ownership transfer is not implicit.
+
+Body quota sums bytes once for every immutable capture/context/version across the entire review, including old revisions, up to8MiB (owner tests may lower only). Heads and receipts are excluded; implicit context0 consumes no quota. Context create charges the new capture plus new selection body; select charges its new selection body; publish charges its full version body. Exact quota passes. One byte over rejects atomically, preserving bodies/pointers and recording only the authorized rejected receipt. Pre-dispatch schema/authorization errors and ID collisions do not overwrite another receipt namespace.
+
+Compact normative row/retry vectors (opaque sample IDs are fixed data, not an ID-generation algorithm):
+
+| Starting records and action | Required retained result |
+|---|---|
+| No rows for review R / snapshot S | Query is storyRevision0, contextRevision0, currentVersionId null, seriesAuthor null; context0 is captureIds empty, with no required physical row. |
+| User U creates capture C1 under expected context0 | Head body is `{"contextRevision":1,"currentVersionId":null,"seriesAuthor":null,"storyRevision":0}`. Capture row C1 and context row (R,S,1) exist; the latter body is `{"captureIds":["C1"]}`. Story revision remains0. |
+| Select empty captures under expected context1 | Append context row (R,S,2), body `{"captureIds":[]}`; preserve C1/context1. Head contextRevision2; other head members unchanged. |
+| Publish version V1 by U at story0/context2 | Append version row V1 / revision1 with previousVersionId null. Head is contextRevision2/currentVersionId V1/seriesAuthor `{"actorId":"U","kind":"user"}`/storyRevision1. Persist its receipt Q1 and full principal+command fingerprint atomically. |
+| Exact authorized retry Q1 after another context revision | Return the identical original receipt/version IDs and original revision values. No second body, quota charge, publication or notification. Fresh authorization and series ownership still apply before replay. |
+| Reuse Q1 with another payload/principal, or collide with a legacy/import/analysis receipt ID | command_conflict; no second value or overwritten original receipt. Revoked/unauthorized principals cannot obtain replay merely by knowing Q1. |
+| Close/reopen a copy of this store | Preserve C1, both context rows, V1, Q1, counters/nullability/author attribution and all earlier review data. Do not synthesize a different source, author, pointer or receipt. |
+
+For a capture whose exact text is `why`, contentHash is `2be23c585f15e5fd3279d0663036dd9f6e634f4225ef326fc83fb874dbb81a0f`, independent of title/origin/time; those metadata still contribute to its canonical body bytes/quota. These vectors specify format compatibility. Same-code reopen tests are engineering evidence, not independent cross-implementation compatibility acceptance.

@@ -2,7 +2,7 @@
 
 **Direction:** Accepted first 480p product behavior
 
-**Implementation:** Merged bounded review/history/import runtime; reviewed semantic task candidate; story/exploration specified but not implemented. Native-host and human acceptance remain separate.
+**Implementation:** Merged bounded review/history/import runtime and implemented semantic/story/exploration/private-recovery candidate. Final combined own-PR comprehension, meaningful answer, knowledge audit and full-round acceptance remain open; native-host and human evidence are separate.
 
 **Architecture:** [Subsystem responsibilities](../architecture.md)
 
@@ -10,7 +10,7 @@
 
 As a reviewer, I open one pinned before/after source change in our own real PR, select a source span, ask its responsible agent a question, and inspect the agent's persisted source-backed answer. I can distinguish the source, author, delivery state and uncertainty behind that answer. The existing Codex or Claude session initiating attachment is the responsible session; the app does not replace it.
 
-The default bootstrap uses PR 14 with immutable identity and teaching scope defined in [runtime knowledge](runtime.md#bootstrap-target-and-source-bounds). Its documentation claim is a valid first bounded source question, not evidence of executable code behavior. Source is manually prepared from immutable Git objects; read-only structural graphs and immutable continuation/history have bounded local implementations. The merged bounded runtime includes repository-path discovery and [durable import jobs](import-jobs.md). The reviewed semantic candidate provides [bounded neighborhoods](semantic-graph.md), [retained semantic state](semantic-storage.md) and [protocol values](semantic-data.md). [Guided explanations and exploration](story-and-exploration.md) specifies the next authored-account/player/recovery behavior; it is not implemented by the static graph.
+The default bootstrap uses PR 14 with immutable identity and teaching scope defined in [runtime knowledge](runtime.md#bootstrap-target-and-source-bounds). Its documentation claim is a valid first bounded source question, not evidence of executable code behavior. Source is manually prepared from immutable Git objects; read-only structural graphs and immutable continuation/history have bounded local implementations. The merged bounded runtime includes repository-path discovery and [durable import jobs](import-jobs.md). The reviewed semantic candidate provides [bounded neighborhoods](semantic-graph.md), [retained semantic state](semantic-storage.md) and [protocol values](semantic-data.md). [Guided explanations and exploration](story-and-exploration.md) maintains the implemented authored-account/player, supporting-source investigation, exact resume and explicit private recovery contract. Static edges remain a separate factual basis, not the authored explanation.
 
 ## Interaction
 
@@ -37,7 +37,7 @@ The bounded continuation/graph implementation and source/import boundaries are d
 
 ## Public interfaces and ownership
 
-[Contracts](contracts.md) define IDs, data, commands, MCP and error semantics. [Delivery](delivery.md) defines CLI notification and recovery. [Local runtime](runtime.md) defines operational setup and evidence limits. [Presentation](presentation.md) defines React UI and design-guideline conformance. UI owns local selection and draft; domain owns validation and durable review state; command processing owns atomic receipts/events; delivery owns CLI effects; the MCP adapter validates credentials and delegates domain operations. Managed integration routes own subscriptions and teardown. No adapter writes around ingress.
+[Contracts](contracts.md) define IDs, data, commands, MCP and error semantics. [Delivery](delivery.md) defines CLI notification and recovery. [Local runtime](runtime.md) defines operational setup and evidence limits. [Presentation](presentation.md) defines React UI and design-guideline conformance. One StoryBridge application owner holds player/cursor, source/comparison selection, original/exploration drafts and the return frame. ReviewBridge owns exact pending-question write-ahead/receipt/readback coordination; AnalysisBridge owns admitted semantic selection and exact source reads. The workspace composes their public operations and managed routes, including draft confirmation and map capture. React renders snapshots, collects intent and retains only local presentation/form mechanics; it does not own source/draft policy. Domain owns validation and durable review state; command processing owns atomic receipts/events; delivery owns CLI effects; the MCP adapter validates credentials and delegates domain operations. Managed integration routes own subscriptions and teardown. No adapter writes around ingress.
 
 ## Observable acceptance
 
@@ -46,4 +46,4 @@ A saved anchored question produces one correctly attributed persisted answer fro
 The [slice plan](../../plans/480p/slices/01-review-loop/plan.md) sequences delivery and records 01-A through 01-G results. Its checklist is not a substitute for this maintained product specification. Learning and detailed interface changes return here before slice acceptance.
 
 
-Repository-path import operations, limits and persisted recovery are maintained in [durable import jobs](import-jobs.md). Static neighborhoods establish supported source relationships and honest coverage, not the user/lifecycle narrative or complete understanding. The accepted next explanation/exploration contract keeps authored rationale, static facts and observed execution distinct. No unrun live-provider/native/human or whole-round gate is implied.
+Repository-path import operations, limits and persisted recovery are maintained in [durable import jobs](import-jobs.md). Static neighborhoods establish supported source relationships and honest coverage, not the user/lifecycle narrative or complete understanding. The current explanation/exploration contract keeps authored rationale, static facts and observed execution distinct. No unrun live-provider/native/human or whole-round gate is implied.

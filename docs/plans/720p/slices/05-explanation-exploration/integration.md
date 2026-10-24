@@ -4,7 +4,7 @@
 
 **Date:** 2026-10-24
 
-**Status:** Revision3 packet independently READY; named 05A core dispatch and local candidate recorded in [05A checkpoint](checkpoint-05a.md). 05A core atbaac411 is independently READY. Named05B [dispatch/checkpoint](checkpoint-05b.md) produced correctedcdc0c7e, independently READY for bounded05B and its05C extension seam.05C is assigned in its [tracked checkpoint](checkpoint-05c.md); durable contracts and a stable engineering candidate are prepared for full-checkpoint independent review.04 G14 remains CHANGES NEEDED and PR24 remains draft.
+**Status:** Revision3 packet independently READY; named 05A core dispatch and local candidate recorded in [05A checkpoint](checkpoint-05a.md). 05A core atbaac411 is independently READY. Named05B [dispatch/checkpoint](checkpoint-05b.md) produced correctedcdc0c7e, independently READY for bounded05B and its05C extension seam.05C is implemented and independently READY for bounded engineering at5b6789f; its [tracked checkpoint](checkpoint-05c.md) separates code, later docs and remaining own-PR/knowledge gates.04 G14 remains CHANGES NEEDED and PR24 remains draft.
 
 **Parent:** [Slice05 plan](plan.md)
 
@@ -126,3 +126,12 @@ For06 return exact story/version/claim/source/reference identities, authorized r
 ## 05B corrected candidate reconciliation for the05C gate
 
 The [05B checkpoint](checkpoint-05b.md) pins exactcdc0c7e public controller/projection/clock/route contracts, all four89 independent P2 findings, corrected evidence and remaining seams. Root's narrow correction authority included `application/analysis.ts` shared same-key readiness and `ui/graph.tsx` explicit story file/hunk focus. The original89 report remains CHANGES NEEDED. Author strict/all-tests and14 affected actual Chrome journeys passed on the corrected clean candidate. Independent recheck now reports READY at exactcdc0c7e with all four P2 findings closed; the checkpoint pins its report/digest and separate independent checks.05C consumes that reviewed seam only after its root assignment and contract reconciliation. The checkpoint records actual legacy draft/manual-map ownership and missing public return-frame/draft/write-ahead APIs; predecessor code completion does not imply exploration/recovery readiness or whole05 acceptance.
+
+
+## Final05C engineering and actual-target handoff
+
+The final bounded engineering input is code `5b6789fe65e1782f7a3fd938713314bd2fd9bebb`, with independent READY report/digest and exact author results in [checkpoint05C](checkpoint-05c.md). Later docs-only source must retain that code identity. Delivered ports are the same StoryBridge player extended with drafts/return-frame/maps/scroll and staged resume; workspace-owned public navigation/path/ask/capture routes; ReviewBridge safe recovery/readSnapshot(signal?) and mandatory private write-ahead/readback; AnalysisBridge openSource(anchor,{intent?,signal?}) with operation-owned cancellation. Source POST reads remain distinct from durable commands; no backend, execution service or second controller is added.
+
+The original draft/comparison/parent guard remains; deliberate composer side/range edits are allowed before submission within the held comparison, while any unresolved command payload is immutable. Missing retained restore remains retryable, auxiliary/delegated reads cancel under their exact owners, and newer views cannot publish through old credential/intent ownership. Known tab-local/draft-size/native/visual limits remain explicit in durable knowledge.
+
+Before final operational preparation, root supplies the [prospective actualPR24 task and three-identity manifest](plan.md#predeclared-meaningful-task-before-presentation), assigns runtime/source-verifier/fresh blind reviewer roles and freezes the actual target/key. Preserve createGateway before/after plus unchanged consumer/static-neighbor-or-explicit-unknown, meaningful example/consequence, whole actual PR responsibility/scope and delivered story/workspace/recovery relevance. No answer-bearing key or source-preparation notes enter the blind packet. The author does not publish or start a final runtime. Full S13/S14/S15 and04 G14 remain open despite engineering READY.
