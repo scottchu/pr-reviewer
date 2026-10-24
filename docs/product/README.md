@@ -11,6 +11,7 @@ This is the durable product specification: what PR Reviewer does, why, and how i
 - [Static source analysis](review-loop/source-analysis.md): exact supported declarations, static facts and honest unknowns.
 - [Retained semantic neighborhoods](review-loop/semantic-graph.md): slice04 integration contract and independent source/graph identities.
 - [Guided explanation, exploration and private recovery](review-loop/story-and-exploration.md): current attributed story/context values, single application player/draft/frame owner, exact supporting-source return and explicit write-ahead question recovery.
+- [Configured head tests](review-loop/test-execution.md): proposed fixed-target execution, complete isolated source/environment, owned job/result/cancel/recovery contract; not yet implemented or execution-qualified.
 - [Persistence compatibility](review-loop/persistence-compatibility.md): supported legacy/current SQLite records, migration and exact identity/retry conventions.
 - [First review loop](review-loop/README.md): user story, UI, data/command/MCP contracts and CLI delivery/recovery.
 - [Architecture](architecture.md): system relationships, technology direction and subsystem boundaries.

@@ -47,3 +47,5 @@ The [slice plan](../../plans/480p/slices/01-review-loop/plan.md) sequences deliv
 
 
 Repository-path import operations, limits and persisted recovery are maintained in [durable import jobs](import-jobs.md). Static neighborhoods establish supported source relationships and honest coverage, not the user/lifecycle narrative or complete understanding. The current explanation/exploration contract keeps authored rationale, static facts and observed execution distinct. No unrun live-provider/native/human or whole-round gate is implied.
+
+[Configured head tests](test-execution.md) defines the proposed next bounded execution journey. Its source/environment/authority contracts are under independent design review; no test execution or later comparison/enrichment is claimed.
