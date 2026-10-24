@@ -131,3 +131,7 @@ Independent report `/tmp/pr-reviewer-06-plan-review/review-692dbca.md`, SHA-256 
 ## B1 first committed public-port checkpoint
 
 [Owner/journal checkpoint](checkpoint-06b-owner.md) records the initial derived ports,73-test inherited baseline and20-test bounded candidate, with explicit missing qualification/preparation/result/artifact/process and consumer behavior. It is an early independent-review point, not full B1 completion or a consumer-ready result schema.
+
+## B1 materialization progress
+
+[Bounded preparation components](checkpoint-06b-preparation.md) now have source/closure/Git process regression evidence and a separate exact17b local preparation observation. They do not yet create production qualification/preparation witnesses or result/artifact consumer ports; those remain the next B1 work. The owner checkpoint's independent P2 closure keeps its17b pin.

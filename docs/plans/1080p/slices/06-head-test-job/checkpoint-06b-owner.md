@@ -29,3 +29,7 @@ Review this exact committed checkpoint against the durable contract and actual s
 ## Independent P2 correction
 
 The independent2dab557 review reproduced three identical requested/started/exited observation retries throwing, contrary to the accepted idempotent-journal contract. Preserve that negative candidate. The correction records the exact last observation digest separately from merged retained identity and returns recorded/duplicate acknowledgement under the current grant/epoch. Duplicate never increments revision or authorizes another spawn; changed payloads and stale handles still reject. Three repo regressions first failed and then passed, including an exited input omitting earlier retained identity. Next materialization work remains separate; this correction does not supply a runner.
+
+## Independent bounded closure at17b8280
+
+Root consumed `/tmp/pr-reviewer-06-plan-review/review-17b8280.md`, SHA-256 `af08abf11a1f10ac2db81049b843bdae7ab0b48a76819350bbfe645bc2fb5044`: READY FOR BOUNDED OWNER/JOURNAL CHECKPOINT; F1/P2 closed. The reviewer reran the three original reproductions, five adjacent revocation/legacy cases,23 candidate tests and one further replay-control scenario:32 focused checks passed, plus strict/boundary checks. Negative2dab557 review remains SHA `b2ae79623f8c2c21c3724120b7c9228d6aec6e7bf25d7a3e4c7e8c7757b5f411`. This does not review the later [materialization checkpoint](checkpoint-06b-preparation.md) or establish full B1 acceptance.
