@@ -2,7 +2,7 @@
 
 **Status:** Accepted direction, documented for further refinement
 
-**Implementation:** First bounded React/SQLite/CLI/MCP milestone merged in PR 19; private local pilot documented in PR 20. Native Codex/Claude journey, complete own-PR dogfood and unfamiliar-human acceptance remain open.
+**Implementation:** Bounded React/SQLite/CLI/MCP milestone and read-only source graph merged. Immutable continuation/history has bounded independent engineering and actual own-PR navigation acceptance. Native Codex/Claude journey, full slice and unfamiliar-human acceptance remain separately open.
 
 ## From vision to system
 
@@ -77,6 +77,7 @@ flowchart TB
 | Review presentation | Canvas, context rail, story controls, exploration and private viewport | Renders read models and submits intent. Business rules remain outside UI components. |
 | Review domain | Snapshots, coverage, groups, anchors, annotations, comments and shared focus | Validates domain commands through explicit interfaces, independent of transport and renderer. |
 | Command processing | Durable ingress, receipts, deduplication and short atomic dispatch | UI, MCP, CLI and worker results use the same write path; jobs execute elsewhere. |
+| Source preparation | Bounded manual pinned Git manifests, legacy identity compatibility and verification witnesses | No database writes. Gateway verifies outside transactions; storage admits new source only with a matching nonserialized review/manifest witness. Provider acquisition requires its own verified adapter. |
 | Source analysis | Pinned source facts, diff coverage and candidate relationships | Returns evidence-backed results; cannot declare agent interpretation as parsed fact. |
 | Execution and evidence | Configured test targets, durable jobs, process outcomes and artifacts | Returns result commands; cannot equate request acceptance with a passing test. |
 | Participant delivery | Attachments, durable inbox and conversation-turn scheduling | A host adapter proves actual conversation delivery and reconciles uncertain wakeups. |

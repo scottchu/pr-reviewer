@@ -10,7 +10,7 @@
 
 The product targets React; this contract does not require a framework-agnostic core or separate core/React packages. Pure domain functions and public subsystem interfaces keep responsibilities testable and effects controlled; they do not commit the product to supporting another framework. React-specific presentation hooks and bindings are appropriate within these boundaries.
 
-Prefer functional patterns over classes, without banning classes where justified. Choose React patterns according to the actual requirement; no particular component customization pattern is prescribed. UI composition must not own domain policy or bypass managed subscription routes. Strict TypeScript is an accepted implementation convention; lint/format tool selection is deferred. For the remaining conventions, see the [architecture conventions](../rules/development.md#implementation-conventions). Strict compiler configuration and bounded runtime exist. No lint tool is selected.
+Prefer functional patterns over classes, without banning classes where justified. Choose React patterns according to the actual requirement; no particular component customization pattern is prescribed. UI composition must not own domain policy or bypass managed subscription routes. Strict TypeScript is an accepted implementation convention; lint/format tool selection is deferred. For the remaining conventions, see the [implementation conventions](../rules/development.md). Strict compiler configuration and bounded runtime exist. No lint tool is selected.
 
 ## Responsibility before library choice
 
@@ -22,7 +22,7 @@ A scoped application/adapter layer owns effects: transactions, streams, host del
 
 Cross-subsystem streams must pass through a declared stream integration layer. Keep the wiring together at the application composition boundary, with typed routes, a subscription registry and scoped lifecycle ownership. Do not scatter subscriptions between another subsystem's internal modules.
 
-A module in subsystem A must not directly subscribe to a module, Subject, Observable or internal store in subsystem B, and vice versa. Export library-neutral public event/query ports; compose them only through the integration layer. Business modules neither import each other's reactive internals nor create hidden cross-subsystem subscriptions in constructors, hooks or helpers. Private streams may remain within a subsystem, but cannot become an alternate integration path. Components consume the approved view-store bridge rather than assembling their own cross-system pipelines.
+A module in subsystem A must not directly subscribe to a module, Subject, Observable or internal store in subsystem B, and vice versa. Export explicit public event/query ports; compose them only through the integration layer. Business modules neither import each other's reactive internals nor create hidden cross-subsystem subscriptions in constructors, hooks or helpers. Private streams may remain within a subsystem, but cannot become an alternate integration path. Components consume the approved view-store bridge rather than assembling their own cross-system pipelines.
 
 ```mermaid
 flowchart LR

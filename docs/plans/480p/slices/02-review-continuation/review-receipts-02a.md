@@ -2,7 +2,7 @@
 
 **Date:** 2026-10-23
 
-**Status:** Bounded engineering checkpoint; current UI correction awaits targeted recheck. Full slice/round acceptance remains open.
+**Status:** Final bounded engineering/presentation acceptance and PR21 merge recorded below. Earlier entries retain their original review-stage limits. Full slice/round acceptance remains open.
 
 **Parent:** [Slice 02](plan.md), [checkpoint evidence](checkpoint-02a.md)
 
@@ -36,3 +36,5 @@ The independent engineering acceptance above applies to `2e0384f`, not automatic
 **Frozen 2e source-corrected account:** `/tmp/pr-reviewer-semantic-review-pr21/phase-b-2e0384f.md` confirmed actual keyboard precise source open at markdown.ts head 43–59, return focus, graph-focus changes preserving source and an unsent draft, and zero question/notification mutations. The reviewer distinguished complete changed-path inventory, explicit selected input and prepared one-hop source; retained owner input is recovery metadata rather than delivered history. Same-side literal links are not semantic dependencies. The global first-120 reference budget has no exact omitted-path/link-count ledger; the remaining-links warning does not make all omitted links unresolved. External test summaries were separate from product evidence, with raw test logs not inspected by that semantic reviewer. No new engineering blocker was reported; the new narrow UI correction still requires targeted recheck.
 
 **Current UI verification:** Strict TypeScript/boundary checks and all five actual Chrome journeys passed, including the three existing controlled/pinned source journeys, the actual pinned PR21 nineteen-span selection and the controlled deleted-side fixture. No unchanged domain/storage test suite was repeated for this UI-only correction. Raw artifacts: `/var/folders/7q/rjwxsm_s54s17s8mn083p71h0000gn/T/pr-reviewer-02A-ui-final.oirRUd3vei`. This is implementer validation, not independent acceptance of the new source.
+
+**Final 02A disposition:** Targeted independent UI review accepted `857fb072aaba095b9dadbfac4dcf11ff914eacdc`; `/tmp/pr-reviewer-02A-independent-review/engineering/recheck-857fb07-ui.md` and `/tmp/pr-reviewer-semantic-review-pr21/recheck-857fb07.md` retain exact scope. PR21 merged as `cd8715ad2f848c444f952919ce019e7b1e913538`; root verified remote/main. The candidate and target graph/interaction/controlled-absence captures remain at `/var/folders/7q/rjwxsm_s54s17s8mn083p71h0000gn/T/pr-reviewer-02A-857-pr21-graphs.zmUhG8m4UE`. The main unimplemented outcomes are now 02B history/continuation and later slices; native/human/full-round acceptance remains open. Pilot update belongs exclusively to root's separately assigned runtime owner.

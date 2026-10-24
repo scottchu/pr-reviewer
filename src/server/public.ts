@@ -1,3 +1,5 @@
+import {verifyPreparedSnapshot} from "../source-preparation/public.ts";
+import type {PreparedSnapshotWitness} from "../source-preparation/public.ts";
 import { createServer } from "node:http";
 import type { IncomingMessage, ServerResponse } from "node:http";
 import { z } from "zod";
@@ -10,10 +12,10 @@ import { createRegistry } from "../integration/registry.ts";
 const readBody = async (req: IncomingMessage): Promise<unknown> => {
   let size = 0;
   const chunks: Buffer[] = [];
-  for await (const chunk of req) {
+  for await (const chunk of req.iterator({destroyOnReturn:false})) {
     const buffer = Buffer.from(chunk as Uint8Array);
     size += buffer.length;
-    if (size > 131072) throw new Error("invalid_request");
+    if (size > 8*1024*1024){req.resume();throw new Error("invalid_request");}
     chunks.push(buffer);
   }
   try {
@@ -69,7 +71,7 @@ export const createGateway = (store: Store, notify: Notify) => {
         const revision = Number(url.searchParams.get("minimumRevision") ?? 0);
         if (!Number.isSafeInteger(revision) || revision < 0)
           throw new Error("invalid_request");
-        send(res, 200, store.review(principal, id, revision));
+        send(res, 200, store.review(principal, id, revision,url.searchParams.get("snapshotId")??undefined));
         return;
       }
       if (req.method === "GET" && url.pathname.startsWith("/api/questions/")) {
@@ -85,7 +87,7 @@ export const createGateway = (store: Store, notify: Notify) => {
         if (!question) throw new Error("invalid_request");
         send(res, 200, {
           question,
-          snapshot: review.snapshot,
+          snapshot: store.review(principal,reviewId,0,question.anchor.snapshotId).snapshot,
           replies: review.replies.filter(
             (r) => r.questionId === question.questionId,
           ),
@@ -117,7 +119,9 @@ export const createGateway = (store: Store, notify: Notify) => {
       }
       if (req.method === "POST" && url.pathname === "/api/commands") {
         const command = commandSchema.parse(await readBody(req));
-        const receipt = store.command(principal, command);
+        let witness:PreparedSnapshotWitness|undefined;
+        if(command.type==="AddSnapshot"&&principal.kind==="user")try{witness=verifyPreparedSnapshot(command.reviewId,command.snapshot,command.identityScheme);}catch{}
+        const receipt = store.command(principal, command,witness);
         if (receipt.state === "applied") {
           if (command.type === "AskQuestion") deliveryRoute.emit();
           if (command.type === "RevokeAttachment")

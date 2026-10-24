@@ -65,13 +65,14 @@ export const createMcp = (launch: LaunchBinding) => {
       inputSchema: {
         reviewId: z.string(),
         minimumRevision: z.number().int().nonnegative().optional(),
+        snapshotId:z.string().optional(),
       },
     },
-    async ({ reviewId, minimumRevision }) => {
+    async ({ reviewId, minimumRevision, snapshotId }) => {
       normal();
       return output(
         await request(
-          `/api/reviews/${encodeURIComponent(reviewId)}?minimumRevision=${minimumRevision ?? 0}`,
+          `/api/reviews/${encodeURIComponent(reviewId)}?minimumRevision=${minimumRevision ?? 0}${snapshotId?`&snapshotId=${encodeURIComponent(snapshotId)}`:""}`,
         ),
       );
     },

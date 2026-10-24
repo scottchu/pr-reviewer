@@ -194,3 +194,84 @@ test("definitive HTTP rejection allows corrected submission; pending readback re
     globalThis.fetch = original;
   }
 });
+
+test('history selection remains pinned through new current and unresolved submissions block source switching',async()=>{
+ const original=globalThis.fetch;let current='s',lost=false;const requested:string[]=[];
+ globalThis.fetch=(async(input:Parameters<typeof fetch>[0],init?:Parameters<typeof fetch>[1])=>{
+  if(init?.method==='POST'){if(lost)throw new Error('lost_ack');return Response.json({state:'applied',revision:1});}
+  const url=new URL(String(input),'http://localhost');requested.push(url.searchParams.get('snapshotId')??'default');const id=url.searchParams.get('snapshotId')??current;
+  return Response.json({...review,snapshot:{...review.snapshot,snapshotId:id},currentSnapshotId:current,snapshotSummaries:[{snapshotId:'s',baseSha:'a',headSha:'b'},{snapshotId:'new',baseSha:'a',headSha:'c'}]});
+ }) as typeof fetch;
+ try{const bridge=createReviewBridge('r');await bridge.login('token');current='new';const dispose=bridge.connect();await new Promise(resolve=>setTimeout(resolve,10));dispose();assert.equal(bridge.getSnapshot().review?.snapshot.snapshotId,'s');assert.equal(bridge.getSnapshot().review?.currentSnapshotId,'new');await bridge.selectSnapshot('new');assert.equal(bridge.getSnapshot().review?.snapshot.snapshotId,'new');lost=true;await assert.rejects(bridge.ask({...anchor,snapshotId:'new'},'Held'),/lost_ack/);await assert.rejects(bridge.selectSnapshot('s'),/submission_pending/);assert.equal(bridge.getSnapshot().review?.snapshot.snapshotId,'new');assert.ok(requested.includes('s'));}finally{globalThis.fetch=original;}
+});
+
+test('superseded history choices cannot roll back a newer displayed selection or later poll',async()=>{
+ const original=globalThis.fetch;
+ const pending=new Map<string,{resolve:(response:Response)=>void}>();let defer=true;
+ const requests:string[]=[];
+ const projection=(snapshotId:string)=>({...review,snapshot:{...review.snapshot,snapshotId},currentSnapshotId:'newest'});
+ globalThis.fetch=(async(input:Parameters<typeof fetch>[0],init?:Parameters<typeof fetch>[1])=>{
+  const id=new URL(String(input),'http://localhost').searchParams.get('snapshotId')??'s';requests.push(id);
+  if(!defer||id==='s')return Response.json(projection(id));
+  return new Promise<Response>((resolve,reject)=>{pending.set(id,{resolve});init?.signal?.addEventListener('abort',()=>reject(new DOMException('Aborted','AbortError')),{once:true});});
+ }) as typeof fetch;
+ try{
+  const bridge=createReviewBridge('r');await bridge.login('token');
+  const older=bridge.selectSnapshot('older').then(()=>null,error=>error);
+  const latest=bridge.selectSnapshot('newest');
+  await older;assert.equal(bridge.getSnapshot().selecting,true,'older completion cannot release the newest read');pending.get('newest')!.resolve(Response.json(projection('newest')));await latest;
+  assert.equal(bridge.getSnapshot().review?.snapshot.snapshotId,'newest');
+  defer=false;const dispose=bridge.connect();await new Promise(resolve=>setTimeout(resolve,10));dispose();
+  assert.equal(bridge.getSnapshot().review?.snapshot.snapshotId,'newest');assert.equal(requests.at(-1),'newest');
+ }finally{globalThis.fetch=original;}
+});
+
+test('a failed latest history choice restores the displayed snapshot, not a superseded target',async()=>{
+ const original=globalThis.fetch;
+ const pending=new Map<string,{resolve:(response:Response)=>void}>();let defer=true;
+ const requests:string[]=[];
+ globalThis.fetch=(async(input:Parameters<typeof fetch>[0],init?:Parameters<typeof fetch>[1])=>{
+  const id=new URL(String(input),'http://localhost').searchParams.get('snapshotId')??'s';requests.push(id);
+  if(!defer||id==='s')return Response.json({...review,snapshot:{...review.snapshot,snapshotId:id}});
+  return new Promise<Response>((resolve,reject)=>{pending.set(id,{resolve});init?.signal?.addEventListener('abort',()=>reject(new DOMException('Aborted','AbortError')),{once:true});});
+ }) as typeof fetch;
+ try{
+  const bridge=createReviewBridge('r');await bridge.login('token');
+  const older=bridge.selectSnapshot('older').then(()=>null,error=>error);
+  const latest=bridge.selectSnapshot('newest').then(()=>null,error=>error);
+  await older;pending.get('newest')!.resolve(Response.json({error:'source_unavailable'},{status:404}));assert.match(String(await latest),/source_unavailable/);assert.equal(bridge.getSnapshot().selecting,false);
+  defer=false;const dispose=bridge.connect();await new Promise(resolve=>setTimeout(resolve,10));dispose();
+  assert.equal(requests.at(-1),'s');assert.equal(bridge.getSnapshot().review?.snapshot.snapshotId,'s');
+ }finally{globalThis.fetch=original;}
+});
+
+test('periodic polling cannot abort or replace an explicit slow history selection',async()=>{
+ const original=globalThis.fetch;let targetReads=0,complete:((response:Response)=>void)|undefined;
+ const requests:string[]=[];
+ globalThis.fetch=(async(input:Parameters<typeof fetch>[0],init?:Parameters<typeof fetch>[1])=>{
+  const id=new URL(String(input),'http://localhost').searchParams.get('snapshotId')??'s';requests.push(id);
+  if(id==='newest'&&++targetReads===1)return new Promise<Response>((resolve,reject)=>{complete=resolve;init?.signal?.addEventListener('abort',()=>reject(new DOMException('Aborted','AbortError')),{once:true});});
+  return Response.json({...review,snapshot:{...review.snapshot,snapshotId:id},currentSnapshotId:'newest'});
+ }) as typeof fetch;
+ let dispose:(()=>void)|undefined;
+ try{
+  const bridge=createReviewBridge('r');await bridge.login('token');dispose=bridge.connect();
+  const choice=bridge.selectSnapshot('newest').then(()=>null,error=>error);
+  assert.equal(bridge.getSnapshot().selecting,true);await assert.rejects(bridge.ask(anchor,'Cannot compose against an unresolved selection'),/selection_in_progress/);
+  await new Promise(resolve=>setTimeout(resolve,800));complete!(Response.json({...review,snapshot:{...review.snapshot,snapshotId:'newest'},currentSnapshotId:'newest'}));
+  assert.equal(await choice,null,'a polling interval must not turn a successful explicit read into source_unavailable');
+  assert.equal(bridge.getSnapshot().selecting,false);
+  assert.equal(bridge.getSnapshot().review?.snapshot.snapshotId,'newest');
+  await new Promise(resolve=>setTimeout(resolve,750));assert.equal(bridge.getSnapshot().review?.snapshot.snapshotId,'newest');assert.equal(requests.at(-1),'newest');
+ }finally{dispose?.();globalThis.fetch=original;}
+});
+
+test('disposing an in-flight source choice releases loading and remount observes the last displayed source',async()=>{
+ const original=globalThis.fetch;const requests:string[]=[];
+ globalThis.fetch=(async(input:Parameters<typeof fetch>[0],init?:Parameters<typeof fetch>[1])=>{
+  const id=new URL(String(input),'http://localhost').searchParams.get('snapshotId')??'s';requests.push(id);
+  if(id==='newest')return new Promise<Response>((_resolve,reject)=>{init?.signal?.addEventListener('abort',()=>reject(new DOMException('Aborted','AbortError')),{once:true});});
+  return Response.json(review);
+ }) as typeof fetch;
+ try{const bridge=createReviewBridge('r');await bridge.login('token');const dispose=bridge.connect();const choice=bridge.selectSnapshot('newest').then(()=>null,error=>error);dispose();assert.match(String(await choice),/selection_superseded/);assert.equal(bridge.getSnapshot().selecting,false);const remount=bridge.connect();await new Promise(resolve=>setTimeout(resolve,10));remount();assert.equal(requests.at(-1),'s');assert.equal(bridge.getSnapshot().review?.snapshot.snapshotId,'s');}finally{globalThis.fetch=original;}
+});

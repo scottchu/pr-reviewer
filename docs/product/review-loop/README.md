@@ -10,7 +10,7 @@
 
 As a reviewer, I open one pinned before/after source change in our own real PR, select a source span, ask its responsible agent a question, and inspect the agent's persisted source-backed answer. I can distinguish the source, author, delivery state and uncertainty behind that answer. The existing Codex or Claude session initiating attachment is the responsible session; the app does not replace it.
 
-The first task uses [PR 14](../../plans/480p/slices/01-review-loop/bootstrap-task.md), including its actual base/head and historical source path. Its documentation claim is a valid first bounded source question, not evidence of executable code behavior. Source is manually prepared from immutable Git objects; general import, semantic graphs, repository jobs, player/narration and new-head continuation are later slices.
+The default bootstrap uses PR 14 with immutable identity and teaching scope defined in [runtime knowledge](runtime.md#bootstrap-target-and-source-bounds). Its documentation claim is a valid first bounded source question, not evidence of executable code behavior. Source is manually prepared from immutable Git objects; read-only structural graphs and immutable continuation/history have bounded local implementations. General import, semantic graphs, repository jobs and player/narration remain later scope.
 
 ## Interaction
 
@@ -31,9 +31,9 @@ This is the agent's source-acquisition responsibility; the reviewer should not h
 3. Select a nonempty exact source span. The composer states its side/path/line span and snapshot; editing or changing selection does not silently move an already-saved question.
 4. Submit once. Persist the question before attempting CLI delivery. Show saved, delivery-pending, notified, working, answered or delivery-unknown using distinct labels; do not claim the agent started solely because CLI exited successfully.
 5. The agent receives a CLI notification, reads the review through MCP and submits its reply through MCP. The app renders the authoritative persisted reply and evidence links. Agent stdout and transcripts are diagnostics, not replies to paste into the UI.
-6. Open a reply's source link at its immutable side/path/span. Restart preserves accepted questions/replies and pending work. Full reopen/follow-up and switching to a new head are slice 02.
+6. Open a reply's source link at its immutable side/path/span. Restart preserves accepted questions/replies and pending work. Explicitly select retained history or another admitted head, then start a new anchored follow-up without moving the original question. Drafts hold their source selection.
 
-The next accepted scope is defined in [continuation, graph bootstrap and import](evolution.md). These planned behaviors are not attributed to the first milestone.
+The bounded continuation/graph implementation and future import boundary are distinguished in [evolution knowledge](evolution.md). Native-host, unfamiliar-human and full-slice acceptance remain separately open.
 
 ## Public interfaces and ownership
 

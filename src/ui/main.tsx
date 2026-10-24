@@ -6,6 +6,7 @@ import "./style.css";
 import { ReviewGraph } from "./graph.tsx";
 const bridge = createReviewBridge(
   new URLSearchParams(window.location.search).get("reviewId") ?? "pr-14",
+  new URLSearchParams(window.location.search).get("snapshotId")??undefined,
 );
 const SourcePane = ({
   source,
@@ -85,7 +86,9 @@ const App = () => {
   const state = useSyncExternalStore(bridge.subscribe, bridge.getSnapshot);
   const [credential, setCredential] = useState(""),
     [draft, setDraft] = useState(""),
-    [selected, setSelected] = useState<Anchor | null>(null);
+    [selected, setSelected] = useState<Anchor | null>(null),
+    [parentQuestionId,setParentQuestionId]=useState<string|undefined>(),
+    [onlySelectedDiscussion,setOnlySelectedDiscussion]=useState(false);
   useEffect(() => bridge.connect(), []);
   useEffect(() => {
     if (state.initialSelection && !selected)
@@ -121,9 +124,17 @@ const App = () => {
       </main>
     );
   const attachment = review.attachment;
-  const openSource = (anchor:Anchor) => {
+  const chooseSnapshot=async(snapshotId:string)=>{
+    if(draft.trim())return;
+    try{await bridge.selectSnapshot(snapshotId);const url=new URL(window.location.href);url.searchParams.set("snapshotId",snapshotId);window.history.replaceState(null,"",url);setSelected(bridge.getSnapshot().initialSelection);}catch{}
+  };
+  const openSource = async(anchor:Anchor) => {
     if(draft.trim() && selected && JSON.stringify(anchor)!==JSON.stringify(selected)) return;
+    if(anchor.snapshotId!==review.snapshot.snapshotId){
+      try{await bridge.selectSnapshot(anchor.snapshotId);}catch{return;}
+    }
     setSelected(anchor);
+    const url=new URL(window.location.href);url.searchParams.set("snapshotId",anchor.snapshotId);url.hash=`source-${anchor.side}-${anchor.startLine}`;window.history.replaceState(null,"",url);
     requestAnimationFrame(()=>document.getElementById(`source-${anchor.side}-${anchor.startLine}`)?.scrollIntoView({block:"center"}));
   };
   return (
@@ -173,6 +184,8 @@ const App = () => {
           )}
         </div>
       </header>
+      <section className="snapshot-selection" aria-label="Snapshot history"><label>Snapshot<select value={review.snapshot.snapshotId} disabled={Boolean(draft.trim())||state.busy} onChange={event=>{void chooseSnapshot(event.target.value);}}>{(review.snapshotSummaries??[{snapshotId:review.snapshot.snapshotId,baseSha:review.snapshot.baseSha,headSha:review.snapshot.headSha}]).map(snapshot=><option key={snapshot.snapshotId} value={snapshot.snapshotId}>{snapshot.snapshotId===(review.currentSnapshotId??review.snapshot.snapshotId)?"Current":"History"} · {snapshot.headSha.slice(0,12)} · {snapshot.snapshotId.slice(0,12)}</option>)}</select></label><p role="status">{review.snapshot.snapshotId===(review.currentSnapshotId??review.snapshot.snapshotId)?"Viewing current snapshot":"Viewing historical snapshot"}. Selection is private and does not move saved source or discussion.</p>{state.error&&<p role="alert">{state.error}</p>}</section>
+      {state.selecting&&<p role="status">Opening the selected snapshot. Question composition is held until its source is ready.</p>}
       {state.graph && selected && <ReviewGraph graph={state.graph} selectedPath={selected.path} onOpen={openSource}/>}
       <section className="source-identity">
         <h2>{selected?.path ?? state.sources[0]?.path}</h2>
@@ -200,8 +213,8 @@ const App = () => {
                 onSubmit={(event) => {
                   event.preventDefault();
                   void bridge
-                    .ask(selected, draft)
-                    .then(() => setDraft(""))
+                    .ask(selected, draft,parentQuestionId)
+                    .then(() => {setDraft("");setParentQuestionId(undefined);})
                     .catch(() => {});
                 }}
               >
@@ -254,9 +267,11 @@ const App = () => {
                   {selected.side} · {selected.path}:{selected.startLine}–
                   {selected.endLine}
                 </p>
+                {parentQuestionId&&<p className="follow-up">Follow-up to question {parentQuestionId} · original snapshot {review.questions.find(question=>question.questionId===parentQuestionId)?.anchor.snapshotId}. New source: {selected.snapshotId}. <button type="button" onClick={()=>setParentQuestionId(undefined)} disabled={Boolean(draft.trim())}>Cancel follow-up</button></p>}
                 <label htmlFor="question">Your question</label>
                 <textarea
                   id="question"
+                  disabled={state.selecting}
                   aria-describedby="selection question-help"
                   rows={4}
                   value={draft}
@@ -266,7 +281,7 @@ const App = () => {
                 <p id="question-help">
                   The answer must cite this pinned source and state its limits.
                 </p>
-                <button disabled={state.busy || !draft.trim()}>
+                <button disabled={state.busy || state.selecting || !draft.trim()}>
                   {state.busy ? "Saving question…" : "Save question"}
                 </button>
                 {state.error && <p role="alert">{state.error}</p>}
@@ -286,7 +301,8 @@ const App = () => {
                   here.
                 </p>
               )}
-              {review.questions.map((question) => {
+              <label className="discussion-filter"><input type="checkbox" checked={onlySelectedDiscussion} onChange={event=>setOnlySelectedDiscussion(event.target.checked)}/> Only selected snapshot discussion</label>
+              {review.questions.filter(question=>!onlySelectedDiscussion||question.anchor.snapshotId===review.snapshot.snapshotId).map((question) => {
                 const item = review.inbox.find(
                     (i) => i.questionId === question.questionId,
                   ),
@@ -301,14 +317,16 @@ const App = () => {
                         {questionStatus(review, question.questionId)}
                       </span>
                     </div>
+                    <p className="discussion-source">{question.anchor.snapshotId===review.snapshot.snapshotId?"Selected source":"Other snapshot"} · snapshot {question.anchor.snapshotId}{question.parentQuestionId?` · follow-up to ${question.parentQuestionId}`:""}</p>
                     <p className="body">{question.text}</p>
                     <a
                       href={`#source-${question.anchor.side}-${question.anchor.startLine}`}
-                      onClick={() => openSource(question.anchor)}
+                      onClick={event => {event.preventDefault();void openSource(question.anchor);}}
                     >
                       {question.anchor.side} · {question.anchor.path}:
                       {question.anchor.startLine}–{question.anchor.endLine}
                     </a>
+                    <button type="button" className="quiet" disabled={Boolean(draft.trim())||state.busy} onClick={()=>{setParentQuestionId(question.questionId);document.getElementById("question")?.focus();}}>Follow up</button>
                     {attempt && (
                       <details>
                         <summary>Notification: {attempt.state}</summary>
@@ -329,7 +347,7 @@ const App = () => {
                               <a
                                 key={index}
                                 href={`#source-${anchor.side}-${anchor.startLine}`}
-                                onClick={() => openSource(anchor)}
+                                onClick={event => {event.preventDefault();void openSource(anchor);}}
                               >
                                 Source: {anchor.side} {anchor.path}:
                                 {anchor.startLine}–{anchor.endLine}
