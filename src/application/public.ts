@@ -84,8 +84,8 @@ export const createReviewBridge = (reviewId: string) => {
         publish({
           ...state,
           review,
-          sources: sourceViews(review.snapshot),
-          graph: projectGraph(review.snapshot),
+          sources: state.review?.snapshot.snapshotId===review.snapshot.snapshotId?state.sources:sourceViews(review.snapshot),
+          graph: state.review?.snapshot.snapshotId===review.snapshot.snapshotId?state.graph:projectGraph(review.snapshot),
           error: "",
           initialSelection: (() => {
             const source=review.snapshot.sources.find(s=>s.side==="head")??review.snapshot.sources[0];

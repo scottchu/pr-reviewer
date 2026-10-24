@@ -31,10 +31,11 @@ const SourcePane = ({
             : "＋ additions · ∼ modifications"}
         </span>
       </header>
+      {source.lines.some(line=>line.status==="not_analyzed")&&<p className="comparison-unknown">Comparison not analyzed: the opposite source is unavailable or exceeds the comparison budget. These lines are not labeled additions/removals.</p>}
       <div className="source-scroll">
         <ol>
           {source.lines.map(({ text: line, number, status }) => {
-            const changed = status !== "unchanged",
+            const changed = status !== "unchanged" && status !== "not_analyzed",
               active =
                 selected.path === source.path &&
                 selected.side === source.side &&
@@ -63,7 +64,7 @@ const SourcePane = ({
                   {number}
                 </button>
                 <span className="change-marker" aria-label={`${status} line`}>
-                  {status === "modified"
+                  {status === "not_analyzed" ? "?" : status === "modified"
                     ? "∼"
                     : changed
                       ? source.side === "base"

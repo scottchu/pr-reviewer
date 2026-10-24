@@ -296,7 +296,7 @@ export const applyCommand = (
   };
 };
 
-export type LineStatus = "unchanged" | "removed" | "added" | "modified";
+export type LineStatus = "unchanged" | "removed" | "added" | "modified" | "not_analyzed";
 export type SourceView = Source & {
   lines: { number: number; text: string; status: LineStatus }[];
 };
@@ -365,3 +365,5 @@ export const compareSources = (
 
 export { projectGraph, sourceViews } from "./graph.ts";
 export type { SourceGraph, GraphNode, GraphEdge } from "./graph.ts";
+
+export { inlineDocumentLinks, resolveDocumentDestination, documentHeadingLine } from "./markdown.ts";

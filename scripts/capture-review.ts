@@ -19,8 +19,10 @@ try {
  if(!response.ok)throw new Error(`authorized query ${response.status}`);
  const review=await response.json() as {snapshot:{snapshotId:string;prUrl:string;baseSha:string;headSha:string}};
  writeFileSync(join(output,'identity.json'),JSON.stringify({candidate:{sourceCommit:runtime.sourceCommit,dirty:runtime.sourceDirty,worktree:resolve('.')},target:{reviewId:runtime.reviewId,...Object.fromEntries(Object.entries(review.snapshot).filter(([key])=>['snapshotId','prUrl','baseSha','headSha'].includes(key)))}},null,2));
+ if(process.env.REVIEW_CAPTURE_FOCUS)await page.getByRole('button',{name:`Focus ${process.env.REVIEW_CAPTURE_FOCUS}`,exact:true}).click();
  const path=process.env.REVIEW_CAPTURE_PATH;
  if(path){
+  await page.getByRole('button',{name:`Focus ${path}`,exact:true}).click();
   await page.getByRole('button',{name:`Open ${process.env.REVIEW_CAPTURE_SIDE??'head'} ${path}`,exact:true}).click();
   const start=process.env.REVIEW_CAPTURE_START??'1',end=process.env.REVIEW_CAPTURE_END??start;
   await page.getByLabel('Start line').fill(start);await page.getByLabel('End line').fill(end);

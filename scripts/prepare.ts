@@ -2,9 +2,8 @@ import { execFileSync } from "node:child_process";
 import { createHash } from "node:crypto";
 import { readFileSync, existsSync } from "node:fs";
 import { z } from "zod";
-import { posix } from "node:path";
 import { createStore } from "../src/storage/public.ts";
-import { canonical } from "../src/domain/public.ts";
+import { canonical, inlineDocumentLinks, resolveDocumentDestination, documentHeadingLine } from "../src/domain/public.ts";
 import { dataRoot, files, writePrivate } from "./local.ts";
 import type { Snapshot, Source, ChangedFile, DocumentReference } from "../src/domain/public.ts";
 const inputSchema = z
@@ -17,7 +16,7 @@ const inputSchema = z
     paths: z.array(z.string().min(1).max(1024)).min(1).max(64).optional(),
     title: z.string().trim().min(1).max(200).optional(),
   })
-  .strict().refine(value => Boolean(value.path) !== Boolean(value.paths), "choose path or paths")
+  .strict().refine(value => !value.paths || new Set(value.paths).size===value.paths.length, "paths must be unique").refine(value => Boolean(value.path) !== Boolean(value.paths), "choose path or paths")
   .refine(value => (value.paths ?? [value.path!]).every(path => !path.startsWith("/") && !path.split("/").includes("..") && !path.includes("\0")), "invalid repository path");
 const bootstrap: z.infer<typeof inputSchema> = {
   prNumber: 14,
@@ -28,7 +27,14 @@ const bootstrap: z.infer<typeof inputSchema> = {
 };
 const readGit = (args: string[]): Buffer => {
   try {
-    return execFileSync("git", args, {
+    const env:NodeJS.ProcessEnv={...process.env};
+    // Keep an explicit object-database selection for controlled fixtures; remove
+    // ambient Git configuration/worktree overrides before read-only acquisition.
+    for(const key of Object.keys(env))if(key.startsWith("GIT_")&&key!=="GIT_DIR")delete env[key];
+    Object.assign(env,{GIT_NO_LAZY_FETCH:"1",GIT_NO_REPLACE_OBJECTS:"1",GIT_CONFIG_NOSYSTEM:"1",GIT_CONFIG_GLOBAL:"/dev/null",GIT_OPTIONAL_LOCKS:"0",GIT_TERMINAL_PROMPT:"0"});
+    return execFileSync("git", ["--no-lazy-fetch","--no-replace-objects","-c","core.fsmonitor=false","-c","core.hooksPath=/dev/null","-c","diff.orderFile=/dev/null",...args], {
+      env,
+      timeout:5000,
       maxBuffer: 1048576,
       stdio: ["ignore", "pipe", "pipe"],
     });
@@ -53,7 +59,7 @@ export const buildSnapshot = (input: unknown): Snapshot => {
   let sources:Source[]=[], changedFiles:ChangedFile[]|undefined, documentReferences:DocumentReference[]|undefined;
   if(spec.path) sources=(["base","head"] as const).map(side=>readSource(spec.path!,side));
   else {
-    const selected=new Set(spec.paths), fields=readGit(["diff","--name-status","--no-renames","-z",baseSha,headSha,"--"]).toString("utf8").split("\0");
+    const selected=new Set(spec.paths), fields=readGit(["diff","--name-status","--no-renames","--no-ext-diff","--no-textconv","--no-relative","--ignore-submodules=none","-z",baseSha,headSha,"--"]).toString("utf8").split("\0");
     changedFiles=[];
     for(let i=0;i<fields.length-1;i+=2){
       const status=fields[i]!,path=fields[i+1]!;
@@ -73,26 +79,18 @@ export const buildSnapshot = (input: unknown): Snapshot => {
     const origins=[...sources];let count=0;
     for(const source of origins){
       if(!source.path.endsWith(".md"))continue;
-      let fence=false;
-      for(const [index,line] of source.content.split("\n").entries()){
-        if(/^\s*(```|~~~)/.test(line)){fence=!fence;continue;}if(fence)continue;
-        for(const match of line.matchAll(/(?<!!)\[[^\]]+\]\(([^\s)]+)(?:\s+"[^"]*")?\)/g)){
+      for(const link of inlineDocumentLinks(source.content)){
           if(count++>=120)break;
-          const destination=match[1]!;
+          const destination=link.destination,index=link.line-1;
           const reference:DocumentReference={destination,source:{snapshotId:"pending",side:source.side,path:source.path,startLine:index+1,endLine:index+1},target:null,method:"inline_markdown_link",reason:null};
           try {
-            if(/^[a-z][a-z0-9+.-]*:/i.test(destination)||destination.startsWith("//"))throw new Error("external destination");
-            const decoded=decodeURIComponent(destination),[relative,fragment]=decoded.split("#");
-            const path=posix.normalize(posix.join(posix.dirname(source.path),relative||posix.basename(source.path)));
-            if(decoded.startsWith("/")||path===".."||path.startsWith("../")||path.includes("\0")||path.includes("?"))throw new Error("unsupported or outside repository destination");
+            const {path,fragment}=resolveDocumentDestination(source.path,destination);
             let target=sources.find(s=>s.path===path&&s.side===source.side);
             if(!target){if(sources.length>=128)throw new Error("context source budget exhausted");target=readSource(path,source.side);sources.push(target);}
-            let targetLine=1;
-            if(fragment){const headings=target.content.split("\n");const found=headings.findIndex(line=>/^#{1,6} /.test(line)&&line.replace(/^#+ /,"").toLowerCase().replace(/[^\p{L}\p{N} _-]/gu,"").replace(/ /g,"-")===fragment);if(found<0)throw new Error("heading fragment unresolved");targetLine=found+1;}
+            const targetLine=documentHeadingLine(target.content,fragment);
             reference.target={snapshotId:"pending",side:source.side,path,startLine:targetLine,endLine:targetLine};
           } catch(error){reference.reason=error instanceof Error?error.message:"target unavailable";}
           documentReferences.push(reference);
-        }
       }
     }
   }
@@ -120,12 +118,14 @@ export const prepareSource = (root: string) => {
         );
       if (reviews[0]) {
         const snapshot = persisted.review(owner, reviews[0].reviewId).snapshot;
-        retained = inputSchema.parse({
+        const stored=persisted.preparedInput(reviews[0].reviewId);
+        const explicitPaths=snapshot.changedFiles?[...new Set(snapshot.changedFiles.flatMap(file=>file.dispositions).filter(d=>d.state==="prepared"&&d.reason==="verified Git blob").map(d=>d.path))]:null;
+        retained = inputSchema.parse(stored??{
           prNumber: snapshot.prNumber,
           prUrl: snapshot.prUrl,
           baseSha: snapshot.baseSha,
           headSha: snapshot.headSha,
-          path: snapshot.sources[0]?.path,
+          ...(explicitPaths?{paths:explicitPaths}:{path:snapshot.sources[0]?.path}),
           ...(snapshot.title ? { title: snapshot.title } : {}),
         });
       }
@@ -156,7 +156,7 @@ export const prepareSource = (root: string) => {
     const existing = store.list({ kind: "user", actorId: "local-user" });
     if (existing.some((review) => review.reviewId !== reviewId))
       throw new Error("command_conflict: different target already prepared");
-    store.prepare(reviewId, snapshot);
+    store.prepare(reviewId, snapshot, spec);
   } finally {
     store.close();
   }

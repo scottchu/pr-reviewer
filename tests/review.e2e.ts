@@ -323,17 +323,23 @@ test('02-G real PR20 graph → keyboard source → anchored question → return,
  writeFileSync(join(artifacts,'pr20-graph-only.aria.txt'),await page.locator('.review-graph').ariaSnapshot());
  const persisted=(await api('/api/reviews/pr-20')) as unknown as Review;
  writeFileSync(join(artifacts,'pr20-target-identity.json'),JSON.stringify({reviewId:persisted.reviewId,snapshotId:persisted.snapshot.snapshotId,prUrl:persisted.snapshot.prUrl,baseSha:persisted.snapshot.baseSha,headSha:persisted.snapshot.headSha},null,2));
+ await page.getByRole('button',{name:'Focus docs/product/review-loop/runtime.md',exact:true}).click();
  const open=page.getByRole('button',{name:'Open head docs/product/review-loop/runtime.md',exact:true});await open.focus();await page.keyboard.press('Enter');
  await expect(page.getByLabel('Source file')).toHaveValue('docs/product/review-loop/runtime.md');
  await page.getByLabel('Start line').fill('35');await page.getByLabel('End line').fill('57');
  await page.getByLabel('Your question').fill('Which boundaries and rollback does the private preview retain, and what does the source leave unverified?');
  await expect(page.getByText('Source selection is held while your question draft is nonempty. Save or clear it before navigating.')).toBeVisible();
+ await page.getByRole('button',{name:'Focus docs/product/review-loop/README.md',exact:true}).click();await expect(page.getByLabel('Source file')).toHaveValue('docs/product/review-loop/runtime.md');await expect(page.getByLabel('Start line')).toHaveValue('35');
+ await page.getByRole('button',{name:'Focus docs/product/review-loop/runtime.md',exact:true}).click();
  await page.getByRole('button',{name:'Save question'}).click();await expect(page.getByText('1 saved question · 0 answers')).toBeVisible();
  const saved=(await api('/api/reviews/pr-20')) as unknown as Review;expect(saved.questions[0]?.anchor).toMatchObject({snapshotId:persisted.snapshot.snapshotId,path:'docs/product/review-loop/runtime.md',startLine:35,endLine:57});expect(saved.attempts).toHaveLength(0);
  const invalid=await api('/api/commands',{type:'AskQuestion',commandId:'unsupported-graph-anchor',reviewId:'pr-20',text:'forged',anchor:{snapshotId:persisted.snapshot.snapshotId,path:'missing.ts',side:'head',startLine:1,endLine:1}});expect(invalid.state).toBe('rejected');expect(invalid.error).toBe('invalid_anchor');
  const unauth=await fetch(`${gatewayUrl}/api/reviews/pr-20`);expect(unauth.status).toBe(401);
  await page.getByRole('link',{name:'Return to change map'}).click();await expect(page.getByRole('heading',{name:'Change map',exact:true})).toBeFocused();
+ await expect(page.getByRole('navigation',{name:'Changed files'}).getByRole('button')).toHaveCount(3);
  await page.getByRole('checkbox',{name:'Show selected file’s changed spans'}).check();await expect(page.locator('.react-flow__node').filter({hasText:'After lines'}).first()).toBeVisible();
+ const boxes=await page.locator('.react-flow__node').evaluateAll(nodes=>nodes.map(node=>{const rect=node.getBoundingClientRect();return {left:rect.left,right:rect.right,top:rect.top,bottom:rect.bottom};}));
+ for(let i=0;i<boxes.length;i++)for(let j=i+1;j<boxes.length;j++){const a=boxes[i]!,b=boxes[j]!;expect(a.right<=b.left||b.right<=a.left||a.bottom<=b.top||b.bottom<=a.top).toBe(true);}
  await page.locator('.review-graph').screenshot({path:join(artifacts,'pr20-graph-spans.png')});
  await page.getByText(/Unresolved references and changed-path dispositions/).click();await expect(page.getByText('external destination').first()).toBeVisible();
  await page.screenshot({path:join(artifacts,'pr20-source-question-return.png'),fullPage:true});
