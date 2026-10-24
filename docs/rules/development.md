@@ -20,3 +20,7 @@ Use decompozr/design-system as a guidelines and design-principles reference. Imp
 
 
 When reusing declared dependencies through package-entry links in an isolated task worktree, keep generated cache directories (for example `.vite` and `.cache`) as real task-local ignored directories. Do not link generated cache output to a shared dependency checkout, or mutate/delete shared cache contents while correcting a task-local link. This preserves task isolation without introducing another dependency installation.
+
+## Regression test entrypoints
+
+Every committed regression test must be reachable through the repository's declared normal test entrypoint. When adding a top-level `tests/*.test.ts` suite, reconcile that inventory with `package.json`'s explicit test command before accepting the change. Keep each suite under its intended runtime: the fixed four-file Bun source-core target remains separate from the explicit Node suite list. An ad hoc focused pass does not establish that the normal entrypoint executes the regression. Run the declared entrypoint and confirm the new cases appear in its actual output; preserve failures and execution limits. This is a maintenance obligation, not a new discovery framework or permission to change dependency/lock/runtime policy.
