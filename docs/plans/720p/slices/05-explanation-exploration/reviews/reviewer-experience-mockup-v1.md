@@ -37,3 +37,7 @@ Fresh UI-first independent review remains unrun under the retained browser-polic
 ## Launch and boundary
 
 New owned loopback http://localhost:56676/ only, strictPort, exact allowed host mac-mini.duckbill-ionian.ts.net. Root alone may create authorized tailnet Serve8476 after local health; this worker does not change network configuration. Installed donor packages are read-only package-entry links with task-local caches. No install/global setting. Timing and geometry remain proposals: static paused opening and explicit Next, no production eight-second timing change. Stop at inspectable mockup and independent design critique; no production composition, publish/merge/deploy or layout adoption.
+
+## Reading-clearance correction before final capture
+
+Author captures showed that end-of-page padding alone lets a fixed player cover source lines in the middle of a long evidence view. The bounded mock now reserves a real bottom rail: the review reading viewport scrolls above it; the player and safe-area clearance occupy their own space. This preserves the accepted first-viewport composition and same-canvas source identity. It is a proposed mock geometry, not a product layout/timing adoption. Recheck the existing four authored journeys after this presentation correction, including reduced-height composer and scroll-to-evidence/return; do not broaden the product suite.
