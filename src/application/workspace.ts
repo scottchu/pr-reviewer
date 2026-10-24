@@ -7,7 +7,7 @@ import {createSourceCanvas,createCanvasFrameValidator} from './canvas.ts';
 import {createStoryBridge,storyProjection} from './story.ts';
 import {createPrivateSession} from './private-session.ts';
 import type {PrivateSession,GraphFrames} from './private-session.ts';
-import type {Anchor} from '../domain/public.ts';
+import type {Anchor,StoryReference} from '../domain/public.ts';
 import {createRegistry} from '../integration/registry.ts';
 export const createReviewWorkspace=(reviewId:string,initialSnapshotId?:string,options:{session?:PrivateSession;canvas?:SourceCanvas}={})=>{
  const session=options.session??createPrivateSession(),canvas=options.canvas??createSourceCanvas(),canvasFrames=createCanvasFrameValidator(),analysis=createAnalysisBridge(reviewId),tests=createHeadTestsBridge(reviewId),registry=createRegistry();
@@ -31,6 +31,8 @@ export const createReviewWorkspace=(reviewId:string,initialSnapshotId?:string,op
     await story.login(captured,current.snapshot);if(!owns(expected,captured))return;canvasAccessReady=true;syncCanvas();syncCanvasStory();
    }catch(error){if(owns(expected,captured))throw error;}
   };
+
+ const inspectSource=async(anchor:Anchor,fileKey?:string)=>{const expected=++generation,captured=credential;story.intent({type:'pause',reason:'reading'});if(anchor.snapshotId!==story.getSnapshot().snapshotId){story.assertCanNavigate();const current=await review.selectSnapshot(anchor.snapshotId);if(!owns(expected,captured))throw new Error('workspace_superseded');await Promise.all([analysis.select(anchor.snapshotId),story.select(current.snapshot)]);}if(!owns(expected,captured))throw new Error('workspace_superseded');await canvas.inspect(anchor,fileKey);if(!owns(expected,captured))throw new Error('workspace_superseded');};
 
  return {
   review,analysis,story,tests,canvas,canLeaveReview:canLeave,
@@ -61,7 +63,8 @@ export const createReviewWorkspace=(reviewId:string,initialSnapshotId?:string,op
   login,
   logout:()=>{generation++;credential='';canvasAccessReady=false;canvas.dispose();story.logout();analysis.logout();review.logout();},
   selectSnapshot:async(snapshotId:string)=>{const expected=++generation,captured=credential;story.assertCanNavigate();const current=await review.selectSnapshot(snapshotId);if(!owns(expected,captured))throw new Error('workspace_superseded');await Promise.all([analysis.select(snapshotId),story.select(current.snapshot)]);if(!owns(expected,captured))throw new Error('workspace_superseded');return current;},
-  inspectSource:async(anchor:Anchor,fileKey?:string)=>{const expected=++generation,captured=credential;story.intent({type:'pause',reason:'reading'});if(anchor.snapshotId!==story.getSnapshot().snapshotId){story.assertCanNavigate();const current=await review.selectSnapshot(anchor.snapshotId);if(!owns(expected,captured))throw new Error('workspace_superseded');await Promise.all([analysis.select(anchor.snapshotId),story.select(current.snapshot)]);}if(!owns(expected,captured))throw new Error('workspace_superseded');await canvas.inspect(anchor,fileKey);if(!owns(expected,captured))throw new Error('workspace_superseded');},
+  inspectSource,
+  inspectReference:async(reference:StoryReference)=>{const expected=generation,captured=credential;await story.openEvidence(reference);if(!owns(expected,captured))throw new Error('workspace_superseded');if(reference.type!=='snapshot_source')return;const current=review.getSnapshot().review?.snapshot,target=current?.snapshotId===reference.anchor.snapshotId?current:await review.readSnapshot(reference.anchor.snapshotId);if(!owns(expected,captured))throw new Error('workspace_superseded');const source=target.sources.find(source=>source.side===reference.anchor.side&&source.path===reference.anchor.path);if(!source||source.hash!==reference.contentHash)throw new Error('canvas_reference_unavailable');const proposed=storyProjection(story.getSnapshot())?.comparisonKey,candidates=review.getSnapshot().graph?.files.filter(file=>(reference.anchor.side==='base'?file.oldPath:file.newPath)===reference.anchor.path)??[],fileKey=candidates.some(file=>file.key===proposed)?proposed:candidates.length===1?candidates[0]!.key:candidates.length>1?undefined:canvas.getSnapshot().frame?.fileKey;await inspectSource(reference.anchor,fileKey);},
   openSource:async(anchor:Anchor,fileKey?:string)=>{const expected=++generation,captured=credential;if(anchor.snapshotId!==story.getSnapshot().snapshotId){story.assertCanNavigate();const current=await review.selectSnapshot(anchor.snapshotId);if(!owns(expected,captured))throw new Error('workspace_superseded');await Promise.all([analysis.select(anchor.snapshotId),story.select(current.snapshot)]);}if(!owns(expected,captured))throw new Error('workspace_superseded');story.selectSource(anchor,fileKey);},
   openPath:async(path:string)=>{story.assertCanNavigate();const snapshot=review.getSnapshot().review?.snapshot,source=snapshot?.sources.find(item=>item.path===path&&item.side==='head'&&item.lineCount>0)??snapshot?.sources.find(item=>item.path===path&&item.lineCount>0);if(!snapshot||!source)throw new Error('source_unavailable');story.selectSource({snapshotId:snapshot.snapshotId,side:source.side,path:source.path,startLine:1,endLine:1});},
   captureMap:(kind:'structural'|'semantic',snapshotId:string|null,frame:GraphFrames['structural']|GraphFrames['semantic'])=>{if(!snapshotId)return;mapInput={kind,snapshotId,frame};mapRoutes.get(kind)?.emit();mapInput=null;},

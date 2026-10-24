@@ -1,4 +1,4 @@
-import {sourceComparison,validateAnchor,projectGraph} from '../domain/public.ts';
+import {sourceComparison,sourceViews,validateAnchor,projectGraph} from '../domain/public.ts';
 import type {Anchor,Snapshot,SourceGraph,SourceView} from '../domain/public.ts';
 import type {GraphFrames} from './private-session.ts';
 export type CanvasFrame=NonNullable<GraphFrames['structural']>;
@@ -6,13 +6,26 @@ export type CanvasSide=Readonly<{side:'base'|'head';source:SourceView|null;ancho
 export type CanvasReading=Readonly<{fileKey:string;sides:readonly CanvasSide[]}>;
 export type SourceCanvasView=Readonly<{snapshot:Snapshot|null;graph:SourceGraph|null;frame:CanvasFrame|null;reading:CanvasReading|null;back:readonly CanvasFrame[];busy:boolean;error:string;restoreId:number}>;
 const initial=():SourceCanvasView=>({snapshot:null,graph:null,frame:null,reading:null,back:[],busy:false,error:'',restoreId:0});
+
+export const canvasProjection=(view:SourceCanvasView)=>{
+ const graph=view.graph,file=graph?.files.find(file=>file.key===view.frame?.fileKey)??null;
+ const primary=graph?.nodes.filter(node=>node.kind==='file'&&(node.fileKey?node.fileKey===file?.key:node.path===file?.oldPath||node.path===file?.newPath))??[],ids=new Set(primary.map(node=>node.id));
+ const relatedIds=new Set(graph?.edges.filter(edge=>edge.kind==='document_reference'&&(ids.has(edge.source)||ids.has(edge.target))).flatMap(edge=>[edge.source,edge.target])??[]);
+ const neighbors=graph?.nodes.filter(node=>node.kind==='file'&&!ids.has(node.id)&&relatedIds.has(node.id))??[];
+ const hunk=graph?.nodes.find(node=>node.kind==='hunk'&&node.side==='head'&&(node.fileKey?node.fileKey===file?.key:node.path===file?.newPath));
+ return {file,primary,neighbors,focusAnchor:hunk?.anchor??primary.find(node=>node.side==='head')?.anchor??primary[0]?.anchor??null};
+};
 const defaultFrame=(fileKey:string):CanvasFrame=>({fileKey,context:false,spans:false,spanId:'',viewport:{x:0,y:0,zoom:1}});
 const verifySource=async(source:SourceView)=>{const count=source.content===''?0:source.content.replace(/\n$/,'').split('\n').length;if(count!==source.lineCount)throw new Error('source_line_count_mismatch');const bytes=new TextEncoder().encode(source.content);if(bytes.length>1048576)throw new Error('source_budget_exceeded');const digest=Array.from(new Uint8Array(await crypto.subtle.digest('SHA-256',bytes)),value=>value.toString(16).padStart(2,'0')).join('');if(digest!==source.hash)throw new Error('source_checksum_mismatch');};
 const resolveInspection=(snapshot:Snapshot|null,graph:SourceGraph|null,anchor:Anchor,fileKey:string|undefined,expectedHash?:string):{reading:CanvasReading;contentHash:string}=>{
   if(!snapshot||!graph||graph.snapshotId!==snapshot.snapshotId||!validateAnchor(snapshot.snapshotId,snapshot.sources,anchor))throw new Error('canvas_source_unavailable');
-  const candidates=graph.files.filter(file=>(anchor.side==='base'?file.oldPath:file.newPath)===anchor.path),file=fileKey?candidates.find(file=>file.key===fileKey):candidates.length===1?candidates[0]:undefined;
+  const candidates=graph.files.filter(file=>(anchor.side==='base'?file.oldPath:file.newPath)===anchor.path),origin=fileKey?graph.files.find(file=>file.key===fileKey):undefined;
+  const projection=origin?canvasProjection({...initial(),snapshot,graph,frame:defaultFrame(origin.key)}):null;
+  const context=projection?.neighbors.find(node=>node.side===anchor.side&&node.path===anchor.path);
+  const file=fileKey?candidates.find(file=>file.key===fileKey)??(context?origin:undefined):candidates.length===1?candidates[0]:undefined;
   if(!file)throw new Error(candidates.length>1?'canvas_comparison_ambiguous':'canvas_comparison_unavailable');
-  const sources=sourceComparison(snapshot,anchor,file.key),selected=sources.find(source=>source.side===anchor.side&&source.path===anchor.path);
+  const pairedIds=context?new Set(graph.edges.filter(edge=>edge.kind==='comparison'&&(edge.source===context.id||edge.target===context.id)).flatMap(edge=>[edge.source,edge.target])):null;
+  const sources=context?sourceViews(snapshot).filter(source=>source.side===anchor.side&&source.path===anchor.path||graph.nodes.some(node=>pairedIds?.has(node.id)&&node.side===source.side&&node.path===source.path)):sourceComparison(snapshot,anchor,file.key),selected=sources.find(source=>source.side===anchor.side&&source.path===anchor.path);
   if(!selected)throw new Error('canvas_source_unavailable');if(expectedHash&&selected.hash!==expectedHash)throw new Error('source_checksum_mismatch');
   const sides=(['base','head'] as const).map(side=>{const source=sources.find(item=>item.side===side)??null,sourceAnchor=source&&source.lineCount>0?{snapshotId:snapshot.snapshotId,side,path:source.path,startLine:side===anchor.side?anchor.startLine:Math.max(1,source.lines.find(line=>line.status!=='unchanged'&&line.status!=='not_analyzed')?.number??1),endLine:side===anchor.side?anchor.endLine:Math.max(1,source.lines.find(line=>line.status!=='unchanged'&&line.status!=='not_analyzed')?.number??1)}:null;return {side,source,anchor:sourceAnchor,lines:[],omitted:source?.lineCount??0,reason:source&&source.lineCount===0?'Empty retained source; no selectable lines.':source?'':file.dispositions.find(item=>item.side===side)?.state==='prepared'?'Exact comparison side unavailable in the public source projection; no substitute partner.':file.dispositions.find(item=>item.side===side)?.reason??'Absent or unprepared in the exact pinned comparison.'};});
   return {reading:{fileKey:file.key,sides},contentHash:selected.hash};
@@ -54,6 +67,8 @@ export const createSourceCanvas=(options:{verify?:(source:SourceView)=>Promise<v
   subscribe:(listener:()=>void)=>{listeners.add(listener);return()=>{listeners.delete(listener);};},
   setReview:(snapshot:Snapshot|null,graph:SourceGraph|null)=>{disposed=false;const changed=state.snapshot?.snapshotId!==snapshot?.snapshotId;if(changed||!snapshot||!graph){interrupt();publish({...initial(),snapshot,graph,frame:graph?.files[0]?defaultFrame(graph.files[0].key):null});}else{const selected=state.frame?.inspection,source=selected?snapshot.sources.find(item=>item.side===selected.anchor.side&&item.path===selected.anchor.path):null;publish({...state,snapshot,graph,...(selected&&source?.hash!==selected.contentHash?{reading:null,error:'source_checksum_mismatch'}:{})});}},
   inspect,restore,
+  readFocused:async()=>{const projection=canvasProjection(state);if(!projection.focusAnchor||!projection.file)throw new Error('canvas_source_unavailable');await inspect(projection.focusAnchor,projection.file.key);},
+  inspectNeighbor:async(nodeId:string)=>{const projection=canvasProjection(state),node=projection.neighbors.find(node=>node.id===nodeId);if(!node||!projection.file)throw new Error('canvas_neighbor_unavailable');await inspect(node.anchor,projection.file.key);},
   back:async()=>{const frame=state.back.at(-1);if(!frame)return;await restore(frame);publish({...state,back:state.back.slice(0,-1)});},
   focusFile:(fileKey:string)=>{if(!state.graph?.files.some(file=>file.key===fileKey))throw new Error('canvas_comparison_unavailable');interrupt();publish({...state,frame:defaultFrame(fileKey),reading:null,busy:false,error:'',back:state.frame?[...state.back,structuredClone(state.frame)].slice(-16):state.back,restoreId:state.restoreId+1});},
   setViewport:(viewport:CanvasFrame['viewport'])=>{if(state.frame&&Number.isFinite(viewport.x)&&Number.isFinite(viewport.y)&&Number.isFinite(viewport.zoom)&&viewport.zoom>=.1&&viewport.zoom<=4)publish({...state,frame:{...state.frame,viewport:{...viewport}}});},
