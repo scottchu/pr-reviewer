@@ -2,7 +2,7 @@
 
 **Direction:** Accepted bounded implementation scope derived from the 2026-10-23 autonomous delivery request
 
-**Implementation:** Planned; slice 01 remains the observed baseline
+**Implementation:** Graph bootstrap engineering checkpoint exists on the task branch; continuation/history remains planned. Slice acceptance and native/human gates remain open.
 
 **Parents:** [Review loop](README.md), [architecture](../architecture.md)
 
@@ -47,3 +47,22 @@ The importer may produce a validated result while history/graph work proceeds. O
 ## Preserved authentication boundary
 
 Passkey usability is a known issue deferred to the final follow-up after slices 01–08. Preserve existing login, credentials, stored reviews and exact-session pairing now. No authentication redesign or iCloud-plugin modification is a prerequisite for graph, history, import, story or evidence work. Deferral does not authorize disabling existing access controls.
+
+## Bootstrap derivation contract (02A)
+
+Manual preparation accepts the legacy single `path`, or explicit unique `paths` to prepare multiple changed paths. Multi-file preparation reads the complete `git diff --name-status --no-renames` inventory between the pinned commits. Each entry retains status, old/new path, per-side disposition and reason; unselected, absent, binary, non-text and over-budget material stays visible. Added/deleted files have only their existing side; they must never receive invented empty source objects. Legacy single-path preparation continues to reject unavailable selected blobs rather than silently changing its snapshot identity.
+
+The source manifest may additionally retain bounded inline Markdown references. Each reference includes the literal link destination, exact link-line anchor, resolution method and either a validated same-side target anchor or an unresolved reason. Only inline Markdown links outside fenced code are analyzed; reference-style/HTML links and executable semantics are not analyzed. Relative destinations resolve from the source document directory in the pinned object, with URI decoding and repository containment checks. External URLs, missing paths/fragments, unavailable text and limits remain unresolved. Reading a referenced target is one-hop evidence acquisition, not recursive graph traversal. Prepared referenced files outside the changed inventory are labeled context. If a link prepares another changed side, its disposition becomes prepared with referenced-blob provenance. Identity includes the inventory and references as well as source hashes.
+
+The public application query derives a read-only source graph from that manifest: file nodes, contiguous changed-span nodes, comparison edges for verified pairs, containment edges and document-reference edges. Every node has exact source anchors or a visible unavailable disposition. Every edge carries evidence kind/method and source anchors. Stable IDs derive from snapshot/side/path/span. The graph carries `not analyzed` for callers/callees and unsupported Markdown forms, never a semantic leaf assertion. Comparison work is bounded; over-budget line analysis remains an explicit unknown while complete prepared source stays inspectable.
+
+React renders a file overview before-left/after-right with a selected-file change-span expansion to avoid shrinking the whole graph into unreadable text. The same graph has a keyboard-accessible node and relationship evidence list. Opening source updates explicit path/span selection, preserves question identity and offers return to graph. Missing sides show an absence disposition. Selection across files does not silently move a nonempty draft: the reviewer must clear/save it before choosing a new source. No graph action schedules a notification.
+
+
+## Current structure reflection
+
+**Observation:** The bounded implementation has a pure source/anchor domain, one transactional store, an authenticated gateway, a public React application bridge and a managed integration registry. Source acquisition remains an external immutable input. This is sufficient for the current product and keeps browser rendering from scheduling external work.
+
+**Best rebuild design now:** Retain those responsibility boundaries and a single authoritative database owner. Derive the source graph from immutable source facts at the application query boundary, keep viewport/expansion private, and keep the graph renderer ignorant of delivery policy. An independent graph store would create duplicate identity and mutation machinery for a read-only projection; a semantic parser abstraction would falsely expand this bootstrap's analyzed scope. Neither is justified now. Before adding history, retain snapshots explicitly rather than overloading the displayed source selection as mutable review identity.
+
+**Verified limits:** Current graph nodes use bounded source-heading/change excerpts rather than authored explanation. File relationships show structural evidence and do not establish why the change exists. A fresh reviewer must judge whether that orientation actually reduces assembly work; screenshots and click tests cannot establish it. The whole-product docs-only audit and independent engineering review remain separate acceptance gates.

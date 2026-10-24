@@ -16,6 +16,9 @@ export type Source = {
   hash: string;
   lineCount: number;
 };
+export type SourceDisposition = { side: "base" | "head"; path: string; state: "prepared" | "unprepared" | "unsupported" | "missing"; reason: string };
+export type ChangedFile = { status: "modified" | "added" | "deleted" | "type_changed"; oldPath: string | null; newPath: string | null; dispositions: SourceDisposition[] };
+export type DocumentReference = { destination: string; source: Anchor; target: Anchor | null; method: "inline_markdown_link"; reason: string | null };
 export type Snapshot = {
   title?: string;
   snapshotId: string;
@@ -25,6 +28,8 @@ export type Snapshot = {
   baseSha: string;
   headSha: string;
   sources: Source[];
+  changedFiles?: ChangedFile[];
+  documentReferences?: DocumentReference[];
 };
 export type Attachment = {
   attachmentId: string;
@@ -357,3 +362,6 @@ export const compareSources = (
   });
   return [view(base, a, left), view(head, b, right)];
 };
+
+export { projectGraph, sourceViews } from "./graph.ts";
+export type { SourceGraph, GraphNode, GraphEdge } from "./graph.ts";

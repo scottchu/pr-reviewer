@@ -27,3 +27,5 @@ Documents state intent and preserve knowledge; observed behavior and test eviden
 ## Navigation
 
 Use the [documentation index](../README.md) to find product knowledge, shared rules and round-local delivery plans.
+
+At each upscaling milestone, inspect actual code and structure and state the best design for rebuilding the whole current product now, with rationale and decision-relevant alternatives. Reconcile durable knowledge and actual behavior, then use a fresh docs-only independent audit of the entire delivered product. Missing material knowledge blocks milestone acceptance until corrected. The source preserves stories, behavior, interfaces, invariants, decisions, reasons and limits; copying implementation code or requiring old plans/chat to reconstruct behavior fails this contract.

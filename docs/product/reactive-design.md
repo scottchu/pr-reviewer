@@ -106,3 +106,5 @@ Record the selected release, scope, rationale, observed complexity and test resu
 - [React external-store subscription](https://react.dev/reference/react/useSyncExternalStore).
 
 Sources inspected 2026-10-23. Library versions and local behavior remain unverified until the bounded implementation decision; no package is installed by this design.
+
+Current bounded coordination uses an explicit managed registry, gateway-owned durable delivery and the React external-store bridge. Native lifecycle composition is adequate for this checkpoint; RxJS/Effect remain candidates only if future composition needs justify their cost. No stream package is required to rebuild current behavior.

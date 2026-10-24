@@ -4,7 +4,7 @@
 
 **Session rule:** The session initiating attachment is the attached session
 
-**Status:** CLI mechanisms and earlier Playground bridge evidence established; PR Reviewer adapters not implemented or product-verified
+**Status:** Bounded PR Reviewer CLI/MCP adapters and controlled-host tests exist; native Codex/Claude product acceptance remains unrun. Earlier Playground evidence is historical context.
 
 ## Start from the current session
 
@@ -64,6 +64,6 @@ Use the [existing-session integration checks](../plans/480p/probes/00-host-contr
 
 Record own-PR and candidate provenance, session/attachment identity, capability evidence and missing results per delivery. Do not store credentials or raw unrelated conversation history in docs. Later slices identify affected host regression checks; changed host paths require actual own-PR revalidation. Shared presentation improvements do not require duplicating every unit test, but support claims remain bounded to exercised integrations.
 
-## Current next step
+## Current capability and next evidence
 
-No server, plugin, session or configuration was changed. Implement the [first review-loop contracts](review-loop/README.md), reusing CLI notification and MCP read/reply. Test actual session routing as integration work, without inventing a generic host-feasibility prerequisite. Implementation remains subject to the slice's real source, testing and comprehension inputs. The product workflow is accepted; live adapter capability is still unknown.
+The local candidate implements the shared contracts, controlled CLI notification and actual MCP protocol read/reply, without proving native dynamic tool registration or actual native turn delivery. Codex owner pairing corroborates its exact existing metadata within the local-user trust boundary; Claude owner provisioning remains unavailable in the observed environment. Continue actual host-path verification independently; do not replace unknown native capability with fixture success. The runtime guide and contracts define current operation without requiring historical plans.

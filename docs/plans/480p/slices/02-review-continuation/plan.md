@@ -89,3 +89,13 @@ No product candidate or PR exists for this packet yet. Review scope and protocol
 [Slice 03](../../../720p/slices/03-whole-change/plan.md) may prepare its acquisition subsystem against boundary v1 without touching this writer's shared files. Before integration, return actual snapshot admission/query signatures, history migration decisions, graph manifest/provenance rules, reusable fixtures, reviewed candidate identity and all limits. Its owner reconciles those inputs before the vertical importer route.
 
 No slice02 implementation or acceptance run occurred during this planning task. Historical slice01 code review remains valid for its pinned candidate; its former blanket slice02 block is superseded by the explicit capability amendment, not rewritten as a prior pass.
+
+## Active executor checkpoint
+
+**Date:** 2026-10-23
+
+**Source packet:** 773ce21b61b95f16b722d72ecd4824c079fe52b7
+
+**Owner/workspace:** continuation/bootstrap executor; `/tmp/pr-reviewer-02-graph-history`, branch `build-review-history-and-graph`.
+
+**Status:** 02A implementation in progress; existing pilot untouched. Product derivation details are in evolution.md. PR20's three changed Markdown paths are verified against the pinned local comparison. Independent graph-first understanding, native host acceptance and human comprehension remain unrun.

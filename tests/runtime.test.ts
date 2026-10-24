@@ -272,3 +272,16 @@ test("data root rejects another Git worktree and its metadata before creation", 
     rmSync(root, { recursive: true, force: true });
   }
 });
+
+test('02-G multi-file preparation retains complete PR20 inventory and pinned document references',async()=>{
+ const {buildSnapshot}=await import('../scripts/prepare.ts');
+ const snapshot=buildSnapshot({prNumber:20,prUrl:'https://github.com/scottchu/pr-reviewer/pull/20',baseSha:'aeadce0ace7f509160d0630ee18c75d74e4537b2',headSha:'df171b2ce8aee0c2e72249fc68138cf2f0e507d6',paths:['docs/product/review-loop/runtime.md','docs/product/review-loop/README.md','docs/plans/480p/slices/01-review-loop/implementation-evidence.md']});
+ assert.equal(snapshot.changedFiles?.length,3);
+ assert.equal(snapshot.changedFiles?.flatMap(f=>f.dispositions).filter(d=>d.state==='prepared').length,6);
+ assert.ok(snapshot.documentReferences?.some(r=>r.target));
+ assert.ok(snapshot.documentReferences?.some(r=>r.reason==='external destination'));
+ for(const r of snapshot.documentReferences??[]){assert.equal(r.source.snapshotId,snapshot.snapshotId);if(r.target)assert.equal(r.target.snapshotId,snapshot.snapshotId);}
+ const partial=buildSnapshot({prNumber:20,prUrl:'https://github.com/scottchu/pr-reviewer/pull/20',baseSha:snapshot.baseSha,headSha:snapshot.headSha,paths:['docs/product/review-loop/runtime.md']});
+ assert.equal(partial.changedFiles?.length,3);
+ for(const disposition of partial.changedFiles?.flatMap(f=>f.dispositions)??[])assert.equal(disposition.state==='prepared',partial.sources.some(s=>s.path===disposition.path&&s.side===disposition.side));
+});

@@ -31,3 +31,8 @@ Revocation/replacement fences pending and late writes at apply. An old CLI call 
 Playground's agent-native-markdown-editor bridge has source and recorded live results for thread resume, turn start, real scoped edits/comments, result capture and restart of the same thread. Its dedicated editor thread is not proof of attaching to this current chat, and its fallback-new-thread behavior must not be copied here. The retained PR Reviewer transfer used a queue to this existing receiver. Reuse these mechanisms and test the product adapter as implementation work; do not block all development on a standalone generic host probe.
 
 Each supported host still requires actual product CLI notification → MCP read/reply → authoritative UI evidence before its acceptance. Tests must identify destination, command/event/invocation IDs and persisted reply. A fault may correctly remain unknown; that passes the truthful handling case, not proof of successful delivery.
+
+
+## Definitive failure and retry policy
+
+A spawn error before CLI execution, unverified Claude-owner route, or revoked attachment before dispatch is failed with a bounded reason. A nonzero exit, signal, timeout or thrown delivery error after durable claim remains unknown because external acceptance cannot be excluded. Exit zero is notified, not working/answered. Process restart changes in-flight notifying to unknown. All claimed events retain their invocation and attempt, including definitively failed ones; no automatic retry is implemented for either failed or unknown outcomes. The user sees attention/reconciliation information, and the original inbox remains queryable. A future explicit retry command needs its own policy; reconnect alone does not authorize relaunch.

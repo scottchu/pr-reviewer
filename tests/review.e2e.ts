@@ -306,3 +306,35 @@ test("explicit manual PR19 target renders its own path and saves the declared re
   });
   expect(persisted.attempts).toHaveLength(0);
 });
+
+test('02-G real PR20 graph → keyboard source → anchored question → return, with honest provenance',async({page})=>{
+ await stop();rmSync(root,{recursive:true,force:true});root=mkdtempSync(join(tmpdir(),'pr-reviewer-pr20-graph-'));
+ const spec=join(root,'owner-selection.json');writeFileSync(spec,JSON.stringify({prNumber:20,prUrl:'https://github.com/scottchu/pr-reviewer/pull/20',title:'Private preview and repository-path entry',baseSha:'aeadce0ace7f509160d0630ee18c75d74e4537b2',headSha:'df171b2ce8aee0c2e72249fc68138cf2f0e507d6',paths:['docs/product/review-loop/runtime.md','docs/product/review-loop/README.md','docs/plans/480p/slices/01-review-loop/implementation-evidence.md']}));
+ const previous=process.env.REVIEW_SOURCE_SPEC;process.env.REVIEW_SOURCE_SPEC=spec;try{await start();}finally{if(previous===undefined)delete process.env.REVIEW_SOURCE_SPEC;else process.env.REVIEW_SOURCE_SPEC=previous;}
+ await page.setViewportSize({width:1600,height:1200});await page.goto(uiUrl);await page.getByLabel('Local access token').fill(token);await page.getByRole('button',{name:'Open review'}).click();
+ await expect(page.getByRole('heading',{name:'Change map',exact:true})).toBeVisible();
+ await expect(page.locator('.react-flow__node').first()).toBeVisible();
+ await expect(page.getByText(/Callers\/callees not analyzed/)).toBeVisible();
+ await expect(page.getByRole('checkbox',{name:'Show referenced context'})).not.toBeChecked();
+ // Capture only the actual graph before source drilldown/question; no answer key
+ // or separate diff/source enters the graph-first review bundle.
+ const artifacts=process.env.REVIEW_E2E_ARTIFACT_DIR!;
+ await page.locator('.review-graph').screenshot({path:join(artifacts,'pr20-graph-only.png')});
+ writeFileSync(join(artifacts,'pr20-graph-only.aria.txt'),await page.locator('.review-graph').ariaSnapshot());
+ const persisted=(await api('/api/reviews/pr-20')) as unknown as Review;
+ writeFileSync(join(artifacts,'pr20-target-identity.json'),JSON.stringify({reviewId:persisted.reviewId,snapshotId:persisted.snapshot.snapshotId,prUrl:persisted.snapshot.prUrl,baseSha:persisted.snapshot.baseSha,headSha:persisted.snapshot.headSha},null,2));
+ const open=page.getByRole('button',{name:'Open head docs/product/review-loop/runtime.md',exact:true});await open.focus();await page.keyboard.press('Enter');
+ await expect(page.getByLabel('Source file')).toHaveValue('docs/product/review-loop/runtime.md');
+ await page.getByLabel('Start line').fill('35');await page.getByLabel('End line').fill('57');
+ await page.getByLabel('Your question').fill('Which boundaries and rollback does the private preview retain, and what does the source leave unverified?');
+ await expect(page.getByText('Source selection is held while your question draft is nonempty. Save or clear it before navigating.')).toBeVisible();
+ await page.getByRole('button',{name:'Save question'}).click();await expect(page.getByText('1 saved question · 0 answers')).toBeVisible();
+ const saved=(await api('/api/reviews/pr-20')) as unknown as Review;expect(saved.questions[0]?.anchor).toMatchObject({snapshotId:persisted.snapshot.snapshotId,path:'docs/product/review-loop/runtime.md',startLine:35,endLine:57});expect(saved.attempts).toHaveLength(0);
+ const invalid=await api('/api/commands',{type:'AskQuestion',commandId:'unsupported-graph-anchor',reviewId:'pr-20',text:'forged',anchor:{snapshotId:persisted.snapshot.snapshotId,path:'missing.ts',side:'head',startLine:1,endLine:1}});expect(invalid.state).toBe('rejected');expect(invalid.error).toBe('invalid_anchor');
+ const unauth=await fetch(`${gatewayUrl}/api/reviews/pr-20`);expect(unauth.status).toBe(401);
+ await page.getByRole('link',{name:'Return to change map'}).click();await expect(page.getByRole('heading',{name:'Change map',exact:true})).toBeFocused();
+ await page.getByRole('checkbox',{name:'Show selected file’s changed spans'}).check();await expect(page.locator('.react-flow__node').filter({hasText:'After lines'}).first()).toBeVisible();
+ await page.locator('.review-graph').screenshot({path:join(artifacts,'pr20-graph-spans.png')});
+ await page.getByText(/Unresolved references and changed-path dispositions/).click();await expect(page.getByText('external destination').first()).toBeVisible();
+ await page.screenshot({path:join(artifacts,'pr20-source-question-return.png'),fullPage:true});
+});
