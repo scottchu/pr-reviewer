@@ -1,3 +1,5 @@
+import {createTestRunner} from '../test-jobs/public.ts';
+import type {HeadTestRunnerOptions} from '../test-jobs/public.ts';
 import {createAnalysisRunner} from "../analysis-jobs/public.ts";
 import {createImportRunner} from "../import-jobs/public.ts";
 import type {ImportArtifacts} from "../import-artifacts/public.ts";
@@ -6,7 +8,7 @@ import type {PreparedSnapshotWitness} from "../source-preparation/public.ts";
 import { createServer } from "node:http";
 import type { IncomingMessage, ServerResponse } from "node:http";
 import { z } from "zod";
-import { headTestCommandSchema,headTestScopeSchema,headTestQuerySchema,commandSchema,importCommandSchema,storyCommandSchema,storyQuerySchema,storyContextQuerySchema,analysisCommandSchema,analysisQuerySchema,semanticSourceQuerySchema } from "../domain/public.ts";
+import { headTestArtifactQuerySchema,headTestCommandSchema,headTestScopeSchema,headTestQuerySchema,commandSchema,importCommandSchema,storyCommandSchema,storyQuerySchema,storyContextQuerySchema,analysisCommandSchema,analysisQuerySchema,semanticSourceQuerySchema } from "../domain/public.ts";
 import type { Principal } from "../domain/public.ts";
 import type { Store } from "../storage/public.ts";
 import { createScheduler } from "../delivery/public.ts";
@@ -35,9 +37,10 @@ const send = (res: ServerResponse, status: number, value: unknown) => {
   });
   res.end(JSON.stringify(value));
 };
-export const createGateway = (store: Store, notify: Notify, options:{importArtifacts?:ImportArtifacts}={}) => {
+export const createGateway = (store: Store, notify: Notify, options:{importArtifacts?:ImportArtifacts;testExecution?:HeadTestRunnerOptions}={}) => {
   const importRunner=options.importArtifacts?createImportRunner(store,options.importArtifacts):null;
   const analysisRunner=createAnalysisRunner(store);
+  const testRunner=options.testExecution?createTestRunner(store,options.testExecution):null;
   const scheduler = createScheduler(store, notify);
   const registry = createRegistry();
   const deliveryRoute = registry.register(
@@ -67,6 +70,9 @@ export const createGateway = (store: Store, notify: Notify, options:{importArtif
       };
       if(req.method==='POST'&&url.pathname==='/api/tests/targets'){
         send(res,200,store.tests.targets(authorization.slice(7),headTestScopeSchema.parse(await readBody(req))));return;
+      }
+      if(req.method==='POST'&&url.pathname==='/api/tests/artifact'){
+        send(res,200,await store.tests.artifact(authorization.slice(7),headTestArtifactQuerySchema.parse(await readBody(req))));return;
       }
       if(req.method==='POST'&&url.pathname==='/api/tests/jobs'){
         send(res,200,store.tests.query(authorization.slice(7),headTestQuerySchema.parse(await readBody(req))));return;
@@ -163,7 +169,7 @@ export const createGateway = (store: Store, notify: Notify, options:{importArtif
       if (req.method === "POST" && url.pathname === "/api/commands") {
         const input = await readBody(req);
         if (input !== null && typeof input === 'object' && 'type' in input && (input.type === 'RequestTest' || input.type === 'CancelTest')) {
-          send(res,200,store.tests.command(authorization.slice(7),headTestCommandSchema.parse(input)));return;
+          const receipt=store.tests.command(authorization.slice(7),headTestCommandSchema.parse(input));testRunner?.wake();send(res,200,receipt);return;
         }
         const command = commandSchema.parse(input);
         let witness:PreparedSnapshotWitness|undefined;
@@ -233,7 +239,7 @@ export const createGateway = (store: Store, notify: Notify, options:{importArtif
             ? error.message
             : "invalid_request";
       const known = [
-        "test_job_unavailable","test_target_unavailable","test_target_conflict","repository_not_configured","execution_not_configured",
+        "test_artifact_unavailable","artifact_integrity_error","invalid_artifact_offset","qualification_required","test_job_unavailable","test_target_unavailable","test_target_conflict","repository_not_configured","execution_not_configured",
         "test_queue_full","test_history_limit","test_storage_limit","test_job_conflict","invalid_test_cursor","stale_execution_owner",
         "story_version_unavailable","story_context_unavailable","story_author_conflict","command_conflict",
         "revision_unavailable","analysis_record_unavailable","analysis_job_unavailable",
@@ -269,8 +275,8 @@ export const createGateway = (store: Store, notify: Notify, options:{importArtif
     },
     close: async () => {
       scheduler.stop();
-      const importsStopped=importRunner?.stop(),analysisStopped=analysisRunner.stop();
-      await Promise.all([importsStopped,analysisStopped]);
+      const importsStopped=importRunner?.stop(),analysisStopped=analysisRunner.stop(),testsStopped=testRunner?.stop();
+      await Promise.all([importsStopped,analysisStopped,testsStopped]);
       registry.dispose();
       await new Promise<void>((resolve, reject) =>
         server.close((error) => (error ? reject(error) : resolve())),
@@ -278,5 +284,6 @@ export const createGateway = (store: Store, notify: Notify, options:{importArtif
     },
     diagnostics: () => registry.diagnostics(),
     analysisDiagnostics:()=>analysisRunner.diagnostics(),
+    testDiagnostics:()=>testRunner?.diagnostics()??[],
   };
 };

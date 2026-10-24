@@ -10,3 +10,6 @@ export type {HeadTestPreparationWitness,HeadTestConfiguration,HeadTestQualificat
 
 export {observeHeadTestOutcome,readHeadTestOutcome,readHeadTestArtifact} from './outcome.ts';
 export type {HeadTestOutcomeWitness,HeadArtifactLocation} from './outcome.ts';
+
+export {createTestRunner} from './coordinator.ts';
+export type {HeadTestRunnerOptions} from './coordinator.ts';

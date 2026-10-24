@@ -3,7 +3,7 @@ import { join } from "node:path";
 const allowed: Record<string, string[]> = {
   domain: ["source-acquisition","source-analysis"],
   storage: ["domain","source-preparation","source-acquisition","source-analysis","analysis-jobs","test-jobs"],
-  "test-jobs":["domain","storage","import-jobs"],
+  "test-jobs":["domain","storage","import-jobs","integration"],
   "source-preparation":["domain","source-acquisition","source-analysis"],
   "source-acquisition":[],
   "source-analysis":[],
@@ -11,7 +11,7 @@ const allowed: Record<string, string[]> = {
   "import-artifacts":[],
   "import-jobs":["domain","storage","source-acquisition","source-preparation","import-artifacts","integration"],
   delivery: ["domain", "storage"],
-  server: ["domain", "storage", "delivery", "integration", "source-preparation","import-jobs","import-artifacts","analysis-jobs"],
+  server: ["domain", "storage", "delivery", "integration", "source-preparation","import-jobs","import-artifacts","analysis-jobs","test-jobs"],
   mcp: ["domain"],
   integration: [],
   application: ["domain", "integration"],
