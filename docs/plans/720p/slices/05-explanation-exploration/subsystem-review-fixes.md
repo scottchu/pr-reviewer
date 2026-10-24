@@ -22,3 +22,11 @@ The initial tool-output runs lacked raw log files. A bounded repeat used isolate
 - RED: /tmp/pr-reviewer-subsystem-preview-evidence/fix-regressions-red-83871d5.log, three reproduced failures, SHA256 bd573fb81c916afe254ecac95da0a16bd548435aa6846af0778c49d3326721fa.
 - PASS: /tmp/pr-reviewer-subsystem-preview-evidence/fix-regressions-pass-6478d9b.log, three passed, SHA256 5d4b248ab2e7100f0c3ae0394c22c73c723d843fc7c3b0a9f8859ebb3b8ef202.
 - Independent source recheck: /tmp/pr-reviewer-subsystem-engineering-review/recheck-6478d9b.md, SHA256 43293fad5bf9aa4d0e7cab64d4da747baea63bd482d86b5ccd19e1eade988172. Root read READY for these three P2 fixes only (independent nine unit tests, strict and34 adversarial assertions); it is not E/C or whole-mock/layout acceptance.
+
+## Final whole-source review: cross-lens prose locate
+
+Date: 2026-10-24
+Candidate reviewed:8f87d8e / code c292818
+Status: confirmed P2 join gap; correction required before final draft publication
+
+Global Comments currently resolves prose version only from the discussion lens, while other lenses substitute v1. A v2 thread located from source, import or evidence can become active but remain excluded from the displayed content. Exact content/version/availability must belong to the shared prose presentation independently of scenario/lens. Global locate must always resolve the immutable prose anchor and display its version in the same canvas, retaining prior frame and independent drafts. No current-version substitution is allowed. Add a failing cross-scenario regression spanning source/evidence/import, plus exact Back/frame/draft assertions, then fix and rerun affected original/connected journeys. Keep the published task branch and create/update only one stacked draft PR. No production or layout acceptance follows the correction.
