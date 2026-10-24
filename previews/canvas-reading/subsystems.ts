@@ -18,3 +18,18 @@ export type DiscussionPreview=Readonly<{delivery:'not_attached'|'idle'|'unknown'
 export const initialDiscussion=():DiscussionPreview=>({delivery:'not_attached',prose:'current',viewingOriginal:false});
 export type DiscussionAction={type:'delivery';delivery:DiscussionPreview['delivery']}|{type:'prose';prose:DiscussionPreview['prose']}|{type:'original'};
 export const discussionTransition=(state:DiscussionPreview,action:DiscussionAction):DiscussionPreview=>action.type==='delivery'?{...state,delivery:action.delivery}:action.type==='prose'?{...state,prose:action.prose,viewingOriginal:false}:state.prose==='missing'?state:{...state,viewingOriginal:true};
+
+export type MockJobState='queued'|'preparing'|'running'|'cancel_requested'|'cancelled'|'passed'|'failed'|'unknown';
+export type MockJob=Readonly<{jobId:string;jobRevision:number;commandId:string;invocationId:string;resultId:string|null;state:MockJobState;effectDisposition:'none'|'unresolved'|'quiescent';headSha:string;environment:string;provenance:'test_only_execution';counts:{passed:number;failed:number}|null}>;
+export type TestsPreview=Readonly<{simulation:boolean;sequence:number;selected:string|null;jobs:readonly MockJob[]}>;
+export const initialTests=():TestsPreview=>({simulation:false,sequence:0,selected:null,jobs:[]});
+export const testsTransition=(state:TestsPreview,action:{type:'enable'}|{type:'request';head:string}|{type:'observe';state:MockJobState}|{type:'select';id:string}|{type:'history';head:string}):TestsPreview=>{
+ if(action.type==='enable')return {...state,simulation:true};
+ if(action.type==='select')return state.jobs.some(job=>job.jobId===action.id)?{...state,selected:action.id}:state;
+ if(action.type==='request'||action.type==='history'){
+  if(!state.simulation)return state;const sequence=state.sequence+1,jobId=`mock-job-${sequence}`,historical=action.type==='history';
+  const job:MockJob={jobId,jobRevision:1,commandId:`mock-command-${sequence}`,invocationId:`mock-invocation-${sequence}`,resultId:historical?`mock-result-${sequence}`:null,state:historical?'passed':'queued',effectDisposition:historical?'quiescent':'none',headSha:action.head,environment:historical?'historical-fixture-environment':'current-fixture-environment',provenance:'test_only_execution',counts:historical?{passed:3,failed:0}:null};
+  return {...state,sequence,selected:jobId,jobs:[...state.jobs,job]};
+ }
+ return {...state,jobs:state.jobs.map(job=>{if(job.jobId!==state.selected||['passed','failed','cancelled'].includes(job.state))return job;const terminal=['passed','failed','cancelled'].includes(action.state),result=action.state==='passed'||action.state==='failed';return {...job,jobRevision:job.jobRevision+1,state:action.state,effectDisposition:terminal?'quiescent':action.state==='queued'?'none':'unresolved',resultId:result?`mock-result-${job.jobId}`:null,counts:result?{passed:action.state==='passed'?3:2,failed:action.state==='failed'?1:0}:null};})};
+};
