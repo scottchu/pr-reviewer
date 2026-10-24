@@ -6,7 +6,7 @@ import type {Store,ImportGrant} from '../storage/public.ts';
 import {canonical} from '../domain/public.ts';
 import type {Snapshot} from '../domain/public.ts';
 import {createRegistry} from '../integration/registry.ts';
-import {createTrackedEffects,groupExists} from './process.ts';
+import {createTrackedEffects,processQuiescent} from './process.ts';
 import type {ImportArtifacts} from '../import-artifacts/public.ts';
 export type {ImportArtifacts} from '../import-artifacts/public.ts';
 export const createImportRunner=(store:Store,artifacts:ImportArtifacts,options:{effects?:(grant:ImportGrant,signal:AbortSignal)=>AcquisitionEffects&{terminationConfirmed:()=>boolean}}={})=>{
@@ -25,7 +25,7 @@ export const createImportRunner=(store:Store,artifacts:ImportArtifacts,options:{
    // Quiescence is observation only. The interrupted invocation is never replayed.
    for(const job of imports.unknown(owner)){
     const processes=job.invocations.at(-1)?.processes??[];
-    if(processes.every(process=>process.state==='exited'&&(process.pid===undefined||!groupExists(process.pid))||process.state==='started'&&process.pid!==undefined&&!groupExists(process.pid)))imports.confirmQuiescent(owner,job.jobId);
+    if(processes.every(processQuiescent))imports.confirmQuiescent(owner,job.jobId);
    }
    admission.emit();
    while(!stopped){

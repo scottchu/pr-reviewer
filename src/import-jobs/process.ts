@@ -1,8 +1,11 @@
+import {processQuiescenceEligible} from '../domain/public.ts';
+import type {ProcessQuiescenceRecord} from '../domain/public.ts';
 import {spawn,execFileSync} from 'node:child_process';
 import type {Store,ImportGrant} from '../storage/public.ts';
 import type {AcquisitionEffects,Command,CommandResult,IssueReason} from '../source-acquisition/public.ts';
 const processIdentity=(pid:number):string|null=>{try{return execFileSync('/bin/ps',['-p',String(pid),'-o','lstart=','-o','pgid='],{encoding:'utf8',timeout:1000,maxBuffer:1024,stdio:['ignore','pipe','ignore']}).trim()||null;}catch{return null;}};
 export const groupExists=(pid:number):boolean=>{try{process.kill(-pid,0);return true;}catch(error){return (error as NodeJS.ErrnoException).code!=='ESRCH';}};
+export const processQuiescent=(observation:ProcessQuiescenceRecord):boolean=>processQuiescenceEligible(observation)&&(observation.pid===undefined||!groupExists(observation.pid));
 export type OwnedAcquisitionObservations={launchLimit:()=>number;recordProcess:(observation:import("../domain/public.ts").ProcessObservation)=>void;cancelled:()=>boolean};
 export const createOwnedAcquisitionEffects=({observations,executables={},phaseTimeoutMs=120000,signal}:{observations:OwnedAcquisitionObservations;executables?:Partial<Record<Command['executable'],string>>;phaseTimeoutMs?:number;signal?:AbortSignal})=>{
  const phaseStarted=Date.now(),maxLaunches=observations.launchLimit();let ordinal=0,confirmed=true,poisoned=false,running=false;
@@ -39,7 +42,7 @@ export const createOwnedAcquisitionEffects=({observations,executables={},phaseTi
     if(finished)return;exited=true;finished=true;cleanup();
     // The parent exit alone does not prove descendants in its owned group stopped.
     const childConfirmed=!journalLost&&(!started||Boolean(child.pid&&!groupExists(child.pid)));if(!childConfirmed)poisoned=true;confirmed=!poisoned&&childConfirmed;running=false;
-    try{observations.recordProcess({ordinal:current,executable:command.executable,state:'exited',exitCode:code,signal,reason:cancelled?'cancelled':reason??(code===0?'ok':'command_failed')});}catch{confirmed=false;}
+    try{observations.recordProcess({ordinal:current,executable:command.executable,state:'exited',...(child.pid?{pid:child.pid}:{}),...(identity?{startIdentity:identity}:{}),...(!started&&spawnError&&child.pid===undefined?{spawnDisposition:'not_spawned' as const}:{}),exitCode:code,signal,reason:cancelled?'cancelled':reason??(code===0?'ok':'command_failed')});}catch{confirmed=false;}
     if(!confirmed){reject(new Error('termination_unknown'));return;}
     if(cancelled){reject(new Error('import_cancelled'));return;}
     if(reason||spawnError||code!==0){resolve({kind:'unavailable',reason:reason??'command_failed'});return;}

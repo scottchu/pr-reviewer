@@ -51,8 +51,8 @@ test("analysis/import distinct grants share one lease, startup uncertainty preve
         assert.equal(f.store.analysis.unknown(replacement).length, 1);
         assert.equal(f.store.analysis.claim(replacement), null);
         assert.throws(() => f.store.analysis.cancelled(claim.grant), /stale_analysis_runner/);
-        f.store.analysis.confirmQuiescent(replacement, claim.job.jobId);
-        assert.ok(f.store.imports.claim(imports));
+        assert.throws(() => f.store.analysis.confirmQuiescent(replacement, claim.job.jobId), /analysis_process_unresolved/);
+        assert.equal(f.store.imports.claim(imports), null);
     }
     finally {
         f.cleanup();

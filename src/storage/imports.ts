@@ -1,3 +1,4 @@
+import {processQuiescenceEligible} from '../domain/public.ts';
 import type {ExecutionLease} from './execution.ts';
 import {createHash,randomUUID} from 'node:crypto';
 import type {DatabaseSync} from 'node:sqlite';
@@ -95,6 +96,7 @@ export const createImportStore=({db,tx,load,save,execution,limits={}}:Ports)=>{
   recordProcess:(value:ImportGrant,observation:ProcessObservation)=>tx(()=>{
    const {job,invocation}=grant(value);if(job.state==='cancel_requested'&&observation.state==='requested')throw new Error('import_cancelled');
    const old=invocation.processes.find(process=>process.ordinal===observation.ordinal);
+   if(observation.spawnDisposition==='not_spawned'&&(!processQuiescenceEligible(observation)||old?.state!=='requested'||old.pid!==undefined||old.startIdentity!==undefined))throw new Error('invalid_import_observation');
    if(observation.state==='requested'){if(old||observation.ordinal!==invocation.processes.length+1||invocation.processes.length>=phaseLimit(invocation)||invocation.processes.some(process=>process.state!=='exited'))throw new Error('import_process_limit');invocation.processes.push({...observation,requestedAt:new Date().toISOString()});}
    else {if(!old||old.executable!==observation.executable||observation.state==='started'&&old.state!=='requested'||observation.state==='exited'&&!['requested','started'].includes(old.state))throw new Error('invalid_import_observation');Object.assign(old,observation,observation.state==='started'?{startedAt:new Date().toISOString()}:{endedAt:new Date().toISOString()});}
    update(job);
@@ -116,7 +118,7 @@ export const createImportStore=({db,tx,load,save,execution,limits={}}:Ports)=>{
   fail:(value:ImportGrant,reason:string,terminationConfirmed=true)=>tx(()=>{const {job,invocation}=grant(value);if(terminationConfirmed){terminal(invocation);release(job,invocation);}invocation.state=terminationConfirmed?(job.state==='cancel_requested'?'cancelled':'completed'):'unknown';job.state=!terminationConfirmed?'unknown':job.state==='cancel_requested'?'cancelled':'failed';job.reason=reason;update(job);}),
   ready:(value:ImportOwner)=>{owner(value);return all().filter(job=>job.state==='result_ready');},
   unknown:(value:ImportOwner)=>{owner(value);return all().filter(job=>job.state==='unknown');},
-  confirmQuiescent:(value:ImportOwner,jobId:string)=>tx(()=>{owner(value);const job=get(jobId);if(job.state!=='unknown')throw new Error('invalid_request');const invocation=job.invocations.at(-1);if(invocation)execution.clearQuiescent('import',job.jobId,invocation.invocationId);job.state=job.artifact?'needs_reverification':'failed';job.reason='interrupted_invocation_not_replayed';update(job);}),
+  confirmQuiescent:(value:ImportOwner,jobId:string)=>tx(()=>{owner(value);const job=get(jobId);if(job.state!=='unknown')throw new Error('invalid_request');const invocation=job.invocations.at(-1);if(invocation?.processes.some(process=>!processQuiescenceEligible(process)))throw new Error('import_process_unresolved');if(invocation)execution.clearQuiescent('import',job.jobId,invocation.invocationId);job.state=job.artifact?'needs_reverification':'failed';job.reason='interrupted_invocation_not_replayed';update(job);}),
   admit:(value:ImportOwner,jobId:string,snapshot:Snapshot,witness:PreparedSnapshotWitness):ImportReceipt=>{
    // Expensive content checks and witness lookup precede the short owning transaction.
    const observed=get(jobId),fingerprint=hash(canonical({jobId,target:observed.target,reviewId:observed.reviewId,snapshot}));const observedReview=observed.target?load(observed.reviewId):null;const alreadyRetained=observedReview&&(observedReview.snapshots??[observedReview.snapshot]).some(retained=>retained.snapshotId===snapshot.snapshotId);const exceedsBudget=(observedReview?retainedBytes(observedReview):0)+(alreadyRetained?0:encodedSourceBytes(snapshot))>sourceQuota;let verified=false;try{validateProviderSnapshot(snapshot);verified=isPreparedSnapshotWitness(witness,observed.reviewId,snapshot,jobId);}catch{}

@@ -26,7 +26,7 @@ export const runAnalysisWorker:AnalysisWorker=async(value,observations,options={
   const cleanup=()=>{clearTimeout(deadline);clearInterval(poll);if(killTimer)clearTimeout(killTimer);if(settleTimer)clearTimeout(settleTimer);options.signal?.removeEventListener('abort',abort);};
   const finish=(unknown=false)=>{
    if(finished)return;finished=true;cleanup();let terminal=unknown||journalLost||(!closed&&started)||Boolean(child.pid&&groupExists(child.pid))?'termination_unknown':reason??(spawnFailed||exitCode!==0?'analysis_worker_failed':'ok');
-   if(exited||!started){try{observations.recordProcess({ordinal:1,executable:'node',state:'exited',exitCode,signal:exitSignal,reason:terminal});}catch{terminal='termination_unknown';}}
+   if(exited||!started){try{observations.recordProcess({ordinal:1,executable:'node',state:'exited',...(child.pid?{pid:child.pid}:{}),...(ownedIdentity?{startIdentity:ownedIdentity}:{}),...(!started&&spawnFailed&&child.pid===undefined?{spawnDisposition:'not_spawned' as const}:{}),exitCode,signal:exitSignal,reason:terminal});}catch{terminal='termination_unknown';}}
    child.stdin.destroy();child.stdout.destroy();child.stderr.destroy();child.unref();
    if(terminal!=='ok'){reject(Error(terminal));return;}
    try{const envelope=freeze(validateEnvelope(parseFrame(Buffer.concat(chunks),limits.outputBytes),request));const witness=Object.freeze({}) as AnalysisWorkerWitness;witnesses.set(witness,{request:requestKey,envelope});resolve({envelope,witness});}catch(error){reject(Error(error instanceof Error&&/^analysis_worker_/.test(error.message)?error.message:'analysis_worker_validation'));}

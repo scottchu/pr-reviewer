@@ -2,7 +2,7 @@ import {analysisDiagnosticCode} from "../domain/public.ts";
 import type { Store, AnalysisGrant } from "../storage/public.ts";
 import { acquirePreparedContext } from "../source-preparation/public.ts";
 import type { AcquisitionEffects } from "../source-acquisition/public.ts";
-import { createOwnedAcquisitionEffects, groupExists } from "../import-jobs/public.ts";
+import { createOwnedAcquisitionEffects, processQuiescent } from "../import-jobs/public.ts";
 import { createRegistry } from "../integration/registry.ts";
 import { runAnalysisWorker } from "./public.ts";
 import type { AnalysisWorker } from "./contract.ts";
@@ -33,7 +33,7 @@ export const createAnalysisRunner = (store: Store, options: AnalysisRunnerOption
         try {
             for (const job of analysis.unknown(owner)) {
                 const processes = job.invocations.at(-1)?.processes ?? [];
-                if (processes.every(process => process.state === "exited" && (process.pid === undefined || !groupExists(process.pid)) || process.state === "started" && process.pid !== undefined && !groupExists(process.pid)))
+                if (processes.every(processQuiescent))
                     analysis.confirmQuiescent(owner, job.jobId);
             }
             while (!stopped && !fenced) {
