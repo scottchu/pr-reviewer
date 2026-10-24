@@ -36,3 +36,12 @@ Core candidate: `00a9966a283a83967cf45487403cfa98f0322dc9`. The normal registere
 05B must consume this exact independently reviewed DTO/read-model checkpoint. UI/application schemas must not fork. It must add application-owned playback/focus/read coordination and managed story/context routes without background publication moving source/cursor/draft. 05C owns exploration/return frames and write-ahead question recovery; current legacy AskQuestion behavior is unchanged. Exact authoring references, server errors/CAS/minima and historical/broken-evidence markers above are the delivered inputs. No06 execution contract is invented.
 
 Task-owned raw fixtures self-remove after tests. The ignored real node_modules entry links and isolated task worktree are retained for independent review and broader verification. No unknown artifact was removed; durable knowledge is reconciled into the maintained story contract and this checkpoint.
+
+
+## Independent review correction: coordinate ownership
+
+Status: independent P2 on exact code `00a9966` blocks05B pending correction/review. Reviewer reproduced a U+2028-separated declaration whose parser line2 lies on snapshot LFline1: initial static-claim/focus matching incorrectly accepted unrelated LFline2 and rejected correct LFline1. Existing21 tests did not exercise that cross-coordinate case; their green result is retained and does not establish this behavior.
+
+Correction authority is reconciled in the durable evidence-facade contract before code: resolve/validate exact retained semantic source bytes and coordinates, separately normalize static anchors to snapshot LF spans only for identical snapshot/side/path/hash/text, and match each reference only within its owning coordinate format. Preserve exact semantic anchors, including CRLF/U+2028/U+2029/astral UTF-16 offsets. No looser line-range fallback or current-source substitution is permitted. Public facts add `snapshotAnchors`; existing semantic anchors remain unchanged.
+
+Required evidence: reproduce the original red, then actual admitted node/edge cases for base/head, correct mapped LF spans versus unrelated parser-numbered LF lines, wrong side/hash/spans and semantic offset negatives. Original candidate remains superseded until a corrected commit receives independent review.
