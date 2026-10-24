@@ -2,7 +2,7 @@
 
 Date: 2026-10-24
 
-Status: transferred and locally verified; root independent review and delivery pending.
+Status: independent source engineering review READY; draft PR27 published. Own-PR graph-first review, native host validation, merge and deployment remain open.
 
 Parent: [slice 02](../plan.md).
 
@@ -38,3 +38,16 @@ Verification used Node v24.21.0 at /Applications/ChatGPT.app/Contents/Resources/
 - Whitespace diff and bounded dependency/script/source comparisons passed. Only the declared SDK/doc/test files changed.
 
 Root receives the clean commit plus /private/tmp/pr-reviewer-sdk-main-code.diff and this handoff. Review auth preservation and exact source isolation first; prior READY applies to the migration source, not independently to this transfer. Native Codex/Claude listen/wake, graph-first comprehension, actual host delivery, publication, merge and deployment remain unclaimed. No live pilot, session attachment, notification or native/global setting was touched. No further worker writes are planned after freeze.
+
+
+## Independent transfer review receipt
+
+Date: 2026-10-24.
+
+Reviewed implementation: 2c3c3d115cf46648be9419e611bc38b5f6985985, against e3b270e5f49a9215452b0b86702946043e979059. The subsequent receipt commit changes this document only; it does not change the independently reviewed code, tests, dependencies or lock.
+
+Verdict: READY for bounded source engineering delivery; no P1/P2 finding identified. Root read the complete independent report. Report: /tmp/pr-reviewer-sdk-main-independent/review.md. SHA-256: 4def438873e7354eb283c663eac34a8c9da71c0ca1b7b34214dd53195f5243fb.
+
+The reviewer independently executed six actual MCP tests, strict TypeScript, subsystem boundaries, manifest/lock/source-isolation assertions and whitespace checks, all passing. Parsed lock comparison confirmed common entries unchanged and all 84 removals within the former SDK dependency closure. The reviewer inspected and attributed the author's 47 Bun / 310 Node passes and two controlled-host React passes; those broader checks were not independently rerun. No unchanged runtime checks are rerun for this documentation receipt.
+
+[Draft PR27](https://github.com/scottchu/pr-reviewer/pull/27) publishes this SDK-only candidate. Earlier no-publication instructions and pending-review language above describe the preceding local handoff; root subsequently authorized draft publication and this review reconciliation. Production listen remains absent. READY is not whole-slice acceptance, own-PR graph-first comprehension, native Codex/Claude listen/wake, original-session connection, automatic reaction, merge or deployment evidence. Those gates remain open. The draft stays unmerged and no native/pilot action is authorized by this receipt.
