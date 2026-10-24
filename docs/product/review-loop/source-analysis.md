@@ -107,6 +107,28 @@ All existing preflight/source/metadata/AST and invocation-scan bounds apply. `ou
 
 The profile is intentionally narrower than target TypeScript compilation. No default library or ambient packages are loaded. Unknown standard-library/property calls remain visible. Checking lexical bindings under this bounded profile cannot establish runtime reachability, evaluation order, effects, dependency injection behavior or real execution. Business rules for certainty, budgets and accepted facts belong to the source-analysis domain, never to React rendering or stream operators.
 
+### Exact unresolved-site reason vocabulary
+
+An unresolved site's required reason is exactly one of these15 literals. The literal participates in its ID as `[callerNodeId,siteAnchor,reason]`; a display label or conceptual synonym is not a compatible replacement. These site reasons are distinct from whole-request unavailable reasons, loader issues and unresolved-seed codes. Candidates remain source anchors for investigation, never confirmed call targets.
+
+| Literal | Meaning under the bounded static profile |
+|---|---|
+| `unsupported_dispatch` | The invocation's dispatch form is outside supported direct/namespace-import binding, including runtime object methods, computed properties and constructors. |
+| `dynamic_invocation` | Dynamic invocation form such as eval, dynamic import, calling a returned function, tagged template or decorator; no definite supported implementation is asserted. |
+| `mutable_binding` | The target binding is mutable or an observed write makes it uncertain, including an affected namespace import/member. |
+| `missing_module` | A relative module cannot be resolved from the supplied source map. |
+| `external_module` | A bare/package module lies outside the supplied local profile without a supported pinned alias resolution. |
+| `alias_configuration_gap` | A package-import/alias-shaped request or blocked pinned configuration cannot be resolved within the supported configuration facts. |
+| `declaration_only` | Binding reaches declarations/signatures without a supported implementation body. |
+| `ambiguous_implementation` | A unique supported implementation cannot be selected, including competing implementations/declarations or unsupported star-export ambiguity. |
+| `parse_obstruction` | Syntax failure in a required target module obstructs binding. |
+| `semantic_obstruction` | Required symbol/export semantics or an intersecting compiler diagnostic prevents a supported source binding. |
+| `excluded_source` | The requested module is known in the supplied inventory but unavailable to the selected prepared-source resolver. |
+| `missing_binding` | The invocation has no lexical symbol or no declarations establishing its binding. |
+| `unsupported_binding` | A symbol exists but its declaration/binding form is outside supported callable implementations, including type-only imports/exports and function-valued parameters. |
+| `cyclic_resolution` | Alias/re-export traversal revisits a binding without establishing a unique implementation. |
+| `reexport_limit` | The finite named re-export traversal would exceed the configured reExportLinks budget. |
+
 Write detection must follow lexical binding identity for ordinary assignments, updates, destructuring and iteration assignment targets. In a destructuring shorthand, the compiler's property symbol and written value binding are distinct; using only the property symbol can falsely confirm a later call to a reassigned function. Inspect the written value binding, and do not mark unrelated right-hand/default-value expressions as binding writes. This rule follows the immutability policy rather than assuming a const keyword proves no observed write. Named function-expression recursion may resolve to its owning supported const implementation; passing that expression as a callback still does not establish an invocation.
 
 TypeScript assertion and non-null wrappers on an assignment target do not make the underlying binding immutable. Observed-write detection must unwrap those transparent target expressions. A computed namespace-import member write must also prevent a later member call from being confirmed against an earlier implementation; this is conservative source uncertainty, not evidence that the target runtime permits mutation of module exports. Runtime object member writes must not be promoted into namespace bindings or method-call edges. Independent review found these missing cases in the initial preparation candidate; correction and revalidation are recorded in the preparation evidence.
