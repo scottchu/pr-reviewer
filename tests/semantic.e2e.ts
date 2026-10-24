@@ -175,3 +175,57 @@ test('actual React unavailable worker result cannot label a corpus admitted and 
  await expect(panel.getByRole('heading',{name:'Admitted corpus account',exact:true})).toBeVisible();await expect(panel.getByRole('heading',{name:'Pending preparation corpus account',exact:true})).toBeVisible();await expect(panel.getByText(/New analysis unavailable: budget_exceeded/)).toBeVisible();await expect(panel.getByRole('heading',{name:'Admitted static neighborhood',exact:true})).toBeVisible();
  writeFileSync(testInfo.outputPath('unavailable-account-evidence.json'),JSON.stringify({provenance:'Actual Chrome, real Git/SQLite/gateway/fixed TypeScript6 workers through public React controls. Inventory/compute limit results are genuine; no forged analysis JSON.',candidate:execFileSync('git',['rev-parse','HEAD'],{encoding:'utf8'}).trim(),sourceDirty:execFileSync('git',['status','--porcelain'],{encoding:'utf8'}).trim().length>0,reviewId:targetReview,snapshotId:target.snapshotId,initialUnavailable:unavailable,priorAdmitted:admitted,retained},null,2));
 });
+
+test('unavailable compute React capture and legacy reload preserve draft/source without poisoned polling',async({page},info)=>{
+ test.setTimeout(60000);
+ const id='unavailable-recovery-browser';
+ writeFileSync(join(fixture.root,'caller.ts'),'import {callee} from "./callee";\nexport const caller=()=>{'+ 'callee({});'.repeat(4001)+'};\n');
+ fixture.git('add','caller.ts');fixture.git('commit','-qm','real bounded compute recovery fixture');
+ const target=pinned(snapshot.baseSha,fixture.git('rev-parse','HEAD'));fixture.store.prepare(id,target);
+ const read=async()=>await api(`/api/analysis?reviewId=${id}&snapshotId=${target.snapshotId}`) as AnalysisView;
+ await page.setViewportSize({width:1440,height:1080});await page.goto(`${uiUrl.split('?')[0]}?reviewId=${id}&snapshotId=${target.snapshotId}`);
+ await page.getByLabel('Your question').fill('Preserve my unavailable-compute draft');
+ await expect.poll(()=>page.evaluate(()=>JSON.parse(sessionStorage.getItem('pr-reviewer:private-view:v1')??'{}').value?.drafts?.some((item:{text:string})=>item.text==='Preserve my unavailable-compute draft'))).toBe(true);
+ await api('/api/analysis/commands',{...fixture.request,commandId:'unavailable-browser-prepare',reviewId:id,snapshotId:target.snapshotId});
+ await until(async()=>(await read()).jobs.at(-1)?.state==='awaiting_declarations');
+ const prepared=await read(),inventory=prepared.preparation!.inventory!,job=prepared.jobs.at(-1)!;
+ if(inventory.status!=='available')throw new Error('real_inventory_required');
+ const declarations=inventory.declarations.filter(item=>item.name==='callee');
+ await api('/api/analysis/commands',{type:'SelectAnalysisDeclarations',commandId:'unavailable-browser-compute',jobId:job.jobId,expectedJobRevision:job.jobRevision,corpusId:job.corpusId!,inventoryId:job.inventoryId!,declarationIds:declarations.map(item=>item.id)});
+ await until(async()=>(await read()).jobs.at(-1)?.state==='unavailable');
+ const failed=await read();expect(failed.analysis?.status).toBe('unavailable');if(failed.analysis?.status!=='unavailable')throw new Error('real_compute_failure_required');expect(failed.analysis.limit).toBe('outputSites');expect(failed.selectedAnalysisId).toBeNull();
+ const sourceAnchor=declarations.find(item=>item.declaration.side==='head')!.declaration;
+ const reads:{status:number;analysisId:string|null}[]=[];
+ page.on('response',response=>{const url=new URL(response.url());if(url.pathname==='/api/analysis'&&url.searchParams.get('reviewId')===id)reads.push({status:response.status(),analysisId:url.searchParams.get('analysisId')});});
+ const saved=()=>page.evaluate(()=>JSON.parse(sessionStorage.getItem('pr-reviewer:private-view:v1')??'{}').value as import('../src/application/private-session.ts').PrivateStoryView);
+ const panel=page.getByRole('region',{name:'Function neighborhoods'});
+ await expect(panel.getByText(/New analysis unavailable:/)).toBeVisible();
+ await expect.poll(async()=>(await saved())?.maps.semantic?.analysisId).toBeNull();
+ const initial=await saved();expect(initial.drafts.find(item=>item.id===initial.activeDraftId)?.text).toBe('Preserve my unavailable-compute draft');
+ // Only the private session frame is seeded as legacy data. The failed result,
+ // source and job above were produced by the actual gateway and worker.
+ const legacy={...initial,maps:{...initial.maps,semantic:{analysisId:failed.analysis.analysisId,focus:'',viewport:{x:31,y:47,zoom:1.2},fullSource:true,sourceAnchor,corpusId:failed.corpus!.corpusId}}};
+ // Seed before application startup so unload/checkpoint effects cannot replace
+ // the deliberately retained old-format record with the current live frame.
+ await page.addInitScript(()=>{const raw=sessionStorage.getItem('controlled-next-private-view');if(raw){sessionStorage.setItem('pr-reviewer:private-view:v1',raw);sessionStorage.removeItem('controlled-next-private-view');}});
+ const seed=async(value:typeof legacy)=>page.evaluate(value=>{const record=JSON.parse(sessionStorage.getItem('pr-reviewer:private-view:v1')!);record.value=value;sessionStorage.setItem('controlled-next-private-view',JSON.stringify(record));},value);
+ await seed(legacy);const start=reads.length;await page.reload();
+ await expect(page.getByLabel('Your question')).toHaveValue('Preserve my unavailable-compute draft');
+ writeFileSync(info.outputPath('reload-state.json'),JSON.stringify({saved:await saved(),text:await page.locator('body').innerText(),reads},null,2));
+ await expect(page.getByText('Saved unavailable analysis was not admitted; restored its diagnostic view without a historical analysis pin.',{exact:false})).toBeVisible();
+ await expect(panel.getByRole('region',{name:'Retained semantic source'}).getByLabel('Exact retained source')).toContainText('export const callee');
+ await expect(panel.getByRole('button',{name:'Return to selected span',exact:true})).toBeVisible();
+ await expect.poll(async()=>(await saved()).maps.semantic?.analysisId).toBeNull();
+ const restored=await saved();expect(restored.maps.semantic).toEqual({...legacy.maps.semantic,analysisId:null});expect(restored.drafts).toEqual(legacy.drafts);
+ await expect.poll(()=>reads.length-start).toBeGreaterThanOrEqual(3);expect(reads.slice(start).every(item=>item.status===200&&item.analysisId===null)).toBe(true);
+ await page.screenshot({path:info.outputPath('unavailable-recovered.png'),fullPage:true});
+ const missing={...legacy,maps:{...legacy.maps,semantic:{...legacy.maps.semantic,analysisId:'f'.repeat(64)}}};
+ await seed(missing);await page.reload();await expect(page.getByText('analysis_record_unavailable',{exact:false}).first()).toBeVisible();
+ const missingStart=reads.length;await expect.poll(()=>reads.length-missingStart).toBeGreaterThanOrEqual(2);expect(reads.slice(missingStart).every(item=>item.status===200&&item.analysisId===null)).toBe(true);
+ // A newer preparation has no compute result. It cannot justify rewriting the old pin.
+ const before=await read();await api('/api/analysis/commands',{...fixture.request,commandId:'newer-unavailable-browser-prepare',reviewId:id,snapshotId:target.snapshotId,expectedAnalysisGeneration:before.analysisGeneration});
+ await until(async()=>(await read()).jobs.at(-1)?.state==='awaiting_declarations');expect((await read()).analysis).toBeNull();
+ await seed(legacy);await page.reload();await expect(page.getByText('analysis_record_unavailable',{exact:false}).first()).toBeVisible();
+ const newerStart=reads.length;await expect.poll(()=>reads.length-newerStart).toBeGreaterThanOrEqual(2);expect(reads.slice(newerStart).every(item=>item.status===200&&item.analysisId===null)).toBe(true);
+ writeFileSync(info.outputPath('unavailable-recovery-evidence.json'),JSON.stringify({implementation:'47e3233cb92aa4173027b48466d49f6aea2d10f5',candidate:execFileSync('git',['rev-parse','HEAD'],{encoding:'utf8'}).trim(),reviewId:id,snapshotId:target.snapshotId,base:target.baseSha,head:target.headSha,failedAnalysisId:failed.analysis.analysisId,realComputeLimit:failed.analysis.limit,legacyPrivateFrameSeeded:true,reads,limits:'Controlled author engineering Chrome/React test, not own-PR or unfamiliar comprehension/native host evidence.'},null,2));
+});
