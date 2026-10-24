@@ -9,8 +9,13 @@ declare const ownerBrand:unique symbol;
 declare const grantBrand:unique symbol;
 export type ImportOwner={readonly [ownerBrand]:true};
 export type ImportGrant={readonly [grantBrand]:true};
-type Ports={db:DatabaseSync;tx:<T>(operation:()=>T)=>T;load:(id:string)=>Review;save:(review:Review)=>void};
-export const createImportStore=({db,tx,load,save}:Ports)=>{
+export type ImportLimits={maxLaunches?:number;maxRetainedSourceBytes?:number};
+type Ports={limits?:ImportLimits;db:DatabaseSync;tx:<T>(operation:()=>T)=>T;load:(id:string)=>Review;save:(review:Review)=>void};
+export const createImportStore=({db,tx,load,save,limits={}}:Ports)=>{
+ const ceiling=limits.maxLaunches??4096,sourceQuota=limits.maxRetainedSourceBytes??64*1024*1024;
+ if(!Number.isSafeInteger(ceiling)||ceiling<1||ceiling>4096||!Number.isSafeInteger(sourceQuota)||sourceQuota<1||sourceQuota>64*1024*1024)throw new Error('invalid_import_limit');
+ const phaseLimit=(invocation:ImportInvocation)=>Math.min(invocation.phase==='discovery'?256:4096,ceiling);
+ const encodedSourceBytes=(snapshot:Snapshot)=>Buffer.byteLength(JSON.stringify(snapshot.sources),'utf8');
  db.exec('CREATE TABLE IF NOT EXISTS import_jobs(id TEXT PRIMARY KEY,body TEXT NOT NULL); CREATE TABLE IF NOT EXISTS import_receipts(id TEXT PRIMARY KEY,actor TEXT NOT NULL,fingerprint TEXT NOT NULL,body TEXT NOT NULL); CREATE TABLE IF NOT EXISTS import_owner(id INTEGER PRIMARY KEY CHECK(id=1),generation TEXT NOT NULL);');
  const owners=new WeakMap<object,string>(),grants=new WeakMap<object,{generation:string;jobId:string;invocationId:string}>();
  const all=()=> (db.prepare('SELECT body FROM import_jobs ORDER BY rowid').all() as {body:string}[]).map(row=>JSON.parse(row.body) as ImportJob);
@@ -23,7 +28,7 @@ export const createImportStore=({db,tx,load,save}:Ports)=>{
  const terminal=(invocation:ImportInvocation)=>{if(invocation.processes.some(process=>process.state!=='exited'))throw new Error('import_process_unresolved');};
  const matching=(candidate:ProviderCandidate)=> (db.prepare('SELECT review_id,current_snapshot_id FROM review_import_identities WHERE provider=? AND host=? AND target_project=? AND change_number=? ORDER BY review_id').all(candidate.provider,candidate.host,candidate.targetProject,candidate.number) as {review_id:string;current_snapshot_id:string}[]).map(row=>({reviewId:row.review_id,currentSnapshotId:row.current_snapshot_id}));
  const view=(job:ImportJob)=>{const {credentialReference,...publicJob}=job;return publicJob;};
- const retainedBytes=(review:Review)=> (review.snapshots??[review.snapshot]).reduce((n,snapshot)=>n+snapshot.sources.reduce((sum,source)=>sum+Buffer.byteLength(source.content,'utf8'),0),0);
+ const retainedBytes=(review:Review)=> (review.snapshots??[review.snapshot]).reduce((n,snapshot)=>n+encodedSourceBytes(snapshot),0);
  const command=(token:string,input:ImportCommand):ImportReceipt=>{
   const reference=hash(token),principal=user(reference),parsed=importCommandSchema.parse(input),fingerprint=hash(canonical(parsed));
   return tx(()=>{
@@ -82,10 +87,11 @@ export const createImportStore=({db,tx,load,save}:Ports)=>{
     const result=Object.freeze({}) as ImportGrant;grants.set(result,{generation,jobId:job.jobId,invocationId:invocation.invocationId});return {job,grant:result};
    }return null;
   }),
+  launchLimit:(value:ImportGrant)=>phaseLimit(grant(value).invocation),
   recordProcess:(value:ImportGrant,observation:ProcessObservation)=>tx(()=>{
    const {job,invocation}=grant(value);if(job.state==='cancel_requested'&&observation.state==='requested')throw new Error('import_cancelled');
    const old=invocation.processes.find(process=>process.ordinal===observation.ordinal);
-   if(observation.state==='requested'){if(old||observation.ordinal!==invocation.processes.length+1||invocation.processes.length>=256||invocation.processes.some(process=>process.state!=='exited'))throw new Error('import_process_limit');invocation.processes.push({...observation,requestedAt:new Date().toISOString()});}
+   if(observation.state==='requested'){if(old||observation.ordinal!==invocation.processes.length+1||invocation.processes.length>=phaseLimit(invocation)||invocation.processes.some(process=>process.state!=='exited'))throw new Error('import_process_limit');invocation.processes.push({...observation,requestedAt:new Date().toISOString()});}
    else {if(!old||old.executable!==observation.executable||observation.state==='started'&&old.state!=='requested'||observation.state==='exited'&&!['requested','started'].includes(old.state))throw new Error('invalid_import_observation');Object.assign(old,observation,observation.state==='started'?{startedAt:new Date().toISOString()}:{endedAt:new Date().toISOString()});}
    update(job);
   }),
@@ -109,7 +115,7 @@ export const createImportStore=({db,tx,load,save}:Ports)=>{
   confirmQuiescent:(value:ImportOwner,jobId:string)=>tx(()=>{owner(value);const job=get(jobId);if(job.state!=='unknown')throw new Error('invalid_request');job.state=job.artifact?'needs_reverification':'failed';job.reason='interrupted_invocation_not_replayed';update(job);}),
   admit:(value:ImportOwner,jobId:string,snapshot:Snapshot,witness:PreparedSnapshotWitness):ImportReceipt=>{
    // Expensive content checks and witness lookup precede the short owning transaction.
-   const observed=get(jobId),fingerprint=hash(canonical({jobId,target:observed.target,reviewId:observed.reviewId,snapshot}));const observedReview=observed.target?load(observed.reviewId):null;const exceedsBudget=observedReview&&retainedBytes(observedReview)+snapshot.sources.reduce((n,s)=>n+Buffer.byteLength(s.content,'utf8'),0)>64*1024*1024&&!(observedReview.snapshots??[observedReview.snapshot]).some(s=>s.snapshotId===snapshot.snapshotId);let verified=false;try{validateProviderSnapshot(snapshot);verified=isPreparedSnapshotWitness(witness,observed.reviewId,snapshot,jobId);}catch{}
+   const observed=get(jobId),fingerprint=hash(canonical({jobId,target:observed.target,reviewId:observed.reviewId,snapshot}));const observedReview=observed.target?load(observed.reviewId):null;const alreadyRetained=observedReview&&(observedReview.snapshots??[observedReview.snapshot]).some(retained=>retained.snapshotId===snapshot.snapshotId);const exceedsBudget=(observedReview?retainedBytes(observedReview):0)+(alreadyRetained?0:encodedSourceBytes(snapshot))>sourceQuota;let verified=false;try{validateProviderSnapshot(snapshot);verified=isPreparedSnapshotWitness(witness,observed.reviewId,snapshot,jobId);}catch{}
    return tx(()=>{
     owner(value);const job=get(jobId),id=job.admissionCommandId;let principal:Principal={kind:'user',actorId:job.actorId};if(id!==observed.admissionCommandId||canonical(job.target)!==canonical(observed.target))throw new Error('stale_import_runner');
     const old=db.prepare('SELECT actor,fingerprint,body FROM import_receipts WHERE id=?').get(id) as {actor:string;fingerprint:string;body:string}|undefined;
@@ -119,8 +125,8 @@ export const createImportStore=({db,tx,load,save}:Ports)=>{
      principal=user(job.credentialReference);
      if(job.state!=='result_ready'||!verified||!job.candidate||canonical(job.candidate)!==canonical(snapshot.candidate)||observed.reviewId!==job.reviewId)throw new Error('source_unavailable');
      let review:Review,result:Record<string,unknown>;
-     if(job.target){const current=load(job.reviewId);if(exceedsBudget)throw new Error('retained_source_limit');const next=applyCommand(current,principal,{type:'AddSnapshot',commandId:id,reviewId:job.reviewId,expectedCurrentSnapshotId:job.target.expectedCurrentSnapshotId,identityScheme:'acquisition_v1',snapshot},{entity:randomUUID(),event:randomUUID()},new Date().toISOString());review=next.review;result=next.result;}
-     else{if(matching(snapshot.candidate!).length)throw new Error('existing_review_conflict');if(db.prepare('SELECT id FROM reviews WHERE id=?').get(job.reviewId))throw new Error('review_identity_conflict');review=createImportedReview(job.reviewId,snapshot);result={snapshotId:snapshot.snapshotId};}
+     if(job.target){const current=load(job.reviewId);const next=applyCommand(current,principal,{type:'AddSnapshot',commandId:id,reviewId:job.reviewId,expectedCurrentSnapshotId:job.target.expectedCurrentSnapshotId,identityScheme:'acquisition_v1',snapshot},{entity:randomUUID(),event:randomUUID()},new Date().toISOString());if(exceedsBudget&&next.result.alreadyRetained!==true)throw new Error('retained_source_limit');review=next.review;result=next.result;}
+     else{if(exceedsBudget)throw new Error('retained_source_limit');if(matching(snapshot.candidate!).length)throw new Error('existing_review_conflict');if(db.prepare('SELECT id FROM reviews WHERE id=?').get(job.reviewId))throw new Error('review_identity_conflict');review=createImportedReview(job.reviewId,snapshot);result={snapshotId:snapshot.snapshotId};}
      save(review);job.state='admitted';job.reason=null;update(job);receipt={commandId:id,actorId:principal.actorId,state:'applied',jobId,jobRevision:job.jobRevision,result:{...result,reviewId:review.reviewId,reviewRevision:review.revision}};
     }catch(error){if(job.state==='result_ready')job.state='admission_conflict';job.reason=error instanceof Error?error.message:'source_unavailable';update(job);receipt={commandId:id,actorId:principal.actorId,state:'rejected',jobId,jobRevision:job.jobRevision,result:{},error:job.reason};}
     job.admission=receipt;put(job);db.prepare('INSERT INTO import_receipts VALUES (?,?,?,?)').run(id,principal.actorId,fingerprint,JSON.stringify(receipt));return receipt;

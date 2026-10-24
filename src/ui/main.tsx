@@ -27,7 +27,7 @@ const SourcePane = ({
       aria-label={`${source.side === "base" ? "Before" : "After"} source`}
     >
       <header>
-        <h2>{source.side === "base" ? "Before" : "After"}</h2>
+        <h2>{source.side === "base" ? "Before" : "After"}</h2><span>{source.path}</span>
         <span>
           {source.side === "base"
             ? "− removals · ∼ modifications"
@@ -196,7 +196,7 @@ const App = () => {
       </header>
       <section className="snapshot-selection" aria-label="Snapshot history"><label>Snapshot<select value={review.snapshot.snapshotId} disabled={Boolean(draft.trim())||state.busy} onChange={event=>{void chooseSnapshot(event.target.value);}}>{(review.snapshotSummaries??[{snapshotId:review.snapshot.snapshotId,baseSha:review.snapshot.baseSha,headSha:review.snapshot.headSha}]).map(snapshot=><option key={snapshot.snapshotId} value={snapshot.snapshotId}>{snapshot.snapshotId===(review.currentSnapshotId??review.snapshot.snapshotId)?"Current":"History"} · {snapshot.headSha.slice(0,12)} · {snapshot.snapshotId.slice(0,12)}</option>)}</select></label><p role="status">{review.snapshot.snapshotId===(review.currentSnapshotId??review.snapshot.snapshotId)?"Viewing current snapshot":"Viewing historical snapshot"}. Selection is private and does not move saved source or discussion.</p>{state.error&&<p role="alert">{state.error}</p>}</section>
       {state.selecting&&<p role="status">Opening the selected snapshot. Question composition is held until its source is ready.</p>}
-      {state.graph && <ReviewGraph graph={state.graph} selectedPath={selected?.path??""} onOpen={openSource}/>}
+      {state.graph && <ReviewGraph graph={state.graph} selectedPath={selected?.path??""} selectedFileKey={comparisonKey} onOpen={openSource}/>}
       <section className="source-identity">
         <h2>{selected?.path ?? state.sources[0]?.path}</h2>
         <p>
@@ -210,7 +210,7 @@ const App = () => {
       {selected && <div className="source-grid">
             {(["base", "head"] as const).map(side => {
               const source = sourceComparison(review.snapshot,selected,comparisonKey).find(item=>item.side===side);
-              return source ? <SourcePane key={side} source={source} review={review} selected={selected} onSelect={openSource} /> : <section key={side} className="source-pane"><header><h2>{side === "base" ? "Before" : "After"}</h2></header><p>This side has no prepared source for {selected.path}. {review.snapshot.changedFiles?.find(file => file.oldPath === selected.path || file.newPath === selected.path)?.dispositions.find(item => item.side === side)?.reason ?? "Absent from the pinned change or not prepared; no selectable anchor."}</p></section>;
+              return source ? <SourcePane key={side} source={source} review={review} selected={selected} onSelect={anchor=>{void openSource(anchor,comparisonKey);}} /> : <section key={side} className="source-pane"><header><h2>{side === "base" ? "Before" : "After"}</h2></header><p>This side has no prepared source for {selected.path}. {review.snapshot.changedFiles?.find(file => file.oldPath === selected.path || file.newPath === selected.path)?.dispositions.find(item => item.side === side)?.reason ?? "Absent from the pinned change or not prepared; no selectable anchor."}</p></section>;
             })}
           </div>}
           <section className="conversation">

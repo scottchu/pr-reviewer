@@ -4,11 +4,11 @@ import type {AcquisitionEffects,Command,CommandResult,IssueReason} from '../sour
 const processIdentity=(pid:number):string|null=>{try{return execFileSync('/bin/ps',['-p',String(pid),'-o','lstart=','-o','pgid='],{encoding:'utf8',timeout:1000,maxBuffer:1024,stdio:['ignore','pipe','ignore']}).trim()||null;}catch{return null;}};
 export const groupExists=(pid:number):boolean=>{try{process.kill(-pid,0);return true;}catch(error){return (error as NodeJS.ErrnoException).code!=='ESRCH';}};
 export const createTrackedEffects=({imports,grant,executables={},phaseTimeoutMs=120000,signal}:{imports:Store['imports'];grant:ImportGrant;executables?:Partial<Record<Command['executable'],string>>;phaseTimeoutMs?:number;signal?:AbortSignal})=>{
- const phaseStarted=Date.now();let ordinal=0,confirmed=true,poisoned=false,running=false;
+ const phaseStarted=Date.now(),maxLaunches=imports.launchLimit(grant);let ordinal=0,confirmed=true,poisoned=false,running=false;
  const run:AcquisitionEffects['run']=async command=>{
   if(poisoned)throw new Error('termination_unknown');if(running)throw new Error('import_process_limit');
   if(signal?.aborted||imports.cancelled(grant))throw new Error('import_cancelled');
-  const remaining=phaseTimeoutMs-(Date.now()-phaseStarted);if(remaining<=0||ordinal>=256)throw new Error('import_phase_limit');
+  const remaining=phaseTimeoutMs-(Date.now()-phaseStarted);if(remaining<=0||ordinal>=maxLaunches)throw new Error('import_phase_limit');
   const current=++ordinal;imports.recordProcess(grant,{ordinal:current,executable:command.executable,state:'requested'});running=true;
   const env:NodeJS.ProcessEnv={...process.env};for(const key of Object.keys(env))if(key.startsWith('GIT_'))delete env[key];
   Object.assign(env,{GIT_NO_LAZY_FETCH:'1',GIT_NO_REPLACE_OBJECTS:'1',GIT_CONFIG_NOSYSTEM:'1',GIT_CONFIG_GLOBAL:'/dev/null',GIT_OPTIONAL_LOCKS:'0',GIT_TERMINAL_PROMPT:'0',GH_PROMPT_DISABLED:'1',GLAB_CHECK_UPDATE:'false',GIT_LITERAL_PATHSPECS:'1',GIT_ATTR_NOSYSTEM:'1',GIT_PAGER:'cat',PAGER:'cat'});
