@@ -1,7 +1,7 @@
 # B4: integrated single-owner test consumer ports
 
 Date: 2026-10-24
-Status: combined typed consumer checkpoint implemented; independent combined review, browser verification and B2/product acceptance pending
+Status: combined typed consumer checkpoint implemented and registered/browser verification passed; independent combined review and B2/product acceptance pending
 Packet revision: B4.2
 Owner: `/root/plan_head_test_slice06`
 Parent: [slice06](plan.md), [B3 CLI](cli-06b.md), [B1 consumer ports](consumer-ports-06b.md)
@@ -56,4 +56,16 @@ Evidence root: `/tmp/pr-reviewer-06-execution/evidence/b4`. Strict TypeScript, s
 
 The final actual CLI/gateway fixture used ephemeral loopback58890, job42ceb18b-9634-427a-afed-0e611373a173 and resultc9fbf7b93fc87cb943f9003568c8b66cf40fb6bfe970c81d4d026ab192fb1591. Its synthetic raw-object head da2be17cb46bf6e8395d8610213d1e4ba9ad781d executed the fixed four-file target (4 pass/0 fail); provenance remains test_only_execution. CLI status/result matched the stored job/result, and both artifact byte page and text matched the stored stderr, including Chinese/emoji. Artifact SHA256861b6a926f44f6ac3ab9904ba305ca952d0710cd1db57fe1c779f8119b58c762. A question was committed after observing actual preparing/running, without a held lease/slow target; no participant notification occurred. The no-runner fixture separately exercised actual CLI queued cancellation. Fixtures close their gateway/store/processes and remove only owned roots. This evidence is neither an actual product PR run nor a production qualification.
 
-The current25-test actual Chrome E2E run is pending at this checkpoint, with a separate task artifact root; its final outcome will be appended without changing this implementation pin. Full integrated source qualification, B2 UI/application, visual critique, actual own-PR graph-first comprehension and slice acceptance remain open. B2 may consume the stable [public port table](consumer-ports-06b.md) only after root consumes independent combined review; no automatic assignment follows from this checkpoint.
+At implementation checkpoint49564ed the25-test actual Chrome E2E run was pending; its completed outcome is recorded below without changing that implementation pin. Full integrated source qualification, B2 UI/application, visual critique, actual own-PR graph-first comprehension and slice acceptance remain open. B2 may consume the stable [public port table](consumer-ports-06b.md) only after root consumes independent combined review; no automatic assignment follows from this checkpoint.
+
+## B4 source freeze and browser closeout
+
+Date: 2026-10-24
+Status: ready for independent integrated engineering review; B2 dispatch and product acceptance remain root-owned
+Implementation source: `49564eda292da837dc8ea7d060dae49da170c074`
+
+All25 registered actual Chrome E2E cases passed in2.6 minutes. The run used existing Node24 for gateway/Playwright, existing Bun1.4.2 for Vite through REVIEW_BUN_BIN and the installed Chrome executable. The fresh task output is `/tmp/pr-reviewer-06-execution/evidence/b4/e2e` and log `e2e.log` has SHA256e49f36ee34bae50da6e9a6206facb4be9f82d466aea386d0ba221a6370441e19. These cover inherited actual React import, semantic/story/exploration recovery, question/reply/restart and modern/legacy MCP journeys. They do not implement or exercise a React head-test panel, prove native-host behavior or establish own-PR comprehension. Fixed fixture ports5284/5285/6084/6085 were unoccupied before launch and had no listeners after teardown. No pilot port/data was used.
+
+Readback confirms current SDK dependency and devDependency declarations plus bun.lock exactly match9a271e; installed client/server/core each report2.4.0. Current src/ui and src/application exactly match a63293d. Strict TypeScript and subsystem boundaries pass after the final diagnostic-only test addition;70 relative links across6 changed docs resolve. No actual-process policy, result schema, artifact transport or cleanup change was needed beyond the shared local-owner access seam.
+
+Independent review should use49564ed as immutable implementation target and the retained RED/normal/browser evidence above, preserving the prior B1/CLI/auth/SDK receipts as separate historical inputs. The source merge ancestry includes each exact released commit. The local install is available as a possible donor input, but it has not been qualified for the fixed target at this source. Any production availability requires fresh exact-head/source/runtime/isolated copied closure qualification with unchanged limits; metadata and a passing fixture are insufficient. This docs-only closeout does not change the source/test/configuration tree.

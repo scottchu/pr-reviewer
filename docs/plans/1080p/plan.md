@@ -48,6 +48,6 @@ Internal06A db03505 passed independent R3 (66 regressions plus5 adversarial chec
 
 ## 06B combined consumer integration
 
-Status: B1 backend and B3 CLI independently ready at their original pins; B4 combined candidate verification underway.
+Status: B1 backend and B3 CLI independently ready at their original pins; B4 combined source49564ed passes47 Bun,377 Node and25 actual Chrome tests and awaits independent integrated review.
 
 [The B4 packet](slices/06-head-test-job/integration-06b4.md) integrates the accepted single-local-owner access and SDK2 baselines with delivered test-job/CLI ports. It preserves private process authority, shared exclusion, unknown history, cleanup and scoped participant access. Existing own-PR/main/pilot receipts stay root-owned and pinned. B2 React remains unassigned pending stable reviewed consumer ports. New combined source/dependencies invalidate earlier qualification; exact-head execution and full06 UI/CLI/own-PR acceptance remain open.07/08 stay provisional.
