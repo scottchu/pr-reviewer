@@ -110,3 +110,15 @@ test('B03 first stop intent is immutable and prevents any new requested effect',
   assert.throws(()=>f.store.tests.recordProcess(grant,request),/test_stopped/);
  }finally{f.cleanup();}
 });
+
+for(const stage of ['requested','started','exited'] as const)test(`B03 identical ${stage} observation retries acknowledge without revision or launch authority`,()=>{
+ const f=fixture();try{
+  f.store.tests.command(f.token,f.request);const owner=f.store.tests.beginOwner(),{grant}=f.store.tests.claim(owner)!;
+  const requested=f.store.tests.recordProcess(grant,request);assert.equal(requested.disposition,'recorded');
+  const observation=stage==='requested'?request:stage==='started'?{...request,state:stage,pid:process.pid,startIdentity:'fixture-observed'}:{...request,state:stage,exitCode:0};
+  if(stage!=='requested'){if(stage==='exited')f.store.tests.recordProcess(grant,{...request,state:'started',pid:process.pid,startIdentity:'fixture-observed'});f.store.tests.recordProcess(grant,observation);}
+  const before=f.store.tests.journal(grant);assert.equal(f.store.tests.recordProcess(grant,observation).disposition,'duplicate');assert.deepEqual(f.store.tests.journal(grant),before);
+  assert.throws(()=>f.store.tests.recordProcess(grant,{...observation,intentDigest:'b'.repeat(64)}),/invalid_test_observation|test_process_limit/);
+  f.store.tests.beginOwner();assert.throws(()=>f.store.tests.recordProcess(grant,observation),/stale_test_owner/);
+ }finally{f.cleanup();}
+});

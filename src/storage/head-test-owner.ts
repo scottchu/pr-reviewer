@@ -1,4 +1,4 @@
-import {randomUUID} from 'node:crypto';
+import {createHash,randomUUID} from 'node:crypto';
 import type {DatabaseSync} from 'node:sqlite';
 import {z} from 'zod';
 import {headTestCanonical,processQuiescenceEligible,HEAD_TEST_DEFINITION_DIGEST} from '../domain/public.ts';
@@ -36,11 +36,13 @@ export const createHeadTestOwnerStore=({db,tx,execution,rows,get,put,publicJob,l
   control:(value:HeadTestGrant)=>{const {job}=grant(value);let authorized=true;try{credential(job);}catch{authorized=false;}return {jobId:job.jobId,jobRevision:job.jobRevision,cancelled:job.cancellation!==null,authorized,stopReason:job.stopReason??null};},
   recordStop:(value:HeadTestGrant,reason:string)=>tx(()=>{const {job}=grant(value);if(!/^[a-z][a-z0-9_]{0,63}$/.test(reason))throw new Error('invalid_test_reason');if(!job.stopReason)update({...job,stopReason:reason});}),
   journal:(value:HeadTestGrant):HeadTestJournal=>journal(grant(value).job),
-  recordProcess:(value:HeadTestGrant,input:HeadTestProcess,priorQuiescence?:HeadTestQuiescenceWitness)=>{
+  recordProcess:(value:HeadTestGrant,input:HeadTestProcess,priorQuiescence?:HeadTestQuiescenceWitness):Readonly<{disposition:'recorded'|'duplicate'}>=>{
    processSchema.parse(input);
    // Drop explicitly undefined optionals; persisted records have exact optional fields.
    const observation=Object.fromEntries(Object.entries(input).filter(([,item])=>item!==undefined)) as HeadTestProcess;
+   const observationDigest=createHash('sha256').update(headTestCanonical(observation)).digest('hex');
    return tx(()=>{const {job,invocation}=grant(value),processes=invocation.processes;if(invocation.processJournalVersion!==1||!processes)throw new Error('test_process_unresolved');const old=processes.find(item=>item.ordinal===observation.ordinal);
+    if(old?.state===observation.state&&old.observationDigest===observationDigest)return {disposition:'duplicate' as const};
     if(observation.state==='requested'){
      active(job);if(observation.pid!==undefined||observation.startIdentity!==undefined||observation.spawnDisposition!==undefined||observation.exitCode!==undefined||observation.signal!==undefined)throw new Error('invalid_test_observation');
      if(old||observation.ordinal!==processes.length+1||processes.length>=34)throw new Error('test_process_limit');
@@ -53,7 +55,7 @@ export const createHeadTestOwnerStore=({db,tx,execution,rows,get,put,publicJob,l
      if(observation.state==='started'&&(observation.pid===undefined||observation.exitCode!==undefined||observation.spawnDisposition!==undefined))throw new Error('invalid_test_observation');
      if(observation.spawnDisposition!==undefined&&(!processQuiescenceEligible(observation)||old.state!=='requested'||old.pid!==undefined||old.startIdentity!==undefined))throw new Error('invalid_test_observation');
     }
-    const next=old?processes.map(item=>item.ordinal===old.ordinal?{...item,...observation}:item):[...processes,observation];update(changeInvocation(job,{...invocation,processes:next}));
+    const next=old?processes.map(item=>item.ordinal===old.ordinal?{...item,...observation,observationDigest}:item):[...processes,{...observation,observationDigest}];update(changeInvocation(job,{...invocation,processes:next}));return {disposition:'recorded' as const};
    });
   },
   markUnknown:(value:HeadTestGrant,reason:string)=>tx(()=>{const {job}=grant(value);if(!/^[a-z][a-z0-9_]{0,63}$/.test(reason))throw new Error('invalid_test_reason');unknownJob(job,reason);}),

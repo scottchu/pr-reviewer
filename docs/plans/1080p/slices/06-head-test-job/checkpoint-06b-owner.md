@@ -25,3 +25,7 @@ No package/dependency/lock/UI/CLI/native/live runtime changes. Existing package-
 ## Independent review handoff
 
 Review this exact committed checkpoint against the durable contract and actual storage/lease/public boundaries. Focus on fixture nonpromotion, authority/revocation/epoch fencing, ordered intent and identity preservation, fresh private proof versus JSON forgery, unknown outcome after quiescence and shared competing claims. Verify production remains unavailable and do not infer complete B01–B04, B1 or06 acceptance. Return concrete findings and exact tests/limits. Root coordinates review while the sole B1 writer continues the next bounded qualification/preparation chunk; no shared consumer schemas are delegated until committed.
+
+## Independent P2 correction
+
+The independent2dab557 review reproduced three identical requested/started/exited observation retries throwing, contrary to the accepted idempotent-journal contract. Preserve that negative candidate. The correction records the exact last observation digest separately from merged retained identity and returns recorded/duplicate acknowledgement under the current grant/epoch. Duplicate never increments revision or authorizes another spawn; changed payloads and stale handles still reject. Three repo regressions first failed and then passed, including an exited input omitting earlier retained identity. Next materialization work remains separate; this correction does not supply a runner.

@@ -8,7 +8,7 @@ export type HeadTestProcess = ProcessQuiescenceRecord & Readonly<{
  inputCount: number; inputBytes: number; exitCode?: number | null; signal?: string | null;
 }>;
 export type HeadTestPrivateInvocation = HeadTestInvocation & Readonly<{
- processJournalVersion?: 1; processes?: readonly HeadTestProcess[]; filesystemRoots?: readonly string[];
+ processJournalVersion?: 1; processes?: readonly (HeadTestProcess & Readonly<{observationDigest?: string}>)[]; filesystemRoots?: readonly string[];
 }>;
 export type HeadTestStoredJob = Omit<HeadTestJob,'invocations'> & Readonly<{
  credentialReference: string; reservedBytes: number; retainedBytes: number;
