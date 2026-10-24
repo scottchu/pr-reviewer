@@ -17,3 +17,6 @@ That SDK's documented design places LiveKit behind core and has React consume co
 ## UI guidance
 
 Use decompozr/design-system as a guidelines and design-principles reference. Implement in React; do not install Svelte or bridge to Svelte components. Apply the relevant visual, geometry, accessibility and feedback principles, then test the actual React journey and separately inspect visual conformance. The external package’s component-use rules are not adopted.
+
+
+When reusing declared dependencies through package-entry links in an isolated task worktree, keep generated cache directories (for example `.vite` and `.cache`) as real task-local ignored directories. Do not link generated cache output to a shared dependency checkout, or mutate/delete shared cache contents while correcting a task-local link. This preserves task isolation without introducing another dependency installation.
