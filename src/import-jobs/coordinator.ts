@@ -34,7 +34,7 @@ export const createImportRunner=(store:Store,artifacts:ImportArtifacts,options:{
     abort=new AbortController();const effects=options.effects?.(grant,abort.signal)??createTrackedEffects({imports,grant,signal:abort.signal});let resultWriteStarted=false;
     try{
      if(invocation.phase==='discovery'){
-      const discovery=await discoverChange(job.path,effects);imports.finishDiscovery(grant,discovery);
+      const discovery=await discoverChange(job.path,effects);if(!effects.terminationConfirmed())throw new Error('termination_unknown');imports.finishDiscovery(grant,discovery);
      }else{
       if(!job.candidate||!job.canonicalWorktree)throw new Error('source_unavailable');
       let retained:unknown=null;
@@ -43,6 +43,7 @@ export const createImportRunner=(store:Store,artifacts:ImportArtifacts,options:{
        retained=await artifacts.read({reference:job.artifact,expectedJobId:job.jobId,expectedInvocationId:job.artifact.invocationId});
       }
       const result=await acquirePreparedSnapshot({jobId:job.jobId,reviewId:job.reviewId,worktree:job.canonicalWorktree,candidate:job.candidate},effects);
+      if(!effects.terminationConfirmed())throw new Error('termination_unknown');
       if(result.kind!=='prepared')throw new Error(result.issues[0]?.reason??'source_unavailable');
       if(invocation.phase==='reverification'&&canonical(retained)!==canonical(result.value))throw new Error('retained_result_changed');
       resultWriteStarted=true;

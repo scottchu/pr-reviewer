@@ -12,6 +12,14 @@ const bootstrap: z.infer<typeof inputSchema> = {
   headSha: "fd6c5fb26a325c8318087c0f058de247a55e6c07",
   path: "docs/README.md",
 };
+const manualSetupReviews=(store:ReturnType<typeof createStore>)=>{
+ const owner={kind:'user' as const,actorId:'local-user'};
+ return store.list(owner).filter(item=>{
+  if(store.preparedInput(item.reviewId)!==null)return true;
+  const view=store.review(owner,item.reviewId),originalId=view.snapshotSummaries?.[0]?.snapshotId??view.snapshot.snapshotId;
+  return !store.review(owner,item.reviewId,0,originalId).snapshot.candidate;
+ });
+};
 export const prepareSource = (root: string) => {
   const paths = files(root);
   let retained: z.infer<typeof inputSchema> | null = null;
@@ -21,7 +29,7 @@ export const prepareSource = (root: string) => {
     const persisted = createStore(paths.database);
     try {
       const owner = { kind: "user" as const, actorId: "local-user" };
-      const reviews = persisted.list(owner);
+      const reviews = manualSetupReviews(persisted);
       if (reviews.length > 1)
         throw new Error(
           "command_conflict: data root has multiple prepared targets",
@@ -57,7 +65,7 @@ export const prepareSource = (root: string) => {
   const reviewId = `pr-${spec.prNumber}`;
   const store = createStore(paths.database);
   try {
-    const existing = store.list({ kind: "user", actorId: "local-user" });
+    const existing = manualSetupReviews(store);
     if (existing.some((review) => review.reviewId !== reviewId))
       throw new Error("command_conflict: different target already prepared");
     store.prepare(reviewId, snapshot, spec);

@@ -160,3 +160,9 @@ Observed leader exit does not establish process-group quiescence. Recovery check
 
 
 A timeout/cancellation also bounds termination observation. After TERM, the tracked adapter may escalate to KILL only while the original live leader identity still verifies. If that leader exits while a descendant retains inherited pipes, the adapter settles within a further700ms as termination_unknown, detaches its read handles and retains the durable unknown slot. It does not wait indefinitely for pipe closure or infer descendant termination from leader exit. Future quiescence checks remain read-only and cannot kill an unverified/reused group.
+
+
+Termination uncertainty is sticky for the entire phase, not just its latest subprocess. After an unknown outcome, the effect adapter refuses every subsequent launch even when provider discovery catches an exception and tries another route. The coordinator checks whole-phase quiescence before recording discovery completion or accepting an acquired result. A later successful command cannot clear earlier unknown effects or free their durable slot.
+
+
+Runtime restart preserves the retained manual setup entry alongside any number of provider-imported reviews. The legacy source-input/snapshot exports remain that setup’s compatibility projection, not an import catalog or authority to rewrite another review. DB-only setup recovery first uses the authoritative preparation_inputs row; without one it may reconstruct a uniquely identifiable original manual review. It never chooses a provider-imported review arbitrarily. Multiple manual setup identities remain an explicit conflict. Imported reviews reopen through their exact review/snapshot URL or the explicit job result action.

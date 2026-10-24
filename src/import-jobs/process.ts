@@ -4,11 +4,12 @@ import type {AcquisitionEffects,Command,CommandResult,IssueReason} from '../sour
 const processIdentity=(pid:number):string|null=>{try{return execFileSync('/bin/ps',['-p',String(pid),'-o','lstart=','-o','pgid='],{encoding:'utf8',timeout:1000,maxBuffer:1024,stdio:['ignore','pipe','ignore']}).trim()||null;}catch{return null;}};
 export const groupExists=(pid:number):boolean=>{try{process.kill(-pid,0);return true;}catch(error){return (error as NodeJS.ErrnoException).code!=='ESRCH';}};
 export const createTrackedEffects=({imports,grant,executables={},phaseTimeoutMs=120000,signal}:{imports:Store['imports'];grant:ImportGrant;executables?:Partial<Record<Command['executable'],string>>;phaseTimeoutMs?:number;signal?:AbortSignal})=>{
- const phaseStarted=Date.now();let ordinal=0,confirmed=true;
+ const phaseStarted=Date.now();let ordinal=0,confirmed=true,poisoned=false,running=false;
  const run:AcquisitionEffects['run']=async command=>{
+  if(poisoned)throw new Error('termination_unknown');if(running)throw new Error('import_process_limit');
   if(signal?.aborted||imports.cancelled(grant))throw new Error('import_cancelled');
   const remaining=phaseTimeoutMs-(Date.now()-phaseStarted);if(remaining<=0||ordinal>=256)throw new Error('import_phase_limit');
-  const current=++ordinal;imports.recordProcess(grant,{ordinal:current,executable:command.executable,state:'requested'});
+  const current=++ordinal;imports.recordProcess(grant,{ordinal:current,executable:command.executable,state:'requested'});running=true;
   const env:NodeJS.ProcessEnv={...process.env};for(const key of Object.keys(env))if(key.startsWith('GIT_'))delete env[key];
   Object.assign(env,{GIT_NO_LAZY_FETCH:'1',GIT_NO_REPLACE_OBJECTS:'1',GIT_CONFIG_NOSYSTEM:'1',GIT_CONFIG_GLOBAL:'/dev/null',GIT_OPTIONAL_LOCKS:'0',GIT_TERMINAL_PROMPT:'0',GH_PROMPT_DISABLED:'1',GLAB_CHECK_UPDATE:'false',GIT_LITERAL_PATHSPECS:'1',GIT_ATTR_NOSYSTEM:'1',GIT_PAGER:'cat',PAGER:'cat'});
   return await new Promise<CommandResult>((resolve,reject)=>{
@@ -16,7 +17,7 @@ export const createTrackedEffects=({imports,grant,executables={},phaseTimeoutMs=
    let started=false,exited=false,finished=false,identity:string|null=null,reason:IssueReason|null=null,cancelled=false,bytes=0,spawnError=false,journalLost=false;
    const chunks:Buffer[]=[];let killTimer:ReturnType<typeof setTimeout>|undefined,observationTimer:ReturnType<typeof setTimeout>|undefined;
    const cleanup=()=>{clearTimeout(timeout);clearInterval(cancellation);if(killTimer)clearTimeout(killTimer);if(observationTimer)clearTimeout(observationTimer);};
-   const unknown=()=>{if(finished)return;finished=true;confirmed=false;cleanup();child.stdout.destroy();child.stderr.destroy();child.unref();reject(new Error('termination_unknown'));};
+   const unknown=()=>{if(finished)return;finished=true;running=false;poisoned=true;confirmed=false;cleanup();child.stdout.destroy();child.stderr.destroy();child.unref();reject(new Error('termination_unknown'));};
    const stop=(next:IssueReason|null,isCancel=false)=>{
     if(finished||exited)return;reason??=next;cancelled ||= isCancel;if(!observationTimer)observationTimer=setTimeout(unknown,700);
     if(!started||!child.pid||!identity||processIdentity(child.pid)!==identity){confirmed=false;return;}
@@ -36,7 +37,7 @@ export const createTrackedEffects=({imports,grant,executables={},phaseTimeoutMs=
    child.once('close',(code,signal)=>{
     if(finished)return;exited=true;finished=true;cleanup();
     // The parent exit alone does not prove descendants in its owned group stopped.
-    confirmed=!journalLost&&(!started||Boolean(child.pid&&!groupExists(child.pid)));
+    const childConfirmed=!journalLost&&(!started||Boolean(child.pid&&!groupExists(child.pid)));if(!childConfirmed)poisoned=true;confirmed=!poisoned&&childConfirmed;running=false;
     try{imports.recordProcess(grant,{ordinal:current,executable:command.executable,state:'exited',exitCode:code,signal,reason:cancelled?'cancelled':reason??(code===0?'ok':'command_failed')});}catch{confirmed=false;}
     if(!confirmed){reject(new Error('termination_unknown'));return;}
     if(cancelled){reject(new Error('import_cancelled'));return;}
@@ -45,5 +46,5 @@ export const createTrackedEffects=({imports,grant,executables={},phaseTimeoutMs=
    });
   });
  };
- return {run,terminationConfirmed:()=>confirmed};
+ return {run,terminationConfirmed:()=>confirmed&&!running};
 };
