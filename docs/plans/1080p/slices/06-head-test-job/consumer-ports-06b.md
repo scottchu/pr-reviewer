@@ -24,7 +24,7 @@ The owner-only `createTestRunner` uses current store configuration and private e
 
 ## Consumer assignment boundaries
 
-B2 React/application and B3 thin owner HTTP CLI remain root-assigned roles after the backend review gate. Consumers may import only domain public values and use the existing authorized gateway. They must not open SQLite, create owners, accept opaque grants/witnesses, run commands, construct qualification, or resolve artifact paths. Application owns business-independent managed request/poll/read routes, cancellation and teardown; React presents the returned state, collects target intent, retains concurrent question/draft/navigation behavior and uses plain text output. CLI sends the identical strict HTTP inputs and reads the same job/artifact identity; token stays internal. Existing application/UI/delivery/participant files remain outside this author's scope.
+B2 React/application and B3 thin owner HTTP CLI remain root-assigned roles after the backend review gate. Consumers may import only domain public values and use the existing authorized gateway. They must not open SQLite, create owners, accept opaque grants/witnesses, run commands, construct qualification, or resolve artifact paths. Application owns business-independent managed request/poll/read routes, cancellation and teardown; React presents the returned state, collects target intent, retains concurrent question/draft/navigation behavior and uses plain text output. CLI sends the identical strict HTTP inputs and reads the same job/artifact identity; [B3](cli-06b.md) supersedes credential-reference handling with explicit loopback endpoint and no token input. Existing application/UI/delivery/participant files remain outside this author's scope.
 
 ## Current evidence and limits
 

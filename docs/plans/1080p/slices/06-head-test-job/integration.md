@@ -27,7 +27,7 @@ The following retains the planned responsibility map. The linked public-port che
 | Application/public | TestBridge immutable authorized state, exact request/cancel/readback intent, pending identity, lifecycle fences and bounded polling; workspace owns selected source/story/drafts as before. Connect after review authorization without parallelizing analysis/story hydration. |
 | Integration registry | Three declared test routes and bounded diagnostic projections from head-test-v1; no direct internal subscriptions. |
 | React UI | Configured target/select/run/cancel/history/evidence components use application public ports. Inert output, keyboard/focus/status affordances, stable source context; no policy or command fabrication in components. |
-| Owner CLI | Thin TypeScript HTTP client using same schemas, credential reference and receipts. No native participant utility reuse as execution authority, second store, shell runner or token stdout. |
+| Owner CLI | Thin TypeScript HTTP client using the same schemas and receipts; [B3](cli-06b.md) uses an explicit loopback gateway without token or credential-file input. No native participant utility reuse as execution authority, second store, shell runner or token stdout. |
 
 Initial storage support is additive: existing records/receipt meanings are retained, test tables/columns are created under the owning store, and legacy DBs without tests still initialize. Initialize one epoch before all runners. The migration/check order must allow the shared unresolved scan to find test occupancy before any runner claims. Pure domain validation and heavy source/closure/result hashing occur outside transactions; apply-time authority, limits, cancellation and immutable identity conflicts are checked again inside them.
 
