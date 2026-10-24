@@ -4,7 +4,7 @@
 
 **Session rule:** The session initiating attachment is the attached session
 
-**Status:** Bounded PR Reviewer CLI/MCP adapters and controlled-host tests exist; native Codex/Claude product acceptance remains unrun. Earlier Playground evidence is historical context.
+**Status:** Bounded PR Reviewer CLI/MCP adapters and controlled-host tests exist; bounded original-owner Codex SDK reply/UI evidence exists; automatic native delivery/tool registration and full Codex/Claude acceptance remain open. Earlier Playground evidence is historical context.
 
 ## Start from the current session
 
@@ -55,9 +55,9 @@ Use the [existing-session integration checks](../plans/480p/probes/00-host-contr
 
 | Conformance check | Codex | Claude |
 |---|---|---|
-| Originating session initiates verified attach in its current project | Unrun | Unrun |
-| Real own-PR question reaches that exact session and MCP reply appears in UI | Unrun | Unrun |
-| Commands progress during own turn; no self-deadlock | Unrun | Unrun |
+| Originating session initiates verified attach in its current project | Observed bounded local-owner metadata/provisioning; native tool-catalog registration unverified | Unrun |
+| Real own-PR question reaches that exact session and MCP reply appears in UI | Actual UI Save/CLI enqueue acknowledgement, existing-owner live SDK MCP reply and UI evidence readback observed; automatic queued-turn delivery unobserved | Unrun |
+| Commands progress during own turn; no self-deadlock | Existing-owner SDK MCP inbox/question/reply completed; automatic native-turn/catalog path unverified | Unrun |
 | Duplicate/changed payload, wrong actor/session and stale generation handled correctly | Unrun | Unrun |
 | Disconnect/restart and uncertain invocation reconcile without a second owner or blind replay | Unrun | Unrun |
 | Existing work, permissions, configuration and session history preserved | Unrun | Unrun |
@@ -66,4 +66,4 @@ Record own-PR and candidate provenance, session/attachment identity, capability 
 
 ## Current capability and next evidence
 
-The local candidate implements the shared contracts, controlled CLI notification and actual MCP protocol read/reply, without proving native dynamic tool registration or actual native turn delivery. Codex owner pairing corroborates its exact existing metadata within the local-user trust boundary; Claude owner provisioning remains unavailable in the observed environment. Continue actual host-path verification independently; do not replace unknown native capability with fixture success. The runtime guide and contracts define current operation without requiring historical plans.
+The local candidate implements the shared contracts, controlled CLI notification and actual MCP protocol read/reply. A real own-PR operation also observed UI Save, native CLI enqueue acknowledgement, actual existing-owner live SDK MCP inbox/question/reply and authoritative UI answer/evidence readback. The owner answered after explicit steering; no automatic queued turn was observed, and native tool-catalog registration remains unverified. SDK protocol operations cannot be relabeled as native registered-tool invocation or proof that the CLI caused the reply. Codex owner pairing corroborates its exact existing metadata within the local-user trust boundary; Claude owner provisioning remains unavailable in the observed environment. Continue actual host-path verification independently; do not replace unknown native capability with fixture success. The runtime guide and contracts define current operation without requiring historical plans.

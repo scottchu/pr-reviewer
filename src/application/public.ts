@@ -139,9 +139,11 @@ export const createReviewBridge = (reviewId: string, initialSnapshotId?:string) 
     },
     selectSnapshot:async(snapshotId:string)=>{
       if(state.busy||pending)throw new Error("submission_pending: reconcile the question before changing snapshots");
-      const previous=selectedSnapshotId;
-      selectedSnapshotId=snapshotId;generation++;
+      const previous=state.review?.snapshot.snapshotId??selectedSnapshotId;
+      selectedSnapshotId=snapshotId;
+      const expected=++generation;
       const review=await refresh();
+      if(expected!==generation)throw new Error("selection_superseded");
       if(!review){selectedSnapshotId=previous;throw new Error(state.error||"source_unavailable");}
       return review;
     },

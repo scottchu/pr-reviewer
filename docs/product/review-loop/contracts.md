@@ -4,6 +4,8 @@
 
 **Status:** Derived local implementation and controlled-host tests exist; native binding and acceptance limits are explicit below
 
+The [persistence compatibility contract](persistence-compatibility.md) specifies supported legacy/current physical records, exact identity/fingerprint conventions and normative preservation vectors.
+
 ## Identities and persisted records
 
 Use opaque application IDs, UUIDs where generated locally. Caller-supplied actor/session values never establish authorization. UTC timestamps describe observations, not ordering; revisions/cursors order committed state.

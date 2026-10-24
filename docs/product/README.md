@@ -3,7 +3,8 @@
 This is the durable product specification: what PR Reviewer does, why, and how its responsibilities and behavior fit together. A fresh agent should be able to derive the accepted delivered behavior from this knowledge, without reconstructing old execution plans or chat.
 
 - [Vision](vision.md): purpose and the experience of understanding a PR.
-- [Continuation and source import](review-loop/evolution.md): planned immutable history, bootstrap graph and frozen import boundary.
+- [Continuation and source import](review-loop/evolution.md): merged bootstrap graph, current immutable-history candidate and future import boundary.
+- [Persistence compatibility](review-loop/persistence-compatibility.md): supported legacy/current SQLite records, migration and exact identity/retry conventions.
 - [First review loop](review-loop/README.md): user story, UI, data/command/MCP contracts and CLI delivery/recovery.
 - [Architecture](architecture.md): system relationships, technology direction and subsystem boundaries.
 - [Participant adapters](participant-adapters.md): existing-session Codex and Claude identity, capability and ownership contracts.
