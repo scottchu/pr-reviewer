@@ -4,7 +4,7 @@
 
 **Date:** 2026-10-24
 
-**Status:** Docs-only corrective packet prepared; root reconciliation and named implementation dispatch required. No implementation, product acceptance or operational action is claimed here.
+**Status:** Root reconciled A/B1 and approved this bounded correction. Named implementer `/root/plan_story_clarity_05d` owns derived05D work on branch `implement-story-comprehension-clarity`, isolated worktree `/tmp/pr-reviewer-05-story-clarity-implementation`, from packet commit `5a4e779aa58bd9f8d7f6e0db0ab0876bc4107d0a`. Implementation and acceptance evidence remain pending. The clean planning worktree is retained; live67 browser/runtime/MCP remain root-owned.
 
 **Parent:** [Slice05](plan.md), [720p round](../../plan.md)
 
@@ -42,7 +42,7 @@ Private artifacts remain outside Git. Root retains their provenance; no credenti
 
 **Root/integration owner:** Existing root. Sole writer assignment must be recorded by root before code dispatch. This planner owns only this docs-only packet on branch `plan-story-comprehension-clarity`, worktree `/tmp/pr-reviewer-05-story-clarity`, from exact67; it releases after commit. Root may reuse a cohesive qualified05 implementer on a newly assigned isolated task branch. Do not silently resume a released writer.
 
-**Ready inputs:** Exact67 source and current05 public controller/source/readback interfaces; durable review-story-v1 amendment4 in this packet; preserved actual A/B1; authoritative UX amendment in this packet's commit. **Remaining dispatch gate:** Root reads/reconciles this packet, records named executor/branch/worktree and serializes shared files against other work. Readiness is not implementation acceptance.06 planning is independent; no06 code here.
+**Ready inputs:** Exact67 source and current05 public controller/source/readback interfaces; durable review-story-v1 amendment4 in this packet; preserved actual A/B1; authoritative UX amendment in this packet's commit. **Dispatch gate satisfied:** Root reconciled this packet and assigned the named sole implementer above; root serializes shared files against other work. Readiness is not implementation acceptance.06 planning is independent; no06 code here.
 
 **Editable implementation scope:** `src/ui/story.tsx`, `story.css`, `semantic-graph.tsx`, bounded semantic-panel/main/style changes, narrowly required application public intent/projection and workspace coordination, plus directly affected unit/React E2E tests and owning durable docs/nearby05 evidence. Package test registration only if required, serialized by root. No domain/storage/schema/receipt/gateway/MCP/worker/test-runner changes, dependency/lock changes or blanket layout rewrite. Incumbent design-system guideline revision `6cfe720df1a981e8ce8bb053927aea20d12f105d` remains authoritative. Root alone owns active dogfood runtime/browser/MCP and meaningful saved question; worker may use separate task-owned test runtime/browser.
 
