@@ -41,6 +41,31 @@ test.beforeAll(async()=>{
 });
 test.afterAll(async()=>{if(ui&&ui.exitCode===null)await new Promise<void>(resolve=>{ui.once('exit',()=>resolve());ui.kill('SIGTERM');});if(gateway)await gateway.close();fixture?.cleanup();});
 
+test('startup hydration settles semantic readiness before the first enabled Resume and preserves a true restore failure for retry',async({page},info)=>{
+ test.setTimeout(60000);await page.setViewportSize({width:1440,height:1080});await page.clock.install();await login(page);
+ const panel=page.getByRole('region',{name:'Change explanation'}),semantic=page.getByRole('region',{name:'Function neighborhoods'}),resume=panel.getByRole('button',{name:'Resume story',exact:true});
+ await page.getByLabel('Your question').fill('Hydration original draft');await semantic.getByText(/All admitted function nodes/).click();await semantic.getByRole('listitem',{name:'Function head helper const-arrow',exact:true}).getByRole('button',{name:/Inspect full body/}).click();
+ const inspector=semantic.getByRole('region',{name:'Retained semantic source'});await expect(inspector.getByLabel('Exact retained source')).toContainText('value + 10');await expect.poll(async()=>(await saved(page)).maps.semantic?.sourceAnchor?.path).toBe('helper.ts');
+ await panel.getByRole('button',{name:'Explore supporting source',exact:true}).click();await page.getByLabel('Your question').fill('Hydration exploration draft');const before=await saved(page);expect(before.returnFrame?.maps.semantic?.analysisId).toBeTruthy();
+ const commands:string[]=[],routes:Promise<void>[]=[];let release!:()=>void,started!:()=>void,intercepted=false;
+ const gate=new Promise<void>(resolve=>{release=resolve;}),initialStarted=new Promise<void>(resolve=>{started=resolve;});
+ page.on('request',request=>{if(request.method()==='POST'&&new URL(request.url()).pathname.endsWith('/commands'))commands.push(request.url());});
+ await page.route('**/api/analysis?*',route=>{const operation=(async()=>{const url=new URL(route.request().url());if(!intercepted&&!url.searchParams.has('analysisId')){intercepted=true;const response=await route.fetch();started();await gate;await route.fulfill({response});}else await route.continue();})();routes.push(operation);return operation;});
+ try{
+  await page.reload();await page.getByLabel('Local access token').fill(fixture.token);await page.getByRole('button',{name:'Open review',exact:true}).click();await initialStarted;
+  await expect(resume).toHaveCount(0);release();await expect(resume).toBeEnabled();await expect(page.getByRole('alert')).toHaveCount(0);
+  // Click as soon as the actual control is enabled: no extra hydration wait.
+  await resume.click();await expect(page.getByLabel('Your question')).toHaveValue('Hydration original draft');await expect(panel.getByRole('button',{name:'Explore supporting source',exact:true})).toBeEnabled();await expect(page.getByRole('alert')).toHaveCount(0);
+  const firstResume=await saved(page);expect(firstResume.returnFrame).toBeNull();expect(firstResume.maps.semantic).toEqual(before.returnFrame!.maps.semantic);expect(firstResume.drafts.find(draft=>draft.id!==firstResume.activeDraftId)?.text).toBe('Hydration exploration draft');
+  await page.unroute('**/api/analysis?*');await Promise.all(routes);
+  await panel.getByRole('button',{name:'Explore supporting source',exact:true}).click();const retained=await saved(page);let failed=false;
+  await page.route('**/api/story?*',async route=>{if(!failed&&new URL(route.request().url()).searchParams.has('versionId')){failed=true;await route.fulfill({status:503,contentType:'application/json',body:JSON.stringify({error:'controlled_retained_story_unavailable'})});}else await route.continue();});
+  await resume.click();await expect(panel.getByRole('alert')).toHaveText('controlled_retained_story_unavailable');expect((await saved(page)).returnFrame).toEqual(retained.returnFrame);expect((await saved(page)).activeDraftId).toBe(retained.activeDraftId);
+  await page.unroute('**/api/story?*');await resume.click();await expect(page.getByLabel('Your question')).toHaveValue('Hydration original draft');await expect(page.getByRole('alert')).toHaveCount(0);expect((await saved(page)).returnFrame).toBeNull();expect(commands).toEqual([]);
+  await page.screenshot({path:info.outputPath('hydration-first-resume.png'),fullPage:true});evidence(info,{initialAnalysisGated:true,firstEnabledResumeSucceeded:true,firstResume,trueFailureRetained:failed,retryClearedOwnError:true,commands});
+ }finally{release();await Promise.allSettled(routes);await page.unroute('**/api/analysis?*');await page.unroute('**/api/story?*');}
+});
+
 test('desktop dual drafts restore exact story/source/elapsed/maps/scroll across reload, publication and a newer source',async({page},info)=>{
  test.setTimeout(90000);const sourceReads:{method:string;body:unknown}[]=[],commandPosts:string[]=[];page.on('request',request=>{if(new URL(request.url()).pathname==='/api/analysis/source')sourceReads.push({method:request.method(),body:request.postDataJSON()});if(request.method()==='POST'&&new URL(request.url()).pathname.endsWith('/commands'))commandPosts.push(request.url());});await page.setViewportSize({width:1440,height:1080});await page.clock.install();await login(page);
  const panel=page.getByRole('region',{name:'Change explanation'}),player=page.getByRole('navigation',{name:'Story playback'}),semantic=page.getByRole('region',{name:'Function neighborhoods'}),map=page.locator('#review-graph');await expect(player).toBeVisible();

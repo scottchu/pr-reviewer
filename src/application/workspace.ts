@@ -25,7 +25,17 @@ export const createReviewWorkspace=(reviewId:string,initialSnapshotId?:string,op
    const unsubscribe=review.subscribe(()=>guard.emit()),disconnect=review.connect();guard.emit();
    return()=>{generation++;disposed=true;disconnect();unsubscribe();guard.dispose();confirmedRoute?.dispose();confirmedRoute=null;for(const route of mapRoutes.values())route.dispose();mapRoutes.clear();mapInput=null;};
   },
-  login:async(value:string)=>{const captured=value.trim(),expected=++generation;credential=captured;disposed=false;await review.login(captured);if(!owns(expected,captured))return;const current=review.getSnapshot().review;if(!review.getSnapshot().authenticated||!current)return;await Promise.all([analysis.login(captured,current.snapshot.snapshotId),story.login(captured,current.snapshot)]);if(!owns(expected,captured))return;},
+  login:async(value:string)=>{
+   const captured=value.trim(),expected=++generation;credential=captured;disposed=false;
+   try{
+    await review.login(captured);if(!owns(expected,captured))return;
+    const current=review.getSnapshot().review;if(!review.getSnapshot().authenticated||!current)return;
+    // Private hydration may select a retained analysis; finish the initial
+    // semantic login read before handing that selection owner to StoryBridge.
+    await analysis.login(captured,current.snapshot.snapshotId);if(!owns(expected,captured))return;
+    await story.login(captured,current.snapshot);if(!owns(expected,captured))return;
+   }catch(error){if(owns(expected,captured))throw error;}
+  },
   logout:()=>{generation++;credential='';story.logout();analysis.logout();review.logout();},
   selectSnapshot:async(snapshotId:string)=>{const expected=++generation,captured=credential;story.assertCanNavigate();const current=await review.selectSnapshot(snapshotId);if(!owns(expected,captured))throw new Error('workspace_superseded');await Promise.all([analysis.select(snapshotId),story.select(current.snapshot)]);if(!owns(expected,captured))throw new Error('workspace_superseded');return current;},
   openSource:async(anchor:Anchor,fileKey?:string)=>{const expected=++generation,captured=credential;if(anchor.snapshotId!==story.getSnapshot().snapshotId){story.assertCanNavigate();const current=await review.selectSnapshot(anchor.snapshotId);if(!owns(expected,captured))throw new Error('workspace_superseded');await Promise.all([analysis.select(anchor.snapshotId),story.select(current.snapshot)]);}if(!owns(expected,captured))throw new Error('workspace_superseded');story.selectSource(anchor,fileKey);},

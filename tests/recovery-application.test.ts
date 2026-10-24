@@ -20,3 +20,63 @@ test('S11 concurrent async AskQuestion intents cannot replace a reserved command
 test('S11 escaped raw request bound is independent of trimmed text and rejects before any HTTP effect',async()=>{const h=await setup();try{const b=h.bridge();await b.login(h.f.token);await assert.rejects(b.ask(h.f.source.anchor,' '.repeat(128*1024)+'Q'),/question_request_too_large/);assert.equal(h.calls.filter(call=>call.body).length,0);assert.equal(h.m.values.has(PENDING_QUESTION_KEY),false);}finally{await h.cleanup();}});
 test('S10 workspace first mount preserves an explicit imported-review login and authorizes both real child bridges',async()=>{const h=await setup();let disconnect=()=>{},release=()=>{},started=()=>{};const held=new Promise<void>(resolve=>{started=resolve;}),gate=new Promise<void>(resolve=>{release=resolve;}),transport=globalThis.fetch;let first=true;globalThis.fetch=(async(input:Parameters<typeof fetch>[0],init?:RequestInit)=>{const response=await transport(input,init);if(first&&String(input).startsWith('/api/reviews/')){first=false;started();await gate;}return response;}) as typeof fetch;const {createReviewWorkspace}=await import('../src/application/public.ts'),workspace=createReviewWorkspace('r',undefined,{session:h.m.session});try{const login=workspace.login(h.f.token);await held;disconnect=workspace.connect();release();await login;assert.equal(workspace.analysis.getSnapshot().authenticated,true);assert.equal(workspace.story.getSnapshot().authenticated,true);}finally{release();disconnect();workspace.logout();await h.cleanup();}});
 for(const ending of ['caller','logout','disposal'] as const)test(`S12 authorized auxiliary snapshot read is cancelled by ${ending} and ignored-abort completion cannot return source`,async()=>{const h=await setup(),b=h.bridge(),transport=globalThis.fetch,caller=new AbortController();let signal:AbortSignal|null|undefined,release!:(value:Response)=>void,disconnect=()=>{};try{await b.login(h.f.token);disconnect=b.connect();globalThis.fetch=((input:Parameters<typeof fetch>[0],init?:RequestInit)=>{const url=new URL(String(input),'http://local');if(url.pathname==='/api/reviews/r'&&!url.searchParams.has('minimumRevision')){signal=init?.signal;return new Promise<Response>(resolve=>{release=resolve;});}return transport(input,init);}) as typeof fetch;const reading=b.readSnapshot('snapshot',caller.signal).then(value=>value,error=>error);if(ending==='caller')caller.abort();else if(ending==='logout')b.logout();else disconnect();const aborted=signal?.aborted;release(Response.json(h.f.store.review(h.f.store.authenticate(h.f.token),'r')));const result=await reading;assert.equal(aborted,true);assert.ok(result instanceof Error);assert.match(result.message,/superseded|abort/i);}finally{disconnect();await h.cleanup();}});
+
+const hydrationFixture=async(options:{ignoreAbort?:boolean}={})=>{
+ const f=storyFixture(),memory=recoveryMemory(),original=globalThis.fetch;
+ assert.equal(f.store.story.command(f.token,f.publish()).state,'applied');
+ const view=f.store.story.query(f.token,{reviewId:'r',snapshotId:'snapshot'}),version=view.version!,cursor={versionId:version.versionId,chapterId:version.story.chapters[0]!.id,stepId:version.story.steps[0]!.id,index:0};
+ const analysisId='a'.repeat(64),maps={structural:null,semantic:{analysisId,focus:'',fullSource:false,viewport:{x:0,y:0,zoom:1},sourceAnchor:null,corpusId:null}};
+ const originalDraft={id:'original',anchor:f.source.anchor,text:'Original private draft',submitted:false},frame={snapshotId:'snapshot',versionId:version.versionId,cursor,elapsedMs:1500,surface:'flow' as const,position:{x:0,y:0},pageScroll:0,maps,originalDraftId:originalDraft.id,evidence:null};
+ const scope=await memory.session.scope(f.token);
+ assert.equal(memory.session.saveView(scope,{reviewId:'r',snapshotId:'snapshot',versionId:version.versionId,cursor,elapsedMs:1500,surface:'flow',position:{x:0,y:0},pageScroll:0,maps,activeDraftId:'exploration',drafts:[originalDraft,{...originalDraft,id:'exploration',text:'Separate exploration draft'}],returnFrame:frame}).saved,true);
+ const graph:import('../src/domain/public.ts').AnalysisView={...f.store.analysis.query(f.token,{reviewId:'r',snapshotId:'snapshot'}),selectedAnalysisId:analysisId,analysis:{analyzer:'source-neighborhood-v1.0.1',parser:'controlled transport',snapshotId:'snapshot',corpusDigest:'c'.repeat(64),analysisId,corpus:{base:{commit:f.snapshot.baseSha,inventory:'selected-context',acquisition:'test'},head:{commit:f.snapshot.headSha,inventory:'selected-context',acquisition:'test'}},coverage:[],diagnostics:[],observed:{bytes:0,inventoryBytes:0,astNodes:0,invocationSites:0},status:'analyzed',nodes:[],edges:[],unresolved:[],neighborhoods:[]}};
+ const calls:{path:string;token:string;method:string}[]=[];let signal:AbortSignal|null|undefined,release!:(response?:Response)=>void,reject!:(error:Error)=>void,started!:()=>void;
+ const initialStarted=new Promise<void>(resolve=>{started=resolve;});let first=true;
+ globalThis.fetch=(async(input:Parameters<typeof fetch>[0],init?:RequestInit)=>{
+  const path=String(input),url=new URL(path,'http://local'),token=new Headers(init?.headers).get('Authorization')!.slice(7);calls.push({path,token,method:init?.method??'GET'});
+  if(url.pathname.startsWith('/api/reviews/'))return Response.json(f.store.review(f.store.authenticate(token),'r'));
+  if(url.pathname==='/api/story')return Response.json(f.store.story.query(token,{reviewId:'r',snapshotId:'snapshot',...(url.searchParams.get('versionId')?{versionId:url.searchParams.get('versionId')!}:{})}));
+  if(url.pathname==='/api/story/context')return Response.json(f.store.story.context(token,{reviewId:'r',snapshotId:'snapshot'}));
+  if(url.pathname==='/api/analysis'){
+   if(first&&!url.searchParams.has('analysisId')){first=false;signal=init?.signal;started();return new Promise<Response>((resolve,fail)=>{release=(response=Response.json(graph))=>resolve(response);reject=fail;if(!options.ignoreAbort)signal?.addEventListener('abort',()=>fail(new DOMException('signal is aborted without reason','AbortError')),{once:true});});}
+   return Response.json(graph);
+  }
+  throw new Error(`unexpected request ${path}`);
+ }) as typeof fetch;
+ const {createReviewWorkspace}=await import('../src/application/public.ts'),workspace=createReviewWorkspace('r',undefined,{session:memory.session});
+ return {f,memory,workspace,calls,frame,initialStarted,signal:()=>signal,release:(response?:Response)=>release(response),reject:(error:Error)=>reject(error),cleanup:()=>{workspace.logout();globalThis.fetch=original;f.cleanup();}};
+};
+const hydrationTurn=()=>new Promise<void>(resolve=>setImmediate(resolve));
+test('actual workspace hydration orders initial semantic readiness before restoring a pinned private frame and its first Resume',async()=>{
+ const h=await hydrationFixture();try{
+  const login=h.workspace.login(h.f.token).then(()=>null,error=>error as Error);await h.initialStarted;for(let i=0;i<6;i++)await hydrationTurn();
+  assert.equal(h.workspace.story.getSnapshot().returnFrame,null);assert.equal(h.calls.some(call=>call.path.startsWith('/api/story?')),false);h.release();const result=await login;assert.equal(result,null,'normal saved-frame hydration must not reject workspace login');
+  assert.equal(h.signal()?.aborted,false);assert.equal(h.workspace.analysis.getSnapshot().view?.selectedAnalysisId,h.frame.maps.semantic.analysisId);
+  assert.equal(h.workspace.story.getSnapshot().viewRecoveryMessage,'');assert.deepEqual(h.workspace.story.getSnapshot().returnFrame,h.frame);
+  assert.deepEqual(h.workspace.story.getSnapshot().drafts.map(draft=>draft.text),['Original private draft','Separate exploration draft']);
+  await h.workspace.story.resumeStory();assert.equal(h.workspace.story.getSnapshot().returnFrame,null);assert.equal(h.workspace.story.activeDraft()?.text,'Original private draft');
+  assert.equal(h.workspace.analysis.getSnapshot().error,'');assert.equal(h.workspace.story.getSnapshot().error,'');assert.equal(h.calls.filter(call=>call.method==='POST').length,0);
+ }finally{h.release();h.cleanup();}
+});
+for(const failure of ['unauthorized','query_failed','transport_abort','malformed_read'] as const)test(`current-owner ${failure} remains observable during workspace startup`,async()=>{
+ const h=await hydrationFixture();try{const login=h.workspace.login(h.f.token),rejection=assert.rejects(login,failure==='transport_abort'?/independent transport abort/:failure==='malformed_read'?SyntaxError:new RegExp(failure));await h.initialStarted;
+  if(failure==='transport_abort')h.reject(new DOMException('independent transport abort','AbortError'));else if(failure==='malformed_read')h.release(new Response('{invalid JSON'));else h.release(Response.json({error:failure},{status:failure==='unauthorized'?401:503}));await rejection;
+  assert.match(h.workspace.analysis.getSnapshot().error,failure==='transport_abort'?/independent transport abort/:failure==='malformed_read'?/JSON|property name/:new RegExp(failure));assert.equal(h.workspace.story.getSnapshot().authenticated,false);assert.equal(h.workspace.story.getSnapshot().returnFrame,null);
+ }finally{h.release();h.cleanup();}
+});
+for(const ending of ['new-login','logout','disposal'] as const)test(`a superseded workspace startup cannot report an old failure or install private state after ${ending}`,async()=>{
+ const h=await hydrationFixture({ignoreAbort:true});let disconnect=()=>{};try{disconnect=h.workspace.connect();const stale=h.workspace.login(h.f.token).then(()=>null,error=>error as Error);await h.initialStarted;
+  if(ending==='new-login')await h.workspace.login(h.f.store.issueUser());else if(ending==='logout')h.workspace.logout();else disconnect();
+  const before=h.calls.length;h.reject(new DOMException('late old transport abort','AbortError'));assert.equal(await stale,null);await hydrationTurn();
+  assert.equal(h.calls.slice(before).some(call=>call.token===h.f.token),false);assert.equal(h.workspace.story.getSnapshot().drafts.some(draft=>draft.text.includes('private draft')),false);
+  if(ending==='new-login'){assert.equal(h.workspace.story.getSnapshot().authenticated,true);assert.equal(h.workspace.story.getSnapshot().returnFrame,null);}else assert.equal(h.workspace.story.getSnapshot().authenticated,false);
+ }finally{h.release();disconnect();h.cleanup();}
+});
+
+test('an ignored-abort old initial semantic success cannot overwrite the replacement login graph or private selection',async()=>{
+ const h=await hydrationFixture({ignoreAbort:true});try{const stale=h.workspace.login(h.f.token);await h.initialStarted;await h.workspace.login(h.f.store.issueUser());const current=h.workspace.analysis.getSnapshot(),story=h.workspace.story.getSnapshot();h.release();await stale;assert.equal(h.workspace.analysis.getSnapshot(),current);assert.equal(h.workspace.story.getSnapshot(),story);assert.equal(story.returnFrame,null);assert.equal(story.drafts.some(draft=>draft.text.includes('private draft')),false);}finally{h.release();h.cleanup();}
+});
+test('unavailable retained semantic hydration preserves the private checkpoint and exposes its actual limitation',async()=>{
+ const h=await hydrationFixture(),transport=globalThis.fetch;globalThis.fetch=(async(input:Parameters<typeof fetch>[0],init?:RequestInit)=>new URL(String(input),'http://local').searchParams.has('analysisId')?Response.json({error:'analysis_record_unavailable'},{status:404}):transport(input,init)) as typeof fetch;
+ try{const raw=h.memory.values.get(PRIVATE_VIEW_KEY),login=h.workspace.login(h.f.token);await h.initialStarted;h.release();await login;assert.equal(h.workspace.story.getSnapshot().viewRecoveryMessage,'analysis_record_unavailable');assert.equal(h.memory.values.get(PRIVATE_VIEW_KEY),raw);assert.equal(h.workspace.story.getSnapshot().returnFrame,null);assert.equal(h.workspace.analysis.getSnapshot().error,'analysis_record_unavailable');assert.equal(h.calls.some(call=>call.method==='POST'),false);}finally{h.release();h.cleanup();}
+});
