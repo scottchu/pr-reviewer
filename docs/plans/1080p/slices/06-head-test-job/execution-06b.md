@@ -127,3 +127,7 @@ Ready for narrow independent successor-contract review and root consumption. B1 
 **Owner:** plan_head_test_slice06, isolated branch implement-head-test-execution at /tmp/pr-reviewer-06-head-test-execution.
 
 Independent report `/tmp/pr-reviewer-06-plan-review/review-692dbca.md`, SHA-256 `e1a6828f0c7fbe0b4ff3195e8d3d14e72374d1207648b38c267a37086941967f`, passed bounded successor reconciliation; no blocking finding. The exact root-owned I6 scope is now active. Private /tmp/pr-reviewer-06-execution and its named child roots were created exclusively; engineering dependencies use ignored package-entry links to the existing donor, with no shared cache links or installation. These engineering links are not executable-job isolation/qualification. Combined inherited checks precede derived changes. Full G1/new own-PR and all product acceptance limits remain open.
+
+## B1 first committed public-port checkpoint
+
+[Owner/journal checkpoint](checkpoint-06b-owner.md) records the initial derived ports,73-test inherited baseline and20-test bounded candidate, with explicit missing qualification/preparation/result/artifact/process and consumer behavior. It is an early independent-review point, not full B1 completion or a consumer-ready result schema.

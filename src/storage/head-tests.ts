@@ -1,16 +1,17 @@
+import {createHeadTestOwnerStore} from './head-test-owner.ts';
+import type {HeadTestStoredJob as StoredJob} from './head-test-contracts.ts';
 import {createHash, randomUUID} from 'node:crypto';
 import type {DatabaseSync} from 'node:sqlite';
 import {headTestEffectOccupiesSlot, headTestCanonical, headTestCommandSchema, headTestDefinition, HEAD_TEST_DEFINITION_DIGEST, headTestQuerySchema, headTestScopeSchema} from '../domain/public.ts';
 import type {HeadTestCommand, HeadTestJob, HeadTestQuery, HeadTestReceipt, HeadTestScope, HeadTestTargets, HeadTestTarget, HeadTestView, Principal, Review, Snapshot} from '../domain/public.ts';
 import type {ExecutionLease} from './execution.ts';
 
-export type HeadTestOptions = Readonly<{testOnlyAvailable?: true; maxPending?: number; maxJobsPerReview?: number; maxRetainedBytes?: number}>;
-type StoredJob = HeadTestJob & Readonly<{credentialReference: string; reservedBytes: number; retainedBytes: number}>;
+export type HeadTestOptions = Readonly<{testOnlyAvailable?: true; testOnlyExecution?: true; maxPending?: number; maxJobsPerReview?: number; maxRetainedBytes?: number}>;
 type Ports = Readonly<{db: DatabaseSync; tx: <T>(operation: () => T) => T; load: (id: string) => Review; authenticate: (token: string) => Principal; authorize: (principal: Principal, review: Review) => void; execution: ExecutionLease; options?: HeadTestOptions}>;
 const hash = (value: string) => createHash('sha256').update(value).digest('hex');
 const reserveBytes = 2 * 1024 * 1024;
 const terminal = new Set<HeadTestJob['state']>(['cancelled', 'passed', 'failed', 'timed_out', 'unavailable', 'error']);
-const publicJob = ({credentialReference: _credential, reservedBytes: _reserved, retainedBytes: _retained, ...job}: StoredJob): HeadTestJob => job;
+const publicJob = ({credentialReference: _credential, reservedBytes: _reserved, retainedBytes: _retained, stopReason: _stop, invocations, ...job}: StoredJob): HeadTestJob => ({...job,invocations:invocations.map(({invocationId,phase,state,quiescence,processes})=>({invocationId,phase,state,quiescence,...(processes?{processCount:processes.length}:{})}))});
 const target = (): HeadTestTarget => ({targetId: 'review-source-core-v1', revision: 2, digest: HEAD_TEST_DEFINITION_DIGEST, definition: headTestDefinition()});
 const configuredRepository = (snapshot: Snapshot): boolean => {
   const url = new URL(snapshot.prUrl), candidate = snapshot.candidate;
@@ -19,11 +20,11 @@ const configuredRepository = (snapshot: Snapshot): boolean => {
 };
 
 export const createHeadTestStore = ({db, tx, load, authenticate, authorize, execution, options = {}}: Ports) => {
-  const testOnlyAvailable = options.testOnlyAvailable === true;
+  const fixtureExecution = options.testOnlyExecution === true, testOnlyAvailable = options.testOnlyAvailable === true || fixtureExecution;
   const maxPending = options.maxPending ?? 8, maxJobs = options.maxJobsPerReview ?? 256, quota = options.maxRetainedBytes ?? 64 * 1024 * 1024;
   for (const [value, ceiling] of [[maxPending, 8], [maxJobs, 256], [quota, 64 * 1024 * 1024]] as const)
     if (!Number.isSafeInteger(value) || value < 1 || value > ceiling) throw new Error('invalid_test_limit');
-  if (options.testOnlyAvailable !== undefined && options.testOnlyAvailable !== true) throw new Error('invalid_test_configuration');
+  if (options.testOnlyAvailable && options.testOnlyExecution || options.testOnlyExecution !== undefined && options.testOnlyExecution !== true || options.testOnlyAvailable !== undefined && options.testOnlyAvailable !== true) throw new Error('invalid_test_configuration');
   db.exec('CREATE TABLE IF NOT EXISTS test_jobs(id TEXT PRIMARY KEY,body TEXT NOT NULL); CREATE TABLE IF NOT EXISTS test_receipts(id TEXT PRIMARY KEY,actor TEXT NOT NULL,fingerprint TEXT NOT NULL,body TEXT NOT NULL);');
   const rows = () => (db.prepare('SELECT rowid AS sequence,body FROM test_jobs ORDER BY rowid').all() as {sequence: number; body: string}[]).map(row => ({sequence: row.sequence, job: JSON.parse(row.body) as StoredJob}));
   const put = (job: StoredJob) => db.prepare('INSERT INTO test_jobs VALUES (?,?) ON CONFLICT(id) DO UPDATE SET body=excluded.body').run(job.jobId, headTestCanonical(job));
@@ -86,7 +87,7 @@ export const createHeadTestStore = ({db, tx, load, authenticate, authorize, exec
         if (sameReview.length >= maxJobs) throw new Error('test_history_limit');
         if (sameReview.reduce((bytes, item) => bytes + item.reservedBytes + item.retainedBytes, 0) + reserveBytes > quota) throw new Error('test_storage_limit');
         const now = new Date().toISOString();
-        job = {schema: 'head-test-job-v1', jobId: randomUUID(), ...scope, repository: snapshot.repository, sourceProject: snapshot.candidate?.sourceProject ?? snapshot.repository, baseSha: snapshot.baseSha, headSha: snapshot.headSha, actorId: principal.actorId, credentialReference: hash(token), target: target(), provenance: 'test_only_configuration', createdAt: now, updatedAt: now, jobRevision: 1, state: 'queued', reason: null, effectDisposition: 'none', cancellation: null, invocations: [], reservedBytes: reserveBytes, retainedBytes: 0};
+        job = {schema: 'head-test-job-v1', jobId: randomUUID(), ...scope, repository: snapshot.repository, sourceProject: snapshot.candidate?.sourceProject ?? snapshot.repository, baseSha: snapshot.baseSha, headSha: snapshot.headSha, actorId: principal.actorId, credentialReference: hash(token), target: target(), provenance: fixtureExecution ? 'test_only_execution' : 'test_only_configuration', createdAt: now, updatedAt: now, jobRevision: 1, state: 'queued', reason: null, effectDisposition: 'none', cancellation: null, invocations: [], reservedBytes: reserveBytes, retainedBytes: 0};
         disposition = 'queued'; put(job);
       } else {
         job = previous!;
@@ -124,5 +125,5 @@ export const createHeadTestStore = ({db, tx, load, authenticate, authorize, exec
     const matching = (db.prepare("SELECT rowid AS sequence,body FROM test_jobs WHERE rowid>? AND json_extract(body,'$.reviewId')=? AND json_extract(body,'$.snapshotId')=? ORDER BY rowid LIMIT 33").all(after, scope.reviewId, scope.snapshotId) as {sequence: number; body: string}[]).map(row => ({sequence: row.sequence, job: JSON.parse(row.body) as StoredJob})), page = matching.slice(0, 32);
     return {...scope, jobs: page.map(row => publicJob(row.job)), selectedJob: null, nextCursor: matching.length > 32 ? Buffer.from(headTestCanonical({v: 1, ...scope, after: page.at(-1)!.sequence})).toString('base64url') : null};
   };
-  return {targets, command, query};
+  return {targets, command, query, ...createHeadTestOwnerStore({db,tx,load,authorize,execution,rows,get,put,publicJob,fixtureExecution})};
 };

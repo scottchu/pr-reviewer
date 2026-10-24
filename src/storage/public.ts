@@ -607,3 +607,5 @@ export type {StoryLimits} from './story.ts';
 export type {StoryContent,StoryCommand} from '../domain/public.ts';
 
 export type {HeadTestOptions} from "./head-tests.ts";
+
+export type {HeadTestOwner,HeadTestGrant,HeadTestProcess,HeadTestJournal} from './head-test-contracts.ts';

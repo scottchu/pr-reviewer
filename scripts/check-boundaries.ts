@@ -2,7 +2,8 @@ import { readdir, readFile } from "node:fs/promises";
 import { join } from "node:path";
 const allowed: Record<string, string[]> = {
   domain: ["source-acquisition","source-analysis"],
-  storage: ["domain","source-preparation","source-acquisition","source-analysis","analysis-jobs"],
+  storage: ["domain","source-preparation","source-acquisition","source-analysis","analysis-jobs","test-jobs"],
+  "test-jobs":["domain","storage","import-jobs"],
   "source-preparation":["domain","source-acquisition","source-analysis"],
   "source-acquisition":[],
   "source-analysis":[],
