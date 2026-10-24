@@ -12,7 +12,7 @@ React components consume view data and collect user intent. Application/domain i
 
 ## Screen and states
 
-Show a PR/base/head identity header, before-left and after-right source panes, a selected-span label, question composer and ordered discussion. Label removals/additions/modifications in text as well as red/green/yellow. Show question/reply author and source identity; state labels distinguish saved, delivery pending, notified, working, answered and delivery unknown. Attachment pending/revoked disables delivery with an actionable message while preserving saved content.
+Show a PR/base/head identity header and the [persistent review canvas](canvas-reading.md). Focused graph groups reveal before-left and after-right source nodes, a selected-span label, anchored question context and evidence-linked discussion. Source reading stays inside the graph; context/utility controls may surround it. Label removals/additions/modifications in text as well as red/green/yellow. Show question/reply author and source identity; state labels distinguish saved, delivery pending, notified, working, answered and delivery unknown. Attachment pending/revoked disables delivery with an actionable message while preserving saved content.
 
 Keyboard users can select or specify an exact source span, reach the labeled composer, submit once and follow evidence links. Announce state updates politely without moving focus; errors associate with their fields. Submission preserves the draft until acceptance/readback or explicit rejection and avoids duplicate actions while in flight. No responsive layout can hide source attribution or uncertainty.
 
@@ -22,9 +22,9 @@ Test the actual React controls in a real browser: labeled input, click and keybo
 
 The product E2E starts the real app with task-local data, prepares pinned own-PR source, attaches the responsible session, asks through real controls, observes CLI notification/MCP reply and reads authoritative UI state. Independently test stale attachment, wrong anchors, duplicate commands, unknown notification and restart. Browser interaction, real CLI/MCP delivery and unfamiliar-reviewer comprehension are separate evidence.
 
-## Implemented presentation decisions
+## Earlier implemented presentation and current correction
 
-The first view presents complete prepared documents in two independently scrolling panes. Pure source comparison assigns unchanged, removed, added and modified statuses; line markers and accessible labels accompany neutral/red/green/amber paint. The application view model carries these statuses into React. A line button selects one line; labeled side/start/end controls select an inclusive range. Source links retain immutable identity and update the selected span without moving an existing question.
+The first view presented complete prepared documents in two independently scrolling panes. This remains historical implementation evidence, not the accepted target interaction after the 2026-10-24 correction. The next [inspectable mockup](../../plans/720p/slices/05-explanation-exploration/canvas-reading-mockup.md) must establish readable source inside graph nodes before production UI composition resumes; preserve the existing backend and anchor/recovery behavior. Pure source comparison assigns unchanged, removed, added and modified statuses; line markers and accessible labels accompany neutral/red/green/amber paint. The application view model carries these statuses into React. A line button selects one line; labeled side/start/end controls select an inclusive range. Source links retain immutable identity and update the selected span without moving an existing question.
 
 Submission uses one application-owned command identity. An interrupted acknowledgement retains it for an unchanged retry; changing the unresolved submission is rejected until reconciled. The bridge reads at the accepted receipt's revision before clearing the draft. React Strict Mode remount and bridge route tests verify teardown/reconnect; rendering never schedules CLI work. Polling changes only view snapshots, while durable inbox delivery remains gateway-owned.
 

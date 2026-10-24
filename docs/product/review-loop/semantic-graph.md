@@ -12,13 +12,17 @@
 
 ## Experience and meaning
 
-From an immutable review snapshot, choose a changed function and inspect before/after callers and callees, including unchanged source. Each static edge opens the actual same-side call site, implementation declaration and any import/re-export/overload evidence. Source inspection is an explicit action; graph focus, expansion, background completion and history polling never change a question anchor or draft. Retain the original source/graph selection and return position when following evidence.
+From an immutable review snapshot, choose a changed function and inspect before/after callers and callees, including unchanged source. Each static edge opens the actual same-side call site, implementation declaration and any import/re-export/overload evidence. Source inspection focuses readable source inside the [same persistent graph canvas](canvas-reading.md), reached by progressive zoom or an explicit focused lens. Reading is not a required detour to a file inspector. Graph focus, expansion, background completion and history polling never change a question anchor or draft. Retain the original source/graph selection and return position when following evidence.
 
 Show what is known before asking the reviewer to reconstruct it: selected declaration, side, changed/context role, static method, outgoing uncertainty and the scope of the incoming search. The view uses the existing React Flow dependency, one selected function and optional comparison partner, and at most twelve initially visible nodes. All bounded neighbors, call sites, unresolved sites, diagnostics and coverage rows remain accessible through labeled lists and keyboard controls. Remaining visual counts are exact within admitted facts; they are not omitted-repository counts. Do not fit the whole corpus onto one unreadable canvas.
 
 Before/after comparison is a presentation relation, never a call or proof that two functions are equivalent. A source-informed user explicitly selects each side from exact declarations. A same-path/name suggestion may be a labeled navigation suggestion but cannot silently pair renamed/ambiguous declarations. Missing, added, deleted or unsupported counterparts stay explicit. No line/name overlap becomes a semantic identity. A first useful view can show one selected side while a comparison partner remains unselected.
 
 Confirmed edges retain `ts-static-binding-v1` / `resolved_static`, conditional syntax and exact evidence. Static binding does not prove runtime execution, reachability, behavioral intent or test success. Unsupported dispatch, mutable bindings, external/missing modules, declaration-only targets, aliases/config gaps, JSX/framework invocation and analysis limits remain visible. Candidate declarations are not edges. No incoming matches means only “No resolved callers found in these supplied files.” A leaf label is allowed only when the core supplies “No explicit invocation sites in this function body under the supported syntax scan.” Neither statement proves no effects, outside consumers or indirect behavior.
+
+## Current canvas correction versus retained implementation
+
+The [canvas-reading contract](canvas-reading.md) supersedes the separate-inspector destination in older UI descriptions below. The public source reads and immutable semantic facts remain current. Basic focus-to-inline-diff is required now; the [inspectable mockup packet](../../plans/720p/slices/05-explanation-exploration/canvas-reading-mockup.md) precedes new production composition. Detailed source/store/worker formats below are preserved, not replaced by a visual scene model.
 
 ## Responsibilities and public boundaries
 
