@@ -130,8 +130,10 @@ export const createReviewBridge = (reviewId: string, initialSnapshotId?:string) 
       clearInterval(timer);
       route.dispose();
       generation++;
+      const canceled = inflight;
+      inflight = null;
       interruptSelection();
-      inflight?.abort();
+      canceled?.abort();
     };
   };
   return {

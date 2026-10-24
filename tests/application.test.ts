@@ -391,3 +391,62 @@ test('background connection and timer preserve authoritative revocation receipt 
     globalThis.fetch = original;
   }
 });
+
+for (const obsoleteCompletion of ['before-new-read', 'after-new-read', 'failure-before-new-read'] as const) {
+  test(`disposed ignored-abort read settles ${obsoleteCompletion} without owning the reconnected lifetime`, async (context) => {
+    const original = globalThis.fetch;
+    context.mock.timers.enable({ apis: ['setInterval'] });
+    const calls: { signal: AbortSignal | null | undefined; credential: string; resolve: (value: Response) => void; reject: (error: Error) => void }[] = [];
+    globalThis.fetch = ((_input: Parameters<typeof fetch>[0], init?: Parameters<typeof fetch>[1]) => new Promise<Response>((resolve, reject) => {
+      // Deliberately ignore abort: cancellation is not evidence that an obsolete transport settled.
+      calls.push({ signal: init?.signal, credential: new Headers(init?.headers).get('Authorization') ?? '', resolve, reject });
+    })) as typeof fetch;
+    const bridge = createReviewBridge('r');
+    let dispose: (() => void) | undefined;
+    const flush = () => new Promise<void>(resolve => setImmediate(resolve));
+    try {
+      const initialLogin = bridge.login('old-credential');
+      calls[0]!.resolve(Response.json(review));
+      await initialLogin;
+      dispose = bridge.connect();
+      assert.equal(calls.length, 2);
+      const obsolete = calls[1]!;
+      dispose();
+      assert.equal(obsolete.signal?.aborted, true);
+      assert.equal(bridge.diagnostics().length, 0);
+      dispose = bridge.connect();
+      assert.equal(calls.length, 3, 'reconnect cannot wait for a canceled transport to settle');
+      const fresh = bridge.login('fresh-credential');
+      assert.equal(calls.length, 4, 'explicit credential intent supersedes the new background read');
+      assert.equal(calls[2]!.signal?.aborted, true);
+      assert.equal(calls[3]!.credential, 'Bearer fresh-credential');
+      const settleObsolete = async () => {
+        if (obsoleteCompletion === 'failure-before-new-read') obsolete.reject(new Error('obsolete transport failed'));
+        else obsolete.resolve(Response.json({ ...review, revision: 99 }));
+        // The reconnect read is also obsolete after the explicit credential intent.
+        calls[2]!.resolve(Response.json({ ...review, revision: 88 }));
+        await flush();
+      };
+      if (obsoleteCompletion !== 'after-new-read') {
+        await settleObsolete();
+        assert.equal(bridge.getSnapshot().review?.revision, 1);
+        assert.equal(bridge.getSnapshot().error, '');
+      }
+      context.mock.timers.tick(2100);
+      assert.equal(calls.length, 4, 'old finally cannot clear the active fresh-credential read slot');
+      assert.equal(calls[3]!.signal?.aborted, false);
+      calls[3]!.resolve(Response.json({ ...review, revision: 5 }));
+      await fresh;
+      if (obsoleteCompletion === 'after-new-read') await settleObsolete();
+      assert.equal(bridge.getSnapshot().review?.revision, 5, 'obsolete success cannot replace the new authorized projection');
+      assert.equal(bridge.getSnapshot().error, '');
+      context.mock.timers.tick(700);
+      assert.equal(calls.length, 5, 'a settled fresh request permits polling again');
+    } finally {
+      dispose?.();
+      assert.equal(bridge.diagnostics().length, 0);
+      context.mock.timers.reset();
+      globalThis.fetch = original;
+    }
+  });
+}
