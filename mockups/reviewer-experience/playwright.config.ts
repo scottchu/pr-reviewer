@@ -1,0 +1,2 @@
+import {defineConfig} from '@playwright/test';
+export default defineConfig({testDir:'./tests',testMatch:'browser.spec.ts',fullyParallel:false,workers:1,reporter:'list',outputDir:'/tmp/pr-reviewer-experience-mockup-evidence/playwright',use:{baseURL:'http://127.0.0.1:56676',viewport:{width:1440,height:1000},launchOptions:{executablePath:'/Applications/Google Chrome.app/Contents/MacOS/Google Chrome',args:['--no-first-run','--no-default-browser-check']},screenshot:'only-on-failure',trace:'retain-on-failure'}});

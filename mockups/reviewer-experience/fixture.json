@@ -1,0 +1,372 @@
+{
+  "prUrl": "https://github.com/scottchu/pr-reviewer/pull/25",
+  "base": "b096826e31c0927190806de91ed70b8b64aa93d8",
+  "head": "e3b270e5f49a9215452b0b86702946043e979059",
+  "provenance": "Prepared design fixture from immutable Git objects; fixture-local source occurrences, not native analysis or snapshotAnchor.",
+  "sources": {
+    "request": {
+      "before": {
+        "path": "src/application/review.ts",
+        "commit": "b096826e31c0927190806de91ed70b8b64aa93d8",
+        "side": "before",
+        "startLine": 24,
+        "endLine": 31,
+        "startOffset": 2853,
+        "endOffset": 3769,
+        "contentHash": "7953f0b8486ae475717bdc749e23a31f12351f41c11a473280de9a2420265477",
+        "excerptHash": "5fbbf6b5e681c0c27e51c385e1ad12c1ce31c1e2944f7f93ba4f15004fc971ad",
+        "text": " const request=async(captured:string,path:string,body?:unknown,signal?:AbortSignal)=>{\n  const controller=body===undefined?new AbortController():null;if(controller)readControllers.add(controller);\n  const ownedSignal=controller?(signal?AbortSignal.any([signal,controller.signal]):controller.signal):signal;\n  try{\n   if(ownedSignal?.aborted)throw new Error('selection_superseded');\n   const response=await fetch(path,{headers:{Authorization:`Bearer ${captured}`,'Content-Type':'application/json'},...(body===undefined?{}:{method:'POST',body:typeof body==='string'?body:JSON.stringify(body)}),...(ownedSignal?{signal:ownedSignal}:{})});\n   const value=await response.json() as unknown;if(ownedSignal?.aborted)throw new Error('selection_superseded');if(!response.ok)throw new Error(String((value as {error?:string}).error??'request_failed'));return value;\n  }finally{if(controller)readControllers.delete(controller);}\n"
+      },
+      "after": {
+        "path": "src/application/review.ts",
+        "commit": "e3b270e5f49a9215452b0b86702946043e979059",
+        "side": "after",
+        "startLine": 25,
+        "endLine": 32,
+        "startOffset": 2949,
+        "endOffset": 3857,
+        "contentHash": "dae210c79cb019d6edfdbfacfcf3da1e5773ceb4d15cf747df15ffa498c28e4e",
+        "excerptHash": "8c38d02c0c14628270bd430c9cafc1ab6bb567073e6280bd38f3c5d36e649386",
+        "text": " const request=async(captured:string,path:string,body?:unknown,signal?:AbortSignal)=>{\n  const controller=body===undefined?new AbortController():null;if(controller)readControllers.add(controller);\n  const ownedSignal=controller?(signal?AbortSignal.any([signal,controller.signal]):controller.signal):signal;\n  try{\n   if(ownedSignal?.aborted)throw new Error('selection_superseded');\n   const response=await fetch(path,{headers:{...accessHeaders(captured),'Content-Type':'application/json'},...(body===undefined?{}:{method:'POST',body:typeof body==='string'?body:JSON.stringify(body)}),...(ownedSignal?{signal:ownedSignal}:{})});\n   const value=await response.json() as unknown;if(ownedSignal?.aborted)throw new Error('selection_superseded');if(!response.ok)throw new Error(String((value as {error?:string}).error??'request_failed'));return value;\n  }finally{if(controller)readControllers.delete(controller);}\n"
+      }
+    },
+    "helper": {
+      "before": null,
+      "after": {
+        "path": "src/application/local-access.ts",
+        "commit": "e3b270e5f49a9215452b0b86702946043e979059",
+        "side": "after",
+        "startLine": 1,
+        "endLine": 3,
+        "startOffset": 0,
+        "endOffset": 266,
+        "contentHash": "811735e3599292c54af870134345249deed32f1d9b9705f8ca18fd086225d59d",
+        "excerptHash": "811735e3599292c54af870134345249deed32f1d9b9705f8ca18fd086225d59d",
+        "text": "// Nonsecret lifecycle/recovery scope for the single local owner. Never a Bearer.\nexport const localOwnerSession='local-owner:v1';\nexport const accessHeaders=(session:string):Record<string,string>=>session===localOwnerSession?{}:{Authorization:`Bearer ${session}`};\n"
+      }
+    },
+    "refresh": {
+      "before": {
+        "path": "src/application/review.ts",
+        "commit": "b096826e31c0927190806de91ed70b8b64aa93d8",
+        "side": "before",
+        "startLine": 34,
+        "endLine": 44,
+        "startOffset": 3937,
+        "endOffset": 5386,
+        "contentHash": "7953f0b8486ae475717bdc749e23a31f12351f41c11a473280de9a2420265477",
+        "excerptHash": "685f01c9a7986ed14801ae113ec0acb577119ac8b70bdc2009fbab7baff3a132",
+        "text": " const refresh=async(minimumRevision=0)=>{\n  const expected=generation,captured=token;inflight?.abort();const controller=new AbortController();inflight=controller;\n  try{\n   const review=await request(captured,`/api/reviews/${encodeURIComponent(reviewId)}?minimumRevision=${minimumRevision}${selectedSnapshotId?`&snapshotId=${encodeURIComponent(selectedSnapshotId)}`:''}`,undefined,controller.signal) as Review;\n   if(owns(expected,captured)&&!controller.signal.aborted){if(review.reviewId!==reviewId||selectedSnapshotId&&review.snapshot.snapshotId!==selectedSnapshotId)throw new Error('selection_mismatch');selectedSnapshotId??=review.snapshot.snapshotId;\n    const source=review.snapshot.sources.find(source=>source.side==='head'&&source.lineCount>0)??review.snapshot.sources.find(source=>source.lineCount>0);\n    publish({...state,review,sources:state.review?.snapshot.snapshotId===review.snapshot.snapshotId?state.sources:sourceViews(review.snapshot),graph:state.review?.snapshot.snapshotId===review.snapshot.snapshotId?state.graph:projectGraph(review.snapshot),error:'',initialSelection:source?{snapshotId:review.snapshot.snapshotId,side:source.side,path:source.path,startLine:1,endLine:1}:null,authenticated:true});return review;\n   }\n  }catch(error){if(owns(expected,captured)&&!controller.signal.aborted)publish({...state,error:error instanceof Error?error.message:'request_failed'});}\n  finally{if(inflight===controller)inflight=null;}\n };\n"
+      },
+      "after": {
+        "path": "src/application/review.ts",
+        "commit": "e3b270e5f49a9215452b0b86702946043e979059",
+        "side": "after",
+        "startLine": 35,
+        "endLine": 45,
+        "startOffset": 4025,
+        "endOffset": 5474,
+        "contentHash": "dae210c79cb019d6edfdbfacfcf3da1e5773ceb4d15cf747df15ffa498c28e4e",
+        "excerptHash": "685f01c9a7986ed14801ae113ec0acb577119ac8b70bdc2009fbab7baff3a132",
+        "text": " const refresh=async(minimumRevision=0)=>{\n  const expected=generation,captured=token;inflight?.abort();const controller=new AbortController();inflight=controller;\n  try{\n   const review=await request(captured,`/api/reviews/${encodeURIComponent(reviewId)}?minimumRevision=${minimumRevision}${selectedSnapshotId?`&snapshotId=${encodeURIComponent(selectedSnapshotId)}`:''}`,undefined,controller.signal) as Review;\n   if(owns(expected,captured)&&!controller.signal.aborted){if(review.reviewId!==reviewId||selectedSnapshotId&&review.snapshot.snapshotId!==selectedSnapshotId)throw new Error('selection_mismatch');selectedSnapshotId??=review.snapshot.snapshotId;\n    const source=review.snapshot.sources.find(source=>source.side==='head'&&source.lineCount>0)??review.snapshot.sources.find(source=>source.lineCount>0);\n    publish({...state,review,sources:state.review?.snapshot.snapshotId===review.snapshot.snapshotId?state.sources:sourceViews(review.snapshot),graph:state.review?.snapshot.snapshotId===review.snapshot.snapshotId?state.graph:projectGraph(review.snapshot),error:'',initialSelection:source?{snapshotId:review.snapshot.snapshotId,side:source.side,path:source.path,startLine:1,endLine:1}:null,authenticated:true});return review;\n   }\n  }catch(error){if(owns(expected,captured)&&!controller.signal.aborted)publish({...state,error:error instanceof Error?error.message:'request_failed'});}\n  finally{if(inflight===controller)inflight=null;}\n };\n"
+      }
+    },
+    "gateway": {
+      "before": null,
+      "after": {
+        "path": "src/server/public.ts",
+        "commit": "e3b270e5f49a9215452b0b86702946043e979059",
+        "side": "after",
+        "startLine": 61,
+        "endLine": 66,
+        "startOffset": 2523,
+        "endOffset": 2937,
+        "contentHash": "20c22563be7da4c385eda772d5840d55f0993ddeebd85718b3605cddb76a0b0e",
+        "excerptHash": "a8d54e7dacb65de97d38953ee7ba773a87ec33097367e27c76f489875a28ec13",
+        "text": "      const authorization = req.headers.authorization;\n      if (authorization!==undefined&&!authorization.startsWith(\"Bearer \"))\n        throw new Error(\"unauthorized\");\n      // Network reachability is the established single-owner boundary. Explicit\n      // participant credentials never fall back to that owner's authority.\n      const access=authorization===undefined?store.localOwner:authorization.slice(7);\n"
+      }
+    },
+    "owner": {
+      "before": null,
+      "after": {
+        "path": "src/storage/access.ts",
+        "commit": "e3b270e5f49a9215452b0b86702946043e979059",
+        "side": "after",
+        "startLine": 4,
+        "endLine": 14,
+        "startOffset": 93,
+        "endOffset": 820,
+        "contentHash": "0440486de82e136ffe430e4f1bed2b6f57f491319c59a71fad0f9d8507053b4c",
+        "excerptHash": "675a7452ff5597de169c39c1423154723bbd80de03ec8831bbecfc89cc204ba8",
+        "text": "// A trusted in-process owner capability, never a serialized browser credential.\nexport const localOwnerAccess=Object.freeze({principal:Object.freeze({kind:'user' as const,actorId:'local-user'})});\nexport type StorageAccess=string|typeof localOwnerAccess;\nconst ownerReference='local-owner:v1';\nexport const accessReference=(access:StorageAccess)=>{\n if(typeof access==='string')return createHash('sha256').update(access).digest('hex');\n if(access!==localOwnerAccess)throw new Error('unauthorized');\n return ownerReference;\n};\nexport const localPrincipal=(reference:string):Principal|null=>reference===ownerReference?localOwnerAccess.principal:null;\nexport const isLocalOwner=(access:StorageAccess)=>access===localOwnerAccess;\n"
+      }
+    },
+    "test": {
+      "before": null,
+      "after": {
+        "path": "tests/gateway.test.ts",
+        "commit": "e3b270e5f49a9215452b0b86702946043e979059",
+        "side": "after",
+        "startLine": 89,
+        "endLine": 110,
+        "startOffset": 5740,
+        "endOffset": 8666,
+        "contentHash": "13e7db6e38670e876795a150587bb6e5a441548915fb37f67ff0a80563953158",
+        "excerptHash": "bcfd8bf49bd742c5f213cb2a5aa473639fe1d1569102597fcb6af486aad7a656",
+        "text": "// SU-A/B/C: docs/product/review-loop/runtime.md single-local-owner policy.\ntest('single local owner reads and writes without a Bearer while explicit invalid credentials never escalate',async()=>{\n const root=mkdtempSync(join(tmpdir(),'pr-reviewer-local-owner-')),store=createStore(join(root,'db'));\n const content='export const value = 1;\\n',snapshot={snapshotId:'local-source',repository:'local',prUrl:'https://github.com/scottchu/pr-reviewer/pull/14',prNumber:14,baseSha:'a',headSha:'b',sources:[{side:'head' as const,path:'value.ts',content,hash:createHash('sha256').update(content).digest('hex'),lineCount:1}]};\n store.prepare('r',snapshot);const oldToken=store.issueUser();\n store.imports.command(oldToken,{type:'RequestImport',commandId:'old-owner-import',path:'/retained/locator'});\n const {createImportArtifacts}=await import('../src/import-artifacts/public.ts');\n const gateway=createGateway(store,async()=>({state:'unknown',reason:'controlled'}),{importArtifacts:createImportArtifacts(root)}),port=await gateway.listen(0);\n const call=async(path:string,body?:unknown,authorization?:string)=>{const response=await fetch(`http://127.0.0.1:${port}${path}`,{headers:{'Content-Type':'application/json',...(authorization?{Authorization:authorization}:{})},...(body?{method:'POST',body:JSON.stringify(body)}:{})});return {status:response.status,body:await response.json() as Record<string,unknown>};};\n try{\n  assert.deepEqual((await call('/api/self')).body,{kind:'user',actorId:'local-user'});\n  assert.equal((await call('/api/reviews')).status,200);assert.equal((await call('/api/reviews/r')).status,200);\n  assert.equal((await call('/api/analysis?reviewId=r&snapshotId=local-source')).status,200);\n  assert.equal((await call('/api/story?reviewId=r&snapshotId=local-source')).status,200);\n  assert.equal((await call('/api/story/context?reviewId=r&snapshotId=local-source')).status,200);\n  const jobs=await call('/api/imports');assert.equal(jobs.status,200);const job=(jobs.body as unknown as {jobId:string}[])[0]!;assert.ok(job.jobId);\n  assert.equal((await call('/api/imports/commands',{type:'RequestImport',commandId:'new-owner-import',path:'/local/locator'})).body.state,'applied');\n  const command={type:'AskQuestion',commandId:'local-owner-question',reviewId:'r',anchor:{snapshotId:'local-source',path:'value.ts',side:'head',startLine:1,endLine:1},text:'Saved without a login'};\n  const receipt=await call('/api/commands',command);assert.equal(receipt.status,200);assert.equal(receipt.body.state,'applied');assert.equal(receipt.body.actorId,'local-user');\n  assert.deepEqual((await call('/api/commands',command)).body,receipt.body);\n  const readback=await call('/api/reviews/r');assert.equal((readback.body.questions as {text:string}[])[0]?.text,command.text);\n  for(const authorization of ['Bearer wrong','Basic anything','Bearer '])assert.equal((await call('/api/reviews/r',undefined,authorization)).status,401);\n"
+      }
+    }
+  },
+  "ledger": [
+    {
+      "path": "docs/plans/1080p/plan.md",
+      "added": "1",
+      "removed": "1"
+    },
+    {
+      "path": "docs/plans/480p/plan.md",
+      "added": "1",
+      "removed": "1"
+    },
+    {
+      "path": "docs/plans/480p/slices/01-review-loop/plan.md",
+      "added": "4",
+      "removed": "0"
+    },
+    {
+      "path": "docs/plans/480p/slices/01-review-loop/single-user-access/evidence.md",
+      "added": "83",
+      "removed": "0"
+    },
+    {
+      "path": "docs/plans/480p/slices/01-review-loop/single-user-access/plan.md",
+      "added": "71",
+      "removed": "0"
+    },
+    {
+      "path": "docs/plans/480p/slices/02-review-continuation/plan.md",
+      "added": "6",
+      "removed": "0"
+    },
+    {
+      "path": "docs/plans/720p/slices/03-whole-change/plan.md",
+      "added": "6",
+      "removed": "0"
+    },
+    {
+      "path": "docs/plans/720p/slices/04-behavior-neighborhood/plan.md",
+      "added": "6",
+      "removed": "0"
+    },
+    {
+      "path": "docs/plans/720p/slices/05-explanation-exploration/plan.md",
+      "added": "6",
+      "removed": "0"
+    },
+    {
+      "path": "docs/plans/delivery-through-1080p.md",
+      "added": "5",
+      "removed": "1"
+    },
+    {
+      "path": "docs/plans/roadmap.md",
+      "added": "2",
+      "removed": "2"
+    },
+    {
+      "path": "docs/product/architecture.md",
+      "added": "1",
+      "removed": "1"
+    },
+    {
+      "path": "docs/product/review-loop/contracts.md",
+      "added": "4",
+      "removed": "4"
+    },
+    {
+      "path": "docs/product/review-loop/evolution.md",
+      "added": "2",
+      "removed": "2"
+    },
+    {
+      "path": "docs/product/review-loop/import-jobs.md",
+      "added": "7",
+      "removed": "3"
+    },
+    {
+      "path": "docs/product/review-loop/persistence-compatibility.md",
+      "added": "6",
+      "removed": "2"
+    },
+    {
+      "path": "docs/product/review-loop/presentation.md",
+      "added": "7",
+      "removed": "3"
+    },
+    {
+      "path": "docs/product/review-loop/runtime.md",
+      "added": "10",
+      "removed": "6"
+    },
+    {
+      "path": "docs/product/review-loop/semantic-storage.md",
+      "added": "4",
+      "removed": "0"
+    },
+    {
+      "path": "docs/product/review-loop/story-and-exploration.md",
+      "added": "10",
+      "removed": "2"
+    },
+    {
+      "path": "scripts/add-snapshot.ts",
+      "added": "1",
+      "removed": "2"
+    },
+    {
+      "path": "scripts/capture-review.ts",
+      "added": "2",
+      "removed": "4"
+    },
+    {
+      "path": "scripts/dev.ts",
+      "added": "1",
+      "removed": "12"
+    },
+    {
+      "path": "scripts/local.ts",
+      "added": "1",
+      "removed": "1"
+    },
+    {
+      "path": "scripts/pair.ts",
+      "added": "0",
+      "removed": "4"
+    },
+    {
+      "path": "src/application/analysis.ts",
+      "added": "3",
+      "removed": "2"
+    },
+    {
+      "path": "src/application/imports.ts",
+      "added": "9",
+      "removed": "5"
+    },
+    {
+      "path": "src/application/local-access.ts",
+      "added": "3",
+      "removed": "0"
+    },
+    {
+      "path": "src/application/private-session.ts",
+      "added": "2",
+      "removed": "1"
+    },
+    {
+      "path": "src/application/review.ts",
+      "added": "4",
+      "removed": "3"
+    },
+    {
+      "path": "src/application/story.ts",
+      "added": "2",
+      "removed": "1"
+    },
+    {
+      "path": "src/application/workspace.ts",
+      "added": "15",
+      "removed": "11"
+    },
+    {
+      "path": "src/server/public.ts",
+      "added": "13",
+      "removed": "10"
+    },
+    {
+      "path": "src/storage/access.ts",
+      "added": "14",
+      "removed": "0"
+    },
+    {
+      "path": "src/storage/analysis.ts",
+      "added": "14",
+      "removed": "12"
+    },
+    {
+      "path": "src/storage/imports.ts",
+      "added": "7",
+      "removed": "5"
+    },
+    {
+      "path": "src/storage/public.ts",
+      "added": "8",
+      "removed": "10"
+    },
+    {
+      "path": "src/storage/story.ts",
+      "added": "6",
+      "removed": "5"
+    },
+    {
+      "path": "src/ui/main.tsx",
+      "added": "10",
+      "removed": "26"
+    },
+    {
+      "path": "src/ui/style.css",
+      "added": "3",
+      "removed": "6"
+    },
+    {
+      "path": "tests/exploration-recovery.e2e.ts",
+      "added": "5",
+      "removed": "5"
+    },
+    {
+      "path": "tests/gateway.test.ts",
+      "added": "27",
+      "removed": "0"
+    },
+    {
+      "path": "tests/import-jobs.test.ts",
+      "added": "12",
+      "removed": "0"
+    },
+    {
+      "path": "tests/import.e2e.ts",
+      "added": "6",
+      "removed": "6"
+    },
+    {
+      "path": "tests/question-recovery.test.ts",
+      "added": "8",
+      "removed": "0"
+    },
+    {
+      "path": "tests/review.e2e.ts",
+      "added": "31",
+      "removed": "21"
+    },
+    {
+      "path": "tests/runtime.test.ts",
+      "added": "20",
+      "removed": "0"
+    },
+    {
+      "path": "tests/semantic-storage.test.ts",
+      "added": "11",
+      "removed": "0"
+    },
+    {
+      "path": "tests/semantic.e2e.ts",
+      "added": "6",
+      "removed": "6"
+    },
+    {
+      "path": "tests/story.e2e.ts",
+      "added": "6",
+      "removed": "6"
+    }
+  ]
+}
