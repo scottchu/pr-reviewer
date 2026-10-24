@@ -30,7 +30,7 @@ Assigned owner uses `/tmp/pr-reviewer-source-acquisition`, branch `discover-pinn
 
 - Both pinned sides retain unchanged TS/TSX and declaration-only candidates, with exact text/hash/object/commit and separate side identity.
 - All known paths have explicit selection/preparation/exclusion meaning; partial traversal reports unknown unvisited counts, never complete inventory.
-- Default 128 selected entries/side, 256 KiB/file and 4 MiB combined may only be lowered. Priority paths are available or fail explicitly.
+- Default 128 prepared entries/side, 256 KiB/file and 4 MiB combined may only be lowered. Priority paths are available or fail explicitly.
 - Missing promised objects cannot fetch/execute a fixture helper; symlink/submodule/binary/UTF-8/type/hash/missing/budget cases are honest.
 - Canonical ordering, normalized-priority corpus identity and checkout-independent retained bytes are tested; existing changed-file import behavior stays passing.
 
@@ -40,7 +40,7 @@ Root assigns another engineer the exact clean implementation commit, this v1 pac
 
 ## Integration inputs and unresolved gates
 
-The loader's complete known ledger may exceed the analyzer's 128-entry input quota while retained selected inputs stay bounded. 04I must reconcile wider exclusion/account retention with the actual analysis public contract before admission; acquisition does not silently narrow its known scope or alter the analyzer. Snapshot identity and both pinned commits must match the authorized selected review. Keep corpus identity separate, retain the actual bytes for future anchors and route jobs/results only through public integration and domain admission.
+Root reconciled the accepted analysis contract: inventory is separately bounded at 4096 known rows per side and 2 MiB combined ledger metadata; the 128-entry limit counts prepared-text sources, not content-less exclusions. The loader returns the complete bounded known ledger separately from retained prepared source. 04I maps both without silently narrowing scope; exact analyzer public changes remain owned by its assigned executor. Snapshot identity and both pinned commits must match the authorized selected review. Keep corpus identity separate, retain the actual bytes for future anchors and route jobs/results only through public integration and domain admission.
 
 03 durable job/launch/restart/UI and 04 scheduling/analysis/admission/graph remain root-owned later gates. No pure-module result proves actual source-graph comprehension.
 
