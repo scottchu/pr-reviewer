@@ -213,7 +213,7 @@ export const createAnalysisStore = ({ db, tx, load, authorize, execution, limits
                         update(older);
                     }
                     current.generation++;
-                    job = { jobId: randomUUID(), reviewId, snapshotId, generation: current.generation, jobRevision: 1, state: "context_queued", reason: null, corpusId: null, inventoryId: null, analysisId: null, declarationIds: [], invocations: [], contextIssues: [], admission: null, credentialReference: reference, actorId: principal.actorId, worktree, sourceProject: identity.sourceProject, priorityPaths: { ...(parsed.priorityPaths?.base ? { base: parsed.priorityPaths.base } : {}), ...(parsed.priorityPaths?.head ? { head: parsed.priorityPaths.head } : {}) }, failureAccount: null };
+                    job = { ...(parsed.contextFilesPerSide !== undefined ? { contextFilesPerSide: parsed.contextFilesPerSide } : {}), jobId: randomUUID(), reviewId, snapshotId, generation: current.generation, jobRevision: 1, state: "context_queued", reason: null, corpusId: null, inventoryId: null, analysisId: null, declarationIds: [], invocations: [], contextIssues: [], admission: null, credentialReference: reference, actorId: principal.actorId, worktree, sourceProject: identity.sourceProject, priorityPaths: { ...(parsed.priorityPaths?.base ? { base: parsed.priorityPaths.base } : {}), ...(parsed.priorityPaths?.head ? { head: parsed.priorityPaths.head } : {}) }, failureAccount: null };
                     put(job);
                     saveGraph(reviewId, snapshotId, current);
                     result = { jobId: job.jobId };
@@ -347,7 +347,7 @@ export const createAnalysisStore = ({ db, tx, load, authorize, execution, limits
             return null;
         }),
         contextInput: (value: AnalysisGrant) => { const { job, invocation } = grant(value); if (invocation.phase !== "context")
-            throw new Error("analysis_phase_conflict"); return { jobId: job.jobId, review: load(job.reviewId), snapshotId: job.snapshotId, worktree: job.worktree, ...(job.sourceProject ? { sourceProject: job.sourceProject } : {}), priorityPaths: job.priorityPaths }; },
+            throw new Error("analysis_phase_conflict"); return { jobId: job.jobId, review: load(job.reviewId), snapshotId: job.snapshotId, worktree: job.worktree, ...(job.sourceProject ? { sourceProject: job.sourceProject } : {}), ...(job.contextFilesPerSide !== undefined ? { contextFilesPerSide: job.contextFilesPerSide } : {}), priorityPaths: job.priorityPaths }; },
         launchLimit: (value: AnalysisGrant) => { if (grant(value).invocation.phase !== "context")
             throw new Error("analysis_phase_conflict"); return launchLimit; },
         workerRequest,

@@ -41,12 +41,13 @@ export const acquirePreparedContext = async (input: {
     worktree: string;
     sourceProject?: string;
     priorityPaths?: ContextInput["priorityPaths"];
+    contextFilesPerSide?: number;
 }, effects: AcquisitionEffects) => {
     const snapshot = snapshotFor(input.review, input.snapshotId);
     if (!snapshot)
         throw new Error("source_unavailable");
     const identity = contextIdentity(snapshot, input.sourceProject);
-    const result = await loadSourceContext({ worktree: input.worktree, snapshotId: snapshot.snapshotId, identity, commits: { base: snapshot.baseSha, head: snapshot.headSha }, ...(input.priorityPaths ? { priorityPaths: input.priorityPaths } : {}) }, effects);
+    const result = await loadSourceContext({ worktree: input.worktree, snapshotId: snapshot.snapshotId, identity, commits: { base: snapshot.baseSha, head: snapshot.headSha }, ...(input.priorityPaths ? { priorityPaths: input.priorityPaths } : {}), ...(input.contextFilesPerSide !== undefined ? { budgets: { filesPerSide: input.contextFilesPerSide } } : {}) }, effects);
     if (result.kind !== "prepared")
         return result;
     const { corpus } = result, { corpusId, ...data } = corpus;

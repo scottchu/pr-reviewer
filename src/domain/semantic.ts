@@ -8,7 +8,7 @@ const path = z.string().min(1).max(1024).refine(value => !value.startsWith("/") 
 export const semanticAnchorSchema = z.object({ snapshotId: id, side: z.enum(["base", "head"]), path, contentHash: digest, start: z.number().int().nonnegative(), end: z.number().int().nonnegative(), startLine: z.number().int().positive(), endLine: z.number().int().positive() }).strict();
 const revision = z.number().int().nonnegative();
 export const analysisCommandSchema = z.discriminatedUnion("type", [
-    z.object({ type: z.literal("RequestAnalysis"), commandId: id.refine(value => !value.startsWith("analysis-admit:")), reviewId: id, snapshotId: id, expectedAnalysisGeneration: revision, priorityPaths: z.object({ base: z.array(path).max(64).optional(), head: z.array(path).max(64).optional() }).strict().optional(), worktree: z.string().min(1).max(4096).optional(), sourceProject: z.string().min(1).max(512).optional() }).strict().refine(value => (value.priorityPaths?.base?.length ?? 0) + (value.priorityPaths?.head?.length ?? 0) <= 64),
+    z.object({ type: z.literal("RequestAnalysis"), commandId: id.refine(value => !value.startsWith("analysis-admit:")), reviewId: id, snapshotId: id, expectedAnalysisGeneration: revision, contextFilesPerSide: z.number().int().min(1).max(128).optional(), priorityPaths: z.object({ base: z.array(path).max(64).optional(), head: z.array(path).max(64).optional() }).strict().optional(), worktree: z.string().min(1).max(4096).optional(), sourceProject: z.string().min(1).max(512).optional() }).strict().refine(value => (value.priorityPaths?.base?.length ?? 0) + (value.priorityPaths?.head?.length ?? 0) <= 64).refine(value => (["base", "head"] as const).every(side => new Set(value.priorityPaths?.[side] ?? []).size <= (value.contextFilesPerSide ?? 128))),
     z.object({ type: z.literal("SelectAnalysisDeclarations"), commandId: id.refine(value => !value.startsWith("analysis-admit:")), jobId: id, expectedJobRevision: revision, corpusId: digest, inventoryId: digest, declarationIds: z.array(id).min(1).max(2) }).strict(),
     z.object({ type: z.literal("CancelAnalysis"), commandId: id.refine(value => !value.startsWith("analysis-admit:")), jobId: id, expectedJobRevision: revision }).strict(),
     z.object({ type: z.literal("PutGraphClarification"), commandId: id.refine(value => !value.startsWith("analysis-admit:")), reviewId: id, snapshotId: id, analysisId: digest, expectedGraphRevision: revision, clarificationId: id.optional(), text: z.string().trim().min(1).max(4000), kind: z.enum(["interpretation", "question", "correction"]), primary: semanticAnchorSchema, evidence: z.array(semanticAnchorSchema).max(8), supersedes: id.optional() }).strict(),
@@ -34,6 +34,7 @@ export type AnalysisInvocation = {
     processes: AnalysisProcess[];
 };
 export type AnalysisJobView = {
+    contextFilesPerSide?: number;
     jobId: string;
     reviewId: string;
     snapshotId: string;
