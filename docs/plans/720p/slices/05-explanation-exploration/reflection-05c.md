@@ -2,7 +2,7 @@
 
 Date: 2026-10-24
 
-Status: Code-informed knowledge promoted; independent whole-current-product docs-only design rebuild readiness is qualified YES atc0a8945 after F1–F3 recheck. Actual own-PR and full05/720p/original04 G14 acceptance remain OPEN.
+Status: Code-informed knowledge promoted; independent whole-current-product docs-only design rebuild readiness is qualified YES atcd3e134 after thec0 F1–F3 recheck and subsequent startup delta. Actual own-PR and full05/720p/original04 G14 acceptance remain OPEN.
 
 Parent: [720p round](../../plan.md) · [slice05](plan.md) · [engineering checkpoint](checkpoint-05c.md).
 
@@ -62,4 +62,19 @@ Status: **Qualified YES — whole-current-product design rebuild readiness**, wi
 
 This closes the maintained-design sufficiency qualification for the current bounded review/history/import/semantic/story/context/player/exploration/private-recovery product. It does not establish an actual rebuild, application source conformance, product test/browser/native outcomes, own-PR comprehension/meaningful answer, human/device/live-client or deployment acceptance. No durable behavior changes are made to claim this gate. This evidence-only tracked-plan reconciliation changes neither the audited durable packet nor the pinned code/runtime/target.
 
-The [checkpoint identity table](checkpoint-05c.md#independent-knowledge-recheck-and-current-gates) distinguishes engineering code5b, root's actual reviewed/imported PR24 target48, audited knowledgec0 and subsequent evidence-only delivery head. Root is independently diagnosing an early actual-UI Resume AbortError observation; it remains UNCONFIRMED here, with no inferred defect, waived harness wait or successful-resume claim. Actual ownPR, full05/720p/04 G14 and native/Claude/human/merge/deployment gates remain open. The external06 readiness proposal is preparation only, with no06 implementation dispatch.
+The [checkpoint identity table](checkpoint-05c.md#independent-knowledge-recheck-and-current-gates) distinguishes engineering code5b, root's actual reviewed/imported PR24 target48, audited knowledgec0 and subsequent evidence-only delivery head. This paragraph records the earlierc31 status; the subsequently confirmed pre-Resume startup defect and exactcd3 engineering/knowledge closure are recorded below. The originally reported live first-Resume failure remains UNPROVEN. Actual ownPR, full05/720p/04 G14 and native/Claude/human/merge/deployment gates remain open. The external06 readiness proposal is preparation only, with no06 implementation dispatch.
+
+
+## Startup ownership reflection and independent closure
+
+Date: 2026-10-24
+
+The actual-target investigation extended the code-informed reflection from5b to `cd3e1348cdde78fb32fc241e534a27a828e4c621`. Rebuilding this composition now should encode a parent-owned readiness handoff: authorize review, finish initial AnalysisBridge credential/snapshot readiness, recheck captured workspace credential/generation/lifetime, then let StoryBridge hydrate and select its exact retained analysis. Child generation fences prevent old publication; they cannot make two competing parent initialization operations both succeed. Fence stale **rejections** as well as successful continuations, so an old login cannot report failure for a replacement login. Current-owner auth/query/parse/transport errors retain their public error paths, including an independently owned AbortError.
+
+Ordered existing public-port composition is sufficient. Catch-all AbortError suppression would hide real failures; a browser timer or extra wait before clicking an enabled control would conceal missing application readiness. Neither is used. No generic coordinator, new public DTO, second player/draft owner or persisted compatibility change is needed. Exact private-frame publication follows semantic/source readiness, and true failed Resume still retains its first frame for explicit retry. This is responsibility/lifecycle learning, not a visual redesign; long additive layout, maps below story/context and collapsed central account remain final-task risks.
+
+Independent engineering READY atcd3: `/tmp/pr-reviewer-05-player-review/05c/ready-cd3e134.md`, SHA-256 `7fb4b07e6068a2403d92fa8250b6c14376293bbd13db55190f74a7f1251ae3b4` (11 public-bridge schedules, strict/boundaries,21 affected tests, two actual Chrome). Author clean89 affected tests/nine Chrome retain separate evidence in the [checkpoint](checkpoint-05c.md#final-startup-correction-engineering-and-knowledge-release). The confirmed false login alert before Resume is closed; the original live first-Resume failure is UNPROVEN, not relabeled as fixed.
+
+Independent docs-only qualified YES atcd3: `/tmp/pr-reviewer-05-docs-rebuild-audit/recheck-cd3e134.md`, SHA-256 `9f7ca0e1917b39d06c34fb3cc63756b4733a21f059f1dc9416d80517842d8b3d`. The verified35-file/585161-byte packet adds only2013 bytes of startup ownership meaning, with unchanged four normative JSON files and priorc0 whole21-area/122-calculation assessment carried forward, not rerun. No remaining material normative gap found. Source conformance/product tests are separate engineering evidence; an actual rebuild, runtime publication, native/own-PR/human/deployment outcome is not established by the audit. This later plans-only evidence reconciliation leaves the audited durable packet unchanged.
+
+Operational baseline48/story/key is preserved; root owns its S1 content correction and the next final reviewed target/key/reference regeneration after this code fix. Full05/720p/original04 G14 and final actual-ownPR/native/human/Claude/merge/deployment remain open.06 readiness is preparation only, without implementation dispatch.
