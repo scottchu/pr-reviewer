@@ -2,7 +2,8 @@
 
 **Date:** 2026-10-24 UTC
 
-**Status:** Reviewed technical candidate028b6b9; G14 presentation CHANGES NEEDED. Root adopted combined04+05 delivery in draft PR24; no04 merge or full-slice acceptance. See [current checkpoint](checkpoint.md).
+**Status:** Bounded engineering and G14 agent-presentation obligation accepted through combined7b6/05 and independently closed ea test-entrypoint correction. [Final checkpoint receipt](checkpoint.md#combined7b6-g14-closure) preserves original028/67 negatives and exact evidence. Root merge/deployment, full host/human/round acceptance and final knowledge-delta audit remain pending.
+
 
 **Parent:** [720p round](../../plan.md)
 
@@ -39,3 +40,7 @@ The integration packet records merged03 source/base, assigned isolated owner/wor
 ## Case-specific successor readiness — revision3
 
 Reviewed028 technical interfaces may support05 implementation before04 merge, after committed05 packet review and scoped root assignment. G14 remains open with the complete original task and frozen actualA/B evidence. PR24 stays draft through the combined04+05 MVP; fresh final-target story/graph-first understanding followed by source comparison is required before merge. This replaces only the05 accepted04-merge prerequisite for this delivery; it does not declare04 accepted or unlock06. See the [checkpoint](checkpoint.md) for exact evidence, required explanation/whole-scope/span-triage improvements and preserved native/human limits.
+
+## Current bounded acceptance
+
+The [combined7b6 receipt](../05-explanation-exploration/acceptance-7b6.md) supersedes historical open-G14 coordination above, without changing those original accounts or their failed dispositions. Static/source scope, current authored understanding and meaningful question/return are independently evidenced within the stated task; overall effort remains workable, not effortless. No full-round/native/human or delivery acceptance is implied.

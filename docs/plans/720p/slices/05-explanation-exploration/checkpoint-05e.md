@@ -1,6 +1,10 @@
 # 05E journal-loss shared-exclusion correction
 
-**Date:** 2026-10-24. **Revision:**2. **Status:** Independent bounded engineering READY and whole-current-product knowledge qualified YES at exact882e2b8. New pinned actual own-PR acceptance and delivery remain open.
+**Date:** 2026-10-24
+
+**Revision:** 3
+
+**Status:** Independent882 engineering and qualified knowledge retained; actual7b6 bounded comprehension/return and ea entrypoint closure accepted in the final receipt below. Root delivery and the final operational-knowledge narrow recheck remain pending; full native/human/round acceptance is open.
 
 **Parent:** [Slice05](plan.md). **Durable contract:** [journal-loss quiescence](../../../../product/review-loop/import-jobs.md#journal-loss-quiescence-correction-05e) and [semantic correction](../../../../product/review-loop/semantic-storage.md#journal-loss-exclusion-correction-05e).
 
@@ -95,3 +99,35 @@ This nearby handoff is the directly dependent06B contribution; the06 worktree is
 ## Closeout identity and remaining delivery
 
 This closeout changes only tracked05 plan/checkpoint records. Source/tests/configuration and durable product/rule knowledge are identical to reviewed/audited882. Documentation links and whitespace are checked; no redundant product test run or new runtime effect is claimed. Retain the task worktree/branch and independent evidence for root integration and reproduction. Root still owns new pinned actual own-PR graph-first understanding/meaningful-answer checks, any affected live lifecycle exercise, final05/720p reconciliation and PR/main/deployment. No push, merge or deployment occurred in this assignment.
+
+## Normal regression entrypoint correction
+
+**Status:** Normal entrypoint corrected and author-verified at exactea88318. Independent recheck and root delivery remain pending.
+
+A fresh reviewer of immutable `7b6dc0330a1532184c061cd69ace5d2c219b9836` found that the normal `package.json` test command omitted `tests/journal-loss.test.ts`. Root independently confirmed it is the only omitted top-level test suite. The earlier targeted nine-case and71-case results remain valid at their exact pins; they do not prove normal-entrypoint coverage. The original7b6 negative is preserved rather than relabeled.
+
+Root assigned sole executor `/root/plan_story_clarity_05d`, branch `fix-journal-regression-entrypoint`, isolated worktree `/tmp/pr-reviewer-05-regression-entrypoint`, from exact7b6. The durable [regression-entrypoint rule](../../../../rules/development.md#regression-test-entrypoints) is committed before the derived edit. Add only the missing journal-loss file to the literal Node test list; preserve the exact four Bun source-core files and every other script/manifest field, dependencies, lock and application. No discovery framework, runtime/UI/MCP/native action, main write, publication or deployment belongs to this assignment. Other06 worktrees/writers remain separate.
+
+Acceptance: inventory reconciliation identifies no omitted top-level suite; a parsed manifest comparison proves only `scripts.test` changed by the one literal file insertion; actual existing direct Bun1.4.2 `bun run test` with task-local Node24 PATH executes all nine named journal-loss regressions and records final counts/exit; strict TypeScript and subsystem boundaries pass. Preserve full logs outside Git. No repeat Chrome is needed because no UI/application behavior changes. Return a clean committed candidate early for independent recheck, then reconcile exact results and any failures here. The script-only change fits06 qualification's existing rule that canonical manifest comparison excludes only scripts; it does not qualify another source/environment or unlock06 acceptance. New own-PR comprehension, native/human and delivery gates remain root-owned.
+
+### Declared-entrypoint execution receipt
+
+Documentation-first commit `4e94919` precedes derived manifest candidate `ea88318fa5a16f19a3bc55be62e853efd7dcf45f`. The only package change appends literal `tests/journal-loss.test.ts` to the existing Node command. Parsed comparison against7b6 proves every other script/manifest field unchanged; the fixed Bun prefix is byte-identical, `bun.lock` is unchanged, and all47 tracked top-level test suites are now declared with no omissions. Assertion artifact: `/tmp/pr-reviewer-05-regression-entrypoint-evidence/manifest-assertions.json`. This one-time inventory reconciliation adds no discovery/scaffold mechanism.
+
+The actual declared `bun run test` ran from the clean candidate worktree using existing direct `/Users/scottchu/.asdf/installs/bun/1.4.2/bin/bun`, version1.4.2, and task-scoped PATH with Node `/Applications/ChatGPT.app/Contents/Resources/cua_node/bin/node`, version24.21.0. Exit0; **47 Bun and302 Node tests passed,0 failed**, with all nine named05E regressions visibly executed in the normal Node output: six context/worker/import lost-started/lost-exited cases, two import/analysis legacy-journal families, and actual acquisition pre-spawn/requested-write no-launch. Node reported approximately23.2s. Full raw log: `/tmp/pr-reviewer-05-regression-entrypoint-evidence/declared-test.log`, SHA-256 `39140722a39c38f90bd97d1f83c071588573b92f047673a5228a9e85f38e68c9`; `result.json` retains the nine output rows, exact candidate, counts, exit and supporting log hashes. No failure was skipped or masked.
+
+The actual declared `bun run check` also passed strict TypeScript and subsystem boundaries (`check.log` beside the full log). Document links and whitespace passed. Package-entry links reuse the existing donor while generated caches are real task-local ignored directories; no dependency installation or shared-cache mutation occurred. No Chrome rerun is claimed or needed for this package-only test registration: UI/application/backend source is identical to7b6. Existing native/Claude/human, actual own-PR understanding, live lifecycle and deployment limits remain unchanged. The original7b6 missing-entrypoint finding and earlier focused execution evidence stay preserved.
+
+Root receives the clean local candidate early for independent inspection and observed declared-entrypoint recheck. This closeout adds only nearby plan evidence; it does not change the executed manifest identity, grant merge/deployment, rerun earlier knowledge calculations or qualify06's runtime/environment. The shared development rule promotes the durable maintenance knowledge, while this transient receipt supplies exact execution evidence. Retain this task branch/worktree and external logs for root integration/review; no unrelated worktree, runtime, credentials or settings were touched.
+
+## Controlled composed gateway lifecycle at exact7b6
+
+The complete report `/tmp/pr-reviewer-720p-reflection-evidence/7b6-gateway-lifecycle/report.md` was read and its SHA-256 verified: `d77a8110f389c35f9eef86b3e508165c00193519c08b8705102f2e2010c7b2ef`. **PASS for one controlled actual-gateway composition representative**, running exact7b6 with Node24.21.0, supported gateway listen/close, both default import/analysis owners and a fixture SQLite store. A task-owned acquisition helper starts an identity-matching TERM-resistant descendant; the private observation wrapper loses only the started write while requested/terminal writes delegate normally. No product fault route, DB mutation or production override was added.
+
+Close completed within8ms while the import stayed unknown with retained terminal identity and live descendant; routes/HTTP stopped, competing analysis remained queued with no invocation. Reopening the same fixture store with a new actual gateway retained the barrier and helper launch count1. After exact owned fixture cleanup and verified group absence, reconciliation marked interrupted failure without replay and the semantic owner reached awaiting_declarations. Exit0, elapsed1.454s; the task TMPDIR was empty and recorded helper leader/descendant absent after cleanup. Raw probe, result/log/run metadata and checksums remain beside the report.
+
+This closes the formerly unrun **controlled** gateway-close/uncertain-import/reopen composition check at7b6, not every uncertain semantic phase/OS/storage interleaving. The actual own-PR runtime, root MCP, pilot and native sessions were not faulted or stopped. Live own-PR combined shutdown and native fault acceptance remain explicitly unrun. Confirmed stopped effects are not successful recovered results.
+
+## Final bounded outcome and operational clarity
+
+[Combined7b6 bounded acceptance](acceptance-7b6.md) records fresh A/sourceB1/keyB2, actual meaningful same-original-session question/reply/reload/first-ResumeB3, and B4 independent closure of the only missing-entrypoint P2 atea. Root accepts the bounded engineering/agent-comprehension obligation; full rounds/native/Claude/human and root delivery remain incomplete. [Round reflection](../../reviews/reflection-7b6.md) revisits actual code and promotes the indefinite requested-only/legacy PID-less lane blockage and absence of public repair to owning durable import knowledge. Root's fresh docs-only narrow recheck must cover that paragraph before merge; prior qualifiedb0 audit and calculations keep their exact pins. No code, package, tests or06 docs changed in this final receipt.

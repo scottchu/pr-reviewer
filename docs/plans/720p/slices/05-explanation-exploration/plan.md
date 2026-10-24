@@ -4,7 +4,8 @@
 
 **Date:** 2026-10-24
 
-**Status:** Revision3 packet independently READY; [05A core checkpoint](checkpoint-05a.md) prepared under named root dispatch, independently READY atbaac411 for05B input reconciliation and root assignment.[05B player checkpoint](checkpoint-05b.md) is independently READY at exactcdc0c7e for bounded player/application engineering and the05C extension seam.05C is implemented and independently READY for bounded engineering atcd3e134 after the startup hydration correction; its [tracked checkpoint](checkpoint-05c.md) separates final code, subsequent docs and actual own-PR/whole-round gates.04 G14 remains OPEN / CHANGES NEEDED; PR24 remains draft.
+**Status:** Combined04/05 bounded engineering and actual agent-comprehension accepted by root at7b6 with the ea test-entrypoint P2 independently closed. [Final bounded receipt](acceptance-7b6.md) preserves exact A/B/D7 and source identities. Root PR/main/pilot delivery and the final operational-knowledge recheck remain pending; full rounds/native/Claude/human are not accepted. Earlier checkpoint statuses below are historical evidence, not current pending work.
+
 
 **Parent:** [720p round](../../plan.md), [roadmap slice05](../../../roadmap.md#720p-understand-the-whole-pr)
 
@@ -86,7 +87,7 @@ Before acceptance, inspect actual code/structure and ask what design would fit b
 Revision3 planner branch `plan-combined-neighborhood-story-delivery`, worktree `/tmp/pr-reviewer-combined-story-plan`, exact base028b6b9. This task owns the three05 docs plus narrowly authorized04 plan/integration/checkpoint,720p round, through1080p plan and review-loop product map. Main,04 core/UI writers, pilot, credentials, sessions and routes remain untouched. No code/dependencies/tests/runtime/PR/push/merge/delegates. Retain clean local commits/worktree for root incorporation; root later registers the new docs in shared maps. Relative links, allowed paths and whitespace are planning checks, not application acceptance.
 
 
-## Implemented engineering handoff and remaining acceptance
+## Historical05C engineering handoff and remaining acceptance at that checkpoint
 
 Current code is `cd3e1348cdde78fb32fc241e534a27a828e4c621`, independently READY for bounded05C after closing the normal-hydration false-login-alert P2. The [checkpoint](checkpoint-05c.md) records exact independent reports,89 affected tests/nine author Chrome journeys at that code and separately pinned5b/793 results. The [code-informed reflection](reflection-05c.md) promotes current ownership, compatibility, retry and route knowledge; the independent whole-current-product docs-only recheck is qualified YES at knowledgecd3e134, carryingc0 F1–F3 closure/122 standalone calculations and independently checking the startup ownership delta. [Exact report, identities and limits](checkpoint-05c.md#independent-knowledge-recheck-and-current-gates) preserve actual reviewed target48, engineering code5b and subsequent evidence-only delivery separately. Root must correct baseline48 S1 content and regenerate the final reviewed target/key/references after the code fix; no author operational change is implied. No source/packet in this slice authorizes06 execution code or closes04 G14, final actual PR24 A/B/meaningful answer, full05/720p, native/Claude/human, merge or deployment gates.
 
@@ -102,3 +103,7 @@ Actual af39 review questioning uncovered a reproduced P1 shared-exclusion error 
 
 
 05E is now independently **READY FOR BOUNDED CORRECTION** at code882e2b8e7be303965a7a7809a9ae6abf3fc10f3b, and the fresh whole-current-product docs-only recheck is **qualified YES** at that same knowledge head. The [05E closeout](checkpoint-05e.md#independent-engineering-closure-at-exact882) records exact reports/hashes, independent71 tests plus original coupled probes, actual-code reflection,31 standalone audit calculations and the required06B process-contract handoff. The reproduced P1 engineering defect is closed at882; af39 remains the negative candidate. A new pinned actual own-PR result, full05/720p acceptance, native/Claude/human and root delivery gates remain open. The closeout preserves reviewed code and audited durable knowledge unchanged.
+
+## Final bounded outcome and delivery handoff
+
+The [7b6 acceptance receipt](acceptance-7b6.md) closes the original04 G14 bounded presentation task and05 agent understanding/question-return journey after fresh frozenA, independent sourceB1/keyB2, meaningful actualB3 and test-entrypointB4 closure. It preserves old028/67/af39 negatives, distinct7b6 runtime versus ea executed manifest versus later docs heads, remaining workable effort and unknown native/human evidence. The [720p source-informed reflection](../../reviews/reflection-7b6.md) revisits actual boundaries and promotes the indefinite missing-identity operational limit; root's fresh docs-only narrow recheck is needed for that one durable delta. [05E](checkpoint-05e.md) records the controlled composed gateway lifecycle representative and regression entrypoint evidence. This is a bounded engineering/comprehension milestone ready for root delivery, not a complete720p/1080p or deployed-product claim.06 receives the exact private process/journal/query limits through this receipt; its separate writer/acceptance remains untouched.
