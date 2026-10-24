@@ -109,7 +109,11 @@ export const createImportArtifacts=(privateDataRoot:string,options:Readonly<{max
     if(count !== expected.bytes || hash(bytes.subarray(0,count)) !== expected.digest) throw failure("integrity_mismatch");
     return bytes.subarray(0,count);
   };
-  const closeChain=async(chain:readonly HeldDirectory[])=>{await Promise.allSettled(chain.map(item=>item.handle.close()));};
+  const closeResources=async(handle:FileHandle|undefined,chain:readonly HeldDirectory[])=>{
+    const handles=[...(handle ? [handle] : []),...chain.map(item=>item.handle)];
+    const results=await Promise.allSettled(handles.map(async current=>{await current.close();}));
+    return results.some(result=>result.status === "rejected");
+  };
   return Object.freeze({
     write:async({jobId,invocationId,value})=>{
       if(!uuid(jobId) || !uuid(invocationId)) throw failure("invalid_input");
@@ -121,7 +125,7 @@ export const createImportArtifacts=(privateDataRoot:string,options:Readonly<{max
       const chain=await openChain(jobId,invocationId,true);
       const dir=chain.at(-1)!;
       const temp=join(dir.path,`.tmp-${artifactId}-${randomUUID()}.json`),final=join(dir.path,`${artifactId}.json`);
-      let handle:FileHandle|undefined,identity:BigIntStats|undefined,published=false;
+      let handle:FileHandle|undefined,identity:BigIntStats|undefined,published=false,failed=false;
       try {
         await checkChain(chain);
         handle=await open(temp,constants.O_RDWR|constants.O_CREAT|constants.O_EXCL|constants.O_NOFOLLOW,0o600);
@@ -137,13 +141,14 @@ export const createImportArtifacts=(privateDataRoot:string,options:Readonly<{max
         if(!fileSafe(finalStat) || !same(finalStat,identity)) throw failure("replaced");
         return ref;
       } catch(error) {
+        failed=true;
         if(published) throw failure("publication_unknown");
         if(isImportArtifactError(error)) throw error;
         if(fsCode(error) === "EEXIST") throw failure("conflict");
         throw failure("io");
       } finally {
         if(identity) try {await checkChain(chain);const current=await lstat(temp,{bigint:true});if(same(current,identity)) await unlink(temp);} catch { /* Preserve uncertain paths; final artifacts are never removed here. */ }
-        await handle?.close();await closeChain(chain);
+        if(await closeResources(handle,chain) && !failed) throw failure(published ? "publication_unknown" : "io");
       }
     },
     read:async({reference:raw,expectedJobId,expectedInvocationId})=>{
@@ -152,7 +157,7 @@ export const createImportArtifacts=(privateDataRoot:string,options:Readonly<{max
       if(ref.jobId !== expectedJobId || ref.invocationId !== expectedInvocationId) throw failure("binding_mismatch");
       const chain=await openChain(ref.jobId,ref.invocationId,false);
       const path=join(chain.at(-1)!.path,`${ref.artifactId}.json`);
-      let handle:FileHandle|undefined;
+      let handle:FileHandle|undefined,failed=false;
       try {
         await checkChain(chain);
         const before=await lstat(path,{bigint:true});if(!fileSafe(before)) throw failure("unsafe_file");
@@ -168,11 +173,12 @@ export const createImportArtifacts=(privateDataRoot:string,options:Readonly<{max
         if(bound.schema !== ref.schema || bound.artifactId !== ref.artifactId || bound.jobId !== ref.jobId || bound.invocationId !== ref.invocationId) throw failure("binding_mismatch");
         return bound.value;
       } catch(error) {
+        failed=true;
         if(isImportArtifactError(error)) throw error;
         if(fsCode(error) === "ENOENT") throw failure("missing");
         if(["ELOOP","ENOTDIR"].includes(String(fsCode(error)))) throw failure("unsafe_file");
         throw failure("io");
-      } finally {await handle?.close();await closeChain(chain);}
+      } finally {if(await closeResources(handle,chain) && !failed) throw failure("io");}
     },
   } satisfies ImportArtifacts);
 };

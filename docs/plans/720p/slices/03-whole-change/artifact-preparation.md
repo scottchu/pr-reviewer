@@ -91,3 +91,23 @@ Only Node built-ins and the subsystem's public types are imported. Shared owner 
 Shared owner has the exact envelope/digest/cap recipe and accepted single-owner/private-root/public-Node-API limits. Promote the tested public meanings, no-clobber publication, same-descriptor verification, failure/unknown semantics, reference-versus-witness distinction and restart/content-identity limits into import-jobs.md before accepting slice03. The worker's source scope deliberately excludes that shared product file.
 
 Retain the clean new task worktree/branch for root's independent review and later integration. All owned test fixtures and file handles are removed/closed in finally; no raw source/credential log or pilot data was written. The older acquisition/context worktree remains untouched. Full I08 registered-reference admission, I09 application authorization, durable jobs/process restart/re-verification, React journey and own-PR graph critique remain open integration gates.
+
+## Independent close-failure correction
+
+**Reviewed source:** `15f17a3b2c736b6887daa8e167968331c32a20fb`
+
+**Status:** Correction focused-tested; targeted recheck required
+
+Independent actual-FS injection at `/tmp/pr-reviewer-source-acquisition-review/artifact-close-probe.ts` closed the result descriptor then raised EIO after final publication/fsync. The original finally block leaked the raw error/private temp path and skipped directory-handle cleanup. The read path had the same unsanitized cleanup structure. Earlier 13-test success did not cover this failure.
+
+Correction contract: attempt every held file/directory close even if another close fails. Sanitize a close-only failure after write publication to publication_unknown and preserve the final artifact; a read close-only failure returns sanitized io. Preserve an already selected typed primary failure rather than exposing secondary raw cleanup diagnostics. Add failing-first write/read tests with real descriptor closes and injected post-close EIO, verifying every directory close and private-path suppression. No shared/public API or broader artifact policy changes.
+
+### Close-failure correction outcome
+
+**Status:** Implemented and focused-tested; same-reviewer targeted recheck pending
+
+New write/read regressions first failed against `15f17a3` with raw EIO/private-path diagnostics. The correction attempts the result handle and all held directory closes independently using settled outcomes. It reports a close-only failure after publication as sanitized publication_unknown, a read close-only failure as sanitized io, and preserves a previously selected typed primary failure. No final file is removed because of a close error. A close failure means the module cannot claim every OS close succeeded; every held close is attempted, with actual successful descriptor closure observed in the controlled injected-after-close tests.
+
+Final focused verification passed **16 artifact tests**, and the same scoped strict TypeScript command passed. New cases inject EIO after actual file-descriptor closure, assert all four actual directory descriptors close, suppress private root paths from thrown diagnostics, and preserve the complete final artifact. The additional read-integrity control preserves integrity_mismatch when cleanup also fails. The original roundtrip, collision/replacement, cap/escaping, symlink/permission, partial-temp and fsync tests remain passing.
+
+Only this packet, module implementation and focused test changed. Public API, encoded envelope/reference recipe and all shared/product/package/runtime/pilot settings remain unchanged. Reviewer-owned probe/results and reviewed source identity are preserved. Tests restore built-in FS exports and close any remaining fixture descriptors in finally, then remove their owned directories. Retain the clean correction commit for targeted review; shared owner must promote the cleanup/error policy into durable import-job knowledge before integration acceptance.

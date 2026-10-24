@@ -204,3 +204,44 @@ test("postpublication directory fsync failure remains unknown and preserves the 
     assert.deepEqual(stored.value,{source:"complete but unacknowledged"});
   } finally {t.mock.restoreAll();await probe.close();await f.cleanup();}
 });
+
+import fsPromises from "node:fs/promises";
+import { syncBuiltinESMExports } from "node:module";
+
+for(const phase of ["write","read","read_primary_failure"] as const) test(`${phase} close EIO stays sanitized and still closes every owned directory`,async(t)=>{
+  const f=await fixture();
+  const existing=phase !== "write" ? await f.store.write({jobId:f.jobId,invocationId:f.invocationId,value:{complete:true}}) : null;
+  const actualOpen=fsPromises.open;
+  const held:{directory:boolean;closed:boolean;actualClose:()=>Promise<void>}[]=[];
+  let injected=false;
+  try {
+    t.mock.method(fsPromises,"open",async(...args:Parameters<typeof fsPromises.open>)=>{
+      const handle=await actualOpen(...args);
+      const directory=(await handle.stat()).isDirectory();
+      const actualClose=handle.close.bind(handle);
+      const record={directory,closed:false,actualClose};held.push(record);
+      handle.close=async()=>{
+        await actualClose();record.closed=true;
+        if(!directory && !injected) {
+          injected=true;
+          throw Object.assign(new Error(`EIO close at private path ${f.root}`),{code:"EIO",path:f.root});
+        }
+      };
+      return handle;
+    });
+    syncBuiltinESMExports();
+    const operation=phase === "write" ? f.store.write({jobId:f.jobId,invocationId:f.invocationId,value:{complete:true}}) : f.store.read({reference:phase === "read_primary_failure" ? {...existing,digest:"0".repeat(64)} : existing,expectedJobId:f.jobId,expectedInvocationId:f.invocationId});
+    await assert.rejects(operation,(error:unknown)=>isImportArtifactError(error) && error.code === (phase === "write" ? "publication_unknown" : phase === "read_primary_failure" ? "integrity_mismatch" : "io") && !error.message.includes(f.root));
+    assert.equal(injected,true);
+    assert.equal(held.filter(h=>h.directory).length,4);
+    assert.ok(held.every(h=>h.closed),"a close failure skipped another owned descriptor");
+    t.mock.restoreAll();syncBuiltinESMExports();
+    const files=await readdir(directory(f.root,f));assert.equal(files.length,1);assert.equal(files[0]?.startsWith(".tmp-"),false);
+    const stored=JSON.parse(await readFile(join(directory(f.root,f),files[0]!),"utf8")) as {value:unknown};
+    assert.deepEqual(stored.value,{complete:true});
+  } finally {
+    t.mock.restoreAll();syncBuiltinESMExports();
+    for(const item of held) if(!item.closed) await item.actualClose();
+    await f.cleanup();
+  }
+});
