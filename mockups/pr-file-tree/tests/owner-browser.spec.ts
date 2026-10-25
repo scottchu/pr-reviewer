@@ -319,3 +319,69 @@ test.describe('guided camera intent ownership', () => {
     await expect(page.locator('.owner-step')).toHaveText('Trace an unchanged caller into the changed decision');
   });
 });
+
+test.describe('supporting actual answered-question source with normal motion', () => {
+  test.use({ reducedMotion: 'no-preference' });
+  for (const width of [1440, 390]) test(`${width} reply citations return to the immediate answer before the original Story`, async ({ page }) => {
+    await page.setViewportSize({ width, height: 1000 });
+    await page.goto('/');
+    if (width >= 650) await page.getByRole('button', { name: 'Close review context' }).click();
+    await page.getByRole('button', { name: 'Open prepared story' }).click();
+    await page.getByRole('button', { name: 'Next story step' }).click();
+    const earliestCamera = await page.locator('.react-flow__viewport').getAttribute('style');
+    await page.getByRole('button', { name: 'Next story step' }).click();
+    await page.getByRole('button', { name: 'Inspect head src/storage/public.ts L200–204' }).first().click();
+    await expect(page.locator('[aria-label="Back to answer"]')).toHaveCount(0);
+    await page.getByRole('button', { name: 'Split', exact: true }).click();
+    await expect.poll(async () => page.locator('.continuous-comparison').evaluate(element => element.clientWidth)).toBeGreaterThan(width < 650 ? 280 : 700);
+    await page.getByRole('button', { name: 'Open discussion' }).click();
+    const discussion = page.locator('.owner-discussion');
+    const question = discussion.locator('[data-saved-question]').filter({ hasText: 'When an explicit invalid Bearer token is supplied' });
+    await expect(question).toHaveCount(1);
+    await expect(question).toContainText('26545167-0d82-4f0c-8af4-bb4b16252476');
+    const gateway = question.getByRole('button', { name: 'Inspect head src/server/public.ts L61–67', exact: true });
+    await gateway.focus();
+    const origin = {
+      camera: await page.locator('.react-flow__viewport').getAttribute('style'),
+      top: await page.locator('.continuous-reader').evaluate(element => element.scrollTop),
+      left: await page.locator('.continuous-comparison').evaluate(element => element.scrollLeft),
+      scroll: await discussion.evaluate(element => element.scrollTop),
+    };
+    await page.keyboard.press('Enter');
+    await expect(page.locator('[data-expanded-file]')).toHaveAttribute('data-expanded-file', 'src/server/public.ts');
+    await expect(page.getByRole('button', { name: 'Back to answer' })).toBeEnabled();
+    await expect(page.getByRole('button', { name: 'Return to original reading' })).toHaveCount(0);
+    if (width === 1440) {
+      const heldCamera = await page.locator('.react-flow__viewport').getAttribute('style');
+      await page.route('**/api/story?**', route => route.abort());
+      await page.getByRole('button', { name: 'Back to answer' }).click();
+      await expect(page.getByRole('alert')).toBeVisible();
+      await expect(page.locator('[data-expanded-file]')).toHaveAttribute('data-expanded-file', 'src/server/public.ts');
+      await expect(page.locator('.react-flow__viewport')).toHaveAttribute('style', heldCamera!);
+      await page.unroute('**/api/story?**');
+    }
+    if (width < 650) await page.getByRole('button', { name: 'Open discussion' }).click();
+    const helper = question.getByRole('button', { name: 'Inspect head src/storage/access.ts L4–14', exact: true });
+    await helper.click();
+    await expect(page.locator('[data-expanded-file]')).toHaveAttribute('data-expanded-file', 'src/storage/access.ts');
+    await page.getByRole('button', { name: 'Back to answer' }).click();
+    await expect(discussion).toBeVisible();
+    await expect(page.locator('[data-expanded-file]')).toHaveAttribute('data-expanded-file', 'src/storage/public.ts');
+    await expect(page.locator('.continuous-reader')).toHaveClass(/split/);
+    await expect(page.locator('.react-flow__viewport')).toHaveAttribute('style', origin.camera!);
+    await expect.poll(async () => page.locator('.continuous-reader').evaluate(element => element.scrollTop)).toBe(origin.top);
+    await expect.poll(async () => page.locator('.continuous-comparison').evaluate(element => element.scrollLeft)).toBe(origin.left);
+    await expect.poll(async () => discussion.evaluate(element => element.scrollTop)).toBe(origin.scroll);
+    await expect(gateway).toBeFocused();
+    await expect(page.locator('[aria-label="Back to answer"]')).toHaveCount(0);
+    await page.screenshot({ path: `/tmp/pr-reviewer-reading-journey-evidence/r20-answer-return-${width}.png` });
+    await page.getByRole('button', { name: 'Close discussion' }).click();
+    if (width < 650) await page.getByRole('button', { name: 'Open prepared story' }).click();
+    await expect(page.locator('.owner-step')).toHaveText('Compare owner recognition with credential lookup');
+    if (width < 650) await page.getByRole('button', { name: 'Close prepared story' }).click();
+    await page.getByRole('button', { name: 'Return to original reading' }).click();
+    await expect(page.locator('.owner-step')).toHaveText('Trace an unchanged caller into the changed decision');
+    await expect(page.locator('[data-expanded-file]')).toHaveCount(0);
+    await expect(page.locator('.react-flow__viewport')).toHaveAttribute('style', earliestCamera!);
+  });
+});

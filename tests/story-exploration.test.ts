@@ -146,3 +146,99 @@ test('opening real evidence promotes attention without recapturing its original 
     assert.equal(b.getSnapshot().cursor?.stepId, 'first');
   } finally { b.logout(); h.cleanup(); }
 });
+
+test('supporting evidence has one answer origin, keeps two drafts and restores inner before the original Story', async () => {
+  const h = setup();
+  const b = h.bridge();
+  try {
+    await b.login(h.f.token, h.snapshot);
+    b.editDraft('Original Story draft');
+    b.enterExploration({ allowStoryNavigation: true, navigation: { type: 'next' } });
+    await b.openEvidence(h.ref);
+    b.editDraft('Current answer draft');
+    const outer = b.getSnapshot().returnFrame;
+    const active = b.getSnapshot().activeDraftId;
+    const id = b.beginSupportingEvidence();
+    const inner = b.getSnapshot().supportingCheckpoint;
+    await b.openEvidence({ ...h.ref, anchor: { ...h.ref.anchor, path: 'support.ts' } });
+    assert.equal(b.beginSupportingEvidence(), id);
+    assert.equal(b.getSnapshot().supportingCheckpoint, inner);
+    assert.equal(b.getSnapshot().returnFrame, outer);
+    assert.equal(b.getSnapshot().drafts.length, 2);
+    await assert.rejects(b.resumeStory(), /supporting_return_required/);
+    await b.resumeSupportingEvidence(id);
+    assert.equal(b.getSnapshot().supportingCheckpoint, null);
+    assert.equal(b.getSnapshot().returnFrame, outer);
+    assert.equal(b.getSnapshot().cursor?.stepId, 'second');
+    assert.deepEqual(b.getSnapshot().evidence, h.ref);
+    assert.equal(b.getSnapshot().activeDraftId, active);
+    assert.equal(b.activeDraft()?.text, 'Current answer draft');
+    await b.resumeStory();
+    assert.equal(b.getSnapshot().cursor?.stepId, 'first');
+    assert.equal(b.activeDraft()?.text, 'Original Story draft');
+  } finally { b.logout(); h.cleanup(); }
+});
+
+test('supporting restore failure and submission lock preserve both checkpoints for exact retry', async () => {
+  const h = setup();
+  let fail = true;
+  const semantic = createAnalysisBridge('explore');
+  const b = h.bridge({ semantic: { ...semantic, select: async () => { if (fail) throw new Error('supporting_analysis_unavailable'); } } });
+  try {
+    await b.login(h.f.token, h.snapshot);
+    b.enterExploration({ allowStoryNavigation: true, navigation: { type: 'next' } });
+    const outer = b.getSnapshot().returnFrame;
+    b.updateGraphFrame('semantic', { analysisId: 'retained', focus: 'fact', fullSource: false, viewport: { x: 2, y: 3, zoom: 1 }, sourceAnchor: null, corpusId: null });
+    const id = b.beginSupportingEvidence();
+    const inner = b.getSnapshot().supportingCheckpoint;
+    await assert.rejects(b.resumeSupportingEvidence(id), /supporting_analysis_unavailable/);
+    assert.equal(b.getSnapshot().supportingCheckpoint, inner);
+    assert.equal(b.getSnapshot().returnFrame, outer);
+    b.setQuestionGuard(true);
+    assert.throws(() => b.beginSupportingEvidence(), /submission_pending/);
+    await assert.rejects(b.resumeSupportingEvidence(id), /submission_pending/);
+    b.setQuestionGuard(false);
+    assert.equal(b.getSnapshot().supportingCheckpoint, inner);
+    fail = false;
+    // Retained semantic lookup remains unavailable in this fixture; no guessed restoration.
+    await assert.rejects(b.resumeSupportingEvidence('another-checkpoint'), /supporting_return_unavailable/);
+    assert.equal(b.getSnapshot().returnFrame, outer);
+  } finally { b.logout(); h.cleanup(); }
+});
+
+test('supporting draft identity changes fail without guessing a replacement or creating a third draft', async () => {
+  const h = setup();
+  const b = h.bridge();
+  try {
+    await b.login(h.f.token, h.snapshot);
+    b.enterExploration({ allowStoryNavigation: true, navigation: { type: 'next' } });
+    const id = b.beginSupportingEvidence();
+    const inner = b.getSnapshot().supportingCheckpoint;
+    const outer = b.getSnapshot().returnFrame;
+    b.confirmDraft(b.getSnapshot().activeDraftId);
+    b.editDraft('New question after submission');
+    await assert.rejects(b.resumeSupportingEvidence(id), /supporting_return_draft_unavailable/);
+    assert.equal(b.getSnapshot().supportingCheckpoint, inner);
+    assert.equal(b.getSnapshot().returnFrame, outer);
+    assert.equal(b.activeDraft()?.text, 'New question after submission');
+    assert.equal(b.getSnapshot().drafts.length, 2);
+  } finally { b.logout(); h.cleanup(); }
+});
+
+test('supporting checkpoints are transient; stale IDs after reload cannot consume the original frame', async () => {
+  const h = setup();
+  const b = h.bridge();
+  try {
+    await b.login(h.f.token, h.snapshot);
+    b.enterExploration({ allowStoryNavigation: true, navigation: { type: 'next' } });
+    const id = b.beginSupportingEvidence();
+    assert.equal(JSON.stringify(b.getPrivateView()).includes('supportingCheckpoint'), false);
+    const reloaded = h.bridge();
+    await reloaded.login(h.f.token, h.snapshot);
+    const outer = reloaded.getSnapshot().returnFrame;
+    assert.equal(reloaded.getSnapshot().supportingCheckpoint, null);
+    await assert.rejects(reloaded.resumeSupportingEvidence(id), /supporting_return_unavailable/);
+    assert.equal(reloaded.getSnapshot().returnFrame, outer);
+    reloaded.logout();
+  } finally { b.logout(); h.cleanup(); }
+});

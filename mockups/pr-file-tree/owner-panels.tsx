@@ -15,6 +15,7 @@ type Props = {
   restoreVersion?: number;
   onClose: () => void;
   onInspect: (reference: StoryReference, keyboard: boolean) => Promise<void>;
+  onInspectReply?: (reference: StoryReference, keyboard: boolean) => Promise<void>;
   onNavigate: (intent: StoryIntent) => void;
   run: (operation: () => unknown) => void;
 };
@@ -23,7 +24,7 @@ export const anchorLabel = (anchor: Anchor | null) => anchor
   ? `${anchor.side} · ${anchor.path}:${anchor.startLine}–${anchor.endLine}`
   : 'No source range selected';
 
-export const OwnerPanels = ({ panel, narrow, workspace, story, review, busy, scroll, restoreVersion = 0, onClose, onInspect, onNavigate, run }: Props) => {
+export const OwnerPanels = ({ panel, narrow, workspace, story, review, busy, scroll, restoreVersion = 0, onClose, onInspect, onInspectReply, onNavigate, run }: Props) => {
   const element = useRef<HTMLElement>(null);
   const [confirmation, setConfirmation] = useState<QuestionEvidenceIntent | null>(null);
   const projection = storyProjection(story);
@@ -40,8 +41,8 @@ export const OwnerPanels = ({ panel, narrow, workspace, story, review, busy, scr
     if (narrow) surface.querySelector<HTMLElement>('h2')?.focus({ preventScroll: true });
     return () => { if (currentRestore.current === restoreVersion) scroll.current[panel] = surface.scrollTop; };
   }, [panel, narrow, scroll, restoreVersion]);
-  const sourceButton = (reference: StoryReference, index: number) => reference.type === 'snapshot_source'
-    ? <button key={index} className="owner-citation" disabled={busy} onClick={event => run(() => onInspect(reference, event.detail === 0))}>
+  const sourceButton = (reference: StoryReference, index: number, replyKey?: string) => reference.type === 'snapshot_source'
+    ? <button key={index} className="owner-citation" data-reply-evidence={replyKey} disabled={busy} onClick={event => run(() => (replyKey && onInspectReply ? onInspectReply : onInspect)(reference, event.detail === 0))}>
       Inspect {reference.anchor.side} {reference.anchor.path} L{reference.anchor.startLine}–{reference.anchor.endLine}
     </button> : null;
   const claim = (item: NonNullable<typeof projection>['claims'][number], label?: string) => <section key={item.id} className="owner-claim">
@@ -49,7 +50,7 @@ export const OwnerPanels = ({ panel, narrow, workspace, story, review, busy, scr
     <small>{item.basis === 'inference' ? 'Inference' : item.basis === 'source_observation' ? 'Source reading' : item.basis}</small>
     <p>{item.text}</p>
     {item.uncertainty && <p className="owner-limit">{item.uncertainty}</p>}
-    {item.references.map(sourceButton)}
+    {item.references.map((reference, index) => sourceButton(reference, index))}
   </section>;
   return <aside
     ref={element}
@@ -87,9 +88,9 @@ export const OwnerPanels = ({ panel, narrow, workspace, story, review, busy, scr
       {!version || !projection ? <p role="status">{story.error || 'Reading retained story…'}</p> : <>
         <p className="owner-identity">Published by {version.author.actorId} · version <span title={version.versionId}>{version.versionId.slice(0, 8)}</span></p>
         <nav className="owner-story-controls" aria-label="Story steps">
-          <button aria-label="Previous story step" disabled={busy || projection.index === 0 || Boolean(story.returnFrame && story.mode === 'exploring')} onClick={() => onNavigate({ type: 'previous' })}>Previous</button>
+          <button aria-label="Previous story step" disabled={busy || projection.index === 0 || Boolean(story.supportingCheckpoint || story.returnFrame && story.mode === 'exploring')} onClick={() => onNavigate({ type: 'previous' })}>Previous</button>
           <span>{projection.index + 1} / {projection.total}</span>
-          <button aria-label="Next story step" disabled={busy || projection.index + 1 === projection.total || Boolean(story.returnFrame && story.mode === 'exploring')} onClick={() => onNavigate({ type: 'next' })}>Next</button>
+          <button aria-label="Next story step" disabled={busy || projection.index + 1 === projection.total || Boolean(story.supportingCheckpoint || story.returnFrame && story.mode === 'exploring')} onClick={() => onNavigate({ type: 'next' })}>Next</button>
         </nav>
         <h3 className="owner-step">{projection.step.headline}</h3>
         {projection.claims.map(item => claim(item))}
@@ -105,7 +106,7 @@ export const OwnerPanels = ({ panel, narrow, workspace, story, review, busy, scr
       <details className="owner-delivery"><summary>{review.review?.attachment?.active ? 'Native notification unavailable' : 'No participant attached'}</summary><p className="owner-limit">Saved questions use the retained review. {review.review?.attachment?.active
         ? `Attached participant: ${review.review.attachment.actorId} (${review.review.attachment.host}). Native notification is not configured for this candidate; inspect actual delivery status below.`
         : 'No native participant is attached; a reply is unavailable until a responsible session is attached through its existing authorized path.'}</p></details>
-      {story.drafts.length > 1 && <label>Question draft<select value={story.activeDraftId} disabled={Boolean(story.returnFrame) || story.questionLocked} onChange={event => run(() => workspace.story.chooseDraft(event.target.value))}>
+      {story.drafts.length > 1 && <label>Question draft<select value={story.activeDraftId} disabled={Boolean(story.returnFrame || story.supportingCheckpoint) || story.questionLocked} onChange={event => run(() => workspace.story.chooseDraft(event.target.value))}>
         {story.drafts.map((item, index) => <option key={item.id} value={item.id}>{index === 0 ? 'Original' : 'Supporting source'}{item.submitted ? ' · submitted' : ''}</option>)}
       </select></label>}
       {draft?.submitted && <button onClick={() => run(() => workspace.story.editDraft(''))}>New question</button>}
@@ -141,7 +142,7 @@ export const OwnerPanels = ({ panel, narrow, workspace, story, review, busy, scr
           <p>{reply.body}</p><p>{reply.limitations}</p>
           {reply.evidence.map((anchor, index) => {
             const source = story.snapshot?.sources.find(source => source.side === anchor.side && source.path === anchor.path && anchor.snapshotId === story.snapshotId);
-            return source ? sourceButton({ type: 'snapshot_source', contentHash: source.hash, anchor }, index) : <p key={index}>Exact reply evidence unavailable: {anchorLabel(anchor)}</p>;
+            return source ? sourceButton({ type: 'snapshot_source', contentHash: source.hash, anchor }, index, `${reply.replyId}:${index}`) : <p key={index}>Exact reply evidence unavailable: {anchorLabel(anchor)}</p>;
           })}
         </section>)}
       </article>)}

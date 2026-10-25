@@ -271,7 +271,7 @@ const App = () => {
   const contextInvoker = useRef<HTMLButtonElement>(null);
   const contextScroll = useRef(0);
   const [pendingFocus, setPendingFocus] = useState<{
-    target: 'context' | 'reading';
+    target: 'context' | 'reading' | 'reply';
     path: string | null;
   } | null>(null);
   useEffect(() => {
@@ -291,7 +291,9 @@ const App = () => {
       return;
     }
     const focus = () => {
-      const target = pendingFocus.target === 'context'
+      const target = pendingFocus.target === 'reply'
+        ? Array.from(document.querySelectorAll<HTMLElement>('[data-reply-evidence]')).find(element => element.dataset.replyEvidence === pendingFocus.path)
+        : pendingFocus.target === 'context'
         ? contextInvoker.current
         : pendingFocus.path
           ? Array.from(main.current?.querySelectorAll<HTMLElement>('.continuous-reader') ?? [])
@@ -313,7 +315,7 @@ const App = () => {
         observer.disconnect();
       }
     });
-    observer.observe(main.current, { childList: true, subtree: true, attributes: true });
+    observer.observe(main.current.parentElement ?? main.current, { childList: true, subtree: true, attributes: true });
     return () => observer.disconnect();
   }, [pendingFocus]);
   const [sourceRelation, setSourceRelation] = useState<SourceRelation | null>(null);
@@ -957,6 +959,7 @@ const App = () => {
     });
   };
   const ownerReturn = useRef<ReturnType<typeof capturePresentation> | null>(null);
+  const supportingPresentation = useRef<{ id: string; frame: ReturnType<typeof capturePresentation>; focus: string | null } | null>(null);
   const ownerOperation = useRef(false);
   const openOwnerPanel = (panel: OwnerPanel) => {
     pendingFileFrame.current = null;
@@ -981,7 +984,8 @@ const App = () => {
     ownerOperation.current = true;
     setOwnerBusy(true);
     try {
-      const frame = workspace.story.getSnapshot().returnFrame ? null : capturePresentation();
+      const held = workspace.story.getSnapshot();
+      const frame = held.returnFrame || held.supportingCheckpoint ? null : capturePresentation();
       workspace.story.enterExploration();
       if (frame) ownerReturn.current = frame;
       await workspace.inspectReference(reference);
@@ -1019,16 +1023,7 @@ const App = () => {
       setOwnerBusy(false);
     }
   };
-  const resumeOwnerReading = async () => {
-    pendingFileFrame.current = null;
-    if (ownerOperation.current) return;
-    const frame = ownerReturn.current;
-    if (!frame) throw new Error('The original local reading frame is unavailable after reload; retained owner drafts remain preserved.');
-    ownerOperation.current = true;
-    setOwnerBusy(true);
-    try {
-      await workspace.story.resumeStory();
-      if (workspace.story.getSnapshot().returnFrame) throw new Error('Owner return is not complete.');
+  const restorePresentation = (frame: ReturnType<typeof capturePresentation>) => {
       readings.current = frame.readings;
       pendingOwnerReadings.current = frame.readings;
       setSelected(frame.selected);
@@ -1047,7 +1042,6 @@ const App = () => {
       dispatchDetail({ type: 'focus', path: frame.expanded });
       setRestoreVersion(value => value + 1);
       moveCamera(frame.camera);
-      ownerReturn.current = null;
       if (frame.panels) {
         ownerScroll.current = structuredClone(frame.panels.scroll);
         contextScroll.current = frame.panels.contextScroll;
@@ -1058,6 +1052,45 @@ const App = () => {
         panelRestoreRevision.current++;
       } else if (narrow) setOwnerPanel(null);
       setPendingFocus({ target: 'reading', path: frame.expanded });
+  };
+  const inspectReplyEvidence = async (reference: StoryReference, keyboard: boolean) => {
+    if (ownerOperation.current) throw new Error('owner_operation_in_progress');
+    const existing = workspace.story.getSnapshot().supportingCheckpoint;
+    if (existing && supportingPresentation.current?.id !== existing.id) throw new Error('answer_reading_unavailable');
+    const frame = existing ? null : capturePresentation(true);
+    const focus = document.activeElement?.getAttribute('data-reply-evidence') ?? null;
+    const id = workspace.story.beginSupportingEvidence();
+    if (frame) supportingPresentation.current = { id, frame, focus };
+    await inspectOwnerEvidence(reference, keyboard);
+  };
+  const resumeAnswerReading = async () => {
+    pendingFileFrame.current = null;
+    if (ownerOperation.current) return;
+    const checkpoint = workspace.story.getSnapshot().supportingCheckpoint;
+    const retained = supportingPresentation.current;
+    if (!checkpoint || !retained || retained.id !== checkpoint.id) throw new Error('answer_reading_unavailable');
+    ownerOperation.current = true;
+    setOwnerBusy(true);
+    try {
+      await workspace.story.resumeSupportingEvidence(checkpoint.id);
+      if (workspace.story.getSnapshot().supportingCheckpoint) throw new Error('Answer return is not complete.');
+      restorePresentation(retained.frame);
+      supportingPresentation.current = null;
+      if (retained.focus) setPendingFocus({ target: 'reply', path: retained.focus });
+    } finally { ownerOperation.current = false; setOwnerBusy(false); }
+  };
+  const resumeOwnerReading = async () => {
+    pendingFileFrame.current = null;
+    if (ownerOperation.current) return;
+    const frame = ownerReturn.current;
+    if (!frame) throw new Error('The original local reading frame is unavailable after reload; retained owner drafts remain preserved.');
+    ownerOperation.current = true;
+    setOwnerBusy(true);
+    try {
+      await workspace.story.resumeStory();
+      if (workspace.story.getSnapshot().returnFrame) throw new Error('Owner return is not complete.');
+      restorePresentation(frame);
+      ownerReturn.current = null;
     } finally {
       ownerOperation.current = false;
       setOwnerBusy(false);
@@ -1239,7 +1272,12 @@ const App = () => {
         <button id="open-owner-story" aria-label="Open prepared story" title="Prepared story" disabled={!ownerStory.authenticated || ownerBusy} aria-expanded={storyOpen && (!narrow || (ownerPanel === 'story' && !impactOpen))} onClick={() => openOwnerPanel('story')}><ActionIcon action="story" /></button>
         <button id="open-owner-discussion" aria-label="Open discussion" title="Discussion" disabled={!ownerStory.authenticated || ownerBusy} aria-expanded={discussionOpen && (!narrow || (ownerPanel === 'discussion' && !impactOpen))} onClick={() => openOwnerPanel('discussion')}><ActionIcon action="discussion" /></button>
         {detail.expanded && <button aria-label="Inspect visible source for discussion" title="Ask about expanded source" disabled={!ownerStory.authenticated || ownerBusy} onClick={() => runOwner(async () => { await inspectVisibleSource(); openOwnerPanel('discussion'); })}><ActionIcon action="source" /></button>}
-        {ownerStory.returnFrame && <button aria-label="Return to original reading" title="Return to original reading" disabled={ownerBusy || ownerStory.questionLocked} onClick={() => runOwner(resumeOwnerReading)}><ActionIcon action="return" /></button>}
+        {(ownerStory.supportingCheckpoint || ownerStory.returnFrame) && <button
+          aria-label={ownerStory.supportingCheckpoint ? 'Back to answer' : 'Return to original reading'}
+          title={ownerStory.supportingCheckpoint ? 'Back to answer' : 'Return to original reading'}
+          disabled={ownerBusy || ownerStory.questionLocked}
+          onClick={() => runOwner(ownerStory.supportingCheckpoint ? resumeAnswerReading : resumeOwnerReading)}><ActionIcon action="return" /></button>}
+
       </div>}
 
       {(testReturn || sourceReturn || contextReturns.length > 0) && !fullscreen && <button
@@ -1417,6 +1455,7 @@ const App = () => {
       restoreVersion={panelRestoreRevision.current}
       onClose={() => closeOwnerPanel('discussion')}
       onInspect={inspectOwnerEvidence}
+      onInspectReply={inspectReplyEvidence}
       onNavigate={navigateOwnerStory}
       run={runOwner}
     />}
@@ -1432,6 +1471,7 @@ const App = () => {
       restoreVersion={panelRestoreRevision.current}
       onClose={() => closeOwnerPanel('story')}
       onInspect={inspectOwnerEvidence}
+      onInspectReply={inspectReplyEvidence}
       onNavigate={navigateOwnerStory}
       run={runOwner}
     />}

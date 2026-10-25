@@ -35,7 +35,7 @@ export type {ImportViewJob,ImportAction} from './imports.ts';
 export {createAnalysisBridge,semanticProjection,semanticRelationshipProjection,semanticExcerpt,semanticSourceKey,semanticIssueProjection} from './analysis.ts';
 export type {AnalysisBridge,SemanticView} from './analysis.ts';
 export {createStoryBridge,storyTransition,storyProjection,storyPresentation,questionEvidenceProjection} from './story.ts';
-export type {StoryBridge,StoryState,StoryIntent,StoryProjection,StoryExcerpt,StoryClock,StorySemanticPort,StoryGraphFocus,QuestionEvidenceIntent,StoryExplorationOptions} from './story.ts';
+export type {StoryBridge,StoryState,StoryIntent,StoryProjection,StoryExcerpt,StoryClock,StorySemanticPort,StoryGraphFocus,QuestionEvidenceIntent,StoryExplorationOptions,SupportingEvidenceCheckpoint} from './story.ts';
 export {createReviewWorkspace} from './workspace.ts';
 export type {ReviewWorkspace} from './workspace.ts';
 
