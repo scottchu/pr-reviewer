@@ -1,27 +1,39 @@
-# PR25 filename tree mock
+# PR25 file-map design mock
 
-Current simple scope: [product contract](../../docs/product/pr-file-tree-first.md) and [owning packet](../../docs/plans/720p/slices/05-explanation-exploration/reviews/pr-file-tree-mockup-v1.md). Every changed path in PR25 is present; base edges mean containment. Selecting a changed file adds its source-verified static imports, with typed external identities. Overview files are compact outlined objects with one basename/change-mark line. Gesture zoom or explicit file activation expands one same-ID object into its real pinned Before/After hunks inside the canvas. File contents are an actual nested graph of hunk/source/comparison identities, not a flat diff card. Fullscreen switches to this file-group workspace and hides all other PR objects; exit restores the PR state. Native hunk dots navigate locally; import/source edges open a responsive explanation reader.
+The current contract is [F01–F16](../../docs/product/pr-file-tree-first.md); [the owning packet](../../docs/plans/720p/slices/05-explanation-exploration/reviews/pr-file-tree-mockup-v1.md) records historical iterations and evidence. This is an authored design mock with immutable PR25 source, not production integration or native analysis/execution.
 
-`paths.json` is the exact immutable base b096826e31c0927190806de91ed70b8b64aa93d8 → head e3b270e5f49a9215452b0b86702946043e979059 Git path list. The pure builder deduplicates exact paths, preserves full-path/kind identity, derives parents by segments and lays out compact distinct file objects. It infers no calls/semantics. The current import fixture is prepared with the existing TypeScript compiler from pinned Git objects:413static citations across56source sides, with relative target hashes and typed built-in/package identities. It includes type imports and excludes dynamic imports, exports, package resolution and calls. External modules have no fabricated repository hash. Selecting a file overlays only its dependency membership (green added, red removed, gray retained), retains all50 changed files, and adds compact gray one-hop unchanged filenames as needed. Edge/context tooltips preserve exact source/target hashes, side, line and UTF-16 specifier range. No backend analysis capability is introduced. ReactFlow provides the full-window spatial interaction. Drag/scroll pans; graph pinch/Control-wheel zooms; arrows pan, plus/minus zoom and zero shows Overview; Escape closes the explanation reader, exits a file workspace, or clears the PR selection in that order. Zoom-in near a file reveals its source detail at the proposed1.3threshold; zoom-out through1.08 collapses it without losing tree membership. Explicit activation discloses the nested file without moving the PR camera; source selection/inner scrolling stays local. The single Overview control collapses detail and returns readable100% root framing, not a miniature fit-all. Narrow initial framing starts around the application filenames so actual leaf text is immediately readable; no membership is filtered. Pan exposes the remaining tree.
+All 50 changed files remain compact selectable objects in one PR tree. Graph zoom and pan change only the camera. Explicit file activation expands a continuous standard diff in place; fullscreen opens that file alone across the main workspace. Exit restores the prior PR camera, selection, mode and per-file reading state, including expanded context. Unified rows retain distinct Before/After coordinates; Split uses the same ordered paired changes. Dot activation smoothly navigates actual native hunks; wheel and touch scrolling observe the current range. Fresh source opens at horizontal zero, while explicit prior reading restores its offset.
 
-Use installed donor packages through task-local entry links/caches, no install. Scoped normal checks from repository root:
+The default context includes each complete responsible changed callable on both sides. Unrelated source can remain folded and expands inline from exact pinned bytes. A returned-object change can legitimately require its enclosing factory where there is no inner callable; the corresponding context can be large. The context preparation uses the already installed TypeScript compiler, with no new parser capability or dependency. Native Git hunk identities remain logical ranges rather than repeated visual boxes. Concrete prepared explanations cover the three storage/public.ts hunks, storage/access.ts and the review request change; other regions explicitly lack a prepared summary.
+
+Static-import evidence is retained as historical secondary data and is disabled by default. Change-centered call and relevant-test projections are specified but pending at this reader checkpoint; no whole-PR call coverage, test result or successful native execution is claimed. The current mock browser entry is `tests/continuous-browser.spec.ts`. `tests/browser.spec.ts` preserves the earlier boxed/automatic-disclosure iteration and is historical, not the declared current journey.
+
+Immutable reviewed comparison:
+
+- Base `b096826e31c0927190806de91ed70b8b64aa93d8`.
+- Head `e3b270e5f49a9215452b0b86702946043e979059`.
+- `paths.json`: 50 changed paths, four added and 46 modified.
+- `diffs.json`: 126 native three-context-line hunks, 492 added and 192 removed lines.
+- `full-source.json`: exact complete source for 96 available source sides. Added-file Before is absent.
+- `function-context.json`: exact TypeScript source ranges, retaining both source sides independently.
+
+The raw reviewed-source fixtures retain their original bytes and formatting. Readable multi-line mock code does not rewrite the source being reviewed. Inter/OFL assets come from the supplied original prototype assets, not a browser profile.
+
+Use installed donor packages through task-local entry links/caches, with no install. Scoped checks from the repository root:
 
 ```sh
 /Applications/ChatGPT.app/Contents/Resources/cua_node/bin/node node_modules/typescript/bin/tsc -p mockups/pr-file-tree/tsconfig.json
-/Applications/ChatGPT.app/Contents/Resources/cua_node/bin/node --experimental-strip-types --test mockups/pr-file-tree/tests/tree.test.ts mockups/pr-file-tree/tests/imports.test.ts mockups/pr-file-tree/tests/detail.test.ts mockups/pr-file-tree/tests/change-rail.test.ts mockups/pr-file-tree/tests/file-group.test.ts mockups/pr-file-tree/tests/relationship.test.ts mockups/pr-file-tree/tests/reading.test.ts mockups/pr-file-tree/tests/coordinates.test.ts
+/Applications/ChatGPT.app/Contents/Resources/cua_node/bin/node --experimental-strip-types --test mockups/pr-file-tree/tests/tree.test.ts mockups/pr-file-tree/tests/imports.test.ts mockups/pr-file-tree/tests/detail.test.ts mockups/pr-file-tree/tests/change-rail.test.ts mockups/pr-file-tree/tests/file-group.test.ts mockups/pr-file-tree/tests/relationship.test.ts mockups/pr-file-tree/tests/reading.test.ts mockups/pr-file-tree/tests/coordinates.test.ts mockups/pr-file-tree/tests/continuous.test.ts mockups/pr-file-tree/tests/summaries.test.ts
 /Users/scottchu/.asdf/installs/bun/1.4.2/bin/bun node_modules/vite/bin/vite.js build --config mockups/pr-file-tree/vite.config.ts
 /Applications/ChatGPT.app/Contents/Resources/cua_node/bin/node node_modules/@playwright/test/cli.js test --config mockups/pr-file-tree/playwright.config.ts
 ```
 
-Start only the assigned new loopback preview:
+Start only this assigned loopback preview:
 
 ```sh
 /Users/scottchu/.asdf/installs/bun/1.4.2/bin/bun node_modules/vite/bin/vite.js --config mockups/pr-file-tree/vite.config.ts
 ```
 
-127.0.0.1:56677, strictPort, exact additional allowed host mac-mini.duckbill-ionian.ts.net. Root owns any authorized Serve8477 route. No backend/API/data/participant effects. Inter/OFL assets are exact copies from the supplied original prototype's font assets, not browser/profile captures. Existing product/previews remain preserved.
+The server binds 127.0.0.1:56677 with strictPort and exact additional allowed host mac-mini.duckbill-ionian.ts.net. Root owns Serve8477. There are no backend/API/data/participant effects. Preserve existing product/previews and network configuration.
 
-Author Chrome screenshots and synthetic gestures are engineering evidence only. Physical touch/trackpad/device input and unfamiliar-reader comprehension are not established. No independent browser-policy retry, new dependencies, production layout adoption or deployment is part of this mock.
-
-
-All50 files have actual native Git hunks prepared:126hunks,+492/-192lines. `prepare-diffs.ts` reads the exact Git comparison, records each source-side hash/absence and emits real context/removed/added rows with side line numbers. `prepare-imports.ts` reads static import declarations from those immutable source sides. Both are task-local fixture preparation, not backend/public capabilities. Regeneration uses the existing Node runtime with --experimental-strip-types; no install. Current source/diff checks validate the prepared hashes/line content against Git. Same-file overview/detail/collapse captures and the removed external node:fs edge are engineering evidence. Scale bands/local neighbor displacement remain proposed mock geometry; no production semantics changed.
+Author Chrome captures and synthetic gestures are engineering/design observations. Physical iOS Safari, touch/trackpad behavior and unfamiliar-reviewer comprehension remain unverified. The independent browser-policy gate remains denied/unrun; no alternate access or production adoption follows from these checks.

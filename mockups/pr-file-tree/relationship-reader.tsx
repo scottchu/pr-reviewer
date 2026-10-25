@@ -1,13 +1,88 @@
 import React from 'react';
-import type {ImportLink} from './imports.ts';
-import {citationText} from './imports.ts';
-import {explainRelationship} from './relationship.ts';
-import type {SourceRelation} from './file-diff.tsx';
-type Props=({link:ImportLink}|{relation:SourceRelation})&{onClose:()=>void};
-export const RelationshipReader=(props:Props)=>{
- const link='link' in props?props.link:null,relation='relation' in props?props.relation:null;const explanation=link?explainRelationship(link):null,h=relation?.file.hunks[relation.index];
- const fact=relation?.file.path==='scripts/dev.ts'&&relation.index===3?'The startup message keeps the review URL and runtime manifest, and removes the local-login credential reference.':relation?.file.path==='src/application/review.ts'&&relation.index===2?'The request replaces its unconditional Authorization header with accessHeaders(captured). The same fetch and cancellation context remains.':'This native Git hunk compares the exact pinned Before and After source ranges. Red rows are removed; green rows are added; context remains unchanged.';
- const why=relation?.file.path==='scripts/dev.ts'&&relation.index===3?'Inference: the message now agrees with this file’s removed token-loading/issuing flow (Before L28–36) and removed userCredentialRef (Before L62). This does not prove the reason or a successful run.':relation?.file.path==='src/application/review.ts'&&relation.index===2?'Source fact: pinned local-access.ts L1–3 omits Bearer for local-owner:v1 and supplies Bearer for an explicit credential. Inference: delegation centralizes that choice. This is not execution or security proof.':'Unknown: a source comparison does not establish author intent or runtime impact.';
- const citations=link?citationText(link.citations):relation&&h?`${relation.file.path}\n${h.header}\nBefore ${relation.file.before.commit}\nUTF-8 SHA-256 ${relation.file.before.hash??'absent'}\nAfter ${relation.file.after.commit}\nUTF-8 SHA-256 ${relation.file.after.hash??'absent'}`:'';
- return <section className="relationship-reader nodrag nopan nowheel" aria-label={link?'Import relationship explanation':'Source comparison explanation'} onWheel={e=>e.stopPropagation()}><div className="reader-heading"><strong>{link?`Import relationship · ${explanation!.status}`:`Change ${(relation?.index??0)+1} · ${relation?.side} source`}</strong><button onClick={props.onClose} aria-label="Close relationship explanation">×</button></div><p className="reader-relation">{explanation?.from??relation?.file.path}<span>{link?'imports →':'compared source →'}</span>{explanation?.to??`Change ${(relation?.index??0)+1} · Before / After`}</p><h3>What</h3><p>{explanation?.what??fact}</p><h3>How</h3><p>{explanation?.how??`The ${relation?.side} source node contributes its exact source range to this paired native Git comparison. The relation means source comparison, never a call or execution.`}</p><h3>Why</h3><p>{explanation?.why??why}</p><details><summary>Exact pinned source citations</summary><pre>{citations}</pre></details><p className="reader-boundary">{explanation?.boundary??'Same immutable file comparison; no invented function alignment or runtime relation.'} Prepared mock explanation, not live analysis or execution evidence.</p></section>;
+import type { ImportLink } from './imports.ts';
+import { citationText } from './imports.ts';
+import { explainRelationship } from './relationship.ts';
+import type { SourceRelation } from './file-diff.tsx';
+import { summaryFor } from './summaries.ts';
+type Props = ({
+  link: ImportLink;
+} | {
+  relation: SourceRelation;
+}) & {
+  onClose: () => void;
+};
+export const RelationshipReader = (props: Props) => {
+  const link = 'link' in props ? props.link : null;
+  const relation = 'relation' in props ? props.relation : null;
+  const explanation = link ? explainRelationship(link) : null;
+  const h = relation?.file.hunks[relation.index];
+  const prepared = relation ? summaryFor(relation.file, relation.index) : null;
+  const fact = prepared?.what ?? 'No prepared summary for this source region.';
+  const why = prepared?.why ?? 'The exact source remains available. A change explanation has not been prepared for this region; author intent and runtime impact are unknown.';
+  const citations = link ? citationText(link.citations) : relation && h ? `${relation.file.path}\n${h.header}\nBefore ${relation.file.before.commit}\nUTF-8 SHA-256 ${relation.file.before.hash ?? 'absent'}\nAfter ${relation.file.after.commit}\nUTF-8 SHA-256 ${relation.file.after.hash ?? 'absent'}` : '';
+  const primary = explanation?.what ?? fact;
+  return <section
+    className="relationship-reader nodrag nopan nowheel"
+    aria-label={link ? 'Import relationship explanation' : 'Source comparison explanation'}
+    onWheel={e => e.stopPropagation()}
+  >
+
+    <div className="reader-heading">
+
+      <strong>
+
+        {link ? 'Module relation' : `Change ${(relation?.index ?? 0) + 1}`}
+
+      </strong>
+
+      <button
+        onClick={props.onClose}
+        aria-label="Close relationship explanation"
+      >×</button>
+
+    </div>
+
+    <p className="reader-relation">
+
+      {explanation?.from ?? relation?.file.path}
+
+    </p>
+
+    <p className="reader-primary">
+
+      {primary}
+
+    </p>
+
+    <details>
+
+      <summary>Why and source evidence</summary>
+
+      <p>
+
+        {explanation?.why ?? why}
+
+      </p>
+
+      <p>
+
+        {explanation?.how ?? 'Exact pinned Before and After source, not a claim of execution or security.'}
+
+      </p>
+
+      <pre>
+
+        {citations}
+
+      </pre>
+
+      <p className="reader-boundary">
+
+        {explanation?.boundary ?? 'Prepared source explanation. Rationale beyond source facts is inference; runtime impact is unverified.'}
+
+      </p>
+
+    </details>
+
+  </section>;
 };
