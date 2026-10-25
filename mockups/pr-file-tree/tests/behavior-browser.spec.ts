@@ -344,3 +344,22 @@ test('document region references distinguish normative source from implementatio
   await expect(page.locator('.react-flow__viewport')).toHaveAttribute('style', frame!);
   await page.screenshot({ path: `${rootEvidence}/document-references.png` });
 });
+
+
+for (const activation of ['Enter', 'Space']) test(`requirement reference ${activation} focuses visible source and keyboard Back`, async ({ page }) => {
+  await page.goto('/');
+  await page.getByRole('button', { name: 'Find source', exact: true }).click();
+  await page.getByRole('combobox', { name: 'Changed source' }).selectOption('docs/product/review-loop/runtime.md');
+  const reference = page.getByRole('button', { name: /Read documented requirement docs\/product\/review-loop\/runtime.md/ });
+  const frame = await page.locator('.react-flow__viewport').getAttribute('style');
+  await reference.focus();
+  await page.keyboard.press(activation);
+  const reader = page.locator('.continuous-reader');
+  await expect(reader).toBeFocused();
+  await expect(reader).toBeInViewport();
+  const back = page.getByRole('button', { name: 'Back to source context' });
+  await back.focus();
+  await page.keyboard.press('Enter');
+  await expect(page.locator('.react-flow__viewport')).toHaveAttribute('style', frame!);
+  await expect(page.locator('main')).toBeFocused();
+});

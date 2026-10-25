@@ -53,7 +53,7 @@ export type FileRequirementEdge = Edge<{
   sourceLeft: number;
   startLine: number;
   endLine: number;
-  onRead: () => void;
+  onRead: (keyboard: boolean) => void;
   lane: number;
 }, 'requirementReference'>;
 
@@ -67,6 +67,6 @@ export const FileRequirementLine = (props: EdgeProps<FileRequirementEdge>) => {
       style={{ transform: `translate(${data.sourceLeft}px,${props.sourceY + 20}px)` }}
       aria-label={`Read documented requirement ${data.document} After L${data.startLine}–${data.endLine}; implementation evidence src/application/review.ts After L25–33`}
       title="Requirement / implementation evidence; not a call, literal hyperlink or proven edit causation"
-      data-relation-type="requirement-reference" onClick={data.onRead}>Requirement reference</button></EdgeLabelRenderer>
+      data-relation-type="requirement-reference" onClick={event => data.onRead(event.detail === 0)}>Requirement reference</button></EdgeLabelRenderer>
   </>;
 };

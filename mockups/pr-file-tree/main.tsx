@@ -727,7 +727,7 @@ const App = () => {
       source: `file:${reference.path}`, target: 'file:src/application/review.ts',
       sourceHandle: 'contains-out', targetHandle: 'contains-in',
       data: { document: reference.path, sourceLeft: viewTree.nodes.find(node => node.path === reference.path)!.x, startLine: reference.start, endLine: reference.end, lane: index,
-        onRead: () => openContextEvidence(reference.key, false) },
+        onRead: (keyboard: boolean) => openContextEvidence(reference.key, keyboard) },
       ariaLabel: `Documented requirement to request implementation evidence; not a call`,
     })) : []),
     ...(lens === 'behavior' ? fileCalls.map(call => {
