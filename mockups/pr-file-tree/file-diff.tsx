@@ -1,11 +1,11 @@
 import React, { useRef, useState, useLayoutEffect, useMemo, useEffect } from 'react';
-import type { FileReading } from './reading.ts';
+import type { FileReading, ReadingFocus } from './reading.ts';
 import diffs from './diffs.json' with { type: 'json' };
 import fullSource from './full-source.json' with { type: 'json' };
 import functionContext from './function-context.json' with { type: 'json' };
 import { rowCoordinates } from './coordinates.ts';
 import { splitRows } from './change-rail.ts';
-import { continuousSegments, visibleHunk, type SourceRow } from './continuous.ts';
+import { continuousSegments, scopeTestSegments, visibleHunk, type SourceRow } from './continuous.ts';
 export type FileDiff = typeof diffs.files[number];
 export type DiffMode = 'unified' | 'split';
 export type SourceRelation = {
@@ -25,6 +25,8 @@ const SourceLine = ({ row, side, mode }: {
   data-line={row ? (side === 'before' ? row.beforeLine : row.afterLine) ?? '' : ''}
   data-mark={row?.kind === 'removed' ? '−' : row?.kind === 'added' ? '+' : ' '}
   data-source-text={row?.text ?? ''}
+  data-before-line={row?.beforeLine ?? undefined}
+  data-after-line={row?.afterLine ?? undefined}
 >
 
     {mode === 'unified' && row && <span
@@ -65,7 +67,7 @@ const SourceLine = ({ row, side, mode }: {
     {row?.text ?? ''}
 
   </span>;
-export const FileDiffBody = ({ file, mode, fullscreen, width, onExplain, activeRelation, reading, onReading, restoreVersion }: {
+export const FileDiffBody = ({ file, mode, fullscreen, width, onExplain, activeRelation, reading, onReading, restoreVersion, focus, onCalls }: {
   file: FileDiff;
   mode: DiffMode;
   fullscreen: boolean;
@@ -75,11 +77,25 @@ export const FileDiffBody = ({ file, mode, fullscreen, width, onExplain, activeR
   reading: FileReading | undefined;
   onReading: (value: FileReading) => void;
   restoreVersion: number;
+  focus?: ReadingFocus | undefined;
+  onCalls?: (() => void) | undefined;
 }) => {
   const source = fullSource.files.find(s => s.path === file.path)!;
-  const segments = useMemo(() => continuousSegments(file, source, functionContext.files.find(context => context.path === file.path)), [
-    file, source
+  const segments = useMemo(() => {
+    const required = functionContext.files.find(context => context.path === file.path);
+    const result = continuousSegments(file, source, {
+      before: [
+        ...(required?.before ?? []), ...(focus?.before ?? [])
+      ],
+      after: [
+        ...(required?.after ?? []), ...(focus?.after ?? [])
+      ]
+    });
+    return focus?.scope === 'test' ? scopeTestSegments(result, focus) : result;
+  }, [
+    file, source, focus
   ]);
+  const visibleHunks = segments.filter(segment => segment.kind === 'hunk').map(segment => segment.index);
   const body = useRef<HTMLDivElement>(null);
   const content = useRef<HTMLPreElement>(null);
   const horizontal = useRef<HTMLDivElement>(null);
@@ -121,7 +137,7 @@ export const FileDiffBody = ({ file, mode, fullscreen, width, onExplain, activeR
     const el = body.current;
     if (!el)
       return;
-    const next = visibleHunk(file.hunks.map((_, i) => location(i)), el.scrollTop, el.clientHeight, el.scrollHeight);
+    const next = visibleHunks[visibleHunk(visibleHunks.map(location), el.scrollTop, el.clientHeight, el.scrollHeight)] ?? 0;
     setActive(next);
     save({
       active: next,
@@ -190,6 +206,26 @@ export const FileDiffBody = ({ file, mode, fullscreen, width, onExplain, activeR
   }, [
     mode, width
   ]);
+  useLayoutEffect(() => {
+    if (!focus || reading?.focusId === focus.id)
+      return;
+    const line = focus[focus.preferredSide][0]?.startLine;
+    if (line === undefined)
+      return;
+    const row = content.current?.querySelector<HTMLElement>(`[data-${focus.preferredSide}-line="${line}"]`);
+    if (row) {
+      travel.current = null;
+      body.current?.scrollTo({
+        top: Math.max(0, row.offsetTop + (content.current?.offsetTop ?? 0) - 54),
+        behavior: 'instant'
+      });
+      save({
+        focusId: focus.id
+      });
+    }
+  }, [
+    focus?.id
+  ]);
   useEffect(() => {
     const pre = content.current;
     if (!pre)
@@ -201,7 +237,7 @@ export const FileDiffBody = ({ file, mode, fullscreen, width, onExplain, activeR
     observer.observe(pre);
     return () => observer.disconnect();
   }, [
-    file, folds, mode, width
+    file, folds, mode, width, focus?.id
   ]);
   useLayoutEffect(() => () => {
     latest.current.onReading({
@@ -285,7 +321,8 @@ export const FileDiffBody = ({ file, mode, fullscreen, width, onExplain, activeR
       onClick={e => e.stopPropagation()}
     >
 
-      {file.hunks.map((h, index) => {
+      {visibleHunks.map(index => {
+        const h = file.hunks[index]!;
         const removed = h.rows.some(r => r.kind === 'removed');
         const added = h.rows.some(r => r.kind === 'added');
         const kind = removed && added ? 'modified' : removed ? 'removed' : 'added';
@@ -351,14 +388,55 @@ export const FileDiffBody = ({ file, mode, fullscreen, width, onExplain, activeR
 
         <span
           className="version-hashes"
-          title={`Before ${file.before.commit} · ${file.before.hash ?? 'absent'}\nAfter ${file.after.commit} · ${file.after.hash ?? 'absent'}`}
+          title={`${focus ? focus.name + '\n' : ''}Before ${file.before.commit} · ${file.before.hash ?? 'absent'}\nAfter ${file.after.commit} · ${file.after.hash ?? 'absent'}`}
         >
 
           {file.before.commit.slice(0, 7)} →
 
           {file.after.commit.slice(0, 7)}</span>
 
+        {onCalls && <button
+          aria-label="Show changed-function relationships"
+          title="Changed function and direct callers/callees"
+          onClick={onCalls}
+        >
+
+          <svg
+            width="18"
+            height="18"
+            viewBox="0 0 20 20"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="1.4"
+            aria-hidden="true"
+          >
+
+            <path d="M3 10h6m0 0 5-6m-5 6 5 6" />
+
+            <circle
+              cx="3"
+              cy="10"
+              r="2"
+            />
+
+            <circle
+              cx="16"
+              cy="3"
+              r="2"
+            />
+
+            <circle
+              cx="16"
+              cy="17"
+              r="2"
+            />
+
+          </svg>
+
+        </button>}
+
         <button
+          disabled={visibleHunks.length === 0}
           aria-label="Explain current source comparison"
           title="Explain current source comparison"
           className={activeRelation?.file.path === file.path ? 'relation-selected' : ''}
@@ -370,6 +448,13 @@ export const FileDiffBody = ({ file, mode, fullscreen, width, onExplain, activeR
         >↔</button>
 
       </div>
+
+      {focus?.scope === 'test' && <div
+        className="test-source-caption"
+        title={focus.name}
+      >
+        {focus.before.length === 0 ? 'Added declared test · Before absent · not run' : focus.after.length === 0 ? 'Removed declared test · After absent · not run' : visibleHunks.length ? 'Selected declared test · source changes · not run' : 'Selected declared test · unchanged source · not run'}
+      </div>}
 
       <div
         ref={horizontal}

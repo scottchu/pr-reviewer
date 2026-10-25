@@ -104,3 +104,25 @@ export const visibleHunk = (positions: readonly number[], top: number, height: n
   });
   return current;
 };
+export const scopeTestSegments = (segments: readonly Segment[], scope: FunctionContext): Segment[] => {
+  const includes = (row: SourceRow) => ([
+    'before', 'after'
+  ] as const).some(side => {
+    const line = row[side === 'before' ? 'beforeLine' : 'afterLine'];
+    return line !== null && scope[side].some(range => line >= range.startLine && line <= range.endLine);
+  });
+  return segments.flatMap(segment => {
+    if (segment.kind === 'hunk')
+      return segment.rows.some(includes) ? [
+        segment
+      ] : [];
+    const rows = segment.rows.filter(includes);
+    return rows.length ? [
+      {
+        ...segment,
+        kind: 'context' as const,
+        rows
+      }
+    ] : [];
+  });
+};

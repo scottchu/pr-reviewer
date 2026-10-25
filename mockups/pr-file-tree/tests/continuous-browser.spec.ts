@@ -340,6 +340,8 @@ test('fresh analysis source starts at zero with matched code and gutter geometry
     textAdjust: '100%'
   });
   console.log('INITIAL_ANALYSIS_GEOMETRY', JSON.stringify(geometry));
+  for (const line of [49, 54]) await expect(page.locator(`.diff-line[data-after-line="${line}"]`)).toHaveCount(1);
+  for (const line of [48, 53]) await expect(page.locator(`.diff-line[data-before-line="${line}"]`)).toHaveCount(1);
   await page.screenshot({
     path: `${evidence}/continuous-analysis-initial-390.png`
   });

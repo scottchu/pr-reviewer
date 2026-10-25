@@ -12,5 +12,5 @@ Keep related delivery material together. Each round lives under `docs/plans/<rou
 
 - [Exact-head test workspace](product/review-loop/test-ui.md): React test intent, progress, recovery and plain artifact presentation.
 
-- [PR-focused filename tree](product/pr-file-tree-first.md): current deliberately simple whole-PR filename/change map with change-centered direct-call context (imports off by default); not call/semantic graph acceptance.
+- [Change-centered PR file workspace](product/pr-file-tree-first.md): whole-PR file map, continuous source reader, bounded direct-call context and relevant declared-test lens; imports off by default, no runtime/whole-PR semantic acceptance.
 - [Project and repository ontology](product/project-repository-ontology.md): TBox concepts/constraints and concrete PR25 ABox evidence; Project, Repository, source occurrences, calls and declared tests remain distinct.

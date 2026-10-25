@@ -2,7 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import diffs from '../diffs.json' with { type: 'json' };
 import sources from '../full-source.json' with { type: 'json' };
-import { continuousSegments, visibleHunk } from '../continuous.ts';
+import { continuousSegments, scopeTestSegments, visibleHunk } from '../continuous.ts';
 test('continuous hunks plus expandable unchanged intervals reproduce every pinned source line', () => {
   for (const file of diffs.files) {
     const source = sources.files.find(s => s.path === file.path)!;
@@ -46,4 +46,36 @@ test('changed request discloses the complete callable on both sides before unrel
       assert.ok(visible.some(r => r[side === 'before' ? 'beforeLine' : 'afterLine'] === line), `${side} ${line}`);
   }
   assert.ok(segments.some(s => s.kind === 'fold'));
+});
+test('a retained declared-test scope preserves its entire source without unrelated native changes', () => {
+  const file = diffs.files.find(file => file.path === 'tests/gateway.test.ts')!;
+  const source = sources.files.find(source => source.path === file.path)!;
+  const full = continuousSegments(file, source);
+  const scoped = scopeTestSegments(full, {
+    before: [
+      {
+        startLine: 9,
+        endLine: 75
+      }
+    ],
+    after: [
+      {
+        startLine: 9,
+        endLine: 75
+      }
+    ]
+  });
+  assert.ok(scoped.length);
+  assert.ok(!scoped.some(segment => segment.kind === 'hunk'));
+  const rows = scoped.flatMap(segment => segment.rows);
+  assert.equal(rows[0]!.beforeLine, 9);
+  assert.equal(rows.at(-1)!.afterLine, 75);
+  assert.equal(rows.length, 67);
+  assert.ok(rows.every(row => row.kind === 'context'));
+  const required = contexts.files.find(context => context.path === 'src/application/review.ts')!;
+  const reviewFile = diffs.files.find(file => file.path === required.path)!;
+  const reviewSource = sources.files.find(source => source.path === required.path)!;
+  const visible = continuousSegments(reviewFile, reviewSource, required);
+  for (let line = 34;line <= 44;line++)
+    assert.ok(visible.some(segment => segment.kind === 'fold' && segment.rows.some(row => row.beforeLine === line)));
 });

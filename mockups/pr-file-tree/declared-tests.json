@@ -1,0 +1,2641 @@
+{
+  "format": "task-local-change-centered-test-evidence-v1",
+  "commits": {
+    "base": "b096826e31c0927190806de91ed70b8b64aa93d8",
+    "head": "e3b270e5f49a9215452b0b86702946043e979059"
+  },
+  "provenance": "Immutable Git source and existing TypeScript AST; declared tests and source-reviewed public API behavior mappings, never execution/coverage proof.",
+  "coordinates": "Half-open UTF-16 offsets;1-based lines; full original UTF-8 SHA256.",
+  "cases": [
+    {
+      "id": "gateway-retained",
+      "path": "tests/gateway.test.ts",
+      "name": "authenticated HTTP owner/bootstrap/agent boundary and managed shutdown",
+      "summary": "Declares invalid-user/bootstrap rejection, valid attached-agent access, request-bound validation and managed shutdown.",
+      "targets": [
+        "authenticate"
+      ],
+      "basis": "factory_public_api_behavior",
+      "limit": "On base, store.authenticate is a separate returned arrow, not the local authenticate seed; on head it exposes the local seed. Retain this side-specific distinction.",
+      "classification": "unmodified",
+      "declaredTest": true,
+      "execution": {
+        "state": "unrun_in_this_packet",
+        "result": null,
+        "coverage": null
+      },
+      "versions": {
+        "base": {
+          "availability": "available",
+          "definition": {
+            "anchor": {
+              "snapshotId": "pr25-pinned-test-evidence",
+              "side": "base",
+              "path": "tests/gateway.test.ts",
+              "commit": "b096826e31c0927190806de91ed70b8b64aa93d8",
+              "contentHash": "21df294a4bcbdeadcabb3a0767e252fdaef5fe2fc371ea63bb3ab62071cb97d3",
+              "start": 345,
+              "end": 2452,
+              "startLine": 9,
+              "endLine": 75
+            },
+            "sourceText": "test(\"authenticated HTTP owner/bootstrap/agent boundary and managed shutdown\", async () => {\n  const dir = mkdtempSync(join(tmpdir(), \"pr-reviewer-http-\"));\n  const store = createStore(join(dir, \"db\"));\n  store.prepare(\"r\", {\n    snapshotId: \"s\",\n    repository: \"r\",\n    prUrl: \"url\",\n    prNumber: 14,\n    baseSha: \"a\",\n    headSha: \"b\",\n    sources: [],\n  });\n  const token = store.issueUser();\n  const gateway = createGateway(store, async () => ({\n    state: \"unknown\",\n    reason: \"test\",\n  }));\n  const port = await gateway.listen(0);\n  const call = async (path: string, bearer = token, body?: unknown) => {\n    const response = await fetch(`http://127.0.0.1:${port}${path}`, {\n      headers: {\n        Authorization: `Bearer ${bearer}`,\n        \"Content-Type\": \"application/json\",\n      },\n      ...(body ? { method: \"POST\", body: JSON.stringify(body) } : {}),\n    });\n    return {\n      status: response.status,\n      body: (await response.json()) as Record<string, unknown>,\n    };\n  };\n  try {\n    assert.equal((await call(\"/api/reviews\", \"wrong\")).status, 401);\n    const connection = await call(\"/api/connections\", token, {\n      host: \"codex\",\n      sessionId: \"exact\",\n      connectionId: \"launch\",\n      corroborated: true,\n    });\n    const bootstrap = String(connection.body.token);\n    assert.equal((await call(\"/api/reviews/r\", bootstrap)).status, 401);\n    const c = await call(\"/api/challenges\", token, {\n      reviewId: \"r\",\n      host: \"codex\",\n      sessionId: \"exact\",\n      connectionId: \"launch\",\n    });\n    const attached = await call(\"/api/session-attach\", bootstrap, {\n      challengeId: c.body.challengeId,\n      proof: c.body.proof,\n    });\n    assert.equal(attached.status, 200);\n    assert.equal(\n      (await call(\"/api/reviews/r\", String(attached.body.token))).status,\n      200,\n    );\n    assert.equal(\n      (await call(\"/api/inbox?limit=1000\", String(attached.body.token))).status,\n      400,\n    );\n  } finally {\n    await gateway.close();\n    assert.deepEqual(gateway.diagnostics(), []);\n    store.close();\n    rmSync(dir, { recursive: true, force: true });\n  }\n})"
+          },
+          "callback": {
+            "anchor": {
+              "snapshotId": "pr25-pinned-test-evidence",
+              "side": "base",
+              "path": "tests/gateway.test.ts",
+              "commit": "b096826e31c0927190806de91ed70b8b64aa93d8",
+              "contentHash": "21df294a4bcbdeadcabb3a0767e252fdaef5fe2fc371ea63bb3ab62071cb97d3",
+              "start": 424,
+              "end": 2451,
+              "startLine": 9,
+              "endLine": 75
+            },
+            "sourceText": "async () => {\n  const dir = mkdtempSync(join(tmpdir(), \"pr-reviewer-http-\"));\n  const store = createStore(join(dir, \"db\"));\n  store.prepare(\"r\", {\n    snapshotId: \"s\",\n    repository: \"r\",\n    prUrl: \"url\",\n    prNumber: 14,\n    baseSha: \"a\",\n    headSha: \"b\",\n    sources: [],\n  });\n  const token = store.issueUser();\n  const gateway = createGateway(store, async () => ({\n    state: \"unknown\",\n    reason: \"test\",\n  }));\n  const port = await gateway.listen(0);\n  const call = async (path: string, bearer = token, body?: unknown) => {\n    const response = await fetch(`http://127.0.0.1:${port}${path}`, {\n      headers: {\n        Authorization: `Bearer ${bearer}`,\n        \"Content-Type\": \"application/json\",\n      },\n      ...(body ? { method: \"POST\", body: JSON.stringify(body) } : {}),\n    });\n    return {\n      status: response.status,\n      body: (await response.json()) as Record<string, unknown>,\n    };\n  };\n  try {\n    assert.equal((await call(\"/api/reviews\", \"wrong\")).status, 401);\n    const connection = await call(\"/api/connections\", token, {\n      host: \"codex\",\n      sessionId: \"exact\",\n      connectionId: \"launch\",\n      corroborated: true,\n    });\n    const bootstrap = String(connection.body.token);\n    assert.equal((await call(\"/api/reviews/r\", bootstrap)).status, 401);\n    const c = await call(\"/api/challenges\", token, {\n      reviewId: \"r\",\n      host: \"codex\",\n      sessionId: \"exact\",\n      connectionId: \"launch\",\n    });\n    const attached = await call(\"/api/session-attach\", bootstrap, {\n      challengeId: c.body.challengeId,\n      proof: c.body.proof,\n    });\n    assert.equal(attached.status, 200);\n    assert.equal(\n      (await call(\"/api/reviews/r\", String(attached.body.token))).status,\n      200,\n    );\n    assert.equal(\n      (await call(\"/api/inbox?limit=1000\", String(attached.body.token))).status,\n      400,\n    );\n  } finally {\n    await gateway.close();\n    assert.deepEqual(gateway.diagnostics(), []);\n    store.close();\n    rmSync(dir, { recursive: true, force: true });\n  }\n}",
+            "bodyHash": "612457f0d0a7b0362d509c4c3cc4a58811627bf2c9e50ff73f0d81531d4b56d8"
+          }
+        },
+        "head": {
+          "availability": "available",
+          "definition": {
+            "anchor": {
+              "snapshotId": "pr25-pinned-test-evidence",
+              "side": "head",
+              "path": "tests/gateway.test.ts",
+              "commit": "e3b270e5f49a9215452b0b86702946043e979059",
+              "contentHash": "13e7db6e38670e876795a150587bb6e5a441548915fb37f67ff0a80563953158",
+              "start": 345,
+              "end": 2452,
+              "startLine": 9,
+              "endLine": 75
+            },
+            "sourceText": "test(\"authenticated HTTP owner/bootstrap/agent boundary and managed shutdown\", async () => {\n  const dir = mkdtempSync(join(tmpdir(), \"pr-reviewer-http-\"));\n  const store = createStore(join(dir, \"db\"));\n  store.prepare(\"r\", {\n    snapshotId: \"s\",\n    repository: \"r\",\n    prUrl: \"url\",\n    prNumber: 14,\n    baseSha: \"a\",\n    headSha: \"b\",\n    sources: [],\n  });\n  const token = store.issueUser();\n  const gateway = createGateway(store, async () => ({\n    state: \"unknown\",\n    reason: \"test\",\n  }));\n  const port = await gateway.listen(0);\n  const call = async (path: string, bearer = token, body?: unknown) => {\n    const response = await fetch(`http://127.0.0.1:${port}${path}`, {\n      headers: {\n        Authorization: `Bearer ${bearer}`,\n        \"Content-Type\": \"application/json\",\n      },\n      ...(body ? { method: \"POST\", body: JSON.stringify(body) } : {}),\n    });\n    return {\n      status: response.status,\n      body: (await response.json()) as Record<string, unknown>,\n    };\n  };\n  try {\n    assert.equal((await call(\"/api/reviews\", \"wrong\")).status, 401);\n    const connection = await call(\"/api/connections\", token, {\n      host: \"codex\",\n      sessionId: \"exact\",\n      connectionId: \"launch\",\n      corroborated: true,\n    });\n    const bootstrap = String(connection.body.token);\n    assert.equal((await call(\"/api/reviews/r\", bootstrap)).status, 401);\n    const c = await call(\"/api/challenges\", token, {\n      reviewId: \"r\",\n      host: \"codex\",\n      sessionId: \"exact\",\n      connectionId: \"launch\",\n    });\n    const attached = await call(\"/api/session-attach\", bootstrap, {\n      challengeId: c.body.challengeId,\n      proof: c.body.proof,\n    });\n    assert.equal(attached.status, 200);\n    assert.equal(\n      (await call(\"/api/reviews/r\", String(attached.body.token))).status,\n      200,\n    );\n    assert.equal(\n      (await call(\"/api/inbox?limit=1000\", String(attached.body.token))).status,\n      400,\n    );\n  } finally {\n    await gateway.close();\n    assert.deepEqual(gateway.diagnostics(), []);\n    store.close();\n    rmSync(dir, { recursive: true, force: true });\n  }\n})"
+          },
+          "callback": {
+            "anchor": {
+              "snapshotId": "pr25-pinned-test-evidence",
+              "side": "head",
+              "path": "tests/gateway.test.ts",
+              "commit": "e3b270e5f49a9215452b0b86702946043e979059",
+              "contentHash": "13e7db6e38670e876795a150587bb6e5a441548915fb37f67ff0a80563953158",
+              "start": 424,
+              "end": 2451,
+              "startLine": 9,
+              "endLine": 75
+            },
+            "sourceText": "async () => {\n  const dir = mkdtempSync(join(tmpdir(), \"pr-reviewer-http-\"));\n  const store = createStore(join(dir, \"db\"));\n  store.prepare(\"r\", {\n    snapshotId: \"s\",\n    repository: \"r\",\n    prUrl: \"url\",\n    prNumber: 14,\n    baseSha: \"a\",\n    headSha: \"b\",\n    sources: [],\n  });\n  const token = store.issueUser();\n  const gateway = createGateway(store, async () => ({\n    state: \"unknown\",\n    reason: \"test\",\n  }));\n  const port = await gateway.listen(0);\n  const call = async (path: string, bearer = token, body?: unknown) => {\n    const response = await fetch(`http://127.0.0.1:${port}${path}`, {\n      headers: {\n        Authorization: `Bearer ${bearer}`,\n        \"Content-Type\": \"application/json\",\n      },\n      ...(body ? { method: \"POST\", body: JSON.stringify(body) } : {}),\n    });\n    return {\n      status: response.status,\n      body: (await response.json()) as Record<string, unknown>,\n    };\n  };\n  try {\n    assert.equal((await call(\"/api/reviews\", \"wrong\")).status, 401);\n    const connection = await call(\"/api/connections\", token, {\n      host: \"codex\",\n      sessionId: \"exact\",\n      connectionId: \"launch\",\n      corroborated: true,\n    });\n    const bootstrap = String(connection.body.token);\n    assert.equal((await call(\"/api/reviews/r\", bootstrap)).status, 401);\n    const c = await call(\"/api/challenges\", token, {\n      reviewId: \"r\",\n      host: \"codex\",\n      sessionId: \"exact\",\n      connectionId: \"launch\",\n    });\n    const attached = await call(\"/api/session-attach\", bootstrap, {\n      challengeId: c.body.challengeId,\n      proof: c.body.proof,\n    });\n    assert.equal(attached.status, 200);\n    assert.equal(\n      (await call(\"/api/reviews/r\", String(attached.body.token))).status,\n      200,\n    );\n    assert.equal(\n      (await call(\"/api/inbox?limit=1000\", String(attached.body.token))).status,\n      400,\n    );\n  } finally {\n    await gateway.close();\n    assert.deepEqual(gateway.diagnostics(), []);\n    store.close();\n    rmSync(dir, { recursive: true, force: true });\n  }\n}",
+            "bodyHash": "612457f0d0a7b0362d509c4c3cc4a58811627bf2c9e50ff73f0d81531d4b56d8"
+          }
+        }
+      },
+      "nativeHunks": [],
+      "functionMappings": [
+        {
+          "targetId": "2e0dfcb2b5c914737ae3bcf51e1c56c15e5a65f8d29ee4b9f55571e694df0263",
+          "target": {
+            "snapshotId": "pr25-pinned-call-evidence",
+            "side": "head",
+            "path": "src/storage/public.ts",
+            "contentHash": "ebf680d4d62a47f92af2123a60673e4ba58c7236257ffc12cea2ddc981791d58",
+            "start": 10314,
+            "end": 10661,
+            "startLine": 200,
+            "endLine": 204
+          },
+          "certainty": "factory_public_api_behavior",
+          "executionClaim": false,
+          "chain": [
+            "Test imports createStore/createGateway and supplies actual store to gateway",
+            "Test helper calls local HTTP endpoints with absent/explicit credentials",
+            "Head gateway selects store.localOwner or explicit credential then calls store.authenticate",
+            "Head store public authenticate exposes local const",
+            "Local authenticate calls accessReference/localPrincipal"
+          ],
+          "bindingAnchors": [
+            {
+              "snapshotId": "pr25-pinned-test-evidence",
+              "side": "head",
+              "path": "tests/gateway.test.ts",
+              "commit": "e3b270e5f49a9215452b0b86702946043e979059",
+              "contentHash": "13e7db6e38670e876795a150587bb6e5a441548915fb37f67ff0a80563953158",
+              "start": 232,
+              "end": 287,
+              "startLine": 7,
+              "endLine": 7
+            },
+            {
+              "snapshotId": "pr25-pinned-test-evidence",
+              "side": "head",
+              "path": "tests/gateway.test.ts",
+              "commit": "e3b270e5f49a9215452b0b86702946043e979059",
+              "contentHash": "13e7db6e38670e876795a150587bb6e5a441548915fb37f67ff0a80563953158",
+              "start": 288,
+              "end": 344,
+              "startLine": 8,
+              "endLine": 8
+            },
+            {
+              "snapshotId": "pr25-pinned-test-evidence",
+              "side": "head",
+              "path": "src/server/public.ts",
+              "commit": "e3b270e5f49a9215452b0b86702946043e979059",
+              "contentHash": "20c22563be7da4c385eda772d5840d55f0993ddeebd85718b3605cddb76a0b0e",
+              "start": 2857,
+              "end": 2988,
+              "startLine": 66,
+              "endLine": 67
+            },
+            {
+              "snapshotId": "pr25-pinned-test-evidence",
+              "side": "head",
+              "path": "src/storage/public.ts",
+              "commit": "e3b270e5f49a9215452b0b86702946043e979059",
+              "contentHash": "ebf680d4d62a47f92af2123a60673e4ba58c7236257ffc12cea2ddc981791d58",
+              "start": 17500,
+              "end": 17550,
+              "startLine": 285,
+              "endLine": 286
+            },
+            {
+              "snapshotId": "pr25-pinned-test-evidence",
+              "side": "head",
+              "path": "src/storage/public.ts",
+              "commit": "e3b270e5f49a9215452b0b86702946043e979059",
+              "contentHash": "ebf680d4d62a47f92af2123a60673e4ba58c7236257ffc12cea2ddc981791d58",
+              "start": 10372,
+              "end": 10445,
+              "startLine": 201,
+              "endLine": 201
+            },
+            {
+              "snapshotId": "pr25-pinned-test-evidence",
+              "side": "head",
+              "path": "src/storage/public.ts",
+              "commit": "e3b270e5f49a9215452b0b86702946043e979059",
+              "contentHash": "ebf680d4d62a47f92af2123a60673e4ba58c7236257ffc12cea2ddc981791d58",
+              "start": 10018,
+              "end": 10132,
+              "startLine": 198,
+              "endLine": 198
+            },
+            {
+              "snapshotId": "pr25-pinned-test-evidence",
+              "side": "head",
+              "path": "src/storage/imports.ts",
+              "commit": "e3b270e5f49a9215452b0b86702946043e979059",
+              "contentHash": "f29c76c6b9202f53e9d29752ff75f558eeea79739d3c476a93fe3a1e232fa1e2",
+              "start": 5228,
+              "end": 5292,
+              "startLine": 38,
+              "endLine": 38
+            },
+            {
+              "snapshotId": "pr25-pinned-test-evidence",
+              "side": "head",
+              "path": "src/storage/imports.ts",
+              "commit": "e3b270e5f49a9215452b0b86702946043e979059",
+              "contentHash": "f29c76c6b9202f53e9d29752ff75f558eeea79739d3c476a93fe3a1e232fa1e2",
+              "start": 3036,
+              "end": 3096,
+              "startLine": 29,
+              "endLine": 29
+            },
+            {
+              "snapshotId": "pr25-pinned-test-evidence",
+              "side": "head",
+              "path": "src/storage/imports.ts",
+              "commit": "e3b270e5f49a9215452b0b86702946043e979059",
+              "contentHash": "f29c76c6b9202f53e9d29752ff75f558eeea79739d3c476a93fe3a1e232fa1e2",
+              "start": 9358,
+              "end": 9368,
+              "startLine": 75,
+              "endLine": 75
+            }
+          ],
+          "limit": "On base, store.authenticate is a separate returned arrow, not the local authenticate seed; on head it exposes the local seed. Retain this side-specific distinction."
+        }
+      ]
+    },
+    {
+      "id": "gateway-owner-added",
+      "path": "tests/gateway.test.ts",
+      "name": "single local owner reads and writes without a Bearer while explicit invalid credentials never escalate",
+      "summary": "Declares header-free local-owner reads/writes, command replay/readback, legacy import visibility and explicit invalid/bootstrap credential rejection.",
+      "targets": [
+        "authenticate",
+        "accessReference",
+        "localPrincipal"
+      ],
+      "basis": "http_public_api_behavior_source_chain",
+      "limit": "No client review.request/accessHeaders call: this test uses its own fetch helper. Do not attach it to those client functions merely because both omit headers.",
+      "classification": "added",
+      "declaredTest": true,
+      "execution": {
+        "state": "unrun_in_this_packet",
+        "result": null,
+        "coverage": null
+      },
+      "versions": {
+        "base": {
+          "availability": "absent"
+        },
+        "head": {
+          "availability": "available",
+          "definition": {
+            "anchor": {
+              "snapshotId": "pr25-pinned-test-evidence",
+              "side": "head",
+              "path": "tests/gateway.test.ts",
+              "commit": "e3b270e5f49a9215452b0b86702946043e979059",
+              "contentHash": "13e7db6e38670e876795a150587bb6e5a441548915fb37f67ff0a80563953158",
+              "start": 5816,
+              "end": 9025,
+              "startLine": 90,
+              "endLine": 114
+            },
+            "sourceText": "test('single local owner reads and writes without a Bearer while explicit invalid credentials never escalate',async()=>{\n const root=mkdtempSync(join(tmpdir(),'pr-reviewer-local-owner-')),store=createStore(join(root,'db'));\n const content='export const value = 1;\\n',snapshot={snapshotId:'local-source',repository:'local',prUrl:'https://github.com/scottchu/pr-reviewer/pull/14',prNumber:14,baseSha:'a',headSha:'b',sources:[{side:'head' as const,path:'value.ts',content,hash:createHash('sha256').update(content).digest('hex'),lineCount:1}]};\n store.prepare('r',snapshot);const oldToken=store.issueUser();\n store.imports.command(oldToken,{type:'RequestImport',commandId:'old-owner-import',path:'/retained/locator'});\n const {createImportArtifacts}=await import('../src/import-artifacts/public.ts');\n const gateway=createGateway(store,async()=>({state:'unknown',reason:'controlled'}),{importArtifacts:createImportArtifacts(root)}),port=await gateway.listen(0);\n const call=async(path:string,body?:unknown,authorization?:string)=>{const response=await fetch(`http://127.0.0.1:${port}${path}`,{headers:{'Content-Type':'application/json',...(authorization?{Authorization:authorization}:{})},...(body?{method:'POST',body:JSON.stringify(body)}:{})});return {status:response.status,body:await response.json() as Record<string,unknown>};};\n try{\n  assert.deepEqual((await call('/api/self')).body,{kind:'user',actorId:'local-user'});\n  assert.equal((await call('/api/reviews')).status,200);assert.equal((await call('/api/reviews/r')).status,200);\n  assert.equal((await call('/api/analysis?reviewId=r&snapshotId=local-source')).status,200);\n  assert.equal((await call('/api/story?reviewId=r&snapshotId=local-source')).status,200);\n  assert.equal((await call('/api/story/context?reviewId=r&snapshotId=local-source')).status,200);\n  const jobs=await call('/api/imports');assert.equal(jobs.status,200);const job=(jobs.body as unknown as {jobId:string}[])[0]!;assert.ok(job.jobId);\n  assert.equal((await call('/api/imports/commands',{type:'RequestImport',commandId:'new-owner-import',path:'/local/locator'})).body.state,'applied');\n  const command={type:'AskQuestion',commandId:'local-owner-question',reviewId:'r',anchor:{snapshotId:'local-source',path:'value.ts',side:'head',startLine:1,endLine:1},text:'Saved without a login'};\n  const receipt=await call('/api/commands',command);assert.equal(receipt.status,200);assert.equal(receipt.body.state,'applied');assert.equal(receipt.body.actorId,'local-user');\n  assert.deepEqual((await call('/api/commands',command)).body,receipt.body);\n  const readback=await call('/api/reviews/r');assert.equal((readback.body.questions as {text:string}[])[0]?.text,command.text);\n  for(const authorization of ['Bearer wrong','Basic anything','Bearer '])assert.equal((await call('/api/reviews/r',undefined,authorization)).status,401);\n  const connection=store.registerConnection({kind:'user',actorId:'local-user'},{host:'codex',sessionId:'original',connectionId:'original-connection',corroborated:true});\n  assert.equal((await call('/api/reviews/r',undefined,`Bearer ${connection.token}`)).status,401);\n }finally{await gateway.close();store.close();rmSync(root,{recursive:true,force:true});}\n})"
+          },
+          "callback": {
+            "anchor": {
+              "snapshotId": "pr25-pinned-test-evidence",
+              "side": "head",
+              "path": "tests/gateway.test.ts",
+              "commit": "e3b270e5f49a9215452b0b86702946043e979059",
+              "contentHash": "13e7db6e38670e876795a150587bb6e5a441548915fb37f67ff0a80563953158",
+              "start": 5926,
+              "end": 9024,
+              "startLine": 90,
+              "endLine": 114
+            },
+            "sourceText": "async()=>{\n const root=mkdtempSync(join(tmpdir(),'pr-reviewer-local-owner-')),store=createStore(join(root,'db'));\n const content='export const value = 1;\\n',snapshot={snapshotId:'local-source',repository:'local',prUrl:'https://github.com/scottchu/pr-reviewer/pull/14',prNumber:14,baseSha:'a',headSha:'b',sources:[{side:'head' as const,path:'value.ts',content,hash:createHash('sha256').update(content).digest('hex'),lineCount:1}]};\n store.prepare('r',snapshot);const oldToken=store.issueUser();\n store.imports.command(oldToken,{type:'RequestImport',commandId:'old-owner-import',path:'/retained/locator'});\n const {createImportArtifacts}=await import('../src/import-artifacts/public.ts');\n const gateway=createGateway(store,async()=>({state:'unknown',reason:'controlled'}),{importArtifacts:createImportArtifacts(root)}),port=await gateway.listen(0);\n const call=async(path:string,body?:unknown,authorization?:string)=>{const response=await fetch(`http://127.0.0.1:${port}${path}`,{headers:{'Content-Type':'application/json',...(authorization?{Authorization:authorization}:{})},...(body?{method:'POST',body:JSON.stringify(body)}:{})});return {status:response.status,body:await response.json() as Record<string,unknown>};};\n try{\n  assert.deepEqual((await call('/api/self')).body,{kind:'user',actorId:'local-user'});\n  assert.equal((await call('/api/reviews')).status,200);assert.equal((await call('/api/reviews/r')).status,200);\n  assert.equal((await call('/api/analysis?reviewId=r&snapshotId=local-source')).status,200);\n  assert.equal((await call('/api/story?reviewId=r&snapshotId=local-source')).status,200);\n  assert.equal((await call('/api/story/context?reviewId=r&snapshotId=local-source')).status,200);\n  const jobs=await call('/api/imports');assert.equal(jobs.status,200);const job=(jobs.body as unknown as {jobId:string}[])[0]!;assert.ok(job.jobId);\n  assert.equal((await call('/api/imports/commands',{type:'RequestImport',commandId:'new-owner-import',path:'/local/locator'})).body.state,'applied');\n  const command={type:'AskQuestion',commandId:'local-owner-question',reviewId:'r',anchor:{snapshotId:'local-source',path:'value.ts',side:'head',startLine:1,endLine:1},text:'Saved without a login'};\n  const receipt=await call('/api/commands',command);assert.equal(receipt.status,200);assert.equal(receipt.body.state,'applied');assert.equal(receipt.body.actorId,'local-user');\n  assert.deepEqual((await call('/api/commands',command)).body,receipt.body);\n  const readback=await call('/api/reviews/r');assert.equal((readback.body.questions as {text:string}[])[0]?.text,command.text);\n  for(const authorization of ['Bearer wrong','Basic anything','Bearer '])assert.equal((await call('/api/reviews/r',undefined,authorization)).status,401);\n  const connection=store.registerConnection({kind:'user',actorId:'local-user'},{host:'codex',sessionId:'original',connectionId:'original-connection',corroborated:true});\n  assert.equal((await call('/api/reviews/r',undefined,`Bearer ${connection.token}`)).status,401);\n }finally{await gateway.close();store.close();rmSync(root,{recursive:true,force:true});}\n}",
+            "bodyHash": "d879698ad5fcf3d302502f9208c3759a0d6a9806dad5706f4ca7f7c44521758d"
+          }
+        }
+      },
+      "nativeHunks": [
+        {
+          "id": "tests/gateway.test.ts:native:0",
+          "header": "@@ -85,3 +85,30 @@ test('history HTTP admits verified bounded large manifest, rejects oversized enc",
+          "beforeStart": 85,
+          "beforeCount": 3,
+          "afterStart": 85,
+          "afterCount": 30,
+          "rows": [
+            {
+              "kind": "context",
+              "beforeLine": 85,
+              "afterLine": 85,
+              "text": " const oversized=await request('/api/commands',{...add,commandId:'too-big',snapshot:{...next,sources:[{...next.sources[0],content:'x'.repeat(8*1024*1024)}]}});assert.equal(oversized.status,400);assert.equal(oversized.body.error,'invalid_request');assert.equal(store.review(owner,'r').currentSnapshotId,next.snapshotId);assert.equal(store.review(owner,'r').snapshotSummaries?.length,2);"
+            },
+            {
+              "kind": "context",
+              "beforeLine": 86,
+              "afterLine": 86,
+              "text": " }finally{await gateway.close();store.close();if(previous===undefined)delete process.env.GIT_DIR;else process.env.GIT_DIR=previous;rmSync(root,{recursive:true,force:true});}"
+            },
+            {
+              "kind": "context",
+              "beforeLine": 87,
+              "afterLine": 87,
+              "text": "});"
+            },
+            {
+              "kind": "added",
+              "beforeLine": null,
+              "afterLine": 88,
+              "text": ""
+            },
+            {
+              "kind": "added",
+              "beforeLine": null,
+              "afterLine": 89,
+              "text": "// SU-A/B/C: docs/product/review-loop/runtime.md single-local-owner policy."
+            },
+            {
+              "kind": "added",
+              "beforeLine": null,
+              "afterLine": 90,
+              "text": "test('single local owner reads and writes without a Bearer while explicit invalid credentials never escalate',async()=>{"
+            },
+            {
+              "kind": "added",
+              "beforeLine": null,
+              "afterLine": 91,
+              "text": " const root=mkdtempSync(join(tmpdir(),'pr-reviewer-local-owner-')),store=createStore(join(root,'db'));"
+            },
+            {
+              "kind": "added",
+              "beforeLine": null,
+              "afterLine": 92,
+              "text": " const content='export const value = 1;\\n',snapshot={snapshotId:'local-source',repository:'local',prUrl:'https://github.com/scottchu/pr-reviewer/pull/14',prNumber:14,baseSha:'a',headSha:'b',sources:[{side:'head' as const,path:'value.ts',content,hash:createHash('sha256').update(content).digest('hex'),lineCount:1}]};"
+            },
+            {
+              "kind": "added",
+              "beforeLine": null,
+              "afterLine": 93,
+              "text": " store.prepare('r',snapshot);const oldToken=store.issueUser();"
+            },
+            {
+              "kind": "added",
+              "beforeLine": null,
+              "afterLine": 94,
+              "text": " store.imports.command(oldToken,{type:'RequestImport',commandId:'old-owner-import',path:'/retained/locator'});"
+            },
+            {
+              "kind": "added",
+              "beforeLine": null,
+              "afterLine": 95,
+              "text": " const {createImportArtifacts}=await import('../src/import-artifacts/public.ts');"
+            },
+            {
+              "kind": "added",
+              "beforeLine": null,
+              "afterLine": 96,
+              "text": " const gateway=createGateway(store,async()=>({state:'unknown',reason:'controlled'}),{importArtifacts:createImportArtifacts(root)}),port=await gateway.listen(0);"
+            },
+            {
+              "kind": "added",
+              "beforeLine": null,
+              "afterLine": 97,
+              "text": " const call=async(path:string,body?:unknown,authorization?:string)=>{const response=await fetch(`http://127.0.0.1:${port}${path}`,{headers:{'Content-Type':'application/json',...(authorization?{Authorization:authorization}:{})},...(body?{method:'POST',body:JSON.stringify(body)}:{})});return {status:response.status,body:await response.json() as Record<string,unknown>};};"
+            },
+            {
+              "kind": "added",
+              "beforeLine": null,
+              "afterLine": 98,
+              "text": " try{"
+            },
+            {
+              "kind": "added",
+              "beforeLine": null,
+              "afterLine": 99,
+              "text": "  assert.deepEqual((await call('/api/self')).body,{kind:'user',actorId:'local-user'});"
+            },
+            {
+              "kind": "added",
+              "beforeLine": null,
+              "afterLine": 100,
+              "text": "  assert.equal((await call('/api/reviews')).status,200);assert.equal((await call('/api/reviews/r')).status,200);"
+            },
+            {
+              "kind": "added",
+              "beforeLine": null,
+              "afterLine": 101,
+              "text": "  assert.equal((await call('/api/analysis?reviewId=r&snapshotId=local-source')).status,200);"
+            },
+            {
+              "kind": "added",
+              "beforeLine": null,
+              "afterLine": 102,
+              "text": "  assert.equal((await call('/api/story?reviewId=r&snapshotId=local-source')).status,200);"
+            },
+            {
+              "kind": "added",
+              "beforeLine": null,
+              "afterLine": 103,
+              "text": "  assert.equal((await call('/api/story/context?reviewId=r&snapshotId=local-source')).status,200);"
+            },
+            {
+              "kind": "added",
+              "beforeLine": null,
+              "afterLine": 104,
+              "text": "  const jobs=await call('/api/imports');assert.equal(jobs.status,200);const job=(jobs.body as unknown as {jobId:string}[])[0]!;assert.ok(job.jobId);"
+            },
+            {
+              "kind": "added",
+              "beforeLine": null,
+              "afterLine": 105,
+              "text": "  assert.equal((await call('/api/imports/commands',{type:'RequestImport',commandId:'new-owner-import',path:'/local/locator'})).body.state,'applied');"
+            },
+            {
+              "kind": "added",
+              "beforeLine": null,
+              "afterLine": 106,
+              "text": "  const command={type:'AskQuestion',commandId:'local-owner-question',reviewId:'r',anchor:{snapshotId:'local-source',path:'value.ts',side:'head',startLine:1,endLine:1},text:'Saved without a login'};"
+            },
+            {
+              "kind": "added",
+              "beforeLine": null,
+              "afterLine": 107,
+              "text": "  const receipt=await call('/api/commands',command);assert.equal(receipt.status,200);assert.equal(receipt.body.state,'applied');assert.equal(receipt.body.actorId,'local-user');"
+            },
+            {
+              "kind": "added",
+              "beforeLine": null,
+              "afterLine": 108,
+              "text": "  assert.deepEqual((await call('/api/commands',command)).body,receipt.body);"
+            },
+            {
+              "kind": "added",
+              "beforeLine": null,
+              "afterLine": 109,
+              "text": "  const readback=await call('/api/reviews/r');assert.equal((readback.body.questions as {text:string}[])[0]?.text,command.text);"
+            },
+            {
+              "kind": "added",
+              "beforeLine": null,
+              "afterLine": 110,
+              "text": "  for(const authorization of ['Bearer wrong','Basic anything','Bearer '])assert.equal((await call('/api/reviews/r',undefined,authorization)).status,401);"
+            },
+            {
+              "kind": "added",
+              "beforeLine": null,
+              "afterLine": 111,
+              "text": "  const connection=store.registerConnection({kind:'user',actorId:'local-user'},{host:'codex',sessionId:'original',connectionId:'original-connection',corroborated:true});"
+            },
+            {
+              "kind": "added",
+              "beforeLine": null,
+              "afterLine": 112,
+              "text": "  assert.equal((await call('/api/reviews/r',undefined,`Bearer ${connection.token}`)).status,401);"
+            },
+            {
+              "kind": "added",
+              "beforeLine": null,
+              "afterLine": 113,
+              "text": " }finally{await gateway.close();store.close();rmSync(root,{recursive:true,force:true});}"
+            },
+            {
+              "kind": "added",
+              "beforeLine": null,
+              "afterLine": 114,
+              "text": "});"
+            }
+          ],
+          "changeKind": "added",
+          "patchHash": "18fa9476ae529ce8c1ac452cb940697a67113a356133691fdc8c74d788d3775f"
+        }
+      ],
+      "functionMappings": [
+        {
+          "targetId": "9b58606b4a652f7f9bc9500debd30f6d6fc0ccda0d44c170b031c444a909b7d8",
+          "target": {
+            "snapshotId": "pr25-pinned-call-evidence",
+            "side": "head",
+            "path": "src/storage/access.ts",
+            "contentHash": "0440486de82e136ffe430e4f1bed2b6f57f491319c59a71fad0f9d8507053b4c",
+            "start": 401,
+            "end": 618,
+            "startLine": 8,
+            "endLine": 12
+          },
+          "certainty": "http_public_api_behavior_source_chain",
+          "executionClaim": false,
+          "chain": [
+            "Test imports createStore/createGateway and supplies actual store to gateway",
+            "Test helper calls local HTTP endpoints with absent/explicit credentials",
+            "Head gateway selects store.localOwner or explicit credential then calls store.authenticate",
+            "Head store public authenticate exposes local const",
+            "Local authenticate calls accessReference/localPrincipal"
+          ],
+          "bindingAnchors": [
+            {
+              "snapshotId": "pr25-pinned-test-evidence",
+              "side": "head",
+              "path": "tests/gateway.test.ts",
+              "commit": "e3b270e5f49a9215452b0b86702946043e979059",
+              "contentHash": "13e7db6e38670e876795a150587bb6e5a441548915fb37f67ff0a80563953158",
+              "start": 232,
+              "end": 287,
+              "startLine": 7,
+              "endLine": 7
+            },
+            {
+              "snapshotId": "pr25-pinned-test-evidence",
+              "side": "head",
+              "path": "tests/gateway.test.ts",
+              "commit": "e3b270e5f49a9215452b0b86702946043e979059",
+              "contentHash": "13e7db6e38670e876795a150587bb6e5a441548915fb37f67ff0a80563953158",
+              "start": 288,
+              "end": 344,
+              "startLine": 8,
+              "endLine": 8
+            },
+            {
+              "snapshotId": "pr25-pinned-test-evidence",
+              "side": "head",
+              "path": "src/server/public.ts",
+              "commit": "e3b270e5f49a9215452b0b86702946043e979059",
+              "contentHash": "20c22563be7da4c385eda772d5840d55f0993ddeebd85718b3605cddb76a0b0e",
+              "start": 2857,
+              "end": 2988,
+              "startLine": 66,
+              "endLine": 67
+            },
+            {
+              "snapshotId": "pr25-pinned-test-evidence",
+              "side": "head",
+              "path": "src/storage/public.ts",
+              "commit": "e3b270e5f49a9215452b0b86702946043e979059",
+              "contentHash": "ebf680d4d62a47f92af2123a60673e4ba58c7236257ffc12cea2ddc981791d58",
+              "start": 17500,
+              "end": 17550,
+              "startLine": 285,
+              "endLine": 286
+            },
+            {
+              "snapshotId": "pr25-pinned-test-evidence",
+              "side": "head",
+              "path": "src/storage/public.ts",
+              "commit": "e3b270e5f49a9215452b0b86702946043e979059",
+              "contentHash": "ebf680d4d62a47f92af2123a60673e4ba58c7236257ffc12cea2ddc981791d58",
+              "start": 10372,
+              "end": 10445,
+              "startLine": 201,
+              "endLine": 201
+            },
+            {
+              "snapshotId": "pr25-pinned-test-evidence",
+              "side": "head",
+              "path": "src/storage/public.ts",
+              "commit": "e3b270e5f49a9215452b0b86702946043e979059",
+              "contentHash": "ebf680d4d62a47f92af2123a60673e4ba58c7236257ffc12cea2ddc981791d58",
+              "start": 10018,
+              "end": 10132,
+              "startLine": 198,
+              "endLine": 198
+            },
+            {
+              "snapshotId": "pr25-pinned-test-evidence",
+              "side": "head",
+              "path": "src/storage/imports.ts",
+              "commit": "e3b270e5f49a9215452b0b86702946043e979059",
+              "contentHash": "f29c76c6b9202f53e9d29752ff75f558eeea79739d3c476a93fe3a1e232fa1e2",
+              "start": 5228,
+              "end": 5292,
+              "startLine": 38,
+              "endLine": 38
+            },
+            {
+              "snapshotId": "pr25-pinned-test-evidence",
+              "side": "head",
+              "path": "src/storage/imports.ts",
+              "commit": "e3b270e5f49a9215452b0b86702946043e979059",
+              "contentHash": "f29c76c6b9202f53e9d29752ff75f558eeea79739d3c476a93fe3a1e232fa1e2",
+              "start": 3036,
+              "end": 3096,
+              "startLine": 29,
+              "endLine": 29
+            },
+            {
+              "snapshotId": "pr25-pinned-test-evidence",
+              "side": "head",
+              "path": "src/storage/imports.ts",
+              "commit": "e3b270e5f49a9215452b0b86702946043e979059",
+              "contentHash": "f29c76c6b9202f53e9d29752ff75f558eeea79739d3c476a93fe3a1e232fa1e2",
+              "start": 9358,
+              "end": 9368,
+              "startLine": 75,
+              "endLine": 75
+            }
+          ],
+          "limit": "No client review.request/accessHeaders call: this test uses its own fetch helper. Do not attach it to those client functions merely because both omit headers."
+        },
+        {
+          "targetId": "87929f42616495b59d0eddf0b7fae74b9f7bb9b59370fa7ecc9ef43f91917f68",
+          "target": {
+            "snapshotId": "pr25-pinned-call-evidence",
+            "side": "head",
+            "path": "src/storage/access.ts",
+            "contentHash": "0440486de82e136ffe430e4f1bed2b6f57f491319c59a71fad0f9d8507053b4c",
+            "start": 633,
+            "end": 741,
+            "startLine": 13,
+            "endLine": 13
+          },
+          "certainty": "http_public_api_behavior_source_chain",
+          "executionClaim": false,
+          "chain": [
+            "Test imports createStore/createGateway and supplies actual store to gateway",
+            "Test helper calls local HTTP endpoints with absent/explicit credentials",
+            "Head gateway selects store.localOwner or explicit credential then calls store.authenticate",
+            "Head store public authenticate exposes local const",
+            "Local authenticate calls accessReference/localPrincipal"
+          ],
+          "bindingAnchors": [
+            {
+              "snapshotId": "pr25-pinned-test-evidence",
+              "side": "head",
+              "path": "tests/gateway.test.ts",
+              "commit": "e3b270e5f49a9215452b0b86702946043e979059",
+              "contentHash": "13e7db6e38670e876795a150587bb6e5a441548915fb37f67ff0a80563953158",
+              "start": 232,
+              "end": 287,
+              "startLine": 7,
+              "endLine": 7
+            },
+            {
+              "snapshotId": "pr25-pinned-test-evidence",
+              "side": "head",
+              "path": "tests/gateway.test.ts",
+              "commit": "e3b270e5f49a9215452b0b86702946043e979059",
+              "contentHash": "13e7db6e38670e876795a150587bb6e5a441548915fb37f67ff0a80563953158",
+              "start": 288,
+              "end": 344,
+              "startLine": 8,
+              "endLine": 8
+            },
+            {
+              "snapshotId": "pr25-pinned-test-evidence",
+              "side": "head",
+              "path": "src/server/public.ts",
+              "commit": "e3b270e5f49a9215452b0b86702946043e979059",
+              "contentHash": "20c22563be7da4c385eda772d5840d55f0993ddeebd85718b3605cddb76a0b0e",
+              "start": 2857,
+              "end": 2988,
+              "startLine": 66,
+              "endLine": 67
+            },
+            {
+              "snapshotId": "pr25-pinned-test-evidence",
+              "side": "head",
+              "path": "src/storage/public.ts",
+              "commit": "e3b270e5f49a9215452b0b86702946043e979059",
+              "contentHash": "ebf680d4d62a47f92af2123a60673e4ba58c7236257ffc12cea2ddc981791d58",
+              "start": 17500,
+              "end": 17550,
+              "startLine": 285,
+              "endLine": 286
+            },
+            {
+              "snapshotId": "pr25-pinned-test-evidence",
+              "side": "head",
+              "path": "src/storage/public.ts",
+              "commit": "e3b270e5f49a9215452b0b86702946043e979059",
+              "contentHash": "ebf680d4d62a47f92af2123a60673e4ba58c7236257ffc12cea2ddc981791d58",
+              "start": 10372,
+              "end": 10445,
+              "startLine": 201,
+              "endLine": 201
+            },
+            {
+              "snapshotId": "pr25-pinned-test-evidence",
+              "side": "head",
+              "path": "src/storage/public.ts",
+              "commit": "e3b270e5f49a9215452b0b86702946043e979059",
+              "contentHash": "ebf680d4d62a47f92af2123a60673e4ba58c7236257ffc12cea2ddc981791d58",
+              "start": 10018,
+              "end": 10132,
+              "startLine": 198,
+              "endLine": 198
+            },
+            {
+              "snapshotId": "pr25-pinned-test-evidence",
+              "side": "head",
+              "path": "src/storage/imports.ts",
+              "commit": "e3b270e5f49a9215452b0b86702946043e979059",
+              "contentHash": "f29c76c6b9202f53e9d29752ff75f558eeea79739d3c476a93fe3a1e232fa1e2",
+              "start": 5228,
+              "end": 5292,
+              "startLine": 38,
+              "endLine": 38
+            },
+            {
+              "snapshotId": "pr25-pinned-test-evidence",
+              "side": "head",
+              "path": "src/storage/imports.ts",
+              "commit": "e3b270e5f49a9215452b0b86702946043e979059",
+              "contentHash": "f29c76c6b9202f53e9d29752ff75f558eeea79739d3c476a93fe3a1e232fa1e2",
+              "start": 3036,
+              "end": 3096,
+              "startLine": 29,
+              "endLine": 29
+            },
+            {
+              "snapshotId": "pr25-pinned-test-evidence",
+              "side": "head",
+              "path": "src/storage/imports.ts",
+              "commit": "e3b270e5f49a9215452b0b86702946043e979059",
+              "contentHash": "f29c76c6b9202f53e9d29752ff75f558eeea79739d3c476a93fe3a1e232fa1e2",
+              "start": 9358,
+              "end": 9368,
+              "startLine": 75,
+              "endLine": 75
+            }
+          ],
+          "limit": "No client review.request/accessHeaders call: this test uses its own fetch helper. Do not attach it to those client functions merely because both omit headers."
+        },
+        {
+          "targetId": "2e0dfcb2b5c914737ae3bcf51e1c56c15e5a65f8d29ee4b9f55571e694df0263",
+          "target": {
+            "snapshotId": "pr25-pinned-call-evidence",
+            "side": "head",
+            "path": "src/storage/public.ts",
+            "contentHash": "ebf680d4d62a47f92af2123a60673e4ba58c7236257ffc12cea2ddc981791d58",
+            "start": 10314,
+            "end": 10661,
+            "startLine": 200,
+            "endLine": 204
+          },
+          "certainty": "http_public_api_behavior_source_chain",
+          "executionClaim": false,
+          "chain": [
+            "Test imports createStore/createGateway and supplies actual store to gateway",
+            "Test helper calls local HTTP endpoints with absent/explicit credentials",
+            "Head gateway selects store.localOwner or explicit credential then calls store.authenticate",
+            "Head store public authenticate exposes local const",
+            "Local authenticate calls accessReference/localPrincipal"
+          ],
+          "bindingAnchors": [
+            {
+              "snapshotId": "pr25-pinned-test-evidence",
+              "side": "head",
+              "path": "tests/gateway.test.ts",
+              "commit": "e3b270e5f49a9215452b0b86702946043e979059",
+              "contentHash": "13e7db6e38670e876795a150587bb6e5a441548915fb37f67ff0a80563953158",
+              "start": 232,
+              "end": 287,
+              "startLine": 7,
+              "endLine": 7
+            },
+            {
+              "snapshotId": "pr25-pinned-test-evidence",
+              "side": "head",
+              "path": "tests/gateway.test.ts",
+              "commit": "e3b270e5f49a9215452b0b86702946043e979059",
+              "contentHash": "13e7db6e38670e876795a150587bb6e5a441548915fb37f67ff0a80563953158",
+              "start": 288,
+              "end": 344,
+              "startLine": 8,
+              "endLine": 8
+            },
+            {
+              "snapshotId": "pr25-pinned-test-evidence",
+              "side": "head",
+              "path": "src/server/public.ts",
+              "commit": "e3b270e5f49a9215452b0b86702946043e979059",
+              "contentHash": "20c22563be7da4c385eda772d5840d55f0993ddeebd85718b3605cddb76a0b0e",
+              "start": 2857,
+              "end": 2988,
+              "startLine": 66,
+              "endLine": 67
+            },
+            {
+              "snapshotId": "pr25-pinned-test-evidence",
+              "side": "head",
+              "path": "src/storage/public.ts",
+              "commit": "e3b270e5f49a9215452b0b86702946043e979059",
+              "contentHash": "ebf680d4d62a47f92af2123a60673e4ba58c7236257ffc12cea2ddc981791d58",
+              "start": 17500,
+              "end": 17550,
+              "startLine": 285,
+              "endLine": 286
+            },
+            {
+              "snapshotId": "pr25-pinned-test-evidence",
+              "side": "head",
+              "path": "src/storage/public.ts",
+              "commit": "e3b270e5f49a9215452b0b86702946043e979059",
+              "contentHash": "ebf680d4d62a47f92af2123a60673e4ba58c7236257ffc12cea2ddc981791d58",
+              "start": 10372,
+              "end": 10445,
+              "startLine": 201,
+              "endLine": 201
+            },
+            {
+              "snapshotId": "pr25-pinned-test-evidence",
+              "side": "head",
+              "path": "src/storage/public.ts",
+              "commit": "e3b270e5f49a9215452b0b86702946043e979059",
+              "contentHash": "ebf680d4d62a47f92af2123a60673e4ba58c7236257ffc12cea2ddc981791d58",
+              "start": 10018,
+              "end": 10132,
+              "startLine": 198,
+              "endLine": 198
+            },
+            {
+              "snapshotId": "pr25-pinned-test-evidence",
+              "side": "head",
+              "path": "src/storage/imports.ts",
+              "commit": "e3b270e5f49a9215452b0b86702946043e979059",
+              "contentHash": "f29c76c6b9202f53e9d29752ff75f558eeea79739d3c476a93fe3a1e232fa1e2",
+              "start": 5228,
+              "end": 5292,
+              "startLine": 38,
+              "endLine": 38
+            },
+            {
+              "snapshotId": "pr25-pinned-test-evidence",
+              "side": "head",
+              "path": "src/storage/imports.ts",
+              "commit": "e3b270e5f49a9215452b0b86702946043e979059",
+              "contentHash": "f29c76c6b9202f53e9d29752ff75f558eeea79739d3c476a93fe3a1e232fa1e2",
+              "start": 3036,
+              "end": 3096,
+              "startLine": 29,
+              "endLine": 29
+            },
+            {
+              "snapshotId": "pr25-pinned-test-evidence",
+              "side": "head",
+              "path": "src/storage/imports.ts",
+              "commit": "e3b270e5f49a9215452b0b86702946043e979059",
+              "contentHash": "f29c76c6b9202f53e9d29752ff75f558eeea79739d3c476a93fe3a1e232fa1e2",
+              "start": 9358,
+              "end": 9368,
+              "startLine": 75,
+              "endLine": 75
+            }
+          ],
+          "limit": "No client review.request/accessHeaders call: this test uses its own fetch helper. Do not attach it to those client functions merely because both omit headers."
+        }
+      ]
+    },
+    {
+      "id": "imports-owner-added",
+      "path": "tests/import-jobs.test.ts",
+      "name": "local owner manages retained legacy imports and new owner-reference jobs survive restart without a credential",
+      "summary": "Declares owner access to retained legacy import, cancellation, new owner-reference work surviving store reopen, retained credential authentication and exact claimed owner-reference.",
+      "targets": [
+        "authenticate",
+        "accessReference",
+        "localPrincipal"
+      ],
+      "basis": "factory_public_api_behavior_source_chain",
+      "limit": "Test calls store.imports.command/list and store.authenticate; mapping to internal helpers follows createStore/createImportStore public return bindings, not direct imports or measured execution.",
+      "classification": "added",
+      "declaredTest": true,
+      "execution": {
+        "state": "unrun_in_this_packet",
+        "result": null,
+        "coverage": null
+      },
+      "versions": {
+        "base": {
+          "availability": "absent"
+        },
+        "head": {
+          "availability": "available",
+          "definition": {
+            "anchor": {
+              "snapshotId": "pr25-pinned-test-evidence",
+              "side": "head",
+              "path": "tests/import-jobs.test.ts",
+              "commit": "e3b270e5f49a9215452b0b86702946043e979059",
+              "contentHash": "59e62cd5cbf772fe001953e4d87b4466e0bbafb3bae5d704318fa863cb6a802a",
+              "start": 4161,
+              "end": 5383,
+              "startLine": 36,
+              "endLine": 46
+            },
+            "sourceText": "test('local owner manages retained legacy imports and new owner-reference jobs survive restart without a credential',()=>{\n const root=mkdtempSync(join(tmpdir(),'pr-reviewer-owner-import-')),filename=join(root,'db');let store=createStore(filename);\n try{\n  const token=store.issueUser(),legacy=store.imports.command(token,{type:'RequestImport',commandId:'legacy-owner-import',path:'/retained/locator'});\n  assert.equal(store.imports.list(store.localOwner)[0]?.jobId,legacy.jobId);\n  assert.equal(store.imports.command(store.localOwner,{type:'CancelImport',commandId:'cancel-legacy-owner-import',jobId:legacy.jobId!}).state,'applied');\n  const added=store.imports.command(store.localOwner,{type:'RequestImport',commandId:'credential-free-import',path:'/local/locator'});assert.equal(added.state,'applied');store.close();store=createStore(filename);\n  assert.equal(store.imports.list(store.localOwner).length,2);assert.equal(store.authenticate(token).actorId,'local-user');\n  const runner=store.imports.beginOwner(),claim=store.imports.claim(runner)!;assert.equal(claim.job.jobId,added.jobId);assert.equal(claim.job.credentialReference,'local-owner:v1');\n }finally{store.close();rmSync(root,{recursive:true,force:true});}\n})"
+          },
+          "callback": {
+            "anchor": {
+              "snapshotId": "pr25-pinned-test-evidence",
+              "side": "head",
+              "path": "tests/import-jobs.test.ts",
+              "commit": "e3b270e5f49a9215452b0b86702946043e979059",
+              "contentHash": "59e62cd5cbf772fe001953e4d87b4466e0bbafb3bae5d704318fa863cb6a802a",
+              "start": 4278,
+              "end": 5382,
+              "startLine": 36,
+              "endLine": 46
+            },
+            "sourceText": "()=>{\n const root=mkdtempSync(join(tmpdir(),'pr-reviewer-owner-import-')),filename=join(root,'db');let store=createStore(filename);\n try{\n  const token=store.issueUser(),legacy=store.imports.command(token,{type:'RequestImport',commandId:'legacy-owner-import',path:'/retained/locator'});\n  assert.equal(store.imports.list(store.localOwner)[0]?.jobId,legacy.jobId);\n  assert.equal(store.imports.command(store.localOwner,{type:'CancelImport',commandId:'cancel-legacy-owner-import',jobId:legacy.jobId!}).state,'applied');\n  const added=store.imports.command(store.localOwner,{type:'RequestImport',commandId:'credential-free-import',path:'/local/locator'});assert.equal(added.state,'applied');store.close();store=createStore(filename);\n  assert.equal(store.imports.list(store.localOwner).length,2);assert.equal(store.authenticate(token).actorId,'local-user');\n  const runner=store.imports.beginOwner(),claim=store.imports.claim(runner)!;assert.equal(claim.job.jobId,added.jobId);assert.equal(claim.job.credentialReference,'local-owner:v1');\n }finally{store.close();rmSync(root,{recursive:true,force:true});}\n}",
+            "bodyHash": "1b7ac07afb8f8994cfc32116213e3cb697865a1111cb670f7c07d0fc0bdde6e3"
+          }
+        }
+      },
+      "nativeHunks": [
+        {
+          "id": "tests/import-jobs.test.ts:native:0",
+          "header": "@@ -32,3 +32,15 @@ test('unresolved process journals prevent completion, confirmed cancellation and",
+          "beforeStart": 32,
+          "beforeCount": 3,
+          "afterStart": 32,
+          "afterCount": 15,
+          "rows": [
+            {
+              "kind": "context",
+              "beforeLine": 32,
+              "afterLine": 32,
+              "text": " f.store.imports.recordProcess(claim.grant,{ordinal:1,executable:'git',state:'exited',exitCode:null,signal:'SIGTERM'});f.store.imports.fail(claim.grant,'import_cancelled',true);assert.equal(f.store.imports.list(token)[0]?.state,'cancelled');assert.ok(f.store.imports.claim(owner));"
+            },
+            {
+              "kind": "context",
+              "beforeLine": 33,
+              "afterLine": 33,
+              "text": " }finally{f.close();}"
+            },
+            {
+              "kind": "context",
+              "beforeLine": 34,
+              "afterLine": 34,
+              "text": "});"
+            },
+            {
+              "kind": "added",
+              "beforeLine": null,
+              "afterLine": 35,
+              "text": ""
+            },
+            {
+              "kind": "added",
+              "beforeLine": null,
+              "afterLine": 36,
+              "text": "test('local owner manages retained legacy imports and new owner-reference jobs survive restart without a credential',()=>{"
+            },
+            {
+              "kind": "added",
+              "beforeLine": null,
+              "afterLine": 37,
+              "text": " const root=mkdtempSync(join(tmpdir(),'pr-reviewer-owner-import-')),filename=join(root,'db');let store=createStore(filename);"
+            },
+            {
+              "kind": "added",
+              "beforeLine": null,
+              "afterLine": 38,
+              "text": " try{"
+            },
+            {
+              "kind": "added",
+              "beforeLine": null,
+              "afterLine": 39,
+              "text": "  const token=store.issueUser(),legacy=store.imports.command(token,{type:'RequestImport',commandId:'legacy-owner-import',path:'/retained/locator'});"
+            },
+            {
+              "kind": "added",
+              "beforeLine": null,
+              "afterLine": 40,
+              "text": "  assert.equal(store.imports.list(store.localOwner)[0]?.jobId,legacy.jobId);"
+            },
+            {
+              "kind": "added",
+              "beforeLine": null,
+              "afterLine": 41,
+              "text": "  assert.equal(store.imports.command(store.localOwner,{type:'CancelImport',commandId:'cancel-legacy-owner-import',jobId:legacy.jobId!}).state,'applied');"
+            },
+            {
+              "kind": "added",
+              "beforeLine": null,
+              "afterLine": 42,
+              "text": "  const added=store.imports.command(store.localOwner,{type:'RequestImport',commandId:'credential-free-import',path:'/local/locator'});assert.equal(added.state,'applied');store.close();store=createStore(filename);"
+            },
+            {
+              "kind": "added",
+              "beforeLine": null,
+              "afterLine": 43,
+              "text": "  assert.equal(store.imports.list(store.localOwner).length,2);assert.equal(store.authenticate(token).actorId,'local-user');"
+            },
+            {
+              "kind": "added",
+              "beforeLine": null,
+              "afterLine": 44,
+              "text": "  const runner=store.imports.beginOwner(),claim=store.imports.claim(runner)!;assert.equal(claim.job.jobId,added.jobId);assert.equal(claim.job.credentialReference,'local-owner:v1');"
+            },
+            {
+              "kind": "added",
+              "beforeLine": null,
+              "afterLine": 45,
+              "text": " }finally{store.close();rmSync(root,{recursive:true,force:true});}"
+            },
+            {
+              "kind": "added",
+              "beforeLine": null,
+              "afterLine": 46,
+              "text": "});"
+            }
+          ],
+          "changeKind": "added",
+          "patchHash": "a8f42dc1203ba954c1dd4220432d4556f021a40b12877e3629b58fff497e33c9"
+        }
+      ],
+      "functionMappings": [
+        {
+          "targetId": "9b58606b4a652f7f9bc9500debd30f6d6fc0ccda0d44c170b031c444a909b7d8",
+          "target": {
+            "snapshotId": "pr25-pinned-call-evidence",
+            "side": "head",
+            "path": "src/storage/access.ts",
+            "contentHash": "0440486de82e136ffe430e4f1bed2b6f57f491319c59a71fad0f9d8507053b4c",
+            "start": 401,
+            "end": 618,
+            "startLine": 8,
+            "endLine": 12
+          },
+          "certainty": "factory_public_api_behavior_source_chain",
+          "executionClaim": false,
+          "chain": [
+            "Test imports and calls createStore",
+            "Store public return exposes imports and authenticate",
+            "imports is createImportStore return; command/list are public functions",
+            "Command/list call accessReference; user calls localPrincipal",
+            "Head public authenticate exposes local authenticate and calls accessReference/localPrincipal"
+          ],
+          "bindingAnchors": [
+            {
+              "snapshotId": "pr25-pinned-test-evidence",
+              "side": "head",
+              "path": "tests/import-jobs.test.ts",
+              "commit": "e3b270e5f49a9215452b0b86702946043e979059",
+              "contentHash": "59e62cd5cbf772fe001953e4d87b4466e0bbafb3bae5d704318fa863cb6a802a",
+              "start": 181,
+              "end": 234,
+              "startLine": 6,
+              "endLine": 6
+            },
+            {
+              "snapshotId": "pr25-pinned-test-evidence",
+              "side": "head",
+              "path": "src/server/public.ts",
+              "commit": "e3b270e5f49a9215452b0b86702946043e979059",
+              "contentHash": "20c22563be7da4c385eda772d5840d55f0993ddeebd85718b3605cddb76a0b0e",
+              "start": 2857,
+              "end": 2988,
+              "startLine": 66,
+              "endLine": 67
+            },
+            {
+              "snapshotId": "pr25-pinned-test-evidence",
+              "side": "head",
+              "path": "src/storage/public.ts",
+              "commit": "e3b270e5f49a9215452b0b86702946043e979059",
+              "contentHash": "ebf680d4d62a47f92af2123a60673e4ba58c7236257ffc12cea2ddc981791d58",
+              "start": 17500,
+              "end": 17550,
+              "startLine": 285,
+              "endLine": 286
+            },
+            {
+              "snapshotId": "pr25-pinned-test-evidence",
+              "side": "head",
+              "path": "src/storage/public.ts",
+              "commit": "e3b270e5f49a9215452b0b86702946043e979059",
+              "contentHash": "ebf680d4d62a47f92af2123a60673e4ba58c7236257ffc12cea2ddc981791d58",
+              "start": 10372,
+              "end": 10445,
+              "startLine": 201,
+              "endLine": 201
+            },
+            {
+              "snapshotId": "pr25-pinned-test-evidence",
+              "side": "head",
+              "path": "src/storage/public.ts",
+              "commit": "e3b270e5f49a9215452b0b86702946043e979059",
+              "contentHash": "ebf680d4d62a47f92af2123a60673e4ba58c7236257ffc12cea2ddc981791d58",
+              "start": 10018,
+              "end": 10132,
+              "startLine": 198,
+              "endLine": 198
+            },
+            {
+              "snapshotId": "pr25-pinned-test-evidence",
+              "side": "head",
+              "path": "src/storage/imports.ts",
+              "commit": "e3b270e5f49a9215452b0b86702946043e979059",
+              "contentHash": "f29c76c6b9202f53e9d29752ff75f558eeea79739d3c476a93fe3a1e232fa1e2",
+              "start": 5228,
+              "end": 5292,
+              "startLine": 38,
+              "endLine": 38
+            },
+            {
+              "snapshotId": "pr25-pinned-test-evidence",
+              "side": "head",
+              "path": "src/storage/imports.ts",
+              "commit": "e3b270e5f49a9215452b0b86702946043e979059",
+              "contentHash": "f29c76c6b9202f53e9d29752ff75f558eeea79739d3c476a93fe3a1e232fa1e2",
+              "start": 3036,
+              "end": 3096,
+              "startLine": 29,
+              "endLine": 29
+            },
+            {
+              "snapshotId": "pr25-pinned-test-evidence",
+              "side": "head",
+              "path": "src/storage/imports.ts",
+              "commit": "e3b270e5f49a9215452b0b86702946043e979059",
+              "contentHash": "f29c76c6b9202f53e9d29752ff75f558eeea79739d3c476a93fe3a1e232fa1e2",
+              "start": 9358,
+              "end": 9368,
+              "startLine": 75,
+              "endLine": 75
+            }
+          ],
+          "limit": "Test calls store.imports.command/list and store.authenticate; mapping to internal helpers follows createStore/createImportStore public return bindings, not direct imports or measured execution."
+        },
+        {
+          "targetId": "87929f42616495b59d0eddf0b7fae74b9f7bb9b59370fa7ecc9ef43f91917f68",
+          "target": {
+            "snapshotId": "pr25-pinned-call-evidence",
+            "side": "head",
+            "path": "src/storage/access.ts",
+            "contentHash": "0440486de82e136ffe430e4f1bed2b6f57f491319c59a71fad0f9d8507053b4c",
+            "start": 633,
+            "end": 741,
+            "startLine": 13,
+            "endLine": 13
+          },
+          "certainty": "factory_public_api_behavior_source_chain",
+          "executionClaim": false,
+          "chain": [
+            "Test imports and calls createStore",
+            "Store public return exposes imports and authenticate",
+            "imports is createImportStore return; command/list are public functions",
+            "Command/list call accessReference; user calls localPrincipal",
+            "Head public authenticate exposes local authenticate and calls accessReference/localPrincipal"
+          ],
+          "bindingAnchors": [
+            {
+              "snapshotId": "pr25-pinned-test-evidence",
+              "side": "head",
+              "path": "tests/import-jobs.test.ts",
+              "commit": "e3b270e5f49a9215452b0b86702946043e979059",
+              "contentHash": "59e62cd5cbf772fe001953e4d87b4466e0bbafb3bae5d704318fa863cb6a802a",
+              "start": 181,
+              "end": 234,
+              "startLine": 6,
+              "endLine": 6
+            },
+            {
+              "snapshotId": "pr25-pinned-test-evidence",
+              "side": "head",
+              "path": "src/server/public.ts",
+              "commit": "e3b270e5f49a9215452b0b86702946043e979059",
+              "contentHash": "20c22563be7da4c385eda772d5840d55f0993ddeebd85718b3605cddb76a0b0e",
+              "start": 2857,
+              "end": 2988,
+              "startLine": 66,
+              "endLine": 67
+            },
+            {
+              "snapshotId": "pr25-pinned-test-evidence",
+              "side": "head",
+              "path": "src/storage/public.ts",
+              "commit": "e3b270e5f49a9215452b0b86702946043e979059",
+              "contentHash": "ebf680d4d62a47f92af2123a60673e4ba58c7236257ffc12cea2ddc981791d58",
+              "start": 17500,
+              "end": 17550,
+              "startLine": 285,
+              "endLine": 286
+            },
+            {
+              "snapshotId": "pr25-pinned-test-evidence",
+              "side": "head",
+              "path": "src/storage/public.ts",
+              "commit": "e3b270e5f49a9215452b0b86702946043e979059",
+              "contentHash": "ebf680d4d62a47f92af2123a60673e4ba58c7236257ffc12cea2ddc981791d58",
+              "start": 10372,
+              "end": 10445,
+              "startLine": 201,
+              "endLine": 201
+            },
+            {
+              "snapshotId": "pr25-pinned-test-evidence",
+              "side": "head",
+              "path": "src/storage/public.ts",
+              "commit": "e3b270e5f49a9215452b0b86702946043e979059",
+              "contentHash": "ebf680d4d62a47f92af2123a60673e4ba58c7236257ffc12cea2ddc981791d58",
+              "start": 10018,
+              "end": 10132,
+              "startLine": 198,
+              "endLine": 198
+            },
+            {
+              "snapshotId": "pr25-pinned-test-evidence",
+              "side": "head",
+              "path": "src/storage/imports.ts",
+              "commit": "e3b270e5f49a9215452b0b86702946043e979059",
+              "contentHash": "f29c76c6b9202f53e9d29752ff75f558eeea79739d3c476a93fe3a1e232fa1e2",
+              "start": 5228,
+              "end": 5292,
+              "startLine": 38,
+              "endLine": 38
+            },
+            {
+              "snapshotId": "pr25-pinned-test-evidence",
+              "side": "head",
+              "path": "src/storage/imports.ts",
+              "commit": "e3b270e5f49a9215452b0b86702946043e979059",
+              "contentHash": "f29c76c6b9202f53e9d29752ff75f558eeea79739d3c476a93fe3a1e232fa1e2",
+              "start": 3036,
+              "end": 3096,
+              "startLine": 29,
+              "endLine": 29
+            },
+            {
+              "snapshotId": "pr25-pinned-test-evidence",
+              "side": "head",
+              "path": "src/storage/imports.ts",
+              "commit": "e3b270e5f49a9215452b0b86702946043e979059",
+              "contentHash": "f29c76c6b9202f53e9d29752ff75f558eeea79739d3c476a93fe3a1e232fa1e2",
+              "start": 9358,
+              "end": 9368,
+              "startLine": 75,
+              "endLine": 75
+            }
+          ],
+          "limit": "Test calls store.imports.command/list and store.authenticate; mapping to internal helpers follows createStore/createImportStore public return bindings, not direct imports or measured execution."
+        },
+        {
+          "targetId": "2e0dfcb2b5c914737ae3bcf51e1c56c15e5a65f8d29ee4b9f55571e694df0263",
+          "target": {
+            "snapshotId": "pr25-pinned-call-evidence",
+            "side": "head",
+            "path": "src/storage/public.ts",
+            "contentHash": "ebf680d4d62a47f92af2123a60673e4ba58c7236257ffc12cea2ddc981791d58",
+            "start": 10314,
+            "end": 10661,
+            "startLine": 200,
+            "endLine": 204
+          },
+          "certainty": "factory_public_api_behavior_source_chain",
+          "executionClaim": false,
+          "chain": [
+            "Test imports and calls createStore",
+            "Store public return exposes imports and authenticate",
+            "imports is createImportStore return; command/list are public functions",
+            "Command/list call accessReference; user calls localPrincipal",
+            "Head public authenticate exposes local authenticate and calls accessReference/localPrincipal"
+          ],
+          "bindingAnchors": [
+            {
+              "snapshotId": "pr25-pinned-test-evidence",
+              "side": "head",
+              "path": "tests/import-jobs.test.ts",
+              "commit": "e3b270e5f49a9215452b0b86702946043e979059",
+              "contentHash": "59e62cd5cbf772fe001953e4d87b4466e0bbafb3bae5d704318fa863cb6a802a",
+              "start": 181,
+              "end": 234,
+              "startLine": 6,
+              "endLine": 6
+            },
+            {
+              "snapshotId": "pr25-pinned-test-evidence",
+              "side": "head",
+              "path": "src/server/public.ts",
+              "commit": "e3b270e5f49a9215452b0b86702946043e979059",
+              "contentHash": "20c22563be7da4c385eda772d5840d55f0993ddeebd85718b3605cddb76a0b0e",
+              "start": 2857,
+              "end": 2988,
+              "startLine": 66,
+              "endLine": 67
+            },
+            {
+              "snapshotId": "pr25-pinned-test-evidence",
+              "side": "head",
+              "path": "src/storage/public.ts",
+              "commit": "e3b270e5f49a9215452b0b86702946043e979059",
+              "contentHash": "ebf680d4d62a47f92af2123a60673e4ba58c7236257ffc12cea2ddc981791d58",
+              "start": 17500,
+              "end": 17550,
+              "startLine": 285,
+              "endLine": 286
+            },
+            {
+              "snapshotId": "pr25-pinned-test-evidence",
+              "side": "head",
+              "path": "src/storage/public.ts",
+              "commit": "e3b270e5f49a9215452b0b86702946043e979059",
+              "contentHash": "ebf680d4d62a47f92af2123a60673e4ba58c7236257ffc12cea2ddc981791d58",
+              "start": 10372,
+              "end": 10445,
+              "startLine": 201,
+              "endLine": 201
+            },
+            {
+              "snapshotId": "pr25-pinned-test-evidence",
+              "side": "head",
+              "path": "src/storage/public.ts",
+              "commit": "e3b270e5f49a9215452b0b86702946043e979059",
+              "contentHash": "ebf680d4d62a47f92af2123a60673e4ba58c7236257ffc12cea2ddc981791d58",
+              "start": 10018,
+              "end": 10132,
+              "startLine": 198,
+              "endLine": 198
+            },
+            {
+              "snapshotId": "pr25-pinned-test-evidence",
+              "side": "head",
+              "path": "src/storage/imports.ts",
+              "commit": "e3b270e5f49a9215452b0b86702946043e979059",
+              "contentHash": "f29c76c6b9202f53e9d29752ff75f558eeea79739d3c476a93fe3a1e232fa1e2",
+              "start": 5228,
+              "end": 5292,
+              "startLine": 38,
+              "endLine": 38
+            },
+            {
+              "snapshotId": "pr25-pinned-test-evidence",
+              "side": "head",
+              "path": "src/storage/imports.ts",
+              "commit": "e3b270e5f49a9215452b0b86702946043e979059",
+              "contentHash": "f29c76c6b9202f53e9d29752ff75f558eeea79739d3c476a93fe3a1e232fa1e2",
+              "start": 3036,
+              "end": 3096,
+              "startLine": 29,
+              "endLine": 29
+            },
+            {
+              "snapshotId": "pr25-pinned-test-evidence",
+              "side": "head",
+              "path": "src/storage/imports.ts",
+              "commit": "e3b270e5f49a9215452b0b86702946043e979059",
+              "contentHash": "f29c76c6b9202f53e9d29752ff75f558eeea79739d3c476a93fe3a1e232fa1e2",
+              "start": 9358,
+              "end": 9368,
+              "startLine": 75,
+              "endLine": 75
+            }
+          ],
+          "limit": "Test calls store.imports.command/list and store.authenticate; mapping to internal helpers follows createStore/createImportStore public return bindings, not direct imports or measured execution."
+        }
+      ]
+    },
+    {
+      "id": "review-owner-changed",
+      "path": "tests/review.e2e.ts",
+      "name": "01-A/C/F/G controlled host: real React + PR14 → queue → MCP source/read/reply → authoritative UI/restart",
+      "summary": "Declares automatic owner opening without token/logout UI, saved question/reply and restart journey, and observed API requests all lacking Authorization.",
+      "targets": [
+        "request",
+        "accessHeaders"
+      ],
+      "basis": "react_user_journey_source_chain",
+      "limit": "Source-declared controlled-host journey through page.goto/UI workspace opening. Not a direct test call to request/accessHeaders, not real native-host causality, and not coverage of every helper branch.",
+      "classification": "modified",
+      "declaredTest": true,
+      "execution": {
+        "state": "unrun_in_this_packet",
+        "result": null,
+        "coverage": null
+      },
+      "versions": {
+        "base": {
+          "availability": "available",
+          "definition": {
+            "anchor": {
+              "snapshotId": "pr25-pinned-test-evidence",
+              "side": "base",
+              "path": "tests/review.e2e.ts",
+              "commit": "b096826e31c0927190806de91ed70b8b64aa93d8",
+              "contentHash": "03783a9bbefdf8bd565c19d0618b75b6b0c247f3e2e7ca9b66538e746372547c",
+              "start": 4999,
+              "end": 9241,
+              "startLine": 146,
+              "endLine": 244
+            },
+            "sourceText": "test(\"01-A/C/F/G controlled host: real React + PR14 → queue → MCP source/read/reply → authoritative UI/restart\", async ({\n  page,\n}) => {\n  await page.goto(uiUrl);\n  await page.getByLabel(\"Local access token\").fill(token);\n  await page.getByRole(\"button\", { name: \"Open review\" }).click();\n  await expect(\n    page.getByText(\"Session attached\", { exact: true }),\n  ).toBeVisible();\n  await page\n    .getByLabel(\"Your question\")\n    .fill(\n      \"What did this PR make explicit about where a completed slice's knowledge belongs, and can a future agent depend on old execution plans to rebuild the product?\",\n    );\n  await page.getByRole(\"button\", { name: \"Save question\" }).focus();\n  await page.keyboard.press(\"Enter\");\n  await expect(page.getByText(\"1 saved question · 0 answers\")).toBeVisible();\n  await expect(\n    page.getByRole(\"button\", { name: \"Save question\" }),\n  ).toBeDisabled();\n  await expect\n    .poll(() => existsSync(join(root, \"notifications.jsonl\")))\n    .toBe(true);\n  const notification = JSON.parse(\n    readFileSync(join(root, \"notifications.jsonl\"), \"utf8\").trim(),\n  ) as string[];\n  expect(notification.slice(0, 3)).toEqual([\n    \"queue\",\n    \"--thread\",\n    \"controlled-existing-session\",\n  ]);\n  const inbox = await tool(\"inbox_read\");\n  const items = inbox.items as { questionId: string; eventId: string }[];\n  expect(items).toHaveLength(1);\n  const questionId = items[0]!.questionId;\n  expect(notification.join(\" \")).toContain(questionId);\n  const question = await tool(\"question_get\", { questionId });\n  const snapshot = question.snapshot as Review[\"snapshot\"];\n  expect(snapshot.baseSha).toBe(\"a6d63c1e46424cb979ee912aa993ad964835c287\");\n  expect(snapshot.sources.find((s) => s.side === \"head\")?.content).toContain(\n    \"durable\",\n  );\n  const anchor: Anchor = {\n    snapshotId: snapshot.snapshotId,\n    side: \"head\",\n    path: \"docs/README.md\",\n    startLine: 5,\n    endLine: 13,\n  };\n  const input = {\n    commandId: \"controlled-source-reply\",\n    questionId,\n    generation: 1,\n    body: \"The PR explicitly separates durable product knowledge from transient execution plans. Accepted user stories, behavior, architecture, interfaces and detailed decisions must survive in product docs outside plans. Documentation was already authoritative before this change; a fresh agent must be able to rebuild accepted behavior without reconstructing old plans or chat.\",\n    evidence: [anchor],\n    limitations:\n      \"This establishes documented requirements, not a demonstrated rebuild, executable code behavior or native host acceptance.\",\n  };\n  const receipt = await tool(\"reply_submit\", input);\n  expect(receipt.state).toBe(\"applied\");\n  expect(await tool(\"reply_submit\", input)).toEqual(receipt);\n  await expect(page.getByText(input.body, { exact: true })).toBeVisible();\n  await expect(page.getByText(\"Answered\", { exact: true })).toBeVisible();\n  await page\n    .getByRole(\"link\", { name: \"Source: head docs/README.md:5–13\" })\n    .click();\n  await expect(page).toHaveURL(/#source-head-5$/);\n  await expect(page.getByLabel(\"Start line\")).toHaveValue(\"5\");\n  const persisted = (await api(\n    `/api/reviews/pr-14?minimumRevision=${String(receipt.revision)}`,\n  )) as unknown as Review;\n  expect(persisted.replies).toHaveLength(1);\n  expect(persisted.replies[0]?.actorId).toBe(persisted.attachment?.actorId);\n  expect(persisted.questions).toHaveLength(1);\n  expect(persisted.attempts).toHaveLength(1);\n  expect(persisted.attempts[0]?.state).toBe(\"notified\");\n  await page.screenshot({\n    path: join(\n      process.env.REVIEW_E2E_ARTIFACT_DIR ??\n        \"/tmp/pr-reviewer-playwright-artifacts\",\n      \"pr14-answer.png\",\n    ),\n    fullPage: true,\n  });\n  await client.close();\n  await stop();\n  await start();\n  await page.reload();\n  await page.getByLabel(\"Local access token\").fill(token);\n  await page.getByRole(\"button\", { name: \"Open review\" }).click();\n  await expect(page.getByText(input.body, { exact: true })).toBeVisible();\n  expect(\n    readFileSync(join(root, \"notifications.jsonl\"), \"utf8\").trim().split(\"\\n\"),\n  ).toHaveLength(1);\n  await page.getByRole(\"button\", { name: \"Revoke attachment\" }).click();\n  await expect(\n    page.getByText(\"Session revoked\", { exact: true }),\n  ).toBeVisible();\n})"
+          },
+          "callback": {
+            "anchor": {
+              "snapshotId": "pr25-pinned-test-evidence",
+              "side": "base",
+              "path": "tests/review.e2e.ts",
+              "commit": "b096826e31c0927190806de91ed70b8b64aa93d8",
+              "contentHash": "03783a9bbefdf8bd565c19d0618b75b6b0c247f3e2e7ca9b66538e746372547c",
+              "start": 5112,
+              "end": 9240,
+              "startLine": 146,
+              "endLine": 244
+            },
+            "sourceText": "async ({\n  page,\n}) => {\n  await page.goto(uiUrl);\n  await page.getByLabel(\"Local access token\").fill(token);\n  await page.getByRole(\"button\", { name: \"Open review\" }).click();\n  await expect(\n    page.getByText(\"Session attached\", { exact: true }),\n  ).toBeVisible();\n  await page\n    .getByLabel(\"Your question\")\n    .fill(\n      \"What did this PR make explicit about where a completed slice's knowledge belongs, and can a future agent depend on old execution plans to rebuild the product?\",\n    );\n  await page.getByRole(\"button\", { name: \"Save question\" }).focus();\n  await page.keyboard.press(\"Enter\");\n  await expect(page.getByText(\"1 saved question · 0 answers\")).toBeVisible();\n  await expect(\n    page.getByRole(\"button\", { name: \"Save question\" }),\n  ).toBeDisabled();\n  await expect\n    .poll(() => existsSync(join(root, \"notifications.jsonl\")))\n    .toBe(true);\n  const notification = JSON.parse(\n    readFileSync(join(root, \"notifications.jsonl\"), \"utf8\").trim(),\n  ) as string[];\n  expect(notification.slice(0, 3)).toEqual([\n    \"queue\",\n    \"--thread\",\n    \"controlled-existing-session\",\n  ]);\n  const inbox = await tool(\"inbox_read\");\n  const items = inbox.items as { questionId: string; eventId: string }[];\n  expect(items).toHaveLength(1);\n  const questionId = items[0]!.questionId;\n  expect(notification.join(\" \")).toContain(questionId);\n  const question = await tool(\"question_get\", { questionId });\n  const snapshot = question.snapshot as Review[\"snapshot\"];\n  expect(snapshot.baseSha).toBe(\"a6d63c1e46424cb979ee912aa993ad964835c287\");\n  expect(snapshot.sources.find((s) => s.side === \"head\")?.content).toContain(\n    \"durable\",\n  );\n  const anchor: Anchor = {\n    snapshotId: snapshot.snapshotId,\n    side: \"head\",\n    path: \"docs/README.md\",\n    startLine: 5,\n    endLine: 13,\n  };\n  const input = {\n    commandId: \"controlled-source-reply\",\n    questionId,\n    generation: 1,\n    body: \"The PR explicitly separates durable product knowledge from transient execution plans. Accepted user stories, behavior, architecture, interfaces and detailed decisions must survive in product docs outside plans. Documentation was already authoritative before this change; a fresh agent must be able to rebuild accepted behavior without reconstructing old plans or chat.\",\n    evidence: [anchor],\n    limitations:\n      \"This establishes documented requirements, not a demonstrated rebuild, executable code behavior or native host acceptance.\",\n  };\n  const receipt = await tool(\"reply_submit\", input);\n  expect(receipt.state).toBe(\"applied\");\n  expect(await tool(\"reply_submit\", input)).toEqual(receipt);\n  await expect(page.getByText(input.body, { exact: true })).toBeVisible();\n  await expect(page.getByText(\"Answered\", { exact: true })).toBeVisible();\n  await page\n    .getByRole(\"link\", { name: \"Source: head docs/README.md:5–13\" })\n    .click();\n  await expect(page).toHaveURL(/#source-head-5$/);\n  await expect(page.getByLabel(\"Start line\")).toHaveValue(\"5\");\n  const persisted = (await api(\n    `/api/reviews/pr-14?minimumRevision=${String(receipt.revision)}`,\n  )) as unknown as Review;\n  expect(persisted.replies).toHaveLength(1);\n  expect(persisted.replies[0]?.actorId).toBe(persisted.attachment?.actorId);\n  expect(persisted.questions).toHaveLength(1);\n  expect(persisted.attempts).toHaveLength(1);\n  expect(persisted.attempts[0]?.state).toBe(\"notified\");\n  await page.screenshot({\n    path: join(\n      process.env.REVIEW_E2E_ARTIFACT_DIR ??\n        \"/tmp/pr-reviewer-playwright-artifacts\",\n      \"pr14-answer.png\",\n    ),\n    fullPage: true,\n  });\n  await client.close();\n  await stop();\n  await start();\n  await page.reload();\n  await page.getByLabel(\"Local access token\").fill(token);\n  await page.getByRole(\"button\", { name: \"Open review\" }).click();\n  await expect(page.getByText(input.body, { exact: true })).toBeVisible();\n  expect(\n    readFileSync(join(root, \"notifications.jsonl\"), \"utf8\").trim().split(\"\\n\"),\n  ).toHaveLength(1);\n  await page.getByRole(\"button\", { name: \"Revoke attachment\" }).click();\n  await expect(\n    page.getByText(\"Session revoked\", { exact: true }),\n  ).toBeVisible();\n}",
+            "bodyHash": "e23b24a7ec6d51ff20ddd309f9c51adff081a55a27920bd6cfaf5bb45ceccb63"
+          }
+        },
+        "head": {
+          "availability": "available",
+          "definition": {
+            "anchor": {
+              "snapshotId": "pr25-pinned-test-evidence",
+              "side": "head",
+              "path": "tests/review.e2e.ts",
+              "commit": "e3b270e5f49a9215452b0b86702946043e979059",
+              "contentHash": "e302f3daeb9dd4bac02c9256f85b3768681e0fa887bd74c53ea17994cd5277e0",
+              "start": 4833,
+              "end": 9336,
+              "startLine": 140,
+              "endLine": 242
+            },
+            "sourceText": "test(\"01-A/C/F/G controlled host: real React + PR14 → queue → MCP source/read/reply → authoritative UI/restart\", async ({\n  page,\n}) => {\n  const ownerRequests:string[]=[];\n  page.on('request',request=>{if(new URL(request.url()).pathname.startsWith('/api/'))ownerRequests.push(request.headers()['authorization']??'');});\n  await page.goto(uiUrl);\n  await expect(page.getByLabel('Local access token')).toHaveCount(0);\n  await expect(page.getByRole('button',{name:'Log out',exact:true})).toHaveCount(0);\n  expect(existsSync(join(root,'local-user.json'))).toBe(false);\n\n  await expect(\n    page.getByText(\"Session attached\", { exact: true }),\n  ).toBeVisible();\n  await page\n    .getByLabel(\"Your question\")\n    .fill(\n      \"What did this PR make explicit about where a completed slice's knowledge belongs, and can a future agent depend on old execution plans to rebuild the product?\",\n    );\n  await page.getByRole(\"button\", { name: \"Save question\" }).focus();\n  await page.keyboard.press(\"Enter\");\n  await expect(page.getByText(\"1 saved question · 0 answers\")).toBeVisible();\n  await expect(\n    page.getByRole(\"button\", { name: \"Save question\" }),\n  ).toBeDisabled();\n  await expect\n    .poll(() => existsSync(join(root, \"notifications.jsonl\")))\n    .toBe(true);\n  const notification = JSON.parse(\n    readFileSync(join(root, \"notifications.jsonl\"), \"utf8\").trim(),\n  ) as string[];\n  expect(notification.slice(0, 3)).toEqual([\n    \"queue\",\n    \"--thread\",\n    \"controlled-existing-session\",\n  ]);\n  const inbox = await tool(\"inbox_read\");\n  const items = inbox.items as { questionId: string; eventId: string }[];\n  expect(items).toHaveLength(1);\n  const questionId = items[0]!.questionId;\n  expect(notification.join(\" \")).toContain(questionId);\n  const question = await tool(\"question_get\", { questionId });\n  const snapshot = question.snapshot as Review[\"snapshot\"];\n  expect(snapshot.baseSha).toBe(\"a6d63c1e46424cb979ee912aa993ad964835c287\");\n  expect(snapshot.sources.find((s) => s.side === \"head\")?.content).toContain(\n    \"durable\",\n  );\n  const anchor: Anchor = {\n    snapshotId: snapshot.snapshotId,\n    side: \"head\",\n    path: \"docs/README.md\",\n    startLine: 5,\n    endLine: 13,\n  };\n  const input = {\n    commandId: \"controlled-source-reply\",\n    questionId,\n    generation: 1,\n    body: \"The PR explicitly separates durable product knowledge from transient execution plans. Accepted user stories, behavior, architecture, interfaces and detailed decisions must survive in product docs outside plans. Documentation was already authoritative before this change; a fresh agent must be able to rebuild accepted behavior without reconstructing old plans or chat.\",\n    evidence: [anchor],\n    limitations:\n      \"This establishes documented requirements, not a demonstrated rebuild, executable code behavior or native host acceptance.\",\n  };\n  const receipt = await tool(\"reply_submit\", input);\n  expect(receipt.state).toBe(\"applied\");\n  expect(await tool(\"reply_submit\", input)).toEqual(receipt);\n  await expect(page.getByText(input.body, { exact: true })).toBeVisible();\n  await expect(page.getByText(\"Answered\", { exact: true })).toBeVisible();\n  await page\n    .getByRole(\"link\", { name: \"Source: head docs/README.md:5–13\" })\n    .click();\n  await expect(page).toHaveURL(/#source-head-5$/);\n  await expect(page.getByLabel(\"Start line\")).toHaveValue(\"5\");\n  const persisted = (await api(\n    `/api/reviews/pr-14?minimumRevision=${String(receipt.revision)}`,\n  )) as unknown as Review;\n  expect(persisted.replies).toHaveLength(1);\n  expect(persisted.replies[0]?.actorId).toBe(persisted.attachment?.actorId);\n  expect(persisted.questions).toHaveLength(1);\n  expect(persisted.attempts).toHaveLength(1);\n  expect(persisted.attempts[0]?.state).toBe(\"notified\");\n  await page.screenshot({\n    path: join(\n      process.env.REVIEW_E2E_ARTIFACT_DIR ??\n        \"/tmp/pr-reviewer-playwright-artifacts\",\n      \"pr14-answer.png\",\n    ),\n    fullPage: true,\n  });\n  await client.close();\n  await stop();\n  await start();\n  await page.reload();\n\n  await expect(page.getByText(input.body, { exact: true })).toBeVisible();\n  expect(\n    readFileSync(join(root, \"notifications.jsonl\"), \"utf8\").trim().split(\"\\n\"),\n  ).toHaveLength(1);\n  await page.getByRole(\"button\", { name: \"Revoke attachment\" }).click();\n  await expect(\n    page.getByText(\"Session revoked\", { exact: true }),\n  ).toBeVisible();\n  expect(ownerRequests.length).toBeGreaterThan(0);expect(ownerRequests.every(value=>value==='')).toBe(true);\n})"
+          },
+          "callback": {
+            "anchor": {
+              "snapshotId": "pr25-pinned-test-evidence",
+              "side": "head",
+              "path": "tests/review.e2e.ts",
+              "commit": "e3b270e5f49a9215452b0b86702946043e979059",
+              "contentHash": "e302f3daeb9dd4bac02c9256f85b3768681e0fa887bd74c53ea17994cd5277e0",
+              "start": 4946,
+              "end": 9335,
+              "startLine": 140,
+              "endLine": 242
+            },
+            "sourceText": "async ({\n  page,\n}) => {\n  const ownerRequests:string[]=[];\n  page.on('request',request=>{if(new URL(request.url()).pathname.startsWith('/api/'))ownerRequests.push(request.headers()['authorization']??'');});\n  await page.goto(uiUrl);\n  await expect(page.getByLabel('Local access token')).toHaveCount(0);\n  await expect(page.getByRole('button',{name:'Log out',exact:true})).toHaveCount(0);\n  expect(existsSync(join(root,'local-user.json'))).toBe(false);\n\n  await expect(\n    page.getByText(\"Session attached\", { exact: true }),\n  ).toBeVisible();\n  await page\n    .getByLabel(\"Your question\")\n    .fill(\n      \"What did this PR make explicit about where a completed slice's knowledge belongs, and can a future agent depend on old execution plans to rebuild the product?\",\n    );\n  await page.getByRole(\"button\", { name: \"Save question\" }).focus();\n  await page.keyboard.press(\"Enter\");\n  await expect(page.getByText(\"1 saved question · 0 answers\")).toBeVisible();\n  await expect(\n    page.getByRole(\"button\", { name: \"Save question\" }),\n  ).toBeDisabled();\n  await expect\n    .poll(() => existsSync(join(root, \"notifications.jsonl\")))\n    .toBe(true);\n  const notification = JSON.parse(\n    readFileSync(join(root, \"notifications.jsonl\"), \"utf8\").trim(),\n  ) as string[];\n  expect(notification.slice(0, 3)).toEqual([\n    \"queue\",\n    \"--thread\",\n    \"controlled-existing-session\",\n  ]);\n  const inbox = await tool(\"inbox_read\");\n  const items = inbox.items as { questionId: string; eventId: string }[];\n  expect(items).toHaveLength(1);\n  const questionId = items[0]!.questionId;\n  expect(notification.join(\" \")).toContain(questionId);\n  const question = await tool(\"question_get\", { questionId });\n  const snapshot = question.snapshot as Review[\"snapshot\"];\n  expect(snapshot.baseSha).toBe(\"a6d63c1e46424cb979ee912aa993ad964835c287\");\n  expect(snapshot.sources.find((s) => s.side === \"head\")?.content).toContain(\n    \"durable\",\n  );\n  const anchor: Anchor = {\n    snapshotId: snapshot.snapshotId,\n    side: \"head\",\n    path: \"docs/README.md\",\n    startLine: 5,\n    endLine: 13,\n  };\n  const input = {\n    commandId: \"controlled-source-reply\",\n    questionId,\n    generation: 1,\n    body: \"The PR explicitly separates durable product knowledge from transient execution plans. Accepted user stories, behavior, architecture, interfaces and detailed decisions must survive in product docs outside plans. Documentation was already authoritative before this change; a fresh agent must be able to rebuild accepted behavior without reconstructing old plans or chat.\",\n    evidence: [anchor],\n    limitations:\n      \"This establishes documented requirements, not a demonstrated rebuild, executable code behavior or native host acceptance.\",\n  };\n  const receipt = await tool(\"reply_submit\", input);\n  expect(receipt.state).toBe(\"applied\");\n  expect(await tool(\"reply_submit\", input)).toEqual(receipt);\n  await expect(page.getByText(input.body, { exact: true })).toBeVisible();\n  await expect(page.getByText(\"Answered\", { exact: true })).toBeVisible();\n  await page\n    .getByRole(\"link\", { name: \"Source: head docs/README.md:5–13\" })\n    .click();\n  await expect(page).toHaveURL(/#source-head-5$/);\n  await expect(page.getByLabel(\"Start line\")).toHaveValue(\"5\");\n  const persisted = (await api(\n    `/api/reviews/pr-14?minimumRevision=${String(receipt.revision)}`,\n  )) as unknown as Review;\n  expect(persisted.replies).toHaveLength(1);\n  expect(persisted.replies[0]?.actorId).toBe(persisted.attachment?.actorId);\n  expect(persisted.questions).toHaveLength(1);\n  expect(persisted.attempts).toHaveLength(1);\n  expect(persisted.attempts[0]?.state).toBe(\"notified\");\n  await page.screenshot({\n    path: join(\n      process.env.REVIEW_E2E_ARTIFACT_DIR ??\n        \"/tmp/pr-reviewer-playwright-artifacts\",\n      \"pr14-answer.png\",\n    ),\n    fullPage: true,\n  });\n  await client.close();\n  await stop();\n  await start();\n  await page.reload();\n\n  await expect(page.getByText(input.body, { exact: true })).toBeVisible();\n  expect(\n    readFileSync(join(root, \"notifications.jsonl\"), \"utf8\").trim().split(\"\\n\"),\n  ).toHaveLength(1);\n  await page.getByRole(\"button\", { name: \"Revoke attachment\" }).click();\n  await expect(\n    page.getByText(\"Session revoked\", { exact: true }),\n  ).toBeVisible();\n  expect(ownerRequests.length).toBeGreaterThan(0);expect(ownerRequests.every(value=>value==='')).toBe(true);\n}",
+            "bodyHash": "1b6c37271e42743bc64e059ea4f9b438e6d482cb0c34801489883b9c8bab3b5b"
+          }
+        }
+      },
+      "nativeHunks": [
+        {
+          "id": "tests/review.e2e.ts:native:4",
+          "header": "@@ -146,9 +140,13 @@ test.afterAll(async () => {",
+          "beforeStart": 146,
+          "beforeCount": 9,
+          "afterStart": 140,
+          "afterCount": 13,
+          "rows": [
+            {
+              "kind": "context",
+              "beforeLine": 146,
+              "afterLine": 140,
+              "text": "test(\"01-A/C/F/G controlled host: real React + PR14 → queue → MCP source/read/reply → authoritative UI/restart\", async ({"
+            },
+            {
+              "kind": "context",
+              "beforeLine": 147,
+              "afterLine": 141,
+              "text": "  page,"
+            },
+            {
+              "kind": "context",
+              "beforeLine": 148,
+              "afterLine": 142,
+              "text": "}) => {"
+            },
+            {
+              "kind": "added",
+              "beforeLine": null,
+              "afterLine": 143,
+              "text": "  const ownerRequests:string[]=[];"
+            },
+            {
+              "kind": "added",
+              "beforeLine": null,
+              "afterLine": 144,
+              "text": "  page.on('request',request=>{if(new URL(request.url()).pathname.startsWith('/api/'))ownerRequests.push(request.headers()['authorization']??'');});"
+            },
+            {
+              "kind": "context",
+              "beforeLine": 149,
+              "afterLine": 145,
+              "text": "  await page.goto(uiUrl);"
+            },
+            {
+              "kind": "removed",
+              "beforeLine": 150,
+              "afterLine": null,
+              "text": "  await page.getByLabel(\"Local access token\").fill(token);"
+            },
+            {
+              "kind": "removed",
+              "beforeLine": 151,
+              "afterLine": null,
+              "text": "  await page.getByRole(\"button\", { name: \"Open review\" }).click();"
+            },
+            {
+              "kind": "added",
+              "beforeLine": null,
+              "afterLine": 146,
+              "text": "  await expect(page.getByLabel('Local access token')).toHaveCount(0);"
+            },
+            {
+              "kind": "added",
+              "beforeLine": null,
+              "afterLine": 147,
+              "text": "  await expect(page.getByRole('button',{name:'Log out',exact:true})).toHaveCount(0);"
+            },
+            {
+              "kind": "added",
+              "beforeLine": null,
+              "afterLine": 148,
+              "text": "  expect(existsSync(join(root,'local-user.json'))).toBe(false);"
+            },
+            {
+              "kind": "added",
+              "beforeLine": null,
+              "afterLine": 149,
+              "text": ""
+            },
+            {
+              "kind": "context",
+              "beforeLine": 152,
+              "afterLine": 150,
+              "text": "  await expect("
+            },
+            {
+              "kind": "context",
+              "beforeLine": 153,
+              "afterLine": 151,
+              "text": "    page.getByText(\"Session attached\", { exact: true }),"
+            },
+            {
+              "kind": "context",
+              "beforeLine": 154,
+              "afterLine": 152,
+              "text": "  ).toBeVisible();"
+            }
+          ],
+          "changeKind": "modified",
+          "patchHash": "87c8141714b6c10dc750443a9d68a49768d59f6707fc21244e36e20a1cfdbf32"
+        },
+        {
+          "id": "tests/review.e2e.ts:native:5",
+          "header": "@@ -231,8 +229,7 @@ test(\"01-A/C/F/G controlled host: real React + PR14 → queue → MCP source/rea",
+          "beforeStart": 231,
+          "beforeCount": 8,
+          "afterStart": 229,
+          "afterCount": 7,
+          "rows": [
+            {
+              "kind": "context",
+              "beforeLine": 231,
+              "afterLine": 229,
+              "text": "  await stop();"
+            },
+            {
+              "kind": "context",
+              "beforeLine": 232,
+              "afterLine": 230,
+              "text": "  await start();"
+            },
+            {
+              "kind": "context",
+              "beforeLine": 233,
+              "afterLine": 231,
+              "text": "  await page.reload();"
+            },
+            {
+              "kind": "removed",
+              "beforeLine": 234,
+              "afterLine": null,
+              "text": "  await page.getByLabel(\"Local access token\").fill(token);"
+            },
+            {
+              "kind": "removed",
+              "beforeLine": 235,
+              "afterLine": null,
+              "text": "  await page.getByRole(\"button\", { name: \"Open review\" }).click();"
+            },
+            {
+              "kind": "added",
+              "beforeLine": null,
+              "afterLine": 232,
+              "text": ""
+            },
+            {
+              "kind": "context",
+              "beforeLine": 236,
+              "afterLine": 233,
+              "text": "  await expect(page.getByText(input.body, { exact: true })).toBeVisible();"
+            },
+            {
+              "kind": "context",
+              "beforeLine": 237,
+              "afterLine": 234,
+              "text": "  expect("
+            },
+            {
+              "kind": "context",
+              "beforeLine": 238,
+              "afterLine": 235,
+              "text": "    readFileSync(join(root, \"notifications.jsonl\"), \"utf8\").trim().split(\"\\n\"),"
+            }
+          ],
+          "changeKind": "modified",
+          "patchHash": "87c8141714b6c10dc750443a9d68a49768d59f6707fc21244e36e20a1cfdbf32"
+        },
+        {
+          "id": "tests/review.e2e.ts:native:6",
+          "header": "@@ -241,6 +238,7 @@ test(\"01-A/C/F/G controlled host: real React + PR14 → queue → MCP source/rea",
+          "beforeStart": 241,
+          "beforeCount": 6,
+          "afterStart": 238,
+          "afterCount": 7,
+          "rows": [
+            {
+              "kind": "context",
+              "beforeLine": 241,
+              "afterLine": 238,
+              "text": "  await expect("
+            },
+            {
+              "kind": "context",
+              "beforeLine": 242,
+              "afterLine": 239,
+              "text": "    page.getByText(\"Session revoked\", { exact: true }),"
+            },
+            {
+              "kind": "context",
+              "beforeLine": 243,
+              "afterLine": 240,
+              "text": "  ).toBeVisible();"
+            },
+            {
+              "kind": "added",
+              "beforeLine": null,
+              "afterLine": 241,
+              "text": "  expect(ownerRequests.length).toBeGreaterThan(0);expect(ownerRequests.every(value=>value==='')).toBe(true);"
+            },
+            {
+              "kind": "context",
+              "beforeLine": 244,
+              "afterLine": 242,
+              "text": "});"
+            },
+            {
+              "kind": "context",
+              "beforeLine": 245,
+              "afterLine": 243,
+              "text": ""
+            },
+            {
+              "kind": "context",
+              "beforeLine": 246,
+              "afterLine": 244,
+              "text": "test(\"explicit manual PR19 target renders its own path and saves the declared recovery span\", async ({"
+            }
+          ],
+          "changeKind": "added",
+          "patchHash": "87c8141714b6c10dc750443a9d68a49768d59f6707fc21244e36e20a1cfdbf32"
+        }
+      ],
+      "functionMappings": [
+        {
+          "targetId": "083d938782f0e018df80fce707b355488710e75876f88bd92e398ca852879046",
+          "target": {
+            "snapshotId": "pr25-pinned-call-evidence",
+            "side": "base",
+            "path": "src/application/review.ts",
+            "contentHash": "7953f0b8486ae475717bdc749e23a31f12351f41c11a473280de9a2420265477",
+            "start": 2860,
+            "end": 3771,
+            "startLine": 24,
+            "endLine": 32
+          },
+          "certainty": "react_user_journey_source_chain",
+          "executionClaim": false,
+          "chain": [
+            "Test page.goto/reload and observed API header assertions",
+            "React workspace.open (head) / explicit workspace.login (base)",
+            "Workspace delegates review.login",
+            "Review login calls refresh; unchanged refresh calls request",
+            "Head request directly calls explicitly imported accessHeaders; absent on base"
+          ],
+          "bindingAnchors": [
+            {
+              "snapshotId": "pr25-pinned-test-evidence",
+              "side": "base",
+              "path": "src/ui/main.tsx",
+              "commit": "b096826e31c0927190806de91ed70b8b64aa93d8",
+              "contentHash": "dff9049f1bcdd972d42d7e317c9103fedbf23c60ce3ed60d5655687784cdef9f",
+              "start": 6176,
+              "end": 6213,
+              "startLine": 118,
+              "endLine": 118
+            },
+            {
+              "snapshotId": "pr25-pinned-test-evidence",
+              "side": "base",
+              "path": "src/application/public.ts",
+              "commit": "b096826e31c0927190806de91ed70b8b64aa93d8",
+              "contentHash": "94e20323156f2a3c31cdea3b84a453b8e19d27ecad031457412083c08502da64",
+              "start": 2080,
+              "end": 2133,
+              "startLine": 39,
+              "endLine": 39
+            },
+            {
+              "snapshotId": "pr25-pinned-test-evidence",
+              "side": "base",
+              "path": "src/application/workspace.ts",
+              "commit": "b096826e31c0927190806de91ed70b8b64aa93d8",
+              "contentHash": "6823857a1cbc1d474835cf6c00f5071a3b166366faa267c91e0ec1e74f7f522d",
+              "start": 1420,
+              "end": 1478,
+              "startLine": 16,
+              "endLine": 16
+            },
+            {
+              "snapshotId": "pr25-pinned-test-evidence",
+              "side": "base",
+              "path": "src/application/workspace.ts",
+              "commit": "b096826e31c0927190806de91ed70b8b64aa93d8",
+              "contentHash": "6823857a1cbc1d474835cf6c00f5071a3b166366faa267c91e0ec1e74f7f522d",
+              "start": 3139,
+              "end": 3168,
+              "startLine": 31,
+              "endLine": 31
+            },
+            {
+              "snapshotId": "pr25-pinned-test-evidence",
+              "side": "base",
+              "path": "src/application/review.ts",
+              "commit": "b096826e31c0927190806de91ed70b8b64aa93d8",
+              "contentHash": "7953f0b8486ae475717bdc749e23a31f12351f41c11a473280de9a2420265477",
+              "start": 11020,
+              "end": 11043,
+              "startLine": 98,
+              "endLine": 98
+            },
+            {
+              "snapshotId": "pr25-pinned-test-evidence",
+              "side": "base",
+              "path": "src/application/review.ts",
+              "commit": "b096826e31c0927190806de91ed70b8b64aa93d8",
+              "contentHash": "7953f0b8486ae475717bdc749e23a31f12351f41c11a473280de9a2420265477",
+              "start": 4111,
+              "end": 4147,
+              "startLine": 37,
+              "endLine": 37
+            }
+          ],
+          "limit": "Source-declared controlled-host journey through page.goto/UI workspace opening. Not a direct test call to request/accessHeaders, not real native-host causality, and not coverage of every helper branch."
+        },
+        {
+          "targetId": "a7c2131f067aee1cd64b01c90418ffa0da3b0f5469984249d91fa611723893f6",
+          "target": {
+            "snapshotId": "pr25-pinned-call-evidence",
+            "side": "head",
+            "path": "src/application/local-access.ts",
+            "contentHash": "811735e3599292c54af870134345249deed32f1d9b9705f8ca18fd086225d59d",
+            "start": 144,
+            "end": 264,
+            "startLine": 3,
+            "endLine": 3
+          },
+          "certainty": "react_user_journey_source_chain",
+          "executionClaim": false,
+          "chain": [
+            "Test page.goto/reload and observed API header assertions",
+            "React workspace.open (head) / explicit workspace.login (base)",
+            "Workspace delegates review.login",
+            "Review login calls refresh; unchanged refresh calls request",
+            "Head request directly calls explicitly imported accessHeaders; absent on base"
+          ],
+          "bindingAnchors": [
+            {
+              "snapshotId": "pr25-pinned-test-evidence",
+              "side": "head",
+              "path": "src/ui/main.tsx",
+              "commit": "e3b270e5f49a9215452b0b86702946043e979059",
+              "contentHash": "bacca7ee95b2fd9c588452810bdb99913f81620a6722d784b95a31710722ad6a",
+              "start": 4500,
+              "end": 4531,
+              "startLine": 101,
+              "endLine": 101
+            },
+            {
+              "snapshotId": "pr25-pinned-test-evidence",
+              "side": "head",
+              "path": "src/application/public.ts",
+              "commit": "e3b270e5f49a9215452b0b86702946043e979059",
+              "contentHash": "94e20323156f2a3c31cdea3b84a453b8e19d27ecad031457412083c08502da64",
+              "start": 2080,
+              "end": 2133,
+              "startLine": 39,
+              "endLine": 39
+            },
+            {
+              "snapshotId": "pr25-pinned-test-evidence",
+              "side": "head",
+              "path": "src/application/workspace.ts",
+              "commit": "e3b270e5f49a9215452b0b86702946043e979059",
+              "contentHash": "9f17dc7e6e81a8190df3ed521767e69796913e40e6f2f4cfbd694aaf66ae98f5",
+              "start": 1473,
+              "end": 1531,
+              "startLine": 17,
+              "endLine": 17
+            },
+            {
+              "snapshotId": "pr25-pinned-test-evidence",
+              "side": "head",
+              "path": "src/application/workspace.ts",
+              "commit": "e3b270e5f49a9215452b0b86702946043e979059",
+              "contentHash": "9f17dc7e6e81a8190df3ed521767e69796913e40e6f2f4cfbd694aaf66ae98f5",
+              "start": 1926,
+              "end": 1959,
+              "startLine": 22,
+              "endLine": 22
+            },
+            {
+              "snapshotId": "pr25-pinned-test-evidence",
+              "side": "head",
+              "path": "src/application/workspace.ts",
+              "commit": "e3b270e5f49a9215452b0b86702946043e979059",
+              "contentHash": "9f17dc7e6e81a8190df3ed521767e69796913e40e6f2f4cfbd694aaf66ae98f5",
+              "start": 3786,
+              "end": 3805,
+              "startLine": 41,
+              "endLine": 41
+            },
+            {
+              "snapshotId": "pr25-pinned-test-evidence",
+              "side": "head",
+              "path": "src/application/review.ts",
+              "commit": "e3b270e5f49a9215452b0b86702946043e979059",
+              "contentHash": "dae210c79cb019d6edfdbfacfcf3da1e5773ceb4d15cf747df15ffa498c28e4e",
+              "start": 11122,
+              "end": 11145,
+              "startLine": 99,
+              "endLine": 99
+            },
+            {
+              "snapshotId": "pr25-pinned-test-evidence",
+              "side": "head",
+              "path": "src/application/review.ts",
+              "commit": "e3b270e5f49a9215452b0b86702946043e979059",
+              "contentHash": "dae210c79cb019d6edfdbfacfcf3da1e5773ceb4d15cf747df15ffa498c28e4e",
+              "start": 4199,
+              "end": 4235,
+              "startLine": 38,
+              "endLine": 38
+            },
+            {
+              "snapshotId": "pr25-pinned-test-evidence",
+              "side": "head",
+              "path": "src/application/review.ts",
+              "commit": "e3b270e5f49a9215452b0b86702946043e979059",
+              "contentHash": "dae210c79cb019d6edfdbfacfcf3da1e5773ceb4d15cf747df15ffa498c28e4e",
+              "start": 3376,
+              "end": 3402,
+              "startLine": 30,
+              "endLine": 30
+            },
+            {
+              "snapshotId": "pr25-pinned-test-evidence",
+              "side": "head",
+              "path": "src/application/review.ts",
+              "commit": "e3b270e5f49a9215452b0b86702946043e979059",
+              "contentHash": "dae210c79cb019d6edfdbfacfcf3da1e5773ceb4d15cf747df15ffa498c28e4e",
+              "start": 0,
+              "end": 66,
+              "startLine": 1,
+              "endLine": 1
+            },
+            {
+              "snapshotId": "pr25-pinned-test-evidence",
+              "side": "head",
+              "path": "src/application/local-access.ts",
+              "commit": "e3b270e5f49a9215452b0b86702946043e979059",
+              "contentHash": "811735e3599292c54af870134345249deed32f1d9b9705f8ca18fd086225d59d",
+              "start": 131,
+              "end": 265,
+              "startLine": 3,
+              "endLine": 3
+            }
+          ],
+          "limit": "Source-declared controlled-host journey through page.goto/UI workspace opening. Not a direct test call to request/accessHeaders, not real native-host causality, and not coverage of every helper branch."
+        },
+        {
+          "targetId": "2e55daf0e1c5086b0eb7e2390e38003b26bb3cf463f5ae835837f3e95eb43368",
+          "target": {
+            "snapshotId": "pr25-pinned-call-evidence",
+            "side": "head",
+            "path": "src/application/review.ts",
+            "contentHash": "dae210c79cb019d6edfdbfacfcf3da1e5773ceb4d15cf747df15ffa498c28e4e",
+            "start": 2956,
+            "end": 3859,
+            "startLine": 25,
+            "endLine": 33
+          },
+          "certainty": "react_user_journey_source_chain",
+          "executionClaim": false,
+          "chain": [
+            "Test page.goto/reload and observed API header assertions",
+            "React workspace.open (head) / explicit workspace.login (base)",
+            "Workspace delegates review.login",
+            "Review login calls refresh; unchanged refresh calls request",
+            "Head request directly calls explicitly imported accessHeaders; absent on base"
+          ],
+          "bindingAnchors": [
+            {
+              "snapshotId": "pr25-pinned-test-evidence",
+              "side": "head",
+              "path": "src/ui/main.tsx",
+              "commit": "e3b270e5f49a9215452b0b86702946043e979059",
+              "contentHash": "bacca7ee95b2fd9c588452810bdb99913f81620a6722d784b95a31710722ad6a",
+              "start": 4500,
+              "end": 4531,
+              "startLine": 101,
+              "endLine": 101
+            },
+            {
+              "snapshotId": "pr25-pinned-test-evidence",
+              "side": "head",
+              "path": "src/application/public.ts",
+              "commit": "e3b270e5f49a9215452b0b86702946043e979059",
+              "contentHash": "94e20323156f2a3c31cdea3b84a453b8e19d27ecad031457412083c08502da64",
+              "start": 2080,
+              "end": 2133,
+              "startLine": 39,
+              "endLine": 39
+            },
+            {
+              "snapshotId": "pr25-pinned-test-evidence",
+              "side": "head",
+              "path": "src/application/workspace.ts",
+              "commit": "e3b270e5f49a9215452b0b86702946043e979059",
+              "contentHash": "9f17dc7e6e81a8190df3ed521767e69796913e40e6f2f4cfbd694aaf66ae98f5",
+              "start": 1473,
+              "end": 1531,
+              "startLine": 17,
+              "endLine": 17
+            },
+            {
+              "snapshotId": "pr25-pinned-test-evidence",
+              "side": "head",
+              "path": "src/application/workspace.ts",
+              "commit": "e3b270e5f49a9215452b0b86702946043e979059",
+              "contentHash": "9f17dc7e6e81a8190df3ed521767e69796913e40e6f2f4cfbd694aaf66ae98f5",
+              "start": 1926,
+              "end": 1959,
+              "startLine": 22,
+              "endLine": 22
+            },
+            {
+              "snapshotId": "pr25-pinned-test-evidence",
+              "side": "head",
+              "path": "src/application/workspace.ts",
+              "commit": "e3b270e5f49a9215452b0b86702946043e979059",
+              "contentHash": "9f17dc7e6e81a8190df3ed521767e69796913e40e6f2f4cfbd694aaf66ae98f5",
+              "start": 3786,
+              "end": 3805,
+              "startLine": 41,
+              "endLine": 41
+            },
+            {
+              "snapshotId": "pr25-pinned-test-evidence",
+              "side": "head",
+              "path": "src/application/review.ts",
+              "commit": "e3b270e5f49a9215452b0b86702946043e979059",
+              "contentHash": "dae210c79cb019d6edfdbfacfcf3da1e5773ceb4d15cf747df15ffa498c28e4e",
+              "start": 11122,
+              "end": 11145,
+              "startLine": 99,
+              "endLine": 99
+            },
+            {
+              "snapshotId": "pr25-pinned-test-evidence",
+              "side": "head",
+              "path": "src/application/review.ts",
+              "commit": "e3b270e5f49a9215452b0b86702946043e979059",
+              "contentHash": "dae210c79cb019d6edfdbfacfcf3da1e5773ceb4d15cf747df15ffa498c28e4e",
+              "start": 4199,
+              "end": 4235,
+              "startLine": 38,
+              "endLine": 38
+            },
+            {
+              "snapshotId": "pr25-pinned-test-evidence",
+              "side": "head",
+              "path": "src/application/review.ts",
+              "commit": "e3b270e5f49a9215452b0b86702946043e979059",
+              "contentHash": "dae210c79cb019d6edfdbfacfcf3da1e5773ceb4d15cf747df15ffa498c28e4e",
+              "start": 3376,
+              "end": 3402,
+              "startLine": 30,
+              "endLine": 30
+            },
+            {
+              "snapshotId": "pr25-pinned-test-evidence",
+              "side": "head",
+              "path": "src/application/review.ts",
+              "commit": "e3b270e5f49a9215452b0b86702946043e979059",
+              "contentHash": "dae210c79cb019d6edfdbfacfcf3da1e5773ceb4d15cf747df15ffa498c28e4e",
+              "start": 0,
+              "end": 66,
+              "startLine": 1,
+              "endLine": 1
+            },
+            {
+              "snapshotId": "pr25-pinned-test-evidence",
+              "side": "head",
+              "path": "src/application/local-access.ts",
+              "commit": "e3b270e5f49a9215452b0b86702946043e979059",
+              "contentHash": "811735e3599292c54af870134345249deed32f1d9b9705f8ca18fd086225d59d",
+              "start": 131,
+              "end": 265,
+              "startLine": 3,
+              "endLine": 3
+            }
+          ],
+          "limit": "Source-declared controlled-host journey through page.goto/UI workspace opening. Not a direct test call to request/accessHeaders, not real native-host causality, and not coverage of every helper branch."
+        }
+      ]
+    }
+  ],
+  "bindings": [
+    {
+      "anchor": {
+        "snapshotId": "pr25-pinned-test-evidence",
+        "side": "base",
+        "path": "tests/gateway.test.ts",
+        "commit": "b096826e31c0927190806de91ed70b8b64aa93d8",
+        "contentHash": "21df294a4bcbdeadcabb3a0767e252fdaef5fe2fc371ea63bb3ab62071cb97d3",
+        "start": 232,
+        "end": 287,
+        "startLine": 7,
+        "endLine": 7
+      },
+      "sourceText": "import { createStore } from \"../src/storage/public.ts\";"
+    },
+    {
+      "anchor": {
+        "snapshotId": "pr25-pinned-test-evidence",
+        "side": "base",
+        "path": "tests/gateway.test.ts",
+        "commit": "b096826e31c0927190806de91ed70b8b64aa93d8",
+        "contentHash": "21df294a4bcbdeadcabb3a0767e252fdaef5fe2fc371ea63bb3ab62071cb97d3",
+        "start": 288,
+        "end": 344,
+        "startLine": 8,
+        "endLine": 8
+      },
+      "sourceText": "import { createGateway } from \"../src/server/public.ts\";"
+    },
+    {
+      "anchor": {
+        "snapshotId": "pr25-pinned-test-evidence",
+        "side": "base",
+        "path": "tests/import-jobs.test.ts",
+        "commit": "b096826e31c0927190806de91ed70b8b64aa93d8",
+        "contentHash": "eae02f2929607f862eb9e97c78c53792608235fd94b1361b313cdc934f08d57e",
+        "start": 181,
+        "end": 234,
+        "startLine": 6,
+        "endLine": 6
+      },
+      "sourceText": "import {createStore} from '../src/storage/public.ts';"
+    },
+    {
+      "anchor": {
+        "snapshotId": "pr25-pinned-test-evidence",
+        "side": "head",
+        "path": "tests/gateway.test.ts",
+        "commit": "e3b270e5f49a9215452b0b86702946043e979059",
+        "contentHash": "13e7db6e38670e876795a150587bb6e5a441548915fb37f67ff0a80563953158",
+        "start": 232,
+        "end": 287,
+        "startLine": 7,
+        "endLine": 7
+      },
+      "sourceText": "import { createStore } from \"../src/storage/public.ts\";"
+    },
+    {
+      "anchor": {
+        "snapshotId": "pr25-pinned-test-evidence",
+        "side": "head",
+        "path": "tests/gateway.test.ts",
+        "commit": "e3b270e5f49a9215452b0b86702946043e979059",
+        "contentHash": "13e7db6e38670e876795a150587bb6e5a441548915fb37f67ff0a80563953158",
+        "start": 288,
+        "end": 344,
+        "startLine": 8,
+        "endLine": 8
+      },
+      "sourceText": "import { createGateway } from \"../src/server/public.ts\";"
+    },
+    {
+      "anchor": {
+        "snapshotId": "pr25-pinned-test-evidence",
+        "side": "head",
+        "path": "tests/import-jobs.test.ts",
+        "commit": "e3b270e5f49a9215452b0b86702946043e979059",
+        "contentHash": "59e62cd5cbf772fe001953e4d87b4466e0bbafb3bae5d704318fa863cb6a802a",
+        "start": 181,
+        "end": 234,
+        "startLine": 6,
+        "endLine": 6
+      },
+      "sourceText": "import {createStore} from '../src/storage/public.ts';"
+    },
+    {
+      "anchor": {
+        "snapshotId": "pr25-pinned-test-evidence",
+        "side": "base",
+        "path": "src/ui/main.tsx",
+        "commit": "b096826e31c0927190806de91ed70b8b64aa93d8",
+        "contentHash": "dff9049f1bcdd972d42d7e317c9103fedbf23c60ce3ed60d5655687784cdef9f",
+        "start": 6176,
+        "end": 6213,
+        "startLine": 118,
+        "endLine": 118
+      },
+      "sourceText": "act(()=>workspace.login(credential));"
+    },
+    {
+      "anchor": {
+        "snapshotId": "pr25-pinned-test-evidence",
+        "side": "base",
+        "path": "src/application/public.ts",
+        "commit": "b096826e31c0927190806de91ed70b8b64aa93d8",
+        "contentHash": "94e20323156f2a3c31cdea3b84a453b8e19d27ecad031457412083c08502da64",
+        "start": 2080,
+        "end": 2133,
+        "startLine": 39,
+        "endLine": 39
+      },
+      "sourceText": "export {createReviewWorkspace} from './workspace.ts';"
+    },
+    {
+      "anchor": {
+        "snapshotId": "pr25-pinned-test-evidence",
+        "side": "base",
+        "path": "src/application/workspace.ts",
+        "commit": "b096826e31c0927190806de91ed70b8b64aa93d8",
+        "contentHash": "6823857a1cbc1d474835cf6c00f5071a3b166366faa267c91e0ec1e74f7f522d",
+        "start": 1420,
+        "end": 1478,
+        "startLine": 16,
+        "endLine": 16
+      },
+      "sourceText": "const review=createReviewBridge(reviewId,initialSnapshotId"
+    },
+    {
+      "anchor": {
+        "snapshotId": "pr25-pinned-test-evidence",
+        "side": "base",
+        "path": "src/application/workspace.ts",
+        "commit": "b096826e31c0927190806de91ed70b8b64aa93d8",
+        "contentHash": "6823857a1cbc1d474835cf6c00f5071a3b166366faa267c91e0ec1e74f7f522d",
+        "start": 3139,
+        "end": 3168,
+        "startLine": 31,
+        "endLine": 31
+      },
+      "sourceText": "await review.login(captured);"
+    },
+    {
+      "anchor": {
+        "snapshotId": "pr25-pinned-test-evidence",
+        "side": "base",
+        "path": "src/application/review.ts",
+        "commit": "b096826e31c0927190806de91ed70b8b64aa93d8",
+        "contentHash": "7953f0b8486ae475717bdc749e23a31f12351f41c11a473280de9a2420265477",
+        "start": 11020,
+        "end": 11043,
+        "startLine": 98,
+        "endLine": 98
+      },
+      "sourceText": "review=await refresh();"
+    },
+    {
+      "anchor": {
+        "snapshotId": "pr25-pinned-test-evidence",
+        "side": "base",
+        "path": "src/application/review.ts",
+        "commit": "b096826e31c0927190806de91ed70b8b64aa93d8",
+        "contentHash": "7953f0b8486ae475717bdc749e23a31f12351f41c11a473280de9a2420265477",
+        "start": 4111,
+        "end": 4147,
+        "startLine": 37,
+        "endLine": 37
+      },
+      "sourceText": "const review=await request(captured,"
+    },
+    {
+      "anchor": {
+        "snapshotId": "pr25-pinned-test-evidence",
+        "side": "base",
+        "path": "src/storage/public.ts",
+        "commit": "b096826e31c0927190806de91ed70b8b64aa93d8",
+        "contentHash": "61878e4c266549993e81985919feaf17995ee53790e49db5ad91d0b278725175",
+        "start": 17276,
+        "end": 17321,
+        "startLine": 282,
+        "endLine": 282
+      },
+      "sourceText": "authenticate: (token: string): Principal => {"
+    },
+    {
+      "anchor": {
+        "snapshotId": "pr25-pinned-test-evidence",
+        "side": "head",
+        "path": "src/server/public.ts",
+        "commit": "e3b270e5f49a9215452b0b86702946043e979059",
+        "contentHash": "20c22563be7da4c385eda772d5840d55f0993ddeebd85718b3605cddb76a0b0e",
+        "start": 2857,
+        "end": 2988,
+        "startLine": 66,
+        "endLine": 67
+      },
+      "sourceText": "const access=authorization===undefined?store.localOwner:authorization.slice(7);\n      const principal = store.authenticate(access);"
+    },
+    {
+      "anchor": {
+        "snapshotId": "pr25-pinned-test-evidence",
+        "side": "head",
+        "path": "src/storage/public.ts",
+        "commit": "e3b270e5f49a9215452b0b86702946043e979059",
+        "contentHash": "ebf680d4d62a47f92af2123a60673e4ba58c7236257ffc12cea2ddc981791d58",
+        "start": 17500,
+        "end": 17550,
+        "startLine": 285,
+        "endLine": 286
+      },
+      "sourceText": "    authenticate,\n    localOwner:localOwnerAccess,"
+    },
+    {
+      "anchor": {
+        "snapshotId": "pr25-pinned-test-evidence",
+        "side": "head",
+        "path": "src/storage/public.ts",
+        "commit": "e3b270e5f49a9215452b0b86702946043e979059",
+        "contentHash": "ebf680d4d62a47f92af2123a60673e4ba58c7236257ffc12cea2ddc981791d58",
+        "start": 10372,
+        "end": 10445,
+        "startLine": 201,
+        "endLine": 201
+      },
+      "sourceText": "const owner=localPrincipal(accessReference(token));if(owner)return owner;"
+    },
+    {
+      "anchor": {
+        "snapshotId": "pr25-pinned-test-evidence",
+        "side": "head",
+        "path": "src/storage/public.ts",
+        "commit": "e3b270e5f49a9215452b0b86702946043e979059",
+        "contentHash": "ebf680d4d62a47f92af2123a60673e4ba58c7236257ffc12cea2ddc981791d58",
+        "start": 10018,
+        "end": 10132,
+        "startLine": 198,
+        "endLine": 198
+      },
+      "sourceText": "imports=createImportStore({db,tx,load,save,execution,...(options.importLimits?{limits:options.importLimits}:{})});"
+    },
+    {
+      "anchor": {
+        "snapshotId": "pr25-pinned-test-evidence",
+        "side": "head",
+        "path": "src/storage/imports.ts",
+        "commit": "e3b270e5f49a9215452b0b86702946043e979059",
+        "contentHash": "f29c76c6b9202f53e9d29752ff75f558eeea79739d3c476a93fe3a1e232fa1e2",
+        "start": 5228,
+        "end": 5292,
+        "startLine": 38,
+        "endLine": 38
+      },
+      "sourceText": "const reference=accessReference(token),principal=user(reference)"
+    },
+    {
+      "anchor": {
+        "snapshotId": "pr25-pinned-test-evidence",
+        "side": "head",
+        "path": "src/storage/imports.ts",
+        "commit": "e3b270e5f49a9215452b0b86702946043e979059",
+        "contentHash": "f29c76c6b9202f53e9d29752ff75f558eeea79739d3c476a93fe3a1e232fa1e2",
+        "start": 3036,
+        "end": 3096,
+        "startLine": 29,
+        "endLine": 29
+      },
+      "sourceText": "const local=localPrincipal(reference);if(local)return local;"
+    },
+    {
+      "anchor": {
+        "snapshotId": "pr25-pinned-test-evidence",
+        "side": "head",
+        "path": "src/storage/imports.ts",
+        "commit": "e3b270e5f49a9215452b0b86702946043e979059",
+        "contentHash": "f29c76c6b9202f53e9d29752ff75f558eeea79739d3c476a93fe3a1e232fa1e2",
+        "start": 9358,
+        "end": 9368,
+        "startLine": 75,
+        "endLine": 75
+      },
+      "sourceText": "  command,"
+    },
+    {
+      "anchor": {
+        "snapshotId": "pr25-pinned-test-evidence",
+        "side": "head",
+        "path": "src/ui/main.tsx",
+        "commit": "e3b270e5f49a9215452b0b86702946043e979059",
+        "contentHash": "bacca7ee95b2fd9c588452810bdb99913f81620a6722d784b95a31710722ad6a",
+        "start": 4500,
+        "end": 4531,
+        "startLine": 101,
+        "endLine": 101
+      },
+      "sourceText": "    void workspace.open().catch"
+    },
+    {
+      "anchor": {
+        "snapshotId": "pr25-pinned-test-evidence",
+        "side": "head",
+        "path": "src/application/public.ts",
+        "commit": "e3b270e5f49a9215452b0b86702946043e979059",
+        "contentHash": "94e20323156f2a3c31cdea3b84a453b8e19d27ecad031457412083c08502da64",
+        "start": 2080,
+        "end": 2133,
+        "startLine": 39,
+        "endLine": 39
+      },
+      "sourceText": "export {createReviewWorkspace} from './workspace.ts';"
+    },
+    {
+      "anchor": {
+        "snapshotId": "pr25-pinned-test-evidence",
+        "side": "head",
+        "path": "src/application/workspace.ts",
+        "commit": "e3b270e5f49a9215452b0b86702946043e979059",
+        "contentHash": "9f17dc7e6e81a8190df3ed521767e69796913e40e6f2f4cfbd694aaf66ae98f5",
+        "start": 1473,
+        "end": 1531,
+        "startLine": 17,
+        "endLine": 17
+      },
+      "sourceText": "const review=createReviewBridge(reviewId,initialSnapshotId"
+    },
+    {
+      "anchor": {
+        "snapshotId": "pr25-pinned-test-evidence",
+        "side": "head",
+        "path": "src/application/workspace.ts",
+        "commit": "e3b270e5f49a9215452b0b86702946043e979059",
+        "contentHash": "9f17dc7e6e81a8190df3ed521767e69796913e40e6f2f4cfbd694aaf66ae98f5",
+        "start": 1926,
+        "end": 1959,
+        "startLine": 22,
+        "endLine": 22
+      },
+      "sourceText": "    await review.login(captured);"
+    },
+    {
+      "anchor": {
+        "snapshotId": "pr25-pinned-test-evidence",
+        "side": "head",
+        "path": "src/application/workspace.ts",
+        "commit": "e3b270e5f49a9215452b0b86702946043e979059",
+        "contentHash": "9f17dc7e6e81a8190df3ed521767e69796913e40e6f2f4cfbd694aaf66ae98f5",
+        "start": 3786,
+        "end": 3805,
+        "startLine": 41,
+        "endLine": 41
+      },
+      "sourceText": "  open:()=>login(),"
+    },
+    {
+      "anchor": {
+        "snapshotId": "pr25-pinned-test-evidence",
+        "side": "head",
+        "path": "src/application/review.ts",
+        "commit": "e3b270e5f49a9215452b0b86702946043e979059",
+        "contentHash": "dae210c79cb019d6edfdbfacfcf3da1e5773ceb4d15cf747df15ffa498c28e4e",
+        "start": 11122,
+        "end": 11145,
+        "startLine": 99,
+        "endLine": 99
+      },
+      "sourceText": "review=await refresh();"
+    },
+    {
+      "anchor": {
+        "snapshotId": "pr25-pinned-test-evidence",
+        "side": "head",
+        "path": "src/application/review.ts",
+        "commit": "e3b270e5f49a9215452b0b86702946043e979059",
+        "contentHash": "dae210c79cb019d6edfdbfacfcf3da1e5773ceb4d15cf747df15ffa498c28e4e",
+        "start": 4199,
+        "end": 4235,
+        "startLine": 38,
+        "endLine": 38
+      },
+      "sourceText": "const review=await request(captured,"
+    },
+    {
+      "anchor": {
+        "snapshotId": "pr25-pinned-test-evidence",
+        "side": "head",
+        "path": "src/application/review.ts",
+        "commit": "e3b270e5f49a9215452b0b86702946043e979059",
+        "contentHash": "dae210c79cb019d6edfdbfacfcf3da1e5773ceb4d15cf747df15ffa498c28e4e",
+        "start": 3376,
+        "end": 3402,
+        "startLine": 30,
+        "endLine": 30
+      },
+      "sourceText": "...accessHeaders(captured)"
+    },
+    {
+      "anchor": {
+        "snapshotId": "pr25-pinned-test-evidence",
+        "side": "head",
+        "path": "src/application/review.ts",
+        "commit": "e3b270e5f49a9215452b0b86702946043e979059",
+        "contentHash": "dae210c79cb019d6edfdbfacfcf3da1e5773ceb4d15cf747df15ffa498c28e4e",
+        "start": 0,
+        "end": 66,
+        "startLine": 1,
+        "endLine": 1
+      },
+      "sourceText": "import {localOwnerSession,accessHeaders} from './local-access.ts';"
+    },
+    {
+      "anchor": {
+        "snapshotId": "pr25-pinned-test-evidence",
+        "side": "head",
+        "path": "src/application/local-access.ts",
+        "commit": "e3b270e5f49a9215452b0b86702946043e979059",
+        "contentHash": "811735e3599292c54af870134345249deed32f1d9b9705f8ca18fd086225d59d",
+        "start": 131,
+        "end": 265,
+        "startLine": 3,
+        "endLine": 3
+      },
+      "sourceText": "export const accessHeaders=(session:string):Record<string,string>=>session===localOwnerSession?{}:{Authorization:`Bearer ${session}`};"
+    }
+  ],
+  "mappingUnknown": [
+    {
+      "caseId": "gateway-retained",
+      "side": "base",
+      "target": "src/storage/public.ts local authenticate",
+      "reason": "Test exercises the separately returned public authenticate arrow. No source chain here proves it reaches the distinct local seed; do not map by name."
+    }
+  ],
+  "selectedFunctionTargets": [
+    {
+      "id": "083d938782f0e018df80fce707b355488710e75876f88bd92e398ca852879046",
+      "name": "request",
+      "kind": "const-arrow",
+      "declaration": {
+        "snapshotId": "pr25-pinned-call-evidence",
+        "side": "base",
+        "path": "src/application/review.ts",
+        "contentHash": "7953f0b8486ae475717bdc749e23a31f12351f41c11a473280de9a2420265477",
+        "start": 2860,
+        "end": 3771,
+        "startLine": 24,
+        "endLine": 32
+      },
+      "body": {
+        "snapshotId": "pr25-pinned-call-evidence",
+        "side": "base",
+        "path": "src/application/review.ts",
+        "contentHash": "7953f0b8486ae475717bdc749e23a31f12351f41c11a473280de9a2420265477",
+        "start": 2938,
+        "end": 3771,
+        "startLine": 24,
+        "endLine": 32
+      },
+      "role": "changed"
+    },
+    {
+      "id": "a7c2131f067aee1cd64b01c90418ffa0da3b0f5469984249d91fa611723893f6",
+      "name": "accessHeaders",
+      "kind": "const-arrow",
+      "declaration": {
+        "snapshotId": "pr25-pinned-call-evidence",
+        "side": "head",
+        "path": "src/application/local-access.ts",
+        "contentHash": "811735e3599292c54af870134345249deed32f1d9b9705f8ca18fd086225d59d",
+        "start": 144,
+        "end": 264,
+        "startLine": 3,
+        "endLine": 3
+      },
+      "body": {
+        "snapshotId": "pr25-pinned-call-evidence",
+        "side": "head",
+        "path": "src/application/local-access.ts",
+        "contentHash": "811735e3599292c54af870134345249deed32f1d9b9705f8ca18fd086225d59d",
+        "start": 198,
+        "end": 264,
+        "startLine": 3,
+        "endLine": 3
+      },
+      "role": "changed"
+    },
+    {
+      "id": "2e55daf0e1c5086b0eb7e2390e38003b26bb3cf463f5ae835837f3e95eb43368",
+      "name": "request",
+      "kind": "const-arrow",
+      "declaration": {
+        "snapshotId": "pr25-pinned-call-evidence",
+        "side": "head",
+        "path": "src/application/review.ts",
+        "contentHash": "dae210c79cb019d6edfdbfacfcf3da1e5773ceb4d15cf747df15ffa498c28e4e",
+        "start": 2956,
+        "end": 3859,
+        "startLine": 25,
+        "endLine": 33
+      },
+      "body": {
+        "snapshotId": "pr25-pinned-call-evidence",
+        "side": "head",
+        "path": "src/application/review.ts",
+        "contentHash": "dae210c79cb019d6edfdbfacfcf3da1e5773ceb4d15cf747df15ffa498c28e4e",
+        "start": 3034,
+        "end": 3859,
+        "startLine": 25,
+        "endLine": 33
+      },
+      "role": "changed"
+    },
+    {
+      "id": "bc21ae0e1c83ba2ee39ca558a858869285bf5ce950d508ffb965bb054f43f891",
+      "name": "authenticate",
+      "kind": "const-arrow",
+      "declaration": {
+        "snapshotId": "pr25-pinned-call-evidence",
+        "side": "base",
+        "path": "src/storage/public.ts",
+        "contentHash": "61878e4c266549993e81985919feaf17995ee53790e49db5ad91d0b278725175",
+        "start": 10189,
+        "end": 10440,
+        "startLine": 198,
+        "endLine": 201
+      },
+      "body": {
+        "snapshotId": "pr25-pinned-call-evidence",
+        "side": "base",
+        "path": "src/storage/public.ts",
+        "contentHash": "61878e4c266549993e81985919feaf17995ee53790e49db5ad91d0b278725175",
+        "start": 10234,
+        "end": 10440,
+        "startLine": 198,
+        "endLine": 201
+      },
+      "role": "changed"
+    },
+    {
+      "id": "9b58606b4a652f7f9bc9500debd30f6d6fc0ccda0d44c170b031c444a909b7d8",
+      "name": "accessReference",
+      "kind": "const-arrow",
+      "declaration": {
+        "snapshotId": "pr25-pinned-call-evidence",
+        "side": "head",
+        "path": "src/storage/access.ts",
+        "contentHash": "0440486de82e136ffe430e4f1bed2b6f57f491319c59a71fad0f9d8507053b4c",
+        "start": 401,
+        "end": 618,
+        "startLine": 8,
+        "endLine": 12
+      },
+      "body": {
+        "snapshotId": "pr25-pinned-call-evidence",
+        "side": "head",
+        "path": "src/storage/access.ts",
+        "contentHash": "0440486de82e136ffe430e4f1bed2b6f57f491319c59a71fad0f9d8507053b4c",
+        "start": 441,
+        "end": 618,
+        "startLine": 8,
+        "endLine": 12
+      },
+      "role": "changed"
+    },
+    {
+      "id": "87929f42616495b59d0eddf0b7fae74b9f7bb9b59370fa7ecc9ef43f91917f68",
+      "name": "localPrincipal",
+      "kind": "const-arrow",
+      "declaration": {
+        "snapshotId": "pr25-pinned-call-evidence",
+        "side": "head",
+        "path": "src/storage/access.ts",
+        "contentHash": "0440486de82e136ffe430e4f1bed2b6f57f491319c59a71fad0f9d8507053b4c",
+        "start": 633,
+        "end": 741,
+        "startLine": 13,
+        "endLine": 13
+      },
+      "body": {
+        "snapshotId": "pr25-pinned-call-evidence",
+        "side": "head",
+        "path": "src/storage/access.ts",
+        "contentHash": "0440486de82e136ffe430e4f1bed2b6f57f491319c59a71fad0f9d8507053b4c",
+        "start": 683,
+        "end": 741,
+        "startLine": 13,
+        "endLine": 13
+      },
+      "role": "changed"
+    },
+    {
+      "id": "2e0dfcb2b5c914737ae3bcf51e1c56c15e5a65f8d29ee4b9f55571e694df0263",
+      "name": "authenticate",
+      "kind": "const-arrow",
+      "declaration": {
+        "snapshotId": "pr25-pinned-call-evidence",
+        "side": "head",
+        "path": "src/storage/public.ts",
+        "contentHash": "ebf680d4d62a47f92af2123a60673e4ba58c7236257ffc12cea2ddc981791d58",
+        "start": 10314,
+        "end": 10661,
+        "startLine": 200,
+        "endLine": 204
+      },
+      "body": {
+        "snapshotId": "pr25-pinned-call-evidence",
+        "side": "head",
+        "path": "src/storage/public.ts",
+        "contentHash": "ebf680d4d62a47f92af2123a60673e4ba58c7236257ffc12cea2ddc981791d58",
+        "start": 10366,
+        "end": 10661,
+        "startLine": 200,
+        "endLine": 204
+      },
+      "role": "changed"
+    }
+  ],
+  "frontiers": [
+    "No representative test directly invokes imported accessHeaders or the closure-private request; use explicit behavior mapping only.",
+    "Factory return property and HTTP route associations are not direct resolved-static call edges.",
+    "Base public store.authenticate is a separate returned function; no by-name equivalence with the base local authenticate seed.",
+    "No testcase in this packet executes or establishes a result, coverage percentage, runner availability or whole-PR test mapping."
+  ]
+}
