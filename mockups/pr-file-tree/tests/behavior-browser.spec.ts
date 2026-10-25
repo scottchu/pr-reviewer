@@ -21,7 +21,7 @@ for (const width of [1440, 390]) test(`${width} original file roots with caller/
   const call = graph.links.find(link => link.caller === request.id && link.callee === helper.id)!;
   const edge = page.locator(`[data-call-id="${call.id}"]`);
   await expect(edge).toContainText('request() → accessHeaders()');
-  await expect(edge).toContainText('New call in this PR');
+  await expect(edge).not.toContainText('New call in this PR');
   await expect(edge).toBeInViewport();
   const labelBox = await edge.boundingBox();
   expect(labelBox!.x).toBeGreaterThanOrEqual(0);
@@ -37,16 +37,25 @@ for (const width of [1440, 390]) test(`${width} original file roots with caller/
   await expect(page.locator('.continuous-reader')).toBeInViewport();
   const root = page.locator('.react-flow__node[data-id="file:src/application/review.ts"]');
   await expect(root).toHaveCSS('width', width < 650 ? '324px' : '760px');
-  const points = await page.locator(`.react-flow__edge-fileCall[data-id="${call.id}"] path.react-flow__edge-path`).evaluate(element => {
-    const path = element as SVGPathElement; const matrix = path.getScreenCTM()!;
-    const start = path.getPointAtLength(0).matrixTransform(matrix);
-    const end = path.getPointAtLength(path.getTotalLength()).matrixTransform(matrix);
-    return { start: { x: start.x, y: start.y }, end: { x: end.x, y: end.y }, marker: path.getAttribute('marker-end') };
+  const points = await page.locator(`.react-flow__edge-fileCall[data-id="${call.id}"]`).evaluate(element => {
+    const positions = (path: SVGPathElement) => {
+      const matrix = path.getScreenCTM()!;
+      const start = path.getPointAtLength(0).matrixTransform(matrix);
+      const end = path.getPointAtLength(path.getTotalLength()).matrixTransform(matrix);
+      return { start: { x: start.x, y: start.y }, end: { x: end.x, y: end.y } };
+    };
+    const path = element.querySelector<SVGPathElement>('.react-flow__edge-path')!;
+    const extensions = [...element.querySelectorAll<SVGPathElement>('.file-port-extension')].map(positions);
+    return { call: positions(path), extensions, marker: path.getAttribute('marker-end') };
   });
   const caller = await root.boundingBox();
   const callee = await page.locator('.react-flow__node[data-id="file:src/application/local-access.ts"]').boundingBox();
-  expect(Math.abs(points.start.x - caller!.x - caller!.width)).toBeLessThan(4);
-  expect(Math.abs(points.end.x - callee!.x)).toBeLessThan(4);
+  expect(Math.abs(points.extensions[0]!.start.x - caller!.x - caller!.width)).toBeLessThan(4);
+  expect(Math.abs(points.extensions[1]!.start.x - callee!.x)).toBeLessThan(4);
+  for (const [extension, endpoint] of [[points.extensions[0]!, points.call.start], [points.extensions[1]!, points.call.end]] as const) {
+    expect(Math.abs(extension.end.x - endpoint.x)).toBeLessThan(1);
+    expect(Math.abs(extension.end.y - endpoint.y)).toBeLessThan(1);
+  }
   expect(points.marker).toBeTruthy();
   await page.screenshot({ path: `${rootEvidence}/expanded-${width}.png` });
   await page.getByRole('button', { name: 'Unified', exact: true }).click();
@@ -94,7 +103,7 @@ test('both-side unchanged callers and callees, callsite evidence and arbitrary u
   const link = graph.links.find(link => link.caller === request.id && link.callee === helper.id)!;
   await page.getByRole('button', { name: 'Find source', exact: true }).click();
   await page.getByRole('combobox', { name: 'Changed source' }).selectOption('src/application/review.ts');
-  const edge = page.getByRole('button', { name: 'Explain After call request → accessHeaders · src/application/review.ts:30–30 → src/application/local-access.ts:3–3', exact: true });
+  const edge = page.getByRole('button', { name: /^Explain After call request → accessHeaders · src\/application\/review.ts:30–30 → src\/application\/local-access.ts:3–3;/ });
   await expect(edge).toHaveAttribute('data-call-id', link.id);
   await panTo(page, edge);
   await edge.focus();
@@ -113,7 +122,7 @@ test('both-side unchanged callers and callees, callsite evidence and arbitrary u
   await expect(page.locator('[data-expanded-file]')).toHaveCount(0);
   await source.click();
   await expect(page.locator('[data-expanded-file]')).toHaveAttribute('data-expanded-file', 'scripts/add-snapshot.ts');
-  await expect(page.getByRole('status').filter({ hasText: 'Calls unprepared for this source' })).toBeVisible();
+  await expect(page.getByRole('status').filter({ hasText: 'Call relationships are not mapped for this file' })).toBeVisible();
   await expect(page.locator('[data-file-path]')).toHaveCount(50);
   await page.screenshot({ path: '/tmp/pr-reviewer-reading-journey-evidence/r9-unprepared-390.png' });
 });
@@ -184,7 +193,7 @@ test('icon lens switches preserve folded source/test lens, public story cursor, 
 test('root call keyboard evidence returns to exact file projection; unprepared changed source stays reachable', async ({ page }) => {
   await page.setViewportSize({ width: 390, height: 844 });
   await page.goto('/');
-  const edge = page.getByRole('button', { name: 'Explain After call request → accessHeaders · src/application/review.ts:30–30 → src/application/local-access.ts:3–3', exact: true });
+  const edge = page.getByRole('button', { name: /^Explain After call request → accessHeaders · src\/application\/review.ts:30–30 → src\/application\/local-access.ts:3–3;/ });
   const camera = await page.locator('.react-flow__viewport').getAttribute('style');
   await edge.focus();
   await page.keyboard.press('Enter');
@@ -203,11 +212,11 @@ test('root call keyboard evidence returns to exact file projection; unprepared c
   await expect(file).toBeInViewport();
   await file.click();
   await expect(page.locator('[data-expanded-file]')).toHaveAttribute('data-expanded-file', 'scripts/add-snapshot.ts');
-  await expect(page.getByRole('status').filter({ hasText: 'Calls unprepared for this source' })).toBeVisible();
+  await expect(page.getByRole('status').filter({ hasText: 'Call relationships are not mapped for this file' })).toBeVisible();
   await expect(page.locator('[data-file-path]')).toHaveCount(50);
 });
 
-for (const resize of [false, true]) test(`phone root viewport clears legend and preserves endpoint framing after ${resize ? 'desktop resize' : 'fresh open'}`, async ({ page }) => {
+for (const resize of [false, true]) test(`phone root viewport clears bottom controls and preserves endpoint framing after ${resize ? 'desktop resize' : 'fresh open'}`, async ({ page }) => {
   await page.setViewportSize({ width: resize ? 1408 : 390, height: resize ? 796 : 844 });
   await page.goto('/');
   if (resize) {
@@ -224,17 +233,9 @@ for (const resize of [false, true]) test(`phone root viewport clears legend and 
     expect(box!.x + box!.width).toBeLessThanOrEqual(390);
   }
   const graph = await page.locator('.pr-graph').boundingBox();
-  const legend = await page.getByRole('complementary', { name: 'Relationship legend' }).boundingBox();
-  expect(graph!.y + graph!.height).toBeLessThanOrEqual(legend!.y);
-  const labels = await page.locator('.file-call-label').evaluateAll(elements => elements.map(element => {
-    const box = element.getBoundingClientRect(); return { top: box.top, bottom: box.bottom };
-  }));
-  for (const label of labels) {
-    if (label.top < graph!.y + graph!.height && label.bottom > graph!.y) {
-      expect(label.top).toBeGreaterThanOrEqual(graph!.y);
-      expect(label.bottom).toBeLessThanOrEqual(graph!.y + graph!.height);
-    }
-  }
+  await expect(page.locator('.file-call-legend')).toHaveCount(0);
+  const controls = await page.getByRole('navigation', { name: 'Workspace actions' }).boundingBox();
+  expect(graph!.y + graph!.height).toBeLessThanOrEqual(controls!.y);
   if (resize) {
     await source.click();
     await page.getByRole('button', { name: 'Unified', exact: true }).click();
@@ -269,4 +270,77 @@ test('storage root caller blocks keep every exact relation label disjoint', asyn
       && Math.min(a.bottom, b.bottom) > Math.max(a.top, b.top);
     expect(overlap, `Exact call labels overlap: ${a.id} and ${b.id}`).toBe(false);
   }
+});
+
+
+for (const width of [1440, 390]) test(`${width} continuous file-owned storage call lanes remain readable and traceable`, async ({ page }) => {
+  await page.setViewportSize({ width, height: 844 });
+  await page.goto('/');
+  if (width >= 650) await page.getByRole('button', { name: 'Close review context' }).click();
+  await expect(page.locator('[data-file-path]')).toHaveCount(50);
+  await expect(page.locator('.react-flow__edge-fileCall')).toHaveCount(15);
+  await page.getByRole('button', { name: 'Find source', exact: true }).click();
+  await page.getByRole('combobox', { name: 'Changed source' }).selectOption('src/storage/public.ts');
+  await expect(page.getByRole('combobox', { name: 'Changed source' })).toHaveCount(0);
+  const routes = await page.locator('.react-flow__edge-fileCall').evaluateAll(edges => edges.map(edge => {
+    const call = edge.querySelector<SVGPathElement>('.react-flow__edge-path')!;
+    const start = call.getPointAtLength(0); const end = call.getPointAtLength(call.getTotalLength());
+    const extensions = [...edge.querySelectorAll<SVGPathElement>('.file-port-extension')].map(path => ({ owner: path.dataset.portOwner, d: path.getAttribute('d') }));
+    return { id: edge.getAttribute('data-id'), y: start.y, endY: end.y, length: end.x - start.x, extensions, marker: call.getAttribute('marker-end') };
+  }));
+  for (const route of routes) {
+    expect(route.length).toBeGreaterThan(300);
+    expect(route.y).toBe(route.endY);
+    expect(route.marker).toBeTruthy();
+    expect(route.extensions).toHaveLength(2);
+    expect(route.extensions.every(extension => extension.owner && extension.d)).toBe(true);
+  }
+  const storage = projectBehaviorCalls();
+  const analysis = storage.nodes.filter(node => node.declaration.path === 'src/storage/analysis.ts');
+  const ids = storage.links.filter(link => analysis.some(node => node.id === link.caller) && link.target.path === 'src/storage/access.ts').map(link => link.id);
+  expect(ids).toHaveLength(6);
+  for (const id of ids) {
+    const label = page.locator(`[data-call-id="${id}"]`);
+    await expect(label).not.toContainText('New call');
+  }
+  const lanes = routes.filter(route => ids.includes(route.id!)).sort((a,b) => a.y-b.y);
+  for (let i=1;i<lanes.length;i++) expect(lanes[i]!.y-lanes[i-1]!.y).toBe(width < 650 ? 100 : 86);
+  const topology = await page.locator('.react-flow__edge-fileCall').evaluateAll(edges => edges.map(edge => {
+    const path = edge.querySelector<SVGPathElement>('.react-flow__edge-path')!;
+    const matrix = path.getScreenCTM()!;
+    const start = path.getPointAtLength(0).matrixTransform(matrix);
+    const end = path.getPointAtLength(path.getTotalLength()).matrixTransform(matrix);
+    return { left: start.x, right: end.x, y: start.y };
+  }));
+  const labels = await page.locator('.file-call-label').evaluateAll(elements => elements.map(element => {
+    const rect = element.getBoundingClientRect(); return { x: rect.x, right: rect.right, top: rect.top, bottom: rect.bottom };
+  }));
+  for (const label of labels) for (const line of topology) {
+    expect(line.y > label.top && line.y < label.bottom && Math.min(line.right,label.right) > Math.max(line.left,label.x)).toBe(false);
+  }
+  await expect(page.locator('[data-relation-type="requirement-reference"]')).toHaveCount(2);
+  await expect(page.locator('.react-flow__edge-requirementReference')).toHaveCount(2);
+  await page.screenshot({ path: `${rootEvidence}/continuous-storage-${width}.png` });
+  await page.getByRole('button', { name: 'Find source', exact: true }).click();
+  await page.getByRole('combobox', { name: 'Changed source' }).selectOption('src/storage/analysis.ts');
+  await page.screenshot({ path: `${rootEvidence}/analysis-lanes-${width}.png` });
+  await page.getByRole('button', { name: 'Find source', exact: true }).click();
+  await page.getByRole('combobox', { name: 'Changed source' }).selectOption('src/storage/imports.ts');
+  await page.screenshot({ path: `${rootEvidence}/imports-lanes-${width}.png` });
+});
+
+
+test('document region references distinguish normative source from implementation and exact return', async ({ page }) => {
+  await page.goto('/');
+  await page.getByRole('button', { name: 'Find source', exact: true }).click();
+  await page.getByRole('combobox', { name: 'Changed source' }).selectOption('docs/product/review-loop/runtime.md');
+  const reference = page.getByRole('button', { name: /Read documented requirement docs\/product\/review-loop\/runtime.md/ });
+  await expect(reference).toBeInViewport();
+  const frame = await page.locator('.react-flow__viewport').getAttribute('style');
+  await reference.click();
+  await expect(page.locator('[data-expanded-file]')).toHaveAttribute('data-expanded-file', 'docs/product/review-loop/runtime.md');
+  await expect(page.locator('[data-after-line="22"]')).toBeVisible();
+  await page.getByRole('button', { name: 'Back to source context' }).click();
+  await expect(page.locator('.react-flow__viewport')).toHaveAttribute('style', frame!);
+  await page.screenshot({ path: `${rootEvidence}/document-references.png` });
 });

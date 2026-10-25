@@ -20,8 +20,8 @@ import { OwnerPanels, type OwnerPanel } from './owner-panels.tsx';
 import { type GraphLens } from './behavior.ts';
 import { BehaviorNoteLabel, LensIcon, ActionIcon, type BehaviorNote } from './behavior-graph.tsx';
 import { mapJourneySource } from './journey-source.ts';
-import { layoutFileProjection, projectFileCalls } from './file-projection.ts';
-import { FileCallLine } from './file-call.tsx';
+import { layoutFileProjection, projectFileCalls, fileRequirementReferences } from './file-projection.ts';
+import { FileCallLine, FileRequirementLine } from './file-call.tsx';
 import { WorkspaceActions } from './workspace-actions.tsx';
 const motionDuration = () => matchMedia('(prefers-reduced-motion: reduce)').matches ? 0 : 240;
 const tree = buildTree(fixture.paths, fixture.changes);
@@ -193,7 +193,7 @@ const nodeTypes = {
 };
 const edgeTypes = {
   call: CallLine,
-  fileCall: FileCallLine
+  fileCall: FileCallLine, requirementReference: FileRequirementLine
 };
 const containment = tree.edges.map(e => ({
   id: e.id,
@@ -722,6 +722,14 @@ const App = () => {
   const nodes: CanvasNode[] = [...fileNodes, ...(lens === 'files' ? functionNodes : []), ...testNodes];
   const edges: Edge[] = fullscreen ? [] : [
     ...(lens === 'files' ? containment : []),
+    ...(lens === 'behavior' ? fileRequirementReferences.map((reference, index) => ({
+      id: `requirement-reference:${reference.key}:request`, type: 'requirementReference',
+      source: `file:${reference.path}`, target: 'file:src/application/review.ts',
+      sourceHandle: 'contains-out', targetHandle: 'contains-in',
+      data: { document: reference.path, sourceLeft: viewTree.nodes.find(node => node.path === reference.path)!.x, startLine: reference.start, endLine: reference.end, lane: index,
+        onRead: () => openContextEvidence(reference.key, false) },
+      ariaLabel: `Documented requirement to request implementation evidence; not a call`,
+    })) : []),
     ...(lens === 'behavior' ? fileCalls.map(call => {
       const siblings = fileCalls.filter(other => other.caller.declaration.path === call.caller.declaration.path && other.callee.declaration.path === call.callee.declaration.path);
       const index = siblings.findIndex(other => other.link.id === call.link.id);
@@ -730,8 +738,11 @@ const App = () => {
         source: `file:${call.caller.declaration.path}`, target: `file:${call.callee.declaration.path}`,
         sourceHandle: 'contains-out', targetHandle: 'contains-in',
         data: { ...call, active: callExplained?.id === call.link.id, onExplain: setCallExplained,
-          labelX: viewTree.nodes.find(node => node.path === call.caller.declaration.path)!.x,
-          lane: narrow ? index * 70 : (index - (siblings.length - 1) / 2) * 76, narrow },
+          sourceLeft: viewTree.nodes.find(node => node.path === call.caller.declaration.path)!.x,
+          sourceBottom: (() => { const node = viewTree.nodes.find(node => node.path === call.caller.declaration.path)!; return node.y + node.height; })(),
+          targetRight: (() => { const node = viewTree.nodes.find(node => node.path === call.callee.declaration.path)!; return node.x + node.width; })(),
+          targetBottom: (() => { const node = viewTree.nodes.find(node => node.path === call.callee.declaration.path)!; return node.y + node.height; })(),
+          lane: index, narrow },
         markerEnd: { type: MarkerType.ArrowClosed, color: call.status === 'added' ? '#92d4ac' : '#bdc6cc', width: 16, height: 16 },
         ariaLabel: `${call.caller.name} calls ${call.callee.name}; exact contained-symbol call projection`,
       };
@@ -1190,7 +1201,7 @@ const App = () => {
           if (node) { setSelected(path); moveCamera({ x: 12 - node.x, y: 100 - node.y, zoom: 1 }); }
           setSourceFinder(false);
         }}><option value="" disabled>Choose one of 50 changed sources</option>{fixture.paths.map(path => <option key={path} value={path}>{path}</option>)}</select></label>
-        <p>Source homes remain available even where calls are unprepared. Framing a home does not expand source.</p>
+        <p>Choose any changed file. Some call relationships are not shown yet; choosing a file does not expand it.</p>
       </section>}
       {(ownerError || ownerReview.error || ownerStory.error) && <div className="owner-error" role="alert">{ownerError || ownerReview.error || ownerStory.error}<button onClick={() => { setOwnerError(''); }}>Dismiss</button></div>}
       {!fullscreen && contextOpen && (!narrow || !ownerPanel) && <ReviewContext
@@ -1209,7 +1220,7 @@ const App = () => {
       ref={main}
       tabIndex={0}
       onKeyDownCapture={key}
-      aria-label={`PR25 ${lens === 'behavior' ? 'caller-to-callee behavior graph; call arrows retain exact source evidence, other scopes remain unprepared' : 'alternate file tree; directory edges mean contains'}. Drag or scroll to pan; pinch or Control-wheel to zoom; arrow keys pan, plus and minus zoom, zero shows Overview.`}
+      aria-label={`PR25 ${lens === 'behavior' ? 'caller-to-callee behavior graph; call arrows retain exact source evidence, some file relationships are not mapped yet' : 'alternate file tree; directory edges mean contains'}. Drag or scroll to pan; pinch or Control-wheel to zoom; arrow keys pan, plus and minus zoom, zero shows Overview.`}
     >
 
       <ReactFlow<CanvasNode>
@@ -1271,6 +1282,10 @@ const App = () => {
           size={.65}
         />
 
+        {lens === 'behavior' && !fullscreen && <EdgeLabelRenderer>
+          <span className="root-region-label" style={{ transform: `translate(0px,${Math.min(...viewTree.nodes.filter(node => /\.mdx?$/.test(node.path)).map(node => node.y)) - 38}px)` }}>Documentation · requirement references</span>
+          <span className="root-region-label" style={{ transform: 'translate(0px,-38px)' }}>Code · caller → callee</span>
+        </EdgeLabelRenderer>}
       </ReactFlow>
 
       {detail.expanded && !(narrow && (contextOpen || Boolean(ownerPanel))) && <DiffControls
@@ -1294,7 +1309,7 @@ const App = () => {
       {selected && !fullscreen && !calls.nodes.some(node => node.declaration.path === selected) && <span
         className="call-frontier"
         role="status"
-      >Calls unprepared for this source · exact source remains available</span>}
+      >Call relationships are not mapped for this file · source is available</span>}
 
       {testsFor && !fullscreen && relevantTests(testsFor).length === 0 && <span
         className="call-frontier"

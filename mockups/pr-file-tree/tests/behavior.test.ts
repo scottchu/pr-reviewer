@@ -6,7 +6,7 @@ import paths from '../paths.json' with { type: 'json' };
 import supplemental from '../calls-scope.json' with { type: 'json' };
 import { prepareBehaviorContext } from '../prepare-behavior-context.ts';
 import { callActionName, projectBehaviorCalls } from '../calls.ts';
-import { layoutFileProjection, projectFileCalls } from '../file-projection.ts';
+import { layoutFileProjection, projectFileCalls, fileRequirementReferences } from '../file-projection.ts';
 import { buildTree } from '../tree.ts';
 
 test('bounded scope observation preserves exact source/callsites and both unchanged callees without static admission', () => {
@@ -76,4 +76,32 @@ test('all call controls have distinct side/caller/callee/source names while IDs 
     return name;
   });
   assert.equal(new Set(names).size, graph.links.length);
+});
+
+
+test('document file identities occupy a separate upper region while call code stays below', () => {
+  const tree = buildTree(paths.paths, paths.changes);
+  for (const narrow of [false, true]) {
+    const layout = layoutFileProjection(tree, narrow);
+    const documents = layout.nodes.filter(node => /\.mdx?$/.test(node.path));
+    const code = layout.nodes.filter(node => !/\.mdx?$/.test(node.path));
+    assert.ok(documents.length > 0 && code.length > 0);
+    assert.ok(Math.max(...documents.map(node => node.y + node.height)) < Math.min(...code.map(node => node.y)));
+  }
+});
+
+
+test('authored requirement references retain exact normative ranges and actual request implementation evidence', () => {
+  assert.equal(fileRequirementReferences.length, 2);
+  for (const reference of fileRequirementReferences) {
+    const file = source.files.find(file => file.path === reference.path)!;
+    const text = file.after!.split('\n').slice(reference.start - 1, reference.end).join('\n');
+    assert.ok(text.includes('Authorization') || text.includes('credential-free owner requests'));
+    assert.ok(text.includes('agent') || text.includes('Bearer'));
+  }
+  const request = projectBehaviorCalls().nodes.find(node => node.name === 'request' && node.declaration.side === 'head')!;
+  assert.equal(request.declaration.path, 'src/application/review.ts');
+  assert.equal(request.declaration.startLine, 25);
+  assert.equal(request.declaration.endLine, 33);
+  assert.ok(projectFileCalls(buildTree(paths.paths, paths.changes)).some(call => call.caller.id === request.id && call.callee.name === 'accessHeaders'));
 });

@@ -1442,3 +1442,12 @@ button:disabled { cursor: default; opacity: .5; }
 .workspace-actions { width: max-content; }
 
 @media (max-width: 649px) { .workspace-actions-blocked { visibility: hidden; } }
+
+/* Adopted continuous root routing: labels stay above independent call lanes. */
+.file-port-extension { fill: none; stroke: #7f939f; stroke-width: 1.15; stroke-dasharray: 3 4; pointer-events: none; }
+.file-call-label { background: transparent; padding: 0; white-space: normal; font-weight: 550; }
+.file-route-owner { position: absolute; pointer-events: none; color: #dae4ea; font: 14px/20px Inter, sans-serif; white-space: nowrap; }
+
+.root-region-label { position: absolute; color: #d6e2e8; font: 550 16px/24px Inter, sans-serif; pointer-events: none; white-space: nowrap; }
+
+.root-requirement-reference { position: absolute; pointer-events: all; width: max-content; height: auto; border: 1px solid #6c8599; border-radius: 3px; color: #c0d7e9; background: #1e2225; font: 13px/20px Inter, sans-serif; padding: 2px 5px; }

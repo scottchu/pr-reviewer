@@ -35,20 +35,30 @@ export const layoutFileProjection = (tree: FileTree, narrow: boolean): FileTree 
   let top = 0;
   for (const target of targets) {
     const callers = [...new Set(calls.filter(call => call.callee.declaration.path === target).map(call => call.caller.declaration.path))];
-    const start = top;
+    positions.set(target, { x: narrow ? 174 : 760, y: top });
+    top += 100;
     for (const caller of callers) {
       const count = calls.filter(call => call.caller.declaration.path === caller && call.callee.declaration.path === target).length;
-      // Desktop lanes are centered on their source port; place that unchanged
-      // file proxy inside its own block so the next caller's lanes cannot intrude.
-      positions.set(caller, { x: 0, y: top + (narrow ? 0 : (count - 1) * 38) });
-      top += Math.max(narrow ? 270 : 160, count * 76 + 80);
+      positions.set(caller, { x: 0, y: top });
+      top += 140 + count * (narrow ? 100 : 86);
     }
-    positions.set(target, { x: narrow ? 174 : 760, y: narrow ? start + 210 : start + (top - start) / 2 - 40 });
-    top += narrow ? 140 : 120;
+    top += 80;
   }
+  const documents = files.filter(node => /\.mdx?$/.test(node.path));
+  const columns = narrow ? 1 : 3;
+  const docHeight = Math.ceil(documents.length / columns) * 65 + 100;
+  for (const [index, node] of documents.entries()) positions.set(node.path, { x: index % columns * 310, y: -docHeight + Math.floor(index / columns) * 65 });
   const unconnected = files.filter(node => !positions.has(node.path));
   for (const [index, node] of unconnected.entries()) {
     positions.set(node.path, { x: narrow ? 0 : index % 3 * 310, y: top + Math.floor(index / (narrow ? 1 : 3)) * 65 });
   }
   return { edges: [], nodes: files.map(node => ({ ...node, ...positions.get(node.path)!, depth: 0 })) };
 };
+
+
+// Authored requirement/implementation evidence projection over the pinned PR.
+// These are not extracted literal hyperlinks, call edges or edit-causality proof.
+export const fileRequirementReferences = [
+  { key: 'requirement', path: 'docs/product/review-loop/runtime.md', start: 22, end: 26 },
+  { key: 'rationale', path: 'docs/plans/480p/slices/01-review-loop/single-user-access/plan.md', start: 11, end: 13 },
+] as const;
