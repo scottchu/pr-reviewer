@@ -1,5 +1,7 @@
 # Guided explanations and exploration
 
+Latest composition: [canvas panels](canvas-panels.md) owns left context/right detail/bottom discussion and independent graph/detail/draft targets. Story remains an optional attention overlay. Historical implementation descriptions below do not authorize stacked-page or inline-composer geometry; existing frame/persistence contracts are unchanged.
+
 **Contract revision:** `review-story-v1`, planning amendment 4 (measured reading hierarchy and explicit question intent; existing semantic ports preserved)
 
 **Date:** 2026-10-24

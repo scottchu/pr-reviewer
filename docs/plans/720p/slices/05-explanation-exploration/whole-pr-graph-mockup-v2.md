@@ -1,6 +1,6 @@
 # Whole-PR spatial graph: design and next-mock packet v2
 
-Date: 2026-10-24. Status: source design ready for independent review; implementation requires the coordinator's reviewed-packet dispatch. No mock/runtime is implemented by this packet.
+Date: 2026-10-24. Status: whole-map source scope retained; composition superseded by [panel design v3](canvas-panel-design-v3.md). Implementation remains on hold until v3 role readback and coordinator dispatch. No mock/runtime is implemented by this packet.
 
 Parent: [slice05](plan.md). Documentation source base: `3fc242195e8d24ae47efc993afbdb6d3db4e3c60`. Design branch: `recover-whole-pr-spatial-graph`; worktree `/private/tmp/pr-reviewer-whole-pr-design`. Effective model/effort telemetry is unknown. The previous8476 source/preview remains preserved; no edit or launch of it is included.
 

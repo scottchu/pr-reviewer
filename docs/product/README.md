@@ -31,3 +31,5 @@ These documents distinguish accepted direction from unimplemented or unverified 
 The merged runtime/pilot baseline includes repository-path import. The combined semantic/story/exploration/recovery candidate is a separate source/build and has not been deployed to that pilot. Current operations and limits live in their owning documents above; plans retain delivery identities and evidence. Controlled fixture, live-provider, native, human, own-PR and whole-round results cannot substitute for one another.
 
 Configured-test delivery status here refers to the engineering integration candidate at source `79ab8b09817b0d7eae8a2052d3ef6ff72ad17631`. These test jobs are not on main `e3b270e`; this documentation does not claim merge, production qualification, adoption of the provisional panel or native-host delivery.
+
+- [Canvas workspace and panels](review-loop/canvas-panels.md): current composition, independent targets, gesture ownership, constrained readers and acceptance limits.

@@ -1,5 +1,7 @@
 # Anchored comments in the canvas
 
+Current composition follows [canvas panels](canvas-panels.md): floating markers remain anchor-adjacent; full thread and composer slide up from the bottom. Earlier inline-thread geometry is superseded. Selection, detail target and draft anchor remain independent.
+
 **Decision date:** 2026-10-24
 
 **Direction:** Accepted: selecting review prose or code offers a contextual comment, with floating anchor-adjacent human/agent markers and a thread/reply view
@@ -12,7 +14,7 @@
 
 A reviewer selects text in review code or prose and receives a small Comment action beside that selection. Activation captures the selected content identity and opens a contextual draft with the quotation and its source/version visible. Selecting text alone does not submit, wake an agent or replace another draft. Preserve the selection while moving focus into the composer; provide an explicit replace/keep choice if another unresolved draft would be affected.
 
-After a thread exists, a compact floating comment marker sits beside its anchored line/span or prose block. It stays attached to that content as the canvas pans, zooms or changes lens. Opening the marker reveals its contextual thread and reply composer adjacent to the group, with the original quotation highlighted and an explicit return/close action. The reading destination remains the graph, not a separate discussion page. Replying stays in the thread; creating a comment on a different selection creates a distinct anchor rather than silently moving the thread.
+After a thread exists, a compact floating comment marker sits beside its anchored line/span or prose block. It stays attached to that content as the canvas pans, zooms or changes lens. Opening the marker reveals its contextual thread and reply composer in the bottom slide-up discussion panel, with the original quotation highlighted in the graph and an exact anchor summary plus return/close action in the panel. The reading destination remains the graph, not a separate discussion page. Replying stays in the thread; creating a comment on a different selection creates a distinct anchor rather than silently moving the thread.
 
 All review-owned selectable prose and code are eligible interaction targets: source/diff, explanation claims, captured context and discussion text. Navigation labels and controls are not review content. A target without a durable supported anchor may still be demonstrated in an explicitly labeled mock state, but production must expose the limitation rather than pretend that the comment was saved.
 
@@ -37,11 +39,11 @@ Names, icons and colors are presentation; the server derives actual actors from 
 
 ## Density, placement and input
 
-Reserve a small marker lane beside source/prose content. Place the active comment action/thread close enough to show its anchor, but never cover selected text, code line numbers, graph ports, essential edges or controls. Shift or dock within the focused group when space is insufficient and retain a visible tether/anchor summary. Panning and text selection must not fight over the same gesture.
+Reserve a small marker lane beside source/prose content. Keep the selection action and markers beside their anchors without covering selected text, code line numbers, graph ports, essential edges or controls. Thread bodies/composers belong in the bottom panel, not docked inside a source group; retain a truthful anchor summary and Reveal origin there. Panning and text selection must not fight over the same gesture.
 
 Cluster overlapping inactive markers by visible block/group when zoomed out. Counts represent threads in that current view/filter, not message counts or invented unread status. Expanding a cluster lists its threads with author and source/version; selecting one reveals its exact anchor. Mixed human/agent clusters show mixed participants rather than choosing an arbitrary identity. Opening one thread may collapse another panel but cannot discard its draft. Do not open a wall of overlapping bubbles by default.
 
-Provide keyboard focus for markers and a named Comment on selection command, a keyboard-selectable source-range alternative, and focus restoration to the originating marker/selection after close. Touch selection retains native handles and offers an explicit action without requiring hover. Controls use the accepted coarse-pointer target size, visible focus and non-color labels. On narrow layouts the thread may expand below its source/prose block within the same graph group; preserve context and allow dismissal without losing text. Marker geometry cannot be the only way to discover discussions: a scoped accessible thread list focuses the same anchored records.
+Provide keyboard focus for markers and a named Comment on selection command, a keyboard-selectable source-range alternative, and focus restoration to the originating marker/selection after close. Touch selection retains native handles and offers an explicit action without requiring hover. Controls use the accepted coarse-pointer target size, visible focus and non-color labels. On narrow layouts discussion opens from the bottom as the foreground reader, preserving other reader targets behind named cues; dismissal preserves text and anchor. It never becomes a below-source application page. Marker geometry cannot be the only way to discover discussions: a scoped accessible thread list focuses the same anchored records.
 
 ## Public boundaries and persistence honesty
 

@@ -1,5 +1,7 @@
 # The controlling October 23 change-canvas references
 
+Later direct user correction preserves this spatial graph but places context left, detailed explanation right and discussion below: [current panel composition](review-loop/canvas-panels.md). Short connected claims remain in the graph; images do not override the later panel instruction.
+
 Date: 2026-10-24. Status: original requirements/source and supplied-image dissection, not a live browser audit. This supersedes the earlier lesson-centered dissection and its product-fit inference. The [whole PR25 graph](pr25-whole-change-graph.md) and [reviewer experience](review-experience.md) carry the resulting design.
 
 ## Find the actual track

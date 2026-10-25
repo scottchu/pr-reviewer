@@ -1,5 +1,7 @@
 # Read source inside the review canvas
 
+Composition is governed by [canvas panels](canvas-panels.md): viewport-filling graph, default open left context, right explanation and bottom discussion, independent targets and no outer page scroll. Actual diff remains inside the graph.
+
 **Decision date:** 2026-10-24
 
 **Direction:** Accepted user correction: overview and focused source reading remain presentations of the same persistent graph canvas
@@ -49,7 +51,7 @@ Lens and viewport are private presentation state, not domain graph edits. Reuse 
 
 ## Contextual comments on selected content
 
-The [canvas comment contract](canvas-comments.md) applies to selected review prose as well as code. Show the Comment action beside the selection, then an anchor-adjacent floating thread marker with human/agent author identity. Open the thread/reply in context; pan, zoom, lens changes and return never change its anchor. Use a reserved marker lane and counted clusters to prevent overlap, with keyboard/touch and narrow-layout access. Prose requires stable owning content/version/selection identity; unsupported prose persistence stays explicitly preview-only, not a fabricated source anchor or Saved result.
+The [canvas comment contract](canvas-comments.md) applies to selected review prose as well as code. Show the Comment action beside the selection, then an anchor-adjacent floating thread marker with human/agent author identity. Open the thread/reply in the bottom discussion panel, retaining its exact graph anchor; pan, zoom, lens changes and return never change that anchor. Use a reserved marker lane and counted clusters to prevent overlap, with keyboard/touch and narrow-layout access. Prose requires stable owning content/version/selection identity; unsupported prose persistence stays explicitly preview-only, not a fabricated source anchor or Saved result.
 
 ## Narrow layout and accessibility
 
@@ -106,6 +108,6 @@ The [reviewer experience](../review-experience.md) and [reference dissection](..
 
 ## Whole-PR membership and spatial navigation
 
-The controlling October23 contract is explicit in [the whole PR25 graph](../pr25-whole-change-graph.md): all changed hunks have persistent group/file homes, with before/after one-hop callers AND callees including unchanged context or explicit side-specific gaps. Source, explanations and tests are connected graph members inside/adjacent to their groups. Compact support/document groups remain canvas members, not an inventory hidden behind the current story.
+The controlling October23 contract is explicit in [the whole PR25 graph](../pr25-whole-change-graph.md): all changed hunks have persistent group/file homes, with before/after one-hop callers AND callees including unchanged context or explicit side-specific gaps. Source, short explanation claims and tests are connected graph members inside/adjacent to their groups; extended explanation is in the right panel and full discussion in the bottom panel. Compact support/document groups remain canvas members, not an inventory hidden behind the current story.
 
 Story is optional attention over this map; it never replaces membership or gates arbitrary entry. Free pan/zoom and manual semantic-detail expansion must work before playback. Focus may change framing/detail, not swap the graph for a slide. The8476 locked-pan/single-group mock is rejected as a product-fit target; its functional checks do not weaken this contract. Exact graph facts, public state boundaries, anchors and recovery remain unchanged.
