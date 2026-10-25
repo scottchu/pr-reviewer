@@ -8,7 +8,7 @@ Use installed donor packages through task-local entry links/caches, no install. 
 
 ```sh
 /Applications/ChatGPT.app/Contents/Resources/cua_node/bin/node node_modules/typescript/bin/tsc -p mockups/pr-file-tree/tsconfig.json
-/Applications/ChatGPT.app/Contents/Resources/cua_node/bin/node --experimental-strip-types --test mockups/pr-file-tree/tests/tree.test.ts mockups/pr-file-tree/tests/imports.test.ts mockups/pr-file-tree/tests/detail.test.ts mockups/pr-file-tree/tests/change-rail.test.ts mockups/pr-file-tree/tests/file-group.test.ts mockups/pr-file-tree/tests/relationship.test.ts
+/Applications/ChatGPT.app/Contents/Resources/cua_node/bin/node --experimental-strip-types --test mockups/pr-file-tree/tests/tree.test.ts mockups/pr-file-tree/tests/imports.test.ts mockups/pr-file-tree/tests/detail.test.ts mockups/pr-file-tree/tests/change-rail.test.ts mockups/pr-file-tree/tests/file-group.test.ts mockups/pr-file-tree/tests/relationship.test.ts mockups/pr-file-tree/tests/reading.test.ts
 /Users/scottchu/.asdf/installs/bun/1.4.2/bin/bun node_modules/vite/bin/vite.js build --config mockups/pr-file-tree/vite.config.ts
 /Applications/ChatGPT.app/Contents/Resources/cua_node/bin/node node_modules/@playwright/test/cli.js test --config mockups/pr-file-tree/playwright.config.ts
 ```

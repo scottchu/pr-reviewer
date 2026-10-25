@@ -1,6 +1,6 @@
 import {splitRows} from './change-rail.ts';
 import type {FileDiff,DiffMode} from './file-diff.tsx';
-export type InnerData={kind:'file'|'hunk'|'source'|'comparison';label:string;path:string;index:number;side?:'before'|'after';source?:FileDiff['before'];hunk?:FileDiff['hunks'][number];mode:DiffMode;rowHeights:number[];active?:boolean;selectedSource?:boolean;horizontal?:boolean;focusColumn?:number;onMeasured?:(index:number,height:number)=>void;explain?:()=>void};
+export type InnerData={kind:'file'|'hunk'|'source'|'comparison';label:string;path:string;index:number;side?:'before'|'after';source?:FileDiff['before'];hunk?:FileDiff['hunks'][number];mode:DiffMode;rowHeights:number[];active?:boolean;selectedSource?:boolean;horizontal?:boolean;scrollLeft?:number|undefined;restoreVersion?:number;onHorizontal?:(index:number,left:number)=>void;focusColumn?:number;onMeasured?:(index:number,height:number)=>void;explain?:()=>void};
 export type InnerNode={id:string;type:'innerGroup'|'innerSource'|'innerComparison';parentId?:string;position:{x:number;y:number};width:number;height:number;data:InnerData};
 export type InnerEdge={id:string;source:string;target:string;kind:'contains'|'compares';index:number;side?:'before'|'after'};
 export const fileGroupModel=(file:FileDiff,mode:DiffMode,width:number,measured:Record<number,number>={})=>{
