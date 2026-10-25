@@ -427,3 +427,44 @@ test.describe('desktop guided call-context framing', () => {
     await expect(page.locator('.react-flow__viewport')).toHaveAttribute('style', original!);
   });
 });
+
+test('exact request focus selects its comparison until deliberate reader navigation', async ({ page }) => {
+  await page.emulateMedia({ reducedMotion: 'no-preference' });
+  await page.setViewportSize({ width: 1408, height: 796 });
+  await page.goto('/');
+  await page.getByRole('button', { name: 'Inspect the changed request', exact: true }).click();
+  const explain = page.getByRole('button', { name: 'Explain current source comparison', exact: true });
+  await explain.click();
+  const panel = page.getByRole('region', { name: 'Source comparison explanation' });
+  await expect(panel).toContainText('Change 3');
+  await expect(panel).not.toContainText('No prepared summary');
+  await page.getByRole('button', { name: 'Close relationship explanation' }).click();
+  await page.getByRole('button', { name: /src\/application\/review.ts change 1 ·/ }).click();
+  await explain.click();
+  await expect(panel).toContainText('Change 1');
+  await page.screenshot({ path: '/tmp/pr-reviewer-reading-journey-evidence/r22-request-handback.png' });
+});
+
+
+test('exact retained request citation hands comparison selection back to manual scrolling', async ({ page }) => {
+  await page.emulateMedia({ reducedMotion: 'no-preference' });
+  await page.setViewportSize({ width: 1408, height: 796 });
+  await page.goto('/');
+  await page.getByRole('button', { name: 'Close review context', exact: true }).click();
+  await page.getByRole('button', { name: 'Open prepared story', exact: true }).click();
+  await page.getByRole('button', { name: 'Inspect head src/application/review.ts L25–33', exact: true }).first().click();
+  const explain = page.getByRole('button', { name: 'Explain current source comparison', exact: true });
+  await explain.click();
+  const panel = page.getByRole('region', { name: 'Source comparison explanation' });
+  await expect(panel).toContainText('Change 3');
+  await page.getByRole('button', { name: 'Close relationship explanation' }).click();
+  const reader = page.locator('[data-expanded-file="src/application/review.ts"] .continuous-reader');
+  await reader.hover();
+  await page.mouse.wheel(0, -10000);
+  await expect.poll(() => reader.evaluate(element => element.scrollTop)).toBe(0);
+  await explain.click();
+  await expect(panel).toContainText('Change 1');
+  await page.getByRole('button', { name: 'Close relationship explanation' }).click();
+  await page.getByRole('button', { name: 'Return to original reading', exact: true }).click();
+  await expect(page.locator('[data-expanded-file]')).toHaveCount(0);
+});

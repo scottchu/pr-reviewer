@@ -1,3 +1,4 @@
+import { focusedComparison } from './comparison-selection.ts';
 import { SyntaxCode } from './syntax-code.tsx';
 import React, { useRef, useState, useLayoutEffect, useMemo, useEffect } from 'react';
 import type { FileReading, ReadingFocus } from './reading.ts';
@@ -103,6 +104,7 @@ export const FileDiffBody = ({ file, mode, fullscreen, width, onExplain, activeR
   const horizontal = useRef<HTMLDivElement>(null);
   const anchors = useRef<(HTMLElement | null)[]>([]);
   const travel = useRef<number | null>(null);
+  const focusSelection = useRef<{ index: number; side: 'before' | 'after' } | null>(null);
   const local = useRef<FileReading>(reading ?? {
     active: 0,
     top: 0,
@@ -157,7 +159,15 @@ export const FileDiffBody = ({ file, mode, fullscreen, width, onExplain, activeR
         behavior: 'instant'
       });
   };
+  const readManually = () => {
+    const focused = focusSelection.current;
+    focusSelection.current = null;
+    stop();
+    // A boundary wheel may not emit scroll; ownership still changes here.
+    if (focused) observe();
+  };
   const go = (index: number) => {
+    focusSelection.current = null;
     travel.current = index;
     setActive(index);
     save({
@@ -169,6 +179,7 @@ export const FileDiffBody = ({ file, mode, fullscreen, width, onExplain, activeR
     });
   };
   useLayoutEffect(() => {
+    focusSelection.current = null;
     if (reading) {
       pendingRestore.current = reading;
       local.current = reading;
@@ -217,6 +228,12 @@ export const FileDiffBody = ({ file, mode, fullscreen, width, onExplain, activeR
     const side = mode === 'split' ? `.diff-side.${focus.preferredSide} ` : '';
     const row = content.current?.querySelector<HTMLElement>(`${side}[data-${focus.preferredSide}-line="${line}"]`);
     if (row) {
+      const index = focusedComparison(file.hunks, focus);
+      focusSelection.current = index === null ? null : { index, side: focus.preferredSide };
+      if (index !== null) {
+        setActive(index);
+        save({ active: index });
+      }
       travel.current = null;
       body.current?.scrollTo({
         top: Math.max(0, row.offsetTop + (content.current?.offsetTop ?? 0) - 54),
@@ -384,13 +401,19 @@ export const FileDiffBody = ({ file, mode, fullscreen, width, onExplain, activeR
       aria-label={`Pinned diff for ${file.path}`}
       onClick={e => e.stopPropagation()}
       onWheel={e => {
-        stop();
+        readManually();
         e.stopPropagation();
       }}
       onTouchStart={stop}
-      onTouchMove={stop}
-      onPointerDown={stop}
-      onKeyDown={stop}
+      onTouchMove={readManually}
+      onPointerDown={e => {
+        if (e.target === e.currentTarget) readManually();
+        else stop();
+      }}
+      onKeyDown={e => {
+        if (e.target === e.currentTarget && ['ArrowUp', 'ArrowDown', 'PageUp', 'PageDown', 'Home', 'End', ' '].includes(e.key)) readManually();
+        else stop();
+      }}
       onScroll={() => {
         const el = body.current;
         if (!el)
@@ -398,6 +421,7 @@ export const FileDiffBody = ({ file, mode, fullscreen, width, onExplain, activeR
         save({
           top: el.scrollTop
         });
+        if (focusSelection.current) return;
         if (travel.current !== null) {
           const target = Math.max(0, Math.min(location(travel.current) - 54, el.scrollHeight - el.clientHeight));
           if (Math.abs(el.scrollTop - target) < 2)
@@ -475,7 +499,7 @@ export const FileDiffBody = ({ file, mode, fullscreen, width, onExplain, activeR
           onClick={() => onExplain({
             file,
             index: active,
-            side: 'after'
+            side: focusSelection.current?.side ?? 'after'
           })}
         >↔</button>
 
