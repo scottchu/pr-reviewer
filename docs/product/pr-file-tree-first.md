@@ -31,6 +31,16 @@ The supplemental private-scope preparation is deliberately limited to three name
 
 Selection and source/function references are shared across lenses. Camera cache keys distinguish the active source and retain each lens separately; when a source has no retained camera in the destination, translate its existing screen position at the same scale into the new coordinates. The originating lens travels with source/test/Context/fullscreen and owner return frames. Source inspection and lens changes do not adopt a question anchor, move public cursor or discard a dirty draft. `view=files` is an explicit alternate-view link; absence of that selection defaults to Behavior.
 
+### Call readability and narrow orientation clarification
+
+Date: 2026-10-25.
+Status: bounded repair following frozen supplied-image critique and independent source P3.
+The call explanation action names the actual caller→callee, Before/After side, source path and callsite range, with target path/range when needed; opaque relation IDs stay in data/provenance. Certainty remains an independent source-observed/static disclosure. Keyboard users can distinguish and activate the exact relation without correlating a hash. Distinct call records/callsites must not be merged or renamed to improve routing.
+
+Distinct callers must not visually share a long coincident connector trunk. Use separate curved paths with stable small lanes for distinct records sharing exact endpoints; retain each original source/target handle, endpoint, arrowhead, side and evidence. Route shape is presentation, never a new call relation. Validate actual SVG endpoints/direction and relation-target actions after changes.
+
+Narrow first-open retains an explicit, visibly named Context cue, not a mandatory full overlay. Opening it recovers motivation and before/after; closing preserves graph/draft/reading. Keep readable source/function scale and ordinary pan rather than shrinking an entire chain to fit. At390px frame the changed request/helper cards inside the viewport; at320px an off-viewport neighbor is an explicitly retained spatial-navigation limit, not missing content or same-frame completeness. Actual author traversal cannot establish that an unfamiliar reader discovers these actions unaided.
+
 ### F01 — Whole-PR source accounting and alternate file tree
 
 All50 changed PR25 paths have discoverable exact source homes in both lenses. The default behavior lens connects actual callers to callees and locates source/support homes by the accepted responsibility groups, with visibly typed source/scope associations and honest unprepared frontiers. The alternate file lens places the same sources under directory containment branches. Each compact source home shows its basename and Git status; full-path/kind IDs distinguish duplicates. Directory edges mean contains only in that alternate lens. Drag/scroll pans; pinch/Control-wheel and keyboard zoom remain available; Overview frames the active lens without changing disclosure. The canvas fills the window without outer page scrolling. Not all50 must fit the first viewport at legible scale.
