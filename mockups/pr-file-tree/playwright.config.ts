@@ -1,13 +1,13 @@
 import { defineConfig } from '@playwright/test';
 export default defineConfig({
   testDir: './tests',
-  testMatch: ['continuous-browser.spec.ts', 'calls-browser.spec.ts'],
+  testMatch: ['continuous-browser.spec.ts', 'calls-browser.spec.ts', 'journey-browser.spec.ts'],
   workers: 1,
   fullyParallel: false,
   reporter: 'list',
-  outputDir: '/tmp/pr-reviewer-pr-file-tree-evidence/playwright',
+  outputDir: '/tmp/pr-reviewer-reading-journey-evidence/playwright',
   use: {
-    baseURL: 'http://127.0.0.1:56677',
+    baseURL: 'http://127.0.0.1:57943',
     viewport: {
       width: 1440,
       height: 1000

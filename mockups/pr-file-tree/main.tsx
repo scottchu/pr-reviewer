@@ -1,4 +1,4 @@
-import React, { useMemo, useRef, useState, useReducer, useLayoutEffect } from 'react';
+import React, { useMemo, useRef, useState, useReducer, useLayoutEffect, useEffect } from 'react';
 import { createRoot } from 'react-dom/client';
 import { ReactFlow, Background, BackgroundVariant, Handle, Position, BaseEdge, EdgeLabelRenderer, getBezierPath, MarkerType, type Node, type NodeProps, type ReactFlowInstance, type Edge, type EdgeProps, useUpdateNodeInternals } from '@xyflow/react';
 import '@xyflow/react/dist/style.css';
@@ -12,6 +12,7 @@ import { RelationshipReader } from './relationship-reader.tsx';
 import { projectCalls, layoutCalls, relevantTests, type FunctionIdentity, type CallLink } from './calls.ts';
 import { FunctionLabel, DeclaredTestLabel, CallLine, CallExplanation, type FunctionNode, type DeclaredTestNode } from './call-graph.tsx';
 import type { DeclaredTest } from './declared-tests.types.ts';
+import { ReviewContext, type ContextEvidence } from './review-context.tsx';
 const motionDuration = () => matchMedia('(prefers-reduced-motion: reduce)').matches ? 0 : 240;
 const tree = buildTree(fixture.paths, fixture.changes);
 type LabelNode = Node<{
@@ -183,6 +184,19 @@ const initialView = (overview = false) => {
   };
 };
 const App = () => {
+  const [narrow, setNarrow] = useState(window.innerWidth < 650);
+  const [contextOpen, setContextOpen] = useState(window.innerWidth >= 650);
+  const contextInvoker = useRef<HTMLButtonElement>(null);
+  useEffect(() => {
+    const media = matchMedia('(max-width: 649px)');
+    const update = () => setNarrow(media.matches);
+    media.addEventListener('change', update);
+    return () => media.removeEventListener('change', update);
+  }, []);
+  const closeContext = () => {
+    setContextOpen(false);
+    contextInvoker.current?.focus();
+  };
   const flow = useRef<ReactFlowInstance<CanvasNode>>(null);
   const main = useRef<HTMLElement>(null);
   const [sourceRelation, setSourceRelation] = useState<SourceRelation | null>(null);
@@ -197,6 +211,8 @@ const App = () => {
   const [callExplained, setCallExplained] = useState<CallLink | null>(null);
   const sourceSerial = useRef(0);
   const [sourceReturn, setSourceReturn] = useState<{
+    selected: string | null;
+    testsFor: string | null;
     expanded: string | null;
     focus: ReadingFocus | undefined;
     reading: FileReading | undefined;
@@ -208,6 +224,11 @@ const App = () => {
     mode: DiffMode;
   } | null>(null);
   const [testReturn, setTestReturn] = useState<typeof sourceReturn>(null);
+  const [contextReturns, setContextReturns] = useState<readonly {
+    frame: NonNullable<typeof sourceReturn>;
+    source: typeof sourceReturn;
+    test: typeof sourceReturn;
+  }[]>([]);
   const readings = useRef<FileReadings>({});
   const [restoreVersion, setRestoreVersion] = useState(0);
   const cameraOwner = useRef<symbol | null>(null);
@@ -400,6 +421,8 @@ const App = () => {
   const rememberReturn = () => {
     if (!sourceReturn && flow.current)
       setSourceReturn({
+        selected,
+        testsFor,
         expanded: detail.expanded,
         focus: functionFocus,
         reading: detail.expanded ? readings.current[detail.expanded] : undefined,
@@ -407,10 +430,12 @@ const App = () => {
         mode
       });
   };
-  const openFunction = (identity: FunctionIdentity) => {
+  const openFunction = (identity: FunctionIdentity, saveReturn = true) => {
     if (fullscreen)
       return;
-    rememberReturn();
+    if (saveReturn) {
+      rememberReturn();
+    }
     setCallExplained(null);
     setSourceRelation(null);
     sourceSerial.current++;
@@ -444,6 +469,8 @@ const App = () => {
     setSourceRelation(null);
     if (flow.current)
       setTestReturn({
+        selected,
+        testsFor,
         expanded: detail.expanded,
         focus: functionFocus,
         reading: detail.expanded ? readings.current[detail.expanded] : undefined,
@@ -554,12 +581,15 @@ const App = () => {
     })),
   ];
   const returnToSource = () => {
-    const retained = testReturn ?? sourceReturn;
+    const context = contextReturns.at(-1);
+    const retained = testReturn ?? sourceReturn ?? context?.frame;
     if (!retained)
       return;
     if (retained.expanded && retained.reading)
       readings.current = rememberFile(readings.current, retained.expanded, retained.reading);
     setFunctionFocus(retained.focus);
+    setSelected(retained.selected);
+    setTestsFor(retained.testsFor);
     setMode(retained.mode);
     setRestoreVersion(value => value + 1);
     dispatchDetail({
@@ -569,8 +599,13 @@ const App = () => {
     moveCamera(retained.camera);
     if (testReturn)
       setTestReturn(null);
-    else
+    else if (sourceReturn)
       setSourceReturn(null);
+    else if (context) {
+      setSourceReturn(context.source);
+      setTestReturn(context.test);
+      setContextReturns(frames => frames.slice(0, -1));
+    }
   };
   const reset = () => {
     if (fullscreen) {
@@ -594,11 +629,64 @@ const App = () => {
     setCallExplained(null);
     setFunctionFocus(undefined);
     setSourceReturn(null);
+    setContextReturns([]);
     setMode(readings.current[path]?.mode ?? (window.innerWidth < 650 ? 'unified' : 'split'));
     dispatchDetail({
       type: 'focus',
       path: detail.expanded === path ? null : path
     });
+  };
+  const openContextEvidence = (target: ContextEvidence) => {
+    if (!flow.current) {
+      return;
+    }
+    if (narrow) {
+      setContextOpen(false);
+    }
+    const path = target === 'request'
+      ? 'src/application/review.ts'
+      : 'docs/product/review-loop/runtime.md';
+    const frame = {
+      selected,
+      testsFor,
+      expanded: detail.expanded,
+      focus: functionFocus,
+      reading: detail.expanded ? readings.current[detail.expanded] : undefined,
+      camera: flow.current.getViewport(),
+      mode
+    };
+    setContextReturns(frames => [...frames, {
+      frame,
+      source: sourceReturn,
+      test: testReturn
+    }]);
+    setSourceReturn(null);
+    setTestReturn(null);
+    setSelected(path);
+    setTestsFor(null);
+    if (target === 'request') {
+      const request = projectCalls(path).seeds.find(node => node.name === 'request' && node.declaration.side === 'head');
+      if (request) {
+        openFunction(request, false);
+      }
+    } else {
+      sourceSerial.current++;
+      setCallExplained(null);
+      setSourceRelation(null);
+      setFunctionFocus({
+        id: `requirement:${sourceSerial.current}`,
+        path,
+        name: 'Captured local-owner requirement',
+        before: [],
+        after: [{ startLine: 22, endLine: 26 }],
+        preferredSide: 'after'
+      });
+      dispatchDetail({ type: 'focus', path });
+      const node = tree.nodes.find(node => node.path === path && node.kind === 'file');
+      if (node) {
+        moveCamera({ x: 5 - node.x, y: 30 - node.y, zoom: 1 });
+      }
+    }
   };
   const key = (e: React.KeyboardEvent<HTMLElement>) => {
     if (e.key === 'Escape' && callExplained) {
@@ -685,7 +773,14 @@ const App = () => {
 
     <header>
 
-      {(testReturn || sourceReturn) && !fullscreen && <button
+      {!fullscreen && <button
+        ref={contextInvoker}
+        aria-label={contextOpen ? 'Hide review context' : 'Open review context'}
+        aria-expanded={contextOpen}
+        onClick={() => setContextOpen(value => !value)}
+      >Context</button>}
+
+      {(testReturn || sourceReturn || contextReturns.length > 0) && !fullscreen && <button
         className="source-return"
         aria-label="Back to source context"
         title="Back to source context"
@@ -724,7 +819,14 @@ const App = () => {
 
     </header>
 
+    <div className="review-workspace">
+      {!fullscreen && contextOpen && <ReviewContext
+        narrow={narrow}
+        onClose={closeContext}
+        onEvidence={openContextEvidence}
+      />}
     <main
+      inert={!fullscreen && contextOpen && narrow ? true : undefined}
       data-workspace-root={fullscreen ? `file:${fullscreen.path}` : 'pr:25'}
       ref={main}
       tabIndex={0}
@@ -818,6 +920,7 @@ const App = () => {
       />}
 
     </main>
+    </div>
 
   </>;
 };

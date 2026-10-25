@@ -1,6 +1,11 @@
 import { test, expect, type Page, type Locator } from '@playwright/test';
 import { projectCalls } from '../calls.ts';
-const evidence = '/tmp/pr-reviewer-pr-file-tree-evidence';
+const evidence = '/tmp/pr-reviewer-reading-journey-evidence';
+const closeOpeningContext = async (page: Page) => {
+  if ((page.viewportSize()?.width ?? 0) >= 650) {
+    await page.getByRole('button', { name: 'Close review context' }).click();
+  }
+};
 test.use({
   reducedMotion: 'reduce'
 });
@@ -25,6 +30,7 @@ for (const width of [
       height: width === 390 ? 844 : 1000
     });
     await page.goto('/');
+    await closeOpeningContext(page);
     const path = 'src/application/review.ts';
     await panTo(page, file(page, path));
     await file(page, path).click();
@@ -69,6 +75,7 @@ for (const width of [
       height: width === 390 ? 844 : 1000
     });
     await page.goto('/');
+    await closeOpeningContext(page);
     const path = 'src/storage/public.ts';
     await panTo(page, file(page, path));
     await file(page, path).click();
@@ -105,6 +112,7 @@ test('changed function toggles only relevant declared tests and opens exact full
     height: 844
   });
   await page.goto('/');
+    await closeOpeningContext(page);
   const path = 'src/application/review.ts';
   await panTo(page, file(page, path));
   await file(page, path).click();
@@ -154,6 +162,7 @@ test('storage declared tests retain unchanged boundary source without inventing 
     height: 844
   });
   await page.goto('/');
+    await closeOpeningContext(page);
   const path = 'src/storage/public.ts';
   await panTo(page, file(page, path));
   await file(page, path).click();

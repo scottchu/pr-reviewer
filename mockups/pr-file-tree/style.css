@@ -1245,3 +1245,104 @@ html {
   top: 32px;
   z-index: 8;
 }
+
+.review-workspace {
+  display: flex;
+  flex: 1;
+  min-height: 0;
+  position: relative;
+}
+.review-workspace > main {
+  flex: 1;
+  min-width: 0;
+}
+.review-context {
+  flex: 0 0 272px;
+  width: 272px;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  padding: 16px 18px 28px;
+  border-right: 1px solid #454d55;
+  background: #20272b;
+  color: #dce3e8;
+}
+.context-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  color: #a9bac5;
+  font-size: 12px;
+}
+.context-heading button {
+  min-width: 40px;
+  min-height: 40px;
+  justify-content: center;
+}
+.review-context h1 {
+  font-size: 21px;
+  line-height: 1.35;
+  font-weight: 550;
+  margin: 15px 0 24px;
+}
+.review-context h2 {
+  font-size: 12px;
+  line-height: 1.5;
+  color: #b6c9d5;
+  font-weight: 600;
+}
+.review-context section {
+  margin-bottom: 24px;
+}
+.review-context p {
+  margin: 9px 0;
+  font-size: 13px;
+  line-height: 1.65;
+}
+.review-context small {
+  display: block;
+  color: #a7b6bf;
+  font-size: 11px;
+  line-height: 1.6;
+}
+.review-context .context-citation {
+  display: block;
+  width: 100%;
+  height: auto;
+  white-space: normal;
+  margin: 12px 0 9px;
+  padding: 9px 0;
+  min-height: 44px;
+  text-align: left;
+  color: #a8d4ed;
+  background: none;
+  border: 0;
+  text-decoration: underline;
+  text-underline-offset: 4px;
+  font-size: 12px;
+}
+.review-context dl {
+  border-left: 2px solid #617c8b;
+  padding-left: 12px;
+}
+.review-context dt {
+  margin-top: 10px;
+  font-weight: 550;
+  font-size: 12px;
+}
+.review-context dd {
+  margin: 1px 0 10px;
+  font-size: 12px;
+  color: #b8c6ce;
+}
+.review-context .context-comparison {
+  border-top: 1px solid #45515a;
+  padding-top: 14px;
+}
+.context-modal {
+  position: absolute;
+  z-index: 20;
+  inset: 0;
+  width: 100%;
+  border: 0;
+  padding-bottom: max(30px, env(safe-area-inset-bottom));
+}

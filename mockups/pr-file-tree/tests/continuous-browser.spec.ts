@@ -1,5 +1,10 @@
 import { test, expect, type Page } from '@playwright/test';
-const evidence = '/tmp/pr-reviewer-pr-file-tree-evidence';
+const evidence = '/tmp/pr-reviewer-reading-journey-evidence';
+const closeOpeningContext = async (page: Page) => {
+  if ((page.viewportSize()?.width ?? 0) >= 650) {
+    await page.getByRole('button', { name: 'Close review context' }).click();
+  }
+};
 test.use({
   reducedMotion: 'reduce'
 });
@@ -25,6 +30,7 @@ test('390 continuous diff, exact two-sided coordinates, inline context and edge-
     height: 844
   });
   await page.goto('/');
+    await closeOpeningContext(page);
   await expose(page, 'src/storage/imports.ts');
   await find(page, 'src/storage/imports.ts').click();
   const before = await camera(page);
@@ -87,6 +93,7 @@ test('390 storage public manual wheel bottom selects its actual third hunk', asy
     height: 844
   });
   await page.goto('/');
+    await closeOpeningContext(page);
   await expose(page, 'src/storage/public.ts');
   await find(page, 'src/storage/public.ts').click();
   const body = page.locator('.continuous-reader');
@@ -134,6 +141,7 @@ test('all-added file begins at leading source text in full workspace', async ({ 
     height: 844
   });
   await page.goto('/');
+    await closeOpeningContext(page);
   await expose(page, 'src/storage/access.ts');
   await page.getByRole('button', {
     name: 'Fullscreen src/storage/access.ts',
@@ -154,6 +162,7 @@ for (const width of [
       height: width === 390 ? 844 : 1000
     });
     await page.goto('/');
+    await closeOpeningContext(page);
     if (width === 390)
       await expose(page, 'src/storage/imports.ts');
     else
@@ -234,6 +243,7 @@ test.describe('native touch and smooth travel', () => {
       height: 844
     });
     await page.goto('/');
+    await closeOpeningContext(page);
     await expose(page, 'src/storage/public.ts');
     await page.getByRole('button', {
       name: 'Fullscreen src/storage/public.ts',
@@ -278,6 +288,7 @@ test.describe('native touch and smooth travel', () => {
 });
 test('desktop native source selection and shared horizontal scroll stay inside the continuous file', async ({ page }) => {
   await page.goto('/');
+    await closeOpeningContext(page);
   await page.getByRole('button', {
     name: 'Fullscreen scripts/dev.ts',
     exact: true
@@ -313,6 +324,7 @@ test('fresh analysis source starts at zero with matched code and gutter geometry
     height: 844
   });
   await page.goto('/');
+    await closeOpeningContext(page);
   await expose(page, 'src/application/analysis.ts');
   await page.getByRole('button', {
     name: 'Fullscreen src/application/analysis.ts',
@@ -352,6 +364,7 @@ test('graph zoom in both directions only changes the camera for collapsed and ex
     height: 1000
   });
   await page.goto('/');
+    await closeOpeningContext(page);
   await expose(page, 'src/application/review.ts');
   const file = find(page, 'src/application/review.ts');
   const zoom = async (delta: number) => {
@@ -382,6 +395,7 @@ for (const width of [
       height: width === 390 ? 844 : 1000
     });
     await page.goto('/');
+    await closeOpeningContext(page);
     await expose(page, 'src/storage/public.ts');
     await page.getByRole('button', {
       name: 'Fullscreen src/storage/public.ts',
