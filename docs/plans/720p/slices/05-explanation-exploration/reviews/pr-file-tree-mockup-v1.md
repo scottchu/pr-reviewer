@@ -24,3 +24,10 @@ After ready, root reviews source membership/identity and visual simplicity. Conf
 ## Launch/stop
 
 New private loopback127.0.0.1:56677, strictPort, exact allowed host mac-mini.duckbill-ionian.ts.net. Root alone assigns authorized Serve8477 after local health. Worker changes no network configuration. Preserve8472–8476 and their source/runtime/data. Return quick local milestone then clean source/build/fixture pins, desktop390 captures, checks/knownlimits and minimal manifest. Stop at this filename tree; no feature expansion or production integration/merge/deploy.
+
+
+## Latest bounded change-signal amendment
+
+Root confirmed the filename-only geometry in actual1440/390captures. The next correction preserves it: exact Git A/M/D prefix/color (actual4A46M), full-path/status accessibility; no badges/cards/body text. A following bounded selected-file relative static-import overlay may use existing TypeScript tooling on immutable Git objects, with side/line/specifier/source and target hashes. It is fixture preparation, not new backend analysis capability. Membership diff colors are file-level imports, never call/runtime claims. Preserve all50changed nodes; optional one-hop unchanged targets remain gray source-pinned filenames. No broad pipeline or hidden source claims. If import preparation is not quick, expose the clean status tree first and record that gap.
+
+One actual touch-pinch check initially did not change scale: touch emulation was enabled only after the graph had initialized. The bounded browser fixture will establish touch capability before navigation, preserving the pinch assertion; this does not establish physical touch acceptance. Desktop drag/scroll/Control-wheel/reset already passed. No unrelated browser suite is involved.
