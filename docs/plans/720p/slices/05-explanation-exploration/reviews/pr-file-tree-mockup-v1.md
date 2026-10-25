@@ -1,27 +1,46 @@
-# PR25 filename tree mockup — implementation/review handoff v1
+# PR25 file-group mock — implementation/review handoff v1
 
 Date: 2026-10-24.
-Status: implemented with bounded author checks; independent source/visual review pending. This is a deliberately simple file tree, not semantic/product acceptance.
+Status: current nested-group source000f84f is inspectable with bounded independent recheck READY. This is a design mock, not product/layout adoption or unfamiliar-reviewer acceptance. The current clean handoff below supersedes historical flat/filename-only scope and pending statements.
 
 Parent: [05 explanation/exploration](../plan.md). Source: [file-tree-first product contract](../../../../../product/pr-file-tree-first.md). This latest explicit user scope temporarily simplifies the larger spatial overview. The actual October23 Dependency Lens and Scope Microscope references were viewed; no new style or generated image is introduced.
 
 Base EXACTba4a872e15a540065d5a71dbdfde8d7b267a1148. Isolated worktree /tmp/pr-reviewer-pr-file-tree, descriptive branch mockup-pr25-filename-tree. Editable implementation only mockups/pr-file-tree/ plus these scoped docs/map. Production src/config/package/backend/schema/dependencies and all earlier worktrees/runtimes remain unchanged.
 
-## Concrete outcome
+
+## Current clean nested handoff — final bounded endpoint
+
+Renderer/build/browser source **000f84fd6291ba9fbcd352a3d955d34359ba177f**. This final receipt is docs-only; no further renderer/test changes or runs. Product knowledge is consolidated in [pr-file-tree-first.md](../../../../../product/pr-file-tree-first.md), including per-file reading ownership and current nested/fullscreen/edge-reader rules. Earlier text below records superseded iterations, not competing current requirements.
+
+- Full50-file PR25 tree; compact bounded file groups; file activation expands native hunk/source/comparison child nodes without moving the PR camera. Fullscreen renders only that file-group workspace and restores the prior PR graph/reading on exit, including A→B fullscreen→A.
+- Left red/green/yellow dots smooth-scroll the exact current native hunk; mobile Unified keeps real removed/added lines adjacent.12px horizontal source reading retains complete lines/gutters; desktop split shares paired-row geometry. Source/import edges open the named responsive reader with exact citations and fact/inference boundaries. Bottom controls are compact SVG toggles, fixed mobile/floating draggable desktop.
+- **18actual authored Chrome journeys PASS in16.5s**, clean source above: frozen-000f84f/browser-reading-clean.log. These include real mouse source selection, local source scroll, transformed-midpoint mouse source-edge activation, mobile keyboard relation activation, synthetic touch/keyboard graph navigation, exclusive fullscreen/return, A→B reading/mode restoration, motion intermediate samples and containment at outer zoom1/1.39474. Reduced-motion semantics and explicit no-preference motion are distinct checks.
+- **5affected pure checks PASS**, strict PASS, build PASS on exact committed contents: frozen-000f84f/pure-reading-final.log, strict-reading-final.log, build-reading-final.log. The fixture-rich JS is920.12kB and retains the >500kB warning. Prior tree/import/native-source checks remain attributed to their earlier pins; no old platform baseline was rerun or relabeled. Root independently audited all50diff files/96source sides/every native row (+492/−192), and all413static import citations against Git.
+- Actual reviewed PR25 pins remain baselineb096826e31c0927190806de91ed70b8b64aa93d8 / heade3b270e5f49a9215452b0b86702946043e979059, separate from candidate source.126hunks;4added46modified0deleted;413static citations over56code sides. Exact JSON fixture/source/build/capture hashes are in the manifest.
+
+Immutable evidence: /tmp/pr-reviewer-pr-file-tree-evidence/manifest-000f84f.json, SHA-256 **b1c48df54ef92b61762390cfe29734bff63680e72bc032a2d0ec8e8b1dfb4c5a**. All27named final PNGs,11named logs and build payloads have private immutable copies under /tmp/pr-reviewer-pr-file-tree-evidence/frozen-000f84f/. Main inspection paths are nested-pr-390.png, nested-workspace-390.png, nested-edge-390.png and their1440counterparts; rail-unified-yellow-390.png shows the actual logging replacement; cross-file-return-390.png and1440 show the corrected excursion. Manifest hashes were independently read back by root. Root-level PNG paths are mutable working outputs; historical25manifest/first/moving/failure captures are not reattributed to000f. Earlier mutable paths/builds were reused, so their historical hashes must not be mistaken for currently retained25bytes.
+
+Independent c790 review found one P2 (A reading unmounted by B fullscreen); the retained browser-cross-file-red.log reproduces it. The correction is closed by /tmp/pr-reviewer-pr-file-tree-evidence/nested-review-000f84f.md, SHA-256 **30d3a90890a32b5ed009e55e8dae96b3d6ae1f7b8a7771ad4e6950a258cdaeb4**, verdict **READY-bounded**. Reviewer read source delta, inspected author logs and viewed corrected return captures; they did not rerun tests or bypass the denied UI browser. No additional material source/capture issue was reported. The original manifest says recheck pending at its creation; /tmp/pr-reviewer-pr-file-tree-evidence/closeout-000f84f.json, SHA-256 **ad595f0a51fa15be7cb97a8d404f2d82975bfbcddca96ec203caedfca41d68bc**, records the subsequent closure without mutating it.
+
+Runtime retained: Bun PID79743, loopback127.0.0.1:56677, strictPort/exact allowed host. http://localhost:56677/ local200. Root independently read back8HTTPS assets at https://mac-mini.duckbill-ionian.ts.net:8477/ for000f; root-live-000f84f.json records served hashes. Root owns private Serve8477; no worker network configuration writes. Earlier8472–8476 remain preserved. No production/backend/database/schema/dependency/main/GitHub/deploy changes.
+
+Visual conclusion is bounded: corrected source stays inside each child group, red/green rows are adjacent, fullscreen excludes unrelated filenames/edges, and the edge reader identifies the compared relation. Long source still requires horizontal reading; all50files do not fit the first readable viewport. Dense dot touch spacing, module-edge crossings, physical touch/trackpad, real-device performance and unfamiliar-reader understanding remain unverified. Geometry/timing/thresholds are proposals. Prepared explanations are local fixture annotations, not live analysis or execution/security proof. Independent UI-first browser remains denied/unrun. Stop at this inspectable mock and feedback endpoint; no further code/features/runs are authorized by this closeout.
+
+## Historical initial filename-only outcome (superseded)
 
 All50 exact PR25 changed paths become stable full-path file nodes under directory branches. Visible text is basename/directory component only, one compact unboxed line. Full-path tooltip/accessibility disambiguates duplicates. Containment edges define the base tree; the latest amendment below adds only selected-file static relative imports. Whole tree exists before interaction; pan/zoom exposes offscreen nodes at readable scale. Main window is the canvas, no page scroll. One quiet reset-view control; no function cards, body prose, badges, Focus buttons, story/player, subsystem navigation, detail or comment panel.
 
 PR: https://github.com/scottchu/pr-reviewer/pull/25. Baseline b096826e31c0927190806de91ed70b8b64aa93d8; head e3b270e5f49a9215452b0b86702946043e979059. Fixture generated from git diff --name-only -z on these exact objects, not the moving checkout. Fixture hash and complete path count recorded after generation. Pure tree model is independent of React presentation; existing ReactFlow/installed donor dependencies only, task-private caches, no install.
 
-## Proportionate acceptance/checks
+## Historical initial acceptance/checks
 
 TDD pure checks: complete50-path coverage, stable distinct IDs for duplicate basenames, segment-safe directory prefixes, one exact parent/contains edge per node except root, deterministic readable non-overlapping layout. Actual authored Chrome: all50 file nodes exist, pan changes viewport, graph zoom changes scale, reset restores readable initial framing,390px canvas remains usable with no outer page scroll and filenames do not become full-width cards. Strict task TypeScript and mock build. Capture desktop and390px actual rendered tree; evaluate typography/density/containment against the stated simple view separately from click success. No old broad baseline or semantic checks.
 
-## Independent review handoff
+## Historical initial independent handoff
 
 After ready, root reviews source membership/identity and visual simplicity. Confirm all50 exact paths are present, duplicate filenames remain independent, edges have containment meaning only, no large cards/prose/panels appear, readable framing and full-window pan/zoom work. The separately denied independent UI-browser gate remains unrun; no alternate browser route or permission bypass. Author Chrome captures are engineering evidence, not unfamiliar-reader comprehension or physical pinch acceptance.
 
-## Launch/stop
+## Historical initial launch/stop
 
 New private loopback127.0.0.1:56677, strictPort, exact allowed host mac-mini.duckbill-ionian.ts.net. Root alone assigns authorized Serve8477 after local health. Worker changes no network configuration. Preserve8472–8476 and their source/runtime/data. Return quick local milestone then clean source/build/fixture pins, desktop390 captures, checks/knownlimits and minimal manifest. Stop at this filename tree; no feature expansion or production integration/merge/deploy.
 
@@ -33,7 +52,7 @@ Root confirmed the filename-only geometry in actual1440/390captures. The next co
 One actual touch-pinch check initially did not change scale: touch emulation was enabled only after the graph had initialized. The bounded browser fixture will establish touch capability before navigation, preserving the pinch assertion; this does not establish physical touch acceptance. Desktop drag/scroll/Control-wheel/reset already passed. No unrelated browser suite is involved.
 
 
-## Clean delivered source and running milestone
+## Historical25c51b0 delivered milestone (superseded)
 
 Final rendered/build/browser source: **25c51b0f361216a92ba0bfc4599e4cb6f6531043**. Task branch mockup-pr25-filename-tree, isolated /tmp/pr-reviewer-pr-file-tree, exact baseba4a872e15a540065d5a71dbdfde8d7b267a1148. The current closeout is docs-only. Earlier eddb4b5 recorded scope before code;3c43070 documented the change/import amendment;ddace3575e7acecc9c72b30f72432952bfa7a085 was the useful clean change-colored tree with imports explicitly pending. No production src/backend/schema/config/package or dependency changes.
 
@@ -41,7 +60,7 @@ Local runtime: Bun PID79743, existing Bun1.4.2/Vite8.0.3, bound127.0.0.1:56677 w
 
 Own PR25 comparison baselineb096826e31c0927190806de91ed70b8b64aa93d8 → heade3b270e5f49a9215452b0b86702946043e979059 remains separate from mock source. paths.json SHA-256 **ecc1e8b23548babef8f8fade4dc2a0183a67fd288ab856de47b7dc14a9f1c2e3** records exact50changed paths/statuses,4A46M0D. imports.json SHA-256 **388b74421bd88ec6414d0cec5157edaf46719326221e18f131be7cabc17329e6** records240static-relative citations across56code-source sides,0unresolved in this fixture. Source/type imports are not runtime/call evidence. All50changed nodes stay fixed while selected import context/edges appear; repeated basenames retain distinct full-path IDs.
 
-Current manifest: /tmp/pr-reviewer-pr-file-tree-evidence/manifest-25c51b0.json, SHA-256 **719d7b4d75cd7eb94059c67387429250543aa19dd2375bfeed174eed9107fbc3**. It separates final source-bound captures/checks/build hashes from historical moving uncolored captures and prior milestones. Build output is /tmp/pr-reviewer-pr-file-tree-build; emitted JS/CSS/font hashes are in the manifest. The build passes with the tool's504.09kB mock-JS chunk warning; no chunk limit/config suppression or dependency change was made.
+Historical manifest: /tmp/pr-reviewer-pr-file-tree-evidence/manifest-25c51b0.json, SHA-256 **719d7b4d75cd7eb94059c67387429250543aa19dd2375bfeed174eed9107fbc3**. It separates final source-bound captures/checks/build hashes from historical moving uncolored captures and prior milestones. Build output is /tmp/pr-reviewer-pr-file-tree-build; emitted JS/CSS/font hashes are in the manifest. The build passes with the tool's504.09kB mock-JS chunk warning; no chunk limit/config suppression or dependency change was made.
 
 ## Exact observed checks
 
