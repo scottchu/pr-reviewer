@@ -1,7 +1,7 @@
 # Integrated PR25 reading journey repair
 
 Date: 2026-10-25.
-Status: active; bounded functional/root repair and one evidence-backed impact inference have independent source/actual-UI closure at application61125a4. Next: resume already-approved Story framing, then meaningful question/reply/exact reading Return. Complete impact coverage, unfamiliar whole-journey understanding and full acceptance remain open.
+Status: active; real question/source-based reply and bounded inner-answer/outerStory Return are independently source/UI verified at34f9a59. Desktop top-call-context refinement is author-verified for review; mobile same-canvas v2 proposal awaits adoption. Complete impact coverage, unfamiliar whole-journey understanding and full acceptance remain open.
 Parent: [slice 05](../plan.md), [720p](../../../plan.md), [roadmap](../../../../roadmap.md).
 
 ## Ownership and inputs
@@ -605,3 +605,12 @@ V21 accepted scope: desktop explicit offscreen Story attention should frame the 
 Implementation handoff v21: baseline34f9a59, only pure story-framing helper optional context geometry, main synchronous explicit-navigation context bounds, focused helper/candidate tests and docs. PublicStoryBridge/checkpoints, OwnerPanels, root layout, reader/controls/style/runtime/native and actualbusiness records frozen. At desktop1408×796 with existing Context dismissed, actualStep2→3 must show storagepublic/access and BOTH existing authenticate call rows after Next with no Find/pan/zoom/expand; already-visibleStep2 staysstill and Return restores originalStory2. Existing small-screencamera path remains unchanged pending mobile design adoption.
 
 Mobile proposal is ARTIFACT ONLY and awaiting user adoption: `mobile-story-context-proposal/v2/initial-phone-why-and-graph.png`, `v2/proposal.html` with same live content/node/control markup,280pxinternal-scroll Story and graph below. V2 moves secondarypublisher/classification below the primaryactualexplanation/sourceactions so WHY and2callrows are immediately visible; provenance/content are retained, no newtoggle. V1 fullscreen/bounded images remain preserved. Do NOT implement mobilepane/hierarchy until adoption. Full simultaneous-story/graph UX is not accepted yet.
+
+
+### Revision21 fixed-candidate handoff
+
+Changed only desktopBehavior explicit attention context geometry: actual existing file/callee headers plus exact outgoing call-ID label/path bounds (including endpoint captions) feed optional pure framing context. Offscreen context is placed near usable top at the current zoom; x translation remains minimal and oversized context is clamped to keep the selected header readable rather than zoom/fit-all. Already-visible selected target returns null before considering context, so no following/chasing. Narrow and alternateFileTree keep their existing header-only camera path; mobilepane/hierarchy remains unimplemented pending adoption.
+
+`r21-pure-red.log` retains old header-only failure. `r21-pure-final.log`5PASS includes context top placement, visible-target no-op despite offscreen context, oversized target safety and scale invariance. `r21-desktop-first.log`1normal-motion actualChromePASS at1408×796, Context explicitly dismissed: Step2visible no camera/frame; Next3sourcepublic/access bothheaders and2authenticate call labels/fullpaths/endpoint captions visible abovecontrols withoutFind/pan/expand/zoom; originalStory2/camera Return. Author inspected `r21-desktop-context.png`. Candidate strict and build each exit0 separately; unchanged owner tests are not rerun/recounted. Samezoom context wider/taller than available rectangle may remain partial; no arbitrary all-panels/all-viewport fit claim. No business command/native operation.
+
+Review baseline34f9a59; onlymain explicit framing block/helper and affected tests/docs. PublicStoryBridge/transient inner checkpoint/local capture+restore/OwnerPanels/reader/root facts/layout/styles/controls andactualQ/reply remain protected. Exact frozenmanifest separates source/build/UI fromgateway5c7/StoryVersiond8e15978. Reused source/actualUI review should critique this desktop result; the mobile v2 artifact remains a proposal and its v1 clipped-WHY negative is preserved. Fullsamecanvasmobile/unknown-human/nativeautomatic gates remain open.

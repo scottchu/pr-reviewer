@@ -385,3 +385,45 @@ test.describe('supporting actual answered-question source with normal motion', (
     await expect(page.locator('.react-flow__viewport')).toHaveAttribute('style', earliestCamera!);
   });
 });
+
+
+test.describe('desktop guided call-context framing', () => {
+  test.use({ reducedMotion: 'no-preference' });
+  test('offscreen Story3 shows existing storage headers and both call rows near the top without Find or pan', async ({ page }) => {
+    await page.setViewportSize({ width: 1408, height: 796 });
+    await page.goto('/');
+    await page.getByRole('button', { name: 'Close review context' }).click();
+    await page.getByRole('button', { name: 'Open prepared story' }).click();
+    const original = await page.locator('.react-flow__viewport').getAttribute('style');
+    await page.getByRole('button', { name: 'Next story step' }).click();
+    await expect(page.locator('.react-flow__viewport')).toHaveAttribute('style', original!);
+    await expect(page.getByRole('button', { name: 'Return to original reading' })).toHaveCount(0);
+    await page.getByRole('button', { name: 'Next story step' }).click();
+    const graph = (await page.locator('.pr-graph').boundingBox())!;
+    const callee = page.locator('[data-file-path="src/storage/access.ts"]');
+    await expect.poll(async () => (await callee.boundingBox())!.y).toBeCloseTo(graph.y + 12, 0);
+    const storage = projectCalls('src/storage/public.ts');
+    const authenticate = storage.seeds.find(node => node.name === 'authenticate' && node.declaration.side === 'head')!;
+    const links = storage.links.filter(link => link.caller === authenticate.id && link.target.path === 'src/storage/access.ts');
+    expect(links).toHaveLength(2);
+    for (const link of links) {
+      const label = page.locator(`[data-call-id="${link.id}"]`);
+      await expect(label).toBeInViewport();
+      const box = (await label.boundingBox())!;
+      expect(box.y).toBeGreaterThan(graph.y);
+      expect(box.y + box.height).toBeLessThan(graph.y + graph.height);
+      const path = page.locator(`.react-flow__edge[data-id="${link.id}"] .react-flow__edge-path`);
+      const line = (await path.boundingBox())!;
+      expect(line.x).toBeGreaterThanOrEqual(graph.x);
+      expect(line.x + line.width).toBeLessThanOrEqual(graph.x + graph.width);
+      expect(line.y + 30).toBeLessThan(graph.y + graph.height);
+    }
+    await expect(page.locator('[data-expanded-file]')).toHaveCount(0);
+    const framed = await page.locator('.react-flow__viewport').getAttribute('style');
+    expect(framed!.match(/scale\(([^)]+)\)/)![1]).toBe(original!.match(/scale\(([^)]+)\)/)![1]);
+    await page.screenshot({ path: '/tmp/pr-reviewer-reading-journey-evidence/r21-desktop-context.png' });
+    await page.getByRole('button', { name: 'Return to original reading' }).click();
+    await expect(page.locator('.owner-step')).toHaveText('Trace an unchanged caller into the changed decision');
+    await expect(page.locator('.react-flow__viewport')).toHaveAttribute('style', original!);
+  });
+});

@@ -25,7 +25,7 @@ import { layoutFileProjection, projectFileCalls, fileRequirementReferences } fro
 import { FileCallLine, FileRequirementLine } from './file-call.tsx';
 import { prepareChangeImpact } from './change-impact.ts';
 import { ChangeImpactLine, ChangeImpactExplanation } from './change-impact-view.tsx';
-import { storyAttentionCamera } from './story-framing.ts';
+import { storyAttentionCamera, type AttentionRect } from './story-framing.ts';
 import { WorkspaceActions } from './workspace-actions.tsx';
 const motionDuration = () => matchMedia('(prefers-reduced-motion: reduce)').matches ? 0 : 240;
 const tree = buildTree(fixture.paths, fixture.changes);
@@ -1127,7 +1127,30 @@ const App = () => {
       const rect = actions.getBoundingClientRect();
       if (rect.left < area.right && rect.right > area.left && rect.bottom > area.top) area.bottom = Math.min(area.bottom, rect.top - 12);
     }
-    const attention = storyAttentionCamera(camera, header.getBoundingClientRect(), area);
+    const target = header.getBoundingClientRect();
+    let context: AttentionRect | undefined;
+    if (!narrow && lens === 'behavior') {
+      const relevant = fileCalls.filter(call => call.caller.declaration.path === path);
+      if (relevant.length) {
+        const ids = new Set(relevant.map(call => call.link.id));
+        const paths = new Set([path, ...relevant.map(call => call.callee.declaration.path)]);
+        const rectangles: AttentionRect[] = Array.from(main.current?.querySelectorAll<HTMLElement>('[data-file-path]') ?? [])
+          .filter(element => paths.has(element.dataset.filePath ?? '')).map(element => element.getBoundingClientRect());
+        for (const label of main.current?.querySelectorAll<HTMLElement>('[data-call-id]') ?? []) {
+          if (ids.has(label.dataset.callId ?? '')) rectangles.push(label.getBoundingClientRect());
+        }
+        for (const edge of main.current?.querySelectorAll<SVGElement>('.react-flow__edge-fileCall') ?? []) {
+          if (!ids.has(edge.dataset.id ?? '')) continue;
+          const rect = edge.querySelector('.react-flow__edge-path')?.getBoundingClientRect();
+          if (rect) rectangles.push({ left: rect.left, top: rect.top, right: rect.right, bottom: rect.bottom + 30 });
+        }
+        context = {
+          left: Math.min(...rectangles.map(rect => rect.left)), top: Math.min(...rectangles.map(rect => rect.top)),
+          right: Math.max(...rectangles.map(rect => rect.right)), bottom: Math.max(...rectangles.map(rect => rect.bottom)),
+        };
+      }
+    }
+    const attention = storyAttentionCamera(camera, target, area, context);
     if (attention) {
       if (before.returnFrame && !ownerReturn.current) throw new Error('original_local_reading_unavailable');
       const original = before.returnFrame ? null : capturePresentation(true);

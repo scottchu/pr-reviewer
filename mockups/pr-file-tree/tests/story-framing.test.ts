@@ -15,3 +15,18 @@ test('oversized headers keep their readable leading portion, and unavailable are
   assert.equal(storyAttentionCamera(camera, { left: 280, top: 60, right: 1800, bottom: 86 }, area), null);
   assert.equal(storyAttentionCamera(camera, area, { ...area, right: 200 }), null);
 });
+
+test('offscreen desktop attention lands its supported call context near the readable top without zoom', () => {
+  const target = { left: 300, top: 800, right: 450, bottom: 826 };
+  const context = { left: 280, top: 680, right: 900, bottom: 1000 };
+  assert.deepEqual(storyAttentionCamera(camera, target, area, context), { x: 34, y: -710, zoom: 1.4 });
+});
+test('visible target does not chase offscreen context and oversized context never changes scale', () => {
+  const target = { left: 300, top: 80, right: 450, bottom: 106 };
+  const context = { left: 100, top: -400, right: 1800, bottom: 1000 };
+  assert.equal(storyAttentionCamera(camera, target, area, context), null);
+  const framed = storyAttentionCamera(camera, { ...target, top: 900, bottom: 926 }, area, context)!;
+  assert.equal(framed.zoom, camera.zoom);
+  assert.ok(900 + framed.y - camera.y >= area.top);
+  assert.ok(926 + framed.y - camera.y <= area.bottom);
+});
