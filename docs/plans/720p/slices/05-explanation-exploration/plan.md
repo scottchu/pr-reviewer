@@ -1,5 +1,7 @@
 # Slice05: follow an explanation and explore
 
+2026-10-25 active continuation: [integrated PR25 reading journey](reviews/reading-journey-v1.md), with isolated future-work ownership and motivation/evidence/ask/return acceptance. Frozen file-mock scope is not full-journey acceptance.
+
 **Packet revision:** 3
 
 **Date:** 2026-10-24

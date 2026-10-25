@@ -1,5 +1,7 @@
 # Change-centered PR file workspace mock
 
+Current integrated outcome and active repair: [reading journey](../plans/720p/slices/05-explanation-exploration/reviews/reading-journey-v1.md). The frozen mock's F14 deferral is an implementation limit, not permission to omit story synchronization or anchored question/answer from the latest full outcome.
+
 Date: 2026-10-24.
 Status: current accepted requirements for a bounded inspectable mock. Earlier flat-card/nested-card/import-led iterations are historical in the [owning packet](../plans/720p/slices/05-explanation-exploration/reviews/pr-file-tree-mockup-v1.md). This specification supersedes their layout and relationship directions. Production integration, layout adoption and unfamiliar-reviewer comprehension remain separate, unverified gates.
 
@@ -105,3 +107,16 @@ Author Chrome/Playwright, synthetic touch, source audits and static captures are
 An explicit accessible icon test-lens toggle reveals only source-backed tests relevant to the selected changed function: file → function → concise test summary → same-canvas test diff. Summaries explain the actual assertion/risk, not a run result. Test definition/callable/ranges and its relation to the changed function require exact source evidence; relevant unchanged tests can remain context. Clicking uses the same continuous red/green/yellow diff scoped to the selected complete test callable and its intersecting native hunks, with exact source sides/absence. Preserve native hunk context that extends a little beyond that callable; do not display unrelated changed tests as if they were selected. An unchanged relevant test shows unchanged source without fabricated change dots. No all-test dump, autorun or invented mapping. Discovered tests never mean PASS; unavailable/unknown relationships remain explicit.
 
 Acceptance: bounded prepared changed-function/test mapping, relevant-only toggle and navigable summary/diff/return with exact test-function source. Actual execution is separate and absent in this mock. Root-prepared representative mapping is available; deriving the lens remains the next bounded projection after the continuous-reader checkpoint.
+
+### F17 — Begin with the review question and inspect its evidence
+
+Date: 2026-10-25.
+Status: accepted integrated outcome; first bounded composition repair in progress.
+
+The current full outcome is motivation → system relationships and before/after → same-canvas evidence → anchored question/answer → original reading context. Reuse the accepted panel composition, reviewer journey and ontology. Preserve camera-only gesture zoom; explicit expansion reveals semantic detail. Do not introduce a second domain identity model.
+
+The first repair supplies the accepted left Context surface: open on desktop, a named Context cue on narrow screens. It identifies the pinned comparison, a concise review question, captured normative requirement versus attributed prepared source account, a concrete owner/credential example and limits. PR25's retained runtime specification states that opening the workspace no longer requires manual token entry and explicit credentials retain their identity. This is project knowledge, not a function-call fact or proof of execution. Show its exact source citation. The prepared account connects the request's old direct Bearer construction to the new accessHeaders choice; a separate citation opens that exact function occurrence on the existing canvas. All 50 file homes remain available.
+
+Context source actions are deliberate evidence excursions. Back restores exact prior camera, expansion, selected identity, source focus, comparison mode and reading/folds. Closing context preserves the current graph camera and returns focus to its invoker; it is not Back. Fullscreen remains exclusive and hides context. Narrow context is one foreground modal reader with close/Escape and contained focus; no outer scrolling page. Desktop context reserves width rather than covering source. No new route, parser, backend or runtime effects.
+
+Acceptance J1: from first open, state the problem, before/after owner versus explicit credential example and one evidence limit; follow normative source and changed-function citations in the actual React canvas; return to the prior frame; retain complete file membership and camera-only gesture behavior. Test actual desktop/narrow navigation and state restoration. This is authored engineering evidence, not fresh-reviewer comprehension. Story synchronization and anchored actual question/reply remain required subsequent composition work, not closed by J1.
