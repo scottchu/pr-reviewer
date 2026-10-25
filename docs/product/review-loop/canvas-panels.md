@@ -66,7 +66,7 @@ Panel changes never regenerate node positions or alter graph membership. No auto
 | Sheet/drawer explicit handle | Resize/collapse that panel only. Transcript/composer drag is not dismissal. No global edge-swipe takeover of browser/OS Back. |
 | Text input, IME, selection handles | Native editing owns input. Canvas shortcuts/Escape do not intercept composition. Pointer cancellation/focus loss never submits or navigates. |
 
-The start surface owns the gesture until completion/cancellation. A6–8px drag threshold and semantic-detail hysteresis are initial inspection hypotheses, not accepted physical constants. During pinch/pan, avoid reflow under the fingers; explicit expansion reaches the same detail without gestures. Local source scroll, selection and graph identity survive detail simplification. Controls/player/minimap occupy the usable graph area, above the sheet; compact optional player never covers source or composer.
+The start surface owns the gesture until completion/cancellation. A 6–8px drag threshold and semantic-detail hysteresis are initial inspection hypotheses, not accepted physical constants. During pinch/pan, avoid reflow under the fingers; explicit expansion reaches the same detail without gestures. Local source scroll, selection and graph identity survive detail simplification. Controls/player/minimap occupy the usable graph area, above the sheet; compact optional player never covers source or composer.
 
 ## Ownership and accessible alternatives
 

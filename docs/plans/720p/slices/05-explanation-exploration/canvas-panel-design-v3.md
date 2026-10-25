@@ -1,6 +1,6 @@
 # Canvas panel design v3: intake, decisions and review handoff
 
-Date: 2026-10-24. Status: integrated source design awaiting bounded role readback; no UI implementation dispatch, mock launch or runtime acceptance.
+Date: 2026-10-24. Status: all three bounded role readbacks READY-design; no UI implementation dispatch, mock launch or runtime acceptance.
 
 Source base: `740dabe377779722fa928895f13d33a6ae59194f`. Branch: `recover-whole-pr-spatial-graph`. Parent: [slice05](plan.md). Prior v2 whole-map review remains useful scope evidence; composition readiness is superseded by the latest direct user correction.
 
@@ -41,3 +41,15 @@ The [v2 packet](whole-pr-graph-mockup-v2.md) still supplies immutable PR25 conte
 Required new composition cases: desktop default; G3 arbitrary entry with right detail; before-A comment plus B citation excursion; wide independent detail/thread targets; constrained foreground switching with dirty draft; delayed response after target change/close; source selection/scroll versus graph pan/zoom; close preserving newer camera; unavailable explanation/no agent and failed return; keyboard navigation to G7/G8 and unchanged context. Measure the actual graph rectangle and local scroll, not merely panel existence. All eight whole-map gates still apply.
 
 No code, test, dependency, server, browser, network, native-host or configuration work was performed for this revision. No new layout was observed live. Source checks cover document links, whitespace and docs-only scope. Physical device/native delivery/unfamiliar-reader evidence remains open; previous engineering receipts cannot close it.
+
+## Bounded readback closeout
+
+Reviewed design pin: `e8dc536d5bc3abd281e955b5f7863f871324efa6`. All three roles returned **READY-design** with no material blocker in their reviewed scope. The coordinator read all reports; this author read them before reconciling this docs-only tail.
+
+| Role / retained report | Outcome and limits |
+|---|---|
+| Product; `/tmp/pr-reviewer-panel-design-reviews/product-readback-e8dc536.md` | Whole-map opening, low-action detail entry, wide coexistence and protected constrained discussion are coherent. One nonblocking wording mismatch corrected: semantic zoom/manual expansion reveals in-graph source; deliberate node/claim activation opens right detail. No new global action was added. Actual cognitive burden and named-target clarity still require mock inspection. |
+| State; `/tmp/pr-reviewer-panel-design-reviews/state-readback-e8dc536.md` | Independent targets, stale-publication fences, guarded draft adoption, close versus transactional return and managed ownership are consistent. No new persistence or unlimited-draft authority. Actual delayed-event, dirty-draft and unavailable-history behavior remains unverified. |
+| Spatial; `/tmp/pr-reviewer-panel-design-reviews/spatial-readback-e8dc536.md` | Window geometry, constrained readers, input ownership, focal-point zoom and accessible alternatives form a coherent design. Close preserving camera is accepted as an intentional predictable alternative to rollback. Sizes, physical gestures, native selection/keyboard/IME, safe areas and screen-reader execution remain unverified. |
+
+This tail records those verdicts and the precise wording correction, plus a spacing typo; it changes no product behavior. READY-design is not implementation dispatch, observed UX, unfamiliar-reader understanding, native delivery or product acceptance. The eight whole-map gates and v3 composition cases remain required for the next explicitly dispatched mock. No additional full design loop is requested by this closeout.
