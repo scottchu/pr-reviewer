@@ -1399,3 +1399,12 @@ button:disabled { cursor: default; opacity: .5; }
   .owner-heading button { min-height: 44px; }
   .owner-panel { font-size: 14px; }
 }
+
+/* Adopted root file-call projection only; original filename/reader rules unchanged. */
+.file-call-label { display: block; width: max-content; height: auto; justify-content: initial; align-items: initial; position: absolute; pointer-events: all; border: 0; background: #1e2225; padding: 5px 8px; font: 600 17px/25px Inter, sans-serif; text-align: left; white-space: nowrap; }
+.file-call-label small { display: block; color: #bdc6cc; font: 12px/19px Inter, sans-serif; }
+.file-call-label:focus-visible { outline: 2px solid #a8cddf; outline-offset: 3px; }
+.file-call-legend { position: absolute; z-index: 4; left: 12px; bottom: 8px; max-width: min(730px, calc(100% - 24px)); background: #1e2225ed; padding: 6px; display: flex; flex-wrap: wrap; gap: 4px 14px; color: #bdc6cc; font-size: 12px; pointer-events: none; }
+.file-call-legend small { flex-basis: 100%; font-size: 11px; }
+
+@media (max-width: 649px) { .file-call-label { max-width: 350px; white-space: normal; font-size: 17px; } }

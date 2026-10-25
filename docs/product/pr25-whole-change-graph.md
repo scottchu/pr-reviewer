@@ -4,11 +4,11 @@ Date: 2026-10-24. Status: concrete design specification for independent review, 
 
 Target: [our PR25](https://github.com/scottchu/pr-reviewer/pull/25). Baseline `b096826e31c0927190806de91ed70b8b64aa93d8` (B); head `e3b270e5f49a9215452b0b86702946043e979059` (H). The source was read from local immutable Git objects; no live PR/runtime/network claim is made. The next mock's source/build identity is separate.
 
-Date of organization correction: 2026-10-25.
-Status: accepted user direction, superseding file-default candidate organization.
-Caller→callee behavior is the primary/default arrangement. Directory containment belongs only to an explicit alternate file-tree lens, switched with accessible icon actions. The responsibility groups below account for supporting sources and honest call-coverage frontiers; they are not fabricated call relations. Keep actual source-grounded functions and directed callsite-backed edges central, with both-side unchanged caller/callee context. All50source homes remain reachable independently of story or prepared-call coverage. F18 in [the active candidate contract](pr-file-tree-first.md) defines state preservation across lenses. The rejected e3c461c file-default experience is not retroactively accepted.
+Date of latest root correction: 2026-10-25.
+Status: revision-2 same-file-node relationship mockup adopted; bounded implementation authorized.
+The [active F18 contract](pr-file-tree-first.md) controls root presentation: original file nodes/names/status colors/dimensions/expand remain, only folder containment is removed from the default and positions/connections project exact caller→callee evidence. File tree is an icon-switched alternate. No root callable DAG, Before/After partitions or new responsibility frames. The authored G1–G8 organization and spatial proposals below are retained historical/source-accounting context, **not current layout instructions**. Their source-grounded PR facts, provenance and coverage limits remain useful.
 
-## A map the reviewer can enter anywhere
+## Source account and superseded spatial proposal
 
 The central change is removal of human credential entry in a single-owner workspace while retaining explicit participant credentials, stored ownership and source/recovery boundaries. That sentence is an authored account supported by the changes below, not a result of execution or proof of network security. There are multiple coupled responsibilities, not just a request-header helper.
 

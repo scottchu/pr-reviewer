@@ -6,7 +6,7 @@ import paths from '../paths.json' with { type: 'json' };
 import supplemental from '../calls-scope.json' with { type: 'json' };
 import { prepareBehaviorContext } from '../prepare-behavior-context.ts';
 import { callActionName, projectBehaviorCalls } from '../calls.ts';
-import { behaviorSourceHomes, layoutBehavior } from '../behavior.ts';
+import { layoutFileProjection, projectFileCalls } from '../file-projection.ts';
 import { buildTree } from '../tree.ts';
 
 test('bounded scope observation preserves exact source/callsites and both unchanged callees without static admission', () => {
@@ -38,22 +38,29 @@ test('bounded scope observation preserves exact source/callsites and both unchan
   assert.ok(graph.links.filter(link => link.method === 'bounded_same_file_lexical_observation').every(link => link.certainty === 'source_observed_manual' && link.analyzerReason));
 });
 
-test('call DAG ranks true callers before callees and keeps all50 secondary source homes without folder edges', () => {
-  const graph = projectBehaviorCalls();
-  const layout = layoutBehavior(graph);
-  assert.deepEqual(layoutBehavior(graph), layout);
-  for (const link of graph.links) {
-    assert.ok(layout.positions.find(node => node.identity.id === link.caller)!.x < layout.positions.find(node => node.identity.id === link.callee)!.x);
+test('file root reuses every original file identity/style dimension and only projects exact inter-file calls', () => {
+  const original = buildTree(paths.paths, paths.changes);
+  const calls = projectFileCalls(original);
+  assert.equal(calls.length, 15);
+  assert.equal(new Set(calls.map(call => call.link.id)).size, 15);
+  for (const call of calls) {
+    assert.notEqual(call.caller.declaration.path, call.callee.declaration.path);
+    assert.equal(call.status, 'added');
+    const target = source.files.find(file => file.path === call.callee.declaration.path)!;
+    assert.equal(target.before, null);
+    assert.ok(target.after);
+    assert.equal(call.link.target.side, 'head');
   }
-  for (const a of layout.positions) for (const b of layout.positions) {
-    if (a === b) continue;
-    assert.ok(Math.abs(a.x - b.x) >= 200 || Math.abs(a.y - b.y) >= 52);
+  for (const narrow of [false, true]) {
+    const projection = layoutFileProjection(original, narrow);
+    assert.equal(projection.nodes.length, 50);
+    assert.deepEqual(projection.edges, []);
+    assert.deepEqual(projection.nodes.map(node => node.id).sort(), original.nodes.filter(node => node.kind === 'file').map(node => node.id).sort());
+    for (const node of projection.nodes) {
+      const prior = original.nodes.find(item => item.id === node.id)!;
+      for (const key of ['name', 'path', 'change', 'width', 'height', 'kind'] as const) assert.equal(node[key], prior[key]);
+    }
   }
-  const homes = behaviorSourceHomes(buildTree(paths.paths, paths.changes));
-  assert.equal(homes.nodes.length, 50);
-  assert.equal(homes.edges.length, 0);
-  assert.ok(homes.nodes.every(node => node.kind === 'file'));
-  assert.deepEqual(homes.nodes.map(node => node.path).sort(), [...paths.paths].sort());
 });
 
 test('all call controls have distinct side/caller/callee/source names while IDs remain separate provenance', () => {

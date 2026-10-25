@@ -17,14 +17,16 @@ import { createReviewWorkspace, storyProjection } from '../../src/application/pu
 import type { StoryIntent } from '../../src/application/public.ts';
 import type { StoryReference } from '../../src/domain/public.ts';
 import { OwnerPanels, type OwnerPanel } from './owner-panels.tsx';
-import { layoutBehavior, behaviorSourceHomes, sourceHomeSections, type GraphLens } from './behavior.ts';
+import { type GraphLens } from './behavior.ts';
 import { BehaviorNoteLabel, LensIcon, ActionIcon, type BehaviorNote } from './behavior-graph.tsx';
 import { mapJourneySource } from './journey-source.ts';
+import { layoutFileProjection, projectFileCalls } from './file-projection.ts';
+import { FileCallLine } from './file-call.tsx';
 const motionDuration = () => matchMedia('(prefers-reduced-motion: reduce)').matches ? 0 : 240;
 const tree = buildTree(fixture.paths, fixture.changes);
 const behaviorCalls = projectBehaviorCalls();
-const behaviorLayout = layoutBehavior(behaviorCalls);
-const behaviorTree = behaviorSourceHomes(tree);
+const behaviorTree = layoutFileProjection(tree, window.innerWidth < 650);
+const fileCalls = projectFileCalls(tree);
 type LabelNode = Node<{
   name: string;
   path: string;
@@ -171,7 +173,8 @@ const nodeTypes = {
   declaredTest: DeclaredTestLabel
 };
 const edgeTypes = {
-  call: CallLine
+  call: CallLine,
+  fileCall: FileCallLine
 };
 const containment = tree.edges.map(e => ({
   id: e.id,
@@ -188,8 +191,7 @@ const containment = tree.edges.map(e => ({
 const initialView = (lens: GraphLens, overview = false) => {
   const narrow = window.innerWidth < 650;
   if (lens === 'behavior') {
-    const request = behaviorLayout.positions.find(node => node.identity.name === 'request' && node.identity.seed && node.identity.declaration.side === 'head')!;
-    return { x: narrow ? 10 - request.x * 210 / 270 : 28, y: 110 - request.y, zoom: 1 };
+    return { x: narrow ? 12 : 28, y: 120, zoom: 1 };
   }
   const anchor = tree.nodes.find(n => n.id === (narrow && !overview ? 'directory:src/application' : 'directory:.'))!;
   return {
@@ -490,6 +492,7 @@ const App = () => {
         restoreVersion,
         focus: functionFocus?.path === n.path ? functionFocus : undefined,
         onCalls: !fullscreen && n.path === selected && projectCalls(selected).prepared ? () => {
+          if (lens === 'behavior') { switchLens('files'); return; }
           const current = callLayout.filter(item => item.identity.declaration.path === selected);
           const seed = current.find(item => item.identity.seed && item.identity.declaration.side === 'head') ?? current.find(item => item.identity.seed);
           if (seed)
@@ -525,7 +528,10 @@ const App = () => {
   ]);
   const calls = useMemo(() => lens === 'behavior' ? behaviorCalls : projectCalls(selected), [lens, selected]);
   const callLayout = useMemo(() => {
-    if (lens === 'behavior') return behaviorLayout.positions.map(node => ({ ...node, x: node.x * (narrow ? 210 / 270 : 1) }));
+    if (lens === 'behavior') {
+      const origin = viewTree.nodes.find(node => node.path === selected && node.kind === 'file');
+      return origin ? layoutCalls(projectCalls(selected), { x: origin.x + origin.width + 72, y: origin.y }, narrow ? 170 : 200) : [];
+    }
     const origin = viewTree.nodes.find(node => node.path === selected && node.kind === 'file');
     return origin ? layoutCalls(calls, { x: origin.x + origin.width + 72, y: origin.y }, narrow ? 170 : 200) : [];
   }, [
@@ -659,31 +665,24 @@ const App = () => {
       onRead: openTest
     }
   })) : [];
-  const noteDetails: Readonly<Record<string, string>> = {
-    'G2:head': 'Owner requests omit Authorization; explicit credentials retain Bearer. Prepared calls only; runtime and wider dispatch remain unverified.',
-    'G3:head': 'Recognize the in-process owner before credential lookup. Strings retain their own credential path.',
-    'G4:head': 'A stable owner scope, with unchanged hash/byte callees. Unchanged source does not establish unchanged behavior.',
-  };
-  const behaviorNotes: BehaviorNote[] = lens === 'behavior' && !fullscreen
-    ? [...behaviorLayout.sections, ...sourceHomeSections()].map(note => ({
-      id: note.id, type: 'behaviorNote', position: { x: note.id.startsWith('G') ? (narrow ? 210 : 270) : note.x, y: note.y },
-      width: note.id.startsWith('G') ? 320 : 730, height: noteDetails[note.id] ? 70 : 32,
-      draggable: false, selectable: false, focusable: false,
-      data: { label: note.label, ...(noteDetails[note.id] ? { detail: noteDetails[note.id] } : {}) },
-    })) : [];
-  const nodes: CanvasNode[] = [...behaviorNotes, ...fileNodes, ...functionNodes, ...testNodes];
+  const nodes: CanvasNode[] = [...fileNodes, ...(lens === 'files' ? functionNodes : []), ...testNodes];
   const edges: Edge[] = fullscreen ? [] : [
     ...(lens === 'files' ? containment : []),
-    ...(lens === 'behavior' ? fileNodes.flatMap(file => {
-      const declarations = calls.nodes.filter(node => node.declaration.path === file.data.path);
-      const node = declarations.find(node => node.seed && node.declaration.side === 'head') ?? declarations[0];
-      return node ? [{ id: `source-home:${file.id}`, source: node.id, target: file.id,
-        sourceHandle: 'call-out', targetHandle: 'contains-in', type: 'smoothstep',
-        label: 'source', style: { stroke: '#62727b', strokeWidth: .8, strokeDasharray: '2 5', opacity: .5 },
-        labelStyle: { fill: '#b0c1cc', fontSize: 10 }, labelBgStyle: { fill: '#20272b', fillOpacity: .9 },
-        ariaLabel: `${node.name} source home ${file.data.path}; source association, not a call` }] : [];
+    ...(lens === 'behavior' ? fileCalls.map(call => {
+      const siblings = fileCalls.filter(other => other.caller.declaration.path === call.caller.declaration.path && other.callee.declaration.path === call.callee.declaration.path);
+      const index = siblings.findIndex(other => other.link.id === call.link.id);
+      return {
+        id: call.link.id, type: 'fileCall',
+        source: `file:${call.caller.declaration.path}`, target: `file:${call.callee.declaration.path}`,
+        sourceHandle: 'contains-out', targetHandle: 'contains-in',
+        data: { ...call, active: callExplained?.id === call.link.id, onExplain: setCallExplained,
+          labelX: viewTree.nodes.find(node => node.path === call.caller.declaration.path)!.x,
+          lane: narrow ? index * 70 : (index - (siblings.length - 1) / 2) * 76, narrow },
+        markerEnd: { type: MarkerType.ArrowClosed, color: call.status === 'added' ? '#92d4ac' : '#bdc6cc', width: 16, height: 16 },
+        ariaLabel: `${call.caller.name} calls ${call.callee.name}; exact contained-symbol call projection`,
+      };
     }) : []),
-    ...calls.links.map(link => ({
+    ...(lens === 'files' ? calls.links : []).map(link => ({
       id: link.id,
       source: link.caller,
       target: link.callee,
@@ -1168,7 +1167,7 @@ const App = () => {
           setSourceRelation(null);
         }}
         onEdgeClick={(_, edge) => {
-          if (edge.type === 'call') {
+          if (edge.type === 'call' || edge.type === 'fileCall') {
             setSourceRelation(null);
             setCallExplained(calls.links.find(link => link.id === edge.id) ?? null);
           }
@@ -1208,6 +1207,11 @@ const App = () => {
 
       </ReactFlow>
 
+      {lens === 'behavior' && !fullscreen && !detail.expanded && <aside className="file-call-legend" aria-label="Relationship legend">
+        <span style={{ color: '#92d4ac' }}>━ Added call</span><span style={{ color: '#e0c372' }}>━ Modified*</span>
+        <span style={{ color: '#df8996' }}>━ Removed</span><span>━ Unchanged / unclassified (labeled)</span>
+        <small>50 changed files · 15 prepared inter-file calls. Other relationships unprepared. File colors = Git status. *Requires evidenced pairing; none claimed.</small>
+      </aside>}
       {detail.expanded && <DiffControls
         mode={mode}
         onMode={setMode}

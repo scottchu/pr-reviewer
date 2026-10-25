@@ -276,3 +276,14 @@ Acceptance: author desktop/narrow first-open with same file nodes, no directorie
 ### Independent-review handoff v12
 
 Review fixed committed candidate only after executor readiness. Compare root projection to adopted R2 reference and original preserved file visual/expansion; inspect all50membership, exact caller→callee facts/ports/status basis, alternate-lens and protected hashes. Source-informed engineering review is not unfamiliar UI comprehension. Actual UI-first review is separately authorized read-only on8478 only; root assigns a fresh reviewer after candidate freeze. No business commands, draft edits, native sessions or service changes.
+
+
+### Revision 12 executor checkpoint
+
+Implemented root projection reuses original file nodes and their existing ports; no inner node/reader/owner changes. Fifteen exact inter-file head calls all target functions in two Git-added files (base absent), so all displayed arrows are added/green. Canonical34relations/38occurrences remain intact; nineteen same-file calls remain in explicit File-tree inspection. File root retains all50changed nodes; remaining scopes are reachable without fabricated calls.
+
+Author evidence: r12-root-projection/pure.log34PASS; affected-first.log15actual Chrome PASS (root1440/390, both-side unchanged source, source/test lenses, complex dirty draft and public-owner return, existing saved-question/status/failure paths); root-evidence-return.log1PASS (root keyboard call evidence, exact owner return and arbitrary unprepared source). strict.logPASS. Build via existing BunPASS (build-bun.log); first App-bundled Node attempt failed native-binding TeamID loading (build.log), retained without settings/signature/dependency changes. Original first-browser captures showed generic button styling squeezed root labels despite initial structural assertions; root-only display/width fix and complete-label bounding assertions passed browser-second.log. Captures now opening-1440.png/opening-390.png/expanded-* were visually inspected. These are author evidence, not independent acceptance.
+
+protected-proof.json confirms all98protected file hashes, byte-identical Label section and owner evidence/return section, and unchanged original CSS prefix against r11-freeze. The inherited seven-file WIP patch is preserved separately before the root implementation milestone; it is recovery/history, not product acceptance. No server/route/native/security operations performed. Gateway remains its existing clean5c7process; UI uses current Vite source readback. Final source/build/UI and distinct retained gateway provenance are in the private candidate manifest, not relabeled as one restarted process.
+
+Remaining gates: root-coordinated fixed-source review and fresh read-only actual UI-first account on8478; native responsible participant reply/delivery remains unconfigured, no fabricated reply. No production adoption, PR/push/merge authority inferred.
