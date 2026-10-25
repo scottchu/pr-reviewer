@@ -1,14 +1,14 @@
 # PR25 file-group mock — implementation/review handoff v1
 
 Date: 2026-10-24.
-Status: current nested-group source000f84f is inspectable with bounded independent recheck READY. This is a design mock, not product/layout adoption or unfamiliar-reviewer acceptance. The current clean handoff below supersedes historical flat/filename-only scope and pending statements.
+Status: continuous-reader requirements are current; source000f84f below is a preserved historical nested-box checkpoint with bounded independent recheck READY. Current continuous implementation/evidence is being compiled from the F01–F15 contract. This is a design mock, not product/layout adoption or unfamiliar-reviewer acceptance. The current clean handoff below supersedes historical flat/filename-only scope and pending statements.
 
 Parent: [05 explanation/exploration](../plan.md). Source: [file-tree-first product contract](../../../../../product/pr-file-tree-first.md). This latest explicit user scope temporarily simplifies the larger spatial overview. The actual October23 Dependency Lens and Scope Microscope references were viewed; no new style or generated image is introduced.
 
 Base EXACTba4a872e15a540065d5a71dbdfde8d7b267a1148. Isolated worktree /tmp/pr-reviewer-pr-file-tree, descriptive branch mockup-pr25-filename-tree. Editable implementation only mockups/pr-file-tree/ plus these scoped docs/map. Production src/config/package/backend/schema/dependencies and all earlier worktrees/runtimes remain unchanged.
 
 
-## Current clean nested handoff — final bounded endpoint
+## Historical000f clean nested handoff — superseded by continuous-reader correction
 
 Renderer/build/browser source **000f84fd6291ba9fbcd352a3d955d34359ba177f**. This final receipt is docs-only; no further renderer/test changes or runs. Product knowledge is consolidated in [pr-file-tree-first.md](../../../../../product/pr-file-tree-first.md), including per-file reading ownership and current nested/fullscreen/edge-reader rules. Earlier text below records superseded iterations, not competing current requirements.
 
@@ -204,3 +204,6 @@ Product knowledge is now current-only with stable F01–F15 IDs in pr-file-tree-
 | F15 evidence boundaries | Manifest / root review | Prior000f frozen; moving continuous captures separately attributed. UI-first browser remains denied/unrun. |
 
 Call integration is blocked only on this required spec commit, then proceeds within existing authorization. No new approval gate or production authority is introduced.
+
+
+Latest F02 correction committed before code: graph zoom/pan is camera-only; file click/keyboard toggles expansion. Remove automatic threshold/focal disclosure and verify both directions from collapsed and expanded states. F05 explicitly requires adjacent removed/added rows; F10 names changed declaration/function OR callsite seeds. F13 distinguishes126-U3 native hunks from163-U0 blocks. F14 explicitly retains wholePR/unchanged context, left context/right detail and bottom anchored comments as future, not silently removed. Prior000f handoff is now labeled historical.

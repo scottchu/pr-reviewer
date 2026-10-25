@@ -17,9 +17,9 @@ Acceptance: exact Git membership/statuses, duplicate/prefix independence, readab
 
 ### F02 — File-group identity with a continuous diff
 
-A file is a logical group of exact source/range/change identities. Its visible reading surface is **one continuous standard diff**, not repeated ChangeN/Before/After boxed subgraphs. A native hunk remains a stable logical ID/anchor even when it is not a drawn graph card. File activation expands/collapses this surface in the existing PR graph, preserving surrounding files/relations and the camera. Gesture zoom near a file may reveal the same surface. Do not equate expansion with fullscreen or automatic camera refit.
+A file is a logical group of exact source/range/change identities. Its visible reading surface is **one continuous standard diff**, not repeated ChangeN/Before/After boxed subgraphs. A native hunk remains a stable logical ID/anchor even when it is not a drawn graph card. File activation expands/collapses this surface in the existing PR graph, preserving surrounding files/relations and the camera. **Graph zoom/pan changes only the camera.** Only explicit file activation/keyboard intent expands or collapses a file. An expanded file survives zoom-out; zoom-in never opens a collapsed file. Automatic semantic disclosure is superseded, not a current feature. Do not equate expansion with fullscreen or automatic camera refit.
 
-Acceptance: same file/hunk identity, surrounding whole-PR context and unchanged camera across ordinary activation; no per-hunk card wall or repeated version headers. A file near a viewport edge may require ordinary graph pan.
+Acceptance: collapsed and expanded files keep exactly their expansion state through zoom in/out and pan; same file/hunk identity, surrounding whole-PR context and unchanged camera across ordinary activation; no per-hunk card wall or repeated version headers. A file near a viewport edge may require ordinary graph pan.
 
 ### F03 — Exclusive edge-to-edge file workspace and exact return
 
@@ -35,7 +35,7 @@ Acceptance: click/keyboard smoothly scrolls only the local file viewport, withou
 
 ### F05 — Distinct source coordinates and exact source
 
-Unified has separate **Before** and **After** number columns plus change glyph. Context shows both; removal old only; addition new only. Both gutters stay visible during horizontal reading. Split uses the appropriate side number in each column and the same paired native change blocks, without independent side scrollers or inferred function alignment. One version header exposes exact commits/hashes; no invented empty source for an absent side.
+Unified keeps actual removed and added rows contiguous in native change-block order and has separate **Before** and **After** number columns plus change glyph. Context shows both; removal old only; addition new only. Both gutters stay visible during horizontal reading. Split uses the appropriate side number in each column and the same paired native change blocks, without independent side scrollers or inferred function alignment. One version header exposes exact commits/hashes; no invented empty source for an absent side.
 
 Acceptance: imports.ts Change2 shows context24/26,25/27,26/28, removal27/blank, additionblank/29, then28/30. Do not renumber to imply old27 jumps to old29. Source lines, Unicode and immutable side identities remain exact. Long source can require shared horizontal scrolling; it is not promised to fit a phone. All-added source starts horizontal0 unless restoring explicit user reading.
 
@@ -65,7 +65,7 @@ Acceptance: actual pointer/keyboard activation, exact relation identity, respons
 
 ### F10 — Calls centered on changes, never default imports
 
-Default review relationships are actual source-grounded direct callers/callees relevant to **selected changed seeds**, with only necessary one-hop unchanged context. Preserve whole50-file tree membership, but do not dump every function, every call in the selected file or a whole-project graph. Static imports are off by default; the retained import fixture is secondary historical evidence, never call/runtime claims.
+Default review relationships are actual source-grounded direct callers/callees relevant to **selected changed function/declaration or changed-callsite seeds**, with only necessary one-hop unchanged context. Preserve whole50-file tree membership, but do not dump every function, every call in the selected file or a whole-project graph. Static imports are off by default; the retained import fixture is secondary historical evidence, never call/runtime claims.
 
 Prepared scope: review.ts changed request; local-access.ts added accessHeaders; storage/public.ts changed local authenticate; storage/access.ts added accessReference/localPrincipal. Show only selected-file seeds and incident direct base/head calls. Gray unchanged refresh retains both exact source occurrences and its identical-body evidence; unchanged source does not prove unchanged behavior under a changed dependency. Other files/scopes remain explicitly unprepared, not no-calls leaves. Further neighbors are not automatically expanded.
 
@@ -87,13 +87,13 @@ Acceptance: inspect real closed/expanded world coordinates and actual SVG endpoi
 
 ### F13 — Immutable PR fixtures and local responsibilities
 
-PR25 baseline b096826e31c0927190806de91ed70b8b64aa93d8 / head e3b270e5f49a9215452b0b86702946043e979059.50changed paths:4added46modified0deleted;126native hunks,+492/−192lines;96available full source sides. Full-source hashes cover UTF-8 bytes; source anchors use exact half-open UTF-16 offsets and1-based lines. Full source exists for context expansion. Preparation is local read-only Git evidence, not a production parser/import/runtime capability.
+PR25 baseline b096826e31c0927190806de91ed70b8b64aa93d8 / head e3b270e5f49a9215452b0b86702946043e979059.50changed paths:4added46modified0deleted;126native hunks at Git unified context3 (-U3), distinct from the historical163 zero-context (-U0) change blocks; +492/−192lines;96available full source sides. Full-source hashes cover UTF-8 bytes; source anchors use exact half-open UTF-16 offsets and1-based lines. Full source exists for context expansion. Preparation is local read-only Git evidence, not a production parser/import/runtime capability.
 
 Pure projections own paths, native rows, folds, source coordinates and selected change neighborhoods. React owns local presentation/input and reports immutable per-file reading snapshots outside conditional renderers. This preserves A across B-only rendering without keeping unrelated DOM visible. Scroll updates do not cause broad per-frame React publication. Source text selection and horizontal/vertical scroll own their input; graph pan/zoom owns the canvas surface. Earlier nested-ReactFlow store/height/pointer failures are historical lessons, not reasons to retain the rejected card layout.
 
 ### F14 — Larger experience remains explicitly future
 
-Anchored human/agent comments, floating anchor-adjacent identity/thread, exact code/prose selection, discussion delivery/persistence and broader left/right lens composition remain in [canvas comments](review-loop/canvas-comments.md), [canvas reading](review-loop/canvas-reading.md) and [review experience](review-experience.md). They are not silently dropped, implemented or accepted by this bounded file-reader mock. Story is an optional future attention overlay, not graph membership. No participant attachment, commands, notification effects or production test execution is added here.
+Anchored human/agent comments, floating anchor-adjacent identity/thread, exact code/prose selection, discussion delivery/persistence and broader left/right lens composition remain in [canvas comments](review-loop/canvas-comments.md), [canvas reading](review-loop/canvas-reading.md) and [review experience](review-experience.md). The larger whole-PR graph with necessary unchanged context, left context/right detail lenses and bottom anchored discussion remains retained design direction. These are not silently dropped, implemented or accepted by this bounded file-reader mock. Story is an optional future attention overlay, not graph membership. No participant attachment, commands, notification effects or production test execution is added here.
 
 ### F15 — Honest verification and acceptance boundaries
 
