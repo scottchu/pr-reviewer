@@ -174,3 +174,33 @@ Dots target actual rendered change anchors and recompute after folding/mode/size
 Fullscreen is edge-to-edge across the entire main viewport, excluding every unrelated PR object/edge. Remove outer16/32px margins, floating card border/padding, repeated filename header and nested-root blank space. Keep one minimal filepath/exit bar, thin change rail, compact icon controls/safe-area clearance. All-added source starts horizontal0 unless restoring an explicit saved offset; never hide its leading text by applying replacement focus. An explicitly requested replacement focus may still use exact differing text offsets.
 
 Bounded checks: full-source preparation verifies the existing immutable side hashes; pure continuous-segment/fold/coordinate checks and actual390/public.ts multi-hunk manual wheel/touch-bottom behavior, click→manualscroll, inline fold and mode/fullscreen return. The dual-gutter469a3e0 checkpoint is preserved; its boxed-layout checks do not establish the corrected continuous-reader acceptance. No new runtime, dependency, network or production changes.
+
+Evidence correction: the screenshot’s src/storage/public.ts has exactly3native hunks, so “third at bottom” is not itself a demonstrated bug. Treat that report as a concern to verify, never invent a fourth range or a screenshot counterexample. The continuous reader still needs correct observational current-range behavior, including an actual multi-hunk bottom-clamp regression with its real final index.
+
+
+Latest relationship correction: static imports are not the primary review relationship and are now off by default; remove automatic module overlays and import selection cues. Keep the source-verified import fixture as secondary historical preparation, never relabel it calls. Bounded actual caller/callee/context mapping is a separate root-owned source investigation; this reader must not fabricate those edges while awaiting exact source evidence. Source-comparison explanation remains available in the reader. Its primary copy is one or two concrete change/why sentences; exact facts, inference/unknown limits and hashes belong in secondary disclosure. No default module spaghetti or metamodel paragraph wall.
+
+
+## Current requirement trace — before call projection
+
+Product knowledge is now current-only with stable F01–F15 IDs in pr-file-tree-first.md. Historical specifications/checks above are preserved as history, not competing requirements. No claim is made that every new requirement already passed.
+
+| Requirement | Responsible implementation / check | Current evidence / pending |
+|---|---|---|
+| F01 whole tree | tree.ts / main.tsx | Prior exact50path/tree/pan checks; continuous return checks retain50. Calls overlay must preserve membership. |
+| F02 continuous file group | continuous.ts / FileDiffBody | Moving7Chrome PASS; current DOM has logical hunk anchors, no repeated boxes. Clean source/capture binding pending. |
+| F03 exclusive edge-to-edge + return | main.tsx / reading.ts | Moving390 edge-to-edge and desktop/390 A→B return with folds/mode/offsets PASS. |
+| F04 dots/motion/colors | continuous reader / native scroll | Moving native smooth samples + touch interruption PASS; reduced-motion journeys separate. |
+| F05 dual coordinates/source | coordinates.ts / SourceLine | Exact imports24/26…27/blank…blank/29 PASS; new fullsource verified root50files/96sides. |
+| F06 inline context | continuousSegments / fold controls | Exact old31/new33 expansion + source reconstruction + cross-file fold return PASS moving. |
+| F07 observed current range | visibleHunk / scroll handler | Actual public3hunk wheel/touch bottom PASS; screenshot concern is not a fourth-hunk failure. |
+| F08 icon modes/input | DiffControls / source viewport | Moving unified/split/nativecopy PASS; desktop drag inherited source, physical input remains unverified. |
+| F09 simple responsive explanation | RelationshipReader | Simple primary + secondary evidence implemented moving; auth/current-hunk copy and responsive final captures pending source review. |
+| F10 change-only calls | New pure projection + main composition | Root packet ready; NOT IMPLEMENTED yet. Imports disabled by default. |
+| F11 certainty/frontiers | Exact client/storage JSON + projection | Root206anchor audit PASS; copies/projection tests/source-informed UI proof pending. |
+| F12 right/left ports | Explicit ReactFlow handles + refresh | PENDING call integration and actual endpoint checks; hidden import implementation is not proof. |
+| F13 fixture/owners | Full Git fixture / immutable reading | Source/continuous pure checks PASS; current strict/build/frozen evidence pending checkpoint. |
+| F14 future comments/lenses | Existing durable contracts | Explicitly future; no implementation/adoption claim in this mock. |
+| F15 evidence boundaries | Manifest / root review | Prior000f frozen; moving continuous captures separately attributed. UI-first browser remains denied/unrun. |
+
+Call integration is blocked only on this required spec commit, then proceeds within existing authorization. No new approval gate or production authority is introduced.
