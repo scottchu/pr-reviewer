@@ -353,3 +353,8 @@ The [reviewer experience](../review-experience.md) distinguishes current eight-s
 ## Story is an optional attention overlay
 
 The controlling October23 whole-PR canvas is maintained in [reviewer experience](../review-experience.md) and [the concrete PR25 graph](../pr25-whole-change-graph.md). For a fixed snapshot/analysis, story off, Next/Previous and Resume share the same graph/group/node/edge membership. Story updates emphasis and optional camera following; it cannot create/remove groups or make source available only after a step. Arbitrary node entry, both-side callers/callees and free pan/zoom work without a story. Existing cursor/draft/return safeguards apply, but a correct single-path player is not whole-product acceptance.
+
+
+### Explicit guided file attention (approved 2026-10-25)
+
+An explicit Previous/Next step may translate an offscreen exact source into the usable graph rectangle at the existing scale. Before its first movement, use the existing public original cursor/draft return frame and the existing local presentation capture. `enterExploration({ allowStoryNavigation: true })` selects this attention-only entry; default `enterExploration()` remains evidence exploration. Attention-only paused navigation may repeat without replacing the original. Entering actual evidence changes the existing frame to exploration and blocks further step navigation until Return. It must not be possible to reopen navigation by requesting attention-only entry over an active evidence excursion. No new persisted mode or parallel frame owner is introduced. Existing reload limits remain: public frames can persist, local camera/reading frames do not become newly durable.
