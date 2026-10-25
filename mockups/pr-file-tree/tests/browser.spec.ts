@@ -12,16 +12,24 @@ test('whole PR tree contains exactly the pinned filenames, pans, gesture zooms a
  await page.mouse.move(1100,500);await page.mouse.down();await page.mouse.move(900,420,{steps:5});await page.mouse.up();await expect.poll(async()=>Math.round((await viewport(page)).x)).not.toBe(Math.round(initial.x));
  const panned=await viewport(page);await page.mouse.wheel(0,100);await expect.poll(async()=>Math.round((await viewport(page)).y)).not.toBe(Math.round(panned.y));
  await page.keyboard.down('Control');await page.mouse.wheel(0,-200);await page.keyboard.up('Control');await expect.poll(async()=>(await viewport(page)).zoom).toBeGreaterThan(initial.zoom);await page.screenshot({path:`${evidence}/desktop-panned-zoomed.png`});
- await page.getByRole('button',{name:'Reset view'}).click();await expect.poll(async()=>await viewport(page)).toEqual(initial);expect(errors).toEqual([]);
+ await page.getByRole('button',{name:'Overview'}).click();await expect.poll(async()=>await viewport(page)).toEqual(initial);expect(errors).toEqual([]);
 });
 test.describe('touch-capable narrow viewport',()=>{test.use({hasTouch:true});
 test('390px full-window tree has legible filenames, synthetic touch pinch and keyboard pan/zoom without page scroll',async({page,context})=>{
  await page.setViewportSize({width:390,height:844});await page.goto('/');await expect(page.locator('[data-file-path]')).toHaveCount(50);await page.evaluate(()=>document.fonts.ready);const initial=await viewport(page);expect(initial.zoom).toBe(1);
  await page.screenshot({path:`${evidence}/390.png`});expect(await page.evaluate(()=>({width:document.documentElement.scrollWidth,height:document.documentElement.scrollHeight}))).toEqual({width:390,height:844});
  const session=await context.newCDPSession(page);await session.send('Emulation.setTouchEmulationEnabled',{enabled:true,maxTouchPoints:2});await session.send('Input.synthesizePinchGesture',{x:200,y:400,scaleFactor:1.4,relativeSpeed:800,gestureSourceType:'touch'});await expect.poll(async()=>(await viewport(page)).zoom).toBeGreaterThan(1);
- await page.getByRole('button',{name:'Reset view'}).click();await expect.poll(async()=>await viewport(page)).toEqual(initial);
- await page.locator('main').focus();await page.keyboard.press('ArrowRight');await expect.poll(async()=>(await viewport(page)).x).toBe(initial.x-80);await page.keyboard.press('+');await expect.poll(async()=>(await viewport(page)).zoom).toBeGreaterThan(1);await page.screenshot({path:`${evidence}/390-panned-zoomed.png`});
- await page.keyboard.press('0');await expect.poll(async()=>await viewport(page)).toEqual(initial);await expect(page.locator('[data-file-path]')).toHaveCount(50);expect(await page.evaluate(()=>scrollY)).toBe(0);
+ await page.getByRole('button',{name:'Overview'}).click();await expect.poll(async()=>(await viewport(page)).zoom).toBe(1);const overview=await viewport(page);const root=await page.locator('[data-id="directory:."]').boundingBox();expect(root!.x).toBeGreaterThanOrEqual(0);expect(root!.x+root!.width).toBeLessThan(390);
+ await page.locator('main').focus();await page.keyboard.press('ArrowRight');await expect.poll(async()=>(await viewport(page)).x).toBe(overview.x-80);await page.keyboard.press('+');await expect.poll(async()=>(await viewport(page)).zoom).toBeGreaterThan(1);await page.screenshot({path:`${evidence}/390-panned-zoomed.png`});
+ await page.keyboard.press('0');await expect.poll(async()=>await viewport(page)).toEqual(overview);await expect(page.locator('[data-file-path]')).toHaveCount(50);expect(await page.evaluate(()=>scrollY)).toBe(0);
 });
 
+});
+
+test('selecting review.ts overlays verified before/after imports and unchanged filename context while retaining all50 changed paths',async({page})=>{
+ await page.goto('/');await page.locator('[data-file-path="src/application/review.ts"]').click();await expect(page.locator('.import-label')).toHaveCount(5);await expect(page.locator('[data-file-path]')).toHaveCount(50);
+ await expect(page.locator('[data-context-path="src/domain/public.ts"]')).toHaveText('public.ts');await expect(page.locator('[data-context-path="src/application/public.ts"]')).toHaveText('public.ts');
+ const added=page.locator('.import-label').filter({hasText:'+ imports'});await expect(added).toHaveCount(1);await expect(added).toHaveAttribute('title',new RegExp(`after ${fixture.head}`));await expect(added).toHaveAttribute('title',/src\/application\/review.ts:1/);
+ await page.screenshot({path:`${evidence}/desktop-selected-imports.png`});await page.setViewportSize({width:390,height:844});await page.getByRole('button',{name:'Overview'}).click();await page.screenshot({path:`${evidence}/390-overview.png`});
+ await page.locator('main').focus();await page.keyboard.press('Escape');await expect(page.locator('.import-label')).toHaveCount(0);await expect(page.locator('[data-context-path]')).toHaveCount(0);await expect(page.locator('[data-file-path]')).toHaveCount(50);
 });
