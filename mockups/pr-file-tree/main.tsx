@@ -13,8 +13,9 @@ import { projectCalls, projectBehaviorCalls, layoutCalls, relevantTests, type Fu
 import { FunctionLabel, DeclaredTestLabel, CallLine, CallExplanation, type FunctionNode, type DeclaredTestNode } from './call-graph.tsx';
 import type { DeclaredTest } from './declared-tests.types.ts';
 import { ReviewContext, type ContextEvidence } from './review-context.tsx';
-import { createReviewWorkspace, storyProjection } from '../../src/application/public.ts';
+import { createReviewWorkspace, storyProjection, storyTransition } from '../../src/application/public.ts';
 import type { StoryIntent } from '../../src/application/public.ts';
+import { graphFiles } from '../../src/domain/public.ts';
 import type { StoryReference } from '../../src/domain/public.ts';
 import { OwnerPanels, type OwnerPanel } from './owner-panels.tsx';
 import { type GraphLens } from './behavior.ts';
@@ -24,6 +25,7 @@ import { layoutFileProjection, projectFileCalls, fileRequirementReferences } fro
 import { FileCallLine, FileRequirementLine } from './file-call.tsx';
 import { prepareChangeImpact } from './change-impact.ts';
 import { ChangeImpactLine, ChangeImpactExplanation } from './change-impact-view.tsx';
+import { storyAttentionCamera } from './story-framing.ts';
 import { WorkspaceActions } from './workspace-actions.tsx';
 const motionDuration = () => matchMedia('(prefers-reduced-motion: reduce)').matches ? 0 : 240;
 const tree = buildTree(fixture.paths, fixture.changes);
@@ -248,6 +250,7 @@ const App = () => {
   const [ownerError, setOwnerError] = useState('');
   const [ownerBusy, setOwnerBusy] = useState(false);
   const ownerScroll = useRef({ story: 0, discussion: 0 });
+  const panelRestoreRevision = useRef(0);
   const runOwner = (operation: () => unknown) => {
     setOwnerError('');
     try {
@@ -371,6 +374,13 @@ const App = () => {
       if (cameraOwner.current === owner)
         cameraOwner.current = null;
     });
+  };
+  const stopCameraMotion = () => {
+    const current = flow.current?.getViewport();
+    if (current && cameraOwner.current) {
+      cameraOwner.current = null;
+      void flow.current?.setViewport(current, { duration: 0 });
+    }
   };
   const switchLens = (next: GraphLens) => {
     if (fullscreen || next === lens || !flow.current) return;
@@ -919,7 +929,7 @@ const App = () => {
       }
     }
   };
-  const capturePresentation = () => {
+  const capturePresentation = (retainPanels = false) => {
     const file = detail.expanded;
     const retained = file ? readings.current[file] : undefined;
     if (file && retained) {
@@ -936,6 +946,14 @@ const App = () => {
       selected, testsFor, mode, lens, lensCameras: lensCameras.current, lensCameraSources: lensCameraSources.current, functionFocus, expanded: detail.expanded,
       readings: readings.current, sourceReturn, testReturn, contextReturns,
       callExplained, impactOpen, sourceRelation,
+      panels: retainPanels ? {
+        contextOpen, storyOpen, discussionOpen, ownerPanel,
+        contextScroll: contextScroll.current,
+        scroll: {
+          story: document.querySelector<HTMLElement>('.owner-story')?.scrollTop ?? ownerScroll.current.story,
+          discussion: document.querySelector<HTMLElement>('.owner-discussion')?.scrollTop ?? ownerScroll.current.discussion,
+        },
+      } : null,
     });
   };
   const ownerReturn = useRef<ReturnType<typeof capturePresentation> | null>(null);
@@ -949,6 +967,7 @@ const App = () => {
     setOwnerPanel(panel);
   };
   const closeOwnerPanel = (target: OwnerPanel) => {
+    if (target === 'story') stopCameraMotion();
     if (target === 'story') setStoryOpen(false);
     else setDiscussionOpen(false);
     if (ownerPanel === target) setOwnerPanel(null);
@@ -962,11 +981,9 @@ const App = () => {
     ownerOperation.current = true;
     setOwnerBusy(true);
     try {
-      if (!workspace.story.getSnapshot().returnFrame) {
-        const frame = capturePresentation();
-        workspace.story.enterExploration();
-        ownerReturn.current = frame;
-      }
+      const frame = workspace.story.getSnapshot().returnFrame ? null : capturePresentation();
+      workspace.story.enterExploration();
+      if (frame) ownerReturn.current = frame;
       await workspace.inspectReference(reference);
       const canvas = workspace.canvas.getSnapshot();
       if (canvas.busy || canvas.error || canvas.frame?.inspection?.contentHash !== reference.contentHash
@@ -1031,7 +1048,15 @@ const App = () => {
       setRestoreVersion(value => value + 1);
       moveCamera(frame.camera);
       ownerReturn.current = null;
-      if (narrow) setOwnerPanel(null);
+      if (frame.panels) {
+        ownerScroll.current = structuredClone(frame.panels.scroll);
+        contextScroll.current = frame.panels.contextScroll;
+        setContextOpen(frame.panels.contextOpen);
+        setStoryOpen(frame.panels.storyOpen);
+        setDiscussionOpen(frame.panels.discussionOpen);
+        setOwnerPanel(frame.panels.ownerPanel);
+        panelRestoreRevision.current++;
+      } else if (narrow) setOwnerPanel(null);
       setPendingFocus({ target: 'reading', path: frame.expanded });
     } finally {
       ownerOperation.current = false;
@@ -1039,10 +1064,50 @@ const App = () => {
     }
   };
   const navigateOwnerStory = (intent: StoryIntent) => runOwner(() => {
-    workspace.story.intent(intent);
-    const projection = storyProjection(workspace.story.getSnapshot());
-    const path = projection?.sources.find(source => source.reference.type === 'snapshot_source')?.reference.anchor.path;
-    if (path && !workspace.story.getSnapshot().returnFrame) setSelected(path);
+    if (ownerOperation.current) throw new Error('owner_operation_in_progress');
+    const before = workspace.story.getSnapshot();
+    if (intent.type !== 'previous' && intent.type !== 'next' || before.mode === 'exploring') {
+      workspace.story.intent(intent);
+      return;
+    }
+    const preview = storyTransition(before, intent);
+    if (!preview.cursor || preview.cursor.stepId === before.cursor?.stepId) return;
+    const projection = storyProjection(preview);
+    const file = before.snapshot && graphFiles(before.snapshot).find(file => file.key === projection?.comparisonKey);
+    const path = file?.newPath ?? file?.oldPath;
+    const header = Array.from(main.current?.querySelectorAll<HTMLElement>('[data-file-path]') ?? [])
+      .find(element => element.dataset.filePath === path);
+    const graph = main.current?.querySelector<HTMLElement>('.pr-graph');
+    const camera = flow.current?.getViewport();
+    if (!path || !header || !graph || !camera) throw new Error('story_attention_target_unavailable');
+    const bounds = graph.getBoundingClientRect();
+    const area = { left: bounds.left + 12, top: bounds.top + 12, right: bounds.right - 12, bottom: bounds.bottom - 12 };
+    if (!narrow) {
+      for (const panel of document.querySelectorAll<HTMLElement>('.relationship-reader:not(.owner-modal)')) {
+        const rect = panel.getBoundingClientRect();
+        if (rect.bottom <= area.top || rect.top >= area.bottom) continue;
+        if (rect.right >= area.right && rect.left > area.left) area.right = Math.min(area.right, rect.left - 12);
+      }
+    }
+    const actions = document.querySelector<HTMLElement>('.workspace-actions');
+    if (actions && getComputedStyle(actions).visibility !== 'hidden') {
+      const rect = actions.getBoundingClientRect();
+      if (rect.left < area.right && rect.right > area.left && rect.bottom > area.top) area.bottom = Math.min(area.bottom, rect.top - 12);
+    }
+    const attention = storyAttentionCamera(camera, header.getBoundingClientRect(), area);
+    if (attention) {
+      if (before.returnFrame && !ownerReturn.current) throw new Error('original_local_reading_unavailable');
+      const original = before.returnFrame ? null : capturePresentation(true);
+      if (!workspace.story.enterExploration({ allowStoryNavigation: true, navigation: intent })) return;
+      if (original) ownerReturn.current = original;
+    } else workspace.story.intent(intent);
+    const after = workspace.story.getSnapshot();
+    if (after.snapshotId !== before.snapshotId || after.view?.version?.versionId !== before.view?.version?.versionId
+      || after.cursor?.stepId !== preview.cursor.stepId) throw new Error('story_attention_superseded');
+    pendingFileFrame.current = null;
+    stopCameraMotion();
+    setSelected(path);
+    if (attention) moveCamera(attention);
   });
   const inspectVisibleSource = () => {
     const snapshot = ownerStory.snapshot;
@@ -1244,7 +1309,7 @@ const App = () => {
         edges={edges}
         nodeTypes={nodeTypes}
         edgeTypes={edgeTypes}
-        onMoveStart={event => { if (event) pendingFileFrame.current = null; }}
+        onMoveStart={event => { if (event) { pendingFileFrame.current = null; stopCameraMotion(); } }}
         nodesDraggable={false}
         nodesConnectable={false}
         elementsSelectable={false}
@@ -1349,6 +1414,7 @@ const App = () => {
       review={ownerReview}
       busy={ownerBusy}
       scroll={ownerScroll}
+      restoreVersion={panelRestoreRevision.current}
       onClose={() => closeOwnerPanel('discussion')}
       onInspect={inspectOwnerEvidence}
       onNavigate={navigateOwnerStory}
@@ -1363,6 +1429,7 @@ const App = () => {
       review={ownerReview}
       busy={ownerBusy}
       scroll={ownerScroll}
+      restoreVersion={panelRestoreRevision.current}
       onClose={() => closeOwnerPanel('story')}
       onInspect={inspectOwnerEvidence}
       onNavigate={navigateOwnerStory}

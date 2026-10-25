@@ -193,3 +193,129 @@ test('an in-flight source validation exposes a busy state and cannot accept a co
   await expect(page.locator('[data-expanded-file]')).toHaveAttribute('data-expanded-file', 'src/application/review.ts');
   await expect(page.getByRole('button', { name: 'Inspect base src/application/review.ts L24–32' }).first()).toBeEnabled();
 });
+
+
+test.describe('explicit guided attention with normal motion', () => {
+  test.use({ reducedMotion: 'no-preference' });
+  for (const width of [1440, 390]) test(`${width} visible step stays still, offscreen steps preserve the first public and local reading`, async ({ page }) => {
+    await page.setViewportSize({ width, height: 1000 });
+    await page.goto('/');
+    await page.getByRole('button', { name: 'Open discussion' }).click();
+    await page.getByRole('textbox', { name: 'Your question' }).fill('Original guided attention draft');
+    await page.getByRole('button', { name: 'Close discussion' }).click();
+    await page.getByRole('button', { name: 'Open prepared story' }).click();
+    const original = await page.locator('.react-flow__viewport').getAttribute('style');
+    const zoom = (style: string | null) => style!.match(/scale\(([^)]+)\)/)![1];
+    await page.getByRole('button', { name: 'Next story step' }).click();
+    await expect(page.locator('.owner-step')).toHaveText('Trace an unchanged caller into the changed decision');
+    await expect(page.locator('.react-flow__viewport')).toHaveAttribute('style', original!);
+    await expect(page.getByRole('button', { name: 'Return to original reading' })).toHaveCount(0);
+    await page.getByRole('button', { name: 'Next story step' }).click();
+    await expect(page.locator('.owner-step')).toHaveText('Compare owner recognition with credential lookup');
+    await expect(page.locator('[data-expanded-file]')).toHaveCount(0);
+    await expect.poll(async () => (await page.locator('[data-file-path="src/storage/public.ts"]').boundingBox())!.y).toBeLessThan(900);
+    expect(zoom(await page.locator('.react-flow__viewport').getAttribute('style'))).toBe(zoom(original));
+    await expect(page.getByRole('button', { name: 'Previous story step' })).toBeEnabled();
+    await page.getByRole('button', { name: 'Previous story step' }).click();
+    await page.getByRole('button', { name: 'Next story step' }).click();
+    await page.getByRole('button', { name: 'Inspect head src/storage/public.ts L200–204' }).first().click();
+    await expect(page.locator('[data-expanded-file]')).toHaveAttribute('data-expanded-file', 'src/storage/public.ts');
+    if (width < 650) await page.getByRole('button', { name: 'Open prepared story' }).click();
+    await expect(page.getByRole('button', { name: 'Previous story step' })).toBeDisabled();
+    if (width < 650) await page.getByRole('button', { name: 'Close prepared story' }).click();
+    await page.getByRole('button', { name: 'Return to original reading' }).click();
+    await expect(page.locator('[data-expanded-file]')).toHaveCount(0);
+    await expect(page.locator('.react-flow__viewport')).toHaveAttribute('style', original!);
+    await expect(page.locator('.owner-step')).toHaveText('Trace an unchanged caller into the changed decision');
+    if (width < 650) await page.getByRole('button', { name: 'Close prepared story' }).click();
+    await page.getByRole('button', { name: 'Open discussion' }).click();
+    await expect(page.getByRole('textbox', { name: 'Your question' })).toHaveValue('Original guided attention draft');
+    await page.screenshot({ path: `/tmp/pr-reviewer-reading-journey-evidence/r19-return-${width}.png` });
+  });
+});
+
+
+test.describe('guided original panel and reading', () => {
+  test.use({ reducedMotion: 'no-preference' });
+  for (const width of [1440, 390]) test(`${width} attention Return restores Story panel scroll and original folded reading without reopen`, async ({ page }) => {
+    await page.setViewportSize({ width, height: 1000 });
+    await page.goto('/');
+    if (width >= 650) await page.getByRole('button', { name: 'Close review context' }).click();
+    await page.getByRole('button', { name: 'Find source', exact: true }).click();
+    await page.getByRole('combobox', { name: 'Changed source' }).selectOption('src/application/private-session.ts');
+    await page.locator('[data-file-path="src/application/private-session.ts"]').click();
+    await page.getByRole('button', { name: 'Split', exact: true }).click();
+    await expect.poll(async () => page.locator('.continuous-comparison').evaluate(element => element.clientWidth)).toBeGreaterThan(width < 650 ? 280 : 700);
+    await page.locator('.fold-control').first().click();
+    await expect.poll(async () => (await page.locator('[data-expanded-file]').boundingBox())!.height).toBeGreaterThan(500);
+    await page.locator('.continuous-reader').evaluate(element => { element.scrollTop = 70; });
+    await page.locator('.continuous-comparison').evaluate(element => { element.scrollLeft = 80; });
+    await page.getByRole('button', { name: 'Open discussion' }).click();
+    await page.getByRole('textbox', { name: 'Your question' }).fill('Original folded guided draft');
+    await page.getByRole('button', { name: 'Close discussion' }).click();
+    await page.getByRole('button', { name: 'Open prepared story' }).click();
+    const panel = page.locator('.owner-story');
+    await panel.evaluate(element => { element.scrollTop = 24; });
+    const next = page.getByRole('button', { name: 'Next story step' });
+    await next.evaluate(element => element.focus({ preventScroll: true }));
+    const originalReading = async () => ({
+      camera: await page.locator('.react-flow__viewport').getAttribute('style'),
+      top: await page.locator('.continuous-reader').evaluate(element => element.scrollTop),
+      left: await page.locator('.continuous-comparison').evaluate(element => element.scrollLeft),
+      split: await page.locator('.continuous-reader').evaluate(element => element.classList.contains('split')),
+      folds: await page.locator('.fold-control[aria-expanded="true"]').allTextContents(),
+      panelTop: await panel.evaluate(element => element.scrollTop),
+    });
+    const original = await originalReading();
+    await page.keyboard.press('Enter');
+    await next.click();
+    await page.getByRole('button', { name: 'Inspect head src/storage/public.ts L200–204' }).first().click();
+    await expect(page.locator('[data-expanded-file]')).toHaveAttribute('data-expanded-file', 'src/storage/public.ts');
+    if (width === 1440) {
+      const held = await page.locator('.react-flow__viewport').getAttribute('style');
+      await page.route('**/api/story?**', route => route.abort());
+      await page.getByRole('button', { name: 'Return to original reading' }).click();
+      await expect(page.getByRole('alert')).toBeVisible();
+      await expect(page.locator('[data-expanded-file]')).toHaveAttribute('data-expanded-file', 'src/storage/public.ts');
+      await expect(page.locator('.react-flow__viewport')).toHaveAttribute('style', held!);
+      await expect(page.getByRole('button', { name: 'Return to original reading' })).toBeVisible();
+      await page.unroute('**/api/story?**');
+    }
+    await page.getByRole('button', { name: 'Return to original reading' }).click();
+    await expect(panel).toBeVisible();
+    await expect(page.locator('.owner-step')).toHaveText('Compare the request and its exact header helper');
+    await expect(page.locator('[data-expanded-file]')).toHaveAttribute('data-expanded-file', 'src/application/private-session.ts');
+    await expect.poll(originalReading).toEqual(original);
+    await page.screenshot({ path: `/tmp/pr-reviewer-reading-journey-evidence/r19-panel-return-${width}.png` });
+    await page.getByRole('button', { name: 'Close prepared story' }).click();
+    await page.getByRole('button', { name: 'Open discussion' }).click();
+    await expect(page.getByRole('textbox', { name: 'Your question' })).toHaveValue('Original folded guided draft');
+  });
+});
+
+
+test.describe('guided camera intent ownership', () => {
+  test.use({ reducedMotion: 'no-preference' });
+  test('rapid Next Previous, closing Story and a manual pan cannot finish an older target movement', async ({ page }) => {
+    await page.goto('/');
+    await page.getByRole('button', { name: 'Close review context' }).click();
+    await page.getByRole('button', { name: 'Open prepared story' }).click();
+    await page.getByRole('button', { name: 'Next story step' }).click();
+    const original = await page.locator('.react-flow__viewport').getAttribute('style');
+    await page.getByRole('button', { name: 'Next story step' }).click();
+    await page.getByRole('button', { name: 'Previous story step' }).click();
+    await expect(page.locator('.owner-step')).toHaveText('Trace an unchanged caller into the changed decision');
+    await page.getByRole('button', { name: 'Close prepared story' }).click();
+    const graph = (await page.locator('.pr-graph').boundingBox())!;
+    await page.mouse.move(graph.x + graph.width / 2, graph.y + 100);
+    await page.mouse.down();
+    await page.mouse.move(graph.x + graph.width / 2 + 60, graph.y + 140, { steps: 5 });
+    await page.mouse.up();
+    const manual = await page.locator('.react-flow__viewport').getAttribute('style');
+    await page.waitForTimeout(600);
+    await expect(page.locator('.react-flow__viewport')).toHaveAttribute('style', manual!);
+    await page.getByRole('button', { name: 'Return to original reading' }).click();
+    await expect(page.locator('.react-flow__viewport')).toHaveAttribute('style', original!);
+    await expect(page.locator('.owner-step')).toHaveText('Trace an unchanged caller into the changed decision');
+  });
+});

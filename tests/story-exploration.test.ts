@@ -39,3 +39,110 @@ test('canvas inspection preflight rejects Resume before consuming the exact fram
 test('canvas preflight is abort-fenced and positive legacy absence adds no validation read',async()=>{const h=setup();let release!:()=>void,signal:AbortSignal|undefined,checks=0,entered!:()=>void;const ready=new Promise<void>(done=>{entered=done;});const b=h.bridge({canvasFrames:{validate:async(_snapshot,_frame,abort)=>{checks++;signal=abort;entered();await new Promise<void>(done=>{release=done;});}}});try{await b.login(h.f.token,h.snapshot);b.editDraft('Original');b.enterExploration();b.editDraft('Exploration');await b.resumeStory();assert.equal(checks,0);b.updateGraphFrame('structural',{fileKey:h.key,context:false,spans:false,spanId:'',viewport:{x:0,y:0,zoom:1},inspection:{anchor:h.ref.anchor,contentHash:h.snapshot.sources[0]!.hash}});b.enterExploration();const resuming=b.resumeStory().catch(error=>error);await ready;assert.ok(signal);const frame=b.getSnapshot().returnFrame;b.editDraft('Newer exploration input');assert.equal(signal.aborted,true);release();assert.match(String(await resuming),/superseded|abort/i);assert.equal(b.getSnapshot().returnFrame,frame);assert.equal(b.activeDraft()?.text,'Newer exploration input');}finally{b.logout();h.cleanup();}});
 
 test('startup canvas preflight preserves rejected saved frame and both drafts, then valid exact source hydrates and resumes',async()=>{const h=setup(),b=h.bridge();try{await b.login(h.f.token,h.snapshot);b.editDraft('Original saved canvas');b.updateGraphFrame('structural',{fileKey:h.key,context:false,spans:false,spanId:'',viewport:{x:3,y:4,zoom:.8},inspection:{anchor:h.ref.anchor,contentHash:'a'.repeat(64)}});b.enterExploration();b.editDraft('Saved exploration canvas');b.updateGraphFrame('structural',{fileKey:h.key,context:false,spans:false,spanId:'',viewport:{x:3,y:4,zoom:.8},inspection:{anchor:h.ref.anchor,contentHash:h.snapshot.sources[0]!.hash}});const before=[...h.m.values.entries()],next=h.bridge({canvasFrames:createCanvasFrameValidator()});await next.login(h.f.token,h.snapshot);assert.match(next.getSnapshot().viewRecoveryMessage,/checksum/);assert.deepEqual([...h.m.values.entries()],before);next.logout();b.updateGraphFrame('structural',{fileKey:h.key,context:false,spans:false,spanId:'',viewport:{x:3,y:4,zoom:.8},inspection:{anchor:h.ref.anchor,contentHash:h.snapshot.sources[0]!.hash}});const saved=JSON.parse([...h.m.values.values()][0]!) as {value:{returnFrame:{maps:{structural:{inspection:{contentHash:string}}}}}};saved.value.returnFrame.maps.structural.inspection.contentHash=h.snapshot.sources[0]!.hash;h.m.values.set([...h.m.values.keys()][0]!,JSON.stringify(saved));const valid=h.bridge({canvasFrames:createCanvasFrameValidator()});await valid.login(h.f.token,h.snapshot);assert.equal(valid.getSnapshot().mode,'exploring');assert.deepEqual(valid.getSnapshot().drafts.map(draft=>draft.text),['Original saved canvas','Saved exploration canvas']);await valid.resumeStory();assert.equal(valid.activeDraft()?.text,'Original saved canvas');assert.equal(valid.getSnapshot().maps.structural?.inspection?.contentHash,h.snapshot.sources[0]!.hash);valid.logout();}finally{b.logout();h.cleanup();}});
+
+test('attention captures the original cursor and dirty draft atomically, repeats, then promotes to evidence', async () => {
+  const h = setup();
+  const b = h.bridge();
+  try {
+    await b.login(h.f.token, h.snapshot);
+    b.editDraft('Original attention draft');
+    const original = b.activeDraft()!;
+    const cursor = b.getSnapshot().cursor;
+    const publications: { cursor: string | undefined; original: string | undefined }[] = [];
+    const unsubscribe = b.subscribe(() => publications.push({
+      cursor: b.getSnapshot().cursor?.stepId,
+      original: b.getSnapshot().returnFrame?.cursor?.stepId,
+    }));
+    assert.equal(b.enterExploration({ allowStoryNavigation: true, navigation: { type: 'next' } }), true);
+    unsubscribe();
+    assert.deepEqual(publications, [{ cursor: 'second', original: 'first' }]);
+    assert.equal(b.getSnapshot().mode, 'paused');
+    const frame = b.getSnapshot().returnFrame;
+    assert.deepEqual(frame?.cursor, cursor);
+    assert.equal(frame?.originalDraftId, original.id);
+    assert.equal(b.getSnapshot().drafts.length, 2);
+    assert.equal(b.enterExploration({ allowStoryNavigation: true, navigation: { type: 'previous' } }), true);
+    assert.equal(b.getSnapshot().returnFrame, frame);
+    assert.equal(b.getSnapshot().drafts.length, 2);
+    b.enterExploration();
+    assert.equal(b.getSnapshot().mode, 'exploring');
+    const explored = b.getSnapshot();
+    assert.equal(b.enterExploration({ allowStoryNavigation: true, navigation: { type: 'next' } }), false);
+    assert.equal(b.getSnapshot(), explored);
+    b.intent({ type: 'next' });
+    assert.equal(b.getSnapshot().cursor?.stepId, 'first');
+    await b.resumeStory();
+    assert.equal(b.activeDraft()?.id, original.id);
+    assert.equal(b.activeDraft()?.text, 'Original attention draft');
+    assert.deepEqual(b.getSnapshot().cursor, cursor);
+  } finally { b.logout(); h.cleanup(); }
+});
+
+test('attention rejects boundaries and pending submission before allocating or mutating a frame', async () => {
+  const h = setup();
+  const b = h.bridge();
+  try {
+    await b.login(h.f.token, h.snapshot);
+    const before = b.getSnapshot();
+    assert.equal(b.enterExploration({ allowStoryNavigation: true, navigation: { type: 'previous' } }), false);
+    assert.equal(b.getSnapshot(), before);
+    b.setQuestionGuard(true);
+    const guarded = b.getSnapshot();
+    assert.throws(() => b.enterExploration({ allowStoryNavigation: true, navigation: { type: 'next' } }), /submission_pending/);
+    assert.throws(() => b.intent({ type: 'next' }), /submission_pending/);
+    assert.equal(b.getSnapshot(), guarded);
+    assert.equal(b.getSnapshot().returnFrame, null);
+    assert.equal(b.getSnapshot().drafts.length, 1);
+  } finally { b.logout(); h.cleanup(); }
+});
+
+test('attention cannot invalidate an in-flight public return', async () => {
+  const h = setup();
+  const b = h.bridge();
+  try {
+    await b.login(h.f.token, h.snapshot);
+    b.enterExploration({ allowStoryNavigation: true, navigation: { type: 'next' } });
+    const frame = b.getSnapshot().returnFrame;
+    const fetchBefore = globalThis.fetch;
+    let release!: () => void;
+    let started!: () => void;
+    const pending = new Promise<void>(resolve => { release = resolve; });
+    const ready = new Promise<void>(resolve => { started = resolve; });
+    globalThis.fetch = (async (...args: Parameters<typeof fetch>) => {
+      if (String(args[0]).startsWith('/api/story?')) { started(); await pending; }
+      return fetchBefore(...args);
+    }) as typeof fetch;
+    const returning = b.resumeStory();
+    await ready;
+    assert.throws(() => b.enterExploration({ allowStoryNavigation: true, navigation: { type: 'previous' } }), /resume_in_progress/);
+    assert.throws(() => b.intent({ type: 'previous' }), /resume_in_progress/);
+    assert.equal(b.getSnapshot().returnFrame, frame);
+    release();
+    await returning;
+    assert.equal(b.getSnapshot().returnFrame, null);
+    assert.equal(b.getSnapshot().cursor?.stepId, 'first');
+  } finally { b.logout(); h.cleanup(); }
+});
+
+
+test('opening real evidence promotes attention without recapturing its original or permitting replay', async () => {
+  const h = setup();
+  const b = h.bridge();
+  try {
+    await b.login(h.f.token, h.snapshot);
+    b.enterExploration({ allowStoryNavigation: true, navigation: { type: 'next' } });
+    const frame = b.getSnapshot().returnFrame;
+    const originalDraftId = frame?.originalDraftId;
+    b.intent({ type: 'replay' });
+    assert.equal(b.getSnapshot().mode, 'paused');
+    await b.openEvidence(h.ref);
+    assert.equal(b.getSnapshot().mode, 'exploring');
+    assert.equal(b.getSnapshot().returnFrame, frame);
+    assert.equal(b.getSnapshot().returnFrame?.originalDraftId, originalDraftId);
+    assert.equal(b.getSnapshot().drafts.length, 2);
+    b.intent({ type: 'previous' });
+    assert.equal(b.getSnapshot().cursor?.stepId, 'second');
+    await b.resumeStory();
+    assert.equal(b.getSnapshot().cursor?.stepId, 'first');
+  } finally { b.logout(); h.cleanup(); }
+});

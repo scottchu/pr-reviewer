@@ -23,6 +23,10 @@ export type StoryIntent=
  |{type:'replay'}|{type:'pause';reason:string}|{type:'previous'}|{type:'next'}|{type:'chapter';chapterId:string}|{type:'tick';elapsedMs:number}
  |{type:'surface';surface:'flow'|'diff'}|{type:'visibility';hidden:boolean}|{type:'reducedMotion';value:boolean}
  |{type:'movePlayer';x:number;y:number}|{type:'resizePlayer';viewport:{width:number;height:number};size:{width:number;height:number}}|{type:'resetPlayer'};
+export type StoryExplorationOptions = Readonly<{
+  allowStoryNavigation?: boolean;
+  navigation?: Extract<StoryIntent, { type: 'previous' | 'next' }>;
+}>;
 export type StoryExcerpt=Readonly<{reference:SourceReference;coordinates:'snapshot LF lines'|'semantic UTF-16 offsets';text:string;unavailable:boolean}>;
 export type StoryGraphFocus=Readonly<{intentId:string;fileKey:string;hunkId?:string}>;
 export type StoryProjection=Readonly<{chapter:Chapter;step:Step;claims:StoryContent['claims'];index:number;total:number;comparisonKey:string|undefined;graphFocus:StoryGraphFocus|undefined;sources:StoryExcerpt[]}>;
@@ -258,7 +262,62 @@ export const createStoryBridge=(reviewId:string,options:{canvasFrames?:CanvasFra
   pollRoute=registry.register('story-committed-to-authorized-view',scope,()=>authorized()&&Boolean(state.snapshotId)&&!read&&!state.evidenceBusy,()=>{void refresh('poll');});
   focusRoute=registry.register('story-focus-to-coordinated-view',scope,()=>authorized()&&Boolean(state.cursor),()=>{void coordinate();});
  };
- const intent=(intent:StoryIntent)=>{if(intent.type!=='tick'&&intent.type!=='resizePlayer')invalidatePrivateIntent();if(state.mode==='exploring'&&['replay','previous','next','chapter'].includes(intent.type)){publish({...state,error:'resume_required: resume the saved story before story navigation'});return;}const previous=state.focusRevision;publish(storyTransition(state,intent));if(previous!==state.focusRevision){options.semantic?.closeSource?.();focusRoute?.emit();}};
+ const commitStoryState = (next: StoryState) => {
+  const previous = state.focusRevision;
+  publish(next);
+  if (previous !== state.focusRevision) {
+   options.semantic?.closeSource?.();
+   focusRoute?.emit();
+  }
+ };
+ const intent = (intent: StoryIntent) => {
+  const navigation = ['replay', 'previous', 'next', 'chapter'].includes(intent.type);
+  if (navigation) {
+   assertEditable();
+   if (restoreOperation) throw new Error('resume_in_progress');
+  }
+  if (navigation && (state.mode === 'exploring' || state.returnFrame && intent.type === 'replay')) {
+   publish({ ...state, error: 'resume_required: resume the saved story before story navigation' });
+   return;
+  }
+  if (intent.type !== 'tick' && intent.type !== 'resizePlayer') invalidatePrivateIntent();
+  commitStoryState(storyTransition(state, intent));
+ };
+ const enterExploration = (options: StoryExplorationOptions = {}): boolean => {
+  assertEditable();
+  if (restoreOperation) throw new Error('resume_in_progress');
+  const attention = options.allowStoryNavigation === true;
+  if (options.navigation && !attention) throw new Error('attention_navigation_required');
+  if (attention && state.mode === 'exploring') return false;
+  if (options.navigation) {
+   const next = storyTransition(state, options.navigation);
+   if (!next.cursor || next.cursor.stepId === state.cursor?.stepId) return false;
+  }
+  let captured = state;
+  if (!state.returnFrame) {
+   const original = activeDraft();
+   if (!original || !state.snapshotId) throw new Error('source_unavailable');
+   const frame: StoryReturnFrame = {
+    snapshotId: state.snapshotId,
+    versionId: state.view?.version?.versionId ?? null,
+    cursor: state.cursor,
+    elapsedMs: state.elapsedMs,
+    surface: state.surface,
+    position: state.position,
+    pageScroll: state.pageScroll,
+    maps: state.maps,
+    originalDraftId: original.id,
+    evidence: state.evidence,
+   };
+   const retained = state.drafts.find(item => item.id !== original.id);
+   const draft = retained ?? { ...original, id: crypto.randomUUID(), text: '', submitted: false };
+   captured = { ...state, returnFrame: frame, drafts: [original, draft], activeDraftId: draft.id };
+  }
+  const entered: StoryState = { ...captured, mode: attention ? 'paused' : 'exploring' };
+  invalidatePrivateIntent();
+  commitStoryState(options.navigation ? storyTransition(entered, options.navigation) : entered);
+  return true;
+ };
  const select=async(snapshot:Snapshot)=>{
   if(state.snapshotId===snapshot.snapshotId)return;
   const draft=makeDraft(snapshot),retained=state.returnFrame?{drafts:state.drafts.map(item=>{if(item.id!==state.activeDraftId)return item;const {comparisonKey,...rest}=item;return {...rest,anchor:draft.anchor};}),activeDraftId:state.activeDraftId,returnFrame:state.returnFrame,mode:'exploring' as const}:null;interrupt();versionId=undefined;contextTarget=null;publish({...empty(reviewId),...(retained??{drafts:[draft],activeDraftId:draft.id}),questionLocked:state.questionLocked,snapshot:structuredClone(snapshot),snapshotId:snapshot.snapshotId,authenticated:Boolean(token),reducedMotion:state.reducedMotion,hidden:state.hidden,viewport:state.viewport,playerSize:state.playerSize});
@@ -266,6 +325,7 @@ export const createStoryBridge=(reviewId:string,options:{canvasFrames?:CanvasFra
  };
  const bridgeOpenEvidence=async(reference:StoryReference)=>{
    if(!token||!state.snapshotId||disposed)return;
+   if(state.returnFrame && state.mode !== 'exploring') enterExploration();
    intent({type:'pause',reason:'evidence'});evidenceRead?.abort();const controller=new AbortController();evidenceRead=controller;const expected=generation,selectedVersion=state.view?.version,selectedStep=state.cursor?.stepId,capturedToken=token;
    const owns=()=>!disposed&&generation===expected&&state.cursor?.stepId===selectedStep&&state.view?.version?.versionId===selectedVersion?.versionId&&evidenceRead===controller&&!controller.signal.aborted;
    publish({...state,evidence:structuredClone(reference),evidenceText:'',evidenceBusy:true});
@@ -315,7 +375,7 @@ export const createStoryBridge=(reviewId:string,options:{canvasFrames?:CanvasFra
   },
   updateGraphFrame:(kind:'structural'|'semantic',frame:GraphFrames['structural']|GraphFrames['semantic'])=>{if(JSON.stringify(state.maps[kind])===JSON.stringify(frame))return;publish({...state,maps:{...state.maps,[kind]:structuredClone(frame)}});},
   setPageScroll:(pageScroll:number)=>{if(Number.isFinite(pageScroll)&&pageScroll>=0&&Math.abs(state.pageScroll-pageScroll)>1)publish({...state,pageScroll});},
-  enterExploration:()=>{invalidatePrivateIntent();assertEditable();if(state.returnFrame)return;const original=activeDraft();if(!original||!state.snapshotId)throw new Error('source_unavailable');const frame:StoryReturnFrame={snapshotId:state.snapshotId,versionId:state.view?.version?.versionId??null,cursor:state.cursor,elapsedMs:state.elapsedMs,surface:state.surface,position:state.position,pageScroll:state.pageScroll,maps:state.maps,originalDraftId:original.id,evidence:state.evidence};const retained=state.drafts.find(draft=>draft.id!==original.id),draft=retained??{...original,id:crypto.randomUUID(),text:'',submitted:false};publish({...state,returnFrame:frame,drafts:[original,draft],activeDraftId:draft.id,mode:'exploring'});},
+  enterExploration,
   resumeStory:async()=>{
    assertEditable();const frame=state.returnFrame;if(!frame)return;if(restoreOperation)throw new Error('resume_in_progress');
    const expected=generation,captured=token,serial=invalidatePrivateIntent(),drafts=state.drafts,operation={controller:new AbortController()};restoreOperation=operation;const signal=operation.controller.signal;try{

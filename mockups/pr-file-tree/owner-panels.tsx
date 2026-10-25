@@ -12,6 +12,7 @@ type Props = {
   review: View;
   busy: boolean;
   scroll: React.RefObject<Record<OwnerPanel, number>>;
+  restoreVersion?: number;
   onClose: () => void;
   onInspect: (reference: StoryReference, keyboard: boolean) => Promise<void>;
   onNavigate: (intent: StoryIntent) => void;
@@ -22,7 +23,7 @@ export const anchorLabel = (anchor: Anchor | null) => anchor
   ? `${anchor.side} · ${anchor.path}:${anchor.startLine}–${anchor.endLine}`
   : 'No source range selected';
 
-export const OwnerPanels = ({ panel, narrow, workspace, story, review, busy, scroll, onClose, onInspect, onNavigate, run }: Props) => {
+export const OwnerPanels = ({ panel, narrow, workspace, story, review, busy, scroll, restoreVersion = 0, onClose, onInspect, onNavigate, run }: Props) => {
   const element = useRef<HTMLElement>(null);
   const [confirmation, setConfirmation] = useState<QuestionEvidenceIntent | null>(null);
   const projection = storyProjection(story);
@@ -30,13 +31,15 @@ export const OwnerPanels = ({ panel, narrow, workspace, story, review, busy, scr
   const version = story.view?.version;
   const draft = story.drafts.find(item => item.id === story.activeDraftId);
   const proposal = questionEvidenceProjection(story);
+  const currentRestore = useRef(restoreVersion);
+  currentRestore.current = restoreVersion;
   useLayoutEffect(() => {
     const surface = element.current;
     if (!surface) return;
     surface.scrollTop = scroll.current[panel];
     if (narrow) surface.querySelector<HTMLElement>('h2')?.focus({ preventScroll: true });
-    return () => { scroll.current[panel] = surface.scrollTop; };
-  }, [panel, narrow, scroll]);
+    return () => { if (currentRestore.current === restoreVersion) scroll.current[panel] = surface.scrollTop; };
+  }, [panel, narrow, scroll, restoreVersion]);
   const sourceButton = (reference: StoryReference, index: number) => reference.type === 'snapshot_source'
     ? <button key={index} className="owner-citation" disabled={busy} onClick={event => run(() => onInspect(reference, event.detail === 0))}>
       Inspect {reference.anchor.side} {reference.anchor.path} L{reference.anchor.startLine}–{reference.anchor.endLine}
@@ -84,9 +87,9 @@ export const OwnerPanels = ({ panel, narrow, workspace, story, review, busy, scr
       {!version || !projection ? <p role="status">{story.error || 'Reading retained story…'}</p> : <>
         <p className="owner-identity">Published by {version.author.actorId} · version <span title={version.versionId}>{version.versionId.slice(0, 8)}</span></p>
         <nav className="owner-story-controls" aria-label="Story steps">
-          <button aria-label="Previous story step" disabled={busy || projection.index === 0 || Boolean(story.returnFrame)} onClick={() => onNavigate({ type: 'previous' })}>Previous</button>
+          <button aria-label="Previous story step" disabled={busy || projection.index === 0 || Boolean(story.returnFrame && story.mode === 'exploring')} onClick={() => onNavigate({ type: 'previous' })}>Previous</button>
           <span>{projection.index + 1} / {projection.total}</span>
-          <button aria-label="Next story step" disabled={busy || projection.index + 1 === projection.total || Boolean(story.returnFrame)} onClick={() => onNavigate({ type: 'next' })}>Next</button>
+          <button aria-label="Next story step" disabled={busy || projection.index + 1 === projection.total || Boolean(story.returnFrame && story.mode === 'exploring')} onClick={() => onNavigate({ type: 'next' })}>Next</button>
         </nav>
         <h3 className="owner-step">{projection.step.headline}</h3>
         {projection.claims.map(item => claim(item))}
