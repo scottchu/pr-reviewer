@@ -1,5 +1,8 @@
 # 720p: understand the whole PR
 
+Date of latest experience correction: 2026-10-25.
+Status: the user rejected file-default organization; caller/callee primary candidate is implemented and author-tested under [slice05 handoff v9](slices/05-explanation-exploration/reviews/reading-journey-v1.md). File tree is an icon-switched alternate lens over shared source facts. Partial call coverage, independent presentation/source review, actual-UI-first comprehension and native delivery remain separate open gates. Historical milestones below do not accept the rejected file-default experience.
+
 **Status:** Bounded04/05 engineering and actual agent-comprehension milestone accepted through7b6 plus independently closed ea regression-entrypoint correction. [Final receipt](slices/05-explanation-exploration/acceptance-7b6.md) and [actual-code reflection](reviews/reflection-7b6.md) separate evidence pins. PR24 merged and existing pilot deployment/controlled continuity are verified at mainb096. A new [fresh whole-product docs-only audit](reviews/docs-only-8e289f3.md) is qualified YES with no material gap; root verified its35-file normative equivalence to main. Full720p and native/Claude/human acceptance remain incomplete.
 
 

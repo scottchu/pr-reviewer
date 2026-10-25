@@ -1,4 +1,9 @@
 import { test, expect, type Page, type Locator } from '@playwright/test';
+
+const openFiles = async (page: Page) => {
+  await page.goto('/');
+  await page.getByRole('button', { name: 'File tree', exact: true }).click();
+};
 import { projectCalls } from '../calls.ts';
 
 test.use({ reducedMotion: 'reduce' });
@@ -6,7 +11,7 @@ test.use({ reducedMotion: 'reduce' });
 for (const width of [1440, 390]) {
   test(`${width} motivation leads to exact evidence and returns to the original graph`, async ({ page }) => {
     await page.setViewportSize({ width, height: 900 });
-    await page.goto('/');
+    await openFiles(page);
     const context = page.getByRole(width < 650 ? 'dialog' : 'complementary', { name: 'Review context' });
     if (width < 650) {
       await page.getByRole('button', { name: 'Open review context' }).click();
@@ -45,7 +50,7 @@ for (const width of [1440, 390]) {
 
 test('narrow context owns focus and Escape without moving the graph', async ({ page }) => {
   await page.setViewportSize({ width: 390, height: 844 });
-  await page.goto('/');
+  await openFiles(page);
   const camera = await page.locator('.pr-graph .react-flow__viewport').getAttribute('style');
   const opener = page.getByRole('button', { name: 'Open review context' });
   await opener.click();
@@ -60,7 +65,7 @@ test('narrow context owns focus and Escape without moving the graph', async ({ p
 });
 
 test('a second context citation returns one level without consuming the earlier reading frame', async ({ page }) => {
-  await page.goto('/');
+  await openFiles(page);
   const context = page.getByRole('complementary', { name: 'Review context' });
   const initialCamera = await page.locator('.pr-graph .react-flow__viewport').getAttribute('style');
   await context.getByRole('button', { name: 'Inspect the changed request' }).click();
@@ -82,7 +87,7 @@ test('a second context citation returns one level without consuming the earlier 
 // F17 revision 2: pointer input, retained local reading and actual DOM focus.
 test('narrow modal blocks background Overview and Back pointer navigation', async ({ page }) => {
   await page.setViewportSize({ width: 390, height: 600 });
-  await page.goto('/');
+  await openFiles(page);
   await page.getByRole('button', { name: 'Open review context' }).click();
   await page.getByRole('button', { name: 'Inspect the changed request' }).click();
   await expect(page.locator('[data-expanded-file]')).toHaveAttribute('data-expanded-file', 'src/application/review.ts');
@@ -106,7 +111,7 @@ test('narrow modal blocks background Overview and Back pointer navigation', asyn
 for (const width of [1440, 390]) {
   test(`${width} context retains local scroll across close, evidence and fullscreen`, async ({ page }) => {
     await page.setViewportSize({ width, height: 600 });
-    await page.goto('/');
+    await openFiles(page);
     const context = page.locator('.review-context');
     if (width < 650) {
       await page.getByRole('button', { name: 'Open review context' }).click();
@@ -140,7 +145,7 @@ for (const width of [1440, 390]) {
 
 test('keyboard evidence and Back focus the visible reader or graph without losing camera', async ({ page }) => {
   await page.setViewportSize({ width: 390, height: 844 });
-  await page.goto('/');
+  await openFiles(page);
   const opener = page.getByRole('button', { name: 'Open review context' });
   await opener.click();
   await page.getByRole('button', { name: 'Read the captured runtime requirement' }).focus();
@@ -167,7 +172,7 @@ const panTo = async (page: Page, locator: Locator, x = 20, y = 110) => {
   await page.locator('main').focus();
   for (let attempt = 0; attempt < 100; attempt++) {
     const box = await locator.boundingBox();
-    if (box && Math.abs(box.x - x) < 65 && Math.abs(box.y - y) < 65) {
+    if (box && Math.abs(box.x - x) <= 65 && Math.abs(box.y - y) <= 65) {
       return;
     }
     await page.keyboard.press(!box || box.x > x + 65 ? 'ArrowRight'
@@ -197,7 +202,7 @@ const expectReading = async (page: Page, saved: Awaited<ReturnType<typeof captur
 
 test('context preserves earlier function and test return frames including folds, x-scroll, mode and test lens', async ({ page }) => {
   await page.setViewportSize({ width: 390, height: 844 });
-  await page.goto('/');
+  await openFiles(page);
   const path = 'src/application/review.ts';
   const file = page.locator(`[data-file-path="${path}"]`);
   await panTo(page, file);

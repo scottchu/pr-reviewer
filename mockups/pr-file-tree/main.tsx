@@ -9,7 +9,7 @@ import { detailTransition, detailTree } from './detail.ts';
 import { FileDiffBody, DiffControls, fileDiffs, type FileDiff, type DiffMode, type SourceRelation } from './file-diff.tsx';
 import { rememberFile, type FileReading, type FileReadings, type ReadingFocus } from './reading.ts';
 import { RelationshipReader } from './relationship-reader.tsx';
-import { projectCalls, layoutCalls, relevantTests, type FunctionIdentity, type CallLink } from './calls.ts';
+import { projectCalls, projectBehaviorCalls, layoutCalls, relevantTests, type FunctionIdentity, type CallLink } from './calls.ts';
 import { FunctionLabel, DeclaredTestLabel, CallLine, CallExplanation, type FunctionNode, type DeclaredTestNode } from './call-graph.tsx';
 import type { DeclaredTest } from './declared-tests.types.ts';
 import { ReviewContext, type ContextEvidence } from './review-context.tsx';
@@ -17,8 +17,14 @@ import { createReviewWorkspace, storyProjection } from '../../src/application/pu
 import type { StoryIntent } from '../../src/application/public.ts';
 import type { StoryReference } from '../../src/domain/public.ts';
 import { OwnerPanels, type OwnerPanel } from './owner-panels.tsx';
+import { layoutBehavior, behaviorSourceHomes, sourceHomeSections, type GraphLens } from './behavior.ts';
+import { BehaviorNoteLabel, LensIcon, ActionIcon, type BehaviorNote } from './behavior-graph.tsx';
+import { mapJourneySource } from './journey-source.ts';
 const motionDuration = () => matchMedia('(prefers-reduced-motion: reduce)').matches ? 0 : 240;
 const tree = buildTree(fixture.paths, fixture.changes);
+const behaviorCalls = projectBehaviorCalls();
+const behaviorLayout = layoutBehavior(behaviorCalls);
+const behaviorTree = behaviorSourceHomes(tree);
 type LabelNode = Node<{
   name: string;
   path: string;
@@ -157,8 +163,9 @@ const Label = ({ id, data }: NodeProps<LabelNode>) => {
 
   </div>;
 };
-type CanvasNode = LabelNode | FunctionNode | DeclaredTestNode;
+type CanvasNode = LabelNode | FunctionNode | DeclaredTestNode | BehaviorNote;
 const nodeTypes = {
+  behaviorNote: BehaviorNoteLabel,
   filename: Label,
   function: FunctionLabel,
   declaredTest: DeclaredTestLabel
@@ -178,8 +185,12 @@ const containment = tree.edges.map(e => ({
   focusable: false,
   ariaLabel: `${e.source.slice(10)} contains ${e.target.slice(e.target.indexOf(':') + 1)}`
 }));
-const initialView = (overview = false) => {
+const initialView = (lens: GraphLens, overview = false) => {
   const narrow = window.innerWidth < 650;
+  if (lens === 'behavior') {
+    const request = behaviorLayout.positions.find(node => node.identity.name === 'request' && node.identity.seed && node.identity.declaration.side === 'head')!;
+    return { x: narrow ? 12 - request.x * 210 / 270 : 28, y: 110 - request.y, zoom: 1 };
+  }
   const anchor = tree.nodes.find(n => n.id === (narrow && !overview ? 'directory:src/application' : 'directory:.'))!;
   return {
     x: narrow && !overview ? 20 - anchor.x : 28,
@@ -188,6 +199,18 @@ const initialView = (overview = false) => {
   };
 };
 const App = () => {
+  const [lens, setLens] = useState<GraphLens>(() => new URLSearchParams(window.location.search).get('view') === 'files' ? 'files' : 'behavior');
+  const lensCameras = useRef<Record<GraphLens, ReturnType<typeof initialView> | null>>({ behavior: null, files: null });
+  const lensCameraSources = useRef<Record<GraphLens, string | null>>({ behavior: null, files: null });
+  const [canvasReady, setCanvasReady] = useState(false);
+  const baseTree = lens === 'behavior' ? behaviorTree : tree;
+  const [sourceFinder, setSourceFinder] = useState(false);
+  useEffect(() => {
+    const url = new URL(window.location.href);
+    if (lens === 'files') url.searchParams.set('view', 'files');
+    else url.searchParams.delete('view');
+    window.history.replaceState(null, '', url);
+  }, [lens]);
   const [workspace] = useState(() => createReviewWorkspace('pr-25'));
   const ownerStory = useSyncExternalStore(workspace.story.subscribe, workspace.story.getSnapshot);
   const ownerReview = useSyncExternalStore(workspace.review.subscribe, workspace.review.getSnapshot);
@@ -285,6 +308,7 @@ const App = () => {
       zoom: number;
     };
     mode: DiffMode;
+    lens: GraphLens;
   } | null>(null);
   const [testReturn, setTestReturn] = useState<typeof sourceReturn>(null);
   const [contextReturns, setContextReturns] = useState<readonly {
@@ -319,6 +343,29 @@ const App = () => {
         cameraOwner.current = null;
     });
   };
+  const switchLens = (next: GraphLens) => {
+    if (fullscreen || next === lens || !flow.current) return;
+    const current = flow.current.getViewport();
+    const path = detail.expanded ?? selected;
+    lensCameras.current[lens] = current;
+    lensCameraSources.current[lens] = path;
+    const targetTree = next === 'behavior' ? behaviorTree : tree;
+    const origin = baseTree.nodes.find(node => node.kind === 'file' && node.path === path);
+    const destination = targetTree.nodes.find(node => node.kind === 'file' && node.path === path);
+    const remembered = lensCameraSources.current[next] === path ? lensCameras.current[next] : null;
+    const target = remembered ?? (origin && destination
+      ? { x: current.x + (origin.x - destination.x) * current.zoom,
+        y: current.y + (origin.y - destination.y) * current.zoom, zoom: current.zoom }
+      : initialView(next));
+    setLens(next);
+    lensCameras.current[next] = target;
+    lensCameraSources.current[next] = path;
+    moveCamera(target);
+    const url = new URL(window.location.href);
+    if (next === 'files') url.searchParams.set('view', 'files');
+    else url.searchParams.delete('view');
+    window.history.replaceState(null, '', url);
+  };
   const [fullscreen, setFullscreen] = useState<{
     path: string;
     camera: {
@@ -330,6 +377,7 @@ const App = () => {
     expanded: string | null;
     reading: FileReading | undefined;
     mode: DiffMode;
+    lens: GraphLens;
   } | null>(null);
   const restoreCamera = useRef<{
     x: number;
@@ -345,6 +393,7 @@ const App = () => {
     if (fullscreen.expanded && fullscreen.reading)
       readings.current = rememberFile(readings.current, fullscreen.expanded, fullscreen.reading);
     setMode(fullscreen.mode);
+    setLens(fullscreen.lens);
     setRestoreVersion(value => value + 1);
     setSelected(fullscreen.selected);
     dispatchDetail({
@@ -366,7 +415,7 @@ const App = () => {
       selected,
       expanded: detail.expanded,
       reading: detail.expanded ? readings.current[detail.expanded] : undefined,
-      mode
+      mode, lens
     });
     setCallExplained(null);
     setSourceRelation(null);
@@ -378,7 +427,7 @@ const App = () => {
     });
   };
   const viewTree = useMemo(() => {
-    const result = detailTree(tree, detail.expanded, window.innerWidth < 650);
+    const result = detailTree(baseTree, detail.expanded, window.innerWidth < 650);
     if (!fullscreen)
       return result;
     return {
@@ -390,11 +439,11 @@ const App = () => {
       } : n)
     };
   }, [
-    detail.expanded, fullscreen
+    detail.expanded, fullscreen, lens
   ]);
   useLayoutEffect(() => {
     if (fullscreen) {
-      const n = tree.nodes.find(n => n.path === fullscreen.path && n.kind === 'file')!;
+      const n = baseTree.nodes.find(n => n.path === fullscreen.path && n.kind === 'file')!;
       moveCamera({
         x: -n.x,
         y: -n.y,
@@ -441,11 +490,7 @@ const App = () => {
         restoreVersion,
         focus: functionFocus?.path === n.path ? functionFocus : undefined,
         onCalls: !fullscreen && n.path === selected && projectCalls(selected).prepared ? () => {
-          const projected = projectCalls(selected);
-          const current = layoutCalls(projected, {
-            x: n.x + n.width + 72,
-            y: n.y
-          }, window.innerWidth < 650 ? 170 : 200);
+          const current = callLayout.filter(item => item.identity.declaration.path === selected);
           const seed = current.find(item => item.identity.seed && item.identity.declaration.side === 'head') ?? current.find(item => item.identity.seed);
           if (seed)
             moveCamera({
@@ -476,19 +521,15 @@ const App = () => {
       }
     };
   }), [
-    selected, viewTree, detail.expanded, mode, fullscreen, sourceRelation, restoreVersion, functionFocus
+    selected, viewTree, detail.expanded, mode, fullscreen, sourceRelation, restoreVersion, functionFocus, lens
   ]);
-  const calls = useMemo(() => projectCalls(selected), [
-    selected
-  ]);
+  const calls = useMemo(() => lens === 'behavior' ? behaviorCalls : projectCalls(selected), [lens, selected]);
   const callLayout = useMemo(() => {
+    if (lens === 'behavior') return behaviorLayout.positions.map(node => ({ ...node, x: node.x * (narrow ? 210 / 270 : 1) }));
     const origin = viewTree.nodes.find(node => node.path === selected && node.kind === 'file');
-    return origin ? layoutCalls(calls, {
-      x: origin.x + origin.width + 72,
-      y: origin.y
-    }, window.innerWidth < 650 ? 170 : 200) : [];
+    return origin ? layoutCalls(calls, { x: origin.x + origin.width + 72, y: origin.y }, narrow ? 170 : 200) : [];
   }, [
-    calls, viewTree, selected
+    calls, viewTree, selected, lens, narrow
   ]);
   const rememberReturn = () => {
     if (!sourceReturn && flow.current)
@@ -499,7 +540,7 @@ const App = () => {
         focus: functionFocus,
         reading: detail.expanded ? readings.current[detail.expanded] : undefined,
         camera: flow.current.getViewport(),
-        mode
+        mode, lens
       });
   };
   const openFunction = (identity: FunctionIdentity, saveReturn = true) => {
@@ -508,6 +549,7 @@ const App = () => {
     if (saveReturn) {
       rememberReturn();
     }
+    setSelected(identity.declaration.path);
     setCallExplained(null);
     setSourceRelation(null);
     sourceSerial.current++;
@@ -528,7 +570,7 @@ const App = () => {
       type: 'focus',
       path: identity.declaration.path
     });
-    const node = tree.nodes.find(node => node.path === identity.declaration.path && node.kind === 'file');
+    const node = baseTree.nodes.find(node => node.path === identity.declaration.path && node.kind === 'file');
     if (node)
       moveCamera({
         x: 5 - node.x,
@@ -547,7 +589,7 @@ const App = () => {
         focus: functionFocus,
         reading: detail.expanded ? readings.current[detail.expanded] : undefined,
         camera: flow.current.getViewport(),
-        mode
+        mode, lens
       });
     sourceSerial.current++;
     const before = record.versions.base;
@@ -569,7 +611,7 @@ const App = () => {
       type: 'focus',
       path: record.path
     });
-    const node = tree.nodes.find(node => node.path === record.path && node.kind === 'file');
+    const node = baseTree.nodes.find(node => node.path === record.path && node.kind === 'file');
     if (node)
       moveCamera({
         x: 5 - node.x,
@@ -590,7 +632,11 @@ const App = () => {
     selectable: false,
     data: {
       identity,
-      active: (functionFocus?.id.includes(identity.id) ?? false) || callExplained?.caller === identity.id || callExplained?.callee === identity.id,
+      active: (functionFocus?.id.includes(identity.id) ?? false)
+        || Boolean(storyOpen && storyProjection(ownerStory)?.sources.some(source => source.reference.type === 'snapshot_source'
+          && source.reference.anchor.path === identity.declaration.path && source.reference.anchor.side === identity.declaration.side
+          && source.reference.anchor.startLine === identity.declaration.startLine && source.reference.anchor.endLine === identity.declaration.endLine))
+        || callExplained?.caller === identity.id || callExplained?.callee === identity.id,
       testsShown: testsFor === identity.id,
       onRead: openFunction,
       onTests: identity => setTestsFor(current => current === identity.id ? null : identity.id)
@@ -613,11 +659,30 @@ const App = () => {
       onRead: openTest
     }
   })) : [];
-  const nodes: CanvasNode[] = [
-    ...fileNodes, ...functionNodes, ...testNodes
-  ];
+  const noteDetails: Readonly<Record<string, string>> = {
+    'G2:head': 'Owner requests omit Authorization; explicit credentials retain Bearer. Prepared calls only; runtime and wider dispatch remain unverified.',
+    'G3:head': 'Recognize the in-process owner before credential lookup. Strings retain their own credential path.',
+    'G4:head': 'A stable owner scope, with unchanged hash/byte callees. Unchanged source does not establish unchanged behavior.',
+  };
+  const behaviorNotes: BehaviorNote[] = lens === 'behavior' && !fullscreen
+    ? [...behaviorLayout.sections, ...sourceHomeSections()].map(note => ({
+      id: note.id, type: 'behaviorNote', position: { x: note.id.startsWith('G') ? (narrow ? 210 : 270) : note.x, y: note.y },
+      width: note.id.startsWith('G') ? 320 : 730, height: noteDetails[note.id] ? 70 : 32,
+      draggable: false, selectable: false, focusable: false,
+      data: { label: note.label, ...(noteDetails[note.id] ? { detail: noteDetails[note.id] } : {}) },
+    })) : [];
+  const nodes: CanvasNode[] = [...behaviorNotes, ...fileNodes, ...functionNodes, ...testNodes];
   const edges: Edge[] = fullscreen ? [] : [
-    ...containment,
+    ...(lens === 'files' ? containment : []),
+    ...(lens === 'behavior' ? fileNodes.flatMap(file => {
+      const declarations = calls.nodes.filter(node => node.declaration.path === file.data.path);
+      const node = declarations.find(node => node.seed && node.declaration.side === 'head') ?? declarations[0];
+      return node ? [{ id: `source-home:${file.id}`, source: node.id, target: file.id,
+        sourceHandle: 'call-out', targetHandle: 'contains-in', type: 'smoothstep',
+        label: 'source', style: { stroke: '#62727b', strokeWidth: .8, strokeDasharray: '2 5', opacity: .5 },
+        labelStyle: { fill: '#b0c1cc', fontSize: 10 }, labelBgStyle: { fill: '#20272b', fillOpacity: .9 },
+        ariaLabel: `${node.name} source home ${file.data.path}; source association, not a call` }] : [];
+    }) : []),
     ...calls.links.map(link => ({
       id: link.id,
       source: link.caller,
@@ -666,6 +731,7 @@ const App = () => {
     setSelected(retained.selected);
     setTestsFor(retained.testsFor);
     setMode(retained.mode);
+    setLens(retained.lens);
     setRestoreVersion(value => value + 1);
     dispatchDetail({
       type: 'focus',
@@ -691,7 +757,7 @@ const App = () => {
       type: 'focus',
       path: null
     });
-    void flow.current?.setViewport(initialView(true), {
+    void flow.current?.setViewport(initialView(lens, true), {
       duration: 0
     });
   };
@@ -731,7 +797,7 @@ const App = () => {
       focus: functionFocus,
       reading: detail.expanded ? readings.current[detail.expanded] : undefined,
       camera: flow.current.getViewport(),
-      mode
+      mode, lens
     };
     setContextReturns(frames => [...frames, {
       frame,
@@ -760,7 +826,7 @@ const App = () => {
         preferredSide: 'after'
       });
       dispatchDetail({ type: 'focus', path });
-      const node = tree.nodes.find(node => node.path === path && node.kind === 'file');
+      const node = baseTree.nodes.find(node => node.path === path && node.kind === 'file');
       if (node) {
         moveCamera({ x: 5 - node.x, y: 30 - node.y, zoom: 1 });
       }
@@ -779,8 +845,8 @@ const App = () => {
       });
     }
     return structuredClone({
-      camera: flow.current?.getViewport() ?? initialView(),
-      selected, testsFor, mode, functionFocus, expanded: detail.expanded,
+      camera: flow.current?.getViewport() ?? initialView(lens),
+      selected, testsFor, mode, lens, lensCameras: lensCameras.current, lensCameraSources: lensCameraSources.current, functionFocus, expanded: detail.expanded,
       readings: readings.current, sourceReturn, testReturn, contextReturns,
       callExplained, sourceRelation,
     });
@@ -788,6 +854,7 @@ const App = () => {
   const ownerReturn = useRef<ReturnType<typeof capturePresentation> | null>(null);
   const ownerOperation = useRef(false);
   const openOwnerPanel = (panel: OwnerPanel) => {
+    setSourceFinder(false);
     if (narrow) setContextOpen(false);
     if (panel === 'story') setStoryOpen(true);
     else setDiscussionOpen(true);
@@ -836,7 +903,7 @@ const App = () => {
         revealSide: true,
       });
       dispatchDetail({ type: 'focus', path });
-      const node = tree.nodes.find(node => node.path === path && node.kind === 'file');
+      const node = baseTree.nodes.find(node => node.path === path && node.kind === 'file');
       if (node) moveCamera({ x: 8 - node.x, y: 30 - node.y, zoom: 1 });
       if (narrow) setOwnerPanel(null);
       if (keyboard) setPendingFocus({ target: 'reading', path });
@@ -859,6 +926,9 @@ const App = () => {
       setSelected(frame.selected);
       setTestsFor(frame.testsFor);
       setMode(frame.mode);
+      setLens(frame.lens);
+      lensCameras.current = frame.lensCameras;
+      lensCameraSources.current = frame.lensCameraSources;
       setFunctionFocus(frame.functionFocus);
       setSourceReturn(frame.sourceReturn);
       setTestReturn(frame.testReturn);
@@ -983,14 +1053,23 @@ const App = () => {
         ref={contextInvoker}
         aria-label={contextOpen ? 'Hide review context' : 'Open review context'}
         aria-expanded={contextOpen}
-        onClick={() => { if (narrow) setOwnerPanel(null); setContextOpen(value => !value); }}
-      >Context</button>}
+        onClick={() => { setSourceFinder(false); if (narrow) setOwnerPanel(null); setContextOpen(value => !value); }}
+        title="Review context"
+      ><ActionIcon action="context" /></button>}
+
+      {!fullscreen && <div className="lens-actions" role="group" aria-label="Graph view">
+        <button aria-label="Behavior graph" title="Behavior graph · callers and callees" aria-pressed={lens === 'behavior'} disabled={!canvasReady} onClick={() => switchLens('behavior')}><LensIcon files={false} /></button>
+        <button aria-label="File tree" title="File tree · alternate source organization" aria-pressed={lens === 'files'} disabled={!canvasReady} onClick={() => switchLens('files')}><LensIcon files /></button>
+        <button aria-label="Find source" title="Find any changed source" aria-expanded={sourceFinder} onClick={() => setSourceFinder(value => !value)}>
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" aria-hidden="true"><circle cx="10" cy="10" r="6" /><path d="m15 15 6 6" /></svg>
+        </button>
+      </div>}
 
       {!fullscreen && <div className="owner-cues">
-        <button id="open-owner-story" aria-label="Open prepared story" disabled={!ownerStory.authenticated || ownerBusy} aria-expanded={storyOpen && (!narrow || ownerPanel === 'story')} onClick={() => openOwnerPanel('story')}>Story</button>
-        <button id="open-owner-discussion" aria-label="Open discussion" disabled={!ownerStory.authenticated || ownerBusy} aria-expanded={discussionOpen && (!narrow || ownerPanel === 'discussion')} onClick={() => openOwnerPanel('discussion')}>Discuss</button>
-        {detail.expanded && <button aria-label="Inspect visible source for discussion" disabled={!ownerStory.authenticated || ownerBusy} onClick={() => runOwner(async () => { await inspectVisibleSource(); openOwnerPanel('discussion'); })}>Source</button>}
-        {ownerStory.returnFrame && <button aria-label="Return to original reading" disabled={ownerBusy || ownerStory.questionLocked} onClick={() => runOwner(resumeOwnerReading)}>Return</button>}
+        <button id="open-owner-story" aria-label="Open prepared story" title="Prepared story" disabled={!ownerStory.authenticated || ownerBusy} aria-expanded={storyOpen && (!narrow || ownerPanel === 'story')} onClick={() => openOwnerPanel('story')}><ActionIcon action="story" /></button>
+        <button id="open-owner-discussion" aria-label="Open discussion" title="Discussion" disabled={!ownerStory.authenticated || ownerBusy} aria-expanded={discussionOpen && (!narrow || ownerPanel === 'discussion')} onClick={() => openOwnerPanel('discussion')}><ActionIcon action="discussion" /></button>
+        {detail.expanded && <button aria-label="Inspect visible source for discussion" title="Ask about expanded source" disabled={!ownerStory.authenticated || ownerBusy} onClick={() => runOwner(async () => { await inspectVisibleSource(); openOwnerPanel('discussion'); })}><ActionIcon action="source" /></button>}
+        {ownerStory.returnFrame && <button aria-label="Return to original reading" title="Return to original reading" disabled={ownerBusy || ownerStory.questionLocked} onClick={() => runOwner(resumeOwnerReading)}><ActionIcon action="return" /></button>}
       </div>}
 
       {(testReturn || sourceReturn || contextReturns.length > 0) && !fullscreen && <button
@@ -1033,6 +1112,15 @@ const App = () => {
     </header>
 
     <div className="review-workspace">
+      {!fullscreen && sourceFinder && <section className="source-finder" aria-label="Find changed source">
+        <label>Go to source<select aria-label="Changed source" value="" onChange={event => {
+          const path = event.target.value;
+          const node = baseTree.nodes.find(node => node.path === path && node.kind === 'file');
+          if (node) { setSelected(path); moveCamera({ x: 12 - node.x, y: 100 - node.y, zoom: 1 }); }
+          setSourceFinder(false);
+        }}><option value="" disabled>Choose one of 50 changed sources</option>{fixture.paths.map(path => <option key={path} value={path}>{path}</option>)}</select></label>
+        <p>Source homes remain available even where calls are unprepared. Framing a home does not expand source.</p>
+      </section>}
       {(ownerError || ownerReview.error || ownerStory.error) && <div className="owner-error" role="alert">{ownerError || ownerReview.error || ownerStory.error}<button onClick={() => { setOwnerError(''); }}>Dismiss</button></div>}
       {!fullscreen && contextOpen && (!narrow || !ownerPanel) && <ReviewContext
         narrow={narrow}
@@ -1045,10 +1133,12 @@ const App = () => {
     <main
       inert={ownerBusy || (!fullscreen && narrow && (contextOpen || Boolean(ownerPanel))) ? true : undefined}
       data-workspace-root={fullscreen ? `file:${fullscreen.path}` : 'pr:25'}
+      data-canonical-call-count={behaviorCalls.links.length}
+      data-canonical-function-count={behaviorCalls.nodes.length}
       ref={main}
       tabIndex={0}
       onKeyDownCapture={key}
-      aria-label="PR25 file tree. Tree edges mean contains; selected changed-function arrows mean calls, with bounded source evidence. Drag or scroll to pan; pinch or Control-wheel to zoom; arrow keys pan, plus and minus zoom, zero shows Overview."
+      aria-label={`PR25 ${lens === 'behavior' ? 'caller-to-callee behavior graph; call arrows retain exact source evidence, other scopes remain unprepared' : 'alternate file tree; directory edges mean contains'}. Drag or scroll to pan; pinch or Control-wheel to zoom; arrow keys pan, plus and minus zoom, zero shows Overview.`}
     >
 
       <ReactFlow<CanvasNode>
@@ -1078,7 +1168,8 @@ const App = () => {
         }}
         onInit={instance => {
           flow.current = instance;
-          void instance.setViewport(initialView(), {
+          setCanvasReady(true);
+          void instance.setViewport(initialView(lens), {
             duration: 0
           });
         }}
@@ -1119,12 +1210,19 @@ const App = () => {
         link={callExplained}
         nodes={calls.nodes}
         onClose={() => setCallExplained(null)}
+        onInspect={anchor => runOwner(async () => {
+          const snapshot = workspace.story.getSnapshot().snapshot;
+          if (!snapshot) throw new Error('Retained source owner is still opening.');
+          const mapped = mapJourneySource(snapshot, anchor);
+          if (mapped.status !== 'ready') throw new Error(`Callsite source is unavailable: ${mapped.reason}`);
+          await inspectOwnerEvidence(mapped.reference, true);
+        })}
       />}
 
-      {selected && !fullscreen && !calls.prepared && <span
+      {selected && !fullscreen && !calls.nodes.some(node => node.declaration.path === selected) && <span
         className="call-frontier"
         role="status"
-      >Call context unprepared for this file</span>}
+      >Calls unprepared for this source · exact source remains available</span>}
 
       {testsFor && !fullscreen && relevantTests(testsFor).length === 0 && <span
         className="call-frontier"

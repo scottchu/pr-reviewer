@@ -1182,7 +1182,7 @@ html {
   align-items: flex-start;
   justify-content: center;
   padding: 3px 7px;
-  gap: 4px;
+  gap: 1px;
   text-align: left;
   font: 12px/16px Inter, system-ui, sans-serif;
 }
@@ -1380,6 +1380,15 @@ button:disabled { cursor: default; opacity: .5; }
 .owner-error button { flex: none; width: auto; }
 .owner-panel :focus-visible { outline: 2px solid #a8cddf; outline-offset: 2px; }
 .owner-panel ::selection { color: #edf4f7; background: #405b6c; }
+.lens-actions { display: flex; gap: 2px; }
+.lens-actions button[aria-pressed="true"] { background: #344854; color: #dfedf5; }
+.behavior-note { color: #c1d1da; line-height: 20px; padding: 0 3px; }
+.behavior-note strong { display: block; font-size: 14px; font-weight: 550; }
+.behavior-note span { display: block; font-size: 12px; line-height: 19px; margin-top: 5px; color: #adbfca; }
+.source-finder { position: absolute; z-index: 30; top: 8px; left: 12px; width: min(480px, calc(100% - 24px)); background: #20272b; border: 1px solid #62727d; padding: 15px; }
+.source-finder select { display: block; max-width: 100%; width: 100%; padding: 8px; margin-top: 8px; background: #171e22; color: #e1e7eb; border: 1px solid #61717d; font: inherit; }
+.source-finder p { margin-bottom: 0; color: #b0c1cc; }
+.relationship-reader .callsite-action { width: auto; height: auto; min-height: 34px; padding: 5px 7px; text-align: left; color: #bbd6e6; }
 .owner-modal { position: absolute; z-index: 25; inset: 0; width: 100%; border: 0; padding-bottom: max(30px, env(safe-area-inset-bottom)); }
 @media (max-width: 649px) {
   header { padding: 0 8px; gap: 3px; }

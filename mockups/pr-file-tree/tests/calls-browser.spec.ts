@@ -1,4 +1,9 @@
 import { test, expect, type Page, type Locator } from '@playwright/test';
+
+const openFiles = async (page: Page) => {
+  await page.goto('/');
+  await page.getByRole('button', { name: 'File tree', exact: true }).click();
+};
 import { projectCalls } from '../calls.ts';
 const evidence = '/tmp/pr-reviewer-reading-journey-evidence';
 const closeOpeningContext = async (page: Page) => {
@@ -13,11 +18,11 @@ const panTo = async (page: Page, locator: Locator, x = 20, y = 90) => {
   await page.locator('main').focus();
   for (let i = 0;i < 100;i++) {
     const box = await locator.boundingBox();
-    if (box && Math.abs(box.x - x) < 65 && Math.abs(box.y - y) < 65)
+    if (box && Math.abs(box.x - x) <= 65 && Math.abs(box.y - y) <= 65)
       return;
     await page.keyboard.press(!box || box.x > x + 65 ? 'ArrowRight' : box.x < x - 65 ? 'ArrowLeft' : box.y > y + 65 ? 'ArrowDown' : 'ArrowUp');
   }
-  throw new Error('source_context_not_exposed');
+  throw new Error(`source_context_not_exposed: ${JSON.stringify(await locator.boundingBox())}; camera ${await page.locator('.react-flow__viewport').getAttribute('style')}`);
 };
 const file = (page: Page, path: string) => page.locator(`[data-file-path="${path}"]`);
 const functionNode = (page: Page, id: string) => page.locator(`[data-function-id="${id}"]`);
@@ -29,14 +34,14 @@ for (const width of [
       width,
       height: width === 390 ? 844 : 1000
     });
-    await page.goto('/');
+    await openFiles(page);
     await closeOpeningContext(page);
     const path = 'src/application/review.ts';
     await panTo(page, file(page, path));
     await file(page, path).click();
-    await expect(page.locator('[data-file-path]')).toHaveCount(50);
-    await expect(page.locator('.react-flow__edge-call')).toHaveCount(13);
     const projection = projectCalls(path);
+    await expect(page.locator('[data-file-path]')).toHaveCount(50);
+    await expect(page.locator('.react-flow__edge-call')).toHaveCount(projection.links.length);
     const seed = projection.seeds.find(node => node.declaration.side === 'head')!;
     const helper = projection.nodes.find(node => node.name === 'accessHeaders')!;
     const link = projection.links.find(link => link.caller === seed.id && link.callee === helper.id)!;
@@ -74,13 +79,14 @@ for (const width of [
       width,
       height: width === 390 ? 844 : 1000
     });
-    await page.goto('/');
+    await openFiles(page);
     await closeOpeningContext(page);
     const path = 'src/storage/public.ts';
     await panTo(page, file(page, path));
     await file(page, path).click();
     const projection = projectCalls(path);
-    await expect(page.locator('.react-flow__edge-call')).toHaveCount(5);
+    for (const link of projection.links) await expect(page.locator(`.react-flow__edge-call[data-id="${link.id}"]`)).toBeAttached();
+    await expect(page.locator('.react-flow__edge-call')).toHaveCount(projection.links.length);
     const link = projection.links.find(link => link.target.side === 'head' && projection.seeds.some(seed => seed.id === link.caller))!;
     const source = functionNode(page, link.caller);
     const checkEndpoint = async () => {
@@ -111,7 +117,7 @@ test('changed function toggles only relevant declared tests and opens exact full
     width: 390,
     height: 844
   });
-  await page.goto('/');
+  await openFiles(page);
     await closeOpeningContext(page);
   const path = 'src/application/review.ts';
   await panTo(page, file(page, path));
@@ -161,7 +167,7 @@ test('storage declared tests retain unchanged boundary source without inventing 
     width: 390,
     height: 844
   });
-  await page.goto('/');
+  await openFiles(page);
     await closeOpeningContext(page);
   const path = 'src/storage/public.ts';
   await panTo(page, file(page, path));

@@ -1,6 +1,6 @@
 import React, { useLayoutEffect } from 'react';
 import { Handle, Position, BaseEdge, EdgeLabelRenderer, getSmoothStepPath, useUpdateNodeInternals, type Node, type NodeProps, type Edge, type EdgeProps } from '@xyflow/react';
-import { callCitation, declaredTestSummary, type FunctionIdentity, type CallLink } from './calls.ts';
+import { callCitation, declaredTestSummary, type FunctionIdentity, type CallLink, type CallAnchor } from './calls.ts';
 import type { DeclaredTest } from './declared-tests.types.ts';
 export type FunctionNode = Node<{
   identity: FunctionIdentity;
@@ -37,11 +37,8 @@ export const FunctionLabel = ({ id, data }: NodeProps<FunctionNode>) => {
       onClick={() => data.onRead(data.identity)}
     >
 
-      <span>
-
-        {anchor.side === 'base' ? 'Before' : 'After'} ·
-
-        {data.identity.name}</span>
+      <small>{anchor.side === 'base' ? 'Before' : 'After'} · {data.identity.sourceUnchanged ? 'unchanged source' : data.identity.seed ? 'changed' : 'context'}</small>
+      <span>{data.identity.name}</span>
 
       <small>
 
@@ -51,7 +48,7 @@ export const FunctionLabel = ({ id, data }: NodeProps<FunctionNode>) => {
 
         {anchor.endLine}
 
-        {data.identity.sourceUnchanged ? ' · unchanged source' : data.identity.seed ? ' · changed' : ' · context'}</small>
+        </small>
 
     </button>
 
@@ -174,10 +171,11 @@ export const CallLine = (props: EdgeProps<CallEdge>) => {
 
   </>;
 };
-export const CallExplanation = ({ link, nodes, onClose }: {
+export const CallExplanation = ({ link, nodes, onClose, onInspect }: {
   link: CallLink;
   nodes: readonly FunctionIdentity[];
   onClose: () => void;
+  onInspect?: (anchor: CallAnchor) => void;
 }) => {
   const caller = nodes.find(node => node.id === link.caller)!;
   const callee = nodes.find(node => node.id === link.callee)!;
@@ -189,7 +187,7 @@ export const CallExplanation = ({ link, nodes, onClose }: {
         ? 'Authentication checks whether this reference identifies the local owner before looking up a credential.'
         : callee.name === 'accessReference'
           ? `${caller.name} derives an access reference through the shared helper. The helper distinguishes the in-process owner capability from credential strings.`
-          : `${caller.name} calls ${callee.name} at ${link.sites[0]?.anchor.path}:${link.sites[0]?.anchor.startLine}. This is direct source context for the selected authentication change.`;
+          : `${caller.name} calls ${callee.name} at ${link.sites[0]?.anchor.path}:${link.sites[0]?.anchor.startLine}. This is direct source context in the pinned comparison.`;
   return <section
     className="relationship-reader nodrag nopan nowheel"
     aria-label="Call relationship explanation"
@@ -234,6 +232,8 @@ export const CallExplanation = ({ link, nodes, onClose }: {
         {callCitation(link)}
 
       </pre>
+      {onInspect && link.sites.map(site => <button key={`${site.anchor.side}:${site.anchor.start}`} className="callsite-action"
+        onClick={() => onInspect(site.anchor)}>Read callsite {site.anchor.side === 'base' ? 'Before' : 'After'} · {site.anchor.path}:{site.anchor.startLine}</button>)}
 
       <p>
 

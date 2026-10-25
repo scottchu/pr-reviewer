@@ -1,5 +1,6 @@
 import clients from './calls-clients.json' with { type: 'json' };
 import storage from './calls-storage.json' with { type: 'json' };
+import scope from './calls-scope.json' with { type: 'json' };
 import tests from './declared-tests.json' with { type: 'json' };
 import type { ChangeCenteredTestEvidence } from './declared-tests.types.ts';
 export type CallAnchor = {
@@ -42,17 +43,18 @@ type Packet = {
   contextDeclarations: readonly PacketNode[];
   edges: readonly Omit<CallLink, 'analyzerReason'>[];
   sourceObservedCalls: readonly (Omit<CallLink, 'sites' | 'analyzerReason'> & {
-    site: {
+    site?: {
       anchor: CallAnchor;
       sourceText: string;
     };
+    sites?: readonly { anchor: CallAnchor; sourceText: string }[];
     analyzerDisposition: {
       reason: string;
     };
   })[];
 };
 const packets = [
-  clients, storage
+  clients, storage, scope
 ] as unknown as readonly Packet[];
 const declaredTests = tests as ChangeCenteredTestEvidence;
 export const projectCalls = (path: string | null) => {
@@ -68,9 +70,7 @@ export const projectCalls = (path: string | null) => {
       caller: call.caller,
       callee: call.callee,
       target: call.target,
-      sites: [
-        call.site
-      ],
+      sites: call.sites ?? (call.site ? [call.site] : []),
       certainty: call.certainty,
       method: call.method,
       analyzerReason: call.analyzerDisposition.reason
@@ -88,7 +88,9 @@ export const projectCalls = (path: string | null) => {
   ]));
   // Only exact refresh-body proof in the source packet establishes unchanged source.
   const unchanged = new Set(packets.flatMap(packet => packet.contextDeclarations)
-    .filter(node => node.exactBodySHA256 === '5dedaff001ad7d36cd09747c513402d9fb5c18d23d950243c4365347affc7550')
+    .filter(node => node.exactBodySHA256 && packets.flatMap(packet => packet.contextDeclarations).some(other =>
+      other.declaration.side !== node.declaration.side && other.declaration.path === node.declaration.path
+      && other.name === node.name && other.exactBodySHA256 === node.exactBodySHA256))
     .map(node => node.id));
   const nodes = [
     ...nodeIds
@@ -111,6 +113,15 @@ export const projectCalls = (path: string | null) => {
       ? 'Prepared one-hop source context only; other callers, dispatch and runtime behavior remain unknown.'
       : 'Call context is not prepared for this file. This does not mean no calls.'
   };
+};
+export const projectBehaviorCalls = () => {
+  const projections = [...new Set(packets.flatMap(packet => packet.seeds.map(node => node.declaration.path)))].map(projectCalls);
+  const seedIds = new Set(packets.flatMap(packet => packet.seeds.map(node => node.id)));
+  const nodes = [...new Map(projections.flatMap(projection => projection.nodes).map(node => [node.id, node])).values()]
+    .map(node => ({ ...node, seed: seedIds.has(node.id) }));
+  const links = [...new Map(projections.flatMap(projection => projection.links).map(link => [link.id, link])).values()];
+  return { prepared: true, nodes, links, seeds: nodes.filter(node => node.seed),
+    frontier: 'Prepared direct source neighborhoods only. Other callers, dispatch and unprepared source scopes remain unknown.' };
 };
 export const relevantTests = (functionId: string) => declaredTests.cases.filter(record => record.functionMappings.some(mapping => mapping.targetId === functionId));
 export const callCitation = (link: CallLink) => [

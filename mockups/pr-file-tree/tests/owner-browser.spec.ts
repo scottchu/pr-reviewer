@@ -1,4 +1,9 @@
 import { test, expect, type Page, type Locator } from '@playwright/test';
+
+const openFiles = async (page: Page) => {
+  await page.goto('/');
+  await page.getByRole('button', { name: 'File tree', exact: true }).click();
+};
 import { projectCalls } from '../calls.ts';
 
 test.use({ reducedMotion: 'reduce' });
@@ -6,7 +11,7 @@ test.use({ reducedMotion: 'reduce' });
 for (const width of [1440, 390]) {
   test(`${width} real owner story, explicit evidence, saved question and original draft return`, async ({ page, request }) => {
     await page.setViewportSize({ width, height: 844 });
-    await page.goto('/');
+    await openFiles(page);
     await expect(page.getByRole('button', { name: 'Open prepared story' })).toBeEnabled();
     await expect(page.getByRole('region', { name: 'Prepared story' })).toHaveCount(0);
     await expect(page.locator('[data-file-path]')).toHaveCount(50);
@@ -61,7 +66,7 @@ for (const width of [1440, 390]) {
 
 test('dirty anchor confirmation and failed owner return preserve recoverable reading and drafts', async ({ page }) => {
   await page.setViewportSize({ width: 390, height: 844 });
-  await page.goto('/');
+  await openFiles(page);
   await page.getByRole('button', { name: 'Open prepared story' }).click();
   const initialCamera = await page.locator('.react-flow__viewport').getAttribute('style');
   const overview = await page.locator('header button[aria-label="Overview"]').boundingBox();
@@ -99,7 +104,7 @@ const panTo = async (page: Page, locator: Locator) => {
   await page.locator('main').focus();
   for (let attempt = 0; attempt < 100; attempt++) {
     const box = await locator.boundingBox();
-    if (box && Math.abs(box.x - 20) < 65 && Math.abs(box.y - 110) < 65) return;
+    if (box && Math.abs(box.x - 20) <= 65 && Math.abs(box.y - 110) <= 65) return;
     await page.keyboard.press(!box || box.x > 85 ? 'ArrowRight'
       : box.x < -45 ? 'ArrowLeft' : box.y > 175 ? 'ArrowDown' : 'ArrowUp');
   }
@@ -124,7 +129,7 @@ const expectReading = async (page: Page, saved: Awaited<ReturnType<typeof readin
 
 test('owner return retains the earlier function/test/Context frames and exact folded reading', async ({ page }) => {
   await page.setViewportSize({ width: 390, height: 844 });
-  await page.goto('/');
+  await openFiles(page);
   const path = 'src/application/review.ts';
   const file = page.locator(`[data-file-path="${path}"]`);
   await panTo(page, file);
@@ -173,7 +178,7 @@ test('owner return retains the earlier function/test/Context frames and exact fo
 });
 
 test('an in-flight source validation exposes a busy state and cannot accept a competing citation', async ({ page }) => {
-  await page.goto('/');
+  await openFiles(page);
   await page.getByRole('button', { name: 'Open prepared story' }).click();
   await page.evaluate(() => {
     const digest = crypto.subtle.digest.bind(crypto.subtle);
