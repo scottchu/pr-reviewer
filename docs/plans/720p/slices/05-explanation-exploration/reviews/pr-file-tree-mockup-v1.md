@@ -109,3 +109,16 @@ Motion finding: the first no-preference Chrome check exposed ReactFlow’s defau
 ## Preserved flat-detail iteration — superseded, not current acceptance
 
 The bounded intermediate rail/grouped-row/edge-reader/fullscreen iteration passed15pure tests, strict and13authored Chrome journeys (browser-complete-second.log), including sampled intermediate expansion heights and smooth scroll positions. It remains a recovery checkpoint only: the latest user explicitly requires nested spatial file groups and distinct file-workspace fullscreen, so the flat body/bigger-box interpretation is not accepted. Do not label those tests as nested-graph evidence. Keep the actual yellow Unified capture and responsive-reader captures historical.
+
+
+## Nested file groups and distinct workspace roots — current accepted mock scope
+
+Date: 2026-10-24. This supersedes flat file-as-diff-card and bigger-box fullscreen interpretations above. A file is a spatial group. Click/keyboard activation expands or collapses its nested contents in the existing whole-PR canvas without camera translation/refit; the surrounding file/directory groups remain present. Gesture semantic zoom can disclose the same group. Source selection and local scrolling remain local.
+
+The bounded inner model is grounded only in the native Git comparison: stable file group ID; stable hunk group IDs by path/index/header; exact Before/After source-side nodes carrying immutable commit/hash/range; and a paired comparison child with native source rows. Visible contains/source-comparison relationships connect these identities. No fake functions/calls/evidence are introduced. Unified/split are presentations of the same hunk/source identities and ordered change blocks, not independent side scrollers. A nested ReactFlow projection inside the file’s local scrolling viewport owns these child identities and relationships; outer PR identity/edges remain unchanged. Dots target exact hunk group coordinates, smooth-scroll locally and retain the selected/current group.
+
+The separate top-right fullscreen action changes the entire main workspace root to this file group, exposing the same child IDs/relations. The PR overview is hidden during this immersive file workspace, not destroyed. Exit/Escape restores the prior PR camera, selection, expanded group and source reading/mode state. This does not create another route or mutate production data. Source-comparison edges open the responsive explanation reader with precise hunk/side/path/hash facts; module edges retain their own import explanation.
+
+Acceptance: desktop/390 file click expands children with surrounding PR groups and no camera change; dots navigate real contiguous changes; source-edge explanation identifies the exact compared sides; fullscreen has file-group workspace root and same child IDs; exit restores PR graph/reading. Preserve15pure/13Chrome flat-iteration checks as historical, then adapt affected journeys to these corrected intents instead of claiming the old tests prove nesting.
+
+Latest controls correction: replace visible Unified/Split text with a compact segmented single-column/two-column SVG toggle. Accessible names, title and aria-pressed remain; touch hits and mobile safe-area clearance remain adequate. Desktop controls float/drag; mobile controls stay fixed. No extra control-label wall.
