@@ -67,3 +67,6 @@ At focused scale desktop shows both sides;390px stacks the same stable source no
 ## Design before further composition
 
 Use the [reviewer experience specification](../review-experience.md) for the coherent opening, graph-led explanation, inline source, contextual question and return journey. The user rejected the functional preview hierarchy; the implemented sections above describe partial engineering, not the UX target. [Original references](../review-reference-dissection.md) are now located and dissected. New layout geometry and replay timing remain design-review proposals; no new UI implementation is authorized by this documentation correction.
+
+
+The [October23 primary references](../review-reference-dissection.md) supersede the earlier lesson image as the spatial foundation. The [whole-PR design](../pr25-whole-change-graph.md) requires persistent multiple groups and source/explanation/test nodes connected within them, with free pan/zoom and story-independent membership. A polished single-group editor with a step selector remains insufficient;8476 is rejected for that scope. Preserve the dark editor baseline without restoring the older lesson-pane hierarchy.

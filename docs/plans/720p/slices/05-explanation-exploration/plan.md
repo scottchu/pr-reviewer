@@ -120,3 +120,8 @@ The pre-existing failed-compute selection/reload defect is tracked in the [bound
 ## Reviewer-experience design reset
 
 The user rejected the functional preview as the UX target and requested original-reference dissection and design specifications first. [Design review packet v1](reviews/reviewer-experience-design-v1.md) is the next design gate; earlier implementation/check receipts remain bounded engineering history. Do not continue UI composition from those receipts. Independent specification review precedes the next authorized inspectable mockup and its separate adoption decision.
+
+
+## Controlling whole-PR design recovery
+
+The October23 handoff, now paired with the actual three October23 visual concepts, requires a persistent whole-PR spatial graph rather than a single-path teaching mock. The8476 product-fit target/readiness is withdrawn. [Whole-graph mockup v2](whole-pr-graph-mockup-v2.md) is the next bounded implementation/review packet, contingent on coordinator consumption of independent design review. Its complete50-file/163-hunk target and both-side source neighborhoods are durable in [PR25 whole graph](../../../../product/pr25-whole-change-graph.md). No code/runtime work is authorized by this documentation-only correction itself.

@@ -102,3 +102,10 @@ Legacy structural maps with spans/spanId but no inspection still restore overvie
 ## Reviewer-experience design correction
 
 The [reviewer experience](../review-experience.md) and [reference dissection](../review-reference-dissection.md) now govern the proposed information hierarchy for the next design review. The 8474 functional preview is rejected as a UX target; existing engineering checks remain historical functional evidence. Basic same-canvas reading is accepted, but neither this candidate nor a list of its controls establishes an adopted layout. The next step is independent specification review, then an explicitly authorized inspectable mockup.
+
+
+## Whole-PR membership and spatial navigation
+
+The controlling October23 contract is explicit in [the whole PR25 graph](../pr25-whole-change-graph.md): all changed hunks have persistent group/file homes, with before/after one-hop callers AND callees including unchanged context or explicit side-specific gaps. Source, explanations and tests are connected graph members inside/adjacent to their groups. Compact support/document groups remain canvas members, not an inventory hidden behind the current story.
+
+Story is optional attention over this map; it never replaces membership or gates arbitrary entry. Free pan/zoom and manual semantic-detail expansion must work before playback. Focus may change framing/detail, not swap the graph for a slide. The8476 locked-pan/single-group mock is rejected as a product-fit target; its functional checks do not weaken this contract. Exact graph facts, public state boundaries, anchors and recovery remain unchanged.

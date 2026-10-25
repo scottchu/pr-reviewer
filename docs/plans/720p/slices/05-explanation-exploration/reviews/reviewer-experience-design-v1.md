@@ -1,5 +1,7 @@
 # Reviewer-experience design review packet v1
 
+**Superseded product scope:** the8476 single-group/locked-pan target is rejected. Earlier readiness is historical functional/design evidence only. Use [whole-graph packet v2](../whole-pr-graph-mockup-v2.md), grounded in the controlling October23 instructions and recovered canvas concepts, before any new mock implementation.
+
 Date: 2026-10-24.
 
 Status: specification ready for independent design review; no further UI implementation or preview launch authorized by this packet. The user redirected the primary task from validation repair to understanding the original UX and writing design specs first.

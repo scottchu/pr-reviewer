@@ -346,3 +346,8 @@ The candidate's actual React journeys verify source-link reading, first-frame pr
 ## Experience reconciliation pending design review
 
 The [reviewer experience](../review-experience.md) distinguishes current eight-second automatic progression from the original reference’s within-scene demonstration followed by a reading stop. The timer above records current engineering, not verified user adoption of that duration. The proposed next mock uses paused/manual reading and explicitly evaluates a current-scene replay stop before any timing implementation changes. Flow/Diff means different detail/framing of the same persistent canvas under the later canvas correction; it must not require a detached source pane. Basic inline disclosure is core, while advanced scale/motion refinement remains later work.
+
+
+## Story is an optional attention overlay
+
+The controlling October23 whole-PR canvas is maintained in [reviewer experience](../review-experience.md) and [the concrete PR25 graph](../pr25-whole-change-graph.md). For a fixed snapshot/analysis, story off, Next/Previous and Resume share the same graph/group/node/edge membership. Story updates emphasis and optional camera following; it cannot create/remove groups or make source available only after a step. Arbitrary node entry, both-side callers/callees and free pan/zoom work without a story. Existing cursor/draft/return safeguards apply, but a correct single-path player is not whole-product acceptance.

@@ -4,6 +4,7 @@ This is the durable product specification: what PR Reviewer does, why, and how i
 
 - [Vision](vision.md): purpose and the experience of understanding a PR.
 - [Reviewer experience](review-experience.md): reference-grounded coherent journey and proposed design acceptance before further UI implementation.
+- [PR25 whole-change graph](pr25-whole-change-graph.md): persistent eight-group spatial design, both-side source neighborhoods, all50 files/163 hunk homes and explicit semantic gaps.
 - [Original reference dissection](review-reference-dissection.md): located visual/source evidence, rejected-preview drift and later corrections.
 
 - [Continuation and source import](review-loop/evolution.md): merged structural graph/immutable history and the bounded import candidate.
