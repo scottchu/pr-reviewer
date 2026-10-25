@@ -22,7 +22,7 @@ A reviewer should see what changed and the directly relevant behavior relationsh
 
 ### F18 — Same-file-node caller/callee projection and explicit icon switching
 
-The adopted root relationship projection at the top is authoritative. Keep the exact original file nodes and all50changed paths; calls determine root placement, directories belong only to File tree. Project exact inter-file calls at their owning file proxy ports, label caller() → callee(), and disclose partial coverage. No root function/side partitions.
+The adopted root relationship projection at the top is authoritative. Keep the exact original file nodes and all50changed paths; calls determine root placement, directories belong only to File tree. Project exact inter-file calls at their owning file proxy ports, label caller() → callee(), and disclose partial coverage. No root function/side partitions. Root placement follows current responsive width, including desktop-to-phone transitions; an explicit Overview uses the current projection. The root overview reserves space for its relationship legend so labels cannot be hidden behind it. This does not change inner-reader geometry or promise all50files fit a phone frame.
 
 The action bar retains Behavior graph and File tree SVG actions with accessible names, title, pressed state and visible focus. Switching explicitly changes presentation only: preserve selected source, expansion, folds/scroll/mode, test lens, public story/draft and all return frames. Retain per-lens camera and selected-source screen position on first destination entry. Story attention never controls membership. Camera gestures remain camera-only.
 
