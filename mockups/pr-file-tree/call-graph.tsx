@@ -1,6 +1,6 @@
 import React, { useLayoutEffect } from 'react';
-import { Handle, Position, BaseEdge, EdgeLabelRenderer, getSmoothStepPath, useUpdateNodeInternals, type Node, type NodeProps, type Edge, type EdgeProps } from '@xyflow/react';
-import { callCitation, declaredTestSummary, type FunctionIdentity, type CallLink, type CallAnchor } from './calls.ts';
+import { Handle, Position, BaseEdge, EdgeLabelRenderer, useUpdateNodeInternals, type Node, type NodeProps, type Edge, type EdgeProps } from '@xyflow/react';
+import { callActionName, callCitation, declaredTestSummary, type FunctionIdentity, type CallLink, type CallAnchor } from './calls.ts';
 import type { DeclaredTest } from './declared-tests.types.ts';
 export type FunctionNode = Node<{
   identity: FunctionIdentity;
@@ -127,19 +127,19 @@ export type CallEdge = Edge<{
   link: CallLink;
   active: boolean;
   onExplain: (link: CallLink) => void;
+  caller: FunctionIdentity;
+  callee: FunctionIdentity;
+  lane: number;
 }, 'call'>;
 export const CallLine = (props: EdgeProps<CallEdge>) => {
-  const [path, x, y] = getSmoothStepPath({
-    sourceX: props.sourceX,
-    sourceY: props.sourceY,
-    targetX: props.targetX,
-    targetY: props.targetY,
-    sourcePosition: props.sourcePosition,
-    targetPosition: props.targetPosition,
-    borderRadius: 12,
-    offset: 22
-  });
   const data = props.data;
+  const x = (props.sourceX + props.targetX) / 2;
+  const y = (props.sourceY + props.targetY) / 2 + (data?.lane ?? 0);
+  const control = Math.max(10, Math.abs(props.targetX - props.sourceX) / 4);
+  // Independent curves avoid a shared step trunk. Two joined cubics retain
+  // horizontal endpoint tangents and exact ports, including parallel records.
+  const path = `M ${props.sourceX},${props.sourceY} C ${props.sourceX + control},${props.sourceY} ${x - control},${y} ${x},${y} C ${x + control},${y} ${props.targetX - control},${props.targetY} ${props.targetX},${props.targetY}`;
+  const name = data ? callActionName(data.link, data.caller, data.callee) : 'Call relationship unavailable';
   return <>
 
     <BaseEdge
@@ -162,8 +162,9 @@ export const CallLine = (props: EdgeProps<CallEdge>) => {
         style={{
           transform: `translate(-50%, -50%) translate(${x}px,${y}px)`
         }}
-        title={data ? callCitation(data.link) : ''}
-        aria-label={`Explain call ${props.id}`}
+        title={data ? `${name}\n${callCitation(data.link)}` : ''}
+        aria-label={name}
+        data-call-id={props.id}
         onClick={() => data?.onExplain(data.link)}
       >calls</button>
 

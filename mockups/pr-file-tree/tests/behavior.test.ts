@@ -5,7 +5,7 @@ import source from '../full-source.json' with { type: 'json' };
 import paths from '../paths.json' with { type: 'json' };
 import supplemental from '../calls-scope.json' with { type: 'json' };
 import { prepareBehaviorContext } from '../prepare-behavior-context.ts';
-import { projectBehaviorCalls } from '../calls.ts';
+import { callActionName, projectBehaviorCalls } from '../calls.ts';
 import { behaviorSourceHomes, layoutBehavior } from '../behavior.ts';
 import { buildTree } from '../tree.ts';
 
@@ -54,4 +54,19 @@ test('call DAG ranks true callers before callees and keeps all50 secondary sourc
   assert.equal(homes.edges.length, 0);
   assert.ok(homes.nodes.every(node => node.kind === 'file'));
   assert.deepEqual(homes.nodes.map(node => node.path).sort(), [...paths.paths].sort());
+});
+
+test('all call controls have distinct side/caller/callee/source names while IDs remain separate provenance', () => {
+  const graph = projectBehaviorCalls();
+  const names = graph.links.map(link => {
+    const caller = graph.nodes.find(node => node.id === link.caller)!;
+    const callee = graph.nodes.find(node => node.id === link.callee)!;
+    const name = callActionName(link, caller, callee);
+    assert.ok(name.includes(caller.name) && name.includes(callee.name));
+    assert.ok(name.includes(link.target.side === 'base' ? 'Before' : 'After'));
+    assert.ok(name.includes(link.sites[0]!.anchor.path) && name.includes(link.target.path));
+    assert.ok(!name.includes(link.id));
+    return name;
+  });
+  assert.equal(new Set(names).size, graph.links.length);
 });

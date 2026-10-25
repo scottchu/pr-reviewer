@@ -189,7 +189,7 @@ const initialView = (lens: GraphLens, overview = false) => {
   const narrow = window.innerWidth < 650;
   if (lens === 'behavior') {
     const request = behaviorLayout.positions.find(node => node.identity.name === 'request' && node.identity.seed && node.identity.declaration.side === 'head')!;
-    return { x: narrow ? 12 - request.x * 210 / 270 : 28, y: 110 - request.y, zoom: 1 };
+    return { x: narrow ? 10 - request.x * 210 / 270 : 28, y: 110 - request.y, zoom: 1 };
   }
   const anchor = tree.nodes.find(n => n.id === (narrow && !overview ? 'directory:src/application' : 'directory:.'))!;
   return {
@@ -693,7 +693,13 @@ const App = () => {
       data: {
         link,
         active: callExplained?.id === link.id,
-        onExplain: setCallExplained
+        onExplain: setCallExplained,
+        caller: calls.nodes.find(node => node.id === link.caller)!,
+        callee: calls.nodes.find(node => node.id === link.callee)!,
+        lane: (() => {
+          const parallel = calls.links.filter(other => other.caller === link.caller && other.callee === link.callee);
+          return (parallel.findIndex(other => other.id === link.id) - (parallel.length - 1) / 2) * 32;
+        })(),
       },
       markerEnd: {
         type: MarkerType.ArrowClosed,
@@ -1050,12 +1056,13 @@ const App = () => {
     <header inert={ownerBusy || (!fullscreen && narrow && (contextOpen || Boolean(ownerPanel))) ? true : undefined}>
 
       {!fullscreen && <button
+        className="context-cue"
         ref={contextInvoker}
         aria-label={contextOpen ? 'Hide review context' : 'Open review context'}
         aria-expanded={contextOpen}
         onClick={() => { setSourceFinder(false); if (narrow) setOwnerPanel(null); setContextOpen(value => !value); }}
         title="Review context"
-      ><ActionIcon action="context" /></button>}
+      ><ActionIcon action="context" />{!detail.expanded && <span>Context</span>}</button>}
 
       {!fullscreen && <div className="lens-actions" role="group" aria-label="Graph view">
         <button aria-label="Behavior graph" title="Behavior graph · callers and callees" aria-pressed={lens === 'behavior'} disabled={!canvasReady} onClick={() => switchLens('behavior')}><LensIcon files={false} /></button>

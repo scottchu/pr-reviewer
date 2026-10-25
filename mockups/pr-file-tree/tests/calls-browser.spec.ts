@@ -52,10 +52,8 @@ for (const width of [
     await page.screenshot({
       path: `${evidence}/calls-review-${width}.png`
     });
-    const edge = page.getByRole('button', {
-      name: `Explain call ${link.id}`,
-      exact: true
-    });
+    const edge = page.locator(`button[data-call-id="${link.id}"]`);
+    await expect(edge).toHaveAccessibleName('Explain After call request → accessHeaders · src/application/review.ts:30–30 → src/application/local-access.ts:3–3');
     await panTo(page, edge, 130, 350);
     await edge.click();
     await expect(page.getByRole('region', {

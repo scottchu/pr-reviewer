@@ -132,6 +132,10 @@ export const callCitation = (link: CallLink) => [
     `Analyzer frontier retained: ${link.analyzerReason}`
   ] : []),
 ].join('\n');
+export const callActionName = (link: CallLink, caller: FunctionIdentity, callee: FunctionIdentity) => {
+  const ranges = [...new Set(link.sites.map(site => `${site.anchor.path}:${site.anchor.startLine}–${site.anchor.endLine}`))].join(', ');
+  return `Explain ${link.target.side === 'base' ? 'Before' : 'After'} call ${caller.name} → ${callee.name} · ${ranges} → ${link.target.path}:${link.target.startLine}–${link.target.endLine}`;
+};
 export const layoutCalls = (projection: ReturnType<typeof projectCalls>, origin: {
   x: number;
   y: number;

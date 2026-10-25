@@ -1381,6 +1381,7 @@ button:disabled { cursor: default; opacity: .5; }
 .owner-panel :focus-visible { outline: 2px solid #a8cddf; outline-offset: 2px; }
 .owner-panel ::selection { color: #edf4f7; background: #405b6c; }
 .lens-actions { display: flex; gap: 2px; }
+.context-cue { width: auto; gap: 5px; padding: 0 7px; }
 .lens-actions button[aria-pressed="true"] { background: #344854; color: #dfedf5; }
 .behavior-note { color: #c1d1da; line-height: 20px; padding: 0 3px; }
 .behavior-note strong { display: block; font-size: 14px; font-weight: 550; }

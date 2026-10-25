@@ -79,9 +79,12 @@ test('both-side unchanged callers and callees, callsite evidence and arbitrary u
   const request = graph.nodes.find(node => node.name === 'request' && node.seed && node.declaration.side === 'head')!;
   const helper = graph.nodes.find(node => node.name === 'accessHeaders')!;
   const link = graph.links.find(link => link.caller === request.id && link.callee === helper.id)!;
-  const edge = page.getByRole('button', { name: `Explain call ${link.id}`, exact: true });
+  const edge = page.getByRole('button', { name: 'Explain After call request → accessHeaders · src/application/review.ts:30–30 → src/application/local-access.ts:3–3', exact: true });
+  await expect(edge).toHaveAttribute('data-call-id', link.id);
   await panTo(page, edge);
-  await edge.click();
+  await edge.focus();
+  await expect(edge).toBeFocused();
+  await page.keyboard.press('Enter');
   await page.getByText('Why and source evidence', { exact: true }).click();
   await expect(page.getByRole('region', { name: 'Call relationship explanation' })).toContainText('Source-observed lexical call');
   await page.getByRole('button', { name: /^Read callsite After/ }).click();
