@@ -27,7 +27,7 @@ for (const width of [1440, 390]) test(`${width} original file roots with caller/
   const source = page.locator('[data-file-path="src/application/review.ts"]');
   await expect(source).toContainText('~ review.ts');
   const initial = await source.boundingBox();
-  await page.screenshot({ path: `/tmp/pr-reviewer-reading-journey-evidence/r12-root-projection/opening-${width}.png` });
+  await page.screenshot({ path: `/tmp/pr-reviewer-reading-journey-evidence/r13-mobile-root/opening-${width}.png` });
   await source.click();
   await expect(page.locator('[data-expanded-file]')).toHaveAttribute('data-expanded-file', request.declaration.path);
   await expect(page.locator('.continuous-reader')).toBeInViewport();
@@ -44,7 +44,7 @@ for (const width of [1440, 390]) test(`${width} original file roots with caller/
   expect(Math.abs(points.start.x - caller!.x - caller!.width)).toBeLessThan(4);
   expect(Math.abs(points.end.x - callee!.x)).toBeLessThan(4);
   expect(points.marker).toBeTruthy();
-  await page.screenshot({ path: `/tmp/pr-reviewer-reading-journey-evidence/r12-root-projection/expanded-${width}.png` });
+  await page.screenshot({ path: `/tmp/pr-reviewer-reading-journey-evidence/r13-mobile-root/expanded-${width}.png` });
   await page.getByRole('button', { name: 'Unified', exact: true }).click();
   await page.locator('.continuous-reader').evaluate(element => { element.scrollTop = 95; });
   const saved = await page.locator('.continuous-reader').evaluate(element => element.scrollTop);
@@ -200,5 +200,48 @@ test('root call keyboard evidence returns to exact file projection; unprepared c
   await file.click();
   await expect(page.locator('[data-expanded-file]')).toHaveAttribute('data-expanded-file', 'scripts/add-snapshot.ts');
   await expect(page.getByRole('status').filter({ hasText: 'Calls unprepared for this source' })).toBeVisible();
+  await expect(page.locator('[data-file-path]')).toHaveCount(50);
+});
+
+for (const resize of [false, true]) test(`phone root viewport clears legend and preserves endpoint framing after ${resize ? 'desktop resize' : 'fresh open'}`, async ({ page }) => {
+  await page.setViewportSize({ width: resize ? 1408 : 390, height: resize ? 796 : 844 });
+  await page.goto('/');
+  if (resize) {
+    await page.setViewportSize({ width: 390, height: 844 });
+    await page.getByRole('button', { name: 'Close review context' }).click();
+    await page.getByRole('button', { name: 'Overview', exact: true }).click();
+  }
+  const source = page.locator('[data-file-path="src/application/review.ts"]');
+  const target = page.locator('[data-file-path="src/application/local-access.ts"]');
+  await page.screenshot({ path: `/tmp/pr-reviewer-reading-journey-evidence/r13-mobile-root/${resize ? 'resize' : 'fresh'}-current.png` });
+  for (const node of [source, target]) {
+    const box = await node.boundingBox();
+    expect(box!.x).toBeGreaterThanOrEqual(0);
+    expect(box!.x + box!.width).toBeLessThanOrEqual(390);
+  }
+  const graph = await page.locator('.pr-graph').boundingBox();
+  const legend = await page.getByRole('complementary', { name: 'Relationship legend' }).boundingBox();
+  expect(graph!.y + graph!.height).toBeLessThanOrEqual(legend!.y);
+  const labels = await page.locator('.file-call-label').evaluateAll(elements => elements.map(element => {
+    const box = element.getBoundingClientRect(); return { top: box.top, bottom: box.bottom };
+  }));
+  for (const label of labels) {
+    if (label.top < graph!.y + graph!.height && label.bottom > graph!.y) {
+      expect(label.top).toBeGreaterThanOrEqual(graph!.y);
+      expect(label.bottom).toBeLessThanOrEqual(graph!.y + graph!.height);
+    }
+  }
+  if (resize) {
+    await source.click();
+    await page.getByRole('button', { name: 'Unified', exact: true }).click();
+    await page.locator('.continuous-reader').evaluate(element => { element.scrollTop = 70; });
+    const readingTop = await page.locator('.continuous-reader').evaluate(element => element.scrollTop);
+    await page.setViewportSize({ width: 1408, height: 796 });
+    await page.setViewportSize({ width: 390, height: 844 });
+    await expect(page.locator('[data-expanded-file]')).toHaveAttribute('data-expanded-file', 'src/application/review.ts');
+    await expect.poll(() => page.locator('.continuous-reader').evaluate(element => element.scrollTop)).toBeCloseTo(readingTop, 0);
+    await expect(page.getByRole('button', { name: 'Unified', exact: true })).toHaveAttribute('aria-pressed', 'true');
+  }
+
   await expect(page.locator('[data-file-path]')).toHaveCount(50);
 });

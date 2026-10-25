@@ -39,7 +39,7 @@ export const layoutFileProjection = (tree: FileTree, narrow: boolean): FileTree 
     for (const caller of callers) {
       positions.set(caller, { x: 0, y: top });
       const count = calls.filter(call => call.caller.declaration.path === caller && call.callee.declaration.path === target).length;
-      top += Math.max(narrow ? 210 : 160, count * 76 + 80);
+      top += Math.max(narrow ? 270 : 160, count * 76 + 80);
     }
     positions.set(target, { x: narrow ? 174 : 760, y: narrow ? start + 210 : start + (top - start) / 2 - 40 });
     top += narrow ? 140 : 120;

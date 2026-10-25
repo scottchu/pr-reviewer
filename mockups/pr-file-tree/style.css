@@ -1408,3 +1408,7 @@ button:disabled { cursor: default; opacity: .5; }
 .file-call-legend small { flex-basis: 100%; font-size: 11px; }
 
 @media (max-width: 649px) { .file-call-label { max-width: 350px; white-space: normal; font-size: 17px; } }
+
+/* Root overview only: keep its legend outside the readable graph viewport. */
+.file-projection-overview { height: calc(100% - 100px) !important; }
+@media (max-width: 649px) { .file-projection-overview { height: calc(100% - 144px) !important; } }

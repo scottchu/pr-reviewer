@@ -25,7 +25,6 @@ import { FileCallLine } from './file-call.tsx';
 const motionDuration = () => matchMedia('(prefers-reduced-motion: reduce)').matches ? 0 : 240;
 const tree = buildTree(fixture.paths, fixture.changes);
 const behaviorCalls = projectBehaviorCalls();
-const behaviorTree = layoutFileProjection(tree, window.innerWidth < 650);
 const fileCalls = projectFileCalls(tree);
 type LabelNode = Node<{
   name: string;
@@ -205,6 +204,8 @@ const App = () => {
   const lensCameras = useRef<Record<GraphLens, ReturnType<typeof initialView> | null>>({ behavior: null, files: null });
   const lensCameraSources = useRef<Record<GraphLens, string | null>>({ behavior: null, files: null });
   const [canvasReady, setCanvasReady] = useState(false);
+  const [narrow, setNarrow] = useState(window.innerWidth < 650);
+  const behaviorTree = useMemo(() => layoutFileProjection(tree, narrow), [narrow]);
   const baseTree = lens === 'behavior' ? behaviorTree : tree;
   const [sourceFinder, setSourceFinder] = useState(false);
   useEffect(() => {
@@ -237,7 +238,6 @@ const App = () => {
     void workspace.open().catch(error => setOwnerError(error instanceof Error ? error.message : 'owner_unavailable'));
     return () => { disconnectStory(); disconnect(); };
   }, [workspace]);
-  const [narrow, setNarrow] = useState(window.innerWidth < 650);
   const [contextOpen, setContextOpen] = useState(window.innerWidth >= 650);
   const contextInvoker = useRef<HTMLButtonElement>(null);
   const contextScroll = useRef(0);
@@ -441,7 +441,7 @@ const App = () => {
       } : n)
     };
   }, [
-    detail.expanded, fullscreen, lens
+    detail.expanded, fullscreen, lens, baseTree
   ]);
   useLayoutEffect(() => {
     if (fullscreen) {
@@ -1148,7 +1148,7 @@ const App = () => {
     >
 
       <ReactFlow<CanvasNode>
-        className="pr-graph"
+        className={`pr-graph${lens === 'behavior' && !fullscreen && !detail.expanded ? ' file-projection-overview' : ''}`}
         nodes={nodes}
         edges={edges}
         nodeTypes={nodeTypes}
