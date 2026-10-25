@@ -1412,3 +1412,31 @@ button:disabled { cursor: default; opacity: .5; }
 /* Root overview only: keep its legend outside the readable graph viewport. */
 .file-projection-overview { height: calc(100% - 100px) !important; }
 @media (max-width: 649px) { .file-projection-overview { height: calc(100% - 144px) !important; } }
+
+/* Global controls: explicit user placement; source readers remain separate. */
+.workspace-actions { position: fixed; z-index: 21; left: 50%; bottom: 12px; max-width: calc(100% - 16px); display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 4px; padding: 5px; border: 1px solid #657e8d; border-radius: 7px; background: #27343d; box-shadow: 0 5px 22px #0006; }
+.workspace-actions .owner-cues { display: flex; }
+.workspace-actions button { flex: none; }
+.workspace-action-grip { width: 22px; min-width: 22px; touch-action: none; cursor: grab; }
+.workspace-title > span { display: inline !important; }
+.file-projection-overview { height: calc(100% - var(--workspace-actions-height, 52px) - 24px) !important; }
+@media (max-width: 649px) {
+  .workspace-actions { bottom: 0; transform: translateX(-50%) !important; padding-bottom: calc(5px + env(safe-area-inset-bottom)); }
+  .workspace-action-grip { display: none; }
+  .review-workspace .diff-controls { bottom: calc(var(--workspace-actions-height, 52px) + 12px) !important; }
+}
+
+/* Split columns follow visible width; the existing shared native offset reads code. */
+.continuous-reader.split .paired-row, .split-column-heading { position: sticky; left: 0; width: var(--split-viewport-width, 100%); display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); }
+.continuous-reader.split .diff-side { overflow: hidden; }
+.source-code { display: inline-block; white-space: pre; }
+.continuous-reader.split .source-code { transform: translateX(calc(-1 * var(--source-offset, 0px))); }
+.split-column-heading { color: #b8c9d3; font: 10px/22px Inter, sans-serif; background: #253640; }
+
+.source-code .syntax-keyword { color: #d5b8f0; }
+.source-code .syntax-string { color: #ead5a2; }
+.source-code .syntax-comment { color: #b3c7d0; font-style: italic; }
+.source-code .syntax-number { color: #a9d6ee; }
+.source-code .syntax-plain { color: #e0e8eb; }
+
+.workspace-actions { width: max-content; }

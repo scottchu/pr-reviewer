@@ -25,14 +25,14 @@ export const FileCallLine = (props: EdgeProps<FileCallEdge>) => {
       <button
         className="file-call-label nodrag nopan"
         style={{ transform: `translate(${x}px,${y}px)${data.narrow ? '' : ' translate(-50%,-50%)'}`, color }}
-        aria-label={name}
+        aria-label={`${name}; ${data.status === 'added' ? 'Added call' : 'Comparison not established'}`}
         title={`${name}\n${callCitation(data.link)}`}
         data-call-id={data.link.id}
         data-relationship-status={data.status}
         onClick={() => data.onExplain(data.link)}
       >
         {data.caller.name}() → {data.callee.name}()
-        <small>{data.status === 'added' ? 'New call in this PR' : `${data.link.target.side === 'head' ? 'Current' : 'Before PR'} source call · change unclassified`}</small>
+
       </button>
     </EdgeLabelRenderer>
   </>;

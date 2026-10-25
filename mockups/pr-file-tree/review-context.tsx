@@ -1,7 +1,7 @@
 import React, { useLayoutEffect, useRef } from 'react';
 import fixture from './paths.json' with { type: 'json' };
 
-export type ContextEvidence = 'requirement' | 'request';
+export type ContextEvidence = 'requirement' | 'request' | 'rationale';
 
 export const ReviewContext = ({ narrow, scrollTop, onScroll, onClose, onEvidence }: {
   narrow: boolean;
@@ -57,10 +57,12 @@ export const ReviewContext = ({ narrow, scrollTop, onScroll, onClose, onEvidence
       <span>Context · PR #25</span>
       <button aria-label="Close review context" title="Close context" onClick={onClose}>×</button>
     </div>
-    <h1>Why remove manual token entry?</h1>
+    <h1>Open your own review, without a login step.</h1>
     <section aria-label="Captured requirement">
       <h2>Captured requirement</h2>
-      <p>Open the local review without pasting a credential. Keep explicit agent credentials on their own authentication path.</p>
+      <p>PR Reviewer is the owner’s single-user local tool, but its token form put a credential-entry step between opening the existing URL and returning to retained reviews. The owner should be able to open that URL and immediately see the review, history and graph. This change removes that extra step; it does not introduce a replacement login.</p>
+      <p>Agents remain separately attached participants, so their explicit credentials still identify the responsible session and attachment generation.</p>
+      <button className="context-citation" onClick={event => onEvidence('rationale', event.detail === 0)} aria-label="Read the documented opening rationale">Opening requirement · After L11–13</button>
       <button className="context-citation" onClick={event => onEvidence('requirement', event.detail === 0)}
         aria-label="Read the captured runtime requirement">
         Runtime specification · After L22–26
@@ -68,7 +70,7 @@ export const ReviewContext = ({ narrow, scrollTop, onScroll, onClose, onEvidence
       <small>Project requirement retained in this PR, not a measured runtime outcome.</small>
     </section>
     <section aria-label="Prepared source account">
-      <h2>Prepared source account</h2>
+      <h2>How the code changes</h2>
       <p>Before, the review request always built a Bearer header. After, it delegates to a helper that distinguishes owner requests from explicit credentials.</p>
       <dl>
         <dt>Local owner</dt><dd>No Authorization header.</dd>
@@ -82,7 +84,7 @@ export const ReviewContext = ({ narrow, scrollTop, onScroll, onClose, onEvidence
     </section>
     <section aria-label="Scope and uncertainty">
       <h2>Keep the wider change in view</h2>
-      <p>The 50-file change also touches other clients, gateway/storage ownership, recovery, tools, tests and documentation. This account explains one path; other behavior remains partly unprepared.</p>
+      <p>The 50-file change also touches other clients, gateway/storage ownership, recovery, tools, tests and documentation. This account explains one path; some connections have not been mapped yet.</p>
       <p>Test source does not prove a passing run. This account does not establish security or native agent delivery.</p>
     </section>
     <small className="context-comparison" title={`${fixture.base} → ${fixture.head}`}>

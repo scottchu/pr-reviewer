@@ -22,6 +22,7 @@ import { BehaviorNoteLabel, LensIcon, ActionIcon, type BehaviorNote } from './be
 import { mapJourneySource } from './journey-source.ts';
 import { layoutFileProjection, projectFileCalls } from './file-projection.ts';
 import { FileCallLine } from './file-call.tsx';
+import { WorkspaceActions } from './workspace-actions.tsx';
 const motionDuration = () => matchMedia('(prefers-reduced-motion: reduce)').matches ? 0 : 240;
 const tree = buildTree(fixture.paths, fixture.changes);
 const behaviorCalls = projectBehaviorCalls();
@@ -40,6 +41,8 @@ type LabelNode = Node<{
   fullscreen: boolean;
   onFullscreen: (path: string) => void;
   width: number;
+  height: number;
+  onMeasure: (height: number) => void;
   onSourceExplain: (relation: SourceRelation) => void;
   activeRelation: SourceRelation | null;
   reading: FileReading | undefined;
@@ -50,12 +53,27 @@ type LabelNode = Node<{
 }, 'filename'>;
 const Label = ({ id, data }: NodeProps<LabelNode>) => {
   const update = useUpdateNodeInternals();
+  const surface = useRef<HTMLDivElement>(null);
+  useLayoutEffect(() => {
+    if (!data.expanded || data.fullscreen) return;
+    const pre = surface.current?.querySelector<HTMLElement>('.continuous-comparison pre');
+    const heading = surface.current?.querySelector<HTMLElement>('.continuous-version-header');
+    if (!pre) return;
+    const measure = () => {
+      const maximum = Math.max(180, Math.min(window.innerWidth < 650 ? 580 : 640, window.innerHeight - 120));
+      data.onMeasure(Math.max(180, Math.min(maximum, pre.offsetHeight + (heading?.offsetHeight ?? 32) + 60)));
+    };
+    measure();
+    const observer = new ResizeObserver(measure);
+    observer.observe(pre);
+    return () => observer.disconnect();
+  }, [data.expanded, data.fullscreen, data.path, data.width, data.onMeasure]);
   useLayoutEffect(() => {
     update(id);
     const timer = setTimeout(() => update(id), motionDuration());
     return () => clearTimeout(timer);
   }, [
-    id, data.width, data.expanded, data.fullscreen, update
+    id, data.width, data.height, data.expanded, data.fullscreen, update
   ]);
   return data.fullscreen ? <div className="file-workspace-file">
 
@@ -74,6 +92,7 @@ const Label = ({ id, data }: NodeProps<LabelNode>) => {
     />
 
   </div> : <div
+    ref={surface}
     className={`file-object ${data.kind} ${data.expanded ? 'expanded' : ''}`}
     data-expanded-file={data.expanded ? data.path : undefined}
   >
@@ -206,6 +225,8 @@ const App = () => {
   const [canvasReady, setCanvasReady] = useState(false);
   const [narrow, setNarrow] = useState(window.innerWidth < 650);
   const behaviorTree = useMemo(() => layoutFileProjection(tree, narrow), [narrow]);
+  const [fileHeights, setFileHeights] = useState<Record<string, number>>({});
+  const pendingFileFrame = useRef<string | null>(null);
   const baseTree = lens === 'behavior' ? behaviorTree : tree;
   const [sourceFinder, setSourceFinder] = useState(false);
   useEffect(() => {
@@ -429,7 +450,7 @@ const App = () => {
     });
   };
   const viewTree = useMemo(() => {
-    const result = detailTree(baseTree, detail.expanded, window.innerWidth < 650);
+    const result = detailTree(baseTree, detail.expanded, window.innerWidth < 650, fileHeights);
     if (!fullscreen)
       return result;
     return {
@@ -441,7 +462,7 @@ const App = () => {
       } : n)
     };
   }, [
-    detail.expanded, fullscreen, lens, baseTree
+    detail.expanded, fullscreen, lens, baseTree, fileHeights
   ]);
   useLayoutEffect(() => {
     if (fullscreen) {
@@ -459,6 +480,22 @@ const App = () => {
   }, [
     fullscreen
   ]);
+  useLayoutEffect(() => {
+    const path = pendingFileFrame.current;
+    if (!path || path !== detail.expanded || fullscreen) return;
+    const timer = setTimeout(() => {
+      const node = Array.from(main.current?.querySelectorAll<HTMLElement>('[data-file-path]') ?? [])
+        .find(element => element.dataset.filePath === path)?.closest<HTMLElement>('.react-flow__node');
+      const graph = main.current?.querySelector<HTMLElement>('.pr-graph');
+      const current = flow.current?.getViewport();
+      if (!node || !graph || !current) return;
+      const bounds = node.getBoundingClientRect();
+      const area = graph.getBoundingClientRect();
+      pendingFileFrame.current = null;
+      moveCamera({ ...current, x: current.x + area.left + 12 - bounds.left, y: current.y + area.top + 12 - bounds.top });
+    }, motionDuration() + 40);
+    return () => clearTimeout(timer);
+  }, [viewTree, detail.expanded, fullscreen]);
   const fileNodes: LabelNode[] = useMemo(() => (fullscreen ? viewTree.nodes.filter(n => n.id === `file:${fullscreen.path}`) : [
     ...viewTree.nodes
   ]).map((n: TreeNode) => {
@@ -485,6 +522,8 @@ const App = () => {
         fullscreen: fullscreen?.path === n.path,
         onFullscreen: toggleFullscreen,
         width: n.width,
+        height: n.height,
+        onMeasure: height => setFileHeights(current => Math.abs((current[n.path] ?? 0) - height) < 1 ? current : { ...current, [n.path]: height }),
         reading: readings.current[n.path],
         onReading: value => {
           readings.current = rememberFile(readings.current, n.path, value);
@@ -769,6 +808,7 @@ const App = () => {
   const focusFile = (path: string) => {
     if (fullscreen)
       return;
+    pendingFileFrame.current = detail.expanded === path ? null : path;
     setSelected(path);
     setTestsFor(null);
     setTestReturn(null);
@@ -791,7 +831,7 @@ const App = () => {
     }
     const path = target === 'request'
       ? 'src/application/review.ts'
-      : 'docs/product/review-loop/runtime.md';
+      : target === 'rationale' ? 'docs/plans/480p/slices/01-review-loop/single-user-access/plan.md' : 'docs/product/review-loop/runtime.md';
     if (keyboard) {
       setPendingFocus({ target: 'reading', path });
     }
@@ -827,7 +867,7 @@ const App = () => {
         path,
         name: 'Captured local-owner requirement',
         before: [],
-        after: [{ startLine: 22, endLine: 26 }],
+        after: target === 'rationale' ? [{ startLine: 11, endLine: 13 }] : [{ startLine: 22, endLine: 26 }],
         preferredSide: 'after'
       });
       dispatchDetail({ type: 'focus', path });
@@ -1052,7 +1092,17 @@ const App = () => {
   };
   return <>
 
-    <header inert={ownerBusy || (!fullscreen && narrow && (contextOpen || Boolean(ownerPanel))) ? true : undefined}>
+    <header className="workspace-title">
+      <span title={`PR25 · ${fixture.base} → ${fixture.head}`}>
+
+        {fullscreen ? fullscreen.path : 'pr-reviewer'}
+
+        {!fullscreen && <b>PR #25</b>}
+
+      </span>
+
+    </header>
+    <WorkspaceActions blocked={ownerBusy || (!fullscreen && narrow && (contextOpen || Boolean(ownerPanel)))}>
 
       {!fullscreen && <button
         className="context-cue"
@@ -1085,14 +1135,6 @@ const App = () => {
         onClick={event => returnToSource(event.detail === 0)}
       >←</button>}
 
-      <span title={`PR25 · ${fixture.base} → ${fixture.head}`}>
-
-        {fullscreen ? fullscreen.path : 'pr-reviewer'}
-
-        {!fullscreen && <b>PR #25</b>}
-
-      </span>
-
       <button
         onClick={reset}
         aria-label={fullscreen ? 'Back to PR' : 'Overview'}
@@ -1115,7 +1157,7 @@ const App = () => {
 
       </button>
 
-    </header>
+    </WorkspaceActions>
 
     <div className="review-workspace">
       {!fullscreen && sourceFinder && <section className="source-finder" aria-label="Find changed source">
@@ -1207,11 +1249,6 @@ const App = () => {
 
       </ReactFlow>
 
-      {lens === 'behavior' && !fullscreen && !detail.expanded && <aside className="file-call-legend" aria-label="Relationship legend">
-        <span style={{ color: '#92d4ac' }}>━ Added call</span><span style={{ color: '#e0c372' }}>━ Modified*</span>
-        <span style={{ color: '#df8996' }}>━ Removed</span><span>━ Unchanged / unclassified (labeled)</span>
-        <small>50 changed files · 15 prepared inter-file calls. Other relationships unprepared. File colors = Git status. *Requires evidenced pairing; none claimed.</small>
-      </aside>}
       {detail.expanded && <DiffControls
         mode={mode}
         onMode={setMode}

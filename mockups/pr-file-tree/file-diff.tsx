@@ -1,3 +1,4 @@
+import { SyntaxCode } from './syntax-code.tsx';
 import React, { useRef, useState, useLayoutEffect, useMemo, useEffect } from 'react';
 import type { FileReading, ReadingFocus } from './reading.ts';
 import diffs from './diffs.json' with { type: 'json' };
@@ -16,7 +17,8 @@ export type SourceRelation = {
 export const fileDiffs = new Map(diffs.files.map(file => [
   file.path, file
 ]));
-const SourceLine = ({ row, side, mode }: {
+const SourceLine = ({ row, side, mode, path }: {
+  path: string;
   row: SourceRow | null;
   side: 'before' | 'after';
   mode: DiffMode;
@@ -64,7 +66,7 @@ const SourceLine = ({ row, side, mode }: {
 
     </span>}
 
-    {row?.text ?? ''}
+    <span className="source-code"><SyntaxCode path={path} side={side} line={row ? (side === 'before' ? row.beforeLine : row.afterLine) : null} text={row?.text ?? ''} /></span>
 
   </span>;
 export const FileDiffBody = ({ file, mode, fullscreen, width, onExplain, activeRelation, reading, onReading, restoreVersion, focus, onCalls }: {
@@ -273,6 +275,18 @@ export const FileDiffBody = ({ file, mode, fullscreen, width, onExplain, activeR
       folds: next
     });
   };
+  useLayoutEffect(() => {
+    const pane = horizontal.current;
+    const pre = content.current;
+    if (!pane || !pre) return;
+    pane.style.setProperty('--split-viewport-width', `${pane.clientWidth}px`);
+    if (mode === 'split') {
+      const longest = Math.max(0, ...Array.from(pre.querySelectorAll<HTMLElement>('.source-code')).map(line => line.scrollWidth));
+      const overflow = Math.max(0, longest + 42 - pane.clientWidth / 2);
+      pre.style.width = `${pane.clientWidth + overflow}px`;
+    } else pre.style.width = '';
+    pane.style.setProperty('--source-offset', `${pane.scrollLeft}px`);
+  }, [mode, file.path, folds, width, segments]);
   const renderRows = (rows: SourceRow[], hunk: number | null) => {
     let assigned = false;
     const mark = (element: HTMLElement | null, changed: boolean) => {
@@ -289,6 +303,7 @@ export const FileDiffBody = ({ file, mode, fullscreen, width, onExplain, activeR
     >
 
       <SourceLine
+        path={file.path}
         row={row}
         side={row.kind === 'removed' ? 'before' : 'after'}
         mode={mode}
@@ -303,6 +318,7 @@ export const FileDiffBody = ({ file, mode, fullscreen, width, onExplain, activeR
       <span className="diff-side before">
 
         <SourceLine
+        path={file.path}
           row={pair.before}
           side="before"
           mode={mode}
@@ -313,6 +329,7 @@ export const FileDiffBody = ({ file, mode, fullscreen, width, onExplain, activeR
       <span className="diff-side after">
 
         <SourceLine
+        path={file.path}
           row={pair.after}
           side="after"
           mode={mode}
@@ -468,18 +485,22 @@ export const FileDiffBody = ({ file, mode, fullscreen, width, onExplain, activeR
       <div
         ref={horizontal}
         className="continuous-comparison inner-comparison horizontal nodrag nopan nowheel"
-        onScroll={e => save({
+        onScroll={e => {
+          e.currentTarget.style.setProperty('--source-offset', `${e.currentTarget.scrollLeft}px`);
+          save({
           horizontal: {
             ...local.current.horizontal,
             [-1]: e.currentTarget.scrollLeft
           }
-        })}
+        });
+        }}
       >
 
         <pre ref={content}>
 
           <code>
 
+            {mode === 'split' && <span className="split-column-heading"><span>{file.before.hash ? 'Before' : 'Before · file absent'}</span><span>{file.after.hash ? 'After' : 'After · file absent'}</span></span>}
             {mode === 'unified' && <span className="unified-column-heading">
 
               <span>Before</span>

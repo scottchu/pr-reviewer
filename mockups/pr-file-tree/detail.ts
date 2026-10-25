@@ -29,11 +29,11 @@ export const nearbyFile = (tree: FileTree, p: {
   })).sort((a, b) => a.distance - b.distance);
   return candidates[0] && candidates[0].distance <= radius ? candidates[0].path : null;
 };
-export const detailTree = (tree: FileTree, path: string | null, narrow: boolean): FileTree => {
+export const detailTree = (tree: FileTree, path: string | null, narrow: boolean, heights: Readonly<Record<string, number>> = {}): FileTree => {
   const selected = tree.nodes.find(n => n.kind === 'file' && n.path === path);
   if (!selected)
     return tree;
-  const height = narrow ? 580 : 520;
+  const height = heights[selected.path] ?? (narrow ? 580 : 520);
   const extra = height - selected.height + 18;
   return {
     edges: tree.edges,
@@ -41,6 +41,9 @@ export const detailTree = (tree: FileTree, path: string | null, narrow: boolean)
       ...n,
       width: narrow ? 324 : 760,
       height
+    } : n.y === selected.y && n.x > selected.x ? {
+      ...n,
+      x: n.x + Math.max(0, (narrow ? 324 : 760) - selected.width) + 24
     } : n.y > selected.y ? {
       ...n,
       y: n.y + extra
