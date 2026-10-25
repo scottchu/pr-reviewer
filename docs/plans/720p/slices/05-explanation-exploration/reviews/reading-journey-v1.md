@@ -1,7 +1,7 @@
 # Integrated PR25 reading journey repair
 
 Date: 2026-10-25.
-Status: J1 repair engineering-verified at e310477; J2/J3 preparation active; full journey and acceptance incomplete.
+Status: J1 repair engineering-verified; J2/J3 inputs prepared; owner-backed integration blocked on the scoped runtime decision. Full journey and acceptance incomplete.
 Parent: [slice 05](../plan.md), [720p](../../../plan.md), [roadmap](../../../../roadmap.md).
 
 ## Ownership and inputs
@@ -136,3 +136,14 @@ Fixed a65dc4fb0f89801c04b71b2464470bf1a5f34f6b received [independent content/sou
 Independent preparation is now complete for this input. Runtime/proxy launch remains pending the existing scoped question; no repeated question, API listener, proxy change or native attachment was made. The next coherent implementation is actual owner-backed UI synchronization and question/draft/return composition, verified against authoritative API readback rather than a new local player/draft or fabricated response. Runtime approval would not independently clear native attachment/delivery or the retained UI-first browser restriction. Work remains active and incomplete; do not reduce the original goal to these preparation artifacts.
 
 Retention at this checkpoint: worktree/branch, candidate57943, private prepared source/store, source/StoryContent manifests, failed and passed author logs and concise tracked independent reports remain needed for recovery. No cleanup of preserved service/configuration/conversation state or unrelated files is authorized by this checkpoint. Main is unchanged. This revision is local-only: no push/PR/merge/release/production deployment.
+
+
+## Runtime-scope blocked checkpoint
+
+Date: 2026-10-25.
+Status: blocked, not complete or user-paused.
+The same pending candidate gateway/proxy scope decision has remained across three consecutive goal turns. Earlier turns delivered independent Context/source/story preparation; that work is now committed and reviewed. Current clean HEAD before this checkpoint isbc513da. Readback confirms no /api proxy in candidate Vite configuration and connection refused on proposed57944. No user answer to the scoped question has arrived; automatic goal continuation grants no new destination/service authority.
+
+The next coherent owner-backed story/question integration requires the proposed gateway127.0.0.1:57944, private prepared data root /tmp/pr-reviewer-reading-journey-owner-data and /api proxy on57943. The startup packet explicitly preserves existing services: “Do not restart/change existing services, network, security, permissions or MCP config.” The proposed proxy/runtime effects remain gated; independent preparation is exhausted. Do not create a parallel local story/draft model, fake published version/reply, or additional documents/tests merely to bypass this boundary.
+
+Unblock owner: user. Required input: answer the existing narrowly scoped runtime question; no requirement restatement is needed. If approved, reconcile the runtime scope in this plan, then implement existing public Workspace/Story/SourceCanvas/Question composition and verify actual readback/React journey. Approval would not clear separate native attachment/delivery, denied UI-first browser route or unfamiliar-reviewer acceptance. Full requested goal stays unchanged and incomplete. Retain the clean task branch, data and evidence; no new service, proxy/configuration, archive or cleanup effect occurred in this blocked audit.
