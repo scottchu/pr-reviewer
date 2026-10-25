@@ -80,3 +80,8 @@ User accepts the file-object/detail direction and explicitly requests red/green/
 ## Grouped comparison and local presentation controls amendment
 
 Date: 2026-10-24. Latest user correction requires changes to stay together. Replace vertically unrelated side blocks with a single native-hunk viewport: split rows keep the same Git context/change block together in two columns, with explicit blank cells where that side has no line; unified rows preserve native Git order. Both presentations use the identical pinned rows and one scroll position, never independent side scrollers or invented semantic alignment. Mobile defaults to unified, desktop to split. A compact presentation bar is fixed above the safe area on mobile and floating/draggable on desktop; it appears only for an expanded file, changes presentation locally, and does not move the graph. It does not introduce a route/panel/story. Left hunk dots stay visible outside the internal scroller in either presentation and retain the active hunk when switching.
+
+
+## Same-file canvas fullscreen amendment
+
+Date: 2026-10-24. Every changed file object exposes a quiet top-right accessible fullscreen button. This is an explicit reading intent: expand the same file node to available canvas space at readable scale, preserving its identity/connectors and existing source component. It does not navigate or open a modal/page. Left hunk dots and bottom unified/split controls remain available. Exit or Escape restores the exact prior graph camera, selected file and compact/expanded state; an already-open file keeps its active hunk, reading position and presentation. Native source/rail/control input stays local. Geometry remains a mock proposal.
