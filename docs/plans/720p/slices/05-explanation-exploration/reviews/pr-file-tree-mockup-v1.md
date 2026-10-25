@@ -1,12 +1,21 @@
 # PR25 file-group mock — implementation/review handoff v1
 
 Date: 2026-10-24.
-Status: continuous-reader requirements are current; source000f84f below is a preserved historical nested-box checkpoint with bounded independent recheck READY. Current continuous implementation/evidence is being compiled from the F01–F15 contract. This is a design mock, not product/layout adoption or unfamiliar-reviewer acceptance. The current clean handoff below supersedes historical flat/filename-only scope and pending statements.
+Status: current combined source **3b738264d57552acc8b0ec611124a1982981c61b** is clean and frozen for independent source/design review. The current F01–F16 contract covers continuous whole-function source reading, camera-only graph gestures, change-centered call context and relevant declared-test reading.25pure/17author-Chrome/strict/build PASS; independent review of this exact combined source is pending. Source000f84f below is a preserved historical nested-box checkpoint, not current acceptance. This remains a design mock, not production/layout adoption or unfamiliar-reviewer comprehension.
 
 Parent: [05 explanation/exploration](../plan.md). Source: [file-tree-first product contract](../../../../../product/pr-file-tree-first.md). This latest explicit user scope temporarily simplifies the larger spatial overview. The actual October23 Dependency Lens and Scope Microscope references were viewed; no new style or generated image is introduced.
 
 Base EXACTba4a872e15a540065d5a71dbdfde8d7b267a1148. Isolated worktree /tmp/pr-reviewer-pr-file-tree, descriptive branch mockup-pr25-filename-tree. Editable implementation only mockups/pr-file-tree/ plus these scoped docs/map. Production src/config/package/backend/schema/dependencies and all earlier worktrees/runtimes remain unchanged.
 
+
+
+## Current clean source and immutable evidence
+
+Renderer/build/browser source: **3b738264d57552acc8b0ec611124a1982981c61b**. Immutable manifest `/tmp/pr-reviewer-pr-file-tree-evidence/manifest-3b73826.json`, SHA256 **c21b15c96d51309c59600c3cfce5629e9d1fdeb479039465027eac09ef05dadc**. Its exact23PNG/4log copies and build live in `frozen-3b73826/`. They are from the declared17journey final run, separate from frozen reader bca4b4c and nested000f evidence. Do not reattribute earlier moving captures/logs to this pin.
+
+Runtime remains Bun PID79743 at `http://127.0.0.1:56677/`; root owns existing `https://mac-mini.duckbill-ionian.ts.net:8477/`. Local HTML and actual `/main.tsx` JavaScript returned200 after freeze. No worker network writes, production writes, new dependencies or preserved-route mutations. The docs-only receipt following source freeze does not change runtime/build identity. Current test inventory and limitations are in the combined checkpoint below; the current-only product contract is authoritative over all historical iteration text.
+
+Documentation integration includes readable multi-line implementation rules (0c5cdfc) and explicit project/repository TBox/ABox knowledge (038fd11). Exact raw reviewed-source fixtures remain original, regardless of their historical compressed coding style. The conceptual ontology adds no schema, reasoner or extraction engine.
 
 ## Historical000f clean nested handoff — superseded by continuous-reader correction
 
@@ -45,7 +54,7 @@ After ready, root reviews source membership/identity and visual simplicity. Conf
 New private loopback127.0.0.1:56677, strictPort, exact allowed host mac-mini.duckbill-ionian.ts.net. Root alone assigns authorized Serve8477 after local health. Worker changes no network configuration. Preserve8472–8476 and their source/runtime/data. Return quick local milestone then clean source/build/fixture pins, desktop390 captures, checks/knownlimits and minimal manifest. Stop at this filename tree; no feature expansion or production integration/merge/deploy.
 
 
-## Latest bounded change-signal amendment
+## Historical bounded change-signal amendment
 
 Root confirmed the filename-only geometry in actual1440/390captures. The next correction preserves it: exact Git A/M/D prefix/color (actual4A46M), full-path/status accessibility; no badges/cards/body text. A following bounded selected-file relative static-import overlay may use existing TypeScript tooling on immutable Git objects, with side/line/specifier/source and target hashes. It is fixture preparation, not new backend analysis capability. Membership diff colors are file-level imports, never call/runtime claims. Preserve all50changed nodes; optional one-hop unchanged targets remain gray source-pinned filenames. No broad pipeline or hidden source claims. If import preparation is not quick, expose the clean status tree first and record that gap.
 
@@ -62,14 +71,14 @@ Own PR25 comparison baselineb096826e31c0927190806de91ed70b8b64aa93d8 → heade3b
 
 Historical manifest: /tmp/pr-reviewer-pr-file-tree-evidence/manifest-25c51b0.json, SHA-256 **719d7b4d75cd7eb94059c67387429250543aa19dd2375bfeed174eed9107fbc3**. It separates final source-bound captures/checks/build hashes from historical moving uncolored captures and prior milestones. Build output is /tmp/pr-reviewer-pr-file-tree-build; emitted JS/CSS/font hashes are in the manifest. The build passes with the tool's504.09kB mock-JS chunk warning; no chunk limit/config suppression or dependency change was made.
 
-## Exact observed checks
+## Historical25c51b0 observed checks
 
 - Eight pure tree/import tests PASS: exact Git paths/statuses, duplicate filenames/prefix-safe containment, non-overlap/determinism, invalid-path handling, all240source/target citation hashes/ranges, selected helper/retained module/context membership and unresolved-target behavior. Raw pure-imports.log. This ran after final pure-module changes and before the final renderer-only curve refinement; pure modules are unchanged at25c51b0.
 - Task strict TypeScript and mock build PASS on the exact25c51b0contents. Raw strict-imports.log/build-imports.log.
 - Three actual authored Chrome journeys PASS at clean25c51b0 in2.8s. Desktop verifies all50paths/filename-only geometry, drag/scroll/Control-wheel/Overview.390px verifies pre-enabled synthetic touch pinch, readable scale, keyboard pan/zoom/root Overview and no page scroll. Selected review.ts verifies5static module links, added helper citation, retained imports, two distinct public.ts context nodes, all50changed paths retained and Escape clearing only temporary context. Raw browser-imports-clean.log.
 - Earlier aca7fd4 had4purePASS, desktopPASS and synthetic pinchFAIL under late touch emulation;ddace35 had5purePASS and2ChromePASS with imports pending. Those logs are historical and are not relabeled as final import checks. The import TDD missing-module RED is retained in imports-red.log; generator record output is import-preparation.log. No forced actions or altered independent browser policy were used.
 
-## Final authored visual evidence and critique
+## Historical25c51b0 visual evidence and critique
 
 Six final capture files under /tmp/pr-reviewer-pr-file-tree-evidence/ are source-bound in the manifest: desktop.png, desktop-panned-zoomed.png,390.png,390-panned-zoomed.png,desktop-selected-imports.png,390-overview.png.1440-first.png and390-first.png remain earlier uncolored moving-source captures, explicitly historical.
 
@@ -111,7 +120,7 @@ Date: 2026-10-24. Every changed file object exposes a quiet top-right accessible
 Date: 2026-10-24. The primary acceptance is yellow-dot activation revealing its contiguous real removed/added block with a concise explanation inside that same file node, visibly sharing the hunk identity/current highlight. Prepared explanations describe exact source changes; rationale beyond source facts is explicitly inference. They are authored mock annotations, not generated analysis, execution or verified intent. Pin each annotation to path, exact native hunk header, immutable source side hashes/ranges and any supporting source. Unannotated hunks remain honest: exact source available, no prepared explanation. The first demonstrated mobile path uses Unified and scripts/dev.ts's final logging replacement; fullscreen/control polish must not displace this reading outcome.
 
 
-## Edge explanation reader — latest placement correction
+## Historical edge-reader placement correction
 
 Date: 2026-10-24. This supersedes the preceding inline-explanation placement, which is not the accepted current requirement. Hunk dots exclusively navigate/highlight exact native source changes inside the file. Do not fill file diff nodes with explanation prose. Activating a selected file’s static-import edge opens its relationship explanation in a bottom slide-up reader on mobile or right slide-in reader on desktop. Identify the exact selected edge/from/to, highlight its edge and incident objects, and present What/How/Why with exact before/head citations. Module membership is not calls or runtime impact. Prepared source facts, inference and unknown rationale remain distinct. Close preserves graph camera, source hunk/scroll/mode and selection. The mobile reader stays above the fixed presentation bar with an accessible visible close action; this is not a question composer or new page. Local mock data has no async/delivery/backend effects.
 
@@ -130,7 +139,7 @@ Motion finding: the first no-preference Chrome check exposed ReactFlow’s defau
 The bounded intermediate rail/grouped-row/edge-reader/fullscreen iteration passed15pure tests, strict and13authored Chrome journeys (browser-complete-second.log), including sampled intermediate expansion heights and smooth scroll positions. It remains a recovery checkpoint only: the latest user explicitly requires nested spatial file groups and distinct file-workspace fullscreen, so the flat body/bigger-box interpretation is not accepted. Do not label those tests as nested-graph evidence. Keep the actual yellow Unified capture and responsive-reader captures historical.
 
 
-## Nested file groups and distinct workspace roots — current accepted mock scope
+## Historical nested file groups and workspace roots — superseded by continuous reader
 
 Date: 2026-10-24. This supersedes flat file-as-diff-card and bigger-box fullscreen interpretations above. A file is a spatial group. Click/keyboard activation expands or collapses its nested contents in the existing whole-PR canvas without camera translation/refit; the surrounding file/directory groups remain present. Gesture semantic zoom can disclose the same group. Source selection and local scrolling remain local.
 
@@ -181,7 +190,7 @@ Evidence correction: the screenshot’s src/storage/public.ts has exactly3native
 Latest relationship correction: static imports are not the primary review relationship and are now off by default; remove automatic module overlays and import selection cues. Keep the source-verified import fixture as secondary historical preparation, never relabel it calls. Bounded actual caller/callee/context mapping is a separate root-owned source investigation; this reader must not fabricate those edges while awaiting exact source evidence. Source-comparison explanation remains available in the reader. Its primary copy is one or two concrete change/why sentences; exact facts, inference/unknown limits and hashes belong in secondary disclosure. No default module spaghetti or metamodel paragraph wall.
 
 
-## Current requirement trace — before call projection
+## Current requirement trace — combined mock checkpoint
 
 Product knowledge is now current-only with stable F01–F15 IDs in pr-file-tree-first.md. Historical specifications/checks above are preserved as history, not competing requirements. No claim is made that every new requirement already passed.
 
@@ -230,7 +239,7 @@ Current captures from the11journey run: `continuous-imports-390.png`, `continuou
 
 Build emits a fixture-heavy2.79MB JavaScript chunk warning; no optimization/platform work is implied by this checkpoint. Calls F10–F12 and test lens F16 remain pending next bounded projection. No native run result, coverage, security acceptance, independent UI comprehension or production adoption follows from these author checks.
 
-### Next bounded projection — prepared calls and declared tests
+### Call/test projection scope committed before code
 
 Derive F10–F12 and F16 from the root-audited value packets only, after reader checkpoint bca4b4c. No analyzer/parser/backend changes. Copy the two call JSON packets without changing IDs, source anchors, certainty or frontiers; copy the four-case test packet with every run result still null. Pure functions filter selected-file changed seeds and incident one-hop calls, then exact selected-function test mappings. Same-name and import-only matching are prohibited.
 
