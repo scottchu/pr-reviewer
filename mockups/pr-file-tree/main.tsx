@@ -66,7 +66,8 @@ const Label = ({ id, data }: NodeProps<LabelNode>) => {
     measure();
     const observer = new ResizeObserver(measure);
     observer.observe(pre);
-    return () => observer.disconnect();
+    window.addEventListener('resize', measure);
+    return () => { observer.disconnect(); window.removeEventListener('resize', measure); };
   }, [data.expanded, data.fullscreen, data.path, data.width, data.onMeasure]);
   useLayoutEffect(() => {
     update(id);
@@ -226,7 +227,7 @@ const App = () => {
   const [narrow, setNarrow] = useState(window.innerWidth < 650);
   const behaviorTree = useMemo(() => layoutFileProjection(tree, narrow), [narrow]);
   const [fileHeights, setFileHeights] = useState<Record<string, number>>({});
-  const pendingFileFrame = useRef<string | null>(null);
+  const pendingFileFrame = useRef<{ path: string } | null>(null);
   const baseTree = lens === 'behavior' ? behaviorTree : tree;
   const [sourceFinder, setSourceFinder] = useState(false);
   useEffect(() => {
@@ -356,6 +357,7 @@ const App = () => {
     y: number;
     zoom: number;
   }) => {
+    pendingFileFrame.current = null;
     const owner = Symbol('explicit-camera');
     cameraOwner.current = owner;
     void flow.current?.setViewport(view, {
@@ -481,9 +483,12 @@ const App = () => {
     fullscreen
   ]);
   useLayoutEffect(() => {
-    const path = pendingFileFrame.current;
-    if (!path || path !== detail.expanded || fullscreen) return;
+    const request = pendingFileFrame.current;
+    if (!request) return;
+    const { path } = request;
+    if (path !== detail.expanded || fullscreen) { pendingFileFrame.current = null; return; }
     const timer = setTimeout(() => {
+      if (pendingFileFrame.current !== request) return;
       const node = Array.from(main.current?.querySelectorAll<HTMLElement>('[data-file-path]') ?? [])
         .find(element => element.dataset.filePath === path)?.closest<HTMLElement>('.react-flow__node');
       const graph = main.current?.querySelector<HTMLElement>('.pr-graph');
@@ -496,6 +501,16 @@ const App = () => {
     }, motionDuration() + 40);
     return () => clearTimeout(timer);
   }, [viewTree, detail.expanded, fullscreen]);
+  const previousRoot = useRef({ tree: viewTree, narrow, lens });
+  useLayoutEffect(() => {
+    const previous = previousRoot.current;
+    previousRoot.current = { tree: viewTree, narrow, lens };
+    if (previous.narrow === narrow || previous.lens !== lens || !detail.expanded || fullscreen || pendingFileFrame.current) return;
+    const before = previous.tree.nodes.find(node => node.path === detail.expanded && node.kind === 'file');
+    const after = viewTree.nodes.find(node => node.path === detail.expanded && node.kind === 'file');
+    const camera = flow.current?.getViewport();
+    if (before && after && camera) moveCamera({ ...camera, x: camera.x + (before.x - after.x) * camera.zoom, y: camera.y + (before.y - after.y) * camera.zoom });
+  }, [viewTree, narrow, lens, detail.expanded, fullscreen]);
   const fileNodes: LabelNode[] = useMemo(() => (fullscreen ? viewTree.nodes.filter(n => n.id === `file:${fullscreen.path}`) : [
     ...viewTree.nodes
   ]).map((n: TreeNode) => {
@@ -762,6 +777,7 @@ const App = () => {
     })),
   ];
   const returnToSource = (keyboard = false) => {
+    pendingFileFrame.current = null;
     const context = contextReturns.at(-1);
     const retained = testReturn ?? sourceReturn ?? context?.frame;
     if (!retained)
@@ -793,6 +809,7 @@ const App = () => {
     }
   };
   const reset = () => {
+    pendingFileFrame.current = null;
     if (fullscreen) {
       exitFullscreen();
       return;
@@ -808,7 +825,7 @@ const App = () => {
   const focusFile = (path: string) => {
     if (fullscreen)
       return;
-    pendingFileFrame.current = detail.expanded === path ? null : path;
+    pendingFileFrame.current = detail.expanded === path ? null : { path };
     setSelected(path);
     setTestsFor(null);
     setTestReturn(null);
@@ -823,6 +840,7 @@ const App = () => {
     });
   };
   const openContextEvidence = (target: ContextEvidence, keyboard: boolean) => {
+    pendingFileFrame.current = null;
     if (!flow.current) {
       return;
     }
@@ -899,6 +917,7 @@ const App = () => {
   const ownerReturn = useRef<ReturnType<typeof capturePresentation> | null>(null);
   const ownerOperation = useRef(false);
   const openOwnerPanel = (panel: OwnerPanel) => {
+    pendingFileFrame.current = null;
     setSourceFinder(false);
     if (narrow) setContextOpen(false);
     if (panel === 'story') setStoryOpen(true);
@@ -912,6 +931,7 @@ const App = () => {
     requestAnimationFrame(() => document.getElementById(`open-owner-${target}`)?.focus({ preventScroll: true }));
   };
   const inspectOwnerEvidence = async (reference: StoryReference, keyboard: boolean) => {
+    pendingFileFrame.current = null;
     if (ownerOperation.current || !flow.current) return;
     if (reference.type !== 'snapshot_source') throw new Error('Exact snapshot evidence is required for this reader.');
     if (!fileDiffs.has(reference.anchor.path)) throw new Error('This retained source is not prepared in the continuous reader.');
@@ -958,6 +978,7 @@ const App = () => {
     }
   };
   const resumeOwnerReading = async () => {
+    pendingFileFrame.current = null;
     if (ownerOperation.current) return;
     const frame = ownerReturn.current;
     if (!frame) throw new Error('The original local reading frame is unavailable after reload; retained owner drafts remain preserved.');
@@ -1072,6 +1093,7 @@ const App = () => {
     };
     const pan = offset[e.key];
     if (pan) {
+      pendingFileFrame.current = null;
       e.preventDefault();
       void flow.current.setViewport({
         ...view,
@@ -1080,6 +1102,7 @@ const App = () => {
       });
     }
     else if (e.key === '+' || e.key === '=' || e.key === '-') {
+      pendingFileFrame.current = null;
       e.preventDefault();
       void flow.current.zoomTo(Math.max(.35, Math.min(2.5, view.zoom * (e.key === '-' ? .85 : 1.15))), {
         duration: 0
@@ -1109,7 +1132,7 @@ const App = () => {
         ref={contextInvoker}
         aria-label={contextOpen ? 'Hide review context' : 'Open review context'}
         aria-expanded={contextOpen}
-        onClick={() => { setSourceFinder(false); if (narrow) setOwnerPanel(null); setContextOpen(value => !value); }}
+        onClick={() => { pendingFileFrame.current = null; setSourceFinder(false); if (narrow) setOwnerPanel(null); setContextOpen(value => !value); }}
         title="Review context"
       ><ActionIcon action="context" />{!detail.expanded && <span>Context</span>}</button>}
 
@@ -1195,6 +1218,7 @@ const App = () => {
         edges={edges}
         nodeTypes={nodeTypes}
         edgeTypes={edgeTypes}
+        onMoveStart={event => { if (event) pendingFileFrame.current = null; }}
         nodesDraggable={false}
         nodesConnectable={false}
         elementsSelectable={false}
@@ -1249,7 +1273,7 @@ const App = () => {
 
       </ReactFlow>
 
-      {detail.expanded && <DiffControls
+      {detail.expanded && !(narrow && (contextOpen || Boolean(ownerPanel))) && <DiffControls
         mode={mode}
         onMode={setMode}
       />}

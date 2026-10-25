@@ -14,6 +14,18 @@ export const WorkspaceActions = ({ children, blocked }: { children: ReactNode; b
     observer.observe(surface);
     return () => { observer.disconnect(); document.documentElement.style.removeProperty('--workspace-actions-height'); };
   }, []);
+  useLayoutEffect(() => {
+    const clampOnResize = () => {
+      if (window.innerWidth < 650) return;
+      const rect = element.current?.getBoundingClientRect();
+      if (!rect) return;
+      const dx = rect.left < 8 ? 8 - rect.left : rect.right > window.innerWidth - 8 ? window.innerWidth - 8 - rect.right : 0;
+      const dy = rect.top < 8 ? 8 - rect.top : rect.bottom > window.innerHeight - 8 ? window.innerHeight - 8 - rect.bottom : 0;
+      if (dx || dy) setOffset(current => ({ x: current.x + dx, y: current.y + dy }));
+    };
+    window.addEventListener('resize', clampOnResize);
+    return () => window.removeEventListener('resize', clampOnResize);
+  }, []);
   const move = (next: Offset) => {
     const rect = element.current?.getBoundingClientRect();
     if (!rect) return;
@@ -22,7 +34,7 @@ export const WorkspaceActions = ({ children, blocked }: { children: ReactNode; b
       y: Math.max(offset.y + 8 - rect.top, Math.min(offset.y + window.innerHeight - 8 - rect.bottom, next.y)),
     });
   };
-  return <nav ref={element} className="workspace-actions" aria-label="Workspace actions" inert={blocked ? true : undefined}
+  return <nav ref={element} className={`workspace-actions${blocked ? ' workspace-actions-blocked' : ''}`} aria-label="Workspace actions" inert={blocked ? true : undefined}
     style={{ transform: `translate(calc(-50% + ${offset.x}px), ${offset.y}px)` }}>
     <button className="workspace-action-grip" aria-label="Move workspace controls" title="Drag controls; arrow keys move, Home resets"
       onPointerDown={event => {

@@ -120,3 +120,101 @@ for (const files of [false, true]) test(`${files ? 'File tree' : 'Behavior'} col
   await expect.poll(positions).toEqual(original);
   await expect(page.locator('.react-flow__viewport')).toHaveAttribute('style', frame!);
 });
+
+
+test.describe('review regressions with normal expansion motion', () => {
+  test.use({ reducedMotion: 'no-preference' });
+  test('Split columns follow the animated viewport and expose readable source on both sides', async ({ page }) => {
+    await page.goto('/');
+    for (const path of ['src/storage/access.ts', 'scripts/pair.ts', 'src/application/private-session.ts']) {
+      await openFile(page, path);
+      await page.getByRole('button', { name: 'Split', exact: true }).click();
+      const pane = page.locator('.continuous-comparison');
+      const after = page.locator('.diff-side.after').first();
+      await expect.poll(async () => {
+        const a = await after.boundingBox(); const p = await pane.boundingBox();
+        return a!.width / p!.width;
+      }).toBeGreaterThan(0.45);
+      const geometry = await page.locator('.diff-side.after .source-code').first().evaluate(element => {
+        const code = element.getBoundingClientRect();
+        const cell = element.closest('.diff-side')!.getBoundingClientRect();
+        return { available: cell.right - code.left, width: code.width, prefix: element.textContent };
+      });
+      expect(geometry.available).toBeGreaterThan(200);
+      expect(geometry.prefix!.length).toBeGreaterThan(10);
+      await page.screenshot({ path: `${evidence}/motion-split-${path.split('/').at(-1)}.png` });
+    }
+  });
+  test('desktop control offset is clamped after shrinking the viewport', async ({ page }) => {
+    await page.goto('/');
+    const grip = page.getByRole('button', { name: 'Move workspace controls', exact: true });
+    await grip.focus();
+    for (let n = 0; n < 24; n++) await page.keyboard.press('ArrowRight');
+    const camera = await page.locator('.react-flow__viewport').getAttribute('style');
+    await page.setViewportSize({ width: 700, height: 800 });
+    const bar = page.getByRole('navigation', { name: 'Workspace actions' });
+    await expect.poll(async () => (await bar.boundingBox())!.x).toBeGreaterThanOrEqual(7);
+    await expect.poll(async () => { const b = (await bar.boundingBox())!; return b.x + b.width; }).toBeLessThanOrEqual(693);
+    await expect(page.locator('.react-flow__viewport')).toHaveAttribute('style', camera!);
+  });
+  test('new Context navigation cancels the older file framing and exact Back survives its timer', async ({ page }) => {
+    await page.goto('/');
+    await page.getByRole('button', { name: 'Close review context' }).click();
+    await openFile(page, 'src/storage/access.ts');
+    await page.getByRole('button', { name: 'Open review context' }).click();
+    const original = await page.locator('.react-flow__viewport').getAttribute('style');
+    await page.getByRole('button', { name: 'Read the captured runtime requirement' }).click();
+    await page.getByRole('button', { name: 'Back to source context' }).click();
+    await page.waitForTimeout(500);
+    await expect(page.locator('.react-flow__viewport')).toHaveAttribute('style', original!);
+  });
+  test('After evidence reveals its source prefix and Return restores the original horizontal offset', async ({ page }) => {
+    await page.goto('/');
+    await openFile(page, 'src/application/private-session.ts');
+    await expect.poll(async () => (await page.locator('.diff-side.after').first().boundingBox())!.width).toBeGreaterThan(250);
+    await page.locator('.continuous-comparison').evaluate(element => { element.scrollLeft = 80; });
+    const original = await page.locator('.continuous-comparison').evaluate(element => element.scrollLeft);
+    await page.getByRole('button', { name: 'Open prepared story' }).click();
+    await page.getByRole('button', { name: 'Inspect head src/application/review.ts L25–33' }).first().click();
+    await expect.poll(async () => page.locator('.continuous-comparison').evaluate(element => element.scrollLeft)).toBe(0);
+    const code = page.locator('.diff-side.after [data-after-line="30"] .source-code');
+    await expect.poll(async () => code.evaluate(element => { const b = element.getBoundingClientRect(); return element.closest('.diff-side')!.getBoundingClientRect().right - b.left; })).toBeGreaterThan(200);
+    const bounds = await code.evaluate(element => {
+      const b = element.getBoundingClientRect(); const cell = element.closest('.diff-side')!.getBoundingClientRect();
+      return { left: b.left, cell: cell.left, available: cell.right - b.left };
+    });
+    expect(bounds.left).toBeGreaterThanOrEqual(bounds.cell);
+    expect(bounds.available).toBeGreaterThan(200);
+    await page.getByRole('button', { name: 'Return to original reading' }).click();
+    await expect(page.locator('[data-expanded-file]')).toHaveAttribute('data-expanded-file', 'src/application/private-session.ts');
+    await expect.poll(async () => page.locator('.continuous-comparison').evaluate(element => element.scrollLeft)).toBe(original);
+  });
+  test('resizing an expanded source retains its screen anchor and Context has no background controls', async ({ page }) => {
+    await page.goto('/');
+    await page.getByRole('button', { name: 'Close review context' }).click();
+    await openFile(page, 'src/application/private-session.ts');
+    const node = page.locator('.react-flow__node[data-id="file:src/application/private-session.ts"]');
+    await expect.poll(async () => (await node.boundingBox())!.x).toBeCloseTo(12, 0);
+    await page.setViewportSize({ width: 390, height: 844 });
+    await expect.poll(async () => (await node.boundingBox())!.x).toBeCloseTo(12, 0);
+    await page.getByRole('button', { name: 'Open review context' }).click();
+    await expect(page.getByRole('group', { name: 'Diff presentation' })).toHaveCount(0);
+    await expect(page.getByRole('navigation', { name: 'Workspace actions' })).toBeHidden();
+    await page.screenshot({ path: `${evidence}/mobile-context-controls.png` });
+    await page.getByRole('button', { name: 'Close review context' }).click();
+    await expect(node).toBeVisible();
+    await page.screenshot({ path: `${evidence}/mobile-expanded-resize.png` });
+  });
+
+  test('manual graph navigation cancels a pending file alignment', async ({ page }) => {
+    await page.goto('/');
+    await page.getByRole('button', { name: 'Close review context' }).click();
+    await openFile(page, 'src/storage/access.ts');
+    await page.locator('main').focus();
+    await page.keyboard.press('ArrowRight');
+    const camera = await page.locator('.react-flow__viewport').getAttribute('style');
+    await page.waitForTimeout(500);
+    await expect(page.locator('.react-flow__viewport')).toHaveAttribute('style', camera!);
+  });
+
+});

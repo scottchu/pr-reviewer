@@ -1440,3 +1440,5 @@ button:disabled { cursor: default; opacity: .5; }
 .source-code .syntax-plain { color: #e0e8eb; }
 
 .workspace-actions { width: max-content; }
+
+@media (max-width: 649px) { .workspace-actions-blocked { visibility: hidden; } }

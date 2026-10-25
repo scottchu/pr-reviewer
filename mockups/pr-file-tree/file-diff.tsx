@@ -224,10 +224,10 @@ export const FileDiffBody = ({ file, mode, fullscreen, width, onExplain, activeR
       });
       if (focus.revealSide && horizontal.current) {
         const comparison = horizontal.current;
-        const bounds = comparison.getBoundingClientRect();
-        const scale = bounds.width / comparison.offsetWidth || 1;
-        const left = (row.getBoundingClientRect().left - bounds.left) / scale + comparison.scrollLeft;
-        comparison.scrollLeft = Math.max(0, left);
+        // Fixed visible Split columns already expose either side. Reveal its
+        // source prefix; never scroll by the historical After-column offset.
+        comparison.scrollLeft = 0;
+        comparison.style.setProperty('--source-offset', '0px');
         save({ horizontal: { ...local.current.horizontal, [-1]: comparison.scrollLeft } });
       }
       save({
@@ -279,13 +279,19 @@ export const FileDiffBody = ({ file, mode, fullscreen, width, onExplain, activeR
     const pane = horizontal.current;
     const pre = content.current;
     if (!pane || !pre) return;
-    pane.style.setProperty('--split-viewport-width', `${pane.clientWidth}px`);
-    if (mode === 'split') {
-      const longest = Math.max(0, ...Array.from(pre.querySelectorAll<HTMLElement>('.source-code')).map(line => line.scrollWidth));
-      const overflow = Math.max(0, longest + 42 - pane.clientWidth / 2);
-      pre.style.width = `${pane.clientWidth + overflow}px`;
-    } else pre.style.width = '';
-    pane.style.setProperty('--source-offset', `${pane.scrollLeft}px`);
+    const measure = () => {
+      pane.style.setProperty('--split-viewport-width', `${pane.clientWidth}px`);
+      if (mode === 'split') {
+        const longest = Math.max(0, ...Array.from(pre.querySelectorAll<HTMLElement>('.source-code')).map(line => line.scrollWidth));
+        const overflow = Math.max(0, longest + 42 - pane.clientWidth / 2);
+        pre.style.width = `${pane.clientWidth + overflow}px`;
+      } else pre.style.width = '';
+      pane.style.setProperty('--source-offset', `${pane.scrollLeft}px`);
+    };
+    measure();
+    const observer = new ResizeObserver(measure);
+    observer.observe(pane);
+    return () => observer.disconnect();
   }, [mode, file.path, folds, width, segments]);
   const renderRows = (rows: SourceRow[], hunk: number | null) => {
     let assigned = false;
