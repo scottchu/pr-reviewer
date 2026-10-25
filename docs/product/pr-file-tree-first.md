@@ -1,5 +1,14 @@
 # Change-centered PR behavior workspace
 
+## Adopted root relationship projection — latest user correction
+
+This section supersedes the root callable DAG and separate Before/After arrangements below. The user adopted revision-2 mockup and authorized implementation. The default root uses the SAME original file nodes: identical basename, Git status color, dimensions, expand action and continuous reader. Remove only directory nodes/containment from that default and arrange the same files using evidenced inter-file caller→callee relationships. File tree remains the explicit icon-switched alternate. No root function cards, side partitions, new group frames or inner-reader redesign. All50changed files retain their original identities and arbitrary entry.
+
+Each projected arrow means an exact contained caller calls an exact contained callee, never that files themselves execute. Show readable caller() → callee() names and visible directional arrow. Retain side, exact IDs/callsites/target/provenance in accessible names and evidence. Green means added, yellow modified only with evidenced pairing, red removed and neutral unchanged; unknown comparison status is explicitly unclassified and neutral. An after-side observation alone does not prove added. Calls to exact functions in newly added files have no base target and are added. No same-name counterpart inference. A visible legend distinguishes relation status from the unchanged file Git colors. Same-file relationships do not create separate root neighbors; their existing selected-context inspection remains available in the alternate File tree. Partial call preparation is disclosed, never complete whole-PR coverage.
+
+Frozen: Label markup, file-diff.tsx, reading.ts, detail.ts, file-node CSS/contents, source/test fixtures, fullscreen, panels, story/question/draft/recovery/return owners, application/server/storage/MCP and runtime/routes. The change is root projection/layout/edge rendering and directly affected tests only. Existing selection/lens/reading state machinery is reused unchanged.
+
+
 Current integrated outcome and active repair: [reading journey](../plans/720p/slices/05-explanation-exploration/reviews/reading-journey-v1.md). The frozen mock's F14 deferral is an implementation limit, not permission to omit story synchronization or anchored question/answer from the latest full outcome.
 
 Date: 2026-10-24.
