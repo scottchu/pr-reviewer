@@ -40,3 +40,6 @@ Author Chrome captures and synthetic gestures are engineering/design observation
 
 
 `journey-source.ts` is an identity crosswalk into an already admitted public Snapshot, not a fixture rewriter or new ontology. It preserves the original packet locator, checks the exact PR25 comparison, path/side/hash and UTF-16 coordinates, and returns a separate existing snapshot-source reference in LF lines. Unprepared source, mismatched comparison/hash, shifted coordinates and split surrogate boundaries remain unavailable. Source-byte admission stays with the existing preparation/storage owner; the projection does not independently assert persistence, publication, question eligibility or delivery. It is preparation for J2/J3, not a completed user journey.
+
+
+`journey-story.ts` prepares existing StoryContent for later owner admission. It connects request/header behavior, an unchanged refresh caller and storage authentication; it preserves all50GraphFile keys and marks45outside the prepared chapters unexplained. Claims retain exact snapshot-source references, source-derived examples and explicit inference/unknown limits. It does not create a player, cursor, draft model, StoryVersion, publication receipt or delivered reply. The normal candidate pure entrypoint includes its source-admission/whole-scope regressions.
