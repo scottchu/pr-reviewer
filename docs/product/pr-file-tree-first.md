@@ -37,7 +37,7 @@ Acceptance: click/keyboard smoothly scrolls only the local file viewport, withou
 
 Unified keeps actual removed and added rows contiguous in native change-block order and has separate **Before** and **After** number columns plus change glyph. Context shows both; removal old only; addition new only. Both gutters stay visible during horizontal reading. Split uses the appropriate side number in each column and the same paired native change blocks, without independent side scrollers or inferred function alignment. One version header exposes exact commits/hashes; no invented empty source for an absent side.
 
-Acceptance: imports.ts Change2 shows context24/26,25/27,26/28, removal27/blank, additionblank/29, then28/30. Do not renumber to imply old27 jumps to old29. Source lines, Unicode and immutable side identities remain exact. Long source can require shared horizontal scrolling; it is not promised to fit a phone. All-added source starts horizontal0 unless restoring explicit user reading.
+Acceptance: imports.ts Change2 shows context24/26,25/27,26/28, removal27/blank, additionblank/29, then28/30. Do not renumber to imply old27 jumps to old29. Source lines, Unicode and immutable side identities remain exact. Long source can require shared horizontal scrolling; it is not promised to fit a phone. Every newly opened file starts horizontal0, including modified and added files; never automatically shift toward a replacement prefix. Dot navigation is vertical only and preserves manual x; explicit restoration retains saved x. Normalize code/gutter fonts and line-height and use text-size-adjust:100% without disabling user page zoom. A mobile screenshot alone does not establish iOS autosizing as the cause.
 
 ### F06 — Bounded context and inline expansion
 
@@ -98,3 +98,10 @@ Anchored human/agent comments, floating anchor-adjacent identity/thread, exact c
 ### F15 — Honest verification and acceptance boundaries
 
 Author Chrome/Playwright, synthetic touch, source audits and static captures are engineering/design evidence. They do not establish physical-device/trackpad performance, native-host behavior, live-agent execution, whole-PR semantic coverage or unfamiliar-reviewer comprehension. The independent UI-first browser gate remains denied/unrun; no alternate route or policy retry. Geometry/timing are proposals. Fixture-rich bundle cost, long horizontal source reading and dense touch/navigation remain limits. Maintain exact source/build/review/evidence pins in the owning packet, with passed, failed, historical and pending states distinct. No main/GitHub/production integration/deploy is implied.
+
+
+### F16 — Relevant test lens (new, implementation pending)
+
+An explicit test-lens toggle reveals only source-backed tests relevant to the selected changed function: file → function → concise test summary → same-canvas test diff. Summaries explain the actual assertion/risk, not a run result. Test definition/callable/ranges and its relation to the changed function require exact source evidence; relevant unchanged tests can remain context. Clicking uses the same continuous red/green/yellow diff and entire responsible test-callable context, with exact source sides/absence. No all-test dump, autorun or invented mapping. Discovered tests never mean PASS; unavailable/unknown relationships remain explicit.
+
+Acceptance: bounded prepared changed-function/test mapping, relevant-only toggle and navigable summary/diff/return with exact test-function source. Actual execution is separate and absent in this mock. Root-prepared mapping is a pending input; complete the current function-context/continuous reader before deriving this lens.
