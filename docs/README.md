@@ -12,4 +12,4 @@ Keep related delivery material together. Each round lives under `docs/plans/<rou
 
 - [Exact-head test workspace](product/review-loop/test-ui.md): React test intent, progress, recovery and plain artifact presentation.
 
-- [PR-focused filename tree](product/pr-file-tree-first.md): current deliberately simple whole-PR file-tree mock scope; containment only, not semantic graph acceptance.
+- [PR-focused filename tree](product/pr-file-tree-first.md): current deliberately simple whole-PR filename/change map with selected-file static imports; not call/semantic graph acceptance.
