@@ -187,6 +187,11 @@ const App = () => {
   const [narrow, setNarrow] = useState(window.innerWidth < 650);
   const [contextOpen, setContextOpen] = useState(window.innerWidth >= 650);
   const contextInvoker = useRef<HTMLButtonElement>(null);
+  const contextScroll = useRef(0);
+  const [pendingFocus, setPendingFocus] = useState<{
+    target: 'context' | 'reading';
+    path: string | null;
+  } | null>(null);
   useEffect(() => {
     const media = matchMedia('(max-width: 649px)');
     const update = () => setNarrow(media.matches);
@@ -195,10 +200,40 @@ const App = () => {
   }, []);
   const closeContext = () => {
     setContextOpen(false);
-    contextInvoker.current?.focus();
+    setPendingFocus({ target: 'context', path: null });
   };
   const flow = useRef<ReactFlowInstance<CanvasNode>>(null);
   const main = useRef<HTMLElement>(null);
+  useLayoutEffect(() => {
+    if (!pendingFocus) {
+      return;
+    }
+    const focus = () => {
+      const target = pendingFocus.target === 'context'
+        ? contextInvoker.current
+        : pendingFocus.path
+          ? Array.from(main.current?.querySelectorAll<HTMLElement>('.continuous-reader') ?? [])
+            .find(reader => reader.getAttribute('aria-label') === `Pinned diff for ${pendingFocus.path}`)
+          : main.current;
+      if (!target) {
+        return false;
+      }
+      target.focus({ preventScroll: true });
+      setPendingFocus(null);
+      return true;
+    };
+    if (focus() || !main.current) {
+      return;
+    }
+    // ReactFlow may publish its node DOM after the parent navigation commit.
+    const observer = new MutationObserver(() => {
+      if (focus()) {
+        observer.disconnect();
+      }
+    });
+    observer.observe(main.current, { childList: true, subtree: true, attributes: true });
+    return () => observer.disconnect();
+  }, [pendingFocus]);
   const [sourceRelation, setSourceRelation] = useState<SourceRelation | null>(null);
   const [mode, setMode] = useState<DiffMode>(window.innerWidth < 650 ? 'unified' : 'split');
   const [selected, setSelected] = useState<string | null>(null);
@@ -580,13 +615,16 @@ const App = () => {
       ariaLabel: 'Source-backed test relevance; not a call or execution result'
     })),
   ];
-  const returnToSource = () => {
+  const returnToSource = (keyboard = false) => {
     const context = contextReturns.at(-1);
     const retained = testReturn ?? sourceReturn ?? context?.frame;
     if (!retained)
       return;
     if (retained.expanded && retained.reading)
       readings.current = rememberFile(readings.current, retained.expanded, retained.reading);
+    if (keyboard) {
+      setPendingFocus({ target: 'reading', path: retained.expanded });
+    }
     setFunctionFocus(retained.focus);
     setSelected(retained.selected);
     setTestsFor(retained.testsFor);
@@ -636,7 +674,7 @@ const App = () => {
       path: detail.expanded === path ? null : path
     });
   };
-  const openContextEvidence = (target: ContextEvidence) => {
+  const openContextEvidence = (target: ContextEvidence, keyboard: boolean) => {
     if (!flow.current) {
       return;
     }
@@ -646,6 +684,9 @@ const App = () => {
     const path = target === 'request'
       ? 'src/application/review.ts'
       : 'docs/product/review-loop/runtime.md';
+    if (keyboard) {
+      setPendingFocus({ target: 'reading', path });
+    }
     const frame = {
       selected,
       testsFor,
@@ -771,7 +812,7 @@ const App = () => {
   };
   return <>
 
-    <header>
+    <header inert={!fullscreen && contextOpen && narrow ? true : undefined}>
 
       {!fullscreen && <button
         ref={contextInvoker}
@@ -784,7 +825,7 @@ const App = () => {
         className="source-return"
         aria-label="Back to source context"
         title="Back to source context"
-        onClick={returnToSource}
+        onClick={event => returnToSource(event.detail === 0)}
       >←</button>}
 
       <span title={`PR25 · ${fixture.base} → ${fixture.head}`}>
@@ -822,6 +863,8 @@ const App = () => {
     <div className="review-workspace">
       {!fullscreen && contextOpen && <ReviewContext
         narrow={narrow}
+        scrollTop={contextScroll.current}
+        onScroll={top => { contextScroll.current = top; }}
         onClose={closeContext}
         onEvidence={openContextEvidence}
       />}

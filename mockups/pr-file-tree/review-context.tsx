@@ -3,20 +3,32 @@ import fixture from './paths.json' with { type: 'json' };
 
 export type ContextEvidence = 'requirement' | 'request';
 
-export const ReviewContext = ({ narrow, onClose, onEvidence }: {
+export const ReviewContext = ({ narrow, scrollTop, onScroll, onClose, onEvidence }: {
   narrow: boolean;
+  scrollTop: number;
+  onScroll: (top: number) => void;
   onClose: () => void;
-  onEvidence: (target: ContextEvidence) => void;
+  onEvidence: (target: ContextEvidence, keyboard: boolean) => void;
 }) => {
   const panel = useRef<HTMLElement>(null);
   useLayoutEffect(() => {
-    if (narrow) {
-      panel.current?.querySelector<HTMLButtonElement>('button')?.focus();
+    const element = panel.current;
+    if (element) {
+      element.scrollTop = scrollTop;
     }
+    if (narrow) {
+      panel.current?.querySelector<HTMLButtonElement>('button')?.focus({ preventScroll: true });
+    }
+    return () => {
+      if (element) {
+        onScroll(element.scrollTop);
+      }
+    };
   }, [narrow]);
 
   return <aside
     ref={panel}
+    onScroll={event => onScroll(event.currentTarget.scrollTop)}
     className={`review-context ${narrow ? 'context-modal' : ''}`}
     role={narrow ? 'dialog' : 'complementary'}
     aria-modal={narrow ? true : undefined}
@@ -49,7 +61,7 @@ export const ReviewContext = ({ narrow, onClose, onEvidence }: {
     <section aria-label="Captured requirement">
       <h2>Captured requirement</h2>
       <p>Open the local review without pasting a credential. Keep explicit agent credentials on their own authentication path.</p>
-      <button className="context-citation" onClick={() => onEvidence('requirement')}
+      <button className="context-citation" onClick={event => onEvidence('requirement', event.detail === 0)}
         aria-label="Read the captured runtime requirement">
         Runtime specification · After L22–26
       </button>
@@ -62,7 +74,7 @@ export const ReviewContext = ({ narrow, onClose, onEvidence }: {
         <dt>Local owner</dt><dd>No Authorization header.</dd>
         <dt>Explicit credential</dt><dd>Bearer header retained.</dd>
       </dl>
-      <button className="context-citation" onClick={() => onEvidence('request')}
+      <button className="context-citation" onClick={event => onEvidence('request', event.detail === 0)}
         aria-label="Inspect the changed request">
         request → accessHeaders · inspect source
       </button>

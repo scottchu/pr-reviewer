@@ -120,3 +120,17 @@ The first repair supplies the accepted left Context surface: open on desktop, a 
 Context source actions are deliberate evidence excursions. Back restores exact prior camera, expansion, selected identity, source focus, comparison mode and reading/folds. Closing context preserves the current graph camera and returns focus to its invoker; it is not Back. Fullscreen remains exclusive and hides context. Narrow context is one foreground modal reader with close/Escape and contained focus; no outer scrolling page. Desktop context reserves width rather than covering source. No new route, parser, backend or runtime effects.
 
 Acceptance J1: from first open, state the problem, before/after owner versus explicit credential example and one evidence limit; follow normative source and changed-function citations in the actual React canvas; return to the prior frame; retain complete file membership and camera-only gesture behavior. Test actual desktop/narrow navigation and state restoration. This is authored engineering evidence, not fresh-reviewer comprehension. Story synchronization and anchored actual question/reply remain required subsequent composition work, not closed by J1.
+
+
+### F17 interaction clarification — retained Context and keyboard return
+
+Date: 2026-10-25.
+Status: required repair following independent J1 review of 7423292.
+
+A narrow Context dialog makes all background navigation inert, including header Overview/Back and the graph. Pointer attempts outside the actual dialog cannot change camera, expansion or return frames. Escape/Close restores the Context invoker without moving the graph.
+
+Context local scroll belongs to the React owner outside the conditional panel. Close/reopen, narrow citation excursions and fullscreen hide/show retain this value. Mount restores it before focus; focused controls must use preventScroll. Manual scroll records presentation state without broad state publication. No new persistence or ontology concept is introduced.
+
+Keyboard citation activation explicitly focuses the rendered same-canvas source reader. Back focuses the restored reader, or the semantic graph landmark when returning to the overview. This DOM focus transfer never scrolls the page or changes the camera; saved semantic function focus alone is insufficient. Pointer activation retains native focus behavior.
+
+Acceptance: narrow background Overview/Back pointer attempts preserve state; nonzero Context scroll survives close/reopen, citation/reopen and fullscreen; keyboard citation/Back reach the visible reader/graph. Combine Context navigation with pre-existing source/test excursions and verify folds, horizontal/vertical reading, comparison mode, test lens and exact camera. Existing source-informed review is not unfamiliar-reviewer comprehension.
