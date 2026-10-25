@@ -38,7 +38,7 @@ export const ChangeImpactExplanation = ({ impact, narrow, busy, onClose, onInspe
       if (narrow && event.key === 'Tab') {
         const buttons = panel.current?.querySelectorAll<HTMLButtonElement>('button:not(:disabled)');
         const first = buttons?.[0]; const last = buttons?.[buttons.length - 1];
-        if (event.shiftKey && document.activeElement === first) { event.preventDefault(); last?.focus(); }
+        if (event.shiftKey && (document.activeElement === first || document.activeElement === heading.current)) { event.preventDefault(); last?.focus(); }
         else if (!event.shiftKey && document.activeElement === last) { event.preventDefault(); first?.focus(); }
       }
     }}>

@@ -439,3 +439,24 @@ test.describe('normal-motion impact reading restoration', () => {
 });
 
 });
+
+
+test('narrow change consequence traps reverse Tab from its initial heading and cycles buttons', async ({ page }) => {
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.goto('/');
+  const edge = page.getByRole('button', { name: /Explain inferred change consequence/ });
+  await edge.click();
+  const dialog = page.getByRole('dialog', { name: 'Change consequence explanation' });
+  await expect(dialog.getByRole('heading', { name: 'Matching owner-request headers' })).toBeFocused();
+  const last = dialog.locator('.callsite-action').last();
+  const first = dialog.getByRole('button', { name: 'Close change consequence' });
+  await page.keyboard.press('Shift+Tab');
+  await expect(last).toBeFocused();
+  await page.keyboard.press('Tab');
+  await expect(first).toBeFocused();
+  await page.keyboard.press('Shift+Tab');
+  await expect(last).toBeFocused();
+  await page.keyboard.press('Escape');
+  await expect(dialog).toHaveCount(0);
+  await expect(edge).toBeFocused();
+});
