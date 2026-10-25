@@ -1,402 +1,415 @@
 {
   "base": "b096826e31c0927190806de91ed70b8b64aa93d8",
   "head": "e3b270e5f49a9215452b0b86702946043e979059",
-  "scope": "Static relative import declarations only, including type imports; no package/dynamic imports, exports, calls or runtime inference.",
+  "scope": "Static import declarations including type imports. Relative repository targets are source-hash verified; built-in/package targets are external identities only. No dynamic imports, exports, package resolution, calls or runtime inference.",
   "sources": [
     {
       "path": "scripts/add-snapshot.ts",
       "side": "before",
       "commit": "b096826e31c0927190806de91ed70b8b64aa93d8",
       "hash": "5cb5a932057ea46bc290eb542c545e53b024f71ab27e8915c615315e46617b8e",
-      "staticRelativeImports": 3
+      "staticImports": 4
     },
     {
       "path": "scripts/capture-review.ts",
       "side": "before",
       "commit": "b096826e31c0927190806de91ed70b8b64aa93d8",
       "hash": "cc5f6a86fe1701821c64c19f349abfa82a27af6eb881c95e26a8af9485b396ac",
-      "staticRelativeImports": 0
+      "staticImports": 3
     },
     {
       "path": "scripts/dev.ts",
       "side": "before",
       "commit": "b096826e31c0927190806de91ed70b8b64aa93d8",
       "hash": "c44e78fa82dbbc8afb5708a93454b27f18c78f3fc6f08a9be84549b78779bf2e",
-      "staticRelativeImports": 7
+      "staticImports": 11
     },
     {
       "path": "scripts/local.ts",
       "side": "before",
       "commit": "b096826e31c0927190806de91ed70b8b64aa93d8",
       "hash": "9580439f1929b6ca7e870d1d620f32c9d8ee74078b6bf44d7a3a5d088a838520",
-      "staticRelativeImports": 0
+      "staticImports": 3
     },
     {
       "path": "scripts/pair.ts",
       "side": "before",
       "commit": "b096826e31c0927190806de91ed70b8b64aa93d8",
       "hash": "ded97f61bc1fb26d83e6a26bf3a61f1a7d0022fcff42911b0a252abe9ed53f9a",
-      "staticRelativeImports": 2
+      "staticImports": 5
     },
     {
       "path": "src/application/analysis.ts",
       "side": "before",
       "commit": "b096826e31c0927190806de91ed70b8b64aa93d8",
       "hash": "d6d9343df6613aee8bc9e4eb8cfba4bf8d216abca16ae502d52be91b0140fba3",
-      "staticRelativeImports": 2
+      "staticImports": 2
     },
     {
       "path": "src/application/imports.ts",
       "side": "before",
       "commit": "b096826e31c0927190806de91ed70b8b64aa93d8",
       "hash": "2f60f6e6cd06ff26b541c6108b8bcc5b7010d3170928a5670f39b1c8f1e062c8",
-      "staticRelativeImports": 2
+      "staticImports": 2
     },
     {
       "path": "src/application/private-session.ts",
       "side": "before",
       "commit": "b096826e31c0927190806de91ed70b8b64aa93d8",
       "hash": "839159caebe8eab4adf9dfad3a35caf73e4628a79a9b72a457901ec886ed56a0",
-      "staticRelativeImports": 2
+      "staticImports": 3
     },
     {
       "path": "src/application/review.ts",
       "side": "before",
       "commit": "b096826e31c0927190806de91ed70b8b64aa93d8",
       "hash": "7953f0b8486ae475717bdc749e23a31f12351f41c11a473280de9a2420265477",
-      "staticRelativeImports": 6
+      "staticImports": 6
     },
     {
       "path": "src/application/story.ts",
       "side": "before",
       "commit": "b096826e31c0927190806de91ed70b8b64aa93d8",
       "hash": "459b145d01c3e509dc30b2f0ca4b1c88e9558facb0b69819dc138f3c1646c8f1",
-      "staticRelativeImports": 6
+      "staticImports": 6
     },
     {
       "path": "src/application/workspace.ts",
       "side": "before",
       "commit": "b096826e31c0927190806de91ed70b8b64aa93d8",
       "hash": "6823857a1cbc1d474835cf6c00f5071a3b166366faa267c91e0ec1e74f7f522d",
-      "staticRelativeImports": 7
+      "staticImports": 7
     },
     {
       "path": "src/server/public.ts",
       "side": "before",
       "commit": "b096826e31c0927190806de91ed70b8b64aa93d8",
       "hash": "2bd6f01a2dd416ad1d95993d4fb14b79c56b46a6ce7b8dafb4e1d050a5a48964",
-      "staticRelativeImports": 11
+      "staticImports": 14
     },
     {
       "path": "src/storage/analysis.ts",
       "side": "before",
       "commit": "b096826e31c0927190806de91ed70b8b64aa93d8",
       "hash": "6a183b4bcf101de4f053dd675c03e4ae2541a2a53b639f940a8e28b5c4cd950b",
-      "staticRelativeImports": 11
+      "staticImports": 13
     },
     {
       "path": "src/storage/imports.ts",
       "side": "before",
       "commit": "b096826e31c0927190806de91ed70b8b64aa93d8",
       "hash": "bca5286d0f7834551c8c5399dd4b840b21260328cc8e46cd4d36f03ace1c5cee",
-      "staticRelativeImports": 6
+      "staticImports": 8
     },
     {
       "path": "src/storage/public.ts",
       "side": "before",
       "commit": "b096826e31c0927190806de91ed70b8b64aa93d8",
       "hash": "61878e4c266549993e81985919feaf17995ee53790e49db5ad91d0b278725175",
-      "staticRelativeImports": 13
+      "staticImports": 15
     },
     {
       "path": "src/storage/story.ts",
       "side": "before",
       "commit": "b096826e31c0927190806de91ed70b8b64aa93d8",
       "hash": "f58709d29ff6ef790762ac4ba63bb6954389c1090a04eb74bda65fd8e8dd3ed9",
-      "staticRelativeImports": 2
+      "staticImports": 4
     },
     {
       "path": "src/ui/main.tsx",
       "side": "before",
       "commit": "b096826e31c0927190806de91ed70b8b64aa93d8",
       "hash": "dff9049f1bcdd972d42d7e317c9103fedbf23c60ce3ed60d5655687784cdef9f",
-      "staticRelativeImports": 8
+      "staticImports": 10
     },
     {
       "path": "tests/exploration-recovery.e2e.ts",
       "side": "before",
       "commit": "b096826e31c0927190806de91ed70b8b64aa93d8",
       "hash": "d842fcf9f14ab076ef210fd4af2196f25503d4d2aa1b03646a04dcf9c722a80f",
-      "staticRelativeImports": 6
+      "staticImports": 13
     },
     {
       "path": "tests/gateway.test.ts",
       "side": "before",
       "commit": "b096826e31c0927190806de91ed70b8b64aa93d8",
       "hash": "21df294a4bcbdeadcabb3a0767e252fdaef5fe2fc371ea63bb3ab62071cb97d3",
-      "staticRelativeImports": 2
+      "staticImports": 8
     },
     {
       "path": "tests/import-jobs.test.ts",
       "side": "before",
       "commit": "b096826e31c0927190806de91ed70b8b64aa93d8",
       "hash": "eae02f2929607f862eb9e97c78c53792608235fd94b1361b313cdc934f08d57e",
-      "staticRelativeImports": 1
+      "staticImports": 6
     },
     {
       "path": "tests/import.e2e.ts",
       "side": "before",
       "commit": "b096826e31c0927190806de91ed70b8b64aa93d8",
       "hash": "07b47c45a5a313a266f70804fd2c3dc5405ca4663fa4bd02d7db5fe7ed261e73",
-      "staticRelativeImports": 2
+      "staticImports": 8
     },
     {
       "path": "tests/question-recovery.test.ts",
       "side": "before",
       "commit": "b096826e31c0927190806de91ed70b8b64aa93d8",
       "hash": "3c58c7764577807b30b1dd2c79dc521fd75daf196e7046f2ab5859d4035314fb",
-      "staticRelativeImports": 2
+      "staticImports": 4
     },
     {
       "path": "tests/review.e2e.ts",
       "side": "before",
       "commit": "b096826e31c0927190806de91ed70b8b64aa93d8",
       "hash": "03783a9bbefdf8bd565c19d0618b75b6b0c247f3e2e7ca9b66538e746372547c",
-      "staticRelativeImports": 2
+      "staticImports": 10
     },
     {
       "path": "tests/runtime.test.ts",
       "side": "before",
       "commit": "b096826e31c0927190806de91ed70b8b64aa93d8",
       "hash": "dd7a9b75a36bc916b67952ce9ca8489cb798f457fde2c6158db9461ffaca8332",
-      "staticRelativeImports": 0
+      "staticImports": 6
     },
     {
       "path": "tests/semantic-storage.test.ts",
       "side": "before",
       "commit": "b096826e31c0927190806de91ed70b8b64aa93d8",
       "hash": "535b900a2ecfd50b015bd2200d339f0b2e2e1e2b3de1acddb627b98a9739e914",
-      "staticRelativeImports": 2
+      "staticImports": 8
     },
     {
       "path": "tests/semantic.e2e.ts",
       "side": "before",
       "commit": "b096826e31c0927190806de91ed70b8b64aa93d8",
       "hash": "fd844979938e40fc3ec1079a306b084e0eaaf8fe5788c911c98c51f6a508d8cc",
-      "staticRelativeImports": 4
+      "staticImports": 10
     },
     {
       "path": "tests/story.e2e.ts",
       "side": "before",
       "commit": "b096826e31c0927190806de91ed70b8b64aa93d8",
       "hash": "e25e28aec6649dcea8118ea23234400f93dfc9ba80418c1ad27717694ccd881b",
-      "staticRelativeImports": 4
+      "staticImports": 10
     },
     {
       "path": "scripts/add-snapshot.ts",
       "side": "after",
       "commit": "e3b270e5f49a9215452b0b86702946043e979059",
       "hash": "a83537bf989ce75a445a9c9964dba8bab8f45726a112634e9acec6da774f9738",
-      "staticRelativeImports": 3
+      "staticImports": 4
     },
     {
       "path": "scripts/capture-review.ts",
       "side": "after",
       "commit": "e3b270e5f49a9215452b0b86702946043e979059",
       "hash": "91e746fdad7f7d997b6168fff0aa71e79063f49cccf62c02231ac358667e7f8a",
-      "staticRelativeImports": 0
+      "staticImports": 3
     },
     {
       "path": "scripts/dev.ts",
       "side": "after",
       "commit": "e3b270e5f49a9215452b0b86702946043e979059",
       "hash": "cd6df721fffb9fd9bcfea6fed85aca5032d4243da01ba3a100fdd5e84926d497",
-      "staticRelativeImports": 7
+      "staticImports": 10
     },
     {
       "path": "scripts/local.ts",
       "side": "after",
       "commit": "e3b270e5f49a9215452b0b86702946043e979059",
       "hash": "a74771f638d34c30f6ecc6db32c95e1c5a8048a95073369578545719f2c9adac",
-      "staticRelativeImports": 0
+      "staticImports": 3
     },
     {
       "path": "scripts/pair.ts",
       "side": "after",
       "commit": "e3b270e5f49a9215452b0b86702946043e979059",
       "hash": "5c5eb8a80cff1ed3a1223870668760def0221eb27d9365b7468e6c5b770b250b",
-      "staticRelativeImports": 2
+      "staticImports": 5
     },
     {
       "path": "src/application/analysis.ts",
       "side": "after",
       "commit": "e3b270e5f49a9215452b0b86702946043e979059",
       "hash": "52ba83af9ba583a0300ebcd4037111e71ad54c640e766db5f847085c9dbc7512",
-      "staticRelativeImports": 3
+      "staticImports": 3
     },
     {
       "path": "src/application/imports.ts",
       "side": "after",
       "commit": "e3b270e5f49a9215452b0b86702946043e979059",
       "hash": "83ffd185ba98079b9e46fefd542774cfe33d403c91d897c2efcea13b1ca716da",
-      "staticRelativeImports": 3
+      "staticImports": 3
     },
     {
       "path": "src/application/local-access.ts",
       "side": "after",
       "commit": "e3b270e5f49a9215452b0b86702946043e979059",
       "hash": "811735e3599292c54af870134345249deed32f1d9b9705f8ca18fd086225d59d",
-      "staticRelativeImports": 0
+      "staticImports": 0
     },
     {
       "path": "src/application/private-session.ts",
       "side": "after",
       "commit": "e3b270e5f49a9215452b0b86702946043e979059",
       "hash": "8898cfa974b3033ef0d7bc0c54ef00fbdeeffb2eac7bb89554e29db383c7e8f4",
-      "staticRelativeImports": 3
+      "staticImports": 4
     },
     {
       "path": "src/application/review.ts",
       "side": "after",
       "commit": "e3b270e5f49a9215452b0b86702946043e979059",
       "hash": "dae210c79cb019d6edfdbfacfcf3da1e5773ceb4d15cf747df15ffa498c28e4e",
-      "staticRelativeImports": 7
+      "staticImports": 7
     },
     {
       "path": "src/application/story.ts",
       "side": "after",
       "commit": "e3b270e5f49a9215452b0b86702946043e979059",
       "hash": "1fdf81528e3e1b658123e2ae1992d5406e1a2217819b4a0e0547669d4fea5f9f",
-      "staticRelativeImports": 7
+      "staticImports": 7
     },
     {
       "path": "src/application/workspace.ts",
       "side": "after",
       "commit": "e3b270e5f49a9215452b0b86702946043e979059",
       "hash": "9f17dc7e6e81a8190df3ed521767e69796913e40e6f2f4cfbd694aaf66ae98f5",
-      "staticRelativeImports": 8
+      "staticImports": 8
     },
     {
       "path": "src/server/public.ts",
       "side": "after",
       "commit": "e3b270e5f49a9215452b0b86702946043e979059",
       "hash": "20c22563be7da4c385eda772d5840d55f0993ddeebd85718b3605cddb76a0b0e",
-      "staticRelativeImports": 11
+      "staticImports": 14
     },
     {
       "path": "src/storage/access.ts",
       "side": "after",
       "commit": "e3b270e5f49a9215452b0b86702946043e979059",
       "hash": "0440486de82e136ffe430e4f1bed2b6f57f491319c59a71fad0f9d8507053b4c",
-      "staticRelativeImports": 1
+      "staticImports": 2
     },
     {
       "path": "src/storage/analysis.ts",
       "side": "after",
       "commit": "e3b270e5f49a9215452b0b86702946043e979059",
       "hash": "584ddbec662b403ed2b9dfe50f5b54382347494c12ee735d3442f0db75aca153",
-      "staticRelativeImports": 13
+      "staticImports": 15
     },
     {
       "path": "src/storage/imports.ts",
       "side": "after",
       "commit": "e3b270e5f49a9215452b0b86702946043e979059",
       "hash": "f29c76c6b9202f53e9d29752ff75f558eeea79739d3c476a93fe3a1e232fa1e2",
-      "staticRelativeImports": 8
+      "staticImports": 10
     },
     {
       "path": "src/storage/public.ts",
       "side": "after",
       "commit": "e3b270e5f49a9215452b0b86702946043e979059",
       "hash": "ebf680d4d62a47f92af2123a60673e4ba58c7236257ffc12cea2ddc981791d58",
-      "staticRelativeImports": 15
+      "staticImports": 17
     },
     {
       "path": "src/storage/story.ts",
       "side": "after",
       "commit": "e3b270e5f49a9215452b0b86702946043e979059",
       "hash": "247b63d177a4eb7d9742ea69987b498cab015627b44a08d49bc26e2629da83de",
-      "staticRelativeImports": 3
+      "staticImports": 5
     },
     {
       "path": "src/ui/main.tsx",
       "side": "after",
       "commit": "e3b270e5f49a9215452b0b86702946043e979059",
       "hash": "bacca7ee95b2fd9c588452810bdb99913f81620a6722d784b95a31710722ad6a",
-      "staticRelativeImports": 8
+      "staticImports": 10
     },
     {
       "path": "tests/exploration-recovery.e2e.ts",
       "side": "after",
       "commit": "e3b270e5f49a9215452b0b86702946043e979059",
       "hash": "2cbe089ddd8944ea6c7859327d2a1b2f820a5eca63544aca22a22523c2e8a1d6",
-      "staticRelativeImports": 6
+      "staticImports": 13
     },
     {
       "path": "tests/gateway.test.ts",
       "side": "after",
       "commit": "e3b270e5f49a9215452b0b86702946043e979059",
       "hash": "13e7db6e38670e876795a150587bb6e5a441548915fb37f67ff0a80563953158",
-      "staticRelativeImports": 2
+      "staticImports": 8
     },
     {
       "path": "tests/import-jobs.test.ts",
       "side": "after",
       "commit": "e3b270e5f49a9215452b0b86702946043e979059",
       "hash": "59e62cd5cbf772fe001953e4d87b4466e0bbafb3bae5d704318fa863cb6a802a",
-      "staticRelativeImports": 1
+      "staticImports": 6
     },
     {
       "path": "tests/import.e2e.ts",
       "side": "after",
       "commit": "e3b270e5f49a9215452b0b86702946043e979059",
       "hash": "d922831242f32800b26f4882b6f18f3f675953bd294c69315665790e793f4f81",
-      "staticRelativeImports": 2
+      "staticImports": 8
     },
     {
       "path": "tests/question-recovery.test.ts",
       "side": "after",
       "commit": "e3b270e5f49a9215452b0b86702946043e979059",
       "hash": "05adf2c17e5bb5c853e0f60cc5c21f71972d85a974c988598335aae31d5ae0c5",
-      "staticRelativeImports": 2
+      "staticImports": 4
     },
     {
       "path": "tests/review.e2e.ts",
       "side": "after",
       "commit": "e3b270e5f49a9215452b0b86702946043e979059",
       "hash": "e302f3daeb9dd4bac02c9256f85b3768681e0fa887bd74c53ea17994cd5277e0",
-      "staticRelativeImports": 2
+      "staticImports": 11
     },
     {
       "path": "tests/runtime.test.ts",
       "side": "after",
       "commit": "e3b270e5f49a9215452b0b86702946043e979059",
       "hash": "45903e0b0f1aacf79509a22ad068b042afbe7170663fe5c56042941c97bc7582",
-      "staticRelativeImports": 0
+      "staticImports": 6
     },
     {
       "path": "tests/semantic-storage.test.ts",
       "side": "after",
       "commit": "e3b270e5f49a9215452b0b86702946043e979059",
       "hash": "03e02bf3dd7ad92df8712604b243cc5cc304c431a2d6db4c19c8b15d85db5c88",
-      "staticRelativeImports": 2
+      "staticImports": 8
     },
     {
       "path": "tests/semantic.e2e.ts",
       "side": "after",
       "commit": "e3b270e5f49a9215452b0b86702946043e979059",
       "hash": "db3cca492f8f7c576fbb8e18840b2cc8f283a13fb551b0061e2721a705d726a0",
-      "staticRelativeImports": 4
+      "staticImports": 10
     },
     {
       "path": "tests/story.e2e.ts",
       "side": "after",
       "commit": "e3b270e5f49a9215452b0b86702946043e979059",
       "hash": "97f66ac17e589d7dc767351da96f89d1cef77d82cc859192cd424d13021d10d6",
-      "staticRelativeImports": 4
+      "staticImports": 10
     }
   ],
   "records": [
+    {
+      "from": "scripts/add-snapshot.ts",
+      "side": "before",
+      "commit": "b096826e31c0927190806de91ed70b8b64aa93d8",
+      "sourceHash": "5cb5a932057ea46bc290eb542c545e53b024f71ab27e8915c615315e46617b8e",
+      "sourceLine": 1,
+      "startOffset": 27,
+      "endOffset": 36,
+      "specifier": "node:fs",
+      "target": "node:fs",
+      "targetHash": null,
+      "targetKind": "external"
+    },
     {
       "from": "scripts/add-snapshot.ts",
       "side": "before",
@@ -407,7 +420,8 @@
       "endOffset": 80,
       "specifier": "./prepare.ts",
       "target": "scripts/prepare.ts",
-      "targetHash": "de92502e83682db55685eef74d86ca81e1ec3f2c44c3f829abba015b366cfd81"
+      "targetHash": "de92502e83682db55685eef74d86ca81e1ec3f2c44c3f829abba015b366cfd81",
+      "targetKind": "repository"
     },
     {
       "from": "scripts/add-snapshot.ts",
@@ -419,7 +433,8 @@
       "endOffset": 123,
       "specifier": "./local.ts",
       "target": "scripts/local.ts",
-      "targetHash": "9580439f1929b6ca7e870d1d620f32c9d8ee74078b6bf44d7a3a5d088a838520"
+      "targetHash": "9580439f1929b6ca7e870d1d620f32c9d8ee74078b6bf44d7a3a5d088a838520",
+      "targetKind": "repository"
     },
     {
       "from": "scripts/add-snapshot.ts",
@@ -431,7 +446,47 @@
       "endOffset": 164,
       "specifier": "./local.ts",
       "target": "scripts/local.ts",
-      "targetHash": "9580439f1929b6ca7e870d1d620f32c9d8ee74078b6bf44d7a3a5d088a838520"
+      "targetHash": "9580439f1929b6ca7e870d1d620f32c9d8ee74078b6bf44d7a3a5d088a838520",
+      "targetKind": "repository"
+    },
+    {
+      "from": "scripts/capture-review.ts",
+      "side": "before",
+      "commit": "b096826e31c0927190806de91ed70b8b64aa93d8",
+      "sourceHash": "cc5f6a86fe1701821c64c19f349abfa82a27af6eb881c95e26a8af9485b396ac",
+      "sourceLine": 1,
+      "startOffset": 25,
+      "endOffset": 43,
+      "specifier": "@playwright/test",
+      "target": "@playwright/test",
+      "targetHash": null,
+      "targetKind": "external"
+    },
+    {
+      "from": "scripts/capture-review.ts",
+      "side": "before",
+      "commit": "b096826e31c0927190806de91ed70b8b64aa93d8",
+      "sourceHash": "cc5f6a86fe1701821c64c19f349abfa82a27af6eb881c95e26a8af9485b396ac",
+      "sourceLine": 2,
+      "startOffset": 100,
+      "endOffset": 109,
+      "specifier": "node:fs",
+      "target": "node:fs",
+      "targetHash": null,
+      "targetKind": "external"
+    },
+    {
+      "from": "scripts/capture-review.ts",
+      "side": "before",
+      "commit": "b096826e31c0927190806de91ed70b8b64aa93d8",
+      "sourceHash": "cc5f6a86fe1701821c64c19f349abfa82a27af6eb881c95e26a8af9485b396ac",
+      "sourceLine": 3,
+      "startOffset": 141,
+      "endOffset": 152,
+      "specifier": "node:path",
+      "target": "node:path",
+      "targetHash": null,
+      "targetKind": "external"
     },
     {
       "from": "scripts/dev.ts",
@@ -443,7 +498,60 @@
       "endOffset": 71,
       "specifier": "../src/import-artifacts/public.ts",
       "target": "src/import-artifacts/public.ts",
-      "targetHash": "d53bacdcfdfe23681afdbfeabb0066ca15949f98a4a014ec1e1d58b1fbaf446a"
+      "targetHash": "d53bacdcfdfe23681afdbfeabb0066ca15949f98a4a014ec1e1d58b1fbaf446a",
+      "targetKind": "repository"
+    },
+    {
+      "from": "scripts/dev.ts",
+      "side": "before",
+      "commit": "b096826e31c0927190806de91ed70b8b64aa93d8",
+      "sourceHash": "c44e78fa82dbbc8afb5708a93454b27f18c78f3fc6f08a9be84549b78779bf2e",
+      "sourceLine": 2,
+      "startOffset": 109,
+      "endOffset": 129,
+      "specifier": "node:child_process",
+      "target": "node:child_process",
+      "targetHash": null,
+      "targetKind": "external"
+    },
+    {
+      "from": "scripts/dev.ts",
+      "side": "before",
+      "commit": "b096826e31c0927190806de91ed70b8b64aa93d8",
+      "sourceHash": "c44e78fa82dbbc8afb5708a93454b27f18c78f3fc6f08a9be84549b78779bf2e",
+      "sourceLine": 3,
+      "startOffset": 165,
+      "endOffset": 185,
+      "specifier": "node:child_process",
+      "target": "node:child_process",
+      "targetHash": null,
+      "targetKind": "external"
+    },
+    {
+      "from": "scripts/dev.ts",
+      "side": "before",
+      "commit": "b096826e31c0927190806de91ed70b8b64aa93d8",
+      "sourceHash": "c44e78fa82dbbc8afb5708a93454b27f18c78f3fc6f08a9be84549b78779bf2e",
+      "sourceLine": 4,
+      "startOffset": 228,
+      "endOffset": 237,
+      "specifier": "node:fs",
+      "target": "node:fs",
+      "targetHash": null,
+      "targetKind": "external"
+    },
+    {
+      "from": "scripts/dev.ts",
+      "side": "before",
+      "commit": "b096826e31c0927190806de91ed70b8b64aa93d8",
+      "sourceHash": "c44e78fa82dbbc8afb5708a93454b27f18c78f3fc6f08a9be84549b78779bf2e",
+      "sourceLine": 5,
+      "startOffset": 266,
+      "endOffset": 279,
+      "specifier": "node:crypto",
+      "target": "node:crypto",
+      "targetHash": null,
+      "targetKind": "external"
     },
     {
       "from": "scripts/dev.ts",
@@ -455,7 +563,8 @@
       "endOffset": 335,
       "specifier": "../src/storage/public.ts",
       "target": "src/storage/public.ts",
-      "targetHash": "61878e4c266549993e81985919feaf17995ee53790e49db5ad91d0b278725175"
+      "targetHash": "61878e4c266549993e81985919feaf17995ee53790e49db5ad91d0b278725175",
+      "targetKind": "repository"
     },
     {
       "from": "scripts/dev.ts",
@@ -467,7 +576,8 @@
       "endOffset": 392,
       "specifier": "../src/server/public.ts",
       "target": "src/server/public.ts",
-      "targetHash": "2bd6f01a2dd416ad1d95993d4fb14b79c56b46a6ce7b8dafb4e1d050a5a48964"
+      "targetHash": "2bd6f01a2dd416ad1d95993d4fb14b79c56b46a6ce7b8dafb4e1d050a5a48964",
+      "targetKind": "repository"
     },
     {
       "from": "scripts/dev.ts",
@@ -479,7 +589,8 @@
       "endOffset": 455,
       "specifier": "../src/delivery/public.ts",
       "target": "src/delivery/public.ts",
-      "targetHash": "9a85166fb944a4943f5c1c7941de1976773894759ee933e57bca4fef2b44a761"
+      "targetHash": "9a85166fb944a4943f5c1c7941de1976773894759ee933e57bca4fef2b44a761",
+      "targetKind": "repository"
     },
     {
       "from": "scripts/dev.ts",
@@ -491,7 +602,8 @@
       "endOffset": 531,
       "specifier": "./local.ts",
       "target": "scripts/local.ts",
-      "targetHash": "9580439f1929b6ca7e870d1d620f32c9d8ee74078b6bf44d7a3a5d088a838520"
+      "targetHash": "9580439f1929b6ca7e870d1d620f32c9d8ee74078b6bf44d7a3a5d088a838520",
+      "targetKind": "repository"
     },
     {
       "from": "scripts/dev.ts",
@@ -503,7 +615,8 @@
       "endOffset": 574,
       "specifier": "./local.ts",
       "target": "scripts/local.ts",
-      "targetHash": "9580439f1929b6ca7e870d1d620f32c9d8ee74078b6bf44d7a3a5d088a838520"
+      "targetHash": "9580439f1929b6ca7e870d1d620f32c9d8ee74078b6bf44d7a3a5d088a838520",
+      "targetKind": "repository"
     },
     {
       "from": "scripts/dev.ts",
@@ -515,7 +628,86 @@
       "endOffset": 620,
       "specifier": "./prepare.ts",
       "target": "scripts/prepare.ts",
-      "targetHash": "de92502e83682db55685eef74d86ca81e1ec3f2c44c3f829abba015b366cfd81"
+      "targetHash": "de92502e83682db55685eef74d86ca81e1ec3f2c44c3f829abba015b366cfd81",
+      "targetKind": "repository"
+    },
+    {
+      "from": "scripts/local.ts",
+      "side": "before",
+      "commit": "b096826e31c0927190806de91ed70b8b64aa93d8",
+      "sourceHash": "9580439f1929b6ca7e870d1d620f32c9d8ee74078b6bf44d7a3a5d088a838520",
+      "sourceLine": 12,
+      "startOffset": 157,
+      "endOffset": 166,
+      "specifier": "node:fs",
+      "target": "node:fs",
+      "targetHash": null,
+      "targetKind": "external"
+    },
+    {
+      "from": "scripts/local.ts",
+      "side": "before",
+      "commit": "b096826e31c0927190806de91ed70b8b64aa93d8",
+      "sourceHash": "9580439f1929b6ca7e870d1d620f32c9d8ee74078b6bf44d7a3a5d088a838520",
+      "sourceLine": 13,
+      "startOffset": 197,
+      "endOffset": 217,
+      "specifier": "node:child_process",
+      "target": "node:child_process",
+      "targetHash": null,
+      "targetKind": "external"
+    },
+    {
+      "from": "scripts/local.ts",
+      "side": "before",
+      "commit": "b096826e31c0927190806de91ed70b8b64aa93d8",
+      "sourceHash": "9580439f1929b6ca7e870d1d620f32c9d8ee74078b6bf44d7a3a5d088a838520",
+      "sourceLine": 14,
+      "startOffset": 263,
+      "endOffset": 274,
+      "specifier": "node:path",
+      "target": "node:path",
+      "targetHash": null,
+      "targetKind": "external"
+    },
+    {
+      "from": "scripts/pair.ts",
+      "side": "before",
+      "commit": "b096826e31c0927190806de91ed70b8b64aa93d8",
+      "sourceHash": "ded97f61bc1fb26d83e6a26bf3a61f1a7d0022fcff42911b0a252abe9ed53f9a",
+      "sourceLine": 1,
+      "startOffset": 60,
+      "endOffset": 69,
+      "specifier": "node:fs",
+      "target": "node:fs",
+      "targetHash": null,
+      "targetKind": "external"
+    },
+    {
+      "from": "scripts/pair.ts",
+      "side": "before",
+      "commit": "b096826e31c0927190806de91ed70b8b64aa93d8",
+      "sourceHash": "ded97f61bc1fb26d83e6a26bf3a61f1a7d0022fcff42911b0a252abe9ed53f9a",
+      "sourceLine": 2,
+      "startOffset": 101,
+      "endOffset": 112,
+      "specifier": "node:path",
+      "target": "node:path",
+      "targetHash": null,
+      "targetKind": "external"
+    },
+    {
+      "from": "scripts/pair.ts",
+      "side": "before",
+      "commit": "b096826e31c0927190806de91ed70b8b64aa93d8",
+      "sourceHash": "ded97f61bc1fb26d83e6a26bf3a61f1a7d0022fcff42911b0a252abe9ed53f9a",
+      "sourceLine": 3,
+      "startOffset": 141,
+      "endOffset": 154,
+      "specifier": "node:crypto",
+      "target": "node:crypto",
+      "targetHash": null,
+      "targetKind": "external"
     },
     {
       "from": "scripts/pair.ts",
@@ -527,7 +719,8 @@
       "endOffset": 214,
       "specifier": "./local.ts",
       "target": "scripts/local.ts",
-      "targetHash": "9580439f1929b6ca7e870d1d620f32c9d8ee74078b6bf44d7a3a5d088a838520"
+      "targetHash": "9580439f1929b6ca7e870d1d620f32c9d8ee74078b6bf44d7a3a5d088a838520",
+      "targetKind": "repository"
     },
     {
       "from": "scripts/pair.ts",
@@ -539,7 +732,8 @@
       "endOffset": 257,
       "specifier": "./local.ts",
       "target": "scripts/local.ts",
-      "targetHash": "9580439f1929b6ca7e870d1d620f32c9d8ee74078b6bf44d7a3a5d088a838520"
+      "targetHash": "9580439f1929b6ca7e870d1d620f32c9d8ee74078b6bf44d7a3a5d088a838520",
+      "targetKind": "repository"
     },
     {
       "from": "src/application/analysis.ts",
@@ -551,7 +745,8 @@
       "endOffset": 57,
       "specifier": "../integration/registry.ts",
       "target": "src/integration/registry.ts",
-      "targetHash": "186badf8a706f5d7eb8759ee98d7388568d71802c8d04a069321135483fe8b6a"
+      "targetHash": "186badf8a706f5d7eb8759ee98d7388568d71802c8d04a069321135483fe8b6a",
+      "targetKind": "repository"
     },
     {
       "from": "src/application/analysis.ts",
@@ -563,7 +758,8 @@
       "endOffset": 228,
       "specifier": "../domain/public.ts",
       "target": "src/domain/public.ts",
-      "targetHash": "e25787a89a684b01bcfdf1b0984dad8e27659dda40949a6cb084b93afbbf17ce"
+      "targetHash": "e25787a89a684b01bcfdf1b0984dad8e27659dda40949a6cb084b93afbbf17ce",
+      "targetKind": "repository"
     },
     {
       "from": "src/application/imports.ts",
@@ -575,7 +771,8 @@
       "endOffset": 57,
       "specifier": "../integration/registry.ts",
       "target": "src/integration/registry.ts",
-      "targetHash": "186badf8a706f5d7eb8759ee98d7388568d71802c8d04a069321135483fe8b6a"
+      "targetHash": "186badf8a706f5d7eb8759ee98d7388568d71802c8d04a069321135483fe8b6a",
+      "targetKind": "repository"
     },
     {
       "from": "src/application/imports.ts",
@@ -587,7 +784,21 @@
       "endOffset": 137,
       "specifier": "../domain/public.ts",
       "target": "src/domain/public.ts",
-      "targetHash": "e25787a89a684b01bcfdf1b0984dad8e27659dda40949a6cb084b93afbbf17ce"
+      "targetHash": "e25787a89a684b01bcfdf1b0984dad8e27659dda40949a6cb084b93afbbf17ce",
+      "targetKind": "repository"
+    },
+    {
+      "from": "src/application/private-session.ts",
+      "side": "before",
+      "commit": "b096826e31c0927190806de91ed70b8b64aa93d8",
+      "sourceHash": "839159caebe8eab4adf9dfad3a35caf73e4628a79a9b72a457901ec886ed56a0",
+      "sourceLine": 1,
+      "startOffset": 16,
+      "endOffset": 21,
+      "specifier": "zod",
+      "target": "zod",
+      "targetHash": null,
+      "targetKind": "external"
     },
     {
       "from": "src/application/private-session.ts",
@@ -599,7 +810,8 @@
       "endOffset": 127,
       "specifier": "../domain/public.ts",
       "target": "src/domain/public.ts",
-      "targetHash": "e25787a89a684b01bcfdf1b0984dad8e27659dda40949a6cb084b93afbbf17ce"
+      "targetHash": "e25787a89a684b01bcfdf1b0984dad8e27659dda40949a6cb084b93afbbf17ce",
+      "targetKind": "repository"
     },
     {
       "from": "src/application/private-session.ts",
@@ -611,7 +823,8 @@
       "endOffset": 177,
       "specifier": "../domain/public.ts",
       "target": "src/domain/public.ts",
-      "targetHash": "e25787a89a684b01bcfdf1b0984dad8e27659dda40949a6cb084b93afbbf17ce"
+      "targetHash": "e25787a89a684b01bcfdf1b0984dad8e27659dda40949a6cb084b93afbbf17ce",
+      "targetKind": "repository"
     },
     {
       "from": "src/application/review.ts",
@@ -623,7 +836,8 @@
       "endOffset": 104,
       "specifier": "../domain/public.ts",
       "target": "src/domain/public.ts",
-      "targetHash": "e25787a89a684b01bcfdf1b0984dad8e27659dda40949a6cb084b93afbbf17ce"
+      "targetHash": "e25787a89a684b01bcfdf1b0984dad8e27659dda40949a6cb084b93afbbf17ce",
+      "targetKind": "repository"
     },
     {
       "from": "src/application/review.ts",
@@ -635,7 +849,8 @@
       "endOffset": 177,
       "specifier": "../domain/public.ts",
       "target": "src/domain/public.ts",
-      "targetHash": "e25787a89a684b01bcfdf1b0984dad8e27659dda40949a6cb084b93afbbf17ce"
+      "targetHash": "e25787a89a684b01bcfdf1b0984dad8e27659dda40949a6cb084b93afbbf17ce",
+      "targetKind": "repository"
     },
     {
       "from": "src/application/review.ts",
@@ -647,7 +862,8 @@
       "endOffset": 216,
       "specifier": "./public.ts",
       "target": "src/application/public.ts",
-      "targetHash": "94e20323156f2a3c31cdea3b84a453b8e19d27ecad031457412083c08502da64"
+      "targetHash": "94e20323156f2a3c31cdea3b84a453b8e19d27ecad031457412083c08502da64",
+      "targetKind": "repository"
     },
     {
       "from": "src/application/review.ts",
@@ -659,7 +875,8 @@
       "endOffset": 275,
       "specifier": "../integration/registry.ts",
       "target": "src/integration/registry.ts",
-      "targetHash": "186badf8a706f5d7eb8759ee98d7388568d71802c8d04a069321135483fe8b6a"
+      "targetHash": "186badf8a706f5d7eb8759ee98d7388568d71802c8d04a069321135483fe8b6a",
+      "targetKind": "repository"
     },
     {
       "from": "src/application/review.ts",
@@ -671,7 +888,8 @@
       "endOffset": 386,
       "specifier": "./private-session.ts",
       "target": "src/application/private-session.ts",
-      "targetHash": "839159caebe8eab4adf9dfad3a35caf73e4628a79a9b72a457901ec886ed56a0"
+      "targetHash": "839159caebe8eab4adf9dfad3a35caf73e4628a79a9b72a457901ec886ed56a0",
+      "targetKind": "repository"
     },
     {
       "from": "src/application/review.ts",
@@ -683,7 +901,8 @@
       "endOffset": 477,
       "specifier": "./private-session.ts",
       "target": "src/application/private-session.ts",
-      "targetHash": "839159caebe8eab4adf9dfad3a35caf73e4628a79a9b72a457901ec886ed56a0"
+      "targetHash": "839159caebe8eab4adf9dfad3a35caf73e4628a79a9b72a457901ec886ed56a0",
+      "targetKind": "repository"
     },
     {
       "from": "src/application/story.ts",
@@ -695,7 +914,8 @@
       "endOffset": 74,
       "specifier": "../domain/public.ts",
       "target": "src/domain/public.ts",
-      "targetHash": "e25787a89a684b01bcfdf1b0984dad8e27659dda40949a6cb084b93afbbf17ce"
+      "targetHash": "e25787a89a684b01bcfdf1b0984dad8e27659dda40949a6cb084b93afbbf17ce",
+      "targetKind": "repository"
     },
     {
       "from": "src/application/story.ts",
@@ -707,7 +927,8 @@
       "endOffset": 123,
       "specifier": "../domain/public.ts",
       "target": "src/domain/public.ts",
-      "targetHash": "e25787a89a684b01bcfdf1b0984dad8e27659dda40949a6cb084b93afbbf17ce"
+      "targetHash": "e25787a89a684b01bcfdf1b0984dad8e27659dda40949a6cb084b93afbbf17ce",
+      "targetKind": "repository"
     },
     {
       "from": "src/application/story.ts",
@@ -719,7 +940,8 @@
       "endOffset": 241,
       "specifier": "./private-session.ts",
       "target": "src/application/private-session.ts",
-      "targetHash": "839159caebe8eab4adf9dfad3a35caf73e4628a79a9b72a457901ec886ed56a0"
+      "targetHash": "839159caebe8eab4adf9dfad3a35caf73e4628a79a9b72a457901ec886ed56a0",
+      "targetKind": "repository"
     },
     {
       "from": "src/application/story.ts",
@@ -731,7 +953,8 @@
       "endOffset": 300,
       "specifier": "../integration/registry.ts",
       "target": "src/integration/registry.ts",
-      "targetHash": "186badf8a706f5d7eb8759ee98d7388568d71802c8d04a069321135483fe8b6a"
+      "targetHash": "186badf8a706f5d7eb8759ee98d7388568d71802c8d04a069321135483fe8b6a",
+      "targetKind": "repository"
     },
     {
       "from": "src/application/story.ts",
@@ -743,7 +966,8 @@
       "endOffset": 421,
       "specifier": "../domain/public.ts",
       "target": "src/domain/public.ts",
-      "targetHash": "e25787a89a684b01bcfdf1b0984dad8e27659dda40949a6cb084b93afbbf17ce"
+      "targetHash": "e25787a89a684b01bcfdf1b0984dad8e27659dda40949a6cb084b93afbbf17ce",
+      "targetKind": "repository"
     },
     {
       "from": "src/application/story.ts",
@@ -755,7 +979,8 @@
       "endOffset": 472,
       "specifier": "./analysis.ts",
       "target": "src/application/analysis.ts",
-      "targetHash": "d6d9343df6613aee8bc9e4eb8cfba4bf8d216abca16ae502d52be91b0140fba3"
+      "targetHash": "d6d9343df6613aee8bc9e4eb8cfba4bf8d216abca16ae502d52be91b0140fba3",
+      "targetKind": "repository"
     },
     {
       "from": "src/application/workspace.ts",
@@ -767,7 +992,8 @@
       "endOffset": 46,
       "specifier": "./review.ts",
       "target": "src/application/review.ts",
-      "targetHash": "7953f0b8486ae475717bdc749e23a31f12351f41c11a473280de9a2420265477"
+      "targetHash": "7953f0b8486ae475717bdc749e23a31f12351f41c11a473280de9a2420265477",
+      "targetKind": "repository"
     },
     {
       "from": "src/application/workspace.ts",
@@ -779,7 +1005,8 @@
       "endOffset": 98,
       "specifier": "./analysis.ts",
       "target": "src/application/analysis.ts",
-      "targetHash": "d6d9343df6613aee8bc9e4eb8cfba4bf8d216abca16ae502d52be91b0140fba3"
+      "targetHash": "d6d9343df6613aee8bc9e4eb8cfba4bf8d216abca16ae502d52be91b0140fba3",
+      "targetKind": "repository"
     },
     {
       "from": "src/application/workspace.ts",
@@ -791,7 +1018,8 @@
       "endOffset": 144,
       "specifier": "./story.ts",
       "target": "src/application/story.ts",
-      "targetHash": "459b145d01c3e509dc30b2f0ca4b1c88e9558facb0b69819dc138f3c1646c8f1"
+      "targetHash": "459b145d01c3e509dc30b2f0ca4b1c88e9558facb0b69819dc138f3c1646c8f1",
+      "targetKind": "repository"
     },
     {
       "from": "src/application/workspace.ts",
@@ -803,7 +1031,8 @@
       "endOffset": 203,
       "specifier": "./private-session.ts",
       "target": "src/application/private-session.ts",
-      "targetHash": "839159caebe8eab4adf9dfad3a35caf73e4628a79a9b72a457901ec886ed56a0"
+      "targetHash": "839159caebe8eab4adf9dfad3a35caf73e4628a79a9b72a457901ec886ed56a0",
+      "targetKind": "repository"
     },
     {
       "from": "src/application/workspace.ts",
@@ -815,7 +1044,8 @@
       "endOffset": 273,
       "specifier": "./private-session.ts",
       "target": "src/application/private-session.ts",
-      "targetHash": "839159caebe8eab4adf9dfad3a35caf73e4628a79a9b72a457901ec886ed56a0"
+      "targetHash": "839159caebe8eab4adf9dfad3a35caf73e4628a79a9b72a457901ec886ed56a0",
+      "targetKind": "repository"
     },
     {
       "from": "src/application/workspace.ts",
@@ -827,7 +1057,8 @@
       "endOffset": 322,
       "specifier": "../domain/public.ts",
       "target": "src/domain/public.ts",
-      "targetHash": "e25787a89a684b01bcfdf1b0984dad8e27659dda40949a6cb084b93afbbf17ce"
+      "targetHash": "e25787a89a684b01bcfdf1b0984dad8e27659dda40949a6cb084b93afbbf17ce",
+      "targetKind": "repository"
     },
     {
       "from": "src/application/workspace.ts",
@@ -839,7 +1070,8 @@
       "endOffset": 381,
       "specifier": "../integration/registry.ts",
       "target": "src/integration/registry.ts",
-      "targetHash": "186badf8a706f5d7eb8759ee98d7388568d71802c8d04a069321135483fe8b6a"
+      "targetHash": "186badf8a706f5d7eb8759ee98d7388568d71802c8d04a069321135483fe8b6a",
+      "targetKind": "repository"
     },
     {
       "from": "src/server/public.ts",
@@ -851,7 +1083,8 @@
       "endOffset": 63,
       "specifier": "../analysis-jobs/public.ts",
       "target": "src/analysis-jobs/public.ts",
-      "targetHash": "db3302ac3f2bfd468571fc897188adeedd6f06ffbd6eb2f05aa1bb117e4399f5"
+      "targetHash": "db3302ac3f2bfd468571fc897188adeedd6f06ffbd6eb2f05aa1bb117e4399f5",
+      "targetKind": "repository"
     },
     {
       "from": "src/server/public.ts",
@@ -863,7 +1096,8 @@
       "endOffset": 124,
       "specifier": "../import-jobs/public.ts",
       "target": "src/import-jobs/public.ts",
-      "targetHash": "d299c2636d04d070f1645ee6728ce899064b10e59567403c098d63e268211f66"
+      "targetHash": "d299c2636d04d070f1645ee6728ce899064b10e59567403c098d63e268211f66",
+      "targetKind": "repository"
     },
     {
       "from": "src/server/public.ts",
@@ -875,7 +1109,8 @@
       "endOffset": 192,
       "specifier": "../import-artifacts/public.ts",
       "target": "src/import-artifacts/public.ts",
-      "targetHash": "d53bacdcfdfe23681afdbfeabb0066ca15949f98a4a014ec1e1d58b1fbaf446a"
+      "targetHash": "d53bacdcfdfe23681afdbfeabb0066ca15949f98a4a014ec1e1d58b1fbaf446a",
+      "targetKind": "repository"
     },
     {
       "from": "src/server/public.ts",
@@ -887,7 +1122,8 @@
       "endOffset": 264,
       "specifier": "../source-preparation/public.ts",
       "target": "src/source-preparation/public.ts",
-      "targetHash": "45d55e286d4f3a10bedd3997d7527fb620312ba82a7217292eca73361417529c"
+      "targetHash": "45d55e286d4f3a10bedd3997d7527fb620312ba82a7217292eca73361417529c",
+      "targetKind": "repository"
     },
     {
       "from": "src/server/public.ts",
@@ -899,7 +1135,47 @@
       "endOffset": 342,
       "specifier": "../source-preparation/public.ts",
       "target": "src/source-preparation/public.ts",
-      "targetHash": "45d55e286d4f3a10bedd3997d7527fb620312ba82a7217292eca73361417529c"
+      "targetHash": "45d55e286d4f3a10bedd3997d7527fb620312ba82a7217292eca73361417529c",
+      "targetKind": "repository"
+    },
+    {
+      "from": "src/server/public.ts",
+      "side": "before",
+      "commit": "b096826e31c0927190806de91ed70b8b64aa93d8",
+      "sourceHash": "2bd6f01a2dd416ad1d95993d4fb14b79c56b46a6ce7b8dafb4e1d050a5a48964",
+      "sourceLine": 6,
+      "startOffset": 373,
+      "endOffset": 384,
+      "specifier": "node:http",
+      "target": "node:http",
+      "targetHash": null,
+      "targetKind": "external"
+    },
+    {
+      "from": "src/server/public.ts",
+      "side": "before",
+      "commit": "b096826e31c0927190806de91ed70b8b64aa93d8",
+      "sourceHash": "2bd6f01a2dd416ad1d95993d4fb14b79c56b46a6ce7b8dafb4e1d050a5a48964",
+      "sourceLine": 7,
+      "startOffset": 439,
+      "endOffset": 450,
+      "specifier": "node:http",
+      "target": "node:http",
+      "targetHash": null,
+      "targetKind": "external"
+    },
+    {
+      "from": "src/server/public.ts",
+      "side": "before",
+      "commit": "b096826e31c0927190806de91ed70b8b64aa93d8",
+      "sourceHash": "2bd6f01a2dd416ad1d95993d4fb14b79c56b46a6ce7b8dafb4e1d050a5a48964",
+      "sourceLine": 8,
+      "startOffset": 470,
+      "endOffset": 475,
+      "specifier": "zod",
+      "target": "zod",
+      "targetHash": null,
+      "targetKind": "external"
     },
     {
       "from": "src/server/public.ts",
@@ -911,7 +1187,8 @@
       "endOffset": 676,
       "specifier": "../domain/public.ts",
       "target": "src/domain/public.ts",
-      "targetHash": "e25787a89a684b01bcfdf1b0984dad8e27659dda40949a6cb084b93afbbf17ce"
+      "targetHash": "e25787a89a684b01bcfdf1b0984dad8e27659dda40949a6cb084b93afbbf17ce",
+      "targetKind": "repository"
     },
     {
       "from": "src/server/public.ts",
@@ -923,7 +1200,8 @@
       "endOffset": 730,
       "specifier": "../domain/public.ts",
       "target": "src/domain/public.ts",
-      "targetHash": "e25787a89a684b01bcfdf1b0984dad8e27659dda40949a6cb084b93afbbf17ce"
+      "targetHash": "e25787a89a684b01bcfdf1b0984dad8e27659dda40949a6cb084b93afbbf17ce",
+      "targetKind": "repository"
     },
     {
       "from": "src/server/public.ts",
@@ -935,7 +1213,8 @@
       "endOffset": 781,
       "specifier": "../storage/public.ts",
       "target": "src/storage/public.ts",
-      "targetHash": "61878e4c266549993e81985919feaf17995ee53790e49db5ad91d0b278725175"
+      "targetHash": "61878e4c266549993e81985919feaf17995ee53790e49db5ad91d0b278725175",
+      "targetKind": "repository"
     },
     {
       "from": "src/server/public.ts",
@@ -947,7 +1226,8 @@
       "endOffset": 838,
       "specifier": "../delivery/public.ts",
       "target": "src/delivery/public.ts",
-      "targetHash": "9a85166fb944a4943f5c1c7941de1976773894759ee933e57bca4fef2b44a761"
+      "targetHash": "9a85166fb944a4943f5c1c7941de1976773894759ee933e57bca4fef2b44a761",
+      "targetKind": "repository"
     },
     {
       "from": "src/server/public.ts",
@@ -959,7 +1239,8 @@
       "endOffset": 891,
       "specifier": "../delivery/public.ts",
       "target": "src/delivery/public.ts",
-      "targetHash": "9a85166fb944a4943f5c1c7941de1976773894759ee933e57bca4fef2b44a761"
+      "targetHash": "9a85166fb944a4943f5c1c7941de1976773894759ee933e57bca4fef2b44a761",
+      "targetKind": "repository"
     },
     {
       "from": "src/server/public.ts",
@@ -971,7 +1252,8 @@
       "endOffset": 952,
       "specifier": "../integration/registry.ts",
       "target": "src/integration/registry.ts",
-      "targetHash": "186badf8a706f5d7eb8759ee98d7388568d71802c8d04a069321135483fe8b6a"
+      "targetHash": "186badf8a706f5d7eb8759ee98d7388568d71802c8d04a069321135483fe8b6a",
+      "targetKind": "repository"
     },
     {
       "from": "src/storage/analysis.ts",
@@ -983,7 +1265,34 @@
       "endOffset": 61,
       "specifier": "../domain/public.ts",
       "target": "src/domain/public.ts",
-      "targetHash": "e25787a89a684b01bcfdf1b0984dad8e27659dda40949a6cb084b93afbbf17ce"
+      "targetHash": "e25787a89a684b01bcfdf1b0984dad8e27659dda40949a6cb084b93afbbf17ce",
+      "targetKind": "repository"
+    },
+    {
+      "from": "src/storage/analysis.ts",
+      "side": "before",
+      "commit": "b096826e31c0927190806de91ed70b8b64aa93d8",
+      "sourceHash": "6a183b4bcf101de4f053dd675c03e4ae2541a2a53b639f940a8e28b5c4cd950b",
+      "sourceLine": 2,
+      "startOffset": 102,
+      "endOffset": 115,
+      "specifier": "node:crypto",
+      "target": "node:crypto",
+      "targetHash": null,
+      "targetKind": "external"
+    },
+    {
+      "from": "src/storage/analysis.ts",
+      "side": "before",
+      "commit": "b096826e31c0927190806de91ed70b8b64aa93d8",
+      "sourceHash": "6a183b4bcf101de4f053dd675c03e4ae2541a2a53b639f940a8e28b5c4cd950b",
+      "sourceLine": 3,
+      "startOffset": 151,
+      "endOffset": 164,
+      "specifier": "node:sqlite",
+      "target": "node:sqlite",
+      "targetHash": null,
+      "targetKind": "external"
     },
     {
       "from": "src/storage/analysis.ts",
@@ -995,7 +1304,8 @@
       "endOffset": 329,
       "specifier": "../domain/public.ts",
       "target": "src/domain/public.ts",
-      "targetHash": "e25787a89a684b01bcfdf1b0984dad8e27659dda40949a6cb084b93afbbf17ce"
+      "targetHash": "e25787a89a684b01bcfdf1b0984dad8e27659dda40949a6cb084b93afbbf17ce",
+      "targetKind": "repository"
     },
     {
       "from": "src/storage/analysis.ts",
@@ -1007,7 +1317,8 @@
       "endOffset": 443,
       "specifier": "../domain/public.ts",
       "target": "src/domain/public.ts",
-      "targetHash": "e25787a89a684b01bcfdf1b0984dad8e27659dda40949a6cb084b93afbbf17ce"
+      "targetHash": "e25787a89a684b01bcfdf1b0984dad8e27659dda40949a6cb084b93afbbf17ce",
+      "targetKind": "repository"
     },
     {
       "from": "src/storage/analysis.ts",
@@ -1019,7 +1330,8 @@
       "endOffset": 784,
       "specifier": "../domain/public.ts",
       "target": "src/domain/public.ts",
-      "targetHash": "e25787a89a684b01bcfdf1b0984dad8e27659dda40949a6cb084b93afbbf17ce"
+      "targetHash": "e25787a89a684b01bcfdf1b0984dad8e27659dda40949a6cb084b93afbbf17ce",
+      "targetKind": "repository"
     },
     {
       "from": "src/storage/analysis.ts",
@@ -1031,7 +1343,8 @@
       "endOffset": 899,
       "specifier": "../source-preparation/public.ts",
       "target": "src/source-preparation/public.ts",
-      "targetHash": "45d55e286d4f3a10bedd3997d7527fb620312ba82a7217292eca73361417529c"
+      "targetHash": "45d55e286d4f3a10bedd3997d7527fb620312ba82a7217292eca73361417529c",
+      "targetKind": "repository"
     },
     {
       "from": "src/storage/analysis.ts",
@@ -1043,7 +1356,8 @@
       "endOffset": 978,
       "specifier": "../source-preparation/public.ts",
       "target": "src/source-preparation/public.ts",
-      "targetHash": "45d55e286d4f3a10bedd3997d7527fb620312ba82a7217292eca73361417529c"
+      "targetHash": "45d55e286d4f3a10bedd3997d7527fb620312ba82a7217292eca73361417529c",
+      "targetKind": "repository"
     },
     {
       "from": "src/storage/analysis.ts",
@@ -1055,7 +1369,8 @@
       "endOffset": 1077,
       "specifier": "../source-acquisition/public.ts",
       "target": "src/source-acquisition/public.ts",
-      "targetHash": "4e9ea5acaa585cf9f2223cc75a6083c14902ec7f98c9be2d9a2baea3a2ce8cd5"
+      "targetHash": "4e9ea5acaa585cf9f2223cc75a6083c14902ec7f98c9be2d9a2baea3a2ce8cd5",
+      "targetKind": "repository"
     },
     {
       "from": "src/storage/analysis.ts",
@@ -1067,7 +1382,8 @@
       "endOffset": 1173,
       "specifier": "../source-analysis/public.ts",
       "target": "src/source-analysis/public.ts",
-      "targetHash": "f29b4e0825122ca641d3a4b3fb5ada896c051c1e89b45bcc95e1318042e5d3e3"
+      "targetHash": "f29b4e0825122ca641d3a4b3fb5ada896c051c1e89b45bcc95e1318042e5d3e3",
+      "targetKind": "repository"
     },
     {
       "from": "src/storage/analysis.ts",
@@ -1079,7 +1395,8 @@
       "endOffset": 1243,
       "specifier": "../analysis-jobs/public.ts",
       "target": "src/analysis-jobs/public.ts",
-      "targetHash": "db3302ac3f2bfd468571fc897188adeedd6f06ffbd6eb2f05aa1bb117e4399f5"
+      "targetHash": "db3302ac3f2bfd468571fc897188adeedd6f06ffbd6eb2f05aa1bb117e4399f5",
+      "targetKind": "repository"
     },
     {
       "from": "src/storage/analysis.ts",
@@ -1091,7 +1408,8 @@
       "endOffset": 1347,
       "specifier": "../analysis-jobs/public.ts",
       "target": "src/analysis-jobs/public.ts",
-      "targetHash": "db3302ac3f2bfd468571fc897188adeedd6f06ffbd6eb2f05aa1bb117e4399f5"
+      "targetHash": "db3302ac3f2bfd468571fc897188adeedd6f06ffbd6eb2f05aa1bb117e4399f5",
+      "targetKind": "repository"
     },
     {
       "from": "src/storage/analysis.ts",
@@ -1103,7 +1421,8 @@
       "endOffset": 1401,
       "specifier": "./execution.ts",
       "target": "src/storage/execution.ts",
-      "targetHash": "c4e7ffd18ae5d14462d2fcfc0835698e20b41af019ae9922a29f2c551b056647"
+      "targetHash": "c4e7ffd18ae5d14462d2fcfc0835698e20b41af019ae9922a29f2c551b056647",
+      "targetKind": "repository"
     },
     {
       "from": "src/storage/imports.ts",
@@ -1115,7 +1434,8 @@
       "endOffset": 61,
       "specifier": "../domain/public.ts",
       "target": "src/domain/public.ts",
-      "targetHash": "e25787a89a684b01bcfdf1b0984dad8e27659dda40949a6cb084b93afbbf17ce"
+      "targetHash": "e25787a89a684b01bcfdf1b0984dad8e27659dda40949a6cb084b93afbbf17ce",
+      "targetKind": "repository"
     },
     {
       "from": "src/storage/imports.ts",
@@ -1127,7 +1447,34 @@
       "endOffset": 113,
       "specifier": "./execution.ts",
       "target": "src/storage/execution.ts",
-      "targetHash": "c4e7ffd18ae5d14462d2fcfc0835698e20b41af019ae9922a29f2c551b056647"
+      "targetHash": "c4e7ffd18ae5d14462d2fcfc0835698e20b41af019ae9922a29f2c551b056647",
+      "targetKind": "repository"
+    },
+    {
+      "from": "src/storage/imports.ts",
+      "side": "before",
+      "commit": "b096826e31c0927190806de91ed70b8b64aa93d8",
+      "sourceHash": "bca5286d0f7834551c8c5399dd4b840b21260328cc8e46cd4d36f03ace1c5cee",
+      "sourceLine": 3,
+      "startOffset": 151,
+      "endOffset": 164,
+      "specifier": "node:crypto",
+      "target": "node:crypto",
+      "targetHash": null,
+      "targetKind": "external"
+    },
+    {
+      "from": "src/storage/imports.ts",
+      "side": "before",
+      "commit": "b096826e31c0927190806de91ed70b8b64aa93d8",
+      "sourceHash": "bca5286d0f7834551c8c5399dd4b840b21260328cc8e46cd4d36f03ace1c5cee",
+      "sourceLine": 4,
+      "startOffset": 198,
+      "endOffset": 211,
+      "specifier": "node:sqlite",
+      "target": "node:sqlite",
+      "targetHash": null,
+      "targetKind": "external"
     },
     {
       "from": "src/storage/imports.ts",
@@ -1139,7 +1486,8 @@
       "endOffset": 369,
       "specifier": "../domain/public.ts",
       "target": "src/domain/public.ts",
-      "targetHash": "e25787a89a684b01bcfdf1b0984dad8e27659dda40949a6cb084b93afbbf17ce"
+      "targetHash": "e25787a89a684b01bcfdf1b0984dad8e27659dda40949a6cb084b93afbbf17ce",
+      "targetKind": "repository"
     },
     {
       "from": "src/storage/imports.ts",
@@ -1151,7 +1499,8 @@
       "endOffset": 547,
       "specifier": "../domain/public.ts",
       "target": "src/domain/public.ts",
-      "targetHash": "e25787a89a684b01bcfdf1b0984dad8e27659dda40949a6cb084b93afbbf17ce"
+      "targetHash": "e25787a89a684b01bcfdf1b0984dad8e27659dda40949a6cb084b93afbbf17ce",
+      "targetKind": "repository"
     },
     {
       "from": "src/storage/imports.ts",
@@ -1163,7 +1512,8 @@
       "endOffset": 647,
       "specifier": "../source-preparation/public.ts",
       "target": "src/source-preparation/public.ts",
-      "targetHash": "45d55e286d4f3a10bedd3997d7527fb620312ba82a7217292eca73361417529c"
+      "targetHash": "45d55e286d4f3a10bedd3997d7527fb620312ba82a7217292eca73361417529c",
+      "targetKind": "repository"
     },
     {
       "from": "src/storage/imports.ts",
@@ -1175,7 +1525,8 @@
       "endOffset": 725,
       "specifier": "../source-preparation/public.ts",
       "target": "src/source-preparation/public.ts",
-      "targetHash": "45d55e286d4f3a10bedd3997d7527fb620312ba82a7217292eca73361417529c"
+      "targetHash": "45d55e286d4f3a10bedd3997d7527fb620312ba82a7217292eca73361417529c",
+      "targetKind": "repository"
     },
     {
       "from": "src/storage/public.ts",
@@ -1187,7 +1538,8 @@
       "endOffset": 43,
       "specifier": "./story.ts",
       "target": "src/storage/story.ts",
-      "targetHash": "f58709d29ff6ef790762ac4ba63bb6954389c1090a04eb74bda65fd8e8dd3ed9"
+      "targetHash": "f58709d29ff6ef790762ac4ba63bb6954389c1090a04eb74bda65fd8e8dd3ed9",
+      "targetKind": "repository"
     },
     {
       "from": "src/storage/public.ts",
@@ -1199,7 +1551,8 @@
       "endOffset": 88,
       "specifier": "./story.ts",
       "target": "src/storage/story.ts",
-      "targetHash": "f58709d29ff6ef790762ac4ba63bb6954389c1090a04eb74bda65fd8e8dd3ed9"
+      "targetHash": "f58709d29ff6ef790762ac4ba63bb6954389c1090a04eb74bda65fd8e8dd3ed9",
+      "targetKind": "repository"
     },
     {
       "from": "src/storage/public.ts",
@@ -1211,7 +1564,8 @@
       "endOffset": 188,
       "specifier": "../domain/public.ts",
       "target": "src/domain/public.ts",
-      "targetHash": "e25787a89a684b01bcfdf1b0984dad8e27659dda40949a6cb084b93afbbf17ce"
+      "targetHash": "e25787a89a684b01bcfdf1b0984dad8e27659dda40949a6cb084b93afbbf17ce",
+      "targetKind": "repository"
     },
     {
       "from": "src/storage/public.ts",
@@ -1223,7 +1577,8 @@
       "endOffset": 325,
       "specifier": "../domain/public.ts",
       "target": "src/domain/public.ts",
-      "targetHash": "e25787a89a684b01bcfdf1b0984dad8e27659dda40949a6cb084b93afbbf17ce"
+      "targetHash": "e25787a89a684b01bcfdf1b0984dad8e27659dda40949a6cb084b93afbbf17ce",
+      "targetKind": "repository"
     },
     {
       "from": "src/storage/public.ts",
@@ -1235,7 +1590,8 @@
       "endOffset": 376,
       "specifier": "./analysis.ts",
       "target": "src/storage/analysis.ts",
-      "targetHash": "6a183b4bcf101de4f053dd675c03e4ae2541a2a53b639f940a8e28b5c4cd950b"
+      "targetHash": "6a183b4bcf101de4f053dd675c03e4ae2541a2a53b639f940a8e28b5c4cd950b",
+      "targetKind": "repository"
     },
     {
       "from": "src/storage/public.ts",
@@ -1247,7 +1603,8 @@
       "endOffset": 427,
       "specifier": "./analysis.ts",
       "target": "src/storage/analysis.ts",
-      "targetHash": "6a183b4bcf101de4f053dd675c03e4ae2541a2a53b639f940a8e28b5c4cd950b"
+      "targetHash": "6a183b4bcf101de4f053dd675c03e4ae2541a2a53b639f940a8e28b5c4cd950b",
+      "targetKind": "repository"
     },
     {
       "from": "src/storage/public.ts",
@@ -1259,7 +1616,8 @@
       "endOffset": 480,
       "specifier": "./execution.ts",
       "target": "src/storage/execution.ts",
-      "targetHash": "c4e7ffd18ae5d14462d2fcfc0835698e20b41af019ae9922a29f2c551b056647"
+      "targetHash": "c4e7ffd18ae5d14462d2fcfc0835698e20b41af019ae9922a29f2c551b056647",
+      "targetKind": "repository"
     },
     {
       "from": "src/storage/public.ts",
@@ -1271,7 +1629,8 @@
       "endOffset": 528,
       "specifier": "./imports.ts",
       "target": "src/storage/imports.ts",
-      "targetHash": "bca5286d0f7834551c8c5399dd4b840b21260328cc8e46cd4d36f03ace1c5cee"
+      "targetHash": "bca5286d0f7834551c8c5399dd4b840b21260328cc8e46cd4d36f03ace1c5cee",
+      "targetKind": "repository"
     },
     {
       "from": "src/storage/public.ts",
@@ -1283,7 +1642,8 @@
       "endOffset": 576,
       "specifier": "./imports.ts",
       "target": "src/storage/imports.ts",
-      "targetHash": "bca5286d0f7834551c8c5399dd4b840b21260328cc8e46cd4d36f03ace1c5cee"
+      "targetHash": "bca5286d0f7834551c8c5399dd4b840b21260328cc8e46cd4d36f03ace1c5cee",
+      "targetKind": "repository"
     },
     {
       "from": "src/storage/public.ts",
@@ -1295,7 +1655,8 @@
       "endOffset": 676,
       "specifier": "../source-preparation/public.ts",
       "target": "src/source-preparation/public.ts",
-      "targetHash": "45d55e286d4f3a10bedd3997d7527fb620312ba82a7217292eca73361417529c"
+      "targetHash": "45d55e286d4f3a10bedd3997d7527fb620312ba82a7217292eca73361417529c",
+      "targetKind": "repository"
     },
     {
       "from": "src/storage/public.ts",
@@ -1307,7 +1668,34 @@
       "endOffset": 754,
       "specifier": "../source-preparation/public.ts",
       "target": "src/source-preparation/public.ts",
-      "targetHash": "45d55e286d4f3a10bedd3997d7527fb620312ba82a7217292eca73361417529c"
+      "targetHash": "45d55e286d4f3a10bedd3997d7527fb620312ba82a7217292eca73361417529c",
+      "targetKind": "repository"
+    },
+    {
+      "from": "src/storage/public.ts",
+      "side": "before",
+      "commit": "b096826e31c0927190806de91ed70b8b64aa93d8",
+      "sourceHash": "61878e4c266549993e81985919feaf17995ee53790e49db5ad91d0b278725175",
+      "sourceLine": 12,
+      "startOffset": 785,
+      "endOffset": 798,
+      "specifier": "node:sqlite",
+      "target": "node:sqlite",
+      "targetHash": null,
+      "targetKind": "external"
+    },
+    {
+      "from": "src/storage/public.ts",
+      "side": "before",
+      "commit": "b096826e31c0927190806de91ed70b8b64aa93d8",
+      "sourceHash": "61878e4c266549993e81985919feaf17995ee53790e49db5ad91d0b278725175",
+      "sourceLine": 18,
+      "startOffset": 878,
+      "endOffset": 891,
+      "specifier": "node:crypto",
+      "target": "node:crypto",
+      "targetHash": null,
+      "targetKind": "external"
     },
     {
       "from": "src/storage/public.ts",
@@ -1319,7 +1707,8 @@
       "endOffset": 1004,
       "specifier": "../domain/public.ts",
       "target": "src/domain/public.ts",
-      "targetHash": "e25787a89a684b01bcfdf1b0984dad8e27659dda40949a6cb084b93afbbf17ce"
+      "targetHash": "e25787a89a684b01bcfdf1b0984dad8e27659dda40949a6cb084b93afbbf17ce",
+      "targetKind": "repository"
     },
     {
       "from": "src/storage/public.ts",
@@ -1331,7 +1720,34 @@
       "endOffset": 1130,
       "specifier": "../domain/public.ts",
       "target": "src/domain/public.ts",
-      "targetHash": "e25787a89a684b01bcfdf1b0984dad8e27659dda40949a6cb084b93afbbf17ce"
+      "targetHash": "e25787a89a684b01bcfdf1b0984dad8e27659dda40949a6cb084b93afbbf17ce",
+      "targetKind": "repository"
+    },
+    {
+      "from": "src/storage/story.ts",
+      "side": "before",
+      "commit": "b096826e31c0927190806de91ed70b8b64aa93d8",
+      "sourceHash": "f58709d29ff6ef790762ac4ba63bb6954389c1090a04eb74bda65fd8e8dd3ed9",
+      "sourceLine": 1,
+      "startOffset": 32,
+      "endOffset": 45,
+      "specifier": "node:sqlite",
+      "target": "node:sqlite",
+      "targetHash": null,
+      "targetKind": "external"
+    },
+    {
+      "from": "src/storage/story.ts",
+      "side": "before",
+      "commit": "b096826e31c0927190806de91ed70b8b64aa93d8",
+      "sourceHash": "f58709d29ff6ef790762ac4ba63bb6954389c1090a04eb74bda65fd8e8dd3ed9",
+      "sourceLine": 2,
+      "startOffset": 83,
+      "endOffset": 96,
+      "specifier": "node:crypto",
+      "target": "node:crypto",
+      "targetHash": null,
+      "targetKind": "external"
     },
     {
       "from": "src/storage/story.ts",
@@ -1343,7 +1759,8 @@
       "endOffset": 274,
       "specifier": "../domain/public.ts",
       "target": "src/domain/public.ts",
-      "targetHash": "e25787a89a684b01bcfdf1b0984dad8e27659dda40949a6cb084b93afbbf17ce"
+      "targetHash": "e25787a89a684b01bcfdf1b0984dad8e27659dda40949a6cb084b93afbbf17ce",
+      "targetKind": "repository"
     },
     {
       "from": "src/storage/story.ts",
@@ -1355,7 +1772,34 @@
       "endOffset": 526,
       "specifier": "../domain/public.ts",
       "target": "src/domain/public.ts",
-      "targetHash": "e25787a89a684b01bcfdf1b0984dad8e27659dda40949a6cb084b93afbbf17ce"
+      "targetHash": "e25787a89a684b01bcfdf1b0984dad8e27659dda40949a6cb084b93afbbf17ce",
+      "targetKind": "repository"
+    },
+    {
+      "from": "src/ui/main.tsx",
+      "side": "before",
+      "commit": "b096826e31c0927190806de91ed70b8b64aa93d8",
+      "sourceHash": "dff9049f1bcdd972d42d7e317c9103fedbf23c60ce3ed60d5655687784cdef9f",
+      "sourceLine": 1,
+      "startOffset": 78,
+      "endOffset": 85,
+      "specifier": "react",
+      "target": "react",
+      "targetHash": null,
+      "targetKind": "external"
+    },
+    {
+      "from": "src/ui/main.tsx",
+      "side": "before",
+      "commit": "b096826e31c0927190806de91ed70b8b64aa93d8",
+      "sourceHash": "dff9049f1bcdd972d42d7e317c9103fedbf23c60ce3ed60d5655687784cdef9f",
+      "sourceLine": 2,
+      "startOffset": 114,
+      "endOffset": 132,
+      "specifier": "react-dom/client",
+      "target": "react-dom/client",
+      "targetHash": null,
+      "targetKind": "external"
     },
     {
       "from": "src/ui/main.tsx",
@@ -1367,7 +1811,8 @@
       "endOffset": 252,
       "specifier": "../application/public.ts",
       "target": "src/application/public.ts",
-      "targetHash": "94e20323156f2a3c31cdea3b84a453b8e19d27ecad031457412083c08502da64"
+      "targetHash": "94e20323156f2a3c31cdea3b84a453b8e19d27ecad031457412083c08502da64",
+      "targetKind": "repository"
     },
     {
       "from": "src/ui/main.tsx",
@@ -1379,7 +1824,8 @@
       "endOffset": 306,
       "specifier": "../domain/public.ts",
       "target": "src/domain/public.ts",
-      "targetHash": "e25787a89a684b01bcfdf1b0984dad8e27659dda40949a6cb084b93afbbf17ce"
+      "targetHash": "e25787a89a684b01bcfdf1b0984dad8e27659dda40949a6cb084b93afbbf17ce",
+      "targetKind": "repository"
     },
     {
       "from": "src/ui/main.tsx",
@@ -1391,7 +1837,8 @@
       "endOffset": 377,
       "specifier": "../domain/public.ts",
       "target": "src/domain/public.ts",
-      "targetHash": "e25787a89a684b01bcfdf1b0984dad8e27659dda40949a6cb084b93afbbf17ce"
+      "targetHash": "e25787a89a684b01bcfdf1b0984dad8e27659dda40949a6cb084b93afbbf17ce",
+      "targetKind": "repository"
     },
     {
       "from": "src/ui/main.tsx",
@@ -1403,7 +1850,8 @@
       "endOffset": 399,
       "specifier": "./style.css",
       "target": "src/ui/style.css",
-      "targetHash": "540cd0d451b0dffdff0b4eaf7f2e1fdac74b2a5dec4befaf78756c94a87659c6"
+      "targetHash": "540cd0d451b0dffdff0b4eaf7f2e1fdac74b2a5dec4befaf78756c94a87659c6",
+      "targetKind": "repository"
     },
     {
       "from": "src/ui/main.tsx",
@@ -1415,7 +1863,8 @@
       "endOffset": 442,
       "specifier": "./graph.tsx",
       "target": "src/ui/graph.tsx",
-      "targetHash": "0c578c6ed61e3552db361406e21702e155f51c9075eacec397ca36296d2e1f0c"
+      "targetHash": "0c578c6ed61e3552db361406e21702e155f51c9075eacec397ca36296d2e1f0c",
+      "targetKind": "repository"
     },
     {
       "from": "src/ui/main.tsx",
@@ -1427,7 +1876,8 @@
       "endOffset": 481,
       "specifier": "./imports.tsx",
       "target": "src/ui/imports.tsx",
-      "targetHash": "79c6bf3baae92e3f8550bf607bb9e5fba09517fc94653c5f3476eff91f64dda6"
+      "targetHash": "79c6bf3baae92e3f8550bf607bb9e5fba09517fc94653c5f3476eff91f64dda6",
+      "targetKind": "repository"
     },
     {
       "from": "src/ui/main.tsx",
@@ -1439,7 +1889,8 @@
       "endOffset": 544,
       "specifier": "./story.tsx",
       "target": "src/ui/story.tsx",
-      "targetHash": "8632c9cbe740a2b97c71f69d498f6a03e7114f3ab3d443bf6f15061e9982b7c8"
+      "targetHash": "8632c9cbe740a2b97c71f69d498f6a03e7114f3ab3d443bf6f15061e9982b7c8",
+      "targetKind": "repository"
     },
     {
       "from": "src/ui/main.tsx",
@@ -1451,7 +1902,99 @@
       "endOffset": 596,
       "specifier": "./semantic-panel.tsx",
       "target": "src/ui/semantic-panel.tsx",
-      "targetHash": "dd9ba2cf9cc06d5e2adee0e8ac8998f2606deae7201e20718e0180629194d97c"
+      "targetHash": "dd9ba2cf9cc06d5e2adee0e8ac8998f2606deae7201e20718e0180629194d97c",
+      "targetKind": "repository"
+    },
+    {
+      "from": "tests/exploration-recovery.e2e.ts",
+      "side": "before",
+      "commit": "b096826e31c0927190806de91ed70b8b64aa93d8",
+      "sourceHash": "d842fcf9f14ab076ef210fd4af2196f25503d4d2aa1b03646a04dcf9c722a80f",
+      "sourceLine": 1,
+      "startOffset": 26,
+      "endOffset": 44,
+      "specifier": "@playwright/test",
+      "target": "@playwright/test",
+      "targetHash": null,
+      "targetKind": "external"
+    },
+    {
+      "from": "tests/exploration-recovery.e2e.ts",
+      "side": "before",
+      "commit": "b096826e31c0927190806de91ed70b8b64aa93d8",
+      "sourceHash": "d842fcf9f14ab076ef210fd4af2196f25503d4d2aa1b03646a04dcf9c722a80f",
+      "sourceLine": 2,
+      "startOffset": 79,
+      "endOffset": 97,
+      "specifier": "@playwright/test",
+      "target": "@playwright/test",
+      "targetHash": null,
+      "targetKind": "external"
+    },
+    {
+      "from": "tests/exploration-recovery.e2e.ts",
+      "side": "before",
+      "commit": "b096826e31c0927190806de91ed70b8b64aa93d8",
+      "sourceHash": "d842fcf9f14ab076ef210fd4af2196f25503d4d2aa1b03646a04dcf9c722a80f",
+      "sourceLine": 3,
+      "startOffset": 132,
+      "endOffset": 152,
+      "specifier": "node:child_process",
+      "target": "node:child_process",
+      "targetHash": null,
+      "targetKind": "external"
+    },
+    {
+      "from": "tests/exploration-recovery.e2e.ts",
+      "side": "before",
+      "commit": "b096826e31c0927190806de91ed70b8b64aa93d8",
+      "sourceHash": "d842fcf9f14ab076ef210fd4af2196f25503d4d2aa1b03646a04dcf9c722a80f",
+      "sourceLine": 4,
+      "startOffset": 186,
+      "endOffset": 206,
+      "specifier": "node:child_process",
+      "target": "node:child_process",
+      "targetHash": null,
+      "targetKind": "external"
+    },
+    {
+      "from": "tests/exploration-recovery.e2e.ts",
+      "side": "before",
+      "commit": "b096826e31c0927190806de91ed70b8b64aa93d8",
+      "sourceHash": "d842fcf9f14ab076ef210fd4af2196f25503d4d2aa1b03646a04dcf9c722a80f",
+      "sourceLine": 5,
+      "startOffset": 236,
+      "endOffset": 245,
+      "specifier": "node:fs",
+      "target": "node:fs",
+      "targetHash": null,
+      "targetKind": "external"
+    },
+    {
+      "from": "tests/exploration-recovery.e2e.ts",
+      "side": "before",
+      "commit": "b096826e31c0927190806de91ed70b8b64aa93d8",
+      "sourceHash": "d842fcf9f14ab076ef210fd4af2196f25503d4d2aa1b03646a04dcf9c722a80f",
+      "sourceLine": 6,
+      "startOffset": 266,
+      "endOffset": 277,
+      "specifier": "node:path",
+      "target": "node:path",
+      "targetHash": null,
+      "targetKind": "external"
+    },
+    {
+      "from": "tests/exploration-recovery.e2e.ts",
+      "side": "before",
+      "commit": "b096826e31c0927190806de91ed70b8b64aa93d8",
+      "sourceHash": "d842fcf9f14ab076ef210fd4af2196f25503d4d2aa1b03646a04dcf9c722a80f",
+      "sourceLine": 7,
+      "startOffset": 306,
+      "endOffset": 316,
+      "specifier": "node:net",
+      "target": "node:net",
+      "targetHash": null,
+      "targetKind": "external"
     },
     {
       "from": "tests/exploration-recovery.e2e.ts",
@@ -1463,7 +2006,8 @@
       "endOffset": 371,
       "specifier": "./semantic-fixture.ts",
       "target": "tests/semantic-fixture.ts",
-      "targetHash": "6dd807ddf7c7ed334d19e860dd9bd13cbd459600ed2969142600ac7d9ddf31f6"
+      "targetHash": "6dd807ddf7c7ed334d19e860dd9bd13cbd459600ed2969142600ac7d9ddf31f6",
+      "targetKind": "repository"
     },
     {
       "from": "tests/exploration-recovery.e2e.ts",
@@ -1475,7 +2019,8 @@
       "endOffset": 426,
       "specifier": "../src/server/public.ts",
       "target": "src/server/public.ts",
-      "targetHash": "2bd6f01a2dd416ad1d95993d4fb14b79c56b46a6ce7b8dafb4e1d050a5a48964"
+      "targetHash": "2bd6f01a2dd416ad1d95993d4fb14b79c56b46a6ce7b8dafb4e1d050a5a48964",
+      "targetKind": "repository"
     },
     {
       "from": "tests/exploration-recovery.e2e.ts",
@@ -1487,7 +2032,8 @@
       "endOffset": 516,
       "specifier": "../src/source-preparation/public.ts",
       "target": "src/source-preparation/public.ts",
-      "targetHash": "45d55e286d4f3a10bedd3997d7527fb620312ba82a7217292eca73361417529c"
+      "targetHash": "45d55e286d4f3a10bedd3997d7527fb620312ba82a7217292eca73361417529c",
+      "targetKind": "repository"
     },
     {
       "from": "tests/exploration-recovery.e2e.ts",
@@ -1499,7 +2045,8 @@
       "endOffset": 568,
       "specifier": "../src/domain/public.ts",
       "target": "src/domain/public.ts",
-      "targetHash": "e25787a89a684b01bcfdf1b0984dad8e27659dda40949a6cb084b93afbbf17ce"
+      "targetHash": "e25787a89a684b01bcfdf1b0984dad8e27659dda40949a6cb084b93afbbf17ce",
+      "targetKind": "repository"
     },
     {
       "from": "tests/exploration-recovery.e2e.ts",
@@ -1511,7 +2058,8 @@
       "endOffset": 674,
       "specifier": "../src/domain/public.ts",
       "target": "src/domain/public.ts",
-      "targetHash": "e25787a89a684b01bcfdf1b0984dad8e27659dda40949a6cb084b93afbbf17ce"
+      "targetHash": "e25787a89a684b01bcfdf1b0984dad8e27659dda40949a6cb084b93afbbf17ce",
+      "targetKind": "repository"
     },
     {
       "from": "tests/exploration-recovery.e2e.ts",
@@ -1523,7 +2071,86 @@
       "endOffset": 767,
       "specifier": "../src/application/private-session.ts",
       "target": "src/application/private-session.ts",
-      "targetHash": "839159caebe8eab4adf9dfad3a35caf73e4628a79a9b72a457901ec886ed56a0"
+      "targetHash": "839159caebe8eab4adf9dfad3a35caf73e4628a79a9b72a457901ec886ed56a0",
+      "targetKind": "repository"
+    },
+    {
+      "from": "tests/gateway.test.ts",
+      "side": "before",
+      "commit": "b096826e31c0927190806de91ed70b8b64aa93d8",
+      "sourceHash": "21df294a4bcbdeadcabb3a0767e252fdaef5fe2fc371ea63bb3ab62071cb97d3",
+      "sourceLine": 1,
+      "startOffset": 27,
+      "endOffset": 40,
+      "specifier": "node:crypto",
+      "target": "node:crypto",
+      "targetHash": null,
+      "targetKind": "external"
+    },
+    {
+      "from": "tests/gateway.test.ts",
+      "side": "before",
+      "commit": "b096826e31c0927190806de91ed70b8b64aa93d8",
+      "sourceHash": "21df294a4bcbdeadcabb3a0767e252fdaef5fe2fc371ea63bb3ab62071cb97d3",
+      "sourceLine": 2,
+      "startOffset": 63,
+      "endOffset": 74,
+      "specifier": "node:test",
+      "target": "node:test",
+      "targetHash": null,
+      "targetKind": "external"
+    },
+    {
+      "from": "tests/gateway.test.ts",
+      "side": "before",
+      "commit": "b096826e31c0927190806de91ed70b8b64aa93d8",
+      "sourceHash": "21df294a4bcbdeadcabb3a0767e252fdaef5fe2fc371ea63bb3ab62071cb97d3",
+      "sourceLine": 3,
+      "startOffset": 95,
+      "endOffset": 115,
+      "specifier": "node:assert/strict",
+      "target": "node:assert/strict",
+      "targetHash": null,
+      "targetKind": "external"
+    },
+    {
+      "from": "tests/gateway.test.ts",
+      "side": "before",
+      "commit": "b096826e31c0927190806de91ed70b8b64aa93d8",
+      "sourceHash": "21df294a4bcbdeadcabb3a0767e252fdaef5fe2fc371ea63bb3ab62071cb97d3",
+      "sourceLine": 4,
+      "startOffset": 153,
+      "endOffset": 162,
+      "specifier": "node:fs",
+      "target": "node:fs",
+      "targetHash": null,
+      "targetKind": "external"
+    },
+    {
+      "from": "tests/gateway.test.ts",
+      "side": "before",
+      "commit": "b096826e31c0927190806de91ed70b8b64aa93d8",
+      "sourceHash": "21df294a4bcbdeadcabb3a0767e252fdaef5fe2fc371ea63bb3ab62071cb97d3",
+      "sourceLine": 5,
+      "startOffset": 187,
+      "endOffset": 196,
+      "specifier": "node:os",
+      "target": "node:os",
+      "targetHash": null,
+      "targetKind": "external"
+    },
+    {
+      "from": "tests/gateway.test.ts",
+      "side": "before",
+      "commit": "b096826e31c0927190806de91ed70b8b64aa93d8",
+      "sourceHash": "21df294a4bcbdeadcabb3a0767e252fdaef5fe2fc371ea63bb3ab62071cb97d3",
+      "sourceLine": 6,
+      "startOffset": 219,
+      "endOffset": 230,
+      "specifier": "node:path",
+      "target": "node:path",
+      "targetHash": null,
+      "targetKind": "external"
     },
     {
       "from": "tests/gateway.test.ts",
@@ -1535,7 +2162,8 @@
       "endOffset": 286,
       "specifier": "../src/storage/public.ts",
       "target": "src/storage/public.ts",
-      "targetHash": "61878e4c266549993e81985919feaf17995ee53790e49db5ad91d0b278725175"
+      "targetHash": "61878e4c266549993e81985919feaf17995ee53790e49db5ad91d0b278725175",
+      "targetKind": "repository"
     },
     {
       "from": "tests/gateway.test.ts",
@@ -1547,7 +2175,73 @@
       "endOffset": 343,
       "specifier": "../src/server/public.ts",
       "target": "src/server/public.ts",
-      "targetHash": "2bd6f01a2dd416ad1d95993d4fb14b79c56b46a6ce7b8dafb4e1d050a5a48964"
+      "targetHash": "2bd6f01a2dd416ad1d95993d4fb14b79c56b46a6ce7b8dafb4e1d050a5a48964",
+      "targetKind": "repository"
+    },
+    {
+      "from": "tests/import-jobs.test.ts",
+      "side": "before",
+      "commit": "b096826e31c0927190806de91ed70b8b64aa93d8",
+      "sourceHash": "eae02f2929607f862eb9e97c78c53792608235fd94b1361b313cdc934f08d57e",
+      "sourceLine": 1,
+      "startOffset": 19,
+      "endOffset": 30,
+      "specifier": "node:test",
+      "target": "node:test",
+      "targetHash": null,
+      "targetKind": "external"
+    },
+    {
+      "from": "tests/import-jobs.test.ts",
+      "side": "before",
+      "commit": "b096826e31c0927190806de91ed70b8b64aa93d8",
+      "sourceHash": "eae02f2929607f862eb9e97c78c53792608235fd94b1361b313cdc934f08d57e",
+      "sourceLine": 2,
+      "startOffset": 51,
+      "endOffset": 71,
+      "specifier": "node:assert/strict",
+      "target": "node:assert/strict",
+      "targetHash": null,
+      "targetKind": "external"
+    },
+    {
+      "from": "tests/import-jobs.test.ts",
+      "side": "before",
+      "commit": "b096826e31c0927190806de91ed70b8b64aa93d8",
+      "sourceHash": "eae02f2929607f862eb9e97c78c53792608235fd94b1361b313cdc934f08d57e",
+      "sourceLine": 3,
+      "startOffset": 106,
+      "endOffset": 115,
+      "specifier": "node:fs",
+      "target": "node:fs",
+      "targetHash": null,
+      "targetKind": "external"
+    },
+    {
+      "from": "tests/import-jobs.test.ts",
+      "side": "before",
+      "commit": "b096826e31c0927190806de91ed70b8b64aa93d8",
+      "sourceHash": "eae02f2929607f862eb9e97c78c53792608235fd94b1361b313cdc934f08d57e",
+      "sourceLine": 4,
+      "startOffset": 136,
+      "endOffset": 147,
+      "specifier": "node:path",
+      "target": "node:path",
+      "targetHash": null,
+      "targetKind": "external"
+    },
+    {
+      "from": "tests/import-jobs.test.ts",
+      "side": "before",
+      "commit": "b096826e31c0927190806de91ed70b8b64aa93d8",
+      "sourceHash": "eae02f2929607f862eb9e97c78c53792608235fd94b1361b313cdc934f08d57e",
+      "sourceLine": 5,
+      "startOffset": 170,
+      "endOffset": 179,
+      "specifier": "node:os",
+      "target": "node:os",
+      "targetHash": null,
+      "targetKind": "external"
     },
     {
       "from": "tests/import-jobs.test.ts",
@@ -1559,7 +2253,86 @@
       "endOffset": 233,
       "specifier": "../src/storage/public.ts",
       "target": "src/storage/public.ts",
-      "targetHash": "61878e4c266549993e81985919feaf17995ee53790e49db5ad91d0b278725175"
+      "targetHash": "61878e4c266549993e81985919feaf17995ee53790e49db5ad91d0b278725175",
+      "targetKind": "repository"
+    },
+    {
+      "from": "tests/import.e2e.ts",
+      "side": "before",
+      "commit": "b096826e31c0927190806de91ed70b8b64aa93d8",
+      "sourceHash": "07b47c45a5a313a266f70804fd2c3dc5405ca4663fa4bd02d7db5fe7ed261e73",
+      "sourceLine": 1,
+      "startOffset": 26,
+      "endOffset": 44,
+      "specifier": "@playwright/test",
+      "target": "@playwright/test",
+      "targetHash": null,
+      "targetKind": "external"
+    },
+    {
+      "from": "tests/import.e2e.ts",
+      "side": "before",
+      "commit": "b096826e31c0927190806de91ed70b8b64aa93d8",
+      "sourceHash": "07b47c45a5a313a266f70804fd2c3dc5405ca4663fa4bd02d7db5fe7ed261e73",
+      "sourceLine": 2,
+      "startOffset": 79,
+      "endOffset": 99,
+      "specifier": "node:child_process",
+      "target": "node:child_process",
+      "targetHash": null,
+      "targetKind": "external"
+    },
+    {
+      "from": "tests/import.e2e.ts",
+      "side": "before",
+      "commit": "b096826e31c0927190806de91ed70b8b64aa93d8",
+      "sourceHash": "07b47c45a5a313a266f70804fd2c3dc5405ca4663fa4bd02d7db5fe7ed261e73",
+      "sourceLine": 3,
+      "startOffset": 133,
+      "endOffset": 153,
+      "specifier": "node:child_process",
+      "target": "node:child_process",
+      "targetHash": null,
+      "targetKind": "external"
+    },
+    {
+      "from": "tests/import.e2e.ts",
+      "side": "before",
+      "commit": "b096826e31c0927190806de91ed70b8b64aa93d8",
+      "sourceHash": "07b47c45a5a313a266f70804fd2c3dc5405ca4663fa4bd02d7db5fe7ed261e73",
+      "sourceLine": 4,
+      "startOffset": 236,
+      "endOffset": 245,
+      "specifier": "node:fs",
+      "target": "node:fs",
+      "targetHash": null,
+      "targetKind": "external"
+    },
+    {
+      "from": "tests/import.e2e.ts",
+      "side": "before",
+      "commit": "b096826e31c0927190806de91ed70b8b64aa93d8",
+      "sourceHash": "07b47c45a5a313a266f70804fd2c3dc5405ca4663fa4bd02d7db5fe7ed261e73",
+      "sourceLine": 5,
+      "startOffset": 268,
+      "endOffset": 277,
+      "specifier": "node:os",
+      "target": "node:os",
+      "targetHash": null,
+      "targetKind": "external"
+    },
+    {
+      "from": "tests/import.e2e.ts",
+      "side": "before",
+      "commit": "b096826e31c0927190806de91ed70b8b64aa93d8",
+      "sourceHash": "07b47c45a5a313a266f70804fd2c3dc5405ca4663fa4bd02d7db5fe7ed261e73",
+      "sourceLine": 6,
+      "startOffset": 298,
+      "endOffset": 309,
+      "specifier": "node:path",
+      "target": "node:path",
+      "targetHash": null,
+      "targetKind": "external"
     },
     {
       "from": "tests/import.e2e.ts",
@@ -1571,7 +2344,8 @@
       "endOffset": 364,
       "specifier": "./provider-fixture.ts",
       "target": "tests/provider-fixture.ts",
-      "targetHash": "19cc570beccf36393b6bbabf7ad04dbc4161c8cd29dbcf94a64b82f82680b69b"
+      "targetHash": "19cc570beccf36393b6bbabf7ad04dbc4161c8cd29dbcf94a64b82f82680b69b",
+      "targetKind": "repository"
     },
     {
       "from": "tests/import.e2e.ts",
@@ -1583,7 +2357,34 @@
       "endOffset": 427,
       "specifier": "../src/domain/public.ts",
       "target": "src/domain/public.ts",
-      "targetHash": "e25787a89a684b01bcfdf1b0984dad8e27659dda40949a6cb084b93afbbf17ce"
+      "targetHash": "e25787a89a684b01bcfdf1b0984dad8e27659dda40949a6cb084b93afbbf17ce",
+      "targetKind": "repository"
+    },
+    {
+      "from": "tests/question-recovery.test.ts",
+      "side": "before",
+      "commit": "b096826e31c0927190806de91ed70b8b64aa93d8",
+      "sourceHash": "3c58c7764577807b30b1dd2c79dc521fd75daf196e7046f2ab5859d4035314fb",
+      "sourceLine": 1,
+      "startOffset": 19,
+      "endOffset": 30,
+      "specifier": "node:test",
+      "target": "node:test",
+      "targetHash": null,
+      "targetKind": "external"
+    },
+    {
+      "from": "tests/question-recovery.test.ts",
+      "side": "before",
+      "commit": "b096826e31c0927190806de91ed70b8b64aa93d8",
+      "sourceHash": "3c58c7764577807b30b1dd2c79dc521fd75daf196e7046f2ab5859d4035314fb",
+      "sourceLine": 2,
+      "startOffset": 51,
+      "endOffset": 71,
+      "specifier": "node:assert/strict",
+      "target": "node:assert/strict",
+      "targetHash": null,
+      "targetKind": "external"
     },
     {
       "from": "tests/question-recovery.test.ts",
@@ -1595,7 +2396,8 @@
       "endOffset": 220,
       "specifier": "../src/application/private-session.ts",
       "target": "src/application/private-session.ts",
-      "targetHash": "839159caebe8eab4adf9dfad3a35caf73e4628a79a9b72a457901ec886ed56a0"
+      "targetHash": "839159caebe8eab4adf9dfad3a35caf73e4628a79a9b72a457901ec886ed56a0",
+      "targetKind": "repository"
     },
     {
       "from": "tests/question-recovery.test.ts",
@@ -1607,7 +2409,112 @@
       "endOffset": 332,
       "specifier": "../src/application/private-session.ts",
       "target": "src/application/private-session.ts",
-      "targetHash": "839159caebe8eab4adf9dfad3a35caf73e4628a79a9b72a457901ec886ed56a0"
+      "targetHash": "839159caebe8eab4adf9dfad3a35caf73e4628a79a9b72a457901ec886ed56a0",
+      "targetKind": "repository"
+    },
+    {
+      "from": "tests/review.e2e.ts",
+      "side": "before",
+      "commit": "b096826e31c0927190806de91ed70b8b64aa93d8",
+      "sourceHash": "03783a9bbefdf8bd565c19d0618b75b6b0c247f3e2e7ca9b66538e746372547c",
+      "sourceLine": 1,
+      "startOffset": 29,
+      "endOffset": 47,
+      "specifier": "@playwright/test",
+      "target": "@playwright/test",
+      "targetHash": null,
+      "targetKind": "external"
+    },
+    {
+      "from": "tests/review.e2e.ts",
+      "side": "before",
+      "commit": "b096826e31c0927190806de91ed70b8b64aa93d8",
+      "sourceHash": "03783a9bbefdf8bd565c19d0618b75b6b0c247f3e2e7ca9b66538e746372547c",
+      "sourceLine": 2,
+      "startOffset": 85,
+      "endOffset": 105,
+      "specifier": "node:child_process",
+      "target": "node:child_process",
+      "targetHash": null,
+      "targetKind": "external"
+    },
+    {
+      "from": "tests/review.e2e.ts",
+      "side": "before",
+      "commit": "b096826e31c0927190806de91ed70b8b64aa93d8",
+      "sourceHash": "03783a9bbefdf8bd565c19d0618b75b6b0c247f3e2e7ca9b66538e746372547c",
+      "sourceLine": 3,
+      "startOffset": 141,
+      "endOffset": 161,
+      "specifier": "node:child_process",
+      "target": "node:child_process",
+      "targetHash": null,
+      "targetKind": "external"
+    },
+    {
+      "from": "tests/review.e2e.ts",
+      "side": "before",
+      "commit": "b096826e31c0927190806de91ed70b8b64aa93d8",
+      "sourceHash": "03783a9bbefdf8bd565c19d0618b75b6b0c247f3e2e7ca9b66538e746372547c",
+      "sourceLine": 10,
+      "startOffset": 251,
+      "endOffset": 260,
+      "specifier": "node:fs",
+      "target": "node:fs",
+      "targetHash": null,
+      "targetKind": "external"
+    },
+    {
+      "from": "tests/review.e2e.ts",
+      "side": "before",
+      "commit": "b096826e31c0927190806de91ed70b8b64aa93d8",
+      "sourceHash": "03783a9bbefdf8bd565c19d0618b75b6b0c247f3e2e7ca9b66538e746372547c",
+      "sourceLine": 11,
+      "startOffset": 285,
+      "endOffset": 294,
+      "specifier": "node:os",
+      "target": "node:os",
+      "targetHash": null,
+      "targetKind": "external"
+    },
+    {
+      "from": "tests/review.e2e.ts",
+      "side": "before",
+      "commit": "b096826e31c0927190806de91ed70b8b64aa93d8",
+      "sourceHash": "03783a9bbefdf8bd565c19d0618b75b6b0c247f3e2e7ca9b66538e746372547c",
+      "sourceLine": 12,
+      "startOffset": 326,
+      "endOffset": 337,
+      "specifier": "node:path",
+      "target": "node:path",
+      "targetHash": null,
+      "targetKind": "external"
+    },
+    {
+      "from": "tests/review.e2e.ts",
+      "side": "before",
+      "commit": "b096826e31c0927190806de91ed70b8b64aa93d8",
+      "sourceHash": "03783a9bbefdf8bd565c19d0618b75b6b0c247f3e2e7ca9b66538e746372547c",
+      "sourceLine": 13,
+      "startOffset": 362,
+      "endOffset": 405,
+      "specifier": "@modelcontextprotocol/sdk/client/index.js",
+      "target": "@modelcontextprotocol/sdk/client/index.js",
+      "targetHash": null,
+      "targetKind": "external"
+    },
+    {
+      "from": "tests/review.e2e.ts",
+      "side": "before",
+      "commit": "b096826e31c0927190806de91ed70b8b64aa93d8",
+      "sourceHash": "03783a9bbefdf8bd565c19d0618b75b6b0c247f3e2e7ca9b66538e746372547c",
+      "sourceLine": 14,
+      "startOffset": 444,
+      "endOffset": 487,
+      "specifier": "@modelcontextprotocol/sdk/client/stdio.js",
+      "target": "@modelcontextprotocol/sdk/client/stdio.js",
+      "targetHash": null,
+      "targetKind": "external"
     },
     {
       "from": "tests/review.e2e.ts",
@@ -1619,7 +2526,8 @@
       "endOffset": 546,
       "specifier": "../src/mcp/public.ts",
       "target": "src/mcp/public.ts",
-      "targetHash": "c56195fbcac4fe881b471e1b84585a49b9dc96aadcde4dc375bca4470fec37ad"
+      "targetHash": "c56195fbcac4fe881b471e1b84585a49b9dc96aadcde4dc375bca4470fec37ad",
+      "targetKind": "repository"
     },
     {
       "from": "tests/review.e2e.ts",
@@ -1631,7 +2539,164 @@
       "endOffset": 609,
       "specifier": "../src/domain/public.ts",
       "target": "src/domain/public.ts",
-      "targetHash": "e25787a89a684b01bcfdf1b0984dad8e27659dda40949a6cb084b93afbbf17ce"
+      "targetHash": "e25787a89a684b01bcfdf1b0984dad8e27659dda40949a6cb084b93afbbf17ce",
+      "targetKind": "repository"
+    },
+    {
+      "from": "tests/runtime.test.ts",
+      "side": "before",
+      "commit": "b096826e31c0927190806de91ed70b8b64aa93d8",
+      "sourceHash": "dd7a9b75a36bc916b67952ce9ca8489cb798f457fde2c6158db9461ffaca8332",
+      "sourceLine": 1,
+      "startOffset": 21,
+      "endOffset": 32,
+      "specifier": "node:test",
+      "target": "node:test",
+      "targetHash": null,
+      "targetKind": "external"
+    },
+    {
+      "from": "tests/runtime.test.ts",
+      "side": "before",
+      "commit": "b096826e31c0927190806de91ed70b8b64aa93d8",
+      "sourceHash": "dd7a9b75a36bc916b67952ce9ca8489cb798f457fde2c6158db9461ffaca8332",
+      "sourceLine": 2,
+      "startOffset": 53,
+      "endOffset": 73,
+      "specifier": "node:assert/strict",
+      "target": "node:assert/strict",
+      "targetHash": null,
+      "targetKind": "external"
+    },
+    {
+      "from": "tests/runtime.test.ts",
+      "side": "before",
+      "commit": "b096826e31c0927190806de91ed70b8b64aa93d8",
+      "sourceHash": "dd7a9b75a36bc916b67952ce9ca8489cb798f457fde2c6158db9461ffaca8332",
+      "sourceLine": 3,
+      "startOffset": 111,
+      "endOffset": 131,
+      "specifier": "node:child_process",
+      "target": "node:child_process",
+      "targetHash": null,
+      "targetKind": "external"
+    },
+    {
+      "from": "tests/runtime.test.ts",
+      "side": "before",
+      "commit": "b096826e31c0927190806de91ed70b8b64aa93d8",
+      "sourceHash": "dd7a9b75a36bc916b67952ce9ca8489cb798f457fde2c6158db9461ffaca8332",
+      "sourceLine": 10,
+      "startOffset": 221,
+      "endOffset": 230,
+      "specifier": "node:fs",
+      "target": "node:fs",
+      "targetHash": null,
+      "targetKind": "external"
+    },
+    {
+      "from": "tests/runtime.test.ts",
+      "side": "before",
+      "commit": "b096826e31c0927190806de91ed70b8b64aa93d8",
+      "sourceHash": "dd7a9b75a36bc916b67952ce9ca8489cb798f457fde2c6158db9461ffaca8332",
+      "sourceLine": 11,
+      "startOffset": 255,
+      "endOffset": 264,
+      "specifier": "node:os",
+      "target": "node:os",
+      "targetHash": null,
+      "targetKind": "external"
+    },
+    {
+      "from": "tests/runtime.test.ts",
+      "side": "before",
+      "commit": "b096826e31c0927190806de91ed70b8b64aa93d8",
+      "sourceHash": "dd7a9b75a36bc916b67952ce9ca8489cb798f457fde2c6158db9461ffaca8332",
+      "sourceLine": 12,
+      "startOffset": 287,
+      "endOffset": 298,
+      "specifier": "node:path",
+      "target": "node:path",
+      "targetHash": null,
+      "targetKind": "external"
+    },
+    {
+      "from": "tests/semantic-storage.test.ts",
+      "side": "before",
+      "commit": "b096826e31c0927190806de91ed70b8b64aa93d8",
+      "sourceHash": "535b900a2ecfd50b015bd2200d339f0b2e2e1e2b3de1acddb627b98a9739e914",
+      "sourceLine": 1,
+      "startOffset": 21,
+      "endOffset": 32,
+      "specifier": "node:test",
+      "target": "node:test",
+      "targetHash": null,
+      "targetKind": "external"
+    },
+    {
+      "from": "tests/semantic-storage.test.ts",
+      "side": "before",
+      "commit": "b096826e31c0927190806de91ed70b8b64aa93d8",
+      "sourceHash": "535b900a2ecfd50b015bd2200d339f0b2e2e1e2b3de1acddb627b98a9739e914",
+      "sourceLine": 2,
+      "startOffset": 53,
+      "endOffset": 73,
+      "specifier": "node:assert/strict",
+      "target": "node:assert/strict",
+      "targetHash": null,
+      "targetKind": "external"
+    },
+    {
+      "from": "tests/semantic-storage.test.ts",
+      "side": "before",
+      "commit": "b096826e31c0927190806de91ed70b8b64aa93d8",
+      "sourceHash": "535b900a2ecfd50b015bd2200d339f0b2e2e1e2b3de1acddb627b98a9739e914",
+      "sourceLine": 3,
+      "startOffset": 102,
+      "endOffset": 115,
+      "specifier": "node:crypto",
+      "target": "node:crypto",
+      "targetHash": null,
+      "targetKind": "external"
+    },
+    {
+      "from": "tests/semantic-storage.test.ts",
+      "side": "before",
+      "commit": "b096826e31c0927190806de91ed70b8b64aa93d8",
+      "sourceHash": "535b900a2ecfd50b015bd2200d339f0b2e2e1e2b3de1acddb627b98a9739e914",
+      "sourceLine": 4,
+      "startOffset": 153,
+      "endOffset": 162,
+      "specifier": "node:fs",
+      "target": "node:fs",
+      "targetHash": null,
+      "targetKind": "external"
+    },
+    {
+      "from": "tests/semantic-storage.test.ts",
+      "side": "before",
+      "commit": "b096826e31c0927190806de91ed70b8b64aa93d8",
+      "sourceHash": "535b900a2ecfd50b015bd2200d339f0b2e2e1e2b3de1acddb627b98a9739e914",
+      "sourceLine": 5,
+      "startOffset": 187,
+      "endOffset": 196,
+      "specifier": "node:os",
+      "target": "node:os",
+      "targetHash": null,
+      "targetKind": "external"
+    },
+    {
+      "from": "tests/semantic-storage.test.ts",
+      "side": "before",
+      "commit": "b096826e31c0927190806de91ed70b8b64aa93d8",
+      "sourceHash": "535b900a2ecfd50b015bd2200d339f0b2e2e1e2b3de1acddb627b98a9739e914",
+      "sourceLine": 6,
+      "startOffset": 219,
+      "endOffset": 230,
+      "specifier": "node:path",
+      "target": "node:path",
+      "targetHash": null,
+      "targetKind": "external"
     },
     {
       "from": "tests/semantic-storage.test.ts",
@@ -1643,7 +2708,8 @@
       "endOffset": 286,
       "specifier": "../src/storage/public.ts",
       "target": "src/storage/public.ts",
-      "targetHash": "61878e4c266549993e81985919feaf17995ee53790e49db5ad91d0b278725175"
+      "targetHash": "61878e4c266549993e81985919feaf17995ee53790e49db5ad91d0b278725175",
+      "targetKind": "repository"
     },
     {
       "from": "tests/semantic-storage.test.ts",
@@ -1655,7 +2721,86 @@
       "endOffset": 343,
       "specifier": "../src/domain/public.ts",
       "target": "src/domain/public.ts",
-      "targetHash": "e25787a89a684b01bcfdf1b0984dad8e27659dda40949a6cb084b93afbbf17ce"
+      "targetHash": "e25787a89a684b01bcfdf1b0984dad8e27659dda40949a6cb084b93afbbf17ce",
+      "targetKind": "repository"
+    },
+    {
+      "from": "tests/semantic.e2e.ts",
+      "side": "before",
+      "commit": "b096826e31c0927190806de91ed70b8b64aa93d8",
+      "sourceHash": "fd844979938e40fc3ec1079a306b084e0eaaf8fe5788c911c98c51f6a508d8cc",
+      "sourceLine": 1,
+      "startOffset": 26,
+      "endOffset": 44,
+      "specifier": "@playwright/test",
+      "target": "@playwright/test",
+      "targetHash": null,
+      "targetKind": "external"
+    },
+    {
+      "from": "tests/semantic.e2e.ts",
+      "side": "before",
+      "commit": "b096826e31c0927190806de91ed70b8b64aa93d8",
+      "sourceHash": "fd844979938e40fc3ec1079a306b084e0eaaf8fe5788c911c98c51f6a508d8cc",
+      "sourceLine": 2,
+      "startOffset": 79,
+      "endOffset": 99,
+      "specifier": "node:child_process",
+      "target": "node:child_process",
+      "targetHash": null,
+      "targetKind": "external"
+    },
+    {
+      "from": "tests/semantic.e2e.ts",
+      "side": "before",
+      "commit": "b096826e31c0927190806de91ed70b8b64aa93d8",
+      "sourceHash": "fd844979938e40fc3ec1079a306b084e0eaaf8fe5788c911c98c51f6a508d8cc",
+      "sourceLine": 3,
+      "startOffset": 133,
+      "endOffset": 153,
+      "specifier": "node:child_process",
+      "target": "node:child_process",
+      "targetHash": null,
+      "targetKind": "external"
+    },
+    {
+      "from": "tests/semantic.e2e.ts",
+      "side": "before",
+      "commit": "b096826e31c0927190806de91ed70b8b64aa93d8",
+      "sourceHash": "fd844979938e40fc3ec1079a306b084e0eaaf8fe5788c911c98c51f6a508d8cc",
+      "sourceLine": 4,
+      "startOffset": 183,
+      "endOffset": 192,
+      "specifier": "node:fs",
+      "target": "node:fs",
+      "targetHash": null,
+      "targetKind": "external"
+    },
+    {
+      "from": "tests/semantic.e2e.ts",
+      "side": "before",
+      "commit": "b096826e31c0927190806de91ed70b8b64aa93d8",
+      "sourceHash": "fd844979938e40fc3ec1079a306b084e0eaaf8fe5788c911c98c51f6a508d8cc",
+      "sourceLine": 5,
+      "startOffset": 213,
+      "endOffset": 224,
+      "specifier": "node:path",
+      "target": "node:path",
+      "targetHash": null,
+      "targetKind": "external"
+    },
+    {
+      "from": "tests/semantic.e2e.ts",
+      "side": "before",
+      "commit": "b096826e31c0927190806de91ed70b8b64aa93d8",
+      "sourceHash": "fd844979938e40fc3ec1079a306b084e0eaaf8fe5788c911c98c51f6a508d8cc",
+      "sourceLine": 6,
+      "startOffset": 253,
+      "endOffset": 263,
+      "specifier": "node:net",
+      "target": "node:net",
+      "targetHash": null,
+      "targetKind": "external"
     },
     {
       "from": "tests/semantic.e2e.ts",
@@ -1667,7 +2812,8 @@
       "endOffset": 318,
       "specifier": "./semantic-fixture.ts",
       "target": "tests/semantic-fixture.ts",
-      "targetHash": "6dd807ddf7c7ed334d19e860dd9bd13cbd459600ed2969142600ac7d9ddf31f6"
+      "targetHash": "6dd807ddf7c7ed334d19e860dd9bd13cbd459600ed2969142600ac7d9ddf31f6",
+      "targetKind": "repository"
     },
     {
       "from": "tests/semantic.e2e.ts",
@@ -1679,7 +2825,8 @@
       "endOffset": 373,
       "specifier": "../src/server/public.ts",
       "target": "src/server/public.ts",
-      "targetHash": "2bd6f01a2dd416ad1d95993d4fb14b79c56b46a6ce7b8dafb4e1d050a5a48964"
+      "targetHash": "2bd6f01a2dd416ad1d95993d4fb14b79c56b46a6ce7b8dafb4e1d050a5a48964",
+      "targetKind": "repository"
     },
     {
       "from": "tests/semantic.e2e.ts",
@@ -1691,7 +2838,8 @@
       "endOffset": 440,
       "specifier": "../src/source-preparation/public.ts",
       "target": "src/source-preparation/public.ts",
-      "targetHash": "45d55e286d4f3a10bedd3997d7527fb620312ba82a7217292eca73361417529c"
+      "targetHash": "45d55e286d4f3a10bedd3997d7527fb620312ba82a7217292eca73361417529c",
+      "targetKind": "repository"
     },
     {
       "from": "tests/semantic.e2e.ts",
@@ -1703,7 +2851,86 @@
       "endOffset": 531,
       "specifier": "../src/domain/public.ts",
       "target": "src/domain/public.ts",
-      "targetHash": "e25787a89a684b01bcfdf1b0984dad8e27659dda40949a6cb084b93afbbf17ce"
+      "targetHash": "e25787a89a684b01bcfdf1b0984dad8e27659dda40949a6cb084b93afbbf17ce",
+      "targetKind": "repository"
+    },
+    {
+      "from": "tests/story.e2e.ts",
+      "side": "before",
+      "commit": "b096826e31c0927190806de91ed70b8b64aa93d8",
+      "sourceHash": "e25e28aec6649dcea8118ea23234400f93dfc9ba80418c1ad27717694ccd881b",
+      "sourceLine": 1,
+      "startOffset": 26,
+      "endOffset": 44,
+      "specifier": "@playwright/test",
+      "target": "@playwright/test",
+      "targetHash": null,
+      "targetKind": "external"
+    },
+    {
+      "from": "tests/story.e2e.ts",
+      "side": "before",
+      "commit": "b096826e31c0927190806de91ed70b8b64aa93d8",
+      "sourceHash": "e25e28aec6649dcea8118ea23234400f93dfc9ba80418c1ad27717694ccd881b",
+      "sourceLine": 2,
+      "startOffset": 79,
+      "endOffset": 99,
+      "specifier": "node:child_process",
+      "target": "node:child_process",
+      "targetHash": null,
+      "targetKind": "external"
+    },
+    {
+      "from": "tests/story.e2e.ts",
+      "side": "before",
+      "commit": "b096826e31c0927190806de91ed70b8b64aa93d8",
+      "sourceHash": "e25e28aec6649dcea8118ea23234400f93dfc9ba80418c1ad27717694ccd881b",
+      "sourceLine": 3,
+      "startOffset": 133,
+      "endOffset": 153,
+      "specifier": "node:child_process",
+      "target": "node:child_process",
+      "targetHash": null,
+      "targetKind": "external"
+    },
+    {
+      "from": "tests/story.e2e.ts",
+      "side": "before",
+      "commit": "b096826e31c0927190806de91ed70b8b64aa93d8",
+      "sourceHash": "e25e28aec6649dcea8118ea23234400f93dfc9ba80418c1ad27717694ccd881b",
+      "sourceLine": 4,
+      "startOffset": 180,
+      "endOffset": 193,
+      "specifier": "node:crypto",
+      "target": "node:crypto",
+      "targetHash": null,
+      "targetKind": "external"
+    },
+    {
+      "from": "tests/story.e2e.ts",
+      "side": "before",
+      "commit": "b096826e31c0927190806de91ed70b8b64aa93d8",
+      "sourceHash": "e25e28aec6649dcea8118ea23234400f93dfc9ba80418c1ad27717694ccd881b",
+      "sourceLine": 5,
+      "startOffset": 222,
+      "endOffset": 232,
+      "specifier": "node:net",
+      "target": "node:net",
+      "targetHash": null,
+      "targetKind": "external"
+    },
+    {
+      "from": "tests/story.e2e.ts",
+      "side": "before",
+      "commit": "b096826e31c0927190806de91ed70b8b64aa93d8",
+      "sourceHash": "e25e28aec6649dcea8118ea23234400f93dfc9ba80418c1ad27717694ccd881b",
+      "sourceLine": 6,
+      "startOffset": 262,
+      "endOffset": 271,
+      "specifier": "node:fs",
+      "target": "node:fs",
+      "targetHash": null,
+      "targetKind": "external"
     },
     {
       "from": "tests/story.e2e.ts",
@@ -1715,7 +2942,8 @@
       "endOffset": 320,
       "specifier": "./story-fixture.ts",
       "target": "tests/story-fixture.ts",
-      "targetHash": "4ffe85b1ee0a6230e4e4cc4d801b8a3c8c4fb69a40d13cc1bbfa573257ab1672"
+      "targetHash": "4ffe85b1ee0a6230e4e4cc4d801b8a3c8c4fb69a40d13cc1bbfa573257ab1672",
+      "targetKind": "repository"
     },
     {
       "from": "tests/story.e2e.ts",
@@ -1727,7 +2955,8 @@
       "endOffset": 375,
       "specifier": "../src/server/public.ts",
       "target": "src/server/public.ts",
-      "targetHash": "2bd6f01a2dd416ad1d95993d4fb14b79c56b46a6ce7b8dafb4e1d050a5a48964"
+      "targetHash": "2bd6f01a2dd416ad1d95993d4fb14b79c56b46a6ce7b8dafb4e1d050a5a48964",
+      "targetKind": "repository"
     },
     {
       "from": "tests/story.e2e.ts",
@@ -1739,7 +2968,8 @@
       "endOffset": 440,
       "specifier": "../src/domain/public.ts",
       "target": "src/domain/public.ts",
-      "targetHash": "e25787a89a684b01bcfdf1b0984dad8e27659dda40949a6cb084b93afbbf17ce"
+      "targetHash": "e25787a89a684b01bcfdf1b0984dad8e27659dda40949a6cb084b93afbbf17ce",
+      "targetKind": "repository"
     },
     {
       "from": "tests/story.e2e.ts",
@@ -1751,7 +2981,21 @@
       "endOffset": 533,
       "specifier": "../src/domain/public.ts",
       "target": "src/domain/public.ts",
-      "targetHash": "e25787a89a684b01bcfdf1b0984dad8e27659dda40949a6cb084b93afbbf17ce"
+      "targetHash": "e25787a89a684b01bcfdf1b0984dad8e27659dda40949a6cb084b93afbbf17ce",
+      "targetKind": "repository"
+    },
+    {
+      "from": "scripts/add-snapshot.ts",
+      "side": "after",
+      "commit": "e3b270e5f49a9215452b0b86702946043e979059",
+      "sourceHash": "a83537bf989ce75a445a9c9964dba8bab8f45726a112634e9acec6da774f9738",
+      "sourceLine": 1,
+      "startOffset": 27,
+      "endOffset": 36,
+      "specifier": "node:fs",
+      "target": "node:fs",
+      "targetHash": null,
+      "targetKind": "external"
     },
     {
       "from": "scripts/add-snapshot.ts",
@@ -1763,7 +3007,8 @@
       "endOffset": 80,
       "specifier": "./prepare.ts",
       "target": "scripts/prepare.ts",
-      "targetHash": "de92502e83682db55685eef74d86ca81e1ec3f2c44c3f829abba015b366cfd81"
+      "targetHash": "de92502e83682db55685eef74d86ca81e1ec3f2c44c3f829abba015b366cfd81",
+      "targetKind": "repository"
     },
     {
       "from": "scripts/add-snapshot.ts",
@@ -1775,7 +3020,8 @@
       "endOffset": 123,
       "specifier": "./local.ts",
       "target": "scripts/local.ts",
-      "targetHash": "a74771f638d34c30f6ecc6db32c95e1c5a8048a95073369578545719f2c9adac"
+      "targetHash": "a74771f638d34c30f6ecc6db32c95e1c5a8048a95073369578545719f2c9adac",
+      "targetKind": "repository"
     },
     {
       "from": "scripts/add-snapshot.ts",
@@ -1787,7 +3033,47 @@
       "endOffset": 164,
       "specifier": "./local.ts",
       "target": "scripts/local.ts",
-      "targetHash": "a74771f638d34c30f6ecc6db32c95e1c5a8048a95073369578545719f2c9adac"
+      "targetHash": "a74771f638d34c30f6ecc6db32c95e1c5a8048a95073369578545719f2c9adac",
+      "targetKind": "repository"
+    },
+    {
+      "from": "scripts/capture-review.ts",
+      "side": "after",
+      "commit": "e3b270e5f49a9215452b0b86702946043e979059",
+      "sourceHash": "91e746fdad7f7d997b6168fff0aa71e79063f49cccf62c02231ac358667e7f8a",
+      "sourceLine": 1,
+      "startOffset": 25,
+      "endOffset": 43,
+      "specifier": "@playwright/test",
+      "target": "@playwright/test",
+      "targetHash": null,
+      "targetKind": "external"
+    },
+    {
+      "from": "scripts/capture-review.ts",
+      "side": "after",
+      "commit": "e3b270e5f49a9215452b0b86702946043e979059",
+      "sourceHash": "91e746fdad7f7d997b6168fff0aa71e79063f49cccf62c02231ac358667e7f8a",
+      "sourceLine": 2,
+      "startOffset": 100,
+      "endOffset": 109,
+      "specifier": "node:fs",
+      "target": "node:fs",
+      "targetHash": null,
+      "targetKind": "external"
+    },
+    {
+      "from": "scripts/capture-review.ts",
+      "side": "after",
+      "commit": "e3b270e5f49a9215452b0b86702946043e979059",
+      "sourceHash": "91e746fdad7f7d997b6168fff0aa71e79063f49cccf62c02231ac358667e7f8a",
+      "sourceLine": 3,
+      "startOffset": 141,
+      "endOffset": 152,
+      "specifier": "node:path",
+      "target": "node:path",
+      "targetHash": null,
+      "targetKind": "external"
     },
     {
       "from": "scripts/dev.ts",
@@ -1799,7 +3085,47 @@
       "endOffset": 71,
       "specifier": "../src/import-artifacts/public.ts",
       "target": "src/import-artifacts/public.ts",
-      "targetHash": "d53bacdcfdfe23681afdbfeabb0066ca15949f98a4a014ec1e1d58b1fbaf446a"
+      "targetHash": "d53bacdcfdfe23681afdbfeabb0066ca15949f98a4a014ec1e1d58b1fbaf446a",
+      "targetKind": "repository"
+    },
+    {
+      "from": "scripts/dev.ts",
+      "side": "after",
+      "commit": "e3b270e5f49a9215452b0b86702946043e979059",
+      "sourceHash": "cd6df721fffb9fd9bcfea6fed85aca5032d4243da01ba3a100fdd5e84926d497",
+      "sourceLine": 2,
+      "startOffset": 109,
+      "endOffset": 129,
+      "specifier": "node:child_process",
+      "target": "node:child_process",
+      "targetHash": null,
+      "targetKind": "external"
+    },
+    {
+      "from": "scripts/dev.ts",
+      "side": "after",
+      "commit": "e3b270e5f49a9215452b0b86702946043e979059",
+      "sourceHash": "cd6df721fffb9fd9bcfea6fed85aca5032d4243da01ba3a100fdd5e84926d497",
+      "sourceLine": 3,
+      "startOffset": 165,
+      "endOffset": 185,
+      "specifier": "node:child_process",
+      "target": "node:child_process",
+      "targetHash": null,
+      "targetKind": "external"
+    },
+    {
+      "from": "scripts/dev.ts",
+      "side": "after",
+      "commit": "e3b270e5f49a9215452b0b86702946043e979059",
+      "sourceHash": "cd6df721fffb9fd9bcfea6fed85aca5032d4243da01ba3a100fdd5e84926d497",
+      "sourceLine": 4,
+      "startOffset": 214,
+      "endOffset": 227,
+      "specifier": "node:crypto",
+      "target": "node:crypto",
+      "targetHash": null,
+      "targetKind": "external"
     },
     {
       "from": "scripts/dev.ts",
@@ -1811,7 +3137,8 @@
       "endOffset": 283,
       "specifier": "../src/storage/public.ts",
       "target": "src/storage/public.ts",
-      "targetHash": "ebf680d4d62a47f92af2123a60673e4ba58c7236257ffc12cea2ddc981791d58"
+      "targetHash": "ebf680d4d62a47f92af2123a60673e4ba58c7236257ffc12cea2ddc981791d58",
+      "targetKind": "repository"
     },
     {
       "from": "scripts/dev.ts",
@@ -1823,7 +3150,8 @@
       "endOffset": 340,
       "specifier": "../src/server/public.ts",
       "target": "src/server/public.ts",
-      "targetHash": "20c22563be7da4c385eda772d5840d55f0993ddeebd85718b3605cddb76a0b0e"
+      "targetHash": "20c22563be7da4c385eda772d5840d55f0993ddeebd85718b3605cddb76a0b0e",
+      "targetKind": "repository"
     },
     {
       "from": "scripts/dev.ts",
@@ -1835,7 +3163,8 @@
       "endOffset": 403,
       "specifier": "../src/delivery/public.ts",
       "target": "src/delivery/public.ts",
-      "targetHash": "9a85166fb944a4943f5c1c7941de1976773894759ee933e57bca4fef2b44a761"
+      "targetHash": "9a85166fb944a4943f5c1c7941de1976773894759ee933e57bca4fef2b44a761",
+      "targetKind": "repository"
     },
     {
       "from": "scripts/dev.ts",
@@ -1847,7 +3176,8 @@
       "endOffset": 479,
       "specifier": "./local.ts",
       "target": "scripts/local.ts",
-      "targetHash": "a74771f638d34c30f6ecc6db32c95e1c5a8048a95073369578545719f2c9adac"
+      "targetHash": "a74771f638d34c30f6ecc6db32c95e1c5a8048a95073369578545719f2c9adac",
+      "targetKind": "repository"
     },
     {
       "from": "scripts/dev.ts",
@@ -1859,7 +3189,8 @@
       "endOffset": 522,
       "specifier": "./local.ts",
       "target": "scripts/local.ts",
-      "targetHash": "a74771f638d34c30f6ecc6db32c95e1c5a8048a95073369578545719f2c9adac"
+      "targetHash": "a74771f638d34c30f6ecc6db32c95e1c5a8048a95073369578545719f2c9adac",
+      "targetKind": "repository"
     },
     {
       "from": "scripts/dev.ts",
@@ -1871,7 +3202,86 @@
       "endOffset": 568,
       "specifier": "./prepare.ts",
       "target": "scripts/prepare.ts",
-      "targetHash": "de92502e83682db55685eef74d86ca81e1ec3f2c44c3f829abba015b366cfd81"
+      "targetHash": "de92502e83682db55685eef74d86ca81e1ec3f2c44c3f829abba015b366cfd81",
+      "targetKind": "repository"
+    },
+    {
+      "from": "scripts/local.ts",
+      "side": "after",
+      "commit": "e3b270e5f49a9215452b0b86702946043e979059",
+      "sourceHash": "a74771f638d34c30f6ecc6db32c95e1c5a8048a95073369578545719f2c9adac",
+      "sourceLine": 12,
+      "startOffset": 157,
+      "endOffset": 166,
+      "specifier": "node:fs",
+      "target": "node:fs",
+      "targetHash": null,
+      "targetKind": "external"
+    },
+    {
+      "from": "scripts/local.ts",
+      "side": "after",
+      "commit": "e3b270e5f49a9215452b0b86702946043e979059",
+      "sourceHash": "a74771f638d34c30f6ecc6db32c95e1c5a8048a95073369578545719f2c9adac",
+      "sourceLine": 13,
+      "startOffset": 197,
+      "endOffset": 217,
+      "specifier": "node:child_process",
+      "target": "node:child_process",
+      "targetHash": null,
+      "targetKind": "external"
+    },
+    {
+      "from": "scripts/local.ts",
+      "side": "after",
+      "commit": "e3b270e5f49a9215452b0b86702946043e979059",
+      "sourceHash": "a74771f638d34c30f6ecc6db32c95e1c5a8048a95073369578545719f2c9adac",
+      "sourceLine": 14,
+      "startOffset": 263,
+      "endOffset": 274,
+      "specifier": "node:path",
+      "target": "node:path",
+      "targetHash": null,
+      "targetKind": "external"
+    },
+    {
+      "from": "scripts/pair.ts",
+      "side": "after",
+      "commit": "e3b270e5f49a9215452b0b86702946043e979059",
+      "sourceHash": "5c5eb8a80cff1ed3a1223870668760def0221eb27d9365b7468e6c5b770b250b",
+      "sourceLine": 1,
+      "startOffset": 60,
+      "endOffset": 69,
+      "specifier": "node:fs",
+      "target": "node:fs",
+      "targetHash": null,
+      "targetKind": "external"
+    },
+    {
+      "from": "scripts/pair.ts",
+      "side": "after",
+      "commit": "e3b270e5f49a9215452b0b86702946043e979059",
+      "sourceHash": "5c5eb8a80cff1ed3a1223870668760def0221eb27d9365b7468e6c5b770b250b",
+      "sourceLine": 2,
+      "startOffset": 101,
+      "endOffset": 112,
+      "specifier": "node:path",
+      "target": "node:path",
+      "targetHash": null,
+      "targetKind": "external"
+    },
+    {
+      "from": "scripts/pair.ts",
+      "side": "after",
+      "commit": "e3b270e5f49a9215452b0b86702946043e979059",
+      "sourceHash": "5c5eb8a80cff1ed3a1223870668760def0221eb27d9365b7468e6c5b770b250b",
+      "sourceLine": 3,
+      "startOffset": 141,
+      "endOffset": 154,
+      "specifier": "node:crypto",
+      "target": "node:crypto",
+      "targetHash": null,
+      "targetKind": "external"
     },
     {
       "from": "scripts/pair.ts",
@@ -1883,7 +3293,8 @@
       "endOffset": 214,
       "specifier": "./local.ts",
       "target": "scripts/local.ts",
-      "targetHash": "a74771f638d34c30f6ecc6db32c95e1c5a8048a95073369578545719f2c9adac"
+      "targetHash": "a74771f638d34c30f6ecc6db32c95e1c5a8048a95073369578545719f2c9adac",
+      "targetKind": "repository"
     },
     {
       "from": "scripts/pair.ts",
@@ -1895,7 +3306,8 @@
       "endOffset": 257,
       "specifier": "./local.ts",
       "target": "scripts/local.ts",
-      "targetHash": "a74771f638d34c30f6ecc6db32c95e1c5a8048a95073369578545719f2c9adac"
+      "targetHash": "a74771f638d34c30f6ecc6db32c95e1c5a8048a95073369578545719f2c9adac",
+      "targetKind": "repository"
     },
     {
       "from": "src/application/analysis.ts",
@@ -1907,7 +3319,8 @@
       "endOffset": 65,
       "specifier": "./local-access.ts",
       "target": "src/application/local-access.ts",
-      "targetHash": "811735e3599292c54af870134345249deed32f1d9b9705f8ca18fd086225d59d"
+      "targetHash": "811735e3599292c54af870134345249deed32f1d9b9705f8ca18fd086225d59d",
+      "targetKind": "repository"
     },
     {
       "from": "src/application/analysis.ts",
@@ -1919,7 +3332,8 @@
       "endOffset": 124,
       "specifier": "../integration/registry.ts",
       "target": "src/integration/registry.ts",
-      "targetHash": "186badf8a706f5d7eb8759ee98d7388568d71802c8d04a069321135483fe8b6a"
+      "targetHash": "186badf8a706f5d7eb8759ee98d7388568d71802c8d04a069321135483fe8b6a",
+      "targetKind": "repository"
     },
     {
       "from": "src/application/analysis.ts",
@@ -1931,7 +3345,8 @@
       "endOffset": 295,
       "specifier": "../domain/public.ts",
       "target": "src/domain/public.ts",
-      "targetHash": "e25787a89a684b01bcfdf1b0984dad8e27659dda40949a6cb084b93afbbf17ce"
+      "targetHash": "e25787a89a684b01bcfdf1b0984dad8e27659dda40949a6cb084b93afbbf17ce",
+      "targetKind": "repository"
     },
     {
       "from": "src/application/imports.ts",
@@ -1943,7 +3358,8 @@
       "endOffset": 65,
       "specifier": "./local-access.ts",
       "target": "src/application/local-access.ts",
-      "targetHash": "811735e3599292c54af870134345249deed32f1d9b9705f8ca18fd086225d59d"
+      "targetHash": "811735e3599292c54af870134345249deed32f1d9b9705f8ca18fd086225d59d",
+      "targetKind": "repository"
     },
     {
       "from": "src/application/imports.ts",
@@ -1955,7 +3371,8 @@
       "endOffset": 124,
       "specifier": "../integration/registry.ts",
       "target": "src/integration/registry.ts",
-      "targetHash": "186badf8a706f5d7eb8759ee98d7388568d71802c8d04a069321135483fe8b6a"
+      "targetHash": "186badf8a706f5d7eb8759ee98d7388568d71802c8d04a069321135483fe8b6a",
+      "targetKind": "repository"
     },
     {
       "from": "src/application/imports.ts",
@@ -1967,7 +3384,8 @@
       "endOffset": 204,
       "specifier": "../domain/public.ts",
       "target": "src/domain/public.ts",
-      "targetHash": "e25787a89a684b01bcfdf1b0984dad8e27659dda40949a6cb084b93afbbf17ce"
+      "targetHash": "e25787a89a684b01bcfdf1b0984dad8e27659dda40949a6cb084b93afbbf17ce",
+      "targetKind": "repository"
     },
     {
       "from": "src/application/private-session.ts",
@@ -1979,7 +3397,21 @@
       "endOffset": 51,
       "specifier": "./local-access.ts",
       "target": "src/application/local-access.ts",
-      "targetHash": "811735e3599292c54af870134345249deed32f1d9b9705f8ca18fd086225d59d"
+      "targetHash": "811735e3599292c54af870134345249deed32f1d9b9705f8ca18fd086225d59d",
+      "targetKind": "repository"
+    },
+    {
+      "from": "src/application/private-session.ts",
+      "side": "after",
+      "commit": "e3b270e5f49a9215452b0b86702946043e979059",
+      "sourceHash": "8898cfa974b3033ef0d7bc0c54ef00fbdeeffb2eac7bb89554e29db383c7e8f4",
+      "sourceLine": 2,
+      "startOffset": 69,
+      "endOffset": 74,
+      "specifier": "zod",
+      "target": "zod",
+      "targetHash": null,
+      "targetKind": "external"
     },
     {
       "from": "src/application/private-session.ts",
@@ -1991,7 +3423,8 @@
       "endOffset": 180,
       "specifier": "../domain/public.ts",
       "target": "src/domain/public.ts",
-      "targetHash": "e25787a89a684b01bcfdf1b0984dad8e27659dda40949a6cb084b93afbbf17ce"
+      "targetHash": "e25787a89a684b01bcfdf1b0984dad8e27659dda40949a6cb084b93afbbf17ce",
+      "targetKind": "repository"
     },
     {
       "from": "src/application/private-session.ts",
@@ -2003,7 +3436,8 @@
       "endOffset": 230,
       "specifier": "../domain/public.ts",
       "target": "src/domain/public.ts",
-      "targetHash": "e25787a89a684b01bcfdf1b0984dad8e27659dda40949a6cb084b93afbbf17ce"
+      "targetHash": "e25787a89a684b01bcfdf1b0984dad8e27659dda40949a6cb084b93afbbf17ce",
+      "targetKind": "repository"
     },
     {
       "from": "src/application/review.ts",
@@ -2015,7 +3449,8 @@
       "endOffset": 65,
       "specifier": "./local-access.ts",
       "target": "src/application/local-access.ts",
-      "targetHash": "811735e3599292c54af870134345249deed32f1d9b9705f8ca18fd086225d59d"
+      "targetHash": "811735e3599292c54af870134345249deed32f1d9b9705f8ca18fd086225d59d",
+      "targetKind": "repository"
     },
     {
       "from": "src/application/review.ts",
@@ -2027,7 +3462,8 @@
       "endOffset": 171,
       "specifier": "../domain/public.ts",
       "target": "src/domain/public.ts",
-      "targetHash": "e25787a89a684b01bcfdf1b0984dad8e27659dda40949a6cb084b93afbbf17ce"
+      "targetHash": "e25787a89a684b01bcfdf1b0984dad8e27659dda40949a6cb084b93afbbf17ce",
+      "targetKind": "repository"
     },
     {
       "from": "src/application/review.ts",
@@ -2039,7 +3475,8 @@
       "endOffset": 244,
       "specifier": "../domain/public.ts",
       "target": "src/domain/public.ts",
-      "targetHash": "e25787a89a684b01bcfdf1b0984dad8e27659dda40949a6cb084b93afbbf17ce"
+      "targetHash": "e25787a89a684b01bcfdf1b0984dad8e27659dda40949a6cb084b93afbbf17ce",
+      "targetKind": "repository"
     },
     {
       "from": "src/application/review.ts",
@@ -2051,7 +3488,8 @@
       "endOffset": 283,
       "specifier": "./public.ts",
       "target": "src/application/public.ts",
-      "targetHash": "94e20323156f2a3c31cdea3b84a453b8e19d27ecad031457412083c08502da64"
+      "targetHash": "94e20323156f2a3c31cdea3b84a453b8e19d27ecad031457412083c08502da64",
+      "targetKind": "repository"
     },
     {
       "from": "src/application/review.ts",
@@ -2063,7 +3501,8 @@
       "endOffset": 342,
       "specifier": "../integration/registry.ts",
       "target": "src/integration/registry.ts",
-      "targetHash": "186badf8a706f5d7eb8759ee98d7388568d71802c8d04a069321135483fe8b6a"
+      "targetHash": "186badf8a706f5d7eb8759ee98d7388568d71802c8d04a069321135483fe8b6a",
+      "targetKind": "repository"
     },
     {
       "from": "src/application/review.ts",
@@ -2075,7 +3514,8 @@
       "endOffset": 453,
       "specifier": "./private-session.ts",
       "target": "src/application/private-session.ts",
-      "targetHash": "8898cfa974b3033ef0d7bc0c54ef00fbdeeffb2eac7bb89554e29db383c7e8f4"
+      "targetHash": "8898cfa974b3033ef0d7bc0c54ef00fbdeeffb2eac7bb89554e29db383c7e8f4",
+      "targetKind": "repository"
     },
     {
       "from": "src/application/review.ts",
@@ -2087,7 +3527,8 @@
       "endOffset": 544,
       "specifier": "./private-session.ts",
       "target": "src/application/private-session.ts",
-      "targetHash": "8898cfa974b3033ef0d7bc0c54ef00fbdeeffb2eac7bb89554e29db383c7e8f4"
+      "targetHash": "8898cfa974b3033ef0d7bc0c54ef00fbdeeffb2eac7bb89554e29db383c7e8f4",
+      "targetKind": "repository"
     },
     {
       "from": "src/application/story.ts",
@@ -2099,7 +3540,8 @@
       "endOffset": 47,
       "specifier": "./local-access.ts",
       "target": "src/application/local-access.ts",
-      "targetHash": "811735e3599292c54af870134345249deed32f1d9b9705f8ca18fd086225d59d"
+      "targetHash": "811735e3599292c54af870134345249deed32f1d9b9705f8ca18fd086225d59d",
+      "targetKind": "repository"
     },
     {
       "from": "src/application/story.ts",
@@ -2111,7 +3553,8 @@
       "endOffset": 123,
       "specifier": "../domain/public.ts",
       "target": "src/domain/public.ts",
-      "targetHash": "e25787a89a684b01bcfdf1b0984dad8e27659dda40949a6cb084b93afbbf17ce"
+      "targetHash": "e25787a89a684b01bcfdf1b0984dad8e27659dda40949a6cb084b93afbbf17ce",
+      "targetKind": "repository"
     },
     {
       "from": "src/application/story.ts",
@@ -2123,7 +3566,8 @@
       "endOffset": 172,
       "specifier": "../domain/public.ts",
       "target": "src/domain/public.ts",
-      "targetHash": "e25787a89a684b01bcfdf1b0984dad8e27659dda40949a6cb084b93afbbf17ce"
+      "targetHash": "e25787a89a684b01bcfdf1b0984dad8e27659dda40949a6cb084b93afbbf17ce",
+      "targetKind": "repository"
     },
     {
       "from": "src/application/story.ts",
@@ -2135,7 +3579,8 @@
       "endOffset": 290,
       "specifier": "./private-session.ts",
       "target": "src/application/private-session.ts",
-      "targetHash": "8898cfa974b3033ef0d7bc0c54ef00fbdeeffb2eac7bb89554e29db383c7e8f4"
+      "targetHash": "8898cfa974b3033ef0d7bc0c54ef00fbdeeffb2eac7bb89554e29db383c7e8f4",
+      "targetKind": "repository"
     },
     {
       "from": "src/application/story.ts",
@@ -2147,7 +3592,8 @@
       "endOffset": 349,
       "specifier": "../integration/registry.ts",
       "target": "src/integration/registry.ts",
-      "targetHash": "186badf8a706f5d7eb8759ee98d7388568d71802c8d04a069321135483fe8b6a"
+      "targetHash": "186badf8a706f5d7eb8759ee98d7388568d71802c8d04a069321135483fe8b6a",
+      "targetKind": "repository"
     },
     {
       "from": "src/application/story.ts",
@@ -2159,7 +3605,8 @@
       "endOffset": 470,
       "specifier": "../domain/public.ts",
       "target": "src/domain/public.ts",
-      "targetHash": "e25787a89a684b01bcfdf1b0984dad8e27659dda40949a6cb084b93afbbf17ce"
+      "targetHash": "e25787a89a684b01bcfdf1b0984dad8e27659dda40949a6cb084b93afbbf17ce",
+      "targetKind": "repository"
     },
     {
       "from": "src/application/story.ts",
@@ -2171,7 +3618,8 @@
       "endOffset": 521,
       "specifier": "./analysis.ts",
       "target": "src/application/analysis.ts",
-      "targetHash": "52ba83af9ba583a0300ebcd4037111e71ad54c640e766db5f847085c9dbc7512"
+      "targetHash": "52ba83af9ba583a0300ebcd4037111e71ad54c640e766db5f847085c9dbc7512",
+      "targetKind": "repository"
     },
     {
       "from": "src/application/workspace.ts",
@@ -2183,7 +3631,8 @@
       "endOffset": 51,
       "specifier": "./local-access.ts",
       "target": "src/application/local-access.ts",
-      "targetHash": "811735e3599292c54af870134345249deed32f1d9b9705f8ca18fd086225d59d"
+      "targetHash": "811735e3599292c54af870134345249deed32f1d9b9705f8ca18fd086225d59d",
+      "targetKind": "repository"
     },
     {
       "from": "src/application/workspace.ts",
@@ -2195,7 +3644,8 @@
       "endOffset": 99,
       "specifier": "./review.ts",
       "target": "src/application/review.ts",
-      "targetHash": "dae210c79cb019d6edfdbfacfcf3da1e5773ceb4d15cf747df15ffa498c28e4e"
+      "targetHash": "dae210c79cb019d6edfdbfacfcf3da1e5773ceb4d15cf747df15ffa498c28e4e",
+      "targetKind": "repository"
     },
     {
       "from": "src/application/workspace.ts",
@@ -2207,7 +3657,8 @@
       "endOffset": 151,
       "specifier": "./analysis.ts",
       "target": "src/application/analysis.ts",
-      "targetHash": "52ba83af9ba583a0300ebcd4037111e71ad54c640e766db5f847085c9dbc7512"
+      "targetHash": "52ba83af9ba583a0300ebcd4037111e71ad54c640e766db5f847085c9dbc7512",
+      "targetKind": "repository"
     },
     {
       "from": "src/application/workspace.ts",
@@ -2219,7 +3670,8 @@
       "endOffset": 197,
       "specifier": "./story.ts",
       "target": "src/application/story.ts",
-      "targetHash": "1fdf81528e3e1b658123e2ae1992d5406e1a2217819b4a0e0547669d4fea5f9f"
+      "targetHash": "1fdf81528e3e1b658123e2ae1992d5406e1a2217819b4a0e0547669d4fea5f9f",
+      "targetKind": "repository"
     },
     {
       "from": "src/application/workspace.ts",
@@ -2231,7 +3683,8 @@
       "endOffset": 256,
       "specifier": "./private-session.ts",
       "target": "src/application/private-session.ts",
-      "targetHash": "8898cfa974b3033ef0d7bc0c54ef00fbdeeffb2eac7bb89554e29db383c7e8f4"
+      "targetHash": "8898cfa974b3033ef0d7bc0c54ef00fbdeeffb2eac7bb89554e29db383c7e8f4",
+      "targetKind": "repository"
     },
     {
       "from": "src/application/workspace.ts",
@@ -2243,7 +3696,8 @@
       "endOffset": 326,
       "specifier": "./private-session.ts",
       "target": "src/application/private-session.ts",
-      "targetHash": "8898cfa974b3033ef0d7bc0c54ef00fbdeeffb2eac7bb89554e29db383c7e8f4"
+      "targetHash": "8898cfa974b3033ef0d7bc0c54ef00fbdeeffb2eac7bb89554e29db383c7e8f4",
+      "targetKind": "repository"
     },
     {
       "from": "src/application/workspace.ts",
@@ -2255,7 +3709,8 @@
       "endOffset": 375,
       "specifier": "../domain/public.ts",
       "target": "src/domain/public.ts",
-      "targetHash": "e25787a89a684b01bcfdf1b0984dad8e27659dda40949a6cb084b93afbbf17ce"
+      "targetHash": "e25787a89a684b01bcfdf1b0984dad8e27659dda40949a6cb084b93afbbf17ce",
+      "targetKind": "repository"
     },
     {
       "from": "src/application/workspace.ts",
@@ -2267,7 +3722,8 @@
       "endOffset": 434,
       "specifier": "../integration/registry.ts",
       "target": "src/integration/registry.ts",
-      "targetHash": "186badf8a706f5d7eb8759ee98d7388568d71802c8d04a069321135483fe8b6a"
+      "targetHash": "186badf8a706f5d7eb8759ee98d7388568d71802c8d04a069321135483fe8b6a",
+      "targetKind": "repository"
     },
     {
       "from": "src/server/public.ts",
@@ -2279,7 +3735,8 @@
       "endOffset": 63,
       "specifier": "../analysis-jobs/public.ts",
       "target": "src/analysis-jobs/public.ts",
-      "targetHash": "db3302ac3f2bfd468571fc897188adeedd6f06ffbd6eb2f05aa1bb117e4399f5"
+      "targetHash": "db3302ac3f2bfd468571fc897188adeedd6f06ffbd6eb2f05aa1bb117e4399f5",
+      "targetKind": "repository"
     },
     {
       "from": "src/server/public.ts",
@@ -2291,7 +3748,8 @@
       "endOffset": 124,
       "specifier": "../import-jobs/public.ts",
       "target": "src/import-jobs/public.ts",
-      "targetHash": "d299c2636d04d070f1645ee6728ce899064b10e59567403c098d63e268211f66"
+      "targetHash": "d299c2636d04d070f1645ee6728ce899064b10e59567403c098d63e268211f66",
+      "targetKind": "repository"
     },
     {
       "from": "src/server/public.ts",
@@ -2303,7 +3761,8 @@
       "endOffset": 192,
       "specifier": "../import-artifacts/public.ts",
       "target": "src/import-artifacts/public.ts",
-      "targetHash": "d53bacdcfdfe23681afdbfeabb0066ca15949f98a4a014ec1e1d58b1fbaf446a"
+      "targetHash": "d53bacdcfdfe23681afdbfeabb0066ca15949f98a4a014ec1e1d58b1fbaf446a",
+      "targetKind": "repository"
     },
     {
       "from": "src/server/public.ts",
@@ -2315,7 +3774,8 @@
       "endOffset": 264,
       "specifier": "../source-preparation/public.ts",
       "target": "src/source-preparation/public.ts",
-      "targetHash": "45d55e286d4f3a10bedd3997d7527fb620312ba82a7217292eca73361417529c"
+      "targetHash": "45d55e286d4f3a10bedd3997d7527fb620312ba82a7217292eca73361417529c",
+      "targetKind": "repository"
     },
     {
       "from": "src/server/public.ts",
@@ -2327,7 +3787,47 @@
       "endOffset": 342,
       "specifier": "../source-preparation/public.ts",
       "target": "src/source-preparation/public.ts",
-      "targetHash": "45d55e286d4f3a10bedd3997d7527fb620312ba82a7217292eca73361417529c"
+      "targetHash": "45d55e286d4f3a10bedd3997d7527fb620312ba82a7217292eca73361417529c",
+      "targetKind": "repository"
+    },
+    {
+      "from": "src/server/public.ts",
+      "side": "after",
+      "commit": "e3b270e5f49a9215452b0b86702946043e979059",
+      "sourceHash": "20c22563be7da4c385eda772d5840d55f0993ddeebd85718b3605cddb76a0b0e",
+      "sourceLine": 6,
+      "startOffset": 373,
+      "endOffset": 384,
+      "specifier": "node:http",
+      "target": "node:http",
+      "targetHash": null,
+      "targetKind": "external"
+    },
+    {
+      "from": "src/server/public.ts",
+      "side": "after",
+      "commit": "e3b270e5f49a9215452b0b86702946043e979059",
+      "sourceHash": "20c22563be7da4c385eda772d5840d55f0993ddeebd85718b3605cddb76a0b0e",
+      "sourceLine": 7,
+      "startOffset": 439,
+      "endOffset": 450,
+      "specifier": "node:http",
+      "target": "node:http",
+      "targetHash": null,
+      "targetKind": "external"
+    },
+    {
+      "from": "src/server/public.ts",
+      "side": "after",
+      "commit": "e3b270e5f49a9215452b0b86702946043e979059",
+      "sourceHash": "20c22563be7da4c385eda772d5840d55f0993ddeebd85718b3605cddb76a0b0e",
+      "sourceLine": 8,
+      "startOffset": 470,
+      "endOffset": 475,
+      "specifier": "zod",
+      "target": "zod",
+      "targetHash": null,
+      "targetKind": "external"
     },
     {
       "from": "src/server/public.ts",
@@ -2339,7 +3839,8 @@
       "endOffset": 676,
       "specifier": "../domain/public.ts",
       "target": "src/domain/public.ts",
-      "targetHash": "e25787a89a684b01bcfdf1b0984dad8e27659dda40949a6cb084b93afbbf17ce"
+      "targetHash": "e25787a89a684b01bcfdf1b0984dad8e27659dda40949a6cb084b93afbbf17ce",
+      "targetKind": "repository"
     },
     {
       "from": "src/server/public.ts",
@@ -2351,7 +3852,8 @@
       "endOffset": 730,
       "specifier": "../domain/public.ts",
       "target": "src/domain/public.ts",
-      "targetHash": "e25787a89a684b01bcfdf1b0984dad8e27659dda40949a6cb084b93afbbf17ce"
+      "targetHash": "e25787a89a684b01bcfdf1b0984dad8e27659dda40949a6cb084b93afbbf17ce",
+      "targetKind": "repository"
     },
     {
       "from": "src/server/public.ts",
@@ -2363,7 +3865,8 @@
       "endOffset": 781,
       "specifier": "../storage/public.ts",
       "target": "src/storage/public.ts",
-      "targetHash": "ebf680d4d62a47f92af2123a60673e4ba58c7236257ffc12cea2ddc981791d58"
+      "targetHash": "ebf680d4d62a47f92af2123a60673e4ba58c7236257ffc12cea2ddc981791d58",
+      "targetKind": "repository"
     },
     {
       "from": "src/server/public.ts",
@@ -2375,7 +3878,8 @@
       "endOffset": 838,
       "specifier": "../delivery/public.ts",
       "target": "src/delivery/public.ts",
-      "targetHash": "9a85166fb944a4943f5c1c7941de1976773894759ee933e57bca4fef2b44a761"
+      "targetHash": "9a85166fb944a4943f5c1c7941de1976773894759ee933e57bca4fef2b44a761",
+      "targetKind": "repository"
     },
     {
       "from": "src/server/public.ts",
@@ -2387,7 +3891,8 @@
       "endOffset": 891,
       "specifier": "../delivery/public.ts",
       "target": "src/delivery/public.ts",
-      "targetHash": "9a85166fb944a4943f5c1c7941de1976773894759ee933e57bca4fef2b44a761"
+      "targetHash": "9a85166fb944a4943f5c1c7941de1976773894759ee933e57bca4fef2b44a761",
+      "targetKind": "repository"
     },
     {
       "from": "src/server/public.ts",
@@ -2399,7 +3904,21 @@
       "endOffset": 952,
       "specifier": "../integration/registry.ts",
       "target": "src/integration/registry.ts",
-      "targetHash": "186badf8a706f5d7eb8759ee98d7388568d71802c8d04a069321135483fe8b6a"
+      "targetHash": "186badf8a706f5d7eb8759ee98d7388568d71802c8d04a069321135483fe8b6a",
+      "targetKind": "repository"
+    },
+    {
+      "from": "src/storage/access.ts",
+      "side": "after",
+      "commit": "e3b270e5f49a9215452b0b86702946043e979059",
+      "sourceHash": "0440486de82e136ffe430e4f1bed2b6f57f491319c59a71fad0f9d8507053b4c",
+      "sourceLine": 1,
+      "startOffset": 25,
+      "endOffset": 38,
+      "specifier": "node:crypto",
+      "target": "node:crypto",
+      "targetHash": null,
+      "targetKind": "external"
     },
     {
       "from": "src/storage/access.ts",
@@ -2411,7 +3930,8 @@
       "endOffset": 90,
       "specifier": "../domain/public.ts",
       "target": "src/domain/public.ts",
-      "targetHash": "e25787a89a684b01bcfdf1b0984dad8e27659dda40949a6cb084b93afbbf17ce"
+      "targetHash": "e25787a89a684b01bcfdf1b0984dad8e27659dda40949a6cb084b93afbbf17ce",
+      "targetKind": "repository"
     },
     {
       "from": "src/storage/analysis.ts",
@@ -2423,7 +3943,8 @@
       "endOffset": 71,
       "specifier": "./access.ts",
       "target": "src/storage/access.ts",
-      "targetHash": "0440486de82e136ffe430e4f1bed2b6f57f491319c59a71fad0f9d8507053b4c"
+      "targetHash": "0440486de82e136ffe430e4f1bed2b6f57f491319c59a71fad0f9d8507053b4c",
+      "targetKind": "repository"
     },
     {
       "from": "src/storage/analysis.ts",
@@ -2435,7 +3956,8 @@
       "endOffset": 119,
       "specifier": "./access.ts",
       "target": "src/storage/access.ts",
-      "targetHash": "0440486de82e136ffe430e4f1bed2b6f57f491319c59a71fad0f9d8507053b4c"
+      "targetHash": "0440486de82e136ffe430e4f1bed2b6f57f491319c59a71fad0f9d8507053b4c",
+      "targetKind": "repository"
     },
     {
       "from": "src/storage/analysis.ts",
@@ -2447,7 +3969,34 @@
       "endOffset": 182,
       "specifier": "../domain/public.ts",
       "target": "src/domain/public.ts",
-      "targetHash": "e25787a89a684b01bcfdf1b0984dad8e27659dda40949a6cb084b93afbbf17ce"
+      "targetHash": "e25787a89a684b01bcfdf1b0984dad8e27659dda40949a6cb084b93afbbf17ce",
+      "targetKind": "repository"
+    },
+    {
+      "from": "src/storage/analysis.ts",
+      "side": "after",
+      "commit": "e3b270e5f49a9215452b0b86702946043e979059",
+      "sourceHash": "584ddbec662b403ed2b9dfe50f5b54382347494c12ee735d3442f0db75aca153",
+      "sourceLine": 4,
+      "startOffset": 223,
+      "endOffset": 236,
+      "specifier": "node:crypto",
+      "target": "node:crypto",
+      "targetHash": null,
+      "targetKind": "external"
+    },
+    {
+      "from": "src/storage/analysis.ts",
+      "side": "after",
+      "commit": "e3b270e5f49a9215452b0b86702946043e979059",
+      "sourceHash": "584ddbec662b403ed2b9dfe50f5b54382347494c12ee735d3442f0db75aca153",
+      "sourceLine": 5,
+      "startOffset": 272,
+      "endOffset": 285,
+      "specifier": "node:sqlite",
+      "target": "node:sqlite",
+      "targetHash": null,
+      "targetKind": "external"
     },
     {
       "from": "src/storage/analysis.ts",
@@ -2459,7 +4008,8 @@
       "endOffset": 450,
       "specifier": "../domain/public.ts",
       "target": "src/domain/public.ts",
-      "targetHash": "e25787a89a684b01bcfdf1b0984dad8e27659dda40949a6cb084b93afbbf17ce"
+      "targetHash": "e25787a89a684b01bcfdf1b0984dad8e27659dda40949a6cb084b93afbbf17ce",
+      "targetKind": "repository"
     },
     {
       "from": "src/storage/analysis.ts",
@@ -2471,7 +4021,8 @@
       "endOffset": 564,
       "specifier": "../domain/public.ts",
       "target": "src/domain/public.ts",
-      "targetHash": "e25787a89a684b01bcfdf1b0984dad8e27659dda40949a6cb084b93afbbf17ce"
+      "targetHash": "e25787a89a684b01bcfdf1b0984dad8e27659dda40949a6cb084b93afbbf17ce",
+      "targetKind": "repository"
     },
     {
       "from": "src/storage/analysis.ts",
@@ -2483,7 +4034,8 @@
       "endOffset": 905,
       "specifier": "../domain/public.ts",
       "target": "src/domain/public.ts",
-      "targetHash": "e25787a89a684b01bcfdf1b0984dad8e27659dda40949a6cb084b93afbbf17ce"
+      "targetHash": "e25787a89a684b01bcfdf1b0984dad8e27659dda40949a6cb084b93afbbf17ce",
+      "targetKind": "repository"
     },
     {
       "from": "src/storage/analysis.ts",
@@ -2495,7 +4047,8 @@
       "endOffset": 1020,
       "specifier": "../source-preparation/public.ts",
       "target": "src/source-preparation/public.ts",
-      "targetHash": "45d55e286d4f3a10bedd3997d7527fb620312ba82a7217292eca73361417529c"
+      "targetHash": "45d55e286d4f3a10bedd3997d7527fb620312ba82a7217292eca73361417529c",
+      "targetKind": "repository"
     },
     {
       "from": "src/storage/analysis.ts",
@@ -2507,7 +4060,8 @@
       "endOffset": 1099,
       "specifier": "../source-preparation/public.ts",
       "target": "src/source-preparation/public.ts",
-      "targetHash": "45d55e286d4f3a10bedd3997d7527fb620312ba82a7217292eca73361417529c"
+      "targetHash": "45d55e286d4f3a10bedd3997d7527fb620312ba82a7217292eca73361417529c",
+      "targetKind": "repository"
     },
     {
       "from": "src/storage/analysis.ts",
@@ -2519,7 +4073,8 @@
       "endOffset": 1198,
       "specifier": "../source-acquisition/public.ts",
       "target": "src/source-acquisition/public.ts",
-      "targetHash": "4e9ea5acaa585cf9f2223cc75a6083c14902ec7f98c9be2d9a2baea3a2ce8cd5"
+      "targetHash": "4e9ea5acaa585cf9f2223cc75a6083c14902ec7f98c9be2d9a2baea3a2ce8cd5",
+      "targetKind": "repository"
     },
     {
       "from": "src/storage/analysis.ts",
@@ -2531,7 +4086,8 @@
       "endOffset": 1294,
       "specifier": "../source-analysis/public.ts",
       "target": "src/source-analysis/public.ts",
-      "targetHash": "f29b4e0825122ca641d3a4b3fb5ada896c051c1e89b45bcc95e1318042e5d3e3"
+      "targetHash": "f29b4e0825122ca641d3a4b3fb5ada896c051c1e89b45bcc95e1318042e5d3e3",
+      "targetKind": "repository"
     },
     {
       "from": "src/storage/analysis.ts",
@@ -2543,7 +4099,8 @@
       "endOffset": 1364,
       "specifier": "../analysis-jobs/public.ts",
       "target": "src/analysis-jobs/public.ts",
-      "targetHash": "db3302ac3f2bfd468571fc897188adeedd6f06ffbd6eb2f05aa1bb117e4399f5"
+      "targetHash": "db3302ac3f2bfd468571fc897188adeedd6f06ffbd6eb2f05aa1bb117e4399f5",
+      "targetKind": "repository"
     },
     {
       "from": "src/storage/analysis.ts",
@@ -2555,7 +4112,8 @@
       "endOffset": 1468,
       "specifier": "../analysis-jobs/public.ts",
       "target": "src/analysis-jobs/public.ts",
-      "targetHash": "db3302ac3f2bfd468571fc897188adeedd6f06ffbd6eb2f05aa1bb117e4399f5"
+      "targetHash": "db3302ac3f2bfd468571fc897188adeedd6f06ffbd6eb2f05aa1bb117e4399f5",
+      "targetKind": "repository"
     },
     {
       "from": "src/storage/analysis.ts",
@@ -2567,7 +4125,8 @@
       "endOffset": 1522,
       "specifier": "./execution.ts",
       "target": "src/storage/execution.ts",
-      "targetHash": "c4e7ffd18ae5d14462d2fcfc0835698e20b41af019ae9922a29f2c551b056647"
+      "targetHash": "c4e7ffd18ae5d14462d2fcfc0835698e20b41af019ae9922a29f2c551b056647",
+      "targetKind": "repository"
     },
     {
       "from": "src/storage/imports.ts",
@@ -2579,7 +4138,8 @@
       "endOffset": 71,
       "specifier": "./access.ts",
       "target": "src/storage/access.ts",
-      "targetHash": "0440486de82e136ffe430e4f1bed2b6f57f491319c59a71fad0f9d8507053b4c"
+      "targetHash": "0440486de82e136ffe430e4f1bed2b6f57f491319c59a71fad0f9d8507053b4c",
+      "targetKind": "repository"
     },
     {
       "from": "src/storage/imports.ts",
@@ -2591,7 +4151,8 @@
       "endOffset": 119,
       "specifier": "./access.ts",
       "target": "src/storage/access.ts",
-      "targetHash": "0440486de82e136ffe430e4f1bed2b6f57f491319c59a71fad0f9d8507053b4c"
+      "targetHash": "0440486de82e136ffe430e4f1bed2b6f57f491319c59a71fad0f9d8507053b4c",
+      "targetKind": "repository"
     },
     {
       "from": "src/storage/imports.ts",
@@ -2603,7 +4164,8 @@
       "endOffset": 182,
       "specifier": "../domain/public.ts",
       "target": "src/domain/public.ts",
-      "targetHash": "e25787a89a684b01bcfdf1b0984dad8e27659dda40949a6cb084b93afbbf17ce"
+      "targetHash": "e25787a89a684b01bcfdf1b0984dad8e27659dda40949a6cb084b93afbbf17ce",
+      "targetKind": "repository"
     },
     {
       "from": "src/storage/imports.ts",
@@ -2615,7 +4177,34 @@
       "endOffset": 234,
       "specifier": "./execution.ts",
       "target": "src/storage/execution.ts",
-      "targetHash": "c4e7ffd18ae5d14462d2fcfc0835698e20b41af019ae9922a29f2c551b056647"
+      "targetHash": "c4e7ffd18ae5d14462d2fcfc0835698e20b41af019ae9922a29f2c551b056647",
+      "targetKind": "repository"
+    },
+    {
+      "from": "src/storage/imports.ts",
+      "side": "after",
+      "commit": "e3b270e5f49a9215452b0b86702946043e979059",
+      "sourceHash": "f29c76c6b9202f53e9d29752ff75f558eeea79739d3c476a93fe3a1e232fa1e2",
+      "sourceLine": 5,
+      "startOffset": 272,
+      "endOffset": 285,
+      "specifier": "node:crypto",
+      "target": "node:crypto",
+      "targetHash": null,
+      "targetKind": "external"
+    },
+    {
+      "from": "src/storage/imports.ts",
+      "side": "after",
+      "commit": "e3b270e5f49a9215452b0b86702946043e979059",
+      "sourceHash": "f29c76c6b9202f53e9d29752ff75f558eeea79739d3c476a93fe3a1e232fa1e2",
+      "sourceLine": 6,
+      "startOffset": 319,
+      "endOffset": 332,
+      "specifier": "node:sqlite",
+      "target": "node:sqlite",
+      "targetHash": null,
+      "targetKind": "external"
     },
     {
       "from": "src/storage/imports.ts",
@@ -2627,7 +4216,8 @@
       "endOffset": 490,
       "specifier": "../domain/public.ts",
       "target": "src/domain/public.ts",
-      "targetHash": "e25787a89a684b01bcfdf1b0984dad8e27659dda40949a6cb084b93afbbf17ce"
+      "targetHash": "e25787a89a684b01bcfdf1b0984dad8e27659dda40949a6cb084b93afbbf17ce",
+      "targetKind": "repository"
     },
     {
       "from": "src/storage/imports.ts",
@@ -2639,7 +4229,8 @@
       "endOffset": 668,
       "specifier": "../domain/public.ts",
       "target": "src/domain/public.ts",
-      "targetHash": "e25787a89a684b01bcfdf1b0984dad8e27659dda40949a6cb084b93afbbf17ce"
+      "targetHash": "e25787a89a684b01bcfdf1b0984dad8e27659dda40949a6cb084b93afbbf17ce",
+      "targetKind": "repository"
     },
     {
       "from": "src/storage/imports.ts",
@@ -2651,7 +4242,8 @@
       "endOffset": 768,
       "specifier": "../source-preparation/public.ts",
       "target": "src/source-preparation/public.ts",
-      "targetHash": "45d55e286d4f3a10bedd3997d7527fb620312ba82a7217292eca73361417529c"
+      "targetHash": "45d55e286d4f3a10bedd3997d7527fb620312ba82a7217292eca73361417529c",
+      "targetKind": "repository"
     },
     {
       "from": "src/storage/imports.ts",
@@ -2663,7 +4255,8 @@
       "endOffset": 846,
       "specifier": "../source-preparation/public.ts",
       "target": "src/source-preparation/public.ts",
-      "targetHash": "45d55e286d4f3a10bedd3997d7527fb620312ba82a7217292eca73361417529c"
+      "targetHash": "45d55e286d4f3a10bedd3997d7527fb620312ba82a7217292eca73361417529c",
+      "targetKind": "repository"
     },
     {
       "from": "src/storage/public.ts",
@@ -2675,7 +4268,8 @@
       "endOffset": 75,
       "specifier": "./access.ts",
       "target": "src/storage/access.ts",
-      "targetHash": "0440486de82e136ffe430e4f1bed2b6f57f491319c59a71fad0f9d8507053b4c"
+      "targetHash": "0440486de82e136ffe430e4f1bed2b6f57f491319c59a71fad0f9d8507053b4c",
+      "targetKind": "repository"
     },
     {
       "from": "src/storage/public.ts",
@@ -2687,7 +4281,8 @@
       "endOffset": 123,
       "specifier": "./access.ts",
       "target": "src/storage/access.ts",
-      "targetHash": "0440486de82e136ffe430e4f1bed2b6f57f491319c59a71fad0f9d8507053b4c"
+      "targetHash": "0440486de82e136ffe430e4f1bed2b6f57f491319c59a71fad0f9d8507053b4c",
+      "targetKind": "repository"
     },
     {
       "from": "src/storage/public.ts",
@@ -2699,7 +4294,8 @@
       "endOffset": 168,
       "specifier": "./story.ts",
       "target": "src/storage/story.ts",
-      "targetHash": "247b63d177a4eb7d9742ea69987b498cab015627b44a08d49bc26e2629da83de"
+      "targetHash": "247b63d177a4eb7d9742ea69987b498cab015627b44a08d49bc26e2629da83de",
+      "targetKind": "repository"
     },
     {
       "from": "src/storage/public.ts",
@@ -2711,7 +4307,8 @@
       "endOffset": 213,
       "specifier": "./story.ts",
       "target": "src/storage/story.ts",
-      "targetHash": "247b63d177a4eb7d9742ea69987b498cab015627b44a08d49bc26e2629da83de"
+      "targetHash": "247b63d177a4eb7d9742ea69987b498cab015627b44a08d49bc26e2629da83de",
+      "targetKind": "repository"
     },
     {
       "from": "src/storage/public.ts",
@@ -2723,7 +4320,8 @@
       "endOffset": 313,
       "specifier": "../domain/public.ts",
       "target": "src/domain/public.ts",
-      "targetHash": "e25787a89a684b01bcfdf1b0984dad8e27659dda40949a6cb084b93afbbf17ce"
+      "targetHash": "e25787a89a684b01bcfdf1b0984dad8e27659dda40949a6cb084b93afbbf17ce",
+      "targetKind": "repository"
     },
     {
       "from": "src/storage/public.ts",
@@ -2735,7 +4333,8 @@
       "endOffset": 450,
       "specifier": "../domain/public.ts",
       "target": "src/domain/public.ts",
-      "targetHash": "e25787a89a684b01bcfdf1b0984dad8e27659dda40949a6cb084b93afbbf17ce"
+      "targetHash": "e25787a89a684b01bcfdf1b0984dad8e27659dda40949a6cb084b93afbbf17ce",
+      "targetKind": "repository"
     },
     {
       "from": "src/storage/public.ts",
@@ -2747,7 +4346,8 @@
       "endOffset": 501,
       "specifier": "./analysis.ts",
       "target": "src/storage/analysis.ts",
-      "targetHash": "584ddbec662b403ed2b9dfe50f5b54382347494c12ee735d3442f0db75aca153"
+      "targetHash": "584ddbec662b403ed2b9dfe50f5b54382347494c12ee735d3442f0db75aca153",
+      "targetKind": "repository"
     },
     {
       "from": "src/storage/public.ts",
@@ -2759,7 +4359,8 @@
       "endOffset": 552,
       "specifier": "./analysis.ts",
       "target": "src/storage/analysis.ts",
-      "targetHash": "584ddbec662b403ed2b9dfe50f5b54382347494c12ee735d3442f0db75aca153"
+      "targetHash": "584ddbec662b403ed2b9dfe50f5b54382347494c12ee735d3442f0db75aca153",
+      "targetKind": "repository"
     },
     {
       "from": "src/storage/public.ts",
@@ -2771,7 +4372,8 @@
       "endOffset": 605,
       "specifier": "./execution.ts",
       "target": "src/storage/execution.ts",
-      "targetHash": "c4e7ffd18ae5d14462d2fcfc0835698e20b41af019ae9922a29f2c551b056647"
+      "targetHash": "c4e7ffd18ae5d14462d2fcfc0835698e20b41af019ae9922a29f2c551b056647",
+      "targetKind": "repository"
     },
     {
       "from": "src/storage/public.ts",
@@ -2783,7 +4385,8 @@
       "endOffset": 653,
       "specifier": "./imports.ts",
       "target": "src/storage/imports.ts",
-      "targetHash": "f29c76c6b9202f53e9d29752ff75f558eeea79739d3c476a93fe3a1e232fa1e2"
+      "targetHash": "f29c76c6b9202f53e9d29752ff75f558eeea79739d3c476a93fe3a1e232fa1e2",
+      "targetKind": "repository"
     },
     {
       "from": "src/storage/public.ts",
@@ -2795,7 +4398,8 @@
       "endOffset": 701,
       "specifier": "./imports.ts",
       "target": "src/storage/imports.ts",
-      "targetHash": "f29c76c6b9202f53e9d29752ff75f558eeea79739d3c476a93fe3a1e232fa1e2"
+      "targetHash": "f29c76c6b9202f53e9d29752ff75f558eeea79739d3c476a93fe3a1e232fa1e2",
+      "targetKind": "repository"
     },
     {
       "from": "src/storage/public.ts",
@@ -2807,7 +4411,8 @@
       "endOffset": 801,
       "specifier": "../source-preparation/public.ts",
       "target": "src/source-preparation/public.ts",
-      "targetHash": "45d55e286d4f3a10bedd3997d7527fb620312ba82a7217292eca73361417529c"
+      "targetHash": "45d55e286d4f3a10bedd3997d7527fb620312ba82a7217292eca73361417529c",
+      "targetKind": "repository"
     },
     {
       "from": "src/storage/public.ts",
@@ -2819,7 +4424,34 @@
       "endOffset": 879,
       "specifier": "../source-preparation/public.ts",
       "target": "src/source-preparation/public.ts",
-      "targetHash": "45d55e286d4f3a10bedd3997d7527fb620312ba82a7217292eca73361417529c"
+      "targetHash": "45d55e286d4f3a10bedd3997d7527fb620312ba82a7217292eca73361417529c",
+      "targetKind": "repository"
+    },
+    {
+      "from": "src/storage/public.ts",
+      "side": "after",
+      "commit": "e3b270e5f49a9215452b0b86702946043e979059",
+      "sourceHash": "ebf680d4d62a47f92af2123a60673e4ba58c7236257ffc12cea2ddc981791d58",
+      "sourceLine": 14,
+      "startOffset": 910,
+      "endOffset": 923,
+      "specifier": "node:sqlite",
+      "target": "node:sqlite",
+      "targetHash": null,
+      "targetKind": "external"
+    },
+    {
+      "from": "src/storage/public.ts",
+      "side": "after",
+      "commit": "e3b270e5f49a9215452b0b86702946043e979059",
+      "sourceHash": "ebf680d4d62a47f92af2123a60673e4ba58c7236257ffc12cea2ddc981791d58",
+      "sourceLine": 20,
+      "startOffset": 1003,
+      "endOffset": 1016,
+      "specifier": "node:crypto",
+      "target": "node:crypto",
+      "targetHash": null,
+      "targetKind": "external"
     },
     {
       "from": "src/storage/public.ts",
@@ -2831,7 +4463,8 @@
       "endOffset": 1129,
       "specifier": "../domain/public.ts",
       "target": "src/domain/public.ts",
-      "targetHash": "e25787a89a684b01bcfdf1b0984dad8e27659dda40949a6cb084b93afbbf17ce"
+      "targetHash": "e25787a89a684b01bcfdf1b0984dad8e27659dda40949a6cb084b93afbbf17ce",
+      "targetKind": "repository"
     },
     {
       "from": "src/storage/public.ts",
@@ -2843,7 +4476,8 @@
       "endOffset": 1255,
       "specifier": "../domain/public.ts",
       "target": "src/domain/public.ts",
-      "targetHash": "e25787a89a684b01bcfdf1b0984dad8e27659dda40949a6cb084b93afbbf17ce"
+      "targetHash": "e25787a89a684b01bcfdf1b0984dad8e27659dda40949a6cb084b93afbbf17ce",
+      "targetKind": "repository"
     },
     {
       "from": "src/storage/story.ts",
@@ -2855,7 +4489,34 @@
       "endOffset": 46,
       "specifier": "./access.ts",
       "target": "src/storage/access.ts",
-      "targetHash": "0440486de82e136ffe430e4f1bed2b6f57f491319c59a71fad0f9d8507053b4c"
+      "targetHash": "0440486de82e136ffe430e4f1bed2b6f57f491319c59a71fad0f9d8507053b4c",
+      "targetKind": "repository"
+    },
+    {
+      "from": "src/storage/story.ts",
+      "side": "after",
+      "commit": "e3b270e5f49a9215452b0b86702946043e979059",
+      "sourceHash": "247b63d177a4eb7d9742ea69987b498cab015627b44a08d49bc26e2629da83de",
+      "sourceLine": 2,
+      "startOffset": 80,
+      "endOffset": 93,
+      "specifier": "node:sqlite",
+      "target": "node:sqlite",
+      "targetHash": null,
+      "targetKind": "external"
+    },
+    {
+      "from": "src/storage/story.ts",
+      "side": "after",
+      "commit": "e3b270e5f49a9215452b0b86702946043e979059",
+      "sourceHash": "247b63d177a4eb7d9742ea69987b498cab015627b44a08d49bc26e2629da83de",
+      "sourceLine": 3,
+      "startOffset": 131,
+      "endOffset": 144,
+      "specifier": "node:crypto",
+      "target": "node:crypto",
+      "targetHash": null,
+      "targetKind": "external"
     },
     {
       "from": "src/storage/story.ts",
@@ -2867,7 +4528,8 @@
       "endOffset": 322,
       "specifier": "../domain/public.ts",
       "target": "src/domain/public.ts",
-      "targetHash": "e25787a89a684b01bcfdf1b0984dad8e27659dda40949a6cb084b93afbbf17ce"
+      "targetHash": "e25787a89a684b01bcfdf1b0984dad8e27659dda40949a6cb084b93afbbf17ce",
+      "targetKind": "repository"
     },
     {
       "from": "src/storage/story.ts",
@@ -2879,7 +4541,34 @@
       "endOffset": 574,
       "specifier": "../domain/public.ts",
       "target": "src/domain/public.ts",
-      "targetHash": "e25787a89a684b01bcfdf1b0984dad8e27659dda40949a6cb084b93afbbf17ce"
+      "targetHash": "e25787a89a684b01bcfdf1b0984dad8e27659dda40949a6cb084b93afbbf17ce",
+      "targetKind": "repository"
+    },
+    {
+      "from": "src/ui/main.tsx",
+      "side": "after",
+      "commit": "e3b270e5f49a9215452b0b86702946043e979059",
+      "sourceHash": "bacca7ee95b2fd9c588452810bdb99913f81620a6722d784b95a31710722ad6a",
+      "sourceLine": 1,
+      "startOffset": 78,
+      "endOffset": 85,
+      "specifier": "react",
+      "target": "react",
+      "targetHash": null,
+      "targetKind": "external"
+    },
+    {
+      "from": "src/ui/main.tsx",
+      "side": "after",
+      "commit": "e3b270e5f49a9215452b0b86702946043e979059",
+      "sourceHash": "bacca7ee95b2fd9c588452810bdb99913f81620a6722d784b95a31710722ad6a",
+      "sourceLine": 2,
+      "startOffset": 114,
+      "endOffset": 132,
+      "specifier": "react-dom/client",
+      "target": "react-dom/client",
+      "targetHash": null,
+      "targetKind": "external"
     },
     {
       "from": "src/ui/main.tsx",
@@ -2891,7 +4580,8 @@
       "endOffset": 252,
       "specifier": "../application/public.ts",
       "target": "src/application/public.ts",
-      "targetHash": "94e20323156f2a3c31cdea3b84a453b8e19d27ecad031457412083c08502da64"
+      "targetHash": "94e20323156f2a3c31cdea3b84a453b8e19d27ecad031457412083c08502da64",
+      "targetKind": "repository"
     },
     {
       "from": "src/ui/main.tsx",
@@ -2903,7 +4593,8 @@
       "endOffset": 306,
       "specifier": "../domain/public.ts",
       "target": "src/domain/public.ts",
-      "targetHash": "e25787a89a684b01bcfdf1b0984dad8e27659dda40949a6cb084b93afbbf17ce"
+      "targetHash": "e25787a89a684b01bcfdf1b0984dad8e27659dda40949a6cb084b93afbbf17ce",
+      "targetKind": "repository"
     },
     {
       "from": "src/ui/main.tsx",
@@ -2915,7 +4606,8 @@
       "endOffset": 377,
       "specifier": "../domain/public.ts",
       "target": "src/domain/public.ts",
-      "targetHash": "e25787a89a684b01bcfdf1b0984dad8e27659dda40949a6cb084b93afbbf17ce"
+      "targetHash": "e25787a89a684b01bcfdf1b0984dad8e27659dda40949a6cb084b93afbbf17ce",
+      "targetKind": "repository"
     },
     {
       "from": "src/ui/main.tsx",
@@ -2927,7 +4619,8 @@
       "endOffset": 399,
       "specifier": "./style.css",
       "target": "src/ui/style.css",
-      "targetHash": "6b434d1e81614d8d6b329affa2c71f6a44f9cb130e61eb8559b3f8c8d148bb4e"
+      "targetHash": "6b434d1e81614d8d6b329affa2c71f6a44f9cb130e61eb8559b3f8c8d148bb4e",
+      "targetKind": "repository"
     },
     {
       "from": "src/ui/main.tsx",
@@ -2939,7 +4632,8 @@
       "endOffset": 442,
       "specifier": "./graph.tsx",
       "target": "src/ui/graph.tsx",
-      "targetHash": "0c578c6ed61e3552db361406e21702e155f51c9075eacec397ca36296d2e1f0c"
+      "targetHash": "0c578c6ed61e3552db361406e21702e155f51c9075eacec397ca36296d2e1f0c",
+      "targetKind": "repository"
     },
     {
       "from": "src/ui/main.tsx",
@@ -2951,7 +4645,8 @@
       "endOffset": 481,
       "specifier": "./imports.tsx",
       "target": "src/ui/imports.tsx",
-      "targetHash": "79c6bf3baae92e3f8550bf607bb9e5fba09517fc94653c5f3476eff91f64dda6"
+      "targetHash": "79c6bf3baae92e3f8550bf607bb9e5fba09517fc94653c5f3476eff91f64dda6",
+      "targetKind": "repository"
     },
     {
       "from": "src/ui/main.tsx",
@@ -2963,7 +4658,8 @@
       "endOffset": 544,
       "specifier": "./story.tsx",
       "target": "src/ui/story.tsx",
-      "targetHash": "8632c9cbe740a2b97c71f69d498f6a03e7114f3ab3d443bf6f15061e9982b7c8"
+      "targetHash": "8632c9cbe740a2b97c71f69d498f6a03e7114f3ab3d443bf6f15061e9982b7c8",
+      "targetKind": "repository"
     },
     {
       "from": "src/ui/main.tsx",
@@ -2975,7 +4671,99 @@
       "endOffset": 596,
       "specifier": "./semantic-panel.tsx",
       "target": "src/ui/semantic-panel.tsx",
-      "targetHash": "dd9ba2cf9cc06d5e2adee0e8ac8998f2606deae7201e20718e0180629194d97c"
+      "targetHash": "dd9ba2cf9cc06d5e2adee0e8ac8998f2606deae7201e20718e0180629194d97c",
+      "targetKind": "repository"
+    },
+    {
+      "from": "tests/exploration-recovery.e2e.ts",
+      "side": "after",
+      "commit": "e3b270e5f49a9215452b0b86702946043e979059",
+      "sourceHash": "2cbe089ddd8944ea6c7859327d2a1b2f820a5eca63544aca22a22523c2e8a1d6",
+      "sourceLine": 1,
+      "startOffset": 26,
+      "endOffset": 44,
+      "specifier": "@playwright/test",
+      "target": "@playwright/test",
+      "targetHash": null,
+      "targetKind": "external"
+    },
+    {
+      "from": "tests/exploration-recovery.e2e.ts",
+      "side": "after",
+      "commit": "e3b270e5f49a9215452b0b86702946043e979059",
+      "sourceHash": "2cbe089ddd8944ea6c7859327d2a1b2f820a5eca63544aca22a22523c2e8a1d6",
+      "sourceLine": 2,
+      "startOffset": 79,
+      "endOffset": 97,
+      "specifier": "@playwright/test",
+      "target": "@playwright/test",
+      "targetHash": null,
+      "targetKind": "external"
+    },
+    {
+      "from": "tests/exploration-recovery.e2e.ts",
+      "side": "after",
+      "commit": "e3b270e5f49a9215452b0b86702946043e979059",
+      "sourceHash": "2cbe089ddd8944ea6c7859327d2a1b2f820a5eca63544aca22a22523c2e8a1d6",
+      "sourceLine": 3,
+      "startOffset": 132,
+      "endOffset": 152,
+      "specifier": "node:child_process",
+      "target": "node:child_process",
+      "targetHash": null,
+      "targetKind": "external"
+    },
+    {
+      "from": "tests/exploration-recovery.e2e.ts",
+      "side": "after",
+      "commit": "e3b270e5f49a9215452b0b86702946043e979059",
+      "sourceHash": "2cbe089ddd8944ea6c7859327d2a1b2f820a5eca63544aca22a22523c2e8a1d6",
+      "sourceLine": 4,
+      "startOffset": 186,
+      "endOffset": 206,
+      "specifier": "node:child_process",
+      "target": "node:child_process",
+      "targetHash": null,
+      "targetKind": "external"
+    },
+    {
+      "from": "tests/exploration-recovery.e2e.ts",
+      "side": "after",
+      "commit": "e3b270e5f49a9215452b0b86702946043e979059",
+      "sourceHash": "2cbe089ddd8944ea6c7859327d2a1b2f820a5eca63544aca22a22523c2e8a1d6",
+      "sourceLine": 5,
+      "startOffset": 236,
+      "endOffset": 245,
+      "specifier": "node:fs",
+      "target": "node:fs",
+      "targetHash": null,
+      "targetKind": "external"
+    },
+    {
+      "from": "tests/exploration-recovery.e2e.ts",
+      "side": "after",
+      "commit": "e3b270e5f49a9215452b0b86702946043e979059",
+      "sourceHash": "2cbe089ddd8944ea6c7859327d2a1b2f820a5eca63544aca22a22523c2e8a1d6",
+      "sourceLine": 6,
+      "startOffset": 266,
+      "endOffset": 277,
+      "specifier": "node:path",
+      "target": "node:path",
+      "targetHash": null,
+      "targetKind": "external"
+    },
+    {
+      "from": "tests/exploration-recovery.e2e.ts",
+      "side": "after",
+      "commit": "e3b270e5f49a9215452b0b86702946043e979059",
+      "sourceHash": "2cbe089ddd8944ea6c7859327d2a1b2f820a5eca63544aca22a22523c2e8a1d6",
+      "sourceLine": 7,
+      "startOffset": 306,
+      "endOffset": 316,
+      "specifier": "node:net",
+      "target": "node:net",
+      "targetHash": null,
+      "targetKind": "external"
     },
     {
       "from": "tests/exploration-recovery.e2e.ts",
@@ -2987,7 +4775,8 @@
       "endOffset": 371,
       "specifier": "./semantic-fixture.ts",
       "target": "tests/semantic-fixture.ts",
-      "targetHash": "6dd807ddf7c7ed334d19e860dd9bd13cbd459600ed2969142600ac7d9ddf31f6"
+      "targetHash": "6dd807ddf7c7ed334d19e860dd9bd13cbd459600ed2969142600ac7d9ddf31f6",
+      "targetKind": "repository"
     },
     {
       "from": "tests/exploration-recovery.e2e.ts",
@@ -2999,7 +4788,8 @@
       "endOffset": 426,
       "specifier": "../src/server/public.ts",
       "target": "src/server/public.ts",
-      "targetHash": "20c22563be7da4c385eda772d5840d55f0993ddeebd85718b3605cddb76a0b0e"
+      "targetHash": "20c22563be7da4c385eda772d5840d55f0993ddeebd85718b3605cddb76a0b0e",
+      "targetKind": "repository"
     },
     {
       "from": "tests/exploration-recovery.e2e.ts",
@@ -3011,7 +4801,8 @@
       "endOffset": 516,
       "specifier": "../src/source-preparation/public.ts",
       "target": "src/source-preparation/public.ts",
-      "targetHash": "45d55e286d4f3a10bedd3997d7527fb620312ba82a7217292eca73361417529c"
+      "targetHash": "45d55e286d4f3a10bedd3997d7527fb620312ba82a7217292eca73361417529c",
+      "targetKind": "repository"
     },
     {
       "from": "tests/exploration-recovery.e2e.ts",
@@ -3023,7 +4814,8 @@
       "endOffset": 568,
       "specifier": "../src/domain/public.ts",
       "target": "src/domain/public.ts",
-      "targetHash": "e25787a89a684b01bcfdf1b0984dad8e27659dda40949a6cb084b93afbbf17ce"
+      "targetHash": "e25787a89a684b01bcfdf1b0984dad8e27659dda40949a6cb084b93afbbf17ce",
+      "targetKind": "repository"
     },
     {
       "from": "tests/exploration-recovery.e2e.ts",
@@ -3035,7 +4827,8 @@
       "endOffset": 674,
       "specifier": "../src/domain/public.ts",
       "target": "src/domain/public.ts",
-      "targetHash": "e25787a89a684b01bcfdf1b0984dad8e27659dda40949a6cb084b93afbbf17ce"
+      "targetHash": "e25787a89a684b01bcfdf1b0984dad8e27659dda40949a6cb084b93afbbf17ce",
+      "targetKind": "repository"
     },
     {
       "from": "tests/exploration-recovery.e2e.ts",
@@ -3047,7 +4840,86 @@
       "endOffset": 767,
       "specifier": "../src/application/private-session.ts",
       "target": "src/application/private-session.ts",
-      "targetHash": "8898cfa974b3033ef0d7bc0c54ef00fbdeeffb2eac7bb89554e29db383c7e8f4"
+      "targetHash": "8898cfa974b3033ef0d7bc0c54ef00fbdeeffb2eac7bb89554e29db383c7e8f4",
+      "targetKind": "repository"
+    },
+    {
+      "from": "tests/gateway.test.ts",
+      "side": "after",
+      "commit": "e3b270e5f49a9215452b0b86702946043e979059",
+      "sourceHash": "13e7db6e38670e876795a150587bb6e5a441548915fb37f67ff0a80563953158",
+      "sourceLine": 1,
+      "startOffset": 27,
+      "endOffset": 40,
+      "specifier": "node:crypto",
+      "target": "node:crypto",
+      "targetHash": null,
+      "targetKind": "external"
+    },
+    {
+      "from": "tests/gateway.test.ts",
+      "side": "after",
+      "commit": "e3b270e5f49a9215452b0b86702946043e979059",
+      "sourceHash": "13e7db6e38670e876795a150587bb6e5a441548915fb37f67ff0a80563953158",
+      "sourceLine": 2,
+      "startOffset": 63,
+      "endOffset": 74,
+      "specifier": "node:test",
+      "target": "node:test",
+      "targetHash": null,
+      "targetKind": "external"
+    },
+    {
+      "from": "tests/gateway.test.ts",
+      "side": "after",
+      "commit": "e3b270e5f49a9215452b0b86702946043e979059",
+      "sourceHash": "13e7db6e38670e876795a150587bb6e5a441548915fb37f67ff0a80563953158",
+      "sourceLine": 3,
+      "startOffset": 95,
+      "endOffset": 115,
+      "specifier": "node:assert/strict",
+      "target": "node:assert/strict",
+      "targetHash": null,
+      "targetKind": "external"
+    },
+    {
+      "from": "tests/gateway.test.ts",
+      "side": "after",
+      "commit": "e3b270e5f49a9215452b0b86702946043e979059",
+      "sourceHash": "13e7db6e38670e876795a150587bb6e5a441548915fb37f67ff0a80563953158",
+      "sourceLine": 4,
+      "startOffset": 153,
+      "endOffset": 162,
+      "specifier": "node:fs",
+      "target": "node:fs",
+      "targetHash": null,
+      "targetKind": "external"
+    },
+    {
+      "from": "tests/gateway.test.ts",
+      "side": "after",
+      "commit": "e3b270e5f49a9215452b0b86702946043e979059",
+      "sourceHash": "13e7db6e38670e876795a150587bb6e5a441548915fb37f67ff0a80563953158",
+      "sourceLine": 5,
+      "startOffset": 187,
+      "endOffset": 196,
+      "specifier": "node:os",
+      "target": "node:os",
+      "targetHash": null,
+      "targetKind": "external"
+    },
+    {
+      "from": "tests/gateway.test.ts",
+      "side": "after",
+      "commit": "e3b270e5f49a9215452b0b86702946043e979059",
+      "sourceHash": "13e7db6e38670e876795a150587bb6e5a441548915fb37f67ff0a80563953158",
+      "sourceLine": 6,
+      "startOffset": 219,
+      "endOffset": 230,
+      "specifier": "node:path",
+      "target": "node:path",
+      "targetHash": null,
+      "targetKind": "external"
     },
     {
       "from": "tests/gateway.test.ts",
@@ -3059,7 +4931,8 @@
       "endOffset": 286,
       "specifier": "../src/storage/public.ts",
       "target": "src/storage/public.ts",
-      "targetHash": "ebf680d4d62a47f92af2123a60673e4ba58c7236257ffc12cea2ddc981791d58"
+      "targetHash": "ebf680d4d62a47f92af2123a60673e4ba58c7236257ffc12cea2ddc981791d58",
+      "targetKind": "repository"
     },
     {
       "from": "tests/gateway.test.ts",
@@ -3071,7 +4944,73 @@
       "endOffset": 343,
       "specifier": "../src/server/public.ts",
       "target": "src/server/public.ts",
-      "targetHash": "20c22563be7da4c385eda772d5840d55f0993ddeebd85718b3605cddb76a0b0e"
+      "targetHash": "20c22563be7da4c385eda772d5840d55f0993ddeebd85718b3605cddb76a0b0e",
+      "targetKind": "repository"
+    },
+    {
+      "from": "tests/import-jobs.test.ts",
+      "side": "after",
+      "commit": "e3b270e5f49a9215452b0b86702946043e979059",
+      "sourceHash": "59e62cd5cbf772fe001953e4d87b4466e0bbafb3bae5d704318fa863cb6a802a",
+      "sourceLine": 1,
+      "startOffset": 19,
+      "endOffset": 30,
+      "specifier": "node:test",
+      "target": "node:test",
+      "targetHash": null,
+      "targetKind": "external"
+    },
+    {
+      "from": "tests/import-jobs.test.ts",
+      "side": "after",
+      "commit": "e3b270e5f49a9215452b0b86702946043e979059",
+      "sourceHash": "59e62cd5cbf772fe001953e4d87b4466e0bbafb3bae5d704318fa863cb6a802a",
+      "sourceLine": 2,
+      "startOffset": 51,
+      "endOffset": 71,
+      "specifier": "node:assert/strict",
+      "target": "node:assert/strict",
+      "targetHash": null,
+      "targetKind": "external"
+    },
+    {
+      "from": "tests/import-jobs.test.ts",
+      "side": "after",
+      "commit": "e3b270e5f49a9215452b0b86702946043e979059",
+      "sourceHash": "59e62cd5cbf772fe001953e4d87b4466e0bbafb3bae5d704318fa863cb6a802a",
+      "sourceLine": 3,
+      "startOffset": 106,
+      "endOffset": 115,
+      "specifier": "node:fs",
+      "target": "node:fs",
+      "targetHash": null,
+      "targetKind": "external"
+    },
+    {
+      "from": "tests/import-jobs.test.ts",
+      "side": "after",
+      "commit": "e3b270e5f49a9215452b0b86702946043e979059",
+      "sourceHash": "59e62cd5cbf772fe001953e4d87b4466e0bbafb3bae5d704318fa863cb6a802a",
+      "sourceLine": 4,
+      "startOffset": 136,
+      "endOffset": 147,
+      "specifier": "node:path",
+      "target": "node:path",
+      "targetHash": null,
+      "targetKind": "external"
+    },
+    {
+      "from": "tests/import-jobs.test.ts",
+      "side": "after",
+      "commit": "e3b270e5f49a9215452b0b86702946043e979059",
+      "sourceHash": "59e62cd5cbf772fe001953e4d87b4466e0bbafb3bae5d704318fa863cb6a802a",
+      "sourceLine": 5,
+      "startOffset": 170,
+      "endOffset": 179,
+      "specifier": "node:os",
+      "target": "node:os",
+      "targetHash": null,
+      "targetKind": "external"
     },
     {
       "from": "tests/import-jobs.test.ts",
@@ -3083,7 +5022,86 @@
       "endOffset": 233,
       "specifier": "../src/storage/public.ts",
       "target": "src/storage/public.ts",
-      "targetHash": "ebf680d4d62a47f92af2123a60673e4ba58c7236257ffc12cea2ddc981791d58"
+      "targetHash": "ebf680d4d62a47f92af2123a60673e4ba58c7236257ffc12cea2ddc981791d58",
+      "targetKind": "repository"
+    },
+    {
+      "from": "tests/import.e2e.ts",
+      "side": "after",
+      "commit": "e3b270e5f49a9215452b0b86702946043e979059",
+      "sourceHash": "d922831242f32800b26f4882b6f18f3f675953bd294c69315665790e793f4f81",
+      "sourceLine": 1,
+      "startOffset": 26,
+      "endOffset": 44,
+      "specifier": "@playwright/test",
+      "target": "@playwright/test",
+      "targetHash": null,
+      "targetKind": "external"
+    },
+    {
+      "from": "tests/import.e2e.ts",
+      "side": "after",
+      "commit": "e3b270e5f49a9215452b0b86702946043e979059",
+      "sourceHash": "d922831242f32800b26f4882b6f18f3f675953bd294c69315665790e793f4f81",
+      "sourceLine": 2,
+      "startOffset": 79,
+      "endOffset": 99,
+      "specifier": "node:child_process",
+      "target": "node:child_process",
+      "targetHash": null,
+      "targetKind": "external"
+    },
+    {
+      "from": "tests/import.e2e.ts",
+      "side": "after",
+      "commit": "e3b270e5f49a9215452b0b86702946043e979059",
+      "sourceHash": "d922831242f32800b26f4882b6f18f3f675953bd294c69315665790e793f4f81",
+      "sourceLine": 3,
+      "startOffset": 133,
+      "endOffset": 153,
+      "specifier": "node:child_process",
+      "target": "node:child_process",
+      "targetHash": null,
+      "targetKind": "external"
+    },
+    {
+      "from": "tests/import.e2e.ts",
+      "side": "after",
+      "commit": "e3b270e5f49a9215452b0b86702946043e979059",
+      "sourceHash": "d922831242f32800b26f4882b6f18f3f675953bd294c69315665790e793f4f81",
+      "sourceLine": 4,
+      "startOffset": 236,
+      "endOffset": 245,
+      "specifier": "node:fs",
+      "target": "node:fs",
+      "targetHash": null,
+      "targetKind": "external"
+    },
+    {
+      "from": "tests/import.e2e.ts",
+      "side": "after",
+      "commit": "e3b270e5f49a9215452b0b86702946043e979059",
+      "sourceHash": "d922831242f32800b26f4882b6f18f3f675953bd294c69315665790e793f4f81",
+      "sourceLine": 5,
+      "startOffset": 268,
+      "endOffset": 277,
+      "specifier": "node:os",
+      "target": "node:os",
+      "targetHash": null,
+      "targetKind": "external"
+    },
+    {
+      "from": "tests/import.e2e.ts",
+      "side": "after",
+      "commit": "e3b270e5f49a9215452b0b86702946043e979059",
+      "sourceHash": "d922831242f32800b26f4882b6f18f3f675953bd294c69315665790e793f4f81",
+      "sourceLine": 6,
+      "startOffset": 298,
+      "endOffset": 309,
+      "specifier": "node:path",
+      "target": "node:path",
+      "targetHash": null,
+      "targetKind": "external"
     },
     {
       "from": "tests/import.e2e.ts",
@@ -3095,7 +5113,8 @@
       "endOffset": 364,
       "specifier": "./provider-fixture.ts",
       "target": "tests/provider-fixture.ts",
-      "targetHash": "19cc570beccf36393b6bbabf7ad04dbc4161c8cd29dbcf94a64b82f82680b69b"
+      "targetHash": "19cc570beccf36393b6bbabf7ad04dbc4161c8cd29dbcf94a64b82f82680b69b",
+      "targetKind": "repository"
     },
     {
       "from": "tests/import.e2e.ts",
@@ -3107,7 +5126,34 @@
       "endOffset": 427,
       "specifier": "../src/domain/public.ts",
       "target": "src/domain/public.ts",
-      "targetHash": "e25787a89a684b01bcfdf1b0984dad8e27659dda40949a6cb084b93afbbf17ce"
+      "targetHash": "e25787a89a684b01bcfdf1b0984dad8e27659dda40949a6cb084b93afbbf17ce",
+      "targetKind": "repository"
+    },
+    {
+      "from": "tests/question-recovery.test.ts",
+      "side": "after",
+      "commit": "e3b270e5f49a9215452b0b86702946043e979059",
+      "sourceHash": "05adf2c17e5bb5c853e0f60cc5c21f71972d85a974c988598335aae31d5ae0c5",
+      "sourceLine": 1,
+      "startOffset": 19,
+      "endOffset": 30,
+      "specifier": "node:test",
+      "target": "node:test",
+      "targetHash": null,
+      "targetKind": "external"
+    },
+    {
+      "from": "tests/question-recovery.test.ts",
+      "side": "after",
+      "commit": "e3b270e5f49a9215452b0b86702946043e979059",
+      "sourceHash": "05adf2c17e5bb5c853e0f60cc5c21f71972d85a974c988598335aae31d5ae0c5",
+      "sourceLine": 2,
+      "startOffset": 51,
+      "endOffset": 71,
+      "specifier": "node:assert/strict",
+      "target": "node:assert/strict",
+      "targetHash": null,
+      "targetKind": "external"
     },
     {
       "from": "tests/question-recovery.test.ts",
@@ -3119,7 +5165,8 @@
       "endOffset": 220,
       "specifier": "../src/application/private-session.ts",
       "target": "src/application/private-session.ts",
-      "targetHash": "8898cfa974b3033ef0d7bc0c54ef00fbdeeffb2eac7bb89554e29db383c7e8f4"
+      "targetHash": "8898cfa974b3033ef0d7bc0c54ef00fbdeeffb2eac7bb89554e29db383c7e8f4",
+      "targetKind": "repository"
     },
     {
       "from": "tests/question-recovery.test.ts",
@@ -3131,7 +5178,125 @@
       "endOffset": 332,
       "specifier": "../src/application/private-session.ts",
       "target": "src/application/private-session.ts",
-      "targetHash": "8898cfa974b3033ef0d7bc0c54ef00fbdeeffb2eac7bb89554e29db383c7e8f4"
+      "targetHash": "8898cfa974b3033ef0d7bc0c54ef00fbdeeffb2eac7bb89554e29db383c7e8f4",
+      "targetKind": "repository"
+    },
+    {
+      "from": "tests/review.e2e.ts",
+      "side": "after",
+      "commit": "e3b270e5f49a9215452b0b86702946043e979059",
+      "sourceHash": "e302f3daeb9dd4bac02c9256f85b3768681e0fa887bd74c53ea17994cd5277e0",
+      "sourceLine": 1,
+      "startOffset": 29,
+      "endOffset": 47,
+      "specifier": "@playwright/test",
+      "target": "@playwright/test",
+      "targetHash": null,
+      "targetKind": "external"
+    },
+    {
+      "from": "tests/review.e2e.ts",
+      "side": "after",
+      "commit": "e3b270e5f49a9215452b0b86702946043e979059",
+      "sourceHash": "e302f3daeb9dd4bac02c9256f85b3768681e0fa887bd74c53ea17994cd5277e0",
+      "sourceLine": 2,
+      "startOffset": 73,
+      "endOffset": 91,
+      "specifier": "@playwright/test",
+      "target": "@playwright/test",
+      "targetHash": null,
+      "targetKind": "external"
+    },
+    {
+      "from": "tests/review.e2e.ts",
+      "side": "after",
+      "commit": "e3b270e5f49a9215452b0b86702946043e979059",
+      "sourceHash": "e302f3daeb9dd4bac02c9256f85b3768681e0fa887bd74c53ea17994cd5277e0",
+      "sourceLine": 3,
+      "startOffset": 129,
+      "endOffset": 149,
+      "specifier": "node:child_process",
+      "target": "node:child_process",
+      "targetHash": null,
+      "targetKind": "external"
+    },
+    {
+      "from": "tests/review.e2e.ts",
+      "side": "after",
+      "commit": "e3b270e5f49a9215452b0b86702946043e979059",
+      "sourceHash": "e302f3daeb9dd4bac02c9256f85b3768681e0fa887bd74c53ea17994cd5277e0",
+      "sourceLine": 4,
+      "startOffset": 185,
+      "endOffset": 205,
+      "specifier": "node:child_process",
+      "target": "node:child_process",
+      "targetHash": null,
+      "targetKind": "external"
+    },
+    {
+      "from": "tests/review.e2e.ts",
+      "side": "after",
+      "commit": "e3b270e5f49a9215452b0b86702946043e979059",
+      "sourceHash": "e302f3daeb9dd4bac02c9256f85b3768681e0fa887bd74c53ea17994cd5277e0",
+      "sourceLine": 11,
+      "startOffset": 295,
+      "endOffset": 304,
+      "specifier": "node:fs",
+      "target": "node:fs",
+      "targetHash": null,
+      "targetKind": "external"
+    },
+    {
+      "from": "tests/review.e2e.ts",
+      "side": "after",
+      "commit": "e3b270e5f49a9215452b0b86702946043e979059",
+      "sourceHash": "e302f3daeb9dd4bac02c9256f85b3768681e0fa887bd74c53ea17994cd5277e0",
+      "sourceLine": 12,
+      "startOffset": 329,
+      "endOffset": 338,
+      "specifier": "node:os",
+      "target": "node:os",
+      "targetHash": null,
+      "targetKind": "external"
+    },
+    {
+      "from": "tests/review.e2e.ts",
+      "side": "after",
+      "commit": "e3b270e5f49a9215452b0b86702946043e979059",
+      "sourceHash": "e302f3daeb9dd4bac02c9256f85b3768681e0fa887bd74c53ea17994cd5277e0",
+      "sourceLine": 13,
+      "startOffset": 370,
+      "endOffset": 381,
+      "specifier": "node:path",
+      "target": "node:path",
+      "targetHash": null,
+      "targetKind": "external"
+    },
+    {
+      "from": "tests/review.e2e.ts",
+      "side": "after",
+      "commit": "e3b270e5f49a9215452b0b86702946043e979059",
+      "sourceHash": "e302f3daeb9dd4bac02c9256f85b3768681e0fa887bd74c53ea17994cd5277e0",
+      "sourceLine": 14,
+      "startOffset": 406,
+      "endOffset": 449,
+      "specifier": "@modelcontextprotocol/sdk/client/index.js",
+      "target": "@modelcontextprotocol/sdk/client/index.js",
+      "targetHash": null,
+      "targetKind": "external"
+    },
+    {
+      "from": "tests/review.e2e.ts",
+      "side": "after",
+      "commit": "e3b270e5f49a9215452b0b86702946043e979059",
+      "sourceHash": "e302f3daeb9dd4bac02c9256f85b3768681e0fa887bd74c53ea17994cd5277e0",
+      "sourceLine": 15,
+      "startOffset": 488,
+      "endOffset": 531,
+      "specifier": "@modelcontextprotocol/sdk/client/stdio.js",
+      "target": "@modelcontextprotocol/sdk/client/stdio.js",
+      "targetHash": null,
+      "targetKind": "external"
     },
     {
       "from": "tests/review.e2e.ts",
@@ -3143,7 +5308,8 @@
       "endOffset": 590,
       "specifier": "../src/mcp/public.ts",
       "target": "src/mcp/public.ts",
-      "targetHash": "c56195fbcac4fe881b471e1b84585a49b9dc96aadcde4dc375bca4470fec37ad"
+      "targetHash": "c56195fbcac4fe881b471e1b84585a49b9dc96aadcde4dc375bca4470fec37ad",
+      "targetKind": "repository"
     },
     {
       "from": "tests/review.e2e.ts",
@@ -3155,7 +5321,164 @@
       "endOffset": 653,
       "specifier": "../src/domain/public.ts",
       "target": "src/domain/public.ts",
-      "targetHash": "e25787a89a684b01bcfdf1b0984dad8e27659dda40949a6cb084b93afbbf17ce"
+      "targetHash": "e25787a89a684b01bcfdf1b0984dad8e27659dda40949a6cb084b93afbbf17ce",
+      "targetKind": "repository"
+    },
+    {
+      "from": "tests/runtime.test.ts",
+      "side": "after",
+      "commit": "e3b270e5f49a9215452b0b86702946043e979059",
+      "sourceHash": "45903e0b0f1aacf79509a22ad068b042afbe7170663fe5c56042941c97bc7582",
+      "sourceLine": 1,
+      "startOffset": 21,
+      "endOffset": 32,
+      "specifier": "node:test",
+      "target": "node:test",
+      "targetHash": null,
+      "targetKind": "external"
+    },
+    {
+      "from": "tests/runtime.test.ts",
+      "side": "after",
+      "commit": "e3b270e5f49a9215452b0b86702946043e979059",
+      "sourceHash": "45903e0b0f1aacf79509a22ad068b042afbe7170663fe5c56042941c97bc7582",
+      "sourceLine": 2,
+      "startOffset": 53,
+      "endOffset": 73,
+      "specifier": "node:assert/strict",
+      "target": "node:assert/strict",
+      "targetHash": null,
+      "targetKind": "external"
+    },
+    {
+      "from": "tests/runtime.test.ts",
+      "side": "after",
+      "commit": "e3b270e5f49a9215452b0b86702946043e979059",
+      "sourceHash": "45903e0b0f1aacf79509a22ad068b042afbe7170663fe5c56042941c97bc7582",
+      "sourceLine": 3,
+      "startOffset": 111,
+      "endOffset": 131,
+      "specifier": "node:child_process",
+      "target": "node:child_process",
+      "targetHash": null,
+      "targetKind": "external"
+    },
+    {
+      "from": "tests/runtime.test.ts",
+      "side": "after",
+      "commit": "e3b270e5f49a9215452b0b86702946043e979059",
+      "sourceHash": "45903e0b0f1aacf79509a22ad068b042afbe7170663fe5c56042941c97bc7582",
+      "sourceLine": 10,
+      "startOffset": 221,
+      "endOffset": 230,
+      "specifier": "node:fs",
+      "target": "node:fs",
+      "targetHash": null,
+      "targetKind": "external"
+    },
+    {
+      "from": "tests/runtime.test.ts",
+      "side": "after",
+      "commit": "e3b270e5f49a9215452b0b86702946043e979059",
+      "sourceHash": "45903e0b0f1aacf79509a22ad068b042afbe7170663fe5c56042941c97bc7582",
+      "sourceLine": 11,
+      "startOffset": 255,
+      "endOffset": 264,
+      "specifier": "node:os",
+      "target": "node:os",
+      "targetHash": null,
+      "targetKind": "external"
+    },
+    {
+      "from": "tests/runtime.test.ts",
+      "side": "after",
+      "commit": "e3b270e5f49a9215452b0b86702946043e979059",
+      "sourceHash": "45903e0b0f1aacf79509a22ad068b042afbe7170663fe5c56042941c97bc7582",
+      "sourceLine": 12,
+      "startOffset": 287,
+      "endOffset": 298,
+      "specifier": "node:path",
+      "target": "node:path",
+      "targetHash": null,
+      "targetKind": "external"
+    },
+    {
+      "from": "tests/semantic-storage.test.ts",
+      "side": "after",
+      "commit": "e3b270e5f49a9215452b0b86702946043e979059",
+      "sourceHash": "03e02bf3dd7ad92df8712604b243cc5cc304c431a2d6db4c19c8b15d85db5c88",
+      "sourceLine": 1,
+      "startOffset": 21,
+      "endOffset": 32,
+      "specifier": "node:test",
+      "target": "node:test",
+      "targetHash": null,
+      "targetKind": "external"
+    },
+    {
+      "from": "tests/semantic-storage.test.ts",
+      "side": "after",
+      "commit": "e3b270e5f49a9215452b0b86702946043e979059",
+      "sourceHash": "03e02bf3dd7ad92df8712604b243cc5cc304c431a2d6db4c19c8b15d85db5c88",
+      "sourceLine": 2,
+      "startOffset": 53,
+      "endOffset": 73,
+      "specifier": "node:assert/strict",
+      "target": "node:assert/strict",
+      "targetHash": null,
+      "targetKind": "external"
+    },
+    {
+      "from": "tests/semantic-storage.test.ts",
+      "side": "after",
+      "commit": "e3b270e5f49a9215452b0b86702946043e979059",
+      "sourceHash": "03e02bf3dd7ad92df8712604b243cc5cc304c431a2d6db4c19c8b15d85db5c88",
+      "sourceLine": 3,
+      "startOffset": 102,
+      "endOffset": 115,
+      "specifier": "node:crypto",
+      "target": "node:crypto",
+      "targetHash": null,
+      "targetKind": "external"
+    },
+    {
+      "from": "tests/semantic-storage.test.ts",
+      "side": "after",
+      "commit": "e3b270e5f49a9215452b0b86702946043e979059",
+      "sourceHash": "03e02bf3dd7ad92df8712604b243cc5cc304c431a2d6db4c19c8b15d85db5c88",
+      "sourceLine": 4,
+      "startOffset": 153,
+      "endOffset": 162,
+      "specifier": "node:fs",
+      "target": "node:fs",
+      "targetHash": null,
+      "targetKind": "external"
+    },
+    {
+      "from": "tests/semantic-storage.test.ts",
+      "side": "after",
+      "commit": "e3b270e5f49a9215452b0b86702946043e979059",
+      "sourceHash": "03e02bf3dd7ad92df8712604b243cc5cc304c431a2d6db4c19c8b15d85db5c88",
+      "sourceLine": 5,
+      "startOffset": 187,
+      "endOffset": 196,
+      "specifier": "node:os",
+      "target": "node:os",
+      "targetHash": null,
+      "targetKind": "external"
+    },
+    {
+      "from": "tests/semantic-storage.test.ts",
+      "side": "after",
+      "commit": "e3b270e5f49a9215452b0b86702946043e979059",
+      "sourceHash": "03e02bf3dd7ad92df8712604b243cc5cc304c431a2d6db4c19c8b15d85db5c88",
+      "sourceLine": 6,
+      "startOffset": 219,
+      "endOffset": 230,
+      "specifier": "node:path",
+      "target": "node:path",
+      "targetHash": null,
+      "targetKind": "external"
     },
     {
       "from": "tests/semantic-storage.test.ts",
@@ -3167,7 +5490,8 @@
       "endOffset": 286,
       "specifier": "../src/storage/public.ts",
       "target": "src/storage/public.ts",
-      "targetHash": "ebf680d4d62a47f92af2123a60673e4ba58c7236257ffc12cea2ddc981791d58"
+      "targetHash": "ebf680d4d62a47f92af2123a60673e4ba58c7236257ffc12cea2ddc981791d58",
+      "targetKind": "repository"
     },
     {
       "from": "tests/semantic-storage.test.ts",
@@ -3179,7 +5503,86 @@
       "endOffset": 343,
       "specifier": "../src/domain/public.ts",
       "target": "src/domain/public.ts",
-      "targetHash": "e25787a89a684b01bcfdf1b0984dad8e27659dda40949a6cb084b93afbbf17ce"
+      "targetHash": "e25787a89a684b01bcfdf1b0984dad8e27659dda40949a6cb084b93afbbf17ce",
+      "targetKind": "repository"
+    },
+    {
+      "from": "tests/semantic.e2e.ts",
+      "side": "after",
+      "commit": "e3b270e5f49a9215452b0b86702946043e979059",
+      "sourceHash": "db3cca492f8f7c576fbb8e18840b2cc8f283a13fb551b0061e2721a705d726a0",
+      "sourceLine": 1,
+      "startOffset": 26,
+      "endOffset": 44,
+      "specifier": "@playwright/test",
+      "target": "@playwright/test",
+      "targetHash": null,
+      "targetKind": "external"
+    },
+    {
+      "from": "tests/semantic.e2e.ts",
+      "side": "after",
+      "commit": "e3b270e5f49a9215452b0b86702946043e979059",
+      "sourceHash": "db3cca492f8f7c576fbb8e18840b2cc8f283a13fb551b0061e2721a705d726a0",
+      "sourceLine": 2,
+      "startOffset": 79,
+      "endOffset": 99,
+      "specifier": "node:child_process",
+      "target": "node:child_process",
+      "targetHash": null,
+      "targetKind": "external"
+    },
+    {
+      "from": "tests/semantic.e2e.ts",
+      "side": "after",
+      "commit": "e3b270e5f49a9215452b0b86702946043e979059",
+      "sourceHash": "db3cca492f8f7c576fbb8e18840b2cc8f283a13fb551b0061e2721a705d726a0",
+      "sourceLine": 3,
+      "startOffset": 133,
+      "endOffset": 153,
+      "specifier": "node:child_process",
+      "target": "node:child_process",
+      "targetHash": null,
+      "targetKind": "external"
+    },
+    {
+      "from": "tests/semantic.e2e.ts",
+      "side": "after",
+      "commit": "e3b270e5f49a9215452b0b86702946043e979059",
+      "sourceHash": "db3cca492f8f7c576fbb8e18840b2cc8f283a13fb551b0061e2721a705d726a0",
+      "sourceLine": 4,
+      "startOffset": 183,
+      "endOffset": 192,
+      "specifier": "node:fs",
+      "target": "node:fs",
+      "targetHash": null,
+      "targetKind": "external"
+    },
+    {
+      "from": "tests/semantic.e2e.ts",
+      "side": "after",
+      "commit": "e3b270e5f49a9215452b0b86702946043e979059",
+      "sourceHash": "db3cca492f8f7c576fbb8e18840b2cc8f283a13fb551b0061e2721a705d726a0",
+      "sourceLine": 5,
+      "startOffset": 213,
+      "endOffset": 224,
+      "specifier": "node:path",
+      "target": "node:path",
+      "targetHash": null,
+      "targetKind": "external"
+    },
+    {
+      "from": "tests/semantic.e2e.ts",
+      "side": "after",
+      "commit": "e3b270e5f49a9215452b0b86702946043e979059",
+      "sourceHash": "db3cca492f8f7c576fbb8e18840b2cc8f283a13fb551b0061e2721a705d726a0",
+      "sourceLine": 6,
+      "startOffset": 253,
+      "endOffset": 263,
+      "specifier": "node:net",
+      "target": "node:net",
+      "targetHash": null,
+      "targetKind": "external"
     },
     {
       "from": "tests/semantic.e2e.ts",
@@ -3191,7 +5594,8 @@
       "endOffset": 318,
       "specifier": "./semantic-fixture.ts",
       "target": "tests/semantic-fixture.ts",
-      "targetHash": "6dd807ddf7c7ed334d19e860dd9bd13cbd459600ed2969142600ac7d9ddf31f6"
+      "targetHash": "6dd807ddf7c7ed334d19e860dd9bd13cbd459600ed2969142600ac7d9ddf31f6",
+      "targetKind": "repository"
     },
     {
       "from": "tests/semantic.e2e.ts",
@@ -3203,7 +5607,8 @@
       "endOffset": 373,
       "specifier": "../src/server/public.ts",
       "target": "src/server/public.ts",
-      "targetHash": "20c22563be7da4c385eda772d5840d55f0993ddeebd85718b3605cddb76a0b0e"
+      "targetHash": "20c22563be7da4c385eda772d5840d55f0993ddeebd85718b3605cddb76a0b0e",
+      "targetKind": "repository"
     },
     {
       "from": "tests/semantic.e2e.ts",
@@ -3215,7 +5620,8 @@
       "endOffset": 440,
       "specifier": "../src/source-preparation/public.ts",
       "target": "src/source-preparation/public.ts",
-      "targetHash": "45d55e286d4f3a10bedd3997d7527fb620312ba82a7217292eca73361417529c"
+      "targetHash": "45d55e286d4f3a10bedd3997d7527fb620312ba82a7217292eca73361417529c",
+      "targetKind": "repository"
     },
     {
       "from": "tests/semantic.e2e.ts",
@@ -3227,7 +5633,86 @@
       "endOffset": 531,
       "specifier": "../src/domain/public.ts",
       "target": "src/domain/public.ts",
-      "targetHash": "e25787a89a684b01bcfdf1b0984dad8e27659dda40949a6cb084b93afbbf17ce"
+      "targetHash": "e25787a89a684b01bcfdf1b0984dad8e27659dda40949a6cb084b93afbbf17ce",
+      "targetKind": "repository"
+    },
+    {
+      "from": "tests/story.e2e.ts",
+      "side": "after",
+      "commit": "e3b270e5f49a9215452b0b86702946043e979059",
+      "sourceHash": "97f66ac17e589d7dc767351da96f89d1cef77d82cc859192cd424d13021d10d6",
+      "sourceLine": 1,
+      "startOffset": 26,
+      "endOffset": 44,
+      "specifier": "@playwright/test",
+      "target": "@playwright/test",
+      "targetHash": null,
+      "targetKind": "external"
+    },
+    {
+      "from": "tests/story.e2e.ts",
+      "side": "after",
+      "commit": "e3b270e5f49a9215452b0b86702946043e979059",
+      "sourceHash": "97f66ac17e589d7dc767351da96f89d1cef77d82cc859192cd424d13021d10d6",
+      "sourceLine": 2,
+      "startOffset": 79,
+      "endOffset": 99,
+      "specifier": "node:child_process",
+      "target": "node:child_process",
+      "targetHash": null,
+      "targetKind": "external"
+    },
+    {
+      "from": "tests/story.e2e.ts",
+      "side": "after",
+      "commit": "e3b270e5f49a9215452b0b86702946043e979059",
+      "sourceHash": "97f66ac17e589d7dc767351da96f89d1cef77d82cc859192cd424d13021d10d6",
+      "sourceLine": 3,
+      "startOffset": 133,
+      "endOffset": 153,
+      "specifier": "node:child_process",
+      "target": "node:child_process",
+      "targetHash": null,
+      "targetKind": "external"
+    },
+    {
+      "from": "tests/story.e2e.ts",
+      "side": "after",
+      "commit": "e3b270e5f49a9215452b0b86702946043e979059",
+      "sourceHash": "97f66ac17e589d7dc767351da96f89d1cef77d82cc859192cd424d13021d10d6",
+      "sourceLine": 4,
+      "startOffset": 180,
+      "endOffset": 193,
+      "specifier": "node:crypto",
+      "target": "node:crypto",
+      "targetHash": null,
+      "targetKind": "external"
+    },
+    {
+      "from": "tests/story.e2e.ts",
+      "side": "after",
+      "commit": "e3b270e5f49a9215452b0b86702946043e979059",
+      "sourceHash": "97f66ac17e589d7dc767351da96f89d1cef77d82cc859192cd424d13021d10d6",
+      "sourceLine": 5,
+      "startOffset": 222,
+      "endOffset": 232,
+      "specifier": "node:net",
+      "target": "node:net",
+      "targetHash": null,
+      "targetKind": "external"
+    },
+    {
+      "from": "tests/story.e2e.ts",
+      "side": "after",
+      "commit": "e3b270e5f49a9215452b0b86702946043e979059",
+      "sourceHash": "97f66ac17e589d7dc767351da96f89d1cef77d82cc859192cd424d13021d10d6",
+      "sourceLine": 6,
+      "startOffset": 262,
+      "endOffset": 271,
+      "specifier": "node:fs",
+      "target": "node:fs",
+      "targetHash": null,
+      "targetKind": "external"
     },
     {
       "from": "tests/story.e2e.ts",
@@ -3239,7 +5724,8 @@
       "endOffset": 320,
       "specifier": "./story-fixture.ts",
       "target": "tests/story-fixture.ts",
-      "targetHash": "4ffe85b1ee0a6230e4e4cc4d801b8a3c8c4fb69a40d13cc1bbfa573257ab1672"
+      "targetHash": "4ffe85b1ee0a6230e4e4cc4d801b8a3c8c4fb69a40d13cc1bbfa573257ab1672",
+      "targetKind": "repository"
     },
     {
       "from": "tests/story.e2e.ts",
@@ -3251,7 +5737,8 @@
       "endOffset": 375,
       "specifier": "../src/server/public.ts",
       "target": "src/server/public.ts",
-      "targetHash": "20c22563be7da4c385eda772d5840d55f0993ddeebd85718b3605cddb76a0b0e"
+      "targetHash": "20c22563be7da4c385eda772d5840d55f0993ddeebd85718b3605cddb76a0b0e",
+      "targetKind": "repository"
     },
     {
       "from": "tests/story.e2e.ts",
@@ -3263,7 +5750,8 @@
       "endOffset": 440,
       "specifier": "../src/domain/public.ts",
       "target": "src/domain/public.ts",
-      "targetHash": "e25787a89a684b01bcfdf1b0984dad8e27659dda40949a6cb084b93afbbf17ce"
+      "targetHash": "e25787a89a684b01bcfdf1b0984dad8e27659dda40949a6cb084b93afbbf17ce",
+      "targetKind": "repository"
     },
     {
       "from": "tests/story.e2e.ts",
@@ -3275,7 +5763,8 @@
       "endOffset": 533,
       "specifier": "../src/domain/public.ts",
       "target": "src/domain/public.ts",
-      "targetHash": "e25787a89a684b01bcfdf1b0984dad8e27659dda40949a6cb084b93afbbf17ce"
+      "targetHash": "e25787a89a684b01bcfdf1b0984dad8e27659dda40949a6cb084b93afbbf17ce",
+      "targetKind": "repository"
     }
   ]
 }

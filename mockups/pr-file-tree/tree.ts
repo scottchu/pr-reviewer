@@ -1,5 +1,5 @@
 export type Change='added'|'modified'|'deleted'|'unchanged';
-export type TreeNode={id:string;path:string;name:string;kind:'directory'|'file';depth:number;x:number;y:number;width:number;height:22;change:Change};
+export type TreeNode={id:string;path:string;name:string;kind:'directory'|'file';depth:number;x:number;y:number;width:number;height:number;change:Change};
 export type TreeEdge={id:string;source:string;target:string;kind:'contains'};
 export type FileTree={nodes:TreeNode[];edges:TreeEdge[]};
 const compare=(a:string,b:string)=>a<b?-1:a>b?1:0;
@@ -20,7 +20,7 @@ export const buildTree=(paths:readonly string[],changes:Readonly<Record<string,s
  const columnWidths=new Map<number,number>();for(const n of entries.values())if(n.kind==='directory')columnWidths.set(n.depth,Math.max(columnWidths.get(n.depth)??0,n.name.length*7.4+12));
  const xs=[0];const maxDepth=Math.max(...[...entries.values()].map(n=>n.depth));for(let i=0;i<maxDepth;i++)xs.push(xs[i]!+Math.max(140,(columnWidths.get(i)??0)+48));
  const positions=new Map<string,number>();let row=0;
- const place=(id:string):number=>{const list=children.get(id)??[];if(!list.length){const y=row++*28;positions.set(id,y);return y;}const ys=list.map(place),y=(ys[0]!+ys.at(-1)!)/2;positions.set(id,y);return y;};place('directory:.');
- const nodes=[...entries.values()].sort((a,b)=>compare(a.id,b.id)).map(n=>({...n,x:xs[n.depth]!,y:positions.get(n.id)!,width:Math.ceil(n.name.length*7.4+12)+(n.kind==='file'&&changes[n.path]?14:0),height:22 as const,change:(n.kind==='file'?changes[n.path]??'unchanged':'unchanged') as Change}));
+ const place=(id:string):number=>{const list=children.get(id)??[];if(!list.length){const y=row++*32;positions.set(id,y);return y;}const ys=list.map(place),y=(ys[0]!+ys.at(-1)!)/2;positions.set(id,y);return y;};place('directory:.');
+ const nodes=[...entries.values()].sort((a,b)=>compare(a.id,b.id)).map(n=>({...n,x:xs[n.depth]!,y:positions.get(n.id)!,width:Math.ceil(n.name.length*7.4+12)+(n.kind==='file'&&changes[n.path]?14:0),height:n.kind==='file'?26:22,change:(n.kind==='file'?changes[n.path]??'unchanged':'unchanged') as Change}));
  return {nodes,edges:[...edges.values()].sort((a,b)=>compare(a.id,b.id))};
 };
