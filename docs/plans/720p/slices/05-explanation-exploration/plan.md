@@ -1,7 +1,7 @@
 # Slice05: follow an explanation and explore
 
 Date: 2026-10-25.
-Status: active; user-adopted same-file-node root relationship projection is implemented/author-tested under reading-journey handoff v12. R9/R10 callable/BeforeAfter root structure is rejected history. Fixed-source review and fresh read-only actual UI-first comprehension remain pending. Protected inner reader/owners/runtime remain frozen.
+Status: active; user-adopted same-file-node root relationship projection is implemented/author-tested under reading-journey handoff v12. R9/R10 callable/BeforeAfter root structure is rejected history. Fixed-source review and fresh read-only actual UI-first comprehension remain pending. Protected inner reader/owners/runtime remain frozen. The attempted fresh actual UI-first review is incomplete because no supported browser/app surface was available; no application UI was observed. See reading-journey revision12 review reconciliation; this is neither acceptance nor a demonstrated product failure.
 Context repair e310477 and J2/J3 source/StoryContent preparation received bounded independent source review. User-approved candidate gateway/proxy and requested private-tailnet8478 access now support the integrated owner-backed reading/story/evidence/saved-question/return candidate. See [integrated PR25 reading journey](reviews/reading-journey-v1.md), handoff v8 and its evidence/review gates. Native responsible-session reply, unfamiliar-reviewer understanding and new independent implementation review remain open; frozen file-mock or author engineering success is not full-journey acceptance.
 
 **Packet revision:** 3
