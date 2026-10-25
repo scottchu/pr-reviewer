@@ -2,6 +2,10 @@
 
 Latest user correction controls the composition: [canvas workspace and panels](review-loop/canvas-panels.md). No top-down page; context left, detail right, discussion below, gesture-driven persistent graph. The whole-map requirements remain; earlier composition readiness is historical.
 
+Date of organization correction: 2026-10-25.
+Status: accepted direct user correction; file-default candidate rejected as the primary experience.
+The opening graph is organized by supported caller→callee behavior, including necessary unchanged callers and callees, not folders. The file tree is an alternate icon-switched lens over the same PR/source identities. Preserve reading, selection, public story/drafts and exact return across this switch; a lens does not redefine facts or membership. The current partial call evidence must show its actual connected neighborhoods and precise unprepared frontiers while retaining all50source homes. See [F18](pr-file-tree-first.md#f18--callercallee-primary-lens-and-explicit-icon-switching). Prior file-default engineering totals are historical checkpoints, not approval of that experience.
+
 Date: 2026-10-24.
 
 Status: corrected design specification for independent review. The controlling October23 direction is a persistent spatial graph of the whole PR. The user rejected both the8474 control-wall composition and the8476 single-path/locked-pan-zoom mock as product-fit targets. Earlier mock readiness is withdrawn for that scope. No new runtime or accepted product layout is claimed.

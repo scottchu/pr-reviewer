@@ -1,4 +1,4 @@
-# Change-centered PR file workspace mock
+# Change-centered PR behavior workspace
 
 Current integrated outcome and active repair: [reading journey](../plans/720p/slices/05-explanation-exploration/reviews/reading-journey-v1.md). The frozen mock's F14 deferral is an implementation limit, not permission to omit story synchronization or anchored question/answer from the latest full outcome.
 
@@ -7,13 +7,25 @@ Status: current accepted requirements for a bounded inspectable mock. Earlier fl
 
 ## Purpose and boundary
 
-A reviewer should see what changed and the directly relevant behavior relationships without reading an entire project or learning a control console. The whole changed-file tree provides orientation; continuous source comparison and change-centered direct-call neighborhoods provide evidence. Preserve the original October23 dark editor/Inter/quiet-chrome foundation. This mock has no backend/data/participant/network effects and is not a new parser, analysis platform or production composition.
+A reviewer should see what changed and the directly relevant behavior relationships without reading an entire project or learning a control console. The default organization is source-grounded caller→callee behavior, with changed and necessary unchanged function/source occurrences. File/directory containment is an alternate lens, never the default behavior structure. Preserve the original October23 dark editor/Inter/quiet-chrome foundation and accepted panels. The bounded candidate now uses the explicitly approved existing owner gateway/store/proxy; that permission does not grant production adoption, native-session changes or a new analysis platform.
 
 ## Current requirements and observable acceptance
 
-### F01 — Whole-PR compact spatial file tree
+### F18 — Caller/callee primary lens and explicit icon switching
 
-All50 changed PR25 paths exist immediately under directory containment branches. Each compact bounded file object shows its basename and small Git change mark only; no giant prose/function cards. Full-path/kind IDs distinguish duplicate names. Directory edges mean contains. Drag/scroll pans; pinch/Control-wheel and keyboard zoom remain available; Overview returns readable root framing. The canvas fills the window without outer page scrolling. Not all50 must fit the first viewport at legible scale.
+Date: 2026-10-25.
+Status: accepted correction following the user's rejection of the file-default candidate.
+The user reiterated that the graph is connected by callers and callees, asked why it was organized as folders, and made the file tree a different view switched through icon actions. This supersedes earlier file-first layout language; e3c461c's engineering checks do not establish product acceptance.
+
+Behavior is the first-open default. Place exact callable/source occurrences by real caller→callee relationships, independently for base/head; meaningful supported unchanged callers AND callees remain inspectable. Source/scope/counterpart/test relationships have separate meanings and must never masquerade as calls. An unresolved boundary names the missing evidence. Partial prepared evidence cannot become a fake complete connected graph or a reduced PR. All50changed paths retain source homes and arbitrary entry; unprepared homes belong to the authored responsibility/support groups, not directory branches or an undifferentiated catch-all.
+
+The action bar has familiar SVG actions for Behavior graph and File tree with accessible names, title, pressed state and visible focus. Switching is explicit and changes presentation only. Keep selected function/source identity, expansion, per-file folds/scroll/mode, test lens, public story/draft, original/exploration return frames and source eligibility. Retain each lens's camera separately; source/fullscreen/Context/owner returns include their originating lens and exact camera. Story selects the same source/function identity in either lens and never gates membership. Camera-only gestures, explicit disclosure, continuous full-callable source, declared-test limits, owner-backed questions and honest native-delivery state remain unchanged.
+
+Acceptance: actual desktop/narrow first-open shows connected source-backed functions before selection; follow an unchanged caller and an unchanged callee on both source sides; inspect exact callsite/target/certainty/frontier; toggle icons during complex source/test/Context and owner exploration with dirty draft, then restore all reading/mode/fold/test/cursor/draft frames. Check arbitrary unprepared-source entry, all50source identities, no imported edges labeled calls, source hashes and exact base/head identities. Fresh independent engineering and unfamiliar-reader comprehension remain separate gates.
+
+### F01 — Whole-PR source accounting and alternate file tree
+
+All50 changed PR25 paths have discoverable exact source homes in both lenses. The default behavior lens connects actual callers to callees and locates source/support homes by the accepted responsibility groups, with visibly typed source/scope associations and honest unprepared frontiers. The alternate file lens places the same sources under directory containment branches. Each compact source home shows its basename and Git status; full-path/kind IDs distinguish duplicates. Directory edges mean contains only in that alternate lens. Drag/scroll pans; pinch/Control-wheel and keyboard zoom remain available; Overview frames the active lens without changing disclosure. The canvas fills the window without outer page scrolling. Not all50 must fit the first viewport at legible scale.
 
 Acceptance: exact Git membership/statuses, duplicate/prefix independence, readable desktop/390 framing, real pan/zoom/keyboard and no accidental object dragging. Source-backed path tooltips/accessibility expose full identity.
 
@@ -67,9 +79,9 @@ Acceptance: actual pointer/keyboard activation, exact relation identity, respons
 
 ### F10 — Calls centered on changes, never default imports
 
-Default review relationships are actual source-grounded direct callers/callees relevant to **selected changed function/declaration or changed-callsite seeds**, with only necessary one-hop unchanged context. Preserve whole50-file tree membership, but do not dump every function, every call in the selected file or a whole-project graph. Static imports are off by default; the retained import fixture is secondary historical evidence, never call/runtime claims.
+Default organization is the prepared actual caller/callee graph around changed function/declaration or changed-callsite seeds, with necessary one-hop unchanged context present before file selection. Selecting a file must not be required to discover those relationships. Preserve whole50-file source accounting without pretending every repository function/call is known. In the alternate file lens, selected-file neighborhoods remain a focused view of these same facts. Static imports are off by default; the retained import fixture is secondary historical evidence, never call/runtime claims.
 
-Prepared scope: review.ts changed request; local-access.ts added accessHeaders; storage/public.ts changed local authenticate; storage/access.ts added accessReference/localPrincipal. Show only selected-file seeds and incident direct base/head calls. Gray unchanged refresh retains both exact source occurrences and its identical-body evidence; unchanged source does not prove unchanged behavior under a changed dependency. Other files/scopes remain explicitly unprepared, not no-calls leaves. Further neighbors are not automatically expanded.
+Prepared scope: review.ts changed request; local-access.ts added accessHeaders; storage/public.ts changed local authenticate; storage/access.ts added accessReference/localPrincipal. The immutable client/storage packets supply32 callable occurrences and30 direct edges across9source paths. The bounded supplemental private-session scope preparation uses the existing TypeScript compiler on pinned bytes to expose credentialScope's direct lexical calls to requestFingerprint/encodedBytes on both sides; those two callees retain exact unchanged-body proof. Supplemental lexical observations are not admitted-static facts. Gray unchanged refresh retains both exact source occurrences and its identical-body evidence; unchanged bytes do not prove unchanged behavior under a changed dependency. Other files/scopes remain explicitly unprepared, not no-calls leaves. No arbitrary transitive expansion, guessed dispatch or fabricated cross-component call is permitted.
 
 Acceptance: representative review.ts and storage/public.ts overlays contain only incident changed-seed neighborhoods, callers point to callees, exact source/range identities remain inspectable, and unrelated packet edges stay hidden. Do not guess counterparts by name, connect HTTP/port dispatch to a closure or fabricate gateway/store calls.
 
