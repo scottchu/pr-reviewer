@@ -85,3 +85,8 @@ Date: 2026-10-24. Latest user correction requires changes to stay together. Repl
 ## Same-file canvas fullscreen amendment
 
 Date: 2026-10-24. Every changed file object exposes a quiet top-right accessible fullscreen button. This is an explicit reading intent: expand the same file node to available canvas space at readable scale, preserving its identity/connectors and existing source component. It does not navigate or open a modal/page. Left hunk dots and bottom unified/split controls remain available. Exit or Escape restores the exact prior graph camera, selected file and compact/expanded state; an already-open file keeps its active hunk, reading position and presentation. Native source/rail/control input stays local. Geometry remains a mock proposal.
+
+
+## Primary change comprehension amendment
+
+Date: 2026-10-24. The primary acceptance is yellow-dot activation revealing its contiguous real removed/added block with a concise explanation inside that same file node, visibly sharing the hunk identity/current highlight. Prepared explanations describe exact source changes; rationale beyond source facts is explicitly inference. They are authored mock annotations, not generated analysis, execution or verified intent. Pin each annotation to path, exact native hunk header, immutable source side hashes/ranges and any supporting source. Unannotated hunks remain honest: exact source available, no prepared explanation. The first demonstrated mobile path uses Unified and scripts/dev.ts's final logging replacement; fullscreen/control polish must not displace this reading outcome.
