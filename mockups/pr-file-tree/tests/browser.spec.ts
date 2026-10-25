@@ -5,7 +5,7 @@ const viewport=async(page:Page)=>page.locator('.react-flow__viewport').evaluate(
 test('whole PR tree contains exactly the pinned filenames, pans, gesture zooms and resets at readable scale',async({page})=>{
  const errors:string[]=[];page.on('pageerror',e=>errors.push(e.message));await page.goto('/');await expect(page.locator('[data-file-path]')).toHaveCount(50);await page.evaluate(()=>document.fonts.ready);
  const paths=await page.locator('[data-file-path]').evaluateAll(es=>es.map(e=>e.getAttribute('data-file-path')!).sort());expect(paths).toEqual([...fixture.paths].sort());
- for(const label of await page.locator('[data-file-path]').all()){const path=await label.getAttribute('data-file-path');await expect(label).toHaveText(path!.split('/').at(-1)!);await expect(label).toHaveAttribute('title',path!);}
+ for(const label of await page.locator('[data-file-path]').all()){const path=await label.getAttribute('data-file-path');const change=fixture.changes[path! as keyof typeof fixture.changes];await expect(label).toHaveText(`${change==='added'?'+ ':change==='modified'?'~ ':'− '}${path!.split('/').at(-1)!}`);await expect(label).toHaveAttribute('title',`${path} · ${change}`);}
  const sizes=await page.locator('.react-flow__node').evaluateAll(es=>es.map(e=>({height:e.getBoundingClientRect().height,width:e.getBoundingClientRect().width})));expect(sizes.every(s=>s.height===22&&s.width<300)).toBe(true);await expect(page.getByRole('button')).toHaveCount(1);
  const initial=await viewport(page);expect(initial.zoom).toBe(1);
  await page.screenshot({path:`${evidence}/desktop.png`});
@@ -14,6 +14,7 @@ test('whole PR tree contains exactly the pinned filenames, pans, gesture zooms a
  await page.keyboard.down('Control');await page.mouse.wheel(0,-200);await page.keyboard.up('Control');await expect.poll(async()=>(await viewport(page)).zoom).toBeGreaterThan(initial.zoom);await page.screenshot({path:`${evidence}/desktop-panned-zoomed.png`});
  await page.getByRole('button',{name:'Reset view'}).click();await expect.poll(async()=>await viewport(page)).toEqual(initial);expect(errors).toEqual([]);
 });
+test.describe('touch-capable narrow viewport',()=>{test.use({hasTouch:true});
 test('390px full-window tree has legible filenames, synthetic touch pinch and keyboard pan/zoom without page scroll',async({page,context})=>{
  await page.setViewportSize({width:390,height:844});await page.goto('/');await expect(page.locator('[data-file-path]')).toHaveCount(50);await page.evaluate(()=>document.fonts.ready);const initial=await viewport(page);expect(initial.zoom).toBe(1);
  await page.screenshot({path:`${evidence}/390.png`});expect(await page.evaluate(()=>({width:document.documentElement.scrollWidth,height:document.documentElement.scrollHeight}))).toEqual({width:390,height:844});
@@ -21,4 +22,6 @@ test('390px full-window tree has legible filenames, synthetic touch pinch and ke
  await page.getByRole('button',{name:'Reset view'}).click();await expect.poll(async()=>await viewport(page)).toEqual(initial);
  await page.locator('main').focus();await page.keyboard.press('ArrowRight');await expect.poll(async()=>(await viewport(page)).x).toBe(initial.x-80);await page.keyboard.press('+');await expect.poll(async()=>(await viewport(page)).zoom).toBeGreaterThan(1);await page.screenshot({path:`${evidence}/390-panned-zoomed.png`});
  await page.keyboard.press('0');await expect.poll(async()=>await viewport(page)).toEqual(initial);await expect(page.locator('[data-file-path]')).toHaveCount(50);expect(await page.evaluate(()=>scrollY)).toBe(0);
+});
+
 });

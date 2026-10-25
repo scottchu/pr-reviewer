@@ -22,3 +22,8 @@ test('layout is deterministic, single-line and leaves text rectangles separate',
 test('invalid paths cannot create disguised branches; empty input remains an honest root',()=>{
  for(const path of ['/abs.ts','a//b.ts','../b.ts','a/./b.ts',''])assert.throws(()=>buildTree([path]));assert.deepEqual(buildTree([]).nodes.map(n=>n.id),['directory:.']);
 });
+
+test('Git status marks exactly four added and forty-six modified files without inventing deletions',()=>{
+ const tree=buildTree(fixture.paths,fixture.changes);assert.equal(tree.nodes.filter(n=>n.kind==='file'&&n.change==='added').length,4);assert.equal(tree.nodes.filter(n=>n.kind==='file'&&n.change==='modified').length,46);assert.equal(tree.nodes.filter(n=>n.change==='deleted').length,0);
+ const raw=execFileSync('git',['diff','--name-status','-z',fixture.base,fixture.head]);assert.equal(createHash('sha256').update(raw).digest('hex'),fixture.changeListSha256);
+});

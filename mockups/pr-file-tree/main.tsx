@@ -4,12 +4,12 @@ import {ReactFlow,Background,BackgroundVariant,Handle,Position,type Node,type No
 import '@xyflow/react/dist/style.css';
 import './style.css';
 import fixture from './paths.json' with {type:'json'};
-import {buildTree} from './tree.ts';
-const tree=buildTree(fixture.paths);
-type LabelNode=Node<{name:string;path:string;kind:'file'|'directory'},'filename'>;
-const Label=({data}:NodeProps<LabelNode>)=><><Handle type="target" position={Position.Left} isConnectable={false}/><span className={`filename ${data.kind}`} title={data.path==='.'?'pr-reviewer':data.path} data-file-path={data.kind==='file'?data.path:undefined}>{data.name}</span><Handle type="source" position={Position.Right} isConnectable={false}/></>;
+import {buildTree,type Change} from './tree.ts';
+const tree=buildTree(fixture.paths,fixture.changes);
+type LabelNode=Node<{name:string;path:string;kind:'file'|'directory';change:Change},'filename'>;
+const Label=({data}:NodeProps<LabelNode>)=><><Handle type="target" position={Position.Left} isConnectable={false}/><span className={`filename ${data.kind} ${data.change}`} title={data.path==='.'?'pr-reviewer':`${data.path} · ${data.change}`} data-file-path={data.kind==='file'?data.path:undefined}>{data.change==='added'?'+ ':data.change==='modified'?'~ ':data.change==='deleted'?'− ':''}{data.name}</span><Handle type="source" position={Position.Right} isConnectable={false}/></>;
 const nodeTypes={filename:Label};
-const nodes:LabelNode[]=tree.nodes.map(n=>({id:n.id,type:'filename',position:{x:n.x,y:n.y},data:{name:n.name,path:n.path,kind:n.kind},width:n.width,height:n.height,measured:{width:n.width,height:n.height},draggable:false,selectable:false,focusable:true,ariaLabel:n.path==='.'?'pr-reviewer repository root':n.path,style:{width:n.width,height:n.height}}));
+const nodes:LabelNode[]=tree.nodes.map(n=>({id:n.id,type:'filename',position:{x:n.x,y:n.y},data:{name:n.name,path:n.path,kind:n.kind,change:n.change},width:n.width,height:n.height,measured:{width:n.width,height:n.height},draggable:false,selectable:false,focusable:true,ariaLabel:n.path==='.'?'pr-reviewer repository root':`${n.path} · ${n.change}`,style:{width:n.width,height:n.height}}));
 const edges=tree.edges.map(e=>({id:e.id,source:e.source,target:e.target,type:'smoothstep',interactionWidth:0,selectable:false,focusable:false,ariaLabel:`${e.source.slice(10)} contains ${e.target.slice(e.target.indexOf(':')+1)}`}));
 const initialView=()=>{
  const narrow=window.innerWidth<650;const anchor=tree.nodes.find(n=>n.id===(narrow?'directory:src/application':'directory:.'))!;
