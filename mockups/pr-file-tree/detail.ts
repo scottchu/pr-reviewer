@@ -3,6 +3,7 @@ export type DetailState={expanded:string|null;lastZoom:number};
 export type DetailIntent={type:'focus';path:string|null}|{type:'zoom';zoom:number;focal:string|null};
 export const detailTransition=(s:DetailState,a:DetailIntent):DetailState=>{
  if(a.type==='focus')return {...s,expanded:a.path};
+ if(a.zoom===s.lastZoom)return s;
  if(a.zoom<s.lastZoom-.001&&a.zoom<=1.08)return {expanded:null,lastZoom:a.zoom};
  if(a.zoom>s.lastZoom+.001&&a.zoom>=1.3&&a.focal)return {expanded:s.expanded??a.focal,lastZoom:a.zoom};
  return {...s,lastZoom:a.zoom};

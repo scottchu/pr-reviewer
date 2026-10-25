@@ -1,0 +1,5 @@
+import React from 'react';
+import type {ImportLink} from './imports.ts';
+import {citationText} from './imports.ts';
+import {explainRelationship} from './relationship.ts';
+export const RelationshipReader=({link,onClose}:{link:ImportLink;onClose:()=>void})=>{const explanation=explainRelationship(link);return <section className="relationship-reader nodrag nopan nowheel" aria-label="Import relationship explanation" onWheel={e=>e.stopPropagation()}><div className="reader-heading"><strong>Import relationship · {explanation.status}</strong><button onClick={onClose} aria-label="Close relationship explanation">×</button></div><p className="reader-relation">{explanation.from}<span>imports →</span>{explanation.to}</p><h3>What</h3><p>{explanation.what}</p><h3>How</h3><p>{explanation.how}</p><h3>Why</h3><p>{explanation.why}</p><details><summary>Exact pinned source citations</summary><pre>{citationText(link.citations)}</pre></details><p className="reader-boundary">{explanation.boundary} Prepared mock explanation, not live analysis or execution evidence.</p></section>;};

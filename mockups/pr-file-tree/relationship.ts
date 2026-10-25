@@ -1,0 +1,8 @@
+import type {ImportLink} from './imports.ts';
+export const explainRelationship=(link:ImportLink)=>{
+ const from=link.citations[0]?.from??'unknown source';const status=link.change==='added'?'added':link.change==='deleted'?'removed':'retained';
+ const what=`${from} ${status} a static import of ${link.targetPath}.`;
+ const how=link.change==='added'?'The target is present in the pinned head import declarations and absent from the baseline declarations.':link.change==='deleted'?'The target is present in the pinned baseline import declarations and absent from the head declarations.':'The target is imported on both pinned sides. Imported bindings and source bodies can still differ.';
+ const why=from==='scripts/dev.ts'&&link.targetPath==='node:fs'?'Inference: removing the filesystem import is consistent with removing this file’s token-file reading flow (Before L28–36). The import relation alone does not prove the reason or runtime behavior.':from==='src/application/review.ts'&&link.targetPath==='src/application/local-access.ts'?'Source fact: the new helper omits Bearer for local-owner:v1 and supplies it for an explicit credential. Inference: this dependency centralizes that header choice. It does not prove execution or security.':'Unknown: these static declarations do not establish author intent, call flow or runtime impact.';
+ return {from,to:link.targetPath,status,what,how,why,boundary:link.targetKind==='external'?'External module identity only; no repository target, package resolution or target hash is claimed.':'Repository target resolved against each exact source-side Git tree; type imports are included.'};
+};
