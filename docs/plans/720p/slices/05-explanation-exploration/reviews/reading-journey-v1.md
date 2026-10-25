@@ -1,7 +1,7 @@
 # Integrated PR25 reading journey repair
 
 Date: 2026-10-25.
-Status: J1 repair engineering-verified; J2/J3 inputs prepared; owner-backed integration blocked on the scoped runtime decision. Full journey and acceptance incomplete.
+Status: active; scoped candidate gateway/proxy explicitly authorized; J1 engineering-verified and J2/J3 composition in progress. Full journey and acceptance incomplete.
 Parent: [slice 05](../plan.md), [720p](../../../plan.md), [roadmap](../../../../roadmap.md).
 
 ## Ownership and inputs
@@ -147,3 +147,28 @@ The same pending candidate gateway/proxy scope decision has remained across thre
 The next coherent owner-backed story/question integration requires the proposed gateway127.0.0.1:57944, private prepared data root /tmp/pr-reviewer-reading-journey-owner-data and /api proxy on57943. The startup packet explicitly preserves existing services: “Do not restart/change existing services, network, security, permissions or MCP config.” The proposed proxy/runtime effects remain gated; independent preparation is exhausted. Do not create a parallel local story/draft model, fake published version/reply, or additional documents/tests merely to bypass this boundary.
 
 Unblock owner: user. Required input: answer the existing narrowly scoped runtime question; no requirement restatement is needed. If approved, reconcile the runtime scope in this plan, then implement existing public Workspace/Story/SourceCanvas/Question composition and verify actual readback/React journey. Approval would not clear separate native attachment/delivery, denied UI-first browser route or unfamiliar-reviewer acceptance. Full requested goal stays unchanged and incomplete. Retain the clean task branch, data and evidence; no new service, proxy/configuration, archive or cleanup effect occurred in this blocked audit.
+
+
+## Revision 6 — scoped runtime approval and owner composition
+
+Date: 2026-10-25.
+Status: active; previous runtime-scope blocker resolved by direct user reply.
+Authority: user answered “允許此限定候選整合（建議）” to the exact gateway127.0.0.1:57944/private /tmp/pr-reviewer-reading-journey-owner-data/API proxy57943 question. This authorizes only the stated candidate integration. Preserve production, tailnet/global MCP/native sessions and old candidate targets. No ps/app-server socket retry, new runtime/dependency, native attachment or message delivery authority is inferred.
+
+Sequence and observable acceptance: (1) start existing gateway/store on the assigned port with the prepared exact Snapshot; admit prepared StoryContent through the existing local-owner story command and read its actual receipt/version; refuse to overwrite different retained content; (2) compose StoryBridge/public workspace with the persistent graph and left/right/bottom panels, retaining arbitrary entry and camera-only gesture semantics; (3) inspect exact source references and adopt a question anchor through the existing guarded draft owner; save/read back the actual question without a fabricated reply or delivery result; (4) preserve local reader presentation plus public story/draft frames across evidence exploration and explicit return, including failure; (5) actual React desktop/narrow journeys, source-informed engineering review and separate unfamiliar-reviewer UI-first gate. Current attachment/native reply capability is unknown and must be reported honestly; no local mock identity can stand in for the responsible session.
+
+Candidate runtime implementation is a thin launcher over existing public preparation/storage/server boundaries, no backend/schema rewrite. It uses only the private approved data root, strict assigned loopback port, fail-on-occupied behavior and handle-based shutdown. The existing notifier is not provisioned to any native session; attempts must report unavailable/failed rather than pretend delivery. Candidate story author is the trusted local-owner operation, displayed as a prepared source account; it is not an attached agent's reply. Recoverable manifest and exact source/version readback stay private. Scope remains candidate integration, not production adoption/deployment.
+
+### Revision 7 — requested private-tailnet candidate URL
+
+Date: 2026-10-25.
+Status: scoped access verified; full product journey remains incomplete.
+Authority: the user's later direct request, "Tailscale url", authorizes a new private candidate Serve mapping on the existing host: HTTPS8478 to http://127.0.0.1:57943. This narrowly supersedes the earlier tailnet exclusion for this route only. Existing handlers, especially HTTPS8477 to56677, and existing AllowFunnel443:true must remain identical; no Funnel is enabled for8478. No production/global MCP/native-session change or service replacement is authorized.
+
+Execution owner: reused product executor review_context_repair; root has stopped product writes under the user's delegation policy. Earlier reviews remain historical independent evidence; future executor self-checks are not independent review. Preserve the inherited runtime/docs edits and active candidate/data/evidence. The current runtime manifest records9d586a0 without dirty-state disclosure; source provenance remains an open repair before fixed-pin acceptance.
+
+Plan and acceptance: save Serve baseline and exact per-port rollback in /tmp/pr-reviewer-reading-journey-evidence; confirm8478 is unused; verify current57943 UI and actual /api/story Snapshot/version; add only the new Serve route; read back prior-handler/Funnel equality and HTTPS UI/assets/API identity. Rollback is `tailscale serve --https=8478 off`, followed by comparison with the saved baseline. No broad reset or baseline replacement is permitted. Return the verified candidate URL promptly, then await the coordinator's next bounded task.
+
+Access result: https://mac-mini.duckbill-ionian.ts.net:8478/ is verified from this host. Before mutation, Serve had no8478 entry and TCP listener inspection found none. New HTTPS8478 proxies only127.0.0.1:57943. Removing just the new TCP/Web keys from readback yields exact baseline equality; AllowFunnel is identical and8478 is false/absent. Existing8477 remains56677. HTTPS UI/main/CSS/font return200; /api/story returns retained Snapshot22009f2925f56fed2ca29f3b8a16a147c586f38f61d1c391a7abbd579d5193b2 and actual version d8e15978-5369-4277-b9e5-5c68969451b9, revision1, local-user author. HTTPS review readback includes50changed paths/128source sides; every path/side/hash/lineCount matches the private prepared Snapshot metadata.
+
+Evidence: serve-8478-before.json, serve-8478-after.json, serve-8478-rollback.txt, serve-8478-story.json and serve-8478-source-metadata.json in the retained task evidence directory, plus HTTP resource captures. These contain candidate access/readback evidence, not independent browser acceptance or remote-client usability. No browser, old-service restart, native pairing, production route change, PR/push/merge or other shared configuration change occurred. The user-visible mock still has the previously delivered UI; actual story/question interface composition and runtime provenance repair remain open. Retain baseline/rollback, active worktree/runtime/data and inherited uncommitted edits for the next assigned task.
