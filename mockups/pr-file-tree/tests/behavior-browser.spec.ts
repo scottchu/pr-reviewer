@@ -1,6 +1,10 @@
 import { test, expect, type Page, type Locator } from '@playwright/test';
+import { mkdirSync, existsSync } from 'node:fs';
 import { projectBehaviorCalls, projectCalls } from '../calls.ts';
 test.use({ reducedMotion: 'reduce' });
+const rootEvidence = process.env.REVIEW_ROOT_EVIDENCE_DIR ?? `/tmp/pr-reviewer-reading-journey-evidence/root-author-${Date.now()}`;
+if (existsSync(`${rootEvidence}/candidate-manifest.json`)) throw new Error('refuse_to_overwrite_frozen_root_evidence');
+mkdirSync(rootEvidence, { recursive: true });
 
 for (const width of [1440, 390]) test(`${width} original file roots with caller/callee projection and unchanged expansion`, async ({ page }) => {
   await page.setViewportSize({ width, height: 844 });
@@ -27,7 +31,7 @@ for (const width of [1440, 390]) test(`${width} original file roots with caller/
   const source = page.locator('[data-file-path="src/application/review.ts"]');
   await expect(source).toContainText('~ review.ts');
   const initial = await source.boundingBox();
-  await page.screenshot({ path: `/tmp/pr-reviewer-reading-journey-evidence/r13-mobile-root/opening-${width}.png` });
+  await page.screenshot({ path: `${rootEvidence}/opening-${width}.png` });
   await source.click();
   await expect(page.locator('[data-expanded-file]')).toHaveAttribute('data-expanded-file', request.declaration.path);
   await expect(page.locator('.continuous-reader')).toBeInViewport();
@@ -44,7 +48,7 @@ for (const width of [1440, 390]) test(`${width} original file roots with caller/
   expect(Math.abs(points.start.x - caller!.x - caller!.width)).toBeLessThan(4);
   expect(Math.abs(points.end.x - callee!.x)).toBeLessThan(4);
   expect(points.marker).toBeTruthy();
-  await page.screenshot({ path: `/tmp/pr-reviewer-reading-journey-evidence/r13-mobile-root/expanded-${width}.png` });
+  await page.screenshot({ path: `${rootEvidence}/expanded-${width}.png` });
   await page.getByRole('button', { name: 'Unified', exact: true }).click();
   await page.locator('.continuous-reader').evaluate(element => { element.scrollTop = 95; });
   const saved = await page.locator('.continuous-reader').evaluate(element => element.scrollTop);
@@ -213,7 +217,7 @@ for (const resize of [false, true]) test(`phone root viewport clears legend and 
   }
   const source = page.locator('[data-file-path="src/application/review.ts"]');
   const target = page.locator('[data-file-path="src/application/local-access.ts"]');
-  await page.screenshot({ path: `/tmp/pr-reviewer-reading-journey-evidence/r13-mobile-root/${resize ? 'resize' : 'fresh'}-current.png` });
+  await page.screenshot({ path: `${rootEvidence}/${resize ? 'resize' : 'fresh'}-current.png` });
   for (const node of [source, target]) {
     const box = await node.boundingBox();
     expect(box!.x).toBeGreaterThanOrEqual(0);
@@ -244,4 +248,25 @@ for (const resize of [false, true]) test(`phone root viewport clears legend and 
   }
 
   await expect(page.locator('[data-file-path]')).toHaveCount(50);
+});
+
+test('storage root caller blocks keep every exact relation label disjoint', async ({ page }) => {
+  await page.setViewportSize({ width: 1600, height: 1000 });
+  await page.goto('/');
+  await page.getByRole('button', { name: 'Open prepared story', exact: true }).click();
+  await page.getByRole('button', { name: 'Next story step', exact: true }).click();
+  await page.getByRole('button', { name: 'Next story step', exact: true }).click();
+  await page.getByRole('button', { name: 'Find source', exact: true }).click();
+  await page.getByRole('combobox', { name: 'Changed source' }).selectOption('src/storage/public.ts');
+  await page.screenshot({ path: `${rootEvidence}/storage-labels-current.png` });
+  const labels = await page.locator('.file-call-label').evaluateAll(elements => elements.map(element => {
+    const box = element.getBoundingClientRect();
+    return { id: element.getAttribute('data-call-id'), left: box.left, right: box.right, top: box.top, bottom: box.bottom };
+  }));
+  expect(labels).toHaveLength(15);
+  for (const [index, a] of labels.entries()) for (const b of labels.slice(index + 1)) {
+    const overlap = Math.min(a.right, b.right) > Math.max(a.left, b.left)
+      && Math.min(a.bottom, b.bottom) > Math.max(a.top, b.top);
+    expect(overlap, `Exact call labels overlap: ${a.id} and ${b.id}`).toBe(false);
+  }
 });

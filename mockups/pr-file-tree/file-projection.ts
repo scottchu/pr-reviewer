@@ -37,8 +37,10 @@ export const layoutFileProjection = (tree: FileTree, narrow: boolean): FileTree 
     const callers = [...new Set(calls.filter(call => call.callee.declaration.path === target).map(call => call.caller.declaration.path))];
     const start = top;
     for (const caller of callers) {
-      positions.set(caller, { x: 0, y: top });
       const count = calls.filter(call => call.caller.declaration.path === caller && call.callee.declaration.path === target).length;
+      // Desktop lanes are centered on their source port; place that unchanged
+      // file proxy inside its own block so the next caller's lanes cannot intrude.
+      positions.set(caller, { x: 0, y: top + (narrow ? 0 : (count - 1) * 38) });
       top += Math.max(narrow ? 270 : 160, count * 76 + 80);
     }
     positions.set(target, { x: narrow ? 174 : 760, y: narrow ? start + 210 : start + (top - start) / 2 - 40 });
