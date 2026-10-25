@@ -1,0 +1,5 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import diffs from '../diffs.json' with {type:'json'};
+import {fileGroupModel} from '../file-group.ts';
+test('native hunk/source child identities and relationships survive unified/split and workspace width',()=>{const file=diffs.files.find(f=>f.path==='scripts/dev.ts')!;const unified=fileGroupModel(file,'unified',287),split=fileGroupModel(file,'split',1350);assert.deepEqual(unified.nodes.map(n=>n.id),split.nodes.map(n=>n.id));assert.equal(unified.hunks.length,4);for(const [i,hunk] of unified.hunks.entries()){const group=unified.nodes.find(n=>n.id===hunk.id)!;assert.equal(group.parentId,`file:${file.path}`);for(const side of ['before','after']){const node=unified.nodes.find(n=>n.id===`source:${file.path}:${i}:${side}`)!;assert.equal(node.parentId,hunk.id);assert.equal(node.data.source?.commit,file[side as 'before'|'after'].commit);assert.ok(unified.edges.some(e=>e.source===node.id&&e.target===`comparison:${file.path}:${i}`));}}assert.equal(new Set(unified.nodes.map(n=>n.id)).size,unified.nodes.length);});
