@@ -363,3 +363,79 @@ for (const activation of ['Enter', 'Space']) test(`requirement reference ${activ
   await expect(page.locator('.react-flow__viewport')).toHaveAttribute('style', frame!);
   await expect(page.locator('main')).toBeFocused();
 });
+
+
+for (const width of [1440, 390]) test(`${width} inferred change consequence exposes real source and exact explanation return`, async ({ page }) => {
+  await page.setViewportSize({ width, height: 844 });
+  await page.goto('/');
+  if (width >= 650) await page.getByRole('button', { name: 'Close review context' }).click();
+  const edge = page.getByRole('button', { name: /Explain inferred change consequence/ });
+  await expect(edge).toBeVisible();
+  await expect(page.locator('.react-flow__edge-fileCall')).toHaveCount(15);
+  await expect(page.locator('.react-flow__edge-requirementReference')).toHaveCount(2);
+  await expect(page.locator('.react-flow__edge-changeImpact')).toHaveCount(1);
+  await expect(page.locator('[data-file-path]')).toHaveCount(50);
+  await page.screenshot({ path: `${rootEvidence}/impact-overview-${width}.png` });
+  await edge.focus();
+  await page.keyboard.press('Enter');
+  const explanation = page.getByRole(width < 650 ? 'dialog' : 'region', { name: 'Change consequence explanation' });
+  await expect(explanation.getByRole('heading', { name: 'Matching owner-request headers' })).toBeFocused();
+  await expect(explanation).toContainText('Prepared inference');
+  await expect(explanation).toContainText('not runtime proof');
+  await expect(explanation.locator('.callsite-action')).toHaveCount(6);
+  const original = await page.locator('.react-flow__viewport').getAttribute('style');
+  await page.screenshot({ path: `${rootEvidence}/impact-explanation-${width}.png` });
+  for (const side of ['After', 'Before']) {
+    const button = explanation.getByRole('button', { name: new RegExp(`Read ${side} · src/server/public.ts`) });
+    await button.focus();
+    await page.keyboard.press('Enter');
+    await expect(explanation).toHaveCount(0);
+    await expect(page.locator('[data-expanded-file]')).toHaveAttribute('data-expanded-file', 'src/server/public.ts');
+    const reader = page.locator('.continuous-reader');
+    await expect(reader).toBeFocused();
+    await expect(reader).toBeInViewport();
+    await expect(page.locator(`[data-${side === 'After' ? 'after' : 'before'}-line="61"]`).first()).toBeVisible();
+    await page.getByRole('button', { name: 'Return to original reading' }).click();
+    await expect(explanation).toBeVisible();
+    await expect(explanation.getByRole('heading', { name: 'Matching owner-request headers' })).toBeFocused();
+    await expect(page.locator('[data-expanded-file]')).toHaveCount(0);
+    await expect(page.locator('.react-flow__viewport')).toHaveAttribute('style', original!);
+  }
+  await explanation.getByRole('button', { name: 'Close change consequence' }).click();
+  await expect(edge).toBeFocused();
+});
+
+
+test.describe('normal-motion impact reading restoration', () => {
+  test.use({ reducedMotion: 'no-preference' });
+  test('change consequence Return keeps an existing expanded folded Split reading', async ({ page }) => {
+  await page.goto('/');
+  await page.getByRole('button', { name: 'Close review context' }).click();
+  await page.getByRole('button', { name: 'Find source', exact: true }).click();
+  await page.getByRole('combobox', { name: 'Changed source' }).selectOption('src/application/private-session.ts');
+  await page.locator('[data-file-path="src/application/private-session.ts"]').click();
+  await page.getByRole('button', { name: 'Split', exact: true }).click();
+  await expect.poll(async () => page.locator('.continuous-comparison').evaluate(element => element.clientWidth)).toBeGreaterThan(700);
+  await page.locator('.fold-control').first().click();
+  await expect.poll(async () => (await page.locator('[data-expanded-file]').boundingBox())!.height).toBeGreaterThan(600);
+  await page.locator('.continuous-reader').evaluate(element => { element.scrollTop = 70; });
+  await page.locator('.continuous-comparison').evaluate(element => { element.scrollLeft = 80; });
+  const reading = async () => ({
+    top: await page.locator('.continuous-reader').evaluate(element => element.scrollTop),
+    left: await page.locator('.continuous-comparison').evaluate(element => element.scrollLeft),
+    folds: await page.locator('.fold-control').allTextContents(),
+  });
+  const original = await reading();
+  await page.getByRole('button', { name: /Explain inferred change consequence/ }).focus();
+  await page.keyboard.press('Enter');
+  const panel = page.getByRole('region', { name: 'Change consequence explanation' });
+  await panel.getByRole('button', { name: 'Read After · src/server/public.ts L61–67', exact: true }).click();
+  await expect(page.locator('[data-expanded-file]')).toHaveAttribute('data-expanded-file', 'src/server/public.ts');
+  await page.getByRole('button', { name: 'Return to original reading' }).click();
+  await expect(panel).toBeVisible();
+  await expect(page.locator('[data-expanded-file]')).toHaveAttribute('data-expanded-file', 'src/application/private-session.ts');
+  await expect.poll(reading).toEqual(original);
+  await expect(page.getByRole('button', { name: 'Split', exact: true })).toHaveAttribute('aria-pressed', 'true');
+});
+
+});

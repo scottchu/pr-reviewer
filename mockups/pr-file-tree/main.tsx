@@ -22,6 +22,8 @@ import { BehaviorNoteLabel, LensIcon, ActionIcon, type BehaviorNote } from './be
 import { mapJourneySource } from './journey-source.ts';
 import { layoutFileProjection, projectFileCalls, fileRequirementReferences } from './file-projection.ts';
 import { FileCallLine, FileRequirementLine } from './file-call.tsx';
+import { prepareChangeImpact } from './change-impact.ts';
+import { ChangeImpactLine, ChangeImpactExplanation } from './change-impact-view.tsx';
 import { WorkspaceActions } from './workspace-actions.tsx';
 const motionDuration = () => matchMedia('(prefers-reduced-motion: reduce)').matches ? 0 : 240;
 const tree = buildTree(fixture.paths, fixture.changes);
@@ -193,7 +195,7 @@ const nodeTypes = {
 };
 const edgeTypes = {
   call: CallLine,
-  fileCall: FileCallLine, requirementReference: FileRequirementLine
+  fileCall: FileCallLine, requirementReference: FileRequirementLine, changeImpact: ChangeImpactLine
 };
 const containment = tree.edges.map(e => ({
   id: e.id,
@@ -230,6 +232,7 @@ const App = () => {
   const pendingFileFrame = useRef<{ path: string } | null>(null);
   const baseTree = lens === 'behavior' ? behaviorTree : tree;
   const [sourceFinder, setSourceFinder] = useState(false);
+  const [impactOpen, setImpactOpen] = useState(false);
   useEffect(() => {
     const url = new URL(window.location.href);
     if (lens === 'files') url.searchParams.set('view', 'files');
@@ -260,6 +263,7 @@ const App = () => {
     void workspace.open().catch(error => setOwnerError(error instanceof Error ? error.message : 'owner_unavailable'));
     return () => { disconnectStory(); disconnect(); };
   }, [workspace]);
+  const impact = useMemo(() => ownerStory.snapshot ? prepareChangeImpact(ownerStory.snapshot) : null, [ownerStory.snapshot]);
   const [contextOpen, setContextOpen] = useState(window.innerWidth >= 650);
   const contextInvoker = useRef<HTMLButtonElement>(null);
   const contextScroll = useRef(0);
@@ -722,6 +726,15 @@ const App = () => {
   const nodes: CanvasNode[] = [...fileNodes, ...(lens === 'files' ? functionNodes : []), ...testNodes];
   const edges: Edge[] = fullscreen ? [] : [
     ...(lens === 'files' ? containment : []),
+    ...(lens === 'behavior' && impact?.status === 'ready' ? [{
+      id: `impact:${impact.claim.id}`, type: 'changeImpact',
+      source: 'file:src/server/public.ts', target: 'file:src/application/review.ts',
+      sourceHandle: 'contains-out', targetHandle: 'contains-in',
+      data: { impact, sourceBottom: (() => { const node = viewTree.nodes.find(node => node.path === 'src/server/public.ts')!; return node.y + node.height; })(),
+        onExplain: () => { pendingFileFrame.current = null; setCallExplained(null); setSourceRelation(null); if (narrow) { setContextOpen(false); setOwnerPanel(null); } setImpactOpen(true); } },
+      markerEnd: { type: MarkerType.ArrowClosed, color: '#baa6d6', width: 16, height: 16 },
+      ariaLabel: 'Inferred implementation consequence, not a call or proven edit causation',
+    }] : []),
     ...(lens === 'behavior' ? fileRequirementReferences.map((reference, index) => ({
       id: `requirement-reference:${reference.key}:request`, type: 'requirementReference',
       source: `file:${reference.path}`, target: 'file:src/application/review.ts',
@@ -922,7 +935,7 @@ const App = () => {
       camera: flow.current?.getViewport() ?? initialView(lens),
       selected, testsFor, mode, lens, lensCameras: lensCameras.current, lensCameraSources: lensCameraSources.current, functionFocus, expanded: detail.expanded,
       readings: readings.current, sourceReturn, testReturn, contextReturns,
-      callExplained, sourceRelation,
+      callExplained, impactOpen, sourceRelation,
     });
   };
   const ownerReturn = useRef<ReturnType<typeof capturePresentation> | null>(null);
@@ -982,6 +995,7 @@ const App = () => {
       const node = baseTree.nodes.find(node => node.path === path && node.kind === 'file');
       if (node) moveCamera({ x: 8 - node.x, y: 30 - node.y, zoom: 1 });
       if (narrow) setOwnerPanel(null);
+      setImpactOpen(false);
       if (keyboard) setPendingFocus({ target: 'reading', path });
     } finally {
       ownerOperation.current = false;
@@ -1011,6 +1025,7 @@ const App = () => {
       setTestReturn(frame.testReturn);
       setContextReturns(frame.contextReturns);
       setCallExplained(frame.callExplained);
+      setImpactOpen(Boolean(frame.impactOpen));
       setSourceRelation(frame.sourceRelation);
       dispatchDetail({ type: 'focus', path: frame.expanded });
       setRestoreVersion(value => value + 1);
@@ -1136,7 +1151,7 @@ const App = () => {
       </span>
 
     </header>
-    <WorkspaceActions blocked={ownerBusy || (!fullscreen && narrow && (contextOpen || Boolean(ownerPanel)))}>
+    <WorkspaceActions blocked={ownerBusy || (!fullscreen && narrow && (contextOpen || Boolean(ownerPanel) || impactOpen))}>
 
       {!fullscreen && <button
         className="context-cue"
@@ -1156,8 +1171,8 @@ const App = () => {
       </div>}
 
       {!fullscreen && <div className="owner-cues">
-        <button id="open-owner-story" aria-label="Open prepared story" title="Prepared story" disabled={!ownerStory.authenticated || ownerBusy} aria-expanded={storyOpen && (!narrow || ownerPanel === 'story')} onClick={() => openOwnerPanel('story')}><ActionIcon action="story" /></button>
-        <button id="open-owner-discussion" aria-label="Open discussion" title="Discussion" disabled={!ownerStory.authenticated || ownerBusy} aria-expanded={discussionOpen && (!narrow || ownerPanel === 'discussion')} onClick={() => openOwnerPanel('discussion')}><ActionIcon action="discussion" /></button>
+        <button id="open-owner-story" aria-label="Open prepared story" title="Prepared story" disabled={!ownerStory.authenticated || ownerBusy} aria-expanded={storyOpen && (!narrow || (ownerPanel === 'story' && !impactOpen))} onClick={() => openOwnerPanel('story')}><ActionIcon action="story" /></button>
+        <button id="open-owner-discussion" aria-label="Open discussion" title="Discussion" disabled={!ownerStory.authenticated || ownerBusy} aria-expanded={discussionOpen && (!narrow || (ownerPanel === 'discussion' && !impactOpen))} onClick={() => openOwnerPanel('discussion')}><ActionIcon action="discussion" /></button>
         {detail.expanded && <button aria-label="Inspect visible source for discussion" title="Ask about expanded source" disabled={!ownerStory.authenticated || ownerBusy} onClick={() => runOwner(async () => { await inspectVisibleSource(); openOwnerPanel('discussion'); })}><ActionIcon action="source" /></button>}
         {ownerStory.returnFrame && <button aria-label="Return to original reading" title="Return to original reading" disabled={ownerBusy || ownerStory.questionLocked} onClick={() => runOwner(resumeOwnerReading)}><ActionIcon action="return" /></button>}
       </div>}
@@ -1204,7 +1219,7 @@ const App = () => {
         <p>Choose any changed file. Some call relationships are not shown yet; choosing a file does not expand it.</p>
       </section>}
       {(ownerError || ownerReview.error || ownerStory.error) && <div className="owner-error" role="alert">{ownerError || ownerReview.error || ownerStory.error}<button onClick={() => { setOwnerError(''); }}>Dismiss</button></div>}
-      {!fullscreen && contextOpen && (!narrow || !ownerPanel) && <ReviewContext
+      {!fullscreen && contextOpen && (!narrow || (!ownerPanel && !impactOpen)) && <ReviewContext
         narrow={narrow}
         scrollTop={contextScroll.current}
         onScroll={top => { contextScroll.current = top; }}
@@ -1213,7 +1228,7 @@ const App = () => {
       />}
     <div className="owner-center">
     <main
-      inert={ownerBusy || (!fullscreen && narrow && (contextOpen || Boolean(ownerPanel))) ? true : undefined}
+      inert={ownerBusy || (!fullscreen && narrow && (contextOpen || Boolean(ownerPanel) || impactOpen)) ? true : undefined}
       data-workspace-root={fullscreen ? `file:${fullscreen.path}` : 'pr:25'}
       data-canonical-call-count={behaviorCalls.links.length}
       data-canonical-function-count={behaviorCalls.nodes.length}
@@ -1288,7 +1303,7 @@ const App = () => {
         </EdgeLabelRenderer>}
       </ReactFlow>
 
-      {detail.expanded && !(narrow && (contextOpen || Boolean(ownerPanel))) && <DiffControls
+      {detail.expanded && !(narrow && (contextOpen || Boolean(ownerPanel) || impactOpen)) && <DiffControls
         mode={mode}
         onMode={setMode}
       />}
@@ -1322,7 +1337,11 @@ const App = () => {
       />}
 
     </main>
-    {!fullscreen && discussionOpen && (!narrow || ownerPanel === 'discussion') && <OwnerPanels
+    {!fullscreen && impactOpen && impact?.status === 'ready' && <ChangeImpactExplanation impact={impact} narrow={narrow} busy={ownerBusy}
+      onClose={() => { setImpactOpen(false); requestAnimationFrame(() => document.querySelector<HTMLElement>('[data-impact-id]')?.focus({ preventScroll: true })); }}
+      onInspect={(reference, keyboard) => runOwner(() => inspectOwnerEvidence(reference, keyboard))}
+    />}
+    {!fullscreen && discussionOpen && (!narrow || (ownerPanel === 'discussion' && !impactOpen)) && <OwnerPanels
       panel="discussion"
       narrow={narrow}
       workspace={workspace}
@@ -1336,7 +1355,7 @@ const App = () => {
       run={runOwner}
     />}
     </div>
-    {!fullscreen && storyOpen && (!narrow || ownerPanel === 'story') && <OwnerPanels
+    {!fullscreen && storyOpen && (!narrow || (ownerPanel === 'story' && !impactOpen)) && <OwnerPanels
       panel="story"
       narrow={narrow}
       workspace={workspace}

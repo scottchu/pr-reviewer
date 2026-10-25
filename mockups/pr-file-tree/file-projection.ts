@@ -44,6 +44,8 @@ export const layoutFileProjection = (tree: FileTree, narrow: boolean): FileTree 
     }
     top += 80;
   }
+  // The explained gateway/header consequence shares the existing client neighborhood.
+  positions.set('src/server/public.ts', { x: 0, y: 0 });
   const documents = files.filter(node => /\.mdx?$/.test(node.path));
   const columns = narrow ? 1 : 3;
   const docHeight = Math.ceil(documents.length / columns) * 65 + 100;

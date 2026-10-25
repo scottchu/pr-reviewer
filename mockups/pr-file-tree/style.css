@@ -1451,3 +1451,8 @@ button:disabled { cursor: default; opacity: .5; }
 .root-region-label { position: absolute; color: #d6e2e8; font: 550 16px/24px Inter, sans-serif; pointer-events: none; white-space: nowrap; }
 
 .root-requirement-reference { position: absolute; pointer-events: all; width: max-content; height: auto; border: 1px solid #6c8599; border-radius: 3px; color: #c0d7e9; background: #1e2225; font: 13px/20px Inter, sans-serif; padding: 2px 5px; }
+
+/* One prepared change consequence, distinct from calls and requirement references. */
+.change-impact-label { position: absolute; pointer-events: all; width: max-content; max-width: 328px; height: auto; padding: 0; border: 0; background: transparent; color: #c8b5e0; font: 550 16px/22px Inter, sans-serif; text-align: left; }
+.impact-explanation h2 { font-size: 18px; line-height: 25px; margin: 0; }
+.impact-explanation .callsite-action { display: block; margin: 10px 0; }
