@@ -7,6 +7,9 @@ export default defineConfig({
     host: '127.0.0.1',
     port: 57943,
     strictPort: true,
+    proxy: {
+      '/api': { target: 'http://127.0.0.1:57944' },
+    },
     allowedHosts: [
       'mac-mini.duckbill-ionian.ts.net'
     ]

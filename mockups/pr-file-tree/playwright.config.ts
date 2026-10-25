@@ -1,7 +1,7 @@
 import { defineConfig } from '@playwright/test';
 export default defineConfig({
   testDir: './tests',
-  testMatch: ['continuous-browser.spec.ts', 'calls-browser.spec.ts', 'journey-browser.spec.ts'],
+  testMatch: ['continuous-browser.spec.ts', 'calls-browser.spec.ts', 'journey-browser.spec.ts', 'owner-browser.spec.ts'],
   workers: 1,
   fullyParallel: false,
   reporter: 'list',

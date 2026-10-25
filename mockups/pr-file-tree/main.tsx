@@ -1,4 +1,4 @@
-import React, { useMemo, useRef, useState, useReducer, useLayoutEffect, useEffect } from 'react';
+import React, { useMemo, useRef, useState, useReducer, useLayoutEffect, useEffect, useSyncExternalStore } from 'react';
 import { createRoot } from 'react-dom/client';
 import { ReactFlow, Background, BackgroundVariant, Handle, Position, BaseEdge, EdgeLabelRenderer, getBezierPath, MarkerType, type Node, type NodeProps, type ReactFlowInstance, type Edge, type EdgeProps, useUpdateNodeInternals } from '@xyflow/react';
 import '@xyflow/react/dist/style.css';
@@ -13,6 +13,10 @@ import { projectCalls, layoutCalls, relevantTests, type FunctionIdentity, type C
 import { FunctionLabel, DeclaredTestLabel, CallLine, CallExplanation, type FunctionNode, type DeclaredTestNode } from './call-graph.tsx';
 import type { DeclaredTest } from './declared-tests.types.ts';
 import { ReviewContext, type ContextEvidence } from './review-context.tsx';
+import { createReviewWorkspace, storyProjection } from '../../src/application/public.ts';
+import type { StoryIntent } from '../../src/application/public.ts';
+import type { StoryReference } from '../../src/domain/public.ts';
+import { OwnerPanels, type OwnerPanel } from './owner-panels.tsx';
 const motionDuration = () => matchMedia('(prefers-reduced-motion: reduce)').matches ? 0 : 240;
 const tree = buildTree(fixture.paths, fixture.changes);
 type LabelNode = Node<{
@@ -184,6 +188,30 @@ const initialView = (overview = false) => {
   };
 };
 const App = () => {
+  const [workspace] = useState(() => createReviewWorkspace('pr-25'));
+  const ownerStory = useSyncExternalStore(workspace.story.subscribe, workspace.story.getSnapshot);
+  const ownerReview = useSyncExternalStore(workspace.review.subscribe, workspace.review.getSnapshot);
+  const [ownerPanel, setOwnerPanel] = useState<OwnerPanel | null>(null);
+  const [storyOpen, setStoryOpen] = useState(false);
+  const [discussionOpen, setDiscussionOpen] = useState(false);
+  const [ownerError, setOwnerError] = useState('');
+  const [ownerBusy, setOwnerBusy] = useState(false);
+  const ownerScroll = useRef({ story: 0, discussion: 0 });
+  const runOwner = (operation: () => unknown) => {
+    setOwnerError('');
+    try {
+      const result = operation();
+      if (result instanceof Promise) void result.catch(error => setOwnerError(error instanceof Error ? error.message : 'owner_operation_failed'));
+    } catch (error) {
+      setOwnerError(error instanceof Error ? error.message : 'owner_operation_failed');
+    }
+  };
+  useEffect(() => {
+    const disconnect = workspace.connect();
+    const disconnectStory = workspace.story.connect();
+    void workspace.open().catch(error => setOwnerError(error instanceof Error ? error.message : 'owner_unavailable'));
+    return () => { disconnectStory(); disconnect(); };
+  }, [workspace]);
   const [narrow, setNarrow] = useState(window.innerWidth < 650);
   const [contextOpen, setContextOpen] = useState(window.innerWidth >= 650);
   const contextInvoker = useRef<HTMLButtonElement>(null);
@@ -265,7 +293,16 @@ const App = () => {
     test: typeof sourceReturn;
   }[]>([]);
   const readings = useRef<FileReadings>({});
+  const pendingOwnerReadings = useRef<FileReadings | null>(null);
   const [restoreVersion, setRestoreVersion] = useState(0);
+  useLayoutEffect(() => {
+    if (pendingOwnerReadings.current) {
+      // Old readers may publish their final scroll during unmount. The owner
+      // return restores the captured presentation after that cleanup finishes.
+      readings.current = pendingOwnerReadings.current;
+      pendingOwnerReadings.current = null;
+    }
+  }, [restoreVersion]);
   const cameraOwner = useRef<symbol | null>(null);
   const moveCamera = (view: {
     x: number;
@@ -729,6 +766,134 @@ const App = () => {
       }
     }
   };
+  const capturePresentation = () => {
+    const file = detail.expanded;
+    const retained = file ? readings.current[file] : undefined;
+    if (file && retained) {
+      const reader = main.current?.querySelector<HTMLElement>('.continuous-reader');
+      const comparison = main.current?.querySelector<HTMLElement>('.continuous-comparison');
+      readings.current = rememberFile(readings.current, file, {
+        ...retained,
+        top: reader?.scrollTop ?? retained.top,
+        horizontal: { ...retained.horizontal, [-1]: comparison?.scrollLeft ?? retained.horizontal[-1] ?? 0 },
+      });
+    }
+    return structuredClone({
+      camera: flow.current?.getViewport() ?? initialView(),
+      selected, testsFor, mode, functionFocus, expanded: detail.expanded,
+      readings: readings.current, sourceReturn, testReturn, contextReturns,
+      callExplained, sourceRelation,
+    });
+  };
+  const ownerReturn = useRef<ReturnType<typeof capturePresentation> | null>(null);
+  const ownerOperation = useRef(false);
+  const openOwnerPanel = (panel: OwnerPanel) => {
+    if (narrow) setContextOpen(false);
+    if (panel === 'story') setStoryOpen(true);
+    else setDiscussionOpen(true);
+    setOwnerPanel(panel);
+  };
+  const closeOwnerPanel = (target: OwnerPanel) => {
+    if (target === 'story') setStoryOpen(false);
+    else setDiscussionOpen(false);
+    if (ownerPanel === target) setOwnerPanel(null);
+    requestAnimationFrame(() => document.getElementById(`open-owner-${target}`)?.focus({ preventScroll: true }));
+  };
+  const inspectOwnerEvidence = async (reference: StoryReference, keyboard: boolean) => {
+    if (ownerOperation.current || !flow.current) return;
+    if (reference.type !== 'snapshot_source') throw new Error('Exact snapshot evidence is required for this reader.');
+    if (!fileDiffs.has(reference.anchor.path)) throw new Error('This retained source is not prepared in the continuous reader.');
+    ownerOperation.current = true;
+    setOwnerBusy(true);
+    try {
+      if (!workspace.story.getSnapshot().returnFrame) {
+        const frame = capturePresentation();
+        workspace.story.enterExploration();
+        ownerReturn.current = frame;
+      }
+      await workspace.inspectReference(reference);
+      const canvas = workspace.canvas.getSnapshot();
+      if (canvas.busy || canvas.error || canvas.frame?.inspection?.contentHash !== reference.contentHash
+        || JSON.stringify(canvas.frame.inspection.anchor) !== JSON.stringify(reference.anchor)) {
+        throw new Error(canvas.error || 'Exact source inspection did not complete.');
+      }
+      const { path, side, startLine, endLine } = reference.anchor;
+      sourceSerial.current++;
+      setSelected(path);
+      setTestsFor(null);
+      setCallExplained(null);
+      setSourceRelation(null);
+      setSourceReturn(null);
+      setTestReturn(null);
+      setContextReturns([]);
+      setFunctionFocus({
+        id: `owner-evidence:${sourceSerial.current}`,
+        path,
+        name: 'Exact retained evidence',
+        before: side === 'base' ? [{ startLine, endLine }] : [],
+        after: side === 'head' ? [{ startLine, endLine }] : [],
+        preferredSide: side === 'base' ? 'before' : 'after',
+        revealSide: true,
+      });
+      dispatchDetail({ type: 'focus', path });
+      const node = tree.nodes.find(node => node.path === path && node.kind === 'file');
+      if (node) moveCamera({ x: 8 - node.x, y: 30 - node.y, zoom: 1 });
+      if (narrow) setOwnerPanel(null);
+      if (keyboard) setPendingFocus({ target: 'reading', path });
+    } finally {
+      ownerOperation.current = false;
+      setOwnerBusy(false);
+    }
+  };
+  const resumeOwnerReading = async () => {
+    if (ownerOperation.current) return;
+    const frame = ownerReturn.current;
+    if (!frame) throw new Error('The original local reading frame is unavailable after reload; retained owner drafts remain preserved.');
+    ownerOperation.current = true;
+    setOwnerBusy(true);
+    try {
+      await workspace.story.resumeStory();
+      if (workspace.story.getSnapshot().returnFrame) throw new Error('Owner return is not complete.');
+      readings.current = frame.readings;
+      pendingOwnerReadings.current = frame.readings;
+      setSelected(frame.selected);
+      setTestsFor(frame.testsFor);
+      setMode(frame.mode);
+      setFunctionFocus(frame.functionFocus);
+      setSourceReturn(frame.sourceReturn);
+      setTestReturn(frame.testReturn);
+      setContextReturns(frame.contextReturns);
+      setCallExplained(frame.callExplained);
+      setSourceRelation(frame.sourceRelation);
+      dispatchDetail({ type: 'focus', path: frame.expanded });
+      setRestoreVersion(value => value + 1);
+      moveCamera(frame.camera);
+      ownerReturn.current = null;
+      if (narrow) setOwnerPanel(null);
+      setPendingFocus({ target: 'reading', path: frame.expanded });
+    } finally {
+      ownerOperation.current = false;
+      setOwnerBusy(false);
+    }
+  };
+  const navigateOwnerStory = (intent: StoryIntent) => runOwner(() => {
+    workspace.story.intent(intent);
+    const projection = storyProjection(workspace.story.getSnapshot());
+    const path = projection?.sources.find(source => source.reference.type === 'snapshot_source')?.reference.anchor.path;
+    if (path && !workspace.story.getSnapshot().returnFrame) setSelected(path);
+  });
+  const inspectVisibleSource = () => {
+    const snapshot = ownerStory.snapshot;
+    const path = detail.expanded;
+    const side = functionFocus?.path === path && functionFocus.preferredSide === 'before' ? 'base' : 'head';
+    const source = snapshot?.sources.find(source => source.path === path && source.side === side);
+    const ranges = functionFocus?.path === path ? functionFocus[side === 'base' ? 'before' : 'after'] : [];
+    if (!snapshot || !source || !path) throw new Error('Visible source has no retained question mapping.');
+    return inspectOwnerEvidence({
+      type: 'snapshot_source', contentHash: source.hash,
+      anchor: { snapshotId: snapshot.snapshotId, side, path, startLine: ranges[0]?.startLine ?? 1, endLine: ranges[0]?.endLine ?? 1 },
+    }, true);
+  };
   const key = (e: React.KeyboardEvent<HTMLElement>) => {
     if (e.key === 'Escape' && callExplained) {
       e.preventDefault();
@@ -812,14 +977,21 @@ const App = () => {
   };
   return <>
 
-    <header inert={!fullscreen && contextOpen && narrow ? true : undefined}>
+    <header inert={ownerBusy || (!fullscreen && narrow && (contextOpen || Boolean(ownerPanel))) ? true : undefined}>
 
       {!fullscreen && <button
         ref={contextInvoker}
         aria-label={contextOpen ? 'Hide review context' : 'Open review context'}
         aria-expanded={contextOpen}
-        onClick={() => setContextOpen(value => !value)}
+        onClick={() => { if (narrow) setOwnerPanel(null); setContextOpen(value => !value); }}
       >Context</button>}
+
+      {!fullscreen && <div className="owner-cues">
+        <button id="open-owner-story" aria-label="Open prepared story" disabled={!ownerStory.authenticated || ownerBusy} aria-expanded={storyOpen && (!narrow || ownerPanel === 'story')} onClick={() => openOwnerPanel('story')}>Story</button>
+        <button id="open-owner-discussion" aria-label="Open discussion" disabled={!ownerStory.authenticated || ownerBusy} aria-expanded={discussionOpen && (!narrow || ownerPanel === 'discussion')} onClick={() => openOwnerPanel('discussion')}>Discuss</button>
+        {detail.expanded && <button aria-label="Inspect visible source for discussion" disabled={!ownerStory.authenticated || ownerBusy} onClick={() => runOwner(async () => { await inspectVisibleSource(); openOwnerPanel('discussion'); })}>Source</button>}
+        {ownerStory.returnFrame && <button aria-label="Return to original reading" disabled={ownerBusy || ownerStory.questionLocked} onClick={() => runOwner(resumeOwnerReading)}>Return</button>}
+      </div>}
 
       {(testReturn || sourceReturn || contextReturns.length > 0) && !fullscreen && <button
         className="source-return"
@@ -861,15 +1033,17 @@ const App = () => {
     </header>
 
     <div className="review-workspace">
-      {!fullscreen && contextOpen && <ReviewContext
+      {(ownerError || ownerReview.error || ownerStory.error) && <div className="owner-error" role="alert">{ownerError || ownerReview.error || ownerStory.error}<button onClick={() => { setOwnerError(''); }}>Dismiss</button></div>}
+      {!fullscreen && contextOpen && (!narrow || !ownerPanel) && <ReviewContext
         narrow={narrow}
         scrollTop={contextScroll.current}
         onScroll={top => { contextScroll.current = top; }}
         onClose={closeContext}
         onEvidence={openContextEvidence}
       />}
+    <div className="owner-center">
     <main
-      inert={!fullscreen && contextOpen && narrow ? true : undefined}
+      inert={ownerBusy || (!fullscreen && narrow && (contextOpen || Boolean(ownerPanel))) ? true : undefined}
       data-workspace-root={fullscreen ? `file:${fullscreen.path}` : 'pr:25'}
       ref={main}
       tabIndex={0}
@@ -963,6 +1137,33 @@ const App = () => {
       />}
 
     </main>
+    {!fullscreen && discussionOpen && (!narrow || ownerPanel === 'discussion') && <OwnerPanels
+      panel="discussion"
+      narrow={narrow}
+      workspace={workspace}
+      story={ownerStory}
+      review={ownerReview}
+      busy={ownerBusy}
+      scroll={ownerScroll}
+      onClose={() => closeOwnerPanel('discussion')}
+      onInspect={inspectOwnerEvidence}
+      onNavigate={navigateOwnerStory}
+      run={runOwner}
+    />}
+    </div>
+    {!fullscreen && storyOpen && (!narrow || ownerPanel === 'story') && <OwnerPanels
+      panel="story"
+      narrow={narrow}
+      workspace={workspace}
+      story={ownerStory}
+      review={ownerReview}
+      busy={ownerBusy}
+      scroll={ownerScroll}
+      onClose={() => closeOwnerPanel('story')}
+      onInspect={inspectOwnerEvidence}
+      onNavigate={navigateOwnerStory}
+      run={runOwner}
+    />}
     </div>
 
   </>;

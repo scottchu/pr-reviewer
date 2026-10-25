@@ -1346,3 +1346,46 @@ html {
   border: 0;
   padding-bottom: max(30px, env(safe-area-inset-bottom));
 }
+
+.owner-center { flex: 1; min-width: 0; min-height: 0; display: flex; flex-direction: column; }
+.owner-center > main { width: 100%; flex: 1; min-height: 0; }
+.owner-cues { display: flex; gap: 3px; align-items: center; }
+.owner-cues button { width: auto; padding: 0 8px; white-space: nowrap; }
+button:disabled { cursor: default; opacity: .5; }
+.owner-panel {
+  flex: 0 0 340px; width: 340px; min-height: 0; overflow: auto;
+  overscroll-behavior: contain; padding: 16px 20px 28px;
+  border-left: 1px solid #454d55; background: #20272b; color: #dce3e8;
+}
+.owner-heading { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 18px; }
+.owner-heading h2 { font-size: 16px; line-height: 24px; font-weight: 550; margin: 0; }
+.owner-panel button { width: auto; height: auto; min-height: 34px; padding: 5px 8px; font: inherit; text-align: left; }
+.owner-panel h3 { font-size: 13px; font-weight: 550; line-height: 22px; margin: 14px 0 6px; }
+.owner-panel .owner-step { font-size: 18px; line-height: 26px; margin: 25px 0 18px; }
+.owner-panel p { font-size: 13px; line-height: 22px; margin: 8px 0; }
+.owner-panel small, .owner-identity, .owner-limit { color: #b0c1cc; font-size: 11px; line-height: 18px; overflow-wrap: anywhere; }
+.owner-claim { margin: 0 0 24px; }
+.owner-panel .owner-citation { width: 100%; display: block; color: #bbd6e6; text-decoration: underline; text-underline-offset: 4px; font-size: 11px; line-height: 18px; padding: 5px 0; overflow-wrap: anywhere; }
+.owner-story-controls { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+.owner-discussion { width: 100%; flex: 0 0 280px; border-left: 0; border-top: 1px solid #454d55; }
+.owner-discussion form { display: grid; gap: 8px; }
+.owner-discussion select { display: block; max-width: 100%; padding: 5px; color: #dce3e8; background: #171e22; border: 1px solid #61717d; font: inherit; }
+.owner-delivery { color: #b0c1cc; margin: 8px 0; }
+.owner-discussion:not(.owner-modal) form { grid-template-columns: minmax(0, 1fr) auto; align-items: end; }
+.owner-discussion:not(.owner-modal) form label { grid-column: 1 / -1; }
+.owner-discussion textarea { width: 100%; resize: vertical; color: #e1e7eb; background: #171e22; border: 1px solid #61717d; border-radius: 3px; padding: 10px; font: inherit; caret-color: #c3deed; }
+.owner-discussion article { border-top: 1px solid #454d55; margin-top: 22px; padding-top: 12px; }
+.owner-adoption { margin: 16px 0; }
+.owner-error { position: absolute; z-index: 40; top: 8px; left: 12px; right: 12px; max-height: 160px; overflow: auto; padding: 12px; background: #392c29; border: 1px solid #b89e8d; display: flex; gap: 12px; align-items: center; overflow-wrap: anywhere; }
+.owner-error button { flex: none; width: auto; }
+.owner-panel :focus-visible { outline: 2px solid #a8cddf; outline-offset: 2px; }
+.owner-panel ::selection { color: #edf4f7; background: #405b6c; }
+.owner-modal { position: absolute; z-index: 25; inset: 0; width: 100%; border: 0; padding-bottom: max(30px, env(safe-area-inset-bottom)); }
+@media (max-width: 649px) {
+  header { padding: 0 8px; gap: 3px; }
+  header > span { display: none; }
+  .owner-cues { gap: 0; }
+  .owner-cues button { padding: 0 5px; font-size: 11px; }
+  .owner-heading button { min-height: 44px; }
+  .owner-panel { font-size: 14px; }
+}

@@ -34,5 +34,6 @@ export type ReadingFocus = {
     endLine: number;
   }[];
   preferredSide: 'before' | 'after';
+  revealSide?: boolean;
   scope?: 'test';
 };

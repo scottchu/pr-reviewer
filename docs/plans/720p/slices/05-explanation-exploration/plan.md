@@ -1,6 +1,8 @@
 # Slice05: follow an explanation and explore
 
-2026-10-25 active continuation (Context repair e310477 independently source-reviewed; J2/J3 retained-source and StoryContent inputs prepared/source-reviewed; scoped runtime decision pending): [integrated PR25 reading journey](reviews/reading-journey-v1.md), with isolated future-work ownership and motivation/evidence/ask/return acceptance. Frozen file-mock scope is not full-journey acceptance.
+Date: 2026-10-25.
+Status: active; integrated candidate awaits independent review.
+Context repair e310477 and J2/J3 source/StoryContent preparation received bounded independent source review. User-approved candidate gateway/proxy and requested private-tailnet8478 access now support the integrated owner-backed reading/story/evidence/saved-question/return candidate. See [integrated PR25 reading journey](reviews/reading-journey-v1.md), handoff v8 and its evidence/review gates. Native responsible-session reply, unfamiliar-reviewer understanding and new independent implementation review remain open; frozen file-mock or author engineering success is not full-journey acceptance.
 
 **Packet revision:** 3
 

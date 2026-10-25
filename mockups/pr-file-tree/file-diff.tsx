@@ -212,13 +212,22 @@ export const FileDiffBody = ({ file, mode, fullscreen, width, onExplain, activeR
     const line = focus[focus.preferredSide][0]?.startLine;
     if (line === undefined)
       return;
-    const row = content.current?.querySelector<HTMLElement>(`[data-${focus.preferredSide}-line="${line}"]`);
+    const side = mode === 'split' ? `.diff-side.${focus.preferredSide} ` : '';
+    const row = content.current?.querySelector<HTMLElement>(`${side}[data-${focus.preferredSide}-line="${line}"]`);
     if (row) {
       travel.current = null;
       body.current?.scrollTo({
         top: Math.max(0, row.offsetTop + (content.current?.offsetTop ?? 0) - 54),
         behavior: 'instant'
       });
+      if (focus.revealSide && horizontal.current) {
+        const comparison = horizontal.current;
+        const bounds = comparison.getBoundingClientRect();
+        const scale = bounds.width / comparison.offsetWidth || 1;
+        const left = (row.getBoundingClientRect().left - bounds.left) / scale + comparison.scrollLeft;
+        comparison.scrollLeft = Math.max(0, left);
+        save({ horizontal: { ...local.current.horizontal, [-1]: comparison.scrollLeft } });
+      }
       save({
         focusId: focus.id
       });
