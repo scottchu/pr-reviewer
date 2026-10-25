@@ -1,6 +1,6 @@
 # Slice05: follow an explanation and explore
 
-2026-10-25 active continuation: [integrated PR25 reading journey](reviews/reading-journey-v1.md), with isolated future-work ownership and motivation/evidence/ask/return acceptance. Frozen file-mock scope is not full-journey acceptance.
+2026-10-25 active continuation (Context repair e310477 independently source-reviewed; J2/J3 retained-source preparation and scoped runtime decision pending): [integrated PR25 reading journey](reviews/reading-journey-v1.md), with isolated future-work ownership and motivation/evidence/ask/return acceptance. Frozen file-mock scope is not full-journey acceptance.
 
 **Packet revision:** 3
 

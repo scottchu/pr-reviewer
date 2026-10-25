@@ -13,7 +13,9 @@
     "prepare:source": "node --experimental-strip-types scripts/prepare.ts",
     "mcp": "node --experimental-strip-types src/mcp/main.ts",
     "pair": "node --experimental-strip-types scripts/pair.ts",
-    "mcp:client": "node --experimental-strip-types scripts/mcp-client.ts"
+    "mcp:client": "node --experimental-strip-types scripts/mcp-client.ts",
+    "test:reading-journey": "node --experimental-strip-types --test mockups/pr-file-tree/tests/*.test.ts",
+    "test:reading-journey:e2e": "playwright test --config mockups/pr-file-tree/playwright.config.ts"
   },
   "dependencies": {
     "@modelcontextprotocol/client": "2.4.0",

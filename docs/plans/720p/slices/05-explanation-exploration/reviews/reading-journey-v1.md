@@ -1,16 +1,16 @@
 # Integrated PR25 reading journey repair
 
 Date: 2026-10-25.
-Status: implementation authorized; J1 active; full journey and acceptance incomplete.
+Status: J1 repair engineering-verified at e310477; J2/J3 preparation active; full journey and acceptance incomplete.
 Parent: [slice 05](../plan.md), [720p](../../../plan.md), [roadmap](../../../../roadmap.md).
 
 ## Ownership and inputs
 
-Successor `01a17122-1d1b-7116-8ab5-f9a8ee90001b` owns future work in `/tmp/pr-reviewer-reading-journey`, branch `integrate-pr25-reading-journey`, from exact `9228f39e999200cf5d7e4512221bb700cb42022f`. Parent reconciled future ownership after completed source/author turns. Old worktree `/tmp/pr-reviewer-pr-file-tree`, runtime 8477/56677 and source conversation stay frozen; native release/archive remains unverified. No writer wakeup, forced locks or configuration changes.
+Native successor `01a17137-1308-78a0-bdac-034a333aff78` now owns future work in `/tmp/pr-reviewer-reading-journey`, branch `integrate-pr25-reading-journey`, from exact `9228f39e999200cf5d7e4512221bb700cb42022f`. Parent reconciled future ownership after completed source/author turns. Old worktree `/tmp/pr-reviewer-pr-file-tree`, runtime 8477/56677 and source conversation stay frozen; native release/archive remains unverified. No writer wakeup, forced locks or configuration changes.
 
 Candidate input 3b738264/docs 9228f39 contains ontology 038fd11. Successor verified all 32 handoff files, 27 frozen artifacts/7 fixtures, 180 anchors/24 source sides and 50 paths/96 source sides/126 hunks/1,439 rows. These and author 25 pure/17 Chrome checks do not establish comprehension. October23 spatial references and later explicit-expansion/camera-only correction control; illustrative mock source is not PR25 evidence.
 
-## Implementation handoff v1
+## Historical implementation handoff v1
 
 Authoritative inputs: F01–F17, ontology, accepted canvas panels and reviewer experience. Latest integrated user goal controls over F14's frozen-candidate deferral. Allowed writes: current mock, directly relevant durable docs and this slice packet. J1 repairs motivation/context and exact evidence excursion/return, reusing immutable source and local reader/navigation values. No backend, dependencies, participant authority or persistence changes.
 
@@ -47,7 +47,7 @@ Read-only inspection confirms retained public `createReviewWorkspace`, `createSt
 ## Native continuation revision 2
 
 Date: 2026-10-25.
-Status: active; two J1 P2 findings unresolved; full journey incomplete.
+Status at revision-2 start: active; two J1 P2 findings unresolved then, repaired in e310477; full journey incomplete.
 Owner: native local conversation 01a17137-1308-78a0-bdac-034a333aff78, sole future-product writer after the coordinator's single continuation. Predecessors stay completed/paused; no new successor or archive.
 
 Startup verified clean 7423292 and 13 manifest entries. Interrupted execution subsequently lost the entire temporary worktree, candidate service and raw evidence directories. Git registration, branch, index and committed objects survived. Readback found the old process handle 74866 missing and loopback57943 connection refused. Recovered the same registered worktree at its exact original path from its unchanged index; no branch reset, main mutation or foreign worktree cleanup. Previous uncommitted docs/test edits and raw logs were lost and reconstructed; historical passing outputs cannot be independently rehashed now. Current runtime permission update is danger-full-access/never with profile disabled; no agent configuration change occurred.
@@ -68,3 +68,33 @@ Author checks: 25 pure tests PASS; all26 declared actual Chrome journeys PASS (3
 RED r2-red.log reintroduced the actual three defect paths: background Overview removed expansion; desktop/narrow Context reopened at0 instead of180; keyboard source reader remained inactive. First repair r2-first.log passed three cases but caught a desktop close-before-scroll-event race. The panel now retains scroll in layout cleanup as well as its ordinary scroll callback; r2-journey.log and full sweep verify the repair. Narrow header is inert with the graph. Keyboard intents wait for the exact reader identity through a transient DOM observer, then focus with preventScroll; close waits until the header is interactive. This is UI effect coordination, not a new domain model or stream route.
 
 Requested review: inspect source correctness, modal input isolation, local scroll lifetime and focus timing, actual coverage versus F17/panel contract, preserved full callable/folds/test/return behavior. Return concrete findings and checks with severity, exact candidate and limits. Model selection: gpt-6.1-sol/medium, fresh no-history context; bounded React lifecycle review is appropriate at this capability. Escalate only for a concrete unresolved ownership/focus or data-identity risk. One read-only reviewer; no nested delegation. J2/J3 public composition remains open and can be prepared independently without touching this pinned candidate.
+
+
+## J2/J3 readiness revision 3 — retained source identity
+
+Status: identity preparation active; story/ask composition not accepted.
+The mock call packet uses pr25-pinned-call-evidence, an evidence locator, while existing StoryBridge/SourceCanvas/question owners require a retained Snapshot. Read-only interface inspection found no running owner gateway on documented loopback5185 (connection refused); no old service was changed. An unavailable listener is not permission to restart the old pilot or create a production identity.
+
+Next authorized preparation: use existing buildSnapshot/prepareSource with all50pinned changed paths in a fresh private task data root outside Git, then audit the96fixture source sides and every call/test anchor against that actual retained Snapshot. No source extraction/analyzer redesign, fixture relabeling, backend schema, native pairing or production data mutation. Result is candidate-local retained input, not live participant acceptance. If mappings fail, preserve gaps and pause only dependent composition; no guessed counterpart or coordinate coercion.
+
+Concrete whole-journey acceptance remains: an unfamiliar reviewer first records motivation, concrete before/after/system consequence and an evidence limit through the candidate UI; explores an arbitrary other file/unchanged neighbor; inspects exact code/test evidence on the same canvas; asks a source-anchored question and evaluates the correctly attributed reply; returns to the same reading/story/draft context. Freeze that account before source comparison and critique wrong turns/reopening/cognitive effort. Engineering checks verify source identity, ownership, race/recovery and actual React input separately. Story selects attention, never membership; manual camera gestures never expand/collapse files.
+
+Runtime scope remains the recovered owned Vite57943 and private preparation artifacts. Any additional API runtime/route needs a concrete scoped execution decision before launch; no new destination is inferred merely to make a test green. Readiness output will identify the exact existing public owner integration and minimum runtime requirement for the next decision.
+
+
+### Revision 3 preparation evidence and current gate
+
+J1 engineering repair pin e3104779f3ca50adff770abfb070de2079625fcb: fresh read-only independent review found no concrete correctness blocker. [Tracked independent report](context-repair-review.md) grants no unfamiliar-reviewer or production acceptance. Manifest-e310477.json now hashes all53committed mock inputs,11frozen artifacts and5build files; source bytes were compared with the fixed Git object. Static scoped UI detector returned no findings. Desktop keyboard, breakpoint/enlarged-text/assistive-technology coverage remains bounded; physical/native behavior is not claimed.
+
+Existing public prepareSource produced retained Snapshot22009f2925f56fed2ca29f3b8a16a147c586f38f61d1c391a7abbd579d5193b2 in private task-owned /tmp/pr-reviewer-reading-journey-owner-data. It contains all50changed paths and128prepared source sides (including referenced documents). All96fixture source sides match exactly. Of181distinct serialized anchor records,179map to retained source; two unchanged src/application/public.ts anchors match their pinned Git bytes but are unprepared in this Snapshot. Keep those two evidence-only and ineligible for retained-source questions. No original fixture/locator changed. Summary r3-source-crosswalk-summary.json and r3-unmapped-proof.json preserve the limit.
+
+The derived pure journey-source projection returns the existing StoryReference snapshot-source type separately from the untouched CallAnchor evidence locator. It checks comparison/repository/PR, source side/path/hash, exact offset/line coordinates and surrogate boundaries. No Snapshot/StoryVersion/Comment identity is minted by the UI. Three regression cases cover exact mapping, stale/missing/mismatched inputs, independent source sides and Unicode boundaries; all pass with strict TypeScript. The normal isolated candidate test entrypoints are now declared in package.json and README, including this suite. These are source-correctness readiness checks, not additional product acceptance.
+
+Pending scoped runtime decision was presented asynchronously: allow candidate-only gateway127.0.0.1:57944 with this private prepared data root and a57943proxy for existing /api, preserving production/tailnet/global MCP/native sessions. This is necessary to compose real existing Workspace/Story/SourceCanvas/Question owners rather than a second local story/draft model. The inherited packet excludes new runtime/routes, so no API listener/proxy has been launched while this answer is pending. No response is approval. Exact native attachment/delivery and the denied unfamiliar-reviewer browser route remain separate later gates, even if the candidate runtime is approved.
+
+
+### Independent-review handoff v3 — source crosswalk prerequisite
+
+Scope: the next committed revision after e310477, limited to journey-source.ts, its pure regression and normal candidate test entrypoints/docs. Reuse the completed Context reviewer for this cohesive source-identity follow-up; read-only fixed Git review, no browser/server/process/network/tests or repository mutation. Candidate source remains root-owned. Check that mapping preserves original evidence identity and uncertainty, uses the existing public Snapshot/StoryReference contracts, validates comparison/path/side/hash/UTF-16/LF boundaries, and does not grant persistence, participant authority or eligibility on its own. The trusted source-admission prerequisite belongs to preparation/storage, not this projection. Verify28PASS in r3-normal-entrypoint.log and strict results as supplied author evidence only. Return concrete issues/limits to a separate private report. No nested delegation or product-acceptance claim. Model/effort stay gpt-6.1-sol/medium with the existing cohesive reviewer context.
+
+The scoped runtime question remains pending; preparation/correctness work does not authorize its listener/proxy. Full-journey source integration, story synchronization, real question/reply, exact combined reading/draft return, unfamiliar-reviewer understanding and agreed production/native delivery remain open. The current outcome is a repaired reading prerequisite and a verified identity boundary, not the full goal.
