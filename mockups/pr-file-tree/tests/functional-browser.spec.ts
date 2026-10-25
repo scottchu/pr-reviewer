@@ -195,14 +195,28 @@ test.describe('review regressions with normal expansion motion', () => {
     await openFile(page, 'src/application/private-session.ts');
     const node = page.locator('.react-flow__node[data-id="file:src/application/private-session.ts"]');
     await expect.poll(async () => (await node.boundingBox())!.x).toBeCloseTo(12, 0);
+    await expect.poll(async () => (await node.boundingBox())!.height).toBeGreaterThan(180);
+    await expect.poll(async () => (await node.boundingBox())!.y).toBeCloseTo(58, 0);
     await page.setViewportSize({ width: 390, height: 844 });
     await expect.poll(async () => (await node.boundingBox())!.x).toBeCloseTo(12, 0);
+    await expect.poll(async () => (await node.boundingBox())!.y).toBeCloseTo(58, 0);
+    await expect.poll(async () => (await node.boundingBox())!.height).toBeGreaterThan(180);
     await page.getByRole('button', { name: 'Open review context' }).click();
     await expect(page.getByRole('group', { name: 'Diff presentation' })).toHaveCount(0);
     await expect(page.getByRole('navigation', { name: 'Workspace actions' })).toBeHidden();
     await page.screenshot({ path: `${evidence}/mobile-context-controls.png` });
     await page.getByRole('button', { name: 'Close review context' }).click();
     await expect(node).toBeVisible();
+    const title = await page.locator('[data-file-path="src/application/private-session.ts"]').boundingBox();
+    expect(title!.y).toBeGreaterThanOrEqual(45);
+    expect(title!.y + title!.height).toBeLessThan(150);
+    const source = await page.locator('.diff-side.after .source-code').first().evaluate(element => {
+      const code = element.getBoundingClientRect(); const side = element.closest('.diff-side')!.getBoundingClientRect();
+      return { y: code.y, available: Math.min(side.right, 390) - Math.max(code.left, 0) };
+    });
+    expect(source.y).toBeGreaterThan(100);
+    expect(source.y).toBeLessThan(500);
+    expect(source.available).toBeGreaterThan(80);
     await page.screenshot({ path: `${evidence}/mobile-expanded-resize.png` });
   });
 
