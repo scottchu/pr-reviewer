@@ -25,6 +25,8 @@ Detailed contracts remain in [file workspace](pr-file-tree-first.md), [canvas re
 
 ## Change and review boundary
 
+Use accepted feedback proactively as a design input before planning/code: retain its context, rationale and scope, then derive examples/counterexamples and observable acceptance signals alongside requirements/source evidence/unknowns. Only accepted constraints enter this register; a complaint alone does not freeze a universal rule. See [reviewer experience](review-experience.md#feedback-as-feed-forward-design-input).
+
 Every slice/handoff must name: accepted change; exact allowed seams; protected rows of this register; any explicit supersession; preservation checks; and delivered, pending or unverified status. A real defect may require a narrow exception, but chat or code cannot silently authorize a redesign. Record the reason and updated contract before implementing that exception.
 
 A reviewer checks the authorized delta AND the affected protected behavior. Check actual glyphs, node/label/route ownership, gestures and return states where the change affects them; DOM presence, counts and bounding boxes alone do not establish readability. Keep failures and classify evidence honestly. Do not reopen unrelated protected areas merely to improve a probe.

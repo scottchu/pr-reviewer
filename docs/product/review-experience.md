@@ -20,6 +20,12 @@ The opening should let them say: “This change tries to solve this problem. Thi
 
 The next design uses the entire pinned PR25 change graph, with all behavior/support groups present independently of story. The [concrete whole-change map](pr25-whole-change-graph.md) specifies its eight groups,50 primary files, source-backed neighborhoods and unmodeled frontiers. A focused region is a viewport/detail choice, never the data scope. All quoted code, source relationships, scope counts and execution claims must come from that pinned PR/evidence. A short authored explanation has visible attribution. If intent is unknown, say so and explain the observed change; do not fill the gap with a persuasive invented purpose.
 
+## Feedback as feed-forward design input
+
+Accepted direction: turn situated feedback into guidance before planning and implementation, rather than using it only as a retrospective regression check. Feedback is one input alongside requirements, exact source evidence and unknowns. Preserve its origin, scenario, affected scope, rationale and status (observed, proposed or accepted); later explicit corrections take precedence. An observed complaint is not automatically a universal rule or a frozen invariant.
+
+For accepted feedback, derive intended behavior, scoped constraints, concrete examples/counterexamples and observable pre-implementation acceptance signals. For example, smaller relationship labels must remain subordinate to filenames and beside their OWN arrow, not merely fit a bounding box; softwrap must retain exact source bytes/logical anchors and paired Split heights, not rewrite long lines; mobile controls belong at the fixed bottom with safe-area clearance, not at the desktop's former top position. These examples guide the next design before code. They do not establish that unresolved label placement or physical-device behavior has passed. Use the [invariant register](protected-invariants.md) for accepted preservation boundaries and the [delivery contract](../rules/documentation.md) for the workflow.
+
 ## Decision ledger
 
 | Status | Decision |

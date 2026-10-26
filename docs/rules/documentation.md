@@ -24,6 +24,10 @@ Compilation here includes the agent interpreting requirements, designing within 
 
 Documents state intent and preserve knowledge; observed behavior and test evidence establish what actually happened. A written requirement or generated implementation is not proof of acceptance. Chat is input to the source, and derived code can reveal gaps, but neither silently replaces the documented contract.
 
+## Convert feedback into feed-forward signals
+
+Before planning or deriving code, reconcile relevant feedback with requirements, source evidence and unknowns. Record provenance/context, affected scope, intended behavior and rationale, accepted versus proposed versus observed status, and any explicit supersession. Translate accepted direction into a small example, counterexample and observable acceptance signal; consult these signals while choosing the implementation, not only after it exists. Feedback is one input, not automatic authority for a universal rule, invariant or unrelated redesign. Promote accepted protected constraints to the existing invariant register; retain unresolved interpretations as proposals. Verification then reports actual conformance and returns new learning to these same documents.
+
 ## Navigation
 
 Use the [documentation index](../README.md) to find product knowledge, shared rules and round-local delivery plans.
