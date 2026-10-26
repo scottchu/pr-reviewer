@@ -79,3 +79,9 @@ test('a retained declared-test scope preserves its entire source without unrelat
   for (let line = 34;line <= 44;line++)
     assert.ok(visible.some(segment => segment.kind === 'fold' && segment.rows.some(row => row.beforeLine === line)));
 });
+
+
+test('manual hunk observation uses the same 54px readable offset as explicit navigation', () => {
+  assert.equal(visibleHunk([20, 200, 450, 620], 620 - 54, 200, 1200), 3);
+  assert.equal(visibleHunk([20, 200, 450, 620], 620 - 55, 200, 1200), 2);
+});

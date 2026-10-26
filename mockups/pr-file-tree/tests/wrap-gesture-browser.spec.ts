@@ -136,3 +136,57 @@ test.describe('normal-motion wrapped source focus', () => {
     await expect(page.locator('.react-flow__viewport')).toHaveAttribute('style', originalCamera!);
   });
 });
+
+test.describe('compact exact change navigation', () => {
+  test.use({ reducedMotion: 'no-preference' });
+  for (const width of [1440, 390]) for (const mode of ['Split', 'Unified'] as const) {
+    test(`${width} ${mode} every marker keeps its actual change and manual scrolling hands back`, async ({ page }) => {
+      await page.setViewportSize({ width, height: 900 });
+      await page.goto('/');
+      if (width >= 650) await page.getByRole('button', { name: 'Close review context', exact: true }).click();
+      await page.getByRole('button', { name: 'Find source', exact: true }).click();
+      await page.getByRole('combobox', { name: 'Changed source', exact: true }).selectOption('src/application/review.ts');
+      await page.locator('[data-file-path="src/application/review.ts"]').click();
+      await page.getByRole('button', { name: mode, exact: true }).click();
+      const reader = page.locator('.continuous-reader');
+      const dots = page.locator('.change-dot');
+      await expect(dots).toHaveCount(4);
+      for (let index = 0; index < 4; index++) {
+        await dots.nth(index).click();
+        await expect(dots.nth(index)).toHaveAttribute('aria-current', 'location');
+        const changed = page.locator(`.continuous-hunk[data-hunk="${index}"] .diff-line.added, .continuous-hunk[data-hunk="${index}"] .diff-line.removed`).first();
+        await expect.poll(async () => {
+          const row = await changed.boundingBox(), pane = await reader.boundingBox();
+          return !!row && !!pane && row.y >= pane.y + 31 && row.y < pane.y + pane.height - 20;
+        }).toBe(true);
+        // A late programmatic event must not replace the deliberate target.
+        await reader.evaluate(element => element.dispatchEvent(new Event('scroll')));
+        await expect(dots.nth(index)).toHaveAttribute('aria-current', 'location');
+        await page.getByRole('button', { name: 'Explain current source comparison', exact: true }).click();
+        await expect(page.locator('.relationship-reader .reader-heading strong')).toHaveText(`Change ${index + 1}`);
+        await page.getByRole('button', { name: 'Close relationship explanation', exact: true }).click();
+      }
+      const centers = await dots.evaluateAll(elements => elements.map(element => {
+        const rect = element.getBoundingClientRect(); return { y: rect.y + rect.height / 2, height: rect.height };
+      }));
+      for (let index = 1; index < centers.length; index++) {
+        expect(centers[index]!.y - centers[index - 1]!.y).toBe(width < 650 ? 44 : 36);
+        expect(centers[index]!.y - centers[index - 1]!.y).toBeGreaterThanOrEqual(centers[index]!.height);
+      }
+      await expect(page.locator('.continuous-hunk[data-hunk="3"]')).toContainText('login:async');
+      await reader.hover(); await page.mouse.wheel(0, -100000);
+      await expect(dots.first()).toHaveAttribute('aria-current', 'location');
+      const fold = page.locator('.fold-control').first();
+      await fold.click();
+      await page.setViewportSize({ width: width === 390 ? 400 : 1380, height: 900 });
+      await dots.nth(3).focus(); await page.keyboard.press('Enter');
+      await expect(dots.nth(3)).toHaveAttribute('aria-current', 'location');
+      await expect.poll(async () => {
+        const pane = await reader.boundingBox();
+        const row = await page.locator('.continuous-hunk[data-hunk="3"] .diff-line.added').first().boundingBox();
+        return !!row && !!pane && row.y >= pane.y + 31 && row.y < pane.y + pane.height - 20;
+      }).toBe(true);
+      await page.screenshot({ path: `/tmp/pr-reviewer-reading-journey-evidence/r28-navigation/${width}-${mode}.png` });
+    });
+  }
+});

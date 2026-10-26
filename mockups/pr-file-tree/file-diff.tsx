@@ -1,6 +1,6 @@
 import { focusedComparison } from './comparison-selection.ts';
 import { SyntaxCode } from './syntax-code.tsx';
-import React, { useRef, useState, useLayoutEffect, useMemo, useEffect } from 'react';
+import React, { useRef, useState, useLayoutEffect, useMemo } from 'react';
 import type { FileReading, ReadingFocus } from './reading.ts';
 import diffs from './diffs.json' with { type: 'json' };
 import fullSource from './full-source.json' with { type: 'json' };
@@ -122,7 +122,6 @@ export const FileDiffBody = ({ file, mode, fullscreen, width, onExplain, activeR
   };
   const [active, setActive] = useState(local.current.active);
   const [folds, setFolds] = useState<readonly string[]>(local.current.folds ?? []);
-  const [positions, setPositions] = useState<number[]>([]);
   const pendingRestore = useRef<FileReading | null>(reading ?? null);
   const foldReturn = useRef<{
     index: number;
@@ -167,7 +166,7 @@ export const FileDiffBody = ({ file, mode, fullscreen, width, onExplain, activeR
     if (focused) observe();
   };
   const go = (index: number) => {
-    focusSelection.current = null;
+    focusSelection.current = { index, side: 'after' };
     travel.current = index;
     setActive(index);
     save({
@@ -253,19 +252,6 @@ export const FileDiffBody = ({ file, mode, fullscreen, width, onExplain, activeR
     }
   }, [
     focus?.id
-  ]);
-  useEffect(() => {
-    const pre = content.current;
-    if (!pre)
-      return;
-    const observer = new ResizeObserver(() => {
-      const values = file.hunks.map((_, i) => location(i));
-      setPositions(current => JSON.stringify(current) === JSON.stringify(values) ? current : values);
-    });
-    observer.observe(pre);
-    return () => observer.disconnect();
-  }, [
-    file, folds, mode, width, focus?.id
   ]);
   useLayoutEffect(() => () => {
     latest.current.onReading({
@@ -367,7 +353,7 @@ export const FileDiffBody = ({ file, mode, fullscreen, width, onExplain, activeR
       onClick={e => e.stopPropagation()}
     >
 
-      {visibleHunks.map(index => {
+      {visibleHunks.map((index, ordinal) => {
         const h = file.hunks[index]!;
         const removed = h.rows.some(r => r.kind === 'removed');
         const added = h.rows.some(r => r.kind === 'added');
@@ -376,7 +362,7 @@ export const FileDiffBody = ({ file, mode, fullscreen, width, onExplain, activeR
           key={index}
           className={`change-dot ${kind}`}
           style={{
-            top: `${Math.max(2, Math.min(98, (positions[index] ?? 0) / Math.max(1, body.current?.scrollHeight ?? 1) * 100))}%`
+            top: `calc(22px + ${ordinal} * var(--change-marker-step, 36px))`
           }}
           aria-label={`${file.path} change ${index + 1} · ${kind} · Before L${h.beforeStart},${h.beforeCount} / After L${h.afterStart},${h.afterCount}`}
           aria-current={active === index ? 'location' : undefined}

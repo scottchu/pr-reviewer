@@ -1476,3 +1476,7 @@ html, body, #root { touch-action: pan-x pan-y; }
 /* Wrapped rows no longer need horizontal sticky containment. Exact source
    offsets stay relative to the complete pre, not an individual paired row. */
 .continuous-reader.split .paired-row { position: static; left: auto; }
+
+/* Compact marker order is independent of wrapped source extent. */
+.continuous-rail { --change-marker-step:36px; overflow-y:auto; overflow-x:hidden; }
+@media(max-width:650px) { .continuous-rail { --change-marker-step:44px; } }

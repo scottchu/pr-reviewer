@@ -99,7 +99,7 @@ export const visibleHunk = (positions: readonly number[], top: number, height: n
     return positions.length - 1;
   let current = 0;
   positions.forEach((position, index) => {
-    if (position <= top + 42)
+    if (position <= top + 54)
       current = index;
   });
   return current;
