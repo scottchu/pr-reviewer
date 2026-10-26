@@ -92,3 +92,47 @@ test('390 touch pinch changes only graph camera while reader keeps local vertica
   await expect.poll(()=>reader.evaluate(e=>e.scrollTop)).toBeGreaterThan(0);
   await page.screenshot({path:`${evidence}/gesture-390.png`});
 });
+
+test.describe('normal-motion wrapped source focus', () => {
+  test.use({ reducedMotion: 'no-preference' });
+  for (const width of [1440, 390]) test(`${width} Story request citation reveals line25 and Return keeps earliest origin`, async ({ page }, info) => {
+    await page.setViewportSize({ width, height: 844 });
+    await page.goto('/');
+    if (width >= 650) await page.getByRole('button', { name: 'Close review context', exact: true }).click();
+    await page.getByRole('button', { name: 'Find source', exact: true }).click();
+    await page.getByRole('combobox', { name: 'Changed source', exact: true }).selectOption('src/application/review.ts');
+    await page.locator('[data-file-path="src/application/review.ts"]').click();
+    const reader = page.locator('.continuous-reader');
+    await expect(reader).toBeInViewport();
+    await page.getByRole('button', { name: 'Split', exact: true }).click();
+    await page.locator('.fold-control').first().click();
+    await reader.evaluate(e => { e.scrollTop = 70; });
+    await page.locator('main').focus();
+    for (let index=0; index<5; index++) {
+      const left = (await page.locator('[data-file-path="src/application/review.ts"]').boundingBox())!.x;
+      await page.keyboard.press('ArrowRight');
+      await expect.poll(async () => (await page.locator('[data-file-path="src/application/review.ts"]').boundingBox())!.x).toBeLessThan(left-60);
+    }
+    const originalCamera = await page.locator('.react-flow__viewport').getAttribute('style');
+    const originalTop = await reader.evaluate(e => e.scrollTop);
+    await page.getByRole('button', { name: 'Open prepared story', exact: true }).click();
+    await page.getByRole('button', { name: 'Next story step', exact: true }).click();
+    await page.getByRole('button', { name: 'Inspect head src/application/review.ts L25–33', exact: true }).first().click();
+    const row = page.locator('.diff-side.after .diff-line[data-after-line="25"]');
+    await expect(reader).toBeVisible();
+    const geometry = await row.evaluate(e => ({ rowTop: e.getBoundingClientRect().top, offsetTop: (e as HTMLElement).offsetTop, offsetParent: (e as HTMLElement).offsetParent?.className,
+      readerTop: e.closest('.continuous-reader')!.getBoundingClientRect().top, readerHeight: e.closest('.continuous-reader')!.clientHeight, scrollTop: e.closest('.continuous-reader')!.scrollTop }));
+    await info.attach('focus-geometry', { body: JSON.stringify(geometry), contentType: 'application/json' });
+    await expect.poll(async () => {
+      const a = (await row.boundingBox())!, b = (await reader.boundingBox())!;
+      return a.y >= b.y+25 && a.y < b.y+b.height-22;
+    }).toBe(true);
+    await expect(row).toContainText('const request');
+    await page.screenshot({ path: `${evidence}/exact-citation-${width}.png` });
+    await page.getByRole('button', { name: 'Return to original reading', exact: true }).click();
+    await expect(page.locator('.owner-step')).toHaveText('Compare the request and its exact header helper');
+    await expect(page.locator('[data-expanded-file]')).toHaveAttribute('data-expanded-file', 'src/application/review.ts');
+    await expect.poll(() => reader.evaluate(e => e.scrollTop)).toBe(originalTop);
+    await expect(page.locator('.react-flow__viewport')).toHaveAttribute('style', originalCamera!);
+  });
+});

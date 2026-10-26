@@ -1473,3 +1473,6 @@ html, body, #root { touch-action: pan-x pan-y; }
 .continuous-reader .source-code { display: block; min-width: 0; max-width: 100%; white-space: pre-wrap; overflow-wrap: anywhere; word-break: normal; transform: none !important; }
 .continuous-reader .unified-gutter { position: static; align-items: flex-start; }
 .continuous-comparison.horizontal:after { display: none; }
+/* Wrapped rows no longer need horizontal sticky containment. Exact source
+   offsets stay relative to the complete pre, not an individual paired row. */
+.continuous-reader.split .paired-row { position: static; left: auto; }
