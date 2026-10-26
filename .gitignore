@@ -5,3 +5,6 @@ dist/
 .env
 .env.*
 !.env.example
+
+# Task-only static mockup exports served by the existing candidate.
+/mockups/pr-file-tree/public/elk-v25/
