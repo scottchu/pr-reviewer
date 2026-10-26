@@ -1,0 +1,12 @@
+flowchart LR
+  before["review.ts request() Before · B24–32"]
+  change["Header Change: Bearer → helper · B26–32 / H27–33"]
+  after["review.ts request() After · H25–33"]
+  refresh["review.ts refresh() head · H35–45; body unchanged"]
+  helper["local-access.ts accessHeaders() · H3; owner → no Authorization; otherwise → Bearer"]
+  before -->|"before slice B26–32"| change
+  change -->|"after slice H27–33"| after
+  refresh -->|"calls · H38"| after
+  after -->|"calls · H30"| helper
+  classDef context fill:#29343c,stroke:#9badbb,color:#e2ecf2
+  class refresh context

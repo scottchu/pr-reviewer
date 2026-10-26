@@ -1,0 +1,533 @@
+{
+  "status": "bounded prepared semantic account; not new persisted schema, UI or StoryVersion",
+  "comparison": {
+    "snapshotId": "22009f2925f56fed2ca29f3b8a16a147c586f38f61d1c391a7abbd579d5193b2",
+    "repository": "scottchu/pr-reviewer",
+    "baseSha": "b096826e31c0927190806de91ed70b8b64aa93d8",
+    "headSha": "e3b270e5f49a9215452b0b86702946043e979059"
+  },
+  "granularity": "File is source home; functions are exact side-specific call endpoints; native Change compares ranges, not entire function identity. Diagram aliases are local locators only.",
+  "membership": {
+    "selection": "Curated review.ts request-header replacement: unique native hunk with removed Before29 and added After30. This criterion and exact pinned inputs make membership reproducible.",
+    "rule": "Take containing request declaration on each side; include direct incoming refresh and head outgoing accessHeaders from calls-clients packet; stop at one hop. Include exact named-import binding supporting that outgoing call.",
+    "packet": "mockups/pr-file-tree/calls-clients.json",
+    "packetSHA256": "867ee97dee058f17f71a9df98164bed726d84b744e501b8c463bd582b275bea2",
+    "fixtureSources": "mockups/pr-file-tree/full-source.json",
+    "fixtureSourcesSHA256": "b0bcf1a15f963e383c204e95c512fa1a239cc50912f53bab7f891f89ab60b57d",
+    "unknown": "Not whole repository/PR call coverage. Tests, other changes/callers and runtime/security are unmodeled; original50 changed file membership is unchanged."
+  },
+  "change": {
+    "alias": "change",
+    "type": "Change",
+    "nativeProjectionHunkId": "hunk:src/application/review.ts:2",
+    "hunkHeader": "@@ -26,7 +27,7 @@ export const createReviewBridge=(reviewId:string,initialSnapshotId?:string,optio",
+    "compares": {
+      "beforeEvidence": "beforeHunk",
+      "afterEvidence": "afterHunk"
+    },
+    "containsChangedExpressions": [
+      "beforeHeaders",
+      "afterHeaders"
+    ],
+    "not": "New per-line or whole-function Change; same function names do not coalesce IDs."
+  },
+  "functions": {
+    "requestBefore": {
+      "canonicalPacketId": "083d938782f0e018df80fce707b355488710e75876f88bd92e398ca852879046",
+      "name": "request",
+      "canonicalPacketDeclaration": {
+        "snapshotId": "pr25-pinned-call-evidence",
+        "side": "base",
+        "path": "src/application/review.ts",
+        "contentHash": "7953f0b8486ae475717bdc749e23a31f12351f41c11a473280de9a2420265477",
+        "start": 2860,
+        "end": 3771,
+        "startLine": 24,
+        "endLine": 32
+      },
+      "canonicalPacketBody": {
+        "snapshotId": "pr25-pinned-call-evidence",
+        "side": "base",
+        "path": "src/application/review.ts",
+        "contentHash": "7953f0b8486ae475717bdc749e23a31f12351f41c11a473280de9a2420265477",
+        "start": 2938,
+        "end": 3771,
+        "startLine": 24,
+        "endLine": 32
+      },
+      "mappedSnapshotDeclaration": {
+        "snapshotId": "22009f2925f56fed2ca29f3b8a16a147c586f38f61d1c391a7abbd579d5193b2",
+        "repository": "scottchu/pr-reviewer",
+        "baseSha": "b096826e31c0927190806de91ed70b8b64aa93d8",
+        "headSha": "e3b270e5f49a9215452b0b86702946043e979059",
+        "side": "base",
+        "path": "src/application/review.ts",
+        "sourceHash": "7953f0b8486ae475717bdc749e23a31f12351f41c11a473280de9a2420265477",
+        "startLine": 24,
+        "endLine": 32,
+        "utf16Start": 2860,
+        "utf16End": 3771
+      }
+    },
+    "requestAfter": {
+      "canonicalPacketId": "2e55daf0e1c5086b0eb7e2390e38003b26bb3cf463f5ae835837f3e95eb43368",
+      "name": "request",
+      "canonicalPacketDeclaration": {
+        "snapshotId": "pr25-pinned-call-evidence",
+        "side": "head",
+        "path": "src/application/review.ts",
+        "contentHash": "dae210c79cb019d6edfdbfacfcf3da1e5773ceb4d15cf747df15ffa498c28e4e",
+        "start": 2956,
+        "end": 3859,
+        "startLine": 25,
+        "endLine": 33
+      },
+      "canonicalPacketBody": {
+        "snapshotId": "pr25-pinned-call-evidence",
+        "side": "head",
+        "path": "src/application/review.ts",
+        "contentHash": "dae210c79cb019d6edfdbfacfcf3da1e5773ceb4d15cf747df15ffa498c28e4e",
+        "start": 3034,
+        "end": 3859,
+        "startLine": 25,
+        "endLine": 33
+      },
+      "mappedSnapshotDeclaration": {
+        "snapshotId": "22009f2925f56fed2ca29f3b8a16a147c586f38f61d1c391a7abbd579d5193b2",
+        "repository": "scottchu/pr-reviewer",
+        "baseSha": "b096826e31c0927190806de91ed70b8b64aa93d8",
+        "headSha": "e3b270e5f49a9215452b0b86702946043e979059",
+        "side": "head",
+        "path": "src/application/review.ts",
+        "sourceHash": "dae210c79cb019d6edfdbfacfcf3da1e5773ceb4d15cf747df15ffa498c28e4e",
+        "startLine": 25,
+        "endLine": 33,
+        "utf16Start": 2956,
+        "utf16End": 3859
+      }
+    },
+    "refreshBefore": {
+      "canonicalPacketId": "a20856fb11d475904819c271121db3847354140d979958c77b2763c8ec2f8180",
+      "name": "refresh",
+      "canonicalPacketDeclaration": {
+        "snapshotId": "pr25-pinned-call-evidence",
+        "side": "base",
+        "path": "src/application/review.ts",
+        "contentHash": "7953f0b8486ae475717bdc749e23a31f12351f41c11a473280de9a2420265477",
+        "start": 3944,
+        "end": 5384,
+        "startLine": 34,
+        "endLine": 44
+      },
+      "canonicalPacketBody": {
+        "snapshotId": "pr25-pinned-call-evidence",
+        "side": "base",
+        "path": "src/application/review.ts",
+        "contentHash": "7953f0b8486ae475717bdc749e23a31f12351f41c11a473280de9a2420265477",
+        "start": 3978,
+        "end": 5384,
+        "startLine": 34,
+        "endLine": 44
+      },
+      "mappedSnapshotDeclaration": {
+        "snapshotId": "22009f2925f56fed2ca29f3b8a16a147c586f38f61d1c391a7abbd579d5193b2",
+        "repository": "scottchu/pr-reviewer",
+        "baseSha": "b096826e31c0927190806de91ed70b8b64aa93d8",
+        "headSha": "e3b270e5f49a9215452b0b86702946043e979059",
+        "side": "base",
+        "path": "src/application/review.ts",
+        "sourceHash": "7953f0b8486ae475717bdc749e23a31f12351f41c11a473280de9a2420265477",
+        "startLine": 34,
+        "endLine": 44,
+        "utf16Start": 3944,
+        "utf16End": 5384
+      }
+    },
+    "refreshAfter": {
+      "canonicalPacketId": "9ee077ffe9012fff58ab69d946edf1e60dbf36df40f006f46893f6d614493453",
+      "name": "refresh",
+      "canonicalPacketDeclaration": {
+        "snapshotId": "pr25-pinned-call-evidence",
+        "side": "head",
+        "path": "src/application/review.ts",
+        "contentHash": "dae210c79cb019d6edfdbfacfcf3da1e5773ceb4d15cf747df15ffa498c28e4e",
+        "start": 4032,
+        "end": 5472,
+        "startLine": 35,
+        "endLine": 45
+      },
+      "canonicalPacketBody": {
+        "snapshotId": "pr25-pinned-call-evidence",
+        "side": "head",
+        "path": "src/application/review.ts",
+        "contentHash": "dae210c79cb019d6edfdbfacfcf3da1e5773ceb4d15cf747df15ffa498c28e4e",
+        "start": 4066,
+        "end": 5472,
+        "startLine": 35,
+        "endLine": 45
+      },
+      "mappedSnapshotDeclaration": {
+        "snapshotId": "22009f2925f56fed2ca29f3b8a16a147c586f38f61d1c391a7abbd579d5193b2",
+        "repository": "scottchu/pr-reviewer",
+        "baseSha": "b096826e31c0927190806de91ed70b8b64aa93d8",
+        "headSha": "e3b270e5f49a9215452b0b86702946043e979059",
+        "side": "head",
+        "path": "src/application/review.ts",
+        "sourceHash": "dae210c79cb019d6edfdbfacfcf3da1e5773ceb4d15cf747df15ffa498c28e4e",
+        "startLine": 35,
+        "endLine": 45,
+        "utf16Start": 4032,
+        "utf16End": 5472
+      }
+    },
+    "helperAfter": {
+      "canonicalPacketId": "a7c2131f067aee1cd64b01c90418ffa0da3b0f5469984249d91fa611723893f6",
+      "name": "accessHeaders",
+      "canonicalPacketDeclaration": {
+        "snapshotId": "pr25-pinned-call-evidence",
+        "side": "head",
+        "path": "src/application/local-access.ts",
+        "contentHash": "811735e3599292c54af870134345249deed32f1d9b9705f8ca18fd086225d59d",
+        "start": 144,
+        "end": 264,
+        "startLine": 3,
+        "endLine": 3
+      },
+      "canonicalPacketBody": {
+        "snapshotId": "pr25-pinned-call-evidence",
+        "side": "head",
+        "path": "src/application/local-access.ts",
+        "contentHash": "811735e3599292c54af870134345249deed32f1d9b9705f8ca18fd086225d59d",
+        "start": 198,
+        "end": 264,
+        "startLine": 3,
+        "endLine": 3
+      },
+      "mappedSnapshotDeclaration": {
+        "snapshotId": "22009f2925f56fed2ca29f3b8a16a147c586f38f61d1c391a7abbd579d5193b2",
+        "repository": "scottchu/pr-reviewer",
+        "baseSha": "b096826e31c0927190806de91ed70b8b64aa93d8",
+        "headSha": "e3b270e5f49a9215452b0b86702946043e979059",
+        "side": "head",
+        "path": "src/application/local-access.ts",
+        "sourceHash": "811735e3599292c54af870134345249deed32f1d9b9705f8ca18fd086225d59d",
+        "startLine": 3,
+        "endLine": 3,
+        "utf16Start": 144,
+        "utf16End": 264
+      }
+    }
+  },
+  "unchangedContext": {
+    "before": "refreshBefore",
+    "after": "refreshAfter",
+    "bodySHA256": "5dedaff001ad7d36cd09747c513402d9fb5c18d23d950243c4365347affc7550",
+    "hashEncoding": "UTF-8 body text",
+    "basis": "Exact body bytes equal at these two explicit anchors; identities remain separate; unchanged behavior not established."
+  },
+  "calls": [
+    {
+      "canonicalPacketId": "source-observed:a3ac0b81d9bd0eec1f2e429a9443527ea5458372c569ac834c240f4b62b02030",
+      "callerId": "a20856fb11d475904819c271121db3847354140d979958c77b2763c8ec2f8180",
+      "calleeId": "083d938782f0e018df80fce707b355488710e75876f88bd92e398ca852879046",
+      "target": {
+        "snapshotId": "pr25-pinned-call-evidence",
+        "side": "base",
+        "path": "src/application/review.ts",
+        "contentHash": "7953f0b8486ae475717bdc749e23a31f12351f41c11a473280de9a2420265477",
+        "start": 2860,
+        "end": 3771,
+        "startLine": 24,
+        "endLine": 32
+      },
+      "site": {
+        "anchor": {
+          "snapshotId": "pr25-pinned-call-evidence",
+          "side": "base",
+          "path": "src/application/review.ts",
+          "contentHash": "7953f0b8486ae475717bdc749e23a31f12351f41c11a473280de9a2420265477",
+          "start": 4130,
+          "end": 4337,
+          "startLine": 37,
+          "endLine": 37
+        },
+        "sourceText": "request(captured,`/api/reviews/${encodeURIComponent(reviewId)}?minimumRevision=${minimumRevision}${selectedSnapshotId?`&snapshotId=${encodeURIComponent(selectedSnapshotId)}`:''}`,undefined,controller.signal)"
+      },
+      "mappedSnapshotSite": {
+        "snapshotId": "22009f2925f56fed2ca29f3b8a16a147c586f38f61d1c391a7abbd579d5193b2",
+        "repository": "scottchu/pr-reviewer",
+        "baseSha": "b096826e31c0927190806de91ed70b8b64aa93d8",
+        "headSha": "e3b270e5f49a9215452b0b86702946043e979059",
+        "side": "base",
+        "path": "src/application/review.ts",
+        "sourceHash": "7953f0b8486ae475717bdc749e23a31f12351f41c11a473280de9a2420265477",
+        "startLine": 37,
+        "endLine": 37,
+        "utf16Start": 4130,
+        "utf16End": 4337
+      },
+      "basis": "source-observed lexical call",
+      "certainty": "source_observed_manual",
+      "method": "exact_call_expression_and_source_lexical_binding_review",
+      "analyzerFrontier": "semantic_obstruction"
+    },
+    {
+      "canonicalPacketId": "source-observed:a85050ec78bc58582f63a7ec50f322f46655c4a1656700e919ca78f117b826f1",
+      "callerId": "2e55daf0e1c5086b0eb7e2390e38003b26bb3cf463f5ae835837f3e95eb43368",
+      "calleeId": "a7c2131f067aee1cd64b01c90418ffa0da3b0f5469984249d91fa611723893f6",
+      "target": {
+        "snapshotId": "pr25-pinned-call-evidence",
+        "side": "head",
+        "path": "src/application/local-access.ts",
+        "contentHash": "811735e3599292c54af870134345249deed32f1d9b9705f8ca18fd086225d59d",
+        "start": 144,
+        "end": 264,
+        "startLine": 3,
+        "endLine": 3
+      },
+      "site": {
+        "anchor": {
+          "snapshotId": "pr25-pinned-call-evidence",
+          "side": "head",
+          "path": "src/application/review.ts",
+          "contentHash": "dae210c79cb019d6edfdbfacfcf3da1e5773ceb4d15cf747df15ffa498c28e4e",
+          "start": 3379,
+          "end": 3402,
+          "startLine": 30,
+          "endLine": 30
+        },
+        "sourceText": "accessHeaders(captured)"
+      },
+      "mappedSnapshotSite": {
+        "snapshotId": "22009f2925f56fed2ca29f3b8a16a147c586f38f61d1c391a7abbd579d5193b2",
+        "repository": "scottchu/pr-reviewer",
+        "baseSha": "b096826e31c0927190806de91ed70b8b64aa93d8",
+        "headSha": "e3b270e5f49a9215452b0b86702946043e979059",
+        "side": "head",
+        "path": "src/application/review.ts",
+        "sourceHash": "dae210c79cb019d6edfdbfacfcf3da1e5773ceb4d15cf747df15ffa498c28e4e",
+        "startLine": 30,
+        "endLine": 30,
+        "utf16Start": 3379,
+        "utf16End": 3402
+      },
+      "basis": "source-observed lexical call",
+      "certainty": "source_observed_manual",
+      "method": "exact_call_expression_and_source_lexical_binding_review",
+      "analyzerFrontier": "semantic_obstruction"
+    },
+    {
+      "canonicalPacketId": "source-observed:1f62e2349ec4860c22f4dcdc5c5b9a65e5f31ae5b718b358d497879e9c7883c7",
+      "callerId": "9ee077ffe9012fff58ab69d946edf1e60dbf36df40f006f46893f6d614493453",
+      "calleeId": "2e55daf0e1c5086b0eb7e2390e38003b26bb3cf463f5ae835837f3e95eb43368",
+      "target": {
+        "snapshotId": "pr25-pinned-call-evidence",
+        "side": "head",
+        "path": "src/application/review.ts",
+        "contentHash": "dae210c79cb019d6edfdbfacfcf3da1e5773ceb4d15cf747df15ffa498c28e4e",
+        "start": 2956,
+        "end": 3859,
+        "startLine": 25,
+        "endLine": 33
+      },
+      "site": {
+        "anchor": {
+          "snapshotId": "pr25-pinned-call-evidence",
+          "side": "head",
+          "path": "src/application/review.ts",
+          "contentHash": "dae210c79cb019d6edfdbfacfcf3da1e5773ceb4d15cf747df15ffa498c28e4e",
+          "start": 4218,
+          "end": 4425,
+          "startLine": 38,
+          "endLine": 38
+        },
+        "sourceText": "request(captured,`/api/reviews/${encodeURIComponent(reviewId)}?minimumRevision=${minimumRevision}${selectedSnapshotId?`&snapshotId=${encodeURIComponent(selectedSnapshotId)}`:''}`,undefined,controller.signal)"
+      },
+      "mappedSnapshotSite": {
+        "snapshotId": "22009f2925f56fed2ca29f3b8a16a147c586f38f61d1c391a7abbd579d5193b2",
+        "repository": "scottchu/pr-reviewer",
+        "baseSha": "b096826e31c0927190806de91ed70b8b64aa93d8",
+        "headSha": "e3b270e5f49a9215452b0b86702946043e979059",
+        "side": "head",
+        "path": "src/application/review.ts",
+        "sourceHash": "dae210c79cb019d6edfdbfacfcf3da1e5773ceb4d15cf747df15ffa498c28e4e",
+        "startLine": 38,
+        "endLine": 38,
+        "utf16Start": 4218,
+        "utf16End": 4425
+      },
+      "basis": "source-observed lexical call",
+      "certainty": "source_observed_manual",
+      "method": "exact_call_expression_and_source_lexical_binding_review",
+      "analyzerFrontier": "semantic_obstruction"
+    }
+  ],
+  "binding": {
+    "type": "import binding, not runtime call",
+    "subjectEvidence": "importBinding",
+    "boundIdentifier": "accessHeaders",
+    "targetFunction": "helperAfter",
+    "usedAtEvidence": "afterHeaders"
+  },
+  "explanation": {
+    "about": "change",
+    "claims": [
+      {
+        "id": "headerDelegation",
+        "basis": "observed source",
+        "text": "The request header expression changes from direct Bearer construction to accessHeaders(captured).",
+        "supportedBy": [
+          "beforeHeaders",
+          "afterHeaders",
+          "helperBranch",
+          "importBinding"
+        ]
+      },
+      {
+        "id": "downstreamConsequence",
+        "basis": "source-derived inference",
+        "text": "The unchanged refresh caller participates in the changed header-selection path.",
+        "supportedBy": [
+          "refreshCall",
+          "beforeHeaders",
+          "afterHeaders",
+          "helperBranch"
+        ],
+        "unverified": "Runtime outcome, security and author edit causation."
+      }
+    ],
+    "helperSourceRule": "session === localOwnerSession returns {}; otherwise returns Authorization: Bearer session. Source condition, not executed authentication proof."
+  },
+  "evidence": {
+    "beforeHunk": {
+      "snapshotId": "22009f2925f56fed2ca29f3b8a16a147c586f38f61d1c391a7abbd579d5193b2",
+      "baseSha": "b096826e31c0927190806de91ed70b8b64aa93d8",
+      "headSha": "e3b270e5f49a9215452b0b86702946043e979059",
+      "path": "src/application/review.ts",
+      "side": "base",
+      "sourceHash": "7953f0b8486ae475717bdc749e23a31f12351f41c11a473280de9a2420265477",
+      "rangeUnit": "inclusive LF lines",
+      "startLine": 26,
+      "endLine": 32
+    },
+    "afterHunk": {
+      "snapshotId": "22009f2925f56fed2ca29f3b8a16a147c586f38f61d1c391a7abbd579d5193b2",
+      "baseSha": "b096826e31c0927190806de91ed70b8b64aa93d8",
+      "headSha": "e3b270e5f49a9215452b0b86702946043e979059",
+      "path": "src/application/review.ts",
+      "side": "head",
+      "sourceHash": "dae210c79cb019d6edfdbfacfcf3da1e5773ceb4d15cf747df15ffa498c28e4e",
+      "rangeUnit": "inclusive LF lines",
+      "startLine": 27,
+      "endLine": 33
+    },
+    "beforeHeaders": {
+      "snapshotId": "22009f2925f56fed2ca29f3b8a16a147c586f38f61d1c391a7abbd579d5193b2",
+      "baseSha": "b096826e31c0927190806de91ed70b8b64aa93d8",
+      "headSha": "e3b270e5f49a9215452b0b86702946043e979059",
+      "path": "src/application/review.ts",
+      "side": "base",
+      "sourceHash": "7953f0b8486ae475717bdc749e23a31f12351f41c11a473280de9a2420265477",
+      "rangeUnit": "inclusive LF lines",
+      "startLine": 29,
+      "endLine": 29
+    },
+    "afterHeaders": {
+      "snapshotId": "22009f2925f56fed2ca29f3b8a16a147c586f38f61d1c391a7abbd579d5193b2",
+      "baseSha": "b096826e31c0927190806de91ed70b8b64aa93d8",
+      "headSha": "e3b270e5f49a9215452b0b86702946043e979059",
+      "path": "src/application/review.ts",
+      "side": "head",
+      "sourceHash": "dae210c79cb019d6edfdbfacfcf3da1e5773ceb4d15cf747df15ffa498c28e4e",
+      "rangeUnit": "inclusive LF lines",
+      "startLine": 30,
+      "endLine": 30
+    },
+    "helperBranch": {
+      "snapshotId": "22009f2925f56fed2ca29f3b8a16a147c586f38f61d1c391a7abbd579d5193b2",
+      "baseSha": "b096826e31c0927190806de91ed70b8b64aa93d8",
+      "headSha": "e3b270e5f49a9215452b0b86702946043e979059",
+      "path": "src/application/local-access.ts",
+      "side": "head",
+      "sourceHash": "811735e3599292c54af870134345249deed32f1d9b9705f8ca18fd086225d59d",
+      "rangeUnit": "inclusive LF lines",
+      "startLine": 3,
+      "endLine": 3
+    },
+    "importBinding": {
+      "snapshotId": "22009f2925f56fed2ca29f3b8a16a147c586f38f61d1c391a7abbd579d5193b2",
+      "baseSha": "b096826e31c0927190806de91ed70b8b64aa93d8",
+      "headSha": "e3b270e5f49a9215452b0b86702946043e979059",
+      "path": "src/application/review.ts",
+      "side": "head",
+      "sourceHash": "dae210c79cb019d6edfdbfacfcf3da1e5773ceb4d15cf747df15ffa498c28e4e",
+      "rangeUnit": "inclusive LF lines",
+      "startLine": 1,
+      "endLine": 1
+    },
+    "refreshCall": {
+      "snapshotId": "22009f2925f56fed2ca29f3b8a16a147c586f38f61d1c391a7abbd579d5193b2",
+      "baseSha": "b096826e31c0927190806de91ed70b8b64aa93d8",
+      "headSha": "e3b270e5f49a9215452b0b86702946043e979059",
+      "path": "src/application/review.ts",
+      "side": "head",
+      "sourceHash": "dae210c79cb019d6edfdbfacfcf3da1e5773ceb4d15cf747df15ffa498c28e4e",
+      "rangeUnit": "inclusive LF lines",
+      "startLine": 38,
+      "endLine": 38
+    }
+  },
+  "validity": "Require exact Snapshot/repository/base/head, unique side/path source, SHA256 equality, in-bounds LF/UTF16 range and exact call text. Missing/ambiguous/stale/mismatched is unavailable. Packet-local IDs remain unchanged; mapping does not grant question/source eligibility.",
+  "diagram": {
+    "nodes": {
+      "before": "review.ts request() Before \u00b7 B24\u201332",
+      "change": "Header Change: Bearer \u2192 helper \u00b7 B26\u201332 / H27\u201333",
+      "after": "review.ts request() After \u00b7 H25\u201333",
+      "refresh": "review.ts refresh() head \u00b7 H35\u201345; body unchanged",
+      "helper": "local-access.ts accessHeaders() \u00b7 H3; owner \u2192 no Authorization; otherwise \u2192 Bearer"
+    },
+    "edges": [
+      {
+        "from": "before",
+        "to": "change",
+        "type": "comparison-context",
+        "label": "before slice B26\u201332",
+        "support": [
+          "beforeHunk"
+        ]
+      },
+      {
+        "from": "change",
+        "to": "after",
+        "type": "comparison-context",
+        "label": "after slice H27\u201333",
+        "support": [
+          "afterHunk"
+        ]
+      },
+      {
+        "from": "refresh",
+        "to": "after",
+        "type": "calls",
+        "label": "calls \u00b7 H38",
+        "canonicalCallId": "source-observed:1f62e2349ec4860c22f4dcdc5c5b9a65e5f31ae5b718b358d497879e9c7883c7",
+        "support": [
+          "refreshCall"
+        ]
+      },
+      {
+        "from": "after",
+        "to": "helper",
+        "type": "calls",
+        "label": "calls \u00b7 H30",
+        "canonicalCallId": "source-observed:a85050ec78bc58582f63a7ec50f322f46655c4a1656700e919ca78f117b826f1",
+        "support": [
+          "afterHeaders",
+          "helperBranch",
+          "importBinding"
+        ]
+      }
+    ],
+    "note": "Function nodes show full declaration context; comparison edges identify only the native Change slices within those functions. Other retained facts remain in the data, not invented in the drawing."
+  }
+}
