@@ -20,6 +20,14 @@ The opening should let them say: “This change tries to solve this problem. Thi
 
 The next design uses the entire pinned PR25 change graph, with all behavior/support groups present independently of story. The [concrete whole-change map](pr25-whole-change-graph.md) specifies its eight groups,50 primary files, source-backed neighborhoods and unmodeled frontiers. A focused region is a viewport/detail choice, never the data scope. All quoted code, source relationships, scope counts and execution claims must come from that pinned PR/evidence. A short authored explanation has visible attribution. If intent is unknown, say so and explain the observed change; do not fill the gap with a persuasive invented purpose.
 
+## Controlling recovery boundary: semantic graph before projection
+
+Accepted user direction: first settle entities, exact source/comparison identities, typed relations, explanation claims, evidence and unknowns. UIUX is a projection of that account. A prose section, card, count or route cannot supply semantic meaning. Representative changes must be explainable before projection design resumes.
+
+Before implementing a projection, name global/file/change command scope and one owner/lifetime for selected Change, per-file view, reader position/folds/mode, camera, focus and public nested/outer Return. Components must not independently decide window chrome. The observed two-floating-control composition is an unresolved design divergence, not preserved acceptance; no replacement layout is selected here.
+
+Current7ce22b7 is not independently accepted. R30 aliases have author/partial desktop evidence, but source/phone/exact-source visibility gates are incomplete. Whole-product fresh docs review found material input-contract/ownership/norm conflicts; prior knowledge receipts do not close them. Recovery is docs/model-only until its gates and later adopted projection brief. Feedback becomes a scoped task, rationale, counterexample and pre-implementation signal, not another UI patch.
+
 ## Feedback as feed-forward design input
 
 Accepted direction: turn situated feedback into guidance before planning and implementation, rather than using it only as a retrospective regression check. Feedback is one input alongside requirements, exact source evidence and unknowns. Preserve its origin, scenario, affected scope, rationale and status (observed, proposed or accepted); later explicit corrections take precedence. An observed complaint is not automatically a universal rule or a frozen invariant.

@@ -8,7 +8,7 @@ Implement the UI in React only. Do not add Svelte, Svelte components or a React/
 
 Apply the reference guidelines: restrained neutral hierarchy, meaningful limited color, related controls close together, readable Inter/monospace roles, visible keyboard focus, text alongside status colors, consistent spacing, clear loading/error/recovery states and at least 44px coarse-pointer targets. Own domain meaning and behavior in this product. Record the guideline source revision and check actual React output against it; do not claim package-component integration.
 
-React components consume view data and collect user intent. Application/domain interfaces own submission, persisted state and validation. Selection/draft are local presentation state; cross-subsystem stream wiring remains centralized. Choose the appropriate React pattern by need without prescribing render props.
+React components consume view data and collect user intent. Application/domain interfaces own submission, persisted state and validation. Renderer-only transient selection/hover and local reading geometry are presentation state. Authoritative question selection, drafts, Story cursor, eligibility and transactional restoration belong to their public Review/Story application owners; rendering must not create a parallel draft/return model. Cross-subsystem stream wiring remains centralized. Choose the appropriate React pattern by need without prescribing render props.
 
 ## Screen and states
 

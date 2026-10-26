@@ -10,6 +10,10 @@
 
 **Authorization:** Bounded implementation, tests, agent review and PR delivery through slices 01–08; root coordinates standing merge/local-pilot authority. No new production hosting. The accepted 2026-10-24 single-owner correction removes manual login/token entry while preserving stored data, participant routing and network boundaries; see the [correction packet](480p/slices/01-review-loop/single-user-access/plan.md).
 
+## Controlling recovery scope — 2026-10-26
+
+User requires **graph first, then projection; no random UI patches**. The [720p recovery sequence](720p/plan.md#reading-journey-recovery-graph-first-2026-10-26) supersedes earlier broad continuation/readiness for this reading-journey candidate. Only documentation/model reconciliation is active; product/tests/runtime/data are frozen.7ce22b7 is incomplete-review candidate, not accepted delivery. Prior evidence is preserved; later implementation is not automatically authorized.
+
 ## Goal and current gap
 
 Deliver the [vision](../product/vision.md): a reviewer can explain changed behavior, trace its consequences and justify a decision with evidence. The [high-level design](../product/architecture.md) defines the required boundaries. The repository has a runnable React/SQLite review-loop milestone and a private local pilot. Controlled-host application checks passed; complete native-host, own-PR and unfamiliar-human acceptance remain open. General import, graph, story and execution features are still planned. [Current evidence and sequencing](delivery-through-1080p.md) distinguish those states.

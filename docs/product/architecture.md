@@ -12,7 +12,7 @@ The reviewer can enter at a behavior or a source detail, follow relationships an
 
 Within a group, before-left and after-right source nodes expose colored changes alongside unchanged context, source-anchored explanations and related tests. Red means removal, green addition and yellow modification, with labels beyond color. There is no before/after mode toggle. One-hop callers and callees include unchanged dependencies and both source sides; unresolved relationships remain distinct from confirmed leaves.
 
-The graph leads the explanation. Plain-English narration explains the already-highlighted behavior with a brief why, what/how and concrete example. Semantic zoom and manual expansion reveal detail without changing identity or losing selection. There is no API/Helpers orientation selector.
+The graph leads the explanation. Plain-English narration explains the already-highlighted behavior with a brief why, what/how and concrete example. Only explicit file activation/keyboard intent expands detail; gesture zoom/pan changes the camera only, preserving identity and selection. There is no API/Helpers orientation selector.
 
 Preserve the slim, draggable bottom-center player: drag, previous, replay/pause, next and step count/chapter selection in one row. Mobile Flow/Diff shares the story cursor, reading pause and exploration/resume state. Icons serve operations with accessible names/tooltips; text carries review information. These are experience constraints for progressive delivery, not claims about an existing app.
 

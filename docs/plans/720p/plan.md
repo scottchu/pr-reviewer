@@ -50,3 +50,19 @@ The [bounded acceptance receipt](slices/05-explanation-exploration/acceptance-7b
 
 
 Current slice05 root correction: the user adopted revision-2 same-file-node mockup and authorized only root relationship projection. See [reading-journey handoff v12](slices/05-explanation-exploration/reviews/reading-journey-v1.md). Original filenames/status colors/expand/reader/owners are frozen; root file nodes replace the rejected callable/BeforeAfter organization. Author checks are checkpoint evidence; independent source/UI-first and native reply gates remain distinct and open.
+
+
+## Reading journey recovery: graph first (2026-10-26)
+
+Status: controlling docs-only recovery, not round acceptance. Earlier receipts remain historical at named pins. User explicitly requires graph first, then projection; no random UI patches. [Reflection](slices/05-explanation-exploration/reviews/reflection-recovery-2026-10-26.md) owns causal account/freeze; [first bounded slice](slices/05-explanation-exploration/semantic-graph-recovery.md) owns current docs/model work. Product7ce22b7 is frozen/unaccepted. OS24/access failures never count as completed gates; no service/config workaround is authorized.
+
+| Stage | Owner | Input → output | Acceptance/stop gate | Dependency/authorization |
+| --- | --- | --- | --- | --- |
+| 0 · Current truth | Root accountable; executor records | Pins, user decisions, evidence/failures → status ledger and freeze matrix | Candidate/gates exact; no historical PASS promoted | Active docs only; retain unresolved R30 source visibility |
+| 1 · Semantic contract | Existing model executor | Ontology + exact source/facts → IDs, typed relations, Before/After explanations, evidence/basis/unknowns and prepared input contract | All relevant changes covered or explicit gaps; no invented causation; reproducible call/test membership/summaries; stale active norms reconciled | Active first slice; no UI/code |
+| 2 · Independent model/knowledge | Root dispatches model reviewer + fresh docs-only auditor | Fixed contract → unsupported-assertion findings and representative model-comprehension account | Exact edge/identity/evidence questions answered; material fresh audit gaps corrected/reassessed | Blocked/limited review stays such; author review is not substitute |
+| 3 · Projection brief | Product/design owner; user adopts relevant mockup | Accepted graph → global/file/change action/control and state ownership, allowed exceptions/negative examples | UI invents no meaning; one authoritative owner per state/composition decision; full-window scope clear | Wait1–2 and adoption; no random bar/card/panel patch |
+| 4 · One integrated slice | Sole executor | Adopted projection + bounded packet → reviewable implementation and affected tests | Exact allowlist; preserve identities/owners; finite failing-task repair, no speculative rewrite | Not dispatched; needs its own versioned packet |
+| 5 · Delivery gates | Root owns claims; independent source/UI/knowledge roles | Frozen pin/build + own-PR task → source/engineering/visible-task/understanding/readiness evidence | Settled actual glyph+marker+Explain, traceable dense relations, coherent controls, exact immediate/outer Return; material failure blocks affected acceptance | No full-goal/round completion from counts; native/device limits separate |
+
+Deferred work is retained, not erased: duplicate floating control ownership belongs to3; R30 label/source visibility review to0/4–5; per-file graph persistence to1/3–5; compact labels/routing/library integration only to adopted3–5; exact explanation/mobile Story proposals need their projection gates. None resumes during reflection. Repeated same-kind perceptual/ownership failure stops patches and returns to its contract. Updates report concrete milestone/failure/decision, not per-command volume.

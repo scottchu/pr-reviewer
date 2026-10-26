@@ -37,3 +37,8 @@ At each upscaling milestone, inspect actual code and structure and state the bes
 ## Preservation checklist for bounded changes
 
 Use the [protected invariant register](../product/protected-invariants.md). Before derived edits, name allowed seams, protected behavior, any latest-user supersession and observable preservation checks in the existing slice packet. At review, record each affected invariant as preserved, corrected, pending or unverified with scoped evidence. Actual visual/interaction violations override mechanical PASS; proposals and probes do not become delivered behavior. Update the durable status and dependent readiness after verification.
+
+
+## Graph-first recovery gates
+
+For graph work, semantic entities/identities, typed assertions, evidence basis and unknowns precede projection. A projection cannot authorize new meaning or coverage. The bounded packet names the user's learning task, negative example, control/command scopes, state owners/lifetimes, allowlist and protected exceptions before derived edits. Tests derive from that contract; do not encode an unadopted composition such as two floating bars merely not overlapping. Separate engineering/source/visible-task/comprehension/device evidence. Repeated same-kind perceptual or ownership failure stops local patches and returns to the responsible contract; it does not authorize broad CSS/model/backend changes. Blocked review is incomplete. Reconcile conflicting owning norms before projection implementation, then obtain the required fresh whole-product docs reassessment.
