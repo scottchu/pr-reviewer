@@ -1,3 +1,4 @@
+import { directFileCallRoute, type FileBounds } from './file-call-route.ts';
 import React from 'react';
 import { BaseEdge, EdgeLabelRenderer, type Edge, type EdgeProps } from '@xyflow/react';
 import { callActionName, callCitation, type CallLink } from './calls.ts';
@@ -7,31 +8,25 @@ export type FileCallEdge = Edge<FileCall & {
   active: boolean;
   lane: number;
   narrow: boolean;
-  sourceBottom: number;
-  sourceLeft: number;
-  targetRight: number;
-  targetBottom: number;
+  sourceBounds: FileBounds;
+  targetBounds: FileBounds;
+  count: number;
+  targetIndex: number;
+  targetCount: number;
   onExplain: (link: CallLink) => void;
 }, 'fileCall'>;
 
 export const FileCallLine = (props: EdgeProps<FileCallEdge>) => {
   const data = props.data!;
-  const left = data.sourceLeft;
-  const right = Math.max(data.narrow ? left + 344 : props.targetX - 40, data.sourceLeft + (props.sourceX - data.sourceLeft) + 24, data.targetRight + 20);
-  const y = data.sourceBottom + 110 + data.lane * (data.narrow ? 100 : 86);
-  const sourceRail = `M${props.sourceX},${props.sourceY} H${props.sourceX + 8} V${data.sourceBottom + 32} H${left} V${y}`;
-  const targetRail = `M${props.targetX},${props.targetY} H${props.targetX - 8} V${data.targetBottom + 24} H${right} V${y}`;
-  const path = `M${left},${y} H${right}`;
+  const route = directFileCallRoute(data.sourceBounds, data.targetBounds, data.lane, data.count, data.targetIndex, data.targetCount, data.narrow);
   const color = data.status === 'added' ? '#92d4ac' : '#bdc6cc';
   const name = callActionName(data.link, data.caller, data.callee);
   return <>
-    <path className="file-port-extension" d={sourceRail} data-port-owner={data.caller.declaration.path} />
-    <path className="file-port-extension" d={targetRail} data-port-owner={data.callee.declaration.path} />
-    <BaseEdge id={props.id} path={path} {...(props.markerEnd ? { markerEnd: props.markerEnd } : {})} style={{ stroke: color, strokeWidth: data.active ? 2.7 : 1.8 }} />
+    <BaseEdge id={props.id} path={route.path} {...(props.markerEnd ? { markerEnd: props.markerEnd } : {})} style={{ stroke: color, strokeWidth: data.active ? 2.7 : 1.8 }} />
     <EdgeLabelRenderer>
       <button
         className="file-call-label nodrag nopan"
-        style={{ transform: `translate(${left + 8}px,${y - (data.narrow ? 70 : 46)}px)`, maxWidth: right - left - 16, color }}
+        style={{ transform: `translate(${route.label.x}px,${route.label.y}px)`, maxWidth: data.narrow ? (data.count > 1 ? 208 : Math.max(150, 344 - route.label.x)) : (data.count > 1 ? 340 : 620), color }}
         aria-label={`${name}; ${data.status === 'added' ? 'Added call' : 'Comparison not established'}`}
         title={`${name}\n${callCitation(data.link)}`}
         data-call-id={data.link.id}
@@ -41,8 +36,6 @@ export const FileCallLine = (props: EdgeProps<FileCallEdge>) => {
         {data.caller.name}() → {data.callee.name}()
 
       </button>
-      <span className="file-route-owner" style={{ transform: `translate(${left + 8}px,${y + 6}px)` }}>from {data.caller.declaration.path.split('/').at(-1)}</span>
-      <span className="file-route-owner file-route-target" style={{ transform: `translate(${right - 6}px,${y + 6}px) translateX(-100%)` }}>to {data.callee.declaration.path.split('/').at(-1)}</span>
     </EdgeLabelRenderer>
   </>;
 };

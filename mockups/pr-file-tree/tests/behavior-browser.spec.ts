@@ -45,17 +45,13 @@ for (const width of [1440, 390]) test(`${width} original file roots with caller/
       return { start: { x: start.x, y: start.y }, end: { x: end.x, y: end.y } };
     };
     const path = element.querySelector<SVGPathElement>('.react-flow__edge-path')!;
-    const extensions = [...element.querySelectorAll<SVGPathElement>('.file-port-extension')].map(positions);
-    return { call: positions(path), extensions, marker: path.getAttribute('marker-end') };
+    return { call: positions(path), marker: path.getAttribute('marker-end') };
   });
   const caller = await root.boundingBox();
   const callee = await page.locator('.react-flow__node[data-id="file:src/application/local-access.ts"]').boundingBox();
-  expect(Math.abs(points.extensions[0]!.start.x - caller!.x - caller!.width)).toBeLessThan(4);
-  expect(Math.abs(points.extensions[1]!.start.x - callee!.x)).toBeLessThan(4);
-  for (const [extension, endpoint] of [[points.extensions[0]!, points.call.start], [points.extensions[1]!, points.call.end]] as const) {
-    expect(Math.abs(extension.end.x - endpoint.x)).toBeLessThan(1);
-    expect(Math.abs(extension.end.y - endpoint.y)).toBeLessThan(1);
-  }
+  const atBoundary = (point: { x: number; y: number }, box: NonNullable<typeof caller>) => Math.min(Math.abs(point.x-box.x), Math.abs(point.x-box.x-box.width), Math.abs(point.y-box.y), Math.abs(point.y-box.y-box.height));
+  expect(atBoundary(points.call.start, caller!)).toBeLessThan(4);
+  expect(atBoundary(points.call.end, callee!)).toBeLessThan(4);
   expect(points.marker).toBeTruthy();
   await page.screenshot({ path: `${rootEvidence}/expanded-${width}.png` });
   await page.getByRole('button', { name: 'Unified', exact: true }).click();
@@ -273,60 +269,49 @@ test('storage root caller blocks keep every exact relation label disjoint', asyn
 });
 
 
-for (const width of [1440, 390]) test(`${width} continuous file-owned storage call lanes remain readable and traceable`, async ({ page }) => {
+for (const width of [1440, 390]) test(`${width} independent direct file arrows retain boundary ownership collapsed and expanded`, async ({ page }) => {
   await page.setViewportSize({ width, height: 844 });
   await page.goto('/');
-  if (width >= 650) await page.getByRole('button', { name: 'Close review context' }).click();
+  if (width >= 650) await page.getByRole('button', { name: 'Close review context', exact: true }).click();
   await expect(page.locator('[data-file-path]')).toHaveCount(50);
   await expect(page.locator('.react-flow__edge-fileCall')).toHaveCount(15);
-  await page.getByRole('button', { name: 'Find source', exact: true }).click();
-  await page.getByRole('combobox', { name: 'Changed source' }).selectOption('src/storage/public.ts');
-  await expect(page.getByRole('combobox', { name: 'Changed source' })).toHaveCount(0);
-  const routes = await page.locator('.react-flow__edge-fileCall').evaluateAll(edges => edges.map(edge => {
-    const call = edge.querySelector<SVGPathElement>('.react-flow__edge-path')!;
-    const start = call.getPointAtLength(0); const end = call.getPointAtLength(call.getTotalLength());
-    const extensions = [...edge.querySelectorAll<SVGPathElement>('.file-port-extension')].map(path => ({ owner: path.dataset.portOwner, d: path.getAttribute('d') }));
-    return { id: edge.getAttribute('data-id'), y: start.y, endY: end.y, length: end.x - start.x, extensions, marker: call.getAttribute('marker-end') };
-  }));
-  for (const route of routes) {
-    expect(route.length).toBeGreaterThan(300);
-    expect(route.y).toBe(route.endY);
-    expect(route.marker).toBeTruthy();
-    expect(route.extensions).toHaveLength(2);
-    expect(route.extensions.every(extension => extension.owner && extension.d)).toBe(true);
-  }
-  const storage = projectBehaviorCalls();
-  const analysis = storage.nodes.filter(node => node.declaration.path === 'src/storage/analysis.ts');
-  const ids = storage.links.filter(link => analysis.some(node => node.id === link.caller) && link.target.path === 'src/storage/access.ts').map(link => link.id);
-  expect(ids).toHaveLength(6);
-  for (const id of ids) {
-    const label = page.locator(`[data-call-id="${id}"]`);
-    await expect(label).not.toContainText('New call');
-  }
-  const lanes = routes.filter(route => ids.includes(route.id!)).sort((a,b) => a.y-b.y);
-  for (let i=1;i<lanes.length;i++) expect(lanes[i]!.y-lanes[i-1]!.y).toBe(width < 650 ? 100 : 86);
-  const topology = await page.locator('.react-flow__edge-fileCall').evaluateAll(edges => edges.map(edge => {
-    const path = edge.querySelector<SVGPathElement>('.react-flow__edge-path')!;
-    const matrix = path.getScreenCTM()!;
-    const start = path.getPointAtLength(0).matrixTransform(matrix);
-    const end = path.getPointAtLength(path.getTotalLength()).matrixTransform(matrix);
-    return { left: start.x, right: end.x, y: start.y };
-  }));
-  const labels = await page.locator('.file-call-label').evaluateAll(elements => elements.map(element => {
-    const rect = element.getBoundingClientRect(); return { x: rect.x, right: rect.right, top: rect.top, bottom: rect.bottom };
-  }));
-  for (const label of labels) for (const line of topology) {
-    expect(line.y > label.top && line.y < label.bottom && Math.min(line.right,label.right) > Math.max(line.left,label.x)).toBe(false);
-  }
-  await expect(page.locator('[data-relation-type="requirement-reference"]')).toHaveCount(2);
-  await expect(page.locator('.react-flow__edge-requirementReference')).toHaveCount(2);
-  await page.screenshot({ path: `${rootEvidence}/continuous-storage-${width}.png` });
+  await expect(page.locator('.file-port-extension')).toHaveCount(0);
+  const verify = async () => {
+    const routes = await page.locator('.react-flow__edge-fileCall').evaluateAll(edges => edges.map(edge => {
+      const path = edge.querySelector<SVGPathElement>('.react-flow__edge-path')!;
+      const matrix = path.getScreenCTM()!;
+      const point = (at: number) => { const p = path.getPointAtLength(at).matrixTransform(matrix); return { x: p.x, y: p.y }; };
+      return { id: edge.getAttribute('data-id'), start: point(0), end: point(path.getTotalLength()), d: path.getAttribute('d'), marker: path.getAttribute('marker-end'), dash: getComputedStyle(path).strokeDasharray };
+    }));
+    const facts = projectBehaviorCalls();
+    for (const route of routes) {
+      const link = facts.links.find(link => link.id === route.id)!;
+      const caller = facts.nodes.find(node => node.id === link.caller)!;
+      const source = await page.locator(`.react-flow__node[data-id="file:${caller.declaration.path}"]`).boundingBox();
+      const target = await page.locator(`.react-flow__node[data-id="file:${link.target.path}"]`).boundingBox();
+      const boundary = (point: { x: number; y: number }, box: NonNullable<typeof source>) => Math.min(Math.abs(point.x-box.x), Math.abs(point.x-box.x-box.width), Math.abs(point.y-box.y), Math.abs(point.y-box.y-box.height));
+      expect(boundary(route.start, source!)).toBeLessThan(4);
+      expect(boundary(route.end, target!)).toBeLessThan(4);
+      expect(route.marker).toBeTruthy(); expect(route.dash).toBe('none');
+      expect((route.d!.match(/M/g) ?? []).length).toBe(1);
+    }
+    expect(new Set(routes.map(route => route.d)).size).toBe(15);
+  };
+  await verify();
+  await page.screenshot({ path: `${rootEvidence}/direct-opening-${width}.png` });
   await page.getByRole('button', { name: 'Find source', exact: true }).click();
   await page.getByRole('combobox', { name: 'Changed source' }).selectOption('src/storage/analysis.ts');
-  await page.screenshot({ path: `${rootEvidence}/analysis-lanes-${width}.png` });
-  await page.getByRole('button', { name: 'Find source', exact: true }).click();
-  await page.getByRole('combobox', { name: 'Changed source' }).selectOption('src/storage/imports.ts');
-  await page.screenshot({ path: `${rootEvidence}/imports-lanes-${width}.png` });
+  await page.screenshot({ path: `${rootEvidence}/direct-storage-${width}.png` });
+  await page.locator('[data-file-path="src/storage/analysis.ts"]').click();
+  await expect(page.locator('.continuous-reader')).toBeInViewport();
+  await verify();
+  await page.screenshot({ path: `${rootEvidence}/direct-expanded-${width}.png` });
+  await page.getByRole('button', { name: 'Unified', exact: true }).click();
+  await expect(page.locator('.continuous-reader')).toHaveClass(/unified/);
+  await page.getByRole('button', { name: 'File tree', exact: true }).click();
+  await expect(page.locator('.continuous-reader')).toHaveClass(/unified/);
+  await page.getByRole('button', { name: 'Behavior graph', exact: true }).click();
+  await expect(page.locator('.continuous-reader')).toHaveClass(/unified/);
 });
 
 

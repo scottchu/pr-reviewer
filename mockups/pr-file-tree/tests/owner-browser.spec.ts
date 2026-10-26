@@ -401,7 +401,8 @@ test.describe('desktop guided call-context framing', () => {
     await page.getByRole('button', { name: 'Next story step' }).click();
     const graph = (await page.locator('.pr-graph').boundingBox())!;
     const callee = page.locator('[data-file-path="src/storage/access.ts"]');
-    await expect.poll(async () => (await callee.boundingBox())!.y).toBeCloseTo(graph.y + 12, 0);
+    await expect(callee).toBeInViewport();
+    await expect.poll(async () => (await page.locator('[data-file-path="src/storage/public.ts"]').boundingBox())!.y).toBeCloseTo(graph.y + 12, 0);
     const storage = projectCalls('src/storage/public.ts');
     const authenticate = storage.seeds.find(node => node.name === 'authenticate' && node.declaration.side === 'head')!;
     const links = storage.links.filter(link => link.caller === authenticate.id && link.target.path === 'src/storage/access.ts');
@@ -421,7 +422,7 @@ test.describe('desktop guided call-context framing', () => {
     await expect(page.locator('[data-expanded-file]')).toHaveCount(0);
     const framed = await page.locator('.react-flow__viewport').getAttribute('style');
     expect(framed!.match(/scale\(([^)]+)\)/)![1]).toBe(original!.match(/scale\(([^)]+)\)/)![1]);
-    await page.screenshot({ path: '/tmp/pr-reviewer-reading-journey-evidence/r21-desktop-context.png' });
+    await page.screenshot({ path: '/tmp/pr-reviewer-reading-journey-evidence/r23-desktop-story-context.png' });
     await page.getByRole('button', { name: 'Return to original reading' }).click();
     await expect(page.locator('.owner-step')).toHaveText('Trace an unchanged caller into the changed decision');
     await expect(page.locator('.react-flow__viewport')).toHaveAttribute('style', original!);

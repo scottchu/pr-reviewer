@@ -468,7 +468,16 @@ const App = () => {
     });
   };
   const viewTree = useMemo(() => {
-    const result = detailTree(baseTree, detail.expanded, window.innerWidth < 650, fileHeights);
+    let result = detailTree(baseTree, detail.expanded, window.innerWidth < 650, fileHeights);
+    if (lens === 'behavior' && detail.expanded) {
+      const source = result.nodes.find(node => node.path === detail.expanded);
+      if (source) {
+        const targets = new Set(fileCalls.filter(call => call.caller.declaration.path === source.path).map(call => call.callee.declaration.path));
+        const clearance = (narrow ? 208 : 340) + 96;
+        result = { ...result, nodes: result.nodes.map(node => targets.has(node.path) && node.x < source.x + source.width + clearance
+          ? { ...node, x: source.x + source.width + clearance } : node) };
+      }
+    }
     if (!fullscreen)
       return result;
     return {
@@ -480,7 +489,7 @@ const App = () => {
       } : n)
     };
   }, [
-    detail.expanded, fullscreen, lens, baseTree, fileHeights
+    detail.expanded, fullscreen, lens, baseTree, fileHeights, narrow
   ]);
   useLayoutEffect(() => {
     if (fullscreen) {
@@ -763,10 +772,11 @@ const App = () => {
         source: `file:${call.caller.declaration.path}`, target: `file:${call.callee.declaration.path}`,
         sourceHandle: 'contains-out', targetHandle: 'contains-in',
         data: { ...call, active: callExplained?.id === call.link.id, onExplain: setCallExplained,
-          sourceLeft: viewTree.nodes.find(node => node.path === call.caller.declaration.path)!.x,
-          sourceBottom: (() => { const node = viewTree.nodes.find(node => node.path === call.caller.declaration.path)!; return node.y + node.height; })(),
-          targetRight: (() => { const node = viewTree.nodes.find(node => node.path === call.callee.declaration.path)!; return node.x + node.width; })(),
-          targetBottom: (() => { const node = viewTree.nodes.find(node => node.path === call.callee.declaration.path)!; return node.y + node.height; })(),
+          sourceBounds: viewTree.nodes.find(node => node.path === call.caller.declaration.path)!,
+          targetBounds: viewTree.nodes.find(node => node.path === call.callee.declaration.path)!,
+          count: siblings.length,
+          targetIndex: fileCalls.filter(other => other.callee.declaration.path === call.callee.declaration.path).findIndex(other => other.link.id === call.link.id),
+          targetCount: fileCalls.filter(other => other.callee.declaration.path === call.callee.declaration.path).length,
           lane: index, narrow },
         markerEnd: { type: MarkerType.ArrowClosed, color: call.status === 'added' ? '#92d4ac' : '#bdc6cc', width: 16, height: 16 },
         ariaLabel: `${call.caller.name} calls ${call.callee.name}; exact contained-symbol call projection`,
@@ -1425,7 +1435,7 @@ const App = () => {
 
         {lens === 'behavior' && !fullscreen && <EdgeLabelRenderer>
           <span className="root-region-label" style={{ transform: `translate(0px,${Math.min(...viewTree.nodes.filter(node => /\.mdx?$/.test(node.path)).map(node => node.y)) - 38}px)` }}>Documentation · requirement references</span>
-          <span className="root-region-label" style={{ transform: 'translate(0px,-38px)' }}>Code · caller → callee</span>
+          <span className="root-region-label" style={{ transform: 'translate(0px,-38px)' }}>Code</span>
         </EdgeLabelRenderer>}
       </ReactFlow>
 

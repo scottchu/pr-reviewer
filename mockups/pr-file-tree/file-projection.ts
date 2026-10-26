@@ -35,17 +35,31 @@ export const layoutFileProjection = (tree: FileTree, narrow: boolean): FileTree 
   let top = 0;
   for (const target of targets) {
     const callers = [...new Set(calls.filter(call => call.callee.declaration.path === target).map(call => call.caller.declaration.path))];
-    positions.set(target, { x: narrow ? 174 : 760, y: top });
-    top += 100;
-    for (const caller of callers) {
-      const count = calls.filter(call => call.caller.declaration.path === caller && call.callee.declaration.path === target).length;
-      positions.set(caller, { x: 0, y: top });
-      top += 140 + count * (narrow ? 100 : 86);
+    const countFor = (caller: string) => calls.filter(call => call.caller.declaration.path === caller && call.callee.declaration.path === target).length;
+    const crowded = callers.some(caller => countFor(caller) > 1);
+    if (crowded) {
+      // Source first: its real labels follow it; the callee terminates the flow.
+      callers.sort((a, b) => countFor(b) - countFor(a));
+      for (const caller of callers) {
+        positions.set(caller, { x: 0, y: top });
+        top += 140 + countFor(caller) * (narrow ? 100 : 86);
+      }
+      positions.set(target, { x: narrow ? 400 : 760, y: top + 40 });
+      top += 100;
+    } else {
+      positions.set(target, { x: narrow ? 174 : 760, y: top });
+      top += 100;
+      for (const caller of callers) {
+        positions.set(caller, { x: 0, y: top });
+        top += 226;
+      }
     }
     top += 80;
   }
   // The explained gateway/header consequence shares the existing client neighborhood.
   positions.set('src/server/public.ts', { x: 0, y: 0 });
+  const review = positions.get('src/application/review.ts');
+  if (review) positions.set('src/application/review.ts', { ...review, x: narrow ? 146 : 370 });
   const documents = files.filter(node => /\.mdx?$/.test(node.path));
   const columns = narrow ? 1 : 3;
   const docHeight = Math.ceil(documents.length / columns) * 65 + 100;
