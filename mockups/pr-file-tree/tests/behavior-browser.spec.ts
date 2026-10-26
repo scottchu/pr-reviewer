@@ -458,3 +458,29 @@ test('narrow change consequence traps reverse Tab from its initial heading and c
   await expect(dialog).toHaveCount(0);
   await expect(edge).toBeFocused();
 });
+
+for (const width of [1440, 390]) test(`${width} initial direct calls clear review chip and explanation text`, async ({ page }) => {
+  await page.setViewportSize({ width, height: 844 });
+  await page.goto('/');
+  if (width >= 650) await page.getByRole('button', { name: 'Close review context', exact: true }).click();
+  const graph = projectBehaviorCalls();
+  const ids = graph.links.filter(link => link.target.path === 'src/application/local-access.ts').map(link => link.id);
+  const collisions = await page.evaluate(ids => {
+    const obstacles = [document.querySelector('[data-file-path="src/application/review.ts"]')!, document.querySelector('[data-impact-id]')!, ...ids.map(id => document.querySelector(`[data-call-id="${id}"]`)!)]
+      .map(element => ({ name: element.textContent, rect: element.getBoundingClientRect() }));
+    const result: string[] = [];
+    for (const id of ids) {
+      const path = document.querySelector<SVGPathElement>(`.react-flow__edge[data-id="${id}"] .react-flow__edge-path`)!;
+      const matrix = path.getScreenCTM()!;
+      for (let index=1; index<300; index++) {
+        const p = path.getPointAtLength(path.getTotalLength()*index/300).matrixTransform(matrix);
+        for (const { name, rect } of obstacles) if (p.x > rect.left+2 && p.x < rect.right-2 && p.y > rect.top+2 && p.y < rect.bottom-2) result.push(`${id}: ${name}`);
+      }
+    }
+    return [...new Set(result)];
+  }, ids);
+  expect(collisions).toEqual([]);
+  await expect(page.locator('[data-file-path]')).toHaveCount(50);
+  await expect(page.locator('.react-flow__edge-fileCall')).toHaveCount(15);
+  await page.screenshot({ path: `${rootEvidence}/initial-clearance-${width}.png` });
+});

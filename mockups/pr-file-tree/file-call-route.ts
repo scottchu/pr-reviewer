@@ -14,11 +14,19 @@ export const directFileCallRoute = (source: FileBounds, target: FileBounds, lane
   }
 
   const separated = source.x + source.width + 40 < target.x;
+  if (narrow && separated && source.y > target.y + target.height + 80) {
+    const start = { x: source.x + source.width, y: source.y + source.height / 2 };
+    // The narrow review chip and its labels occupy the middle corridor.
+    // Distinct right-hand curves stay outside those actual content bounds.
+    const right = target.x + target.width + 8 + targetIndex * 6;
+    const turn = target.y + target.height + 44;
+    return { start, end, path: `M${start.x},${start.y} C${right},${start.y} ${right},${start.y} ${right},${start.y - 24} V${turn} C${right},${end.y + 20} ${end.x},${end.y + 20} ${end.x},${end.y}`, label: { x: source.x + 8, y: source.y + source.height + 48 } };
+  }
   const start = separated ? { x: source.x + source.width, y: source.y + source.height / 2 } : { x: source.x + source.width / 2, y: source.y };
   if (separated && Math.abs(start.y - (target.y + target.height / 2)) < 160) {
     const finish = { x: target.x, y: target.y + target.height / 2 };
     const gap = Math.max(24, (finish.x - start.x) / 2);
     return { start, end: finish, path: `M${start.x},${start.y} C${start.x + gap},${start.y} ${finish.x - gap},${finish.y} ${finish.x},${finish.y}`, label: { x: start.x + 8, y: Math.max(start.y, finish.y) + 28 } };
   }
-  return { start, end, path: `M${start.x},${start.y} C${end.x},${start.y} ${end.x},${end.y + 90} ${end.x},${end.y}`, label: { x: source.x + 8, y: source.y + source.height + 48 } };
+  return { start, end, path: narrow ? `M${start.x},${start.y} C${start.x},${start.y - 32} ${end.x},${end.y + 32} ${end.x},${end.y}` : `M${start.x},${start.y} C${end.x},${start.y} ${end.x},${end.y + 90} ${end.x},${end.y}`, label: { x: source.x + 8, y: source.y + source.height + 48 } };
 };

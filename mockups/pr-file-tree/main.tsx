@@ -751,7 +751,7 @@ const App = () => {
       id: `impact:${impact.claim.id}`, type: 'changeImpact',
       source: 'file:src/server/public.ts', target: 'file:src/application/review.ts',
       sourceHandle: 'contains-out', targetHandle: 'contains-in',
-      data: { impact, sourceBottom: (() => { const node = viewTree.nodes.find(node => node.path === 'src/server/public.ts')!; return node.y + node.height; })(),
+      data: { impact, narrow, sourceBottom: (() => { const node = viewTree.nodes.find(node => node.path === 'src/server/public.ts')!; return node.y + node.height; })(),
         onExplain: () => { pendingFileFrame.current = null; setCallExplained(null); setSourceRelation(null); if (narrow) { setContextOpen(false); setOwnerPanel(null); } setImpactOpen(true); } },
       markerEnd: { type: MarkerType.ArrowClosed, color: '#baa6d6', width: 16, height: 16 },
       ariaLabel: 'Inferred implementation consequence, not a call or proven edit causation',
@@ -781,8 +781,13 @@ const App = () => {
               const second = viewTree.nodes.find(node => node.path === b.caller.declaration.path)!;
               return first.y - second.y || fileCalls.indexOf(a) - fileCalls.indexOf(b);
             });
+            const rank = incoming.findIndex(other => other.link.id === call.link.id);
+            const first = viewTree.nodes.find(node => node.path === incoming[0]!.caller.declaration.path)!;
+            const target = viewTree.nodes.find(node => node.path === call.callee.declaration.path)!;
+            // The narrow overlapping source exits upward inside the other curves.
+            if (narrow && first.x > 0 && first.x + first.width > target.x) return rank === 0 ? 0 : incoming.length - rank;
             // Earlier/higher bands terminate farther right, preserving nested order.
-            return incoming.length - 1 - incoming.findIndex(other => other.link.id === call.link.id);
+            return incoming.length - 1 - rank;
           })(),
           targetCount: fileCalls.filter(other => other.callee.declaration.path === call.callee.declaration.path).length,
           lane: index, narrow },

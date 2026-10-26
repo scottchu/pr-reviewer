@@ -4,7 +4,7 @@ import type { StoryReference } from '../../src/domain/public.ts';
 import type { ChangeImpact } from './change-impact.ts';
 
 type ReadyImpact = Extract<ChangeImpact, { status: 'ready' }>;
-export type ChangeImpactEdge = Edge<{ impact: ReadyImpact; sourceBottom: number; onExplain: () => void }, 'changeImpact'>;
+export type ChangeImpactEdge = Edge<{ impact: ReadyImpact; sourceBottom: number; narrow: boolean; onExplain: () => void }, 'changeImpact'>;
 export const ChangeImpactLine = (props: EdgeProps<ChangeImpactEdge>) => {
   const data = props.data!;
   const gap = Math.max(24, (props.targetX - props.sourceX) / 2);
@@ -12,7 +12,7 @@ export const ChangeImpactLine = (props: EdgeProps<ChangeImpactEdge>) => {
   return <>
     <BaseEdge id={props.id} path={path} style={{ stroke: '#baa6d6', strokeWidth: 1.8 }} {...(props.markerEnd ? { markerEnd: props.markerEnd } : {})} />
     <EdgeLabelRenderer><button className="change-impact-label nodrag nopan"
-      style={{ transform: `translate(${Math.min(props.sourceX, props.targetX) + 8}px,${Math.max(props.sourceY, props.targetY) + 30}px)` }}
+      style={{ transform: `translate(${data.narrow ? 8 : Math.min(props.sourceX, props.targetX) + 8}px,${Math.max(props.sourceY, props.targetY) + 30}px)`, ...(data.narrow ? { maxWidth: 120 } : {}) }}
       data-impact-id={data.impact.claim.id} data-relation-type="change-impact"
       data-source-change={data.impact.source.key} data-target-change={data.impact.target.key}
       aria-label="Explain inferred change consequence: server/public.ts → application/review.ts; requires matching owner-request headers"

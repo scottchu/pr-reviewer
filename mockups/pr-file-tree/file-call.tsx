@@ -26,7 +26,7 @@ export const FileCallLine = (props: EdgeProps<FileCallEdge>) => {
     <EdgeLabelRenderer>
       <button
         className="file-call-label nodrag nopan"
-        style={{ transform: `translate(${route.label.x}px,${route.label.y}px)`, maxWidth: data.narrow ? (data.count > 1 ? 208 : Math.max(150, 344 - route.label.x)) : (data.count > 1 ? 340 : 620), color }}
+        style={{ transform: `translate(${route.label.x}px,${route.label.y}px)`, maxWidth: data.narrow ? (data.count > 1 ? 208 : Math.max(120, 334 - route.label.x)) : (data.count > 1 ? 340 : 620), color }}
         aria-label={`${name}; ${data.status === 'added' ? 'Added call' : 'Comparison not established'}`}
         title={`${name}\n${callCitation(data.link)}`}
         data-call-id={data.link.id}
