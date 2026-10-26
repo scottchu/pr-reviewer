@@ -10,7 +10,7 @@ The [product vision](vision.md) calls for a connected understanding of changed b
 
 The reviewer can enter at a behavior or a source detail, follow relationships and return without losing context. A compact context rail separates Epic/Ticket/PR source material from agent understanding, with provenance, freshness and explicit missing information. Behavioral groups account for the whole PR, including supporting configuration, documentation and tests.
 
-Within a group, before-left and after-right source nodes expose colored changes alongside unchanged context, source-anchored explanations and related tests. Red means removal, green addition and yellow modification, with labels beyond color. There is no before/after mode toggle. One-hop callers and callees include unchanged dependencies and both source sides; unresolved relationships remain distinct from confirmed leaves.
+Within each original file group, one continuous Split or Unified source comparison exposes colored changes alongside unchanged context, source-anchored explanations and related tests; side identities remain distinct without becoming separate root nodes. Red means removal, green addition and yellow modification, with labels beyond color. There is no before/after mode toggle. One-hop callers and callees include unchanged dependencies and both source sides; unresolved relationships remain distinct from confirmed leaves.
 
 The graph leads the explanation. Plain-English narration explains the already-highlighted behavior with a brief why, what/how and concrete example. Only explicit file activation/keyboard intent expands detail; gesture zoom/pan changes the camera only, preserving identity and selection. There is no API/Helpers orientation selector.
 

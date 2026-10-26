@@ -42,3 +42,10 @@ Existing sole executor; root coordinates. Read this committed packet/reflection,
 Reused semantic/source reviewer checks exact fixed contract against scoped source evidence and reports unsupported assertions/identity/coverage gaps. Root separately dispatches a fresh docs-only auditor with product/rule docs only, no plan/code/chat/answer key, and the whole-product rebuild question. Its first OS24 attempt covered zero docs; later fresh findings are material gaps, not acceptance. Readiness requires the relevant reassessment.
 
 Projection waits for sufficiently settled semantic contract and independent gates, then a scoped brief/adoption. No future implementation packet is created by this slice.
+
+
+## Latest external audit acceptance input
+
+One user actual-UI audit (two passages) understands the bounded owner-header mechanism but still has to assemble the story. The successful task is: explain the core change, identify affected callers and reach precise diff evidence without first decoding diagnostic labels. Semantic account must define file versus function/source subject granularity, exact endpoints/path identity, common Before/After structure versus the newly added path, core/prepared/full50 coverage and the order needed to learn the behavior. Keep explicit unknowns; do not invent links or nodes to fill space.
+
+Record separately: user request callsiteAfterreview.ts30→about100/dot3 top clipping, and reviewer storageanalysis268→296–305. Neither is diagnosed/fixed here. Later source-navigation acceptance must verify actual settled glyph/range with readable context/current marker/Explain and Return for each distinct case. Stage3 may propose meaning-first relation types/progressive disclosure with secondary internal diagnostics, explicit lens changes and full relationship expansion; those are not adopted layout/collapse patches. [Fresh docs audit receipt](reviews/docs-only-rebuild-audit-2026-10-26.md) remains a material-gap input, not readiness.

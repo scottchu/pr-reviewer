@@ -99,3 +99,18 @@ The [round recovery sequence](../../../plan.md#reading-journey-recovery-graph-fi
 Fresh executor reads: Git pin/status, rules, control mounts/components/CSS, wrong nonoverlap assertion, current docs/packet. Source reviewer read code via ordinary local access/Node filesystem before OS24; its five findings are code-informed, not R30 acceptance. Visual retrospective is history-derived because process creation failed; no new live audit.
 
 Historical evidence remains under `reading-journey-v1.md`: R23 traceability; R24/R25 library/projection failures; R26 source focus; R28 selected-hunk mismatch; unfamiliar account/R22; real answer and R19–21 Return. Do not rerun or promote them during this docs-only task. This report is a recovery contract, not closure of the product, original goal or round.
+
+
+## External user audit addendum — one audit, two passages
+
+Source: the user's latest actual PR25 Behavior/evidence audit, relayed by root. Treat the two passages as ONE external user audit, not two independent reviews. Candidate pin was not supplied in those passages; do not assign our current pin or claim executor reproduction. Private audit screenshots are internal only: no asset/path was copied into public material; redact before any external sharing. The user's session reported no access blocker/no code/PR/business changes/tests; that does not restore this agent's technical permission.
+
+Observed understanding: the user identified four application request paths→local-access/accessHeaders, owner requests without Authorization versus explicit Bearer, and purple server/public→application/review as inferred required matching change rather than a call. This does not establish whole50-file impact, runtime correctness or security.
+
+Blocking user-reported reproduction: “Read callsite After application/review.ts:30” settled around line100; dot3's header region was clipped at the upper edge. This is DISTINCT from the earlier reviewer R30 storage/analysis After268→296–305 observation. Causes and relation between them are unknown; neither is fixed or diagnosed by this reflection. Stage0 retains both separate evidence records. A later gate must land actual request line30 and complete readable target context, agree with Change3/Explain and preserve Return; no metadata-only PASS.
+
+Reported semantic/projection friction: repeated request labels and basename-only public/analysis obscure file/function ownership; duplicated Before/After common structure hides the added path; overview does not establish core versus prepared coverage; relation types are unclear initially; diagnostic SHA/UTF16/semantic_obstruction details dominate meaning; function-relationship action unexpectedly changes to File lens; the reader assembles the account manually.
+
+Recovery acceptance is therefore **core change → affected callers → precise diff evidence**, with relevant unchanged/external context and explicit coverage/unknowns. Stage1 defines subjects/granularity/read order and supported comparisons, not nodes for their own sake. Stage3 considers progressive disclosure and meaning-first typed relations/details only after graph adoption. No collapse/layout/control proposal is adopted or implemented by this audit.
+
+Fresh audit receipt: [frozen docs-only findings](docs-only-rebuild-audit-2026-10-26.md), written by that auditor from its existing account. Initial zero-document OS24 attempt and resumed material findings are separate; no readiness PASS is claimed. Clear stale clauses were reconciled inff4b43a, but the prepared projection input contract remains Stage1 work; this receipt is not a post-correction reassessment.
