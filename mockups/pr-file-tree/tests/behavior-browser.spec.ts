@@ -281,7 +281,7 @@ for (const width of [1440, 390]) test(`${width} independent direct file arrows r
       const path = edge.querySelector<SVGPathElement>('.react-flow__edge-path')!;
       const matrix = path.getScreenCTM()!;
       const point = (at: number) => { const p = path.getPointAtLength(at).matrixTransform(matrix); return { x: p.x, y: p.y }; };
-      return { id: edge.getAttribute('data-id'), start: point(0), end: point(path.getTotalLength()), d: path.getAttribute('d'), marker: path.getAttribute('marker-end'), dash: getComputedStyle(path).strokeDasharray };
+      return { id: edge.getAttribute('data-id'), start: point(0), end: point(path.getTotalLength()), samples: Array.from({ length: 161 }, (_, index) => point(path.getTotalLength() * index / 160)), d: path.getAttribute('d'), marker: path.getAttribute('marker-end'), dash: getComputedStyle(path).strokeDasharray };
     }));
     const facts = projectBehaviorCalls();
     for (const route of routes) {
@@ -296,6 +296,19 @@ for (const width of [1440, 390]) test(`${width} independent direct file arrows r
       expect((route.d!.match(/M/g) ?? []).length).toBe(1);
     }
     expect(new Set(routes.map(route => route.d)).size).toBe(15);
+    const cross = (a: { x: number; y: number }, b: { x: number; y: number }, c: { x: number; y: number }) => (b.x-a.x)*(c.y-a.y)-(b.y-a.y)*(c.x-a.x);
+    const storageIds = new Set(facts.links.filter(link => link.target.path === 'src/storage/access.ts').map(link => link.id));
+    const storageRoutes = routes.filter(route => storageIds.has(route.id!));
+    for (let a=0; a<storageRoutes.length; a++) for (let b=a+1; b<storageRoutes.length; b++) {
+      const first = storageRoutes[a]!, second = storageRoutes[b]!;
+      let intersects = false;
+      for (let i=1; i<first.samples.length; i++) for (let j=1; j<second.samples.length; j++) {
+        const p=first.samples[i-1]!, q=first.samples[i]!, r=second.samples[j-1]!, t=second.samples[j]!;
+        if (cross(p,q,r)*cross(p,q,t)<0 && cross(r,t,p)*cross(r,t,q)<0) intersects=true;
+      }
+      expect(intersects, `${first.id} crosses ${second.id}`).toBe(false);
+    }
+
   };
   await verify();
   await page.screenshot({ path: `${rootEvidence}/direct-opening-${width}.png` });

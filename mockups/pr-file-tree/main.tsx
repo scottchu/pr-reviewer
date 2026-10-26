@@ -775,7 +775,15 @@ const App = () => {
           sourceBounds: viewTree.nodes.find(node => node.path === call.caller.declaration.path)!,
           targetBounds: viewTree.nodes.find(node => node.path === call.callee.declaration.path)!,
           count: siblings.length,
-          targetIndex: fileCalls.filter(other => other.callee.declaration.path === call.callee.declaration.path).findIndex(other => other.link.id === call.link.id),
+          targetIndex: (() => {
+            const incoming = fileCalls.filter(other => other.callee.declaration.path === call.callee.declaration.path).sort((a, b) => {
+              const first = viewTree.nodes.find(node => node.path === a.caller.declaration.path)!;
+              const second = viewTree.nodes.find(node => node.path === b.caller.declaration.path)!;
+              return first.y - second.y || fileCalls.indexOf(a) - fileCalls.indexOf(b);
+            });
+            // Earlier/higher bands terminate farther right, preserving nested order.
+            return incoming.length - 1 - incoming.findIndex(other => other.link.id === call.link.id);
+          })(),
           targetCount: fileCalls.filter(other => other.callee.declaration.path === call.callee.declaration.path).length,
           lane: index, narrow },
         markerEnd: { type: MarkerType.ArrowClosed, color: call.status === 'added' ? '#92d4ac' : '#bdc6cc', width: 16, height: 16 },
