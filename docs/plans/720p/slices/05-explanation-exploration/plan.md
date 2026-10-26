@@ -137,3 +137,5 @@ The October23 handoff, now paired with the actual three October23 visual concept
 
 
 Latest bounded continuation: [reading-journey Revision23 closure](reviews/reading-journey-v1.md) records adopted continuous direct file-call arrows at3f8206b, source/hash and actualdesktop390rechecks, protectedreader/owner state and unchangedreal20Q1reply. Rootpresentation correction is delivered within explicitlimits; mobileStorysamecanvasv2adoption and fullgoalacceptance remain open. Existing source-informed engineering checks do not replace the preserved frozen unfamiliar desktopaccount or establish nativeautomaticdelivery/physicaldevice/crossreloadexactlocalframe guarantees.
+
+Latest live correction: [Revision26 receipt](reviews/reading-journey-v1.md) pins99ee207 for wrapped Split/Unified/source-focus and scoped page-versus-graph gestures, independent source/hash and actual glyph evidence. Preserve the [durable invariant register](../../../../product/protected-invariants.md); physical Safari/independent multitouch, compact own-arrow labels/library integration and mobile Story adoption remain distinct open limits. ELK viewer is a static proposal, not the live app.
