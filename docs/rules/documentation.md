@@ -29,3 +29,7 @@ Documents state intent and preserve knowledge; observed behavior and test eviden
 Use the [documentation index](../README.md) to find product knowledge, shared rules and round-local delivery plans.
 
 At each upscaling milestone, inspect actual code and structure and state the best design for rebuilding the whole current product now, with rationale and decision-relevant alternatives. Reconcile durable knowledge and actual behavior, then use a fresh docs-only independent audit of the entire delivered product. Missing material knowledge blocks milestone acceptance until corrected. The source preserves stories, behavior, interfaces, invariants, decisions, reasons and limits; copying implementation code or requiring old plans/chat to reconstruct behavior fails this contract.
+
+## Preservation checklist for bounded changes
+
+Use the [protected invariant register](../product/protected-invariants.md). Before derived edits, name allowed seams, protected behavior, any latest-user supersession and observable preservation checks in the existing slice packet. At review, record each affected invariant as preserved, corrected, pending or unverified with scoped evidence. Actual visual/interaction violations override mechanical PASS; proposals and probes do not become delivered behavior. Update the durable status and dependent readiness after verification.

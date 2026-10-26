@@ -14,3 +14,5 @@ Keep related delivery material together. Each round lives under `docs/plans/<rou
 
 - [Change-centered PR file workspace](product/pr-file-tree-first.md): whole-PR file map, continuous source reader, bounded direct-call context and relevant declared-test lens; imports off by default, no runtime/whole-PR semantic acceptance.
 - [Project and repository ontology](product/project-repository-ontology.md): TBox concepts/constraints and concrete PR25 ABox evidence; Project, Repository, source occurrences, calls and declared tests remain distinct.
+
+- [Protected product invariants](product/protected-invariants.md): authoritative preservation/status register; every bounded change declares allowed seams and protected behavior.
