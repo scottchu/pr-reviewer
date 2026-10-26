@@ -3,7 +3,7 @@ flowchart LR
   change["Header Change: Bearer → helper · B26–32 / H27–33"]
   after["review.ts request() After · H25–33"]
   refresh["review.ts refresh() head · H35–45; body unchanged"]
-  helper["local-access.ts accessHeaders() · H3; owner → no Authorization; otherwise → Bearer"]
+  helper["local-access.ts accessHeaders() · H3; owner marker → no Authorization; otherwise → Bearer"]
   claim["Claim: request delegates header choice · observed source"]
   evidence["Exact evidence: request B29/H30; helper H3; import H1"]
   before -->|"before slice B26–32"| change
