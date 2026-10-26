@@ -374,7 +374,7 @@ test.describe('supporting actual answered-question source with normal motion', (
     await expect.poll(async () => discussion.evaluate(element => element.scrollTop)).toBe(origin.scroll);
     await expect(gateway).toBeFocused();
     await expect(page.locator('[aria-label="Back to answer"]')).toHaveCount(0);
-    await page.screenshot({ path: `/tmp/pr-reviewer-reading-journey-evidence/r20-answer-return-${width}.png` });
+    await page.screenshot({ path: `/tmp/pr-reviewer-reading-journey-evidence/r26-answer-return-${width}.png` });
     await page.getByRole('button', { name: 'Close discussion' }).click();
     if (width < 650) await page.getByRole('button', { name: 'Open prepared story' }).click();
     await expect(page.locator('.owner-step')).toHaveText('Compare owner recognition with credential lookup');

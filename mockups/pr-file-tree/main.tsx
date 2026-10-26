@@ -1,3 +1,4 @@
+import { installPageGestureBoundary } from './page-gestures.ts';
 import React, { useMemo, useRef, useState, useReducer, useLayoutEffect, useEffect, useSyncExternalStore } from 'react';
 import { createRoot } from 'react-dom/client';
 import { ReactFlow, Background, BackgroundVariant, Handle, Position, BaseEdge, EdgeLabelRenderer, getBezierPath, MarkerType, type Node, type NodeProps, type ReactFlowInstance, type Edge, type EdgeProps, useUpdateNodeInternals } from '@xyflow/react';
@@ -224,6 +225,10 @@ const initialView = (lens: GraphLens, overview = false) => {
   };
 };
 const App = () => {
+  useEffect(() => {
+    const root = document.getElementById('root');
+    return root ? installPageGestureBoundary(root) : undefined;
+  }, []);
   const [lens, setLens] = useState<GraphLens>(() => new URLSearchParams(window.location.search).get('view') === 'files' ? 'files' : 'behavior');
   const lensCameras = useRef<Record<GraphLens, ReturnType<typeof initialView> | null>>({ behavior: null, files: null });
   const lensCameraSources = useRef<Record<GraphLens, string | null>>({ behavior: null, files: null });

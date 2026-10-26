@@ -197,7 +197,7 @@ export const FileDiffBody = ({ file, mode, fullscreen, width, onExplain, activeR
         behavior: 'instant'
       });
       if (horizontal.current)
-        horizontal.current.scrollLeft = restore.horizontal[-1] ?? 0;
+        horizontal.current.scrollLeft = 0;
       save(restore);
       pendingRestore.current = null;
     }
@@ -215,7 +215,7 @@ export const FileDiffBody = ({ file, mode, fullscreen, width, onExplain, activeR
   useLayoutEffect(() => {
     const el = horizontal.current;
     if (el && local.current.horizontal[-1] !== undefined)
-      el.scrollLeft = local.current.horizontal[-1] ?? 0;
+      el.scrollLeft = 0;
   }, [
     mode, width
   ]);
@@ -298,11 +298,8 @@ export const FileDiffBody = ({ file, mode, fullscreen, width, onExplain, activeR
     if (!pane || !pre) return;
     const measure = () => {
       pane.style.setProperty('--split-viewport-width', `${pane.clientWidth}px`);
-      if (mode === 'split') {
-        const longest = Math.max(0, ...Array.from(pre.querySelectorAll<HTMLElement>('.source-code')).map(line => line.scrollWidth));
-        const overflow = Math.max(0, longest + 42 - pane.clientWidth / 2);
-        pre.style.width = `${pane.clientWidth + overflow}px`;
-      } else pre.style.width = '';
+      pre.style.width = '100%';
+      pane.scrollLeft = 0;
       pane.style.setProperty('--source-offset', `${pane.scrollLeft}px`);
     };
     measure();

@@ -1456,3 +1456,20 @@ button:disabled { cursor: default; opacity: .5; }
 .change-impact-label { position: absolute; pointer-events: all; width: max-content; max-width: 328px; height: auto; padding: 0; border: 0; background: transparent; color: #c8b5e0; font: 550 16px/22px Inter, sans-serif; text-align: left; }
 .impact-explanation h2 { font-size: 18px; line-height: 25px; margin: 0; }
 .impact-explanation .callsite-action { display: block; margin: 10px 0; }
+
+
+/* Page gestures never scale the toolbar; the graph owns its own pinch camera. */
+html, body, #root { touch-action: pan-x pan-y; }
+.continuous-reader, .continuous-comparison.inner-comparison.horizontal { touch-action: pan-y; }
+
+/* One grid row per real source line; visual continuations retain its coordinates. */
+.continuous-comparison.inner-comparison.horizontal { overflow-x: hidden; width: 100%; }
+.continuous-comparison pre { min-width: 0 !important; max-width: 100%; width: 100%; white-space: normal !important; }
+.continuous-comparison pre > code { display: block; }
+.continuous-reader .paired-row { align-items: stretch; }
+.continuous-reader .diff-side { min-width: 0; }
+.continuous-reader .diff-line { display: grid; grid-template-columns: 39px minmax(0, 1fr); min-width: 0; white-space: normal; height: 100%; align-items: stretch; }
+.continuous-reader .unified-row .diff-line { grid-template-columns: 85px minmax(0, 1fr); }
+.continuous-reader .source-code { display: block; min-width: 0; max-width: 100%; white-space: pre-wrap; overflow-wrap: anywhere; word-break: normal; transform: none !important; }
+.continuous-reader .unified-gutter { position: static; align-items: flex-start; }
+.continuous-comparison.horizontal:after { display: none; }
