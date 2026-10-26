@@ -1,7 +1,7 @@
 import { directFileCallRoute, type FileBounds } from './file-call-route.ts';
 import React from 'react';
 import { BaseEdge, EdgeLabelRenderer, type Edge, type EdgeProps } from '@xyflow/react';
-import { callActionName, callCitation, type CallLink } from './calls.ts';
+import { callActionName, callCitation, callDisplayName, type CallLink } from './calls.ts';
 import type { FileCall } from './file-projection.ts';
 
 export type FileCallEdge = Edge<FileCall & {
@@ -33,7 +33,7 @@ export const FileCallLine = (props: EdgeProps<FileCallEdge>) => {
         data-relationship-status={data.status}
         onClick={() => data.onExplain(data.link)}
       >
-        {data.caller.name}() → {data.callee.name}()
+        {callDisplayName(data.caller)}() → {callDisplayName(data.callee)}()
 
       </button>
     </EdgeLabelRenderer>

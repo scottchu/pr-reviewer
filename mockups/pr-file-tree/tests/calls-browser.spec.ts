@@ -211,3 +211,25 @@ test('storage declared tests retain unchanged boundary source without inventing 
     path: `${evidence}/tests-added-source-390.png`
   });
 });
+
+for (const width of [1440, 390]) test(`${width} exact callback display aliases replace offsets without changing call identity`, async ({ page }) => {
+  await page.setViewportSize({ width, height: 1000 });
+  await page.goto('/');
+  if (width >= 650) await page.getByRole('button', { name: 'Close review context', exact: true }).click();
+  await page.getByRole('button', { name: 'Find source', exact: true }).click();
+  await page.getByRole('combobox', { name: 'Changed source', exact: true }).selectOption('src/storage/analysis.ts');
+  const aliases = ['analysis.marker', 'analysis.evidence', 'analysis.query', 'analysis.source'];
+  for (const name of aliases) {
+    const call = page.locator('.file-call-label').filter({ hasText: `${name}() → accessReference()` });
+    await expect(call).toHaveCount(1);
+    await expect(call).toHaveAccessibleName(new RegExp(name.replace('.', '\\.')));
+    await expect(call).not.toHaveAccessibleName(/callback@/);
+    await expect(call).toHaveAttribute('data-call-id', /^[a-f0-9]{64}$/);
+  }
+  const marker = page.locator('.file-call-label').filter({ hasText: 'analysis.marker() → accessReference()' });
+  await marker.click();
+  await expect(page.locator('.relationship-reader .reader-heading strong')).toContainText('analysis.marker');
+  await expect(page.locator('.relationship-reader .reader-primary')).toContainText('analysis.marker');
+  await page.getByRole('button', { name: 'Close relationship explanation', exact: true }).click();
+  await page.screenshot({ path: `/tmp/pr-reviewer-reading-journey-evidence/r30-callback-label/${width}-labels.png` });
+});

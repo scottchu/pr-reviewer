@@ -1,3 +1,5 @@
+import { callDisplayName } from './callback-display.ts';
+export { callDisplayName } from './callback-display.ts';
 import clients from './calls-clients.json' with { type: 'json' };
 import storage from './calls-storage.json' with { type: 'json' };
 import scope from './calls-scope.json' with { type: 'json' };
@@ -134,7 +136,7 @@ export const callCitation = (link: CallLink) => [
 ].join('\n');
 export const callActionName = (link: CallLink, caller: FunctionIdentity, callee: FunctionIdentity) => {
   const ranges = [...new Set(link.sites.map(site => `${site.anchor.path}:${site.anchor.startLine}–${site.anchor.endLine}`))].join(', ');
-  return `Explain ${link.target.side === 'base' ? 'Before' : 'After'} call ${caller.name} → ${callee.name} · ${ranges} → ${link.target.path}:${link.target.startLine}–${link.target.endLine}`;
+  return `Explain ${link.target.side === 'base' ? 'Before' : 'After'} call ${callDisplayName(caller)} → ${callDisplayName(callee)} · ${ranges} → ${link.target.path}:${link.target.startLine}–${link.target.endLine}`;
 };
 export const layoutCalls = (projection: ReturnType<typeof projectCalls>, origin: {
   x: number;

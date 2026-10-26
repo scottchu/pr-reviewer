@@ -1,3 +1,4 @@
+import { callDisplayName } from '../callback-display.ts';
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { createHash } from 'node:crypto';
@@ -69,7 +70,7 @@ test('all call controls have distinct side/caller/callee/source names while IDs 
     const caller = graph.nodes.find(node => node.id === link.caller)!;
     const callee = graph.nodes.find(node => node.id === link.callee)!;
     const name = callActionName(link, caller, callee);
-    assert.ok(name.includes(caller.name) && name.includes(callee.name));
+    assert.ok(name.includes(callDisplayName(caller)) && name.includes(callDisplayName(callee)));
     assert.ok(name.includes(link.target.side === 'base' ? 'Before' : 'After'));
     assert.ok(name.includes(link.sites[0]!.anchor.path) && name.includes(link.target.path));
     assert.ok(!name.includes(link.id));

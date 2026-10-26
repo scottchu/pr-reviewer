@@ -10,7 +10,7 @@ import { detailTransition, detailTree } from './detail.ts';
 import { FileDiffBody, DiffControls, fileDiffs, type FileDiff, type DiffMode, type SourceRelation } from './file-diff.tsx';
 import { rememberFile, type FileReading, type FileReadings, type ReadingFocus } from './reading.ts';
 import { RelationshipReader } from './relationship-reader.tsx';
-import { projectCalls, projectBehaviorCalls, layoutCalls, relevantTests, type FunctionIdentity, type CallLink } from './calls.ts';
+import { projectCalls, projectBehaviorCalls, layoutCalls, relevantTests, callDisplayName, type FunctionIdentity, type CallLink } from './calls.ts';
 import { FunctionLabel, DeclaredTestLabel, CallLine, CallExplanation, type FunctionNode, type DeclaredTestNode } from './call-graph.tsx';
 import type { DeclaredTest } from './declared-tests.types.ts';
 import { ReviewContext, type ContextEvidence } from './review-context.tsx';
@@ -647,7 +647,7 @@ const App = () => {
     setFunctionFocus({
       id: `function:${identity.id}:${sourceSerial.current}`,
       path: identity.declaration.path,
-      name: identity.name,
+      name: callDisplayName(identity),
       before: side === 'before' ? [
         identity.declaration
       ] : [],
@@ -797,7 +797,7 @@ const App = () => {
           targetCount: fileCalls.filter(other => other.callee.declaration.path === call.callee.declaration.path).length,
           lane: index, narrow },
         markerEnd: { type: MarkerType.ArrowClosed, color: call.status === 'added' ? '#92d4ac' : '#bdc6cc', width: 16, height: 16 },
-        ariaLabel: `${call.caller.name} calls ${call.callee.name}; exact contained-symbol call projection`,
+        ariaLabel: `${callDisplayName(call.caller)} calls ${callDisplayName(call.callee)}; exact contained-symbol call projection`,
       };
     }) : []),
     ...(lens === 'files' ? calls.links : []).map(link => ({

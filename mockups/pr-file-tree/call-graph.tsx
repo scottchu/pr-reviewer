@@ -1,6 +1,6 @@
 import React, { useLayoutEffect } from 'react';
 import { Handle, Position, BaseEdge, EdgeLabelRenderer, useUpdateNodeInternals, type Node, type NodeProps, type Edge, type EdgeProps } from '@xyflow/react';
-import { callActionName, callCitation, declaredTestSummary, type FunctionIdentity, type CallLink, type CallAnchor } from './calls.ts';
+import { callActionName, callCitation, callDisplayName, declaredTestSummary, type FunctionIdentity, type CallLink, type CallAnchor } from './calls.ts';
 import type { DeclaredTest } from './declared-tests.types.ts';
 export type FunctionNode = Node<{
   identity: FunctionIdentity;
@@ -17,7 +17,7 @@ export const FunctionLabel = ({ id, data }: NodeProps<FunctionNode>) => {
     id, update
   ]);
   const anchor = data.identity.declaration;
-  const description = `${anchor.side === 'base' ? 'Before' : 'After'} ${data.identity.name} · ${anchor.path}:${anchor.startLine}–${anchor.endLine}`;
+  const description = `${anchor.side === 'base' ? 'Before' : 'After'} ${callDisplayName(data.identity)} · ${anchor.path}:${anchor.startLine}–${anchor.endLine}`;
   return <div
     className={`function-object ${data.identity.seed ? 'changed-seed' : 'call-context'} ${data.active ? 'active' : ''}`}
     data-function-id={data.identity.id}
@@ -33,12 +33,12 @@ export const FunctionLabel = ({ id, data }: NodeProps<FunctionNode>) => {
     <button
       className="function-read nodrag nopan"
       aria-label={`Read ${description}`}
-      title={`${description}\nSHA256 ${anchor.contentHash}\nUTF-16 ${anchor.start}–${anchor.end}`}
+      title={`${description}\nAnalyzer label ${data.identity.name}\nSHA256 ${anchor.contentHash}\nUTF-16 ${anchor.start}–${anchor.end}`}
       onClick={() => data.onRead(data.identity)}
     >
 
       <small>{anchor.side === 'base' ? 'Before' : 'After'} · {data.identity.sourceUnchanged ? 'unchanged source' : data.identity.seed ? 'changed' : 'context'}</small>
-      <span>{data.identity.name}</span>
+      <span>{callDisplayName(data.identity)}</span>
 
       <small>
 
@@ -180,15 +180,16 @@ export const CallExplanation = ({ link, nodes, onClose, onInspect }: {
 }) => {
   const caller = nodes.find(node => node.id === link.caller)!;
   const callee = nodes.find(node => node.id === link.callee)!;
+  const callerName = callDisplayName(caller), calleeName = callDisplayName(callee);
   const what = callee.name === 'accessHeaders'
-    ? `${caller.name} delegates its access headers to accessHeaders. Local-owner requests omit Bearer; explicit credentials retain it.`
+    ? `${callerName} delegates its access headers to accessHeaders. Local-owner requests omit Bearer; explicit credentials retain it.`
     : caller.name === 'refresh' && callee.name === 'request'
       ? 'Refresh loads the pinned review through request. Its source body is unchanged here, while request’s access-header choice changes.'
       : caller.name === 'authenticate' && callee.name === 'localPrincipal'
         ? 'Authentication checks whether this reference identifies the local owner before looking up a credential.'
         : callee.name === 'accessReference'
-          ? `${caller.name} derives an access reference through the shared helper. The helper distinguishes the in-process owner capability from credential strings.`
-          : `${caller.name} calls ${callee.name} at ${link.sites[0]?.anchor.path}:${link.sites[0]?.anchor.startLine}. This is direct source context in the pinned comparison.`;
+          ? `${callerName} derives an access reference through the shared helper. The helper distinguishes the in-process owner capability from credential strings.`
+          : `${callerName} calls ${calleeName} at ${link.sites[0]?.anchor.path}:${link.sites[0]?.anchor.startLine}. This is direct source context in the pinned comparison.`;
   return <section
     className="relationship-reader nodrag nopan nowheel"
     aria-label="Call relationship explanation"
@@ -199,9 +200,9 @@ export const CallExplanation = ({ link, nodes, onClose, onInspect }: {
 
       <strong>
 
-        {caller.name} →
+        {callerName} →
 
-        {callee.name}</strong>
+        {calleeName}</strong>
 
       <button
         aria-label="Close relationship explanation"
