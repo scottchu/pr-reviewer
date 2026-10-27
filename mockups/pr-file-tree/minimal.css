@@ -45,3 +45,6 @@ main { flex: 1; min-height: 0; }
 
 .minimal-route { cursor: grab; touch-action: none; }
 .minimal-route:active { cursor: grabbing; }
+
+/* Nonselectable ReactFlow edges remain directly draggable through their stroke. */
+.minimal-route .react-flow__edge-interaction { pointer-events: stroke; touch-action: none; }
