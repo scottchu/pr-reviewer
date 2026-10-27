@@ -25,7 +25,7 @@
     {
       "id": "reason",
       "kind": "reason",
-      "name": "Owner request needs no Authorization",
+      "name": "Always-Bearer request headers",
       "value": "Always constructing Bearer cannot express an owner request without Authorization",
       "label": "Why change?"
     },
