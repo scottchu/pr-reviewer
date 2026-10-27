@@ -2,26 +2,29 @@
 html, body, #root { width: 100%; height: 100%; margin: 0; }
 body { background: #171d22; color: #e2e8ed; font-family: system-ui, sans-serif; }
 #root { display: flex; flex-direction: column; }
-.minimal-header { padding: 15px 20px; border-bottom: 1px solid #3b454e; flex: none; }
+.minimal-header { padding: 14px 20px; border-bottom: 1px solid #3b454e; flex: none; }
 .minimal-header h1 { margin: 0 0 5px; font-size: 18px; font-weight: 600; }
-.minimal-header p { margin: 0 0 5px; color: #afbfcc; font-size: 12px; }
-.minimal-header code { font-size: 11px; color: #95afc5; overflow-wrap: anywhere; }
+.minimal-header p { margin: 0; color: #afbfcc; font-size: 12px; }
 main { flex: 1; min-height: 0; }
-.minimal-entity { width: 320px; padding: 15px; background: #242c33; border: 1px solid #6f8291; border-radius: 7px; }
-.minimal-entity h2 { margin: 0 0 10px; font-size: 15px; font-weight: 600; line-height: 1.4; }
-.minimal-entity pre { margin: 0; white-space: pre-wrap; overflow-wrap: anywhere; font: 11px/1.5 ui-monospace, monospace; color: #d5dfe6; }
-.kind-change { border-color: #b6a2cf; background: #302b39; }
-.kind-reason, .kind-goal { border-color: #ac9568; }
-.minimal-change-graph { position: relative; width: 100%; height: 100%; border: 2px solid #ad95c6; border-radius: 12px; background: #2b27314d; padding: 22px; }
-.minimal-change-graph h2 { margin: 0 0 12px; font-size: 18px; }
-.minimal-graph-identity { width: 600px; margin: 0; font: 11px/1.5 ui-monospace, monospace; white-space: pre-wrap; overflow-wrap: anywhere; }
-.minimal-edge-json { position: absolute; width: 420px; margin: 0; padding: 12px; background: #171d22; border: 1px solid #52636f; border-radius: 4px; font: 10px/1.4 ui-monospace, monospace; white-space: pre-wrap; overflow-wrap: anywhere; pointer-events: none; }
+.minimal-entity { width: 300px; padding: 12px 14px; background: #263139; color: #e2e8ed; border: 1px solid #718694; border-radius: 6px; }
+.minimal-entity h2 { margin: 0; font-size: 14px; font-weight: 500; line-height: 1.45; overflow-wrap: anywhere; }
+.minimal-entity p { margin: 6px 0 0; font-size: 12px; line-height: 1.45; overflow-wrap: anywhere; }
+.version-tag { display: inline-block; font-size: 11px; line-height: 1.5; font-weight: 600; }
+.minimal-entity .version-tag { margin-bottom: 5px; }
+.version-before { background: #fae5e4; border-color: #ca7e7b; color: #642b29; }
+.version-after { background: #e3f3e8; border-color: #76ac89; color: #25543a; }
+.minimal-change-graph { position: relative; width: 100%; height: 100%; border: 2px solid #ad95c6; border-radius: 10px; background: #2b27314d; padding: 20px; }
+.minimal-change-graph > h2 { margin: 0; font-size: 17px; font-weight: 500; }
+.minimal-edge-card { position: absolute; width: max-content; max-width: 280px; margin: 0; padding: 9px 12px; background: #263139; border: 1px solid #718694; border-radius: 5px; font-size: 12px; line-height: 1.45; pointer-events: none; }
+.minimal-edge-card.version-before { background: #fae5e4; border-color: #ca7e7b; color: #642b29; }
+.minimal-edge-card.version-after { background: #e3f3e8; border-color: #76ac89; color: #25543a; }
+.edge-main-row { display: flex; align-items: baseline; gap: 9px; flex-wrap: wrap; }
+.minimal-edge-card p { margin: 4px 0 0; font-size: 11px; }
 .react-flow__edgelabel-renderer { z-index: 2; }
 .react-flow__node-graph { z-index: -1 !important; }
 .react-flow__edge-path { stroke: #9db3c8; stroke-width: 1.6; }
-.react-flow__handle { width: 6px; height: 6px; background: #c2d5e4; border: 0; }
+.react-flow__handle { width: 6px; height: 6px; background: #91a9ba; border: 0; }
 @media (max-width: 649px) {
   .minimal-header { padding: 12px 14px; }
   .minimal-header h1 { font-size: 16px; }
-  .minimal-graph-identity { width: 320px; }
 }

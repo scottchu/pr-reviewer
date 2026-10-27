@@ -47,3 +47,8 @@ For graph work, semantic entities/identities, typed assertions, evidence basis a
 ## Simplification does not remove required semantics
 
 When stripping a presentation or implementation to its minimum, record an explicit keep/remove map. Keep every accepted semantic and behavioral requirement unless the user explicitly changes it. Map each retained requirement to its model structure, derived code and observable acceptance; fewer panels/imports is not a smaller semantic contract. Missing evidence is unfinished preparation, not a scope waiver. A simplified projection must still expose the required identity-bearing graphs, typed relations and evidence. Verify these structures/tasks directly before declaring delivery; render counts or absence of chrome do not substitute.
+
+
+## Make plans reconstructible in both directions
+
+Retain links among previous/current observed reality, intent, expected reality, gap, overall plan, slice plan and resulting MR code+docs. Forward: reality→expected gap→plan→slice→MR. Backward: MR→observed outcome→slice→overall plan→gap→expected reality→previous reality. Record which statements are planned, observed or inferred reconstruction, with source/context/status. Do not infer runtime success or original intent solely from a diff. New unexpected gaps are inputs to the next plan; reconcile them rather than revising history to make prior delivery appear complete. This is a documentation responsibility, not a new planning implementation.
