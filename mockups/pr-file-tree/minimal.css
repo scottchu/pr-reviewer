@@ -12,7 +12,9 @@ main { flex: 1; min-height: 0; }
 .minimal-entity pre { margin: 0; white-space: pre-wrap; overflow-wrap: anywhere; font: 11px/1.5 ui-monospace, monospace; color: #d5dfe6; }
 .kind-change { border-color: #b6a2cf; background: #302b39; }
 .kind-reason, .kind-goal { border-color: #ac9568; }
-.minimal-relation { position: absolute; width: 190px; padding: 8px; margin: 0; background: #171d22; color: #adbfcc; border: 1px solid #405461; border-radius: 4px; font: 10px/1.4 ui-monospace, monospace; white-space: pre-wrap; pointer-events: none; }
+.minimal-outgoing { position: relative; margin-top: 14px; padding-top: 10px; border-top: 1px solid #52636f; }
+.minimal-outgoing pre { font: 10px/1.4 ui-monospace, monospace; color: #b2c7d7; }
+.minimal-outgoing .react-flow__handle { right: -18px; }
 .react-flow__edge-path { stroke: #9db3c8; stroke-width: 1.6; }
 .react-flow__handle { width: 6px; height: 6px; background: #c2d5e4; border: 0; }
 @media (max-width: 649px) {

@@ -1,7 +1,7 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { createRoot } from 'react-dom/client';
 import {
-  ReactFlow, Background, BaseEdge, EdgeLabelRenderer, Handle, Position,
+  ReactFlow, Background, BaseEdge, Handle, Position,
   MarkerType, getBezierPath, type Node, type NodeProps, type Edge,
   type EdgeProps,
 } from '@xyflow/react';
@@ -10,29 +10,25 @@ import './minimal.css';
 import { installPageGestureBoundary } from './page-gestures.ts';
 import { minimalGraph, positions, type GraphEntity, type GraphRelation } from './minimal-graph.ts';
 
-type EntityNode = Node<{ entity: GraphEntity }, 'entity'>;
+type EntityNode = Node<{ entity: GraphEntity; outgoing: readonly GraphRelation[] }, 'entity'>;
 type RelationEdge = Edge<{ relation: GraphRelation }, 'relation'>;
 
 const Entity = ({ data }: NodeProps<EntityNode>) => (
   <article className={`minimal-entity kind-${data.entity.kind}`}>
-    <Handle type="target" position={Position.Top} />
+    <Handle id="in" type="target" position={Position.Left} />
     <h2>{String(data.entity.data.name ?? data.entity.kind)}</h2>
     <pre className="nodrag nowheel">{JSON.stringify(data.entity, null, 2)}</pre>
-    <Handle type="source" position={Position.Bottom} />
+    {data.outgoing.map(relation => (
+      <div className="minimal-outgoing" key={relation.id}>
+        <pre className="nodrag nowheel nopan" aria-label={`${relation.relation} edge JSON`}>{JSON.stringify(relation, null, 2)}</pre>
+        <Handle id={relation.id} type="source" position={Position.Right} />
+      </div>
+    ))}
   </article>
 );
 const Relation = (props: EdgeProps<RelationEdge>) => {
-  const [path, x, y] = getBezierPath(props);
-  if (!props.data) return null;
-  const { relation } = props.data;
-  return <>
-    <BaseEdge id={props.id} path={path} {...(props.markerEnd ? { markerEnd: props.markerEnd } : {})} />
-    <EdgeLabelRenderer>
-      <pre className="minimal-relation nodrag nopan" style={{ transform: `translate(-50%, -50%) translate(${x}px, ${y}px)` }}>
-        {JSON.stringify({ from: relation.from, to: relation.to, version: relation.version, relation: relation.relation }, null, 2)}
-      </pre>
-    </EdgeLabelRenderer>
-  </>;
+  const [path] = getBezierPath(props);
+  return <BaseEdge id={props.id} path={path} {...(props.markerEnd ? { markerEnd: props.markerEnd } : {})} />;
 };
 const nodeTypes = { entity: Entity };
 const edgeTypes = { relation: Relation };
@@ -51,7 +47,7 @@ const App = () => {
     return minimalGraph.nodes.map(entity => ({
       id: entity.id,
       type: 'entity',
-      data: { entity },
+      data: { entity, outgoing: minimalGraph.edges.filter(relation => relation.from === entity.id) },
       position: layout[entity.id] ?? { x: 0, y: 0 },
       draggable: false,
     }));
@@ -60,7 +56,9 @@ const App = () => {
     id: relation.id,
     type: 'relation',
     source: relation.from,
+    sourceHandle: relation.id,
     target: relation.to,
+    targetHandle: 'in',
     data: { relation },
     markerEnd: { type: MarkerType.ArrowClosed, color: '#9db3c8' },
   })), []);
@@ -73,7 +71,7 @@ const App = () => {
     <main aria-label="Request comparison graph">
       <ReactFlow<EntityNode, RelationEdge>
         nodes={nodes} edges={edges} nodeTypes={nodeTypes} edgeTypes={edgeTypes}
-        defaultViewport={{ x: narrow ? 0 : 90, y: 35, zoom: 1 }}
+        defaultViewport={{ x: 20, y: 35 - (positions(narrow).change?.y ?? 0), zoom: 1 }}
         minZoom={0.25} maxZoom={2} nodesConnectable={false}
         nodesDraggable={false} elementsSelectable={false} proOptions={{ hideAttribution: true }}
       >

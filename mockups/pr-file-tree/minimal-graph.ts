@@ -97,28 +97,31 @@ export const minimalGraph = {
   ],
 } as const;
 
-export const positions = (narrow: boolean): Readonly<Record<string, { x: number; y: number }>> => narrow
-  ? {
-    change: { x: 20, y: 0 },
-    'request-before': { x: 20, y: 430 },
-    'bearer-before': { x: 20, y: 880 },
-    'request-after': { x: 440, y: 430 },
-    'helper-after': { x: 440, y: 880 },
-    'refresh-after': { x: 440, y: 0 },
-    reason: { x: 20, y: 1420 },
-    goal: { x: 440, y: 1420 },
-    'review-file': { x: 20, y: 1960 },
-    'helper-file': { x: 440, y: 1960 },
-  }
-  : {
-    change: { x: 430, y: 0 },
-    'request-before': { x: 10, y: 440 },
-    'bearer-before': { x: 10, y: 930 },
-    'request-after': { x: 850, y: 440 },
-    'helper-after': { x: 850, y: 930 },
-    'refresh-after': { x: 850, y: 0 },
-    reason: { x: 10, y: 1450 },
-    goal: { x: 850, y: 1450 },
-    'review-file': { x: 10, y: 2040 },
-    'helper-file': { x: 850, y: 2040 },
-  };
+// This local layout reserves a full slot for every source-owned JSON record.
+// The view does not add semantic grouping or a general layout registry.
+const heightBudget = (id: string) => {
+  const node = minimalGraph.nodes.find(value => value.id === id);
+  if (!node) return 0;
+  const lines = JSON.stringify(node, null, 2).split('\n')
+    .reduce((total, line) => total + Math.max(1, Math.ceil(line.length / 40)), 0);
+  const edgeHeight = minimalGraph.edges.filter(value => value.from === id).reduce((total, relation) => {
+    const recordLines = JSON.stringify(relation, null, 2).split('\n')
+      .reduce((count, line) => count + Math.max(1, Math.ceil(line.length / 44)), 0);
+    return total + recordLines * 14 + 40;
+  }, 0);
+  return 120 + lines * 17 + edgeHeight;
+};
+const firstRow = Math.max(heightBudget('request-before'), heightBudget('bearer-before'), heightBudget('review-file')) + 140;
+const secondRow = firstRow + Math.max(heightBudget('change'), heightBudget('request-after'), heightBudget('helper-after'), heightBudget('helper-file')) + 160;
+export const positions = (_narrow: boolean): Readonly<Record<string, { x: number; y: number }>> => ({
+  'request-before': { x: 440, y: 0 },
+  'bearer-before': { x: 880, y: 0 },
+  'review-file': { x: 1320, y: 0 },
+  change: { x: 0, y: firstRow },
+  'request-after': { x: 440, y: firstRow },
+  'helper-after': { x: 880, y: firstRow },
+  'helper-file': { x: 1320, y: firstRow },
+  'refresh-after': { x: 0, y: secondRow },
+  reason: { x: 440, y: secondRow },
+  goal: { x: 880, y: secondRow },
+});
