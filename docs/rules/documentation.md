@@ -24,6 +24,14 @@ Compilation here includes the agent interpreting requirements, designing within 
 
 Documents state intent and preserve knowledge; observed behavior and test evidence establish what actually happened. A written requirement or generated implementation is not proof of acceptance. Chat is input to the source, and derived code can reveal gaps, but neither silently replaces the documented contract.
 
+## Delivery status and live endpoint gate
+
+Local implementation, passing tests, a successful build and source review establish only their scoped local results. They do not establish that an application change has been delivered to the user. When the authorized delivery scope includes an existing user endpoint, that endpoint must serve the exact candidate and the affected actual user journey must be verified there before an unqualified “done”, “fixed” or “complete” claim. Serving assets alone is deployment evidence, not journey verification.
+
+Report **implemented**, **locally tested**, **deployed**, **live verified** and **blocked** separately as applicable. Tie deployment and live observations to the actual URL and candidate source/build identity. If the URL still serves an older or frozen build, say so explicitly; a newer local candidate is not the deployed candidate. Bounded claims such as “pure checks passed” or “source review found no blocker” remain valid only within that stated scope.
+
+An access, deployment or verification blocker keeps the affected delivery gate open; it does not waive it or grant authority to bypass restrictions, change a destination or widen permissions. Continue independent authorized preparation where useful and state the remaining gate honestly. Docs-only and explicitly design-only tasks use their agreed artifact/readback acceptance without an invented live-application requirement. This contract implements the short rule in [AGENTS.md](../../AGENTS.md), rather than adding another approval process.
+
 ## Convert feedback into feed-forward signals
 
 Before planning or deriving code, reconcile relevant feedback with requirements, source evidence and unknowns. Record provenance/context, affected scope, intended behavior and rationale, accepted versus proposed versus observed status, and any explicit supersession. Translate accepted direction into a small example, counterexample and observable acceptance signal; consult these signals while choosing the implementation, not only after it exists. Feedback is one input, not automatic authority for a universal rule, invariant or unrelated redesign. Promote accepted protected constraints to the existing invariant register; retain unresolved interpretations as proposals. Verification then reports actual conformance and returns new learning to these same documents.

@@ -222,3 +222,10 @@ Focused3pure checks PASS, strictTS PASS, local Vite build PASS. Independent fixe
 Persistent immutable local build/manifest: `/Users/scottchu/.codex-workspaces/artifacts/pr-reviewer-row-projection-2026-10-27/logical-candidate/c86e159/`. Original occurrence JSON SHA comparison is equal; mapping/status source input and original version anchors retained. New feed-forward planning direction is durable knowledge only, no runtime planning feature.
 
 No network retry/browser traversal/publication attempted under the current explicit network restriction. Existing57943/8478 stays frozen on the prior pre-ontology row WIP build, with no HMR; it is NOT the c86 candidate and not accepted. Necessary next gate: permitted actual desktop390 single logical function/File/Test, Before/After behavior+sameFile source locations, status semantics, neutralFile vsversionedgecolors, own-arrow/boundary/nooverlap checks. Then publish the fixed build on the existing destination. Gateway remains absent because retained owner data was not recovered. No new owner/data/native/session/route/security change. This is local readiness, not full task/goal acceptance.
+
+
+## Delivery-claim rule and current open state
+
+2026-10-27 user explicitly requires this as a project rule: local implementation/tests/source review are not completed application delivery. AGENTS and the owning documentation delivery contract now require exact-candidate serving at the authorized user URL plus affected actual-journey verification before an unqualified done/fixed/complete claim. Blockers do not waive the gate; docs-only work does not invent one.
+
+Current state remains: c86e159 implemented, locally tested/built and source-reviewed; NOT deployed or live-verified. Last recorded URL state serves the older frozen build, not c86e159. No server/network read or mutation was attempted in this docs-only update, so it is not a fresh liveness observation. Existing application work remains open pending permitted deployment/actual UI checks. This rule commit is docs-only completion, not application completion.
