@@ -1,8 +1,8 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useState, useRef } from 'react';
 import { createRoot } from 'react-dom/client';
 import {
   ReactFlow, Background, BaseEdge, EdgeLabelRenderer, Handle, Position,
-  MarkerType, getBezierPath, type Node, type NodeProps, type Edge,
+  MarkerType, getBezierPath, useNodesState, useReactFlow, type Node, type NodeProps, type Edge,
   type EdgeProps,
 } from '@xyflow/react';
 import '@xyflow/react/dist/style.css';
@@ -59,6 +59,25 @@ const GraphBoundary = ({ data }: NodeProps<EntityNode>) => (
   </section>
 );
 const Relation = (props: EdgeProps<RelationEdge>) => {
+  const { getZoom } = useReactFlow();
+  const [offset, setOffset] = useState({ x: 0, y: 0 });
+  const drag = useRef<{ pointer: number; clientX: number; clientY: number; x: number; y: number; zoom: number } | null>(null);
+  const beginDrag = (event: React.PointerEvent<HTMLDivElement>) => {
+    if (event.button !== 0) return;
+    event.stopPropagation(); event.preventDefault();
+    event.currentTarget.setPointerCapture(event.pointerId);
+    drag.current = { pointer: event.pointerId, clientX: event.clientX, clientY: event.clientY, ...offset, zoom: getZoom() };
+  };
+  const moveDrag = (event: React.PointerEvent<HTMLDivElement>) => {
+    const start = drag.current; if (!start || start.pointer !== event.pointerId) return;
+    event.stopPropagation(); event.preventDefault();
+    setOffset({ x: start.x + (event.clientX - start.clientX) / start.zoom, y: start.y + (event.clientY - start.clientY) / start.zoom });
+  };
+  const endDrag = (event: React.PointerEvent<HTMLDivElement>) => {
+    if (drag.current?.pointer !== event.pointerId) return;
+    event.stopPropagation(); drag.current = null;
+    if (event.currentTarget.hasPointerCapture(event.pointerId)) event.currentTarget.releasePointerCapture(event.pointerId);
+  };
   const [defaultPath, defaultX, defaultY] = getBezierPath(props);
   if (!props.data) return null;
   const testLink = props.data.relation.from === 'test-change' && props.data.relation.to === 'change';
@@ -91,7 +110,7 @@ const Relation = (props: EdgeProps<RelationEdge>) => {
   return <>
     <BaseEdge id={props.id} path={path} {...(props.markerEnd ? { markerEnd: props.markerEnd } : {})} />
     <EdgeLabelRenderer>
-      <div className={`minimal-edge-card version-${props.data.relation.version} nodrag nopan`} data-relation={props.data.relation.relation} data-edge-id={props.id} style={{ transform: `translate(-50%, -50%) translate(${ownCall ? callLabelX : x}px, ${ownCall ? callLabelY : y}px)` }}>
+      <div className={`minimal-edge-card version-${props.data.relation.version} nodrag nopan`} data-relation={props.data.relation.relation} data-edge-id={props.id} role="button" tabIndex={0} aria-label={`Move ${card.title} label`} onPointerDown={beginDrag} onPointerMove={moveDrag} onPointerUp={endDrag} onPointerCancel={endDrag} onKeyDown={event => { const delta = ({ ArrowLeft: [-10,0], ArrowRight: [10,0], ArrowUp: [0,-10], ArrowDown: [0,10] } as Record<string, number[]>)[event.key]; if (event.key === 'Home') { event.preventDefault(); event.stopPropagation(); setOffset({x:0,y:0}); } else if (delta) { event.preventDefault(); event.stopPropagation(); setOffset(value => ({ x: value.x + delta[0]!, y: value.y + delta[1]! })); } }} style={{ transform: `translate(-50%, -50%) translate(${(ownCall ? callLabelX : x) + offset.x}px, ${(ownCall ? callLabelY : y) + offset.y}px)` }}>
         <div className="edge-main-row"><Version value={props.data.relation.version} />{card.title && <span>{card.title}</span>}{props.data.relation.relation === 'located_in' && card.rows.map(row => <span key={row}>{row}</span>)}</div>
         {props.data.relation.relation !== 'located_in' && card.rows.map((row, index) => <p key={index}>{row}</p>)}
       </div>
@@ -110,19 +129,20 @@ const App = () => {
     const dispose = installPageGestureBoundary(document.documentElement);
     return () => { media.removeEventListener('change', update); dispose(); };
   }, []);
-  const nodes = useMemo<EntityNode[]>(() => {
+  const initialNodes = useMemo<EntityNode[]>(() => {
     const layout = rowPositions;
     return allEntities().map(entity => {
       const parent = minimalGraph.nodes.find(graph => graph.nodes?.some(child => child.id === entity.id));
       const isGraph = Boolean(entity.nodes && entity.edges);
       return {
         id: entity.id, type: isGraph ? 'graph' : 'entity', data: { entity, viewId: entity.id },
-        position: entity.kind === 'callsite' ? { x: 640, y: 350 } : layout[entity.id] ?? { x: 0, y: 0 }, draggable: false,
+        position: entity.kind === 'callsite' ? { x: 640, y: 350 } : layout[entity.id] ?? { x: 0, y: 0 }, draggable: true,
         ...(parent ? { parentId: parent.id, extent: 'parent' as const } : {}),
         ...(isGraph ? { style: { ...groupSize(entity.id) } } : {}),
       };
     });
   }, [narrow]);
+  const [nodes, , onNodesChange] = useNodesState<EntityNode>(initialNodes);
   const edges = useMemo<RelationEdge[]>(() => allRelations().filter(relation => !omittedStructuralEdge(relation)).map(relation => {
     const fromGraph = relation.from === 'change' || relation.from === 'test-change';
     const comparison = relation.relation === 'before' || relation.relation === 'after';
@@ -145,10 +165,10 @@ const App = () => {
     </header>
     <main aria-label="Request comparison graph">
       <ReactFlow<EntityNode, RelationEdge>
-        nodes={nodes} edges={edges} nodeTypes={nodeTypes} edgeTypes={edgeTypes}
+        nodes={nodes} onNodesChange={onNodesChange} edges={edges} nodeTypes={nodeTypes} edgeTypes={edgeTypes}
         defaultViewport={{ x: 20, y: 35, zoom: 1 }}
         minZoom={0.25} maxZoom={2} nodesConnectable={false}
-        nodesDraggable={false} elementsSelectable={false} proOptions={{ hideAttribution: true }}
+        nodesDraggable={true} elementsSelectable={false} proOptions={{ hideAttribution: true }}
       >
         <Background color="#29333b" gap={24} size={1} />
       </ReactFlow>

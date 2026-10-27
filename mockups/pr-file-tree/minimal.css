@@ -33,3 +33,9 @@ main { flex: 1; min-height: 0; }
 .minimal-entity.status-change { background: #fff0bd; border-color: #b79b43; color: #5c4918; }
 .minimal-entity.status-add { background: #e3f3e8; border-color: #76ac89; color: #25543a; }
 .minimal-entity.status-remove { background: #fae5e4; border-color: #ca7e7b; color: #642b29; }
+
+/* Local layout gestures own their pointer, without canvas pan or text selection. */
+.minimal-edge-card { pointer-events: all; touch-action: none; user-select: none; cursor: grab; }
+.minimal-edge-card:active { cursor: grabbing; }
+.minimal-edge-card:focus-visible { outline: 2px solid #bed8ed; outline-offset: 3px; }
+.react-flow__node { touch-action: none; }

@@ -100,6 +100,18 @@ for (const entity of entities.values()) {
     if (entity.id === 'request') requestDefinitions.push(edge); else sourceLocations.push(edge);
   }
 }
+export const pairUnchangedLocations = (edges: readonly GraphRelation[], supportedSubjects: ReadonlySet<string>): readonly GraphRelation[] => {
+ const consumed = new Set<string>(); const result: GraphRelation[] = [];
+ for (const edge of edges) {
+  if (consumed.has(edge.id)) continue;
+  const pair = edge.relation === 'located_in' && edge.version === 'before' && supportedSubjects.has(edge.from) ? edges.find(other => other.from === edge.from && other.to === edge.to && other.relation === edge.relation && other.version === 'after') : undefined;
+  if (!pair) { result.push(edge); continue; }
+  consumed.add(pair.id);
+  result.push({ ...edge, id: edge.from + ':unchanged-location:' + edge.to, version: 'comparison', data: { comparisonStatus: 'no change', basis: 'Explicit logical identity, exact unchanged refresh source body and same logical File; declaration line shifts retained as evidence', witnesses: [edge, pair] } });
+ }
+ return result;
+};
+const pairedSourceLocations = pairUnchangedLocations(sourceLocations, new Set(['refresh']));
 const relation = (edge: GraphRelation): GraphRelation => ({
   ...edge, from: logicalId(edge.from), to: logicalId(edge.to),
   data: {
@@ -131,7 +143,7 @@ export const comparisonGraph = {
   nodes: [...groups, ...[...entities.values()].filter(node => !grouped.has(node.id))],
   edges: [
     ...source.edges.filter(edge => edge.relation !== 'calls' && edge.relation !== 'located_in').map(relation),
-    ...sourceLocations, ...derivedCallEdges,
+    ...pairedSourceLocations, ...derivedCallEdges,
     { id: 'request:defined_in:review-file', from: 'request', to: 'review-file', version: 'comparison' as const, relation: 'defined_in', data: { definitionOccurrences: requestDefinitions, projection: 'metadata' } },
   ],
 };

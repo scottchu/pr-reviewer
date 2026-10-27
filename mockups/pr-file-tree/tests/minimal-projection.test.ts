@@ -1,7 +1,7 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { minimalGraph as source } from '../minimal-graph.ts';
-import { comparisonGraph, allEntities, allRelations } from '../comparison-graph.ts';
+import { comparisonGraph, allEntities, allRelations, pairUnchangedLocations } from '../comparison-graph.ts';
 import { cardRows, edgeRows, omittedStructuralEdge } from '../minimal-projection.ts';
 
 test('explicit compiler emits one function/File/test entity and retains original occurrence evidence', () => {
@@ -67,7 +67,8 @@ test('kind-driven rows keep short commit/range and clearly describe unexecuted a
  const helper = relations.find(edge => edge.from === 'helper' && edge.relation === 'located_in');
  assert.equal(helper?.to,'helper-file'); assert.deepEqual(helper?.data.range,{startLine:3,endLine:3});
  const refreshHomes = relations.filter(edge => edge.from === 'refresh' && edge.relation === 'located_in');
- assert.deepEqual(refreshHomes.map(edge => edge.data.range),[{startLine:34,endLine:44},{startLine:35,endLine:45}]);
+ assert.equal(refreshHomes.length,1); assert.equal(refreshHomes[0]?.version,'comparison'); assert.equal(refreshHomes[0]?.data.comparisonStatus,'no change');
+ const witnesses = refreshHomes[0]?.data.witnesses as {data:{range:unknown}}[]; assert.deepEqual(witnesses.map(edge => edge.data.range),[{startLine:34,endLine:44},{startLine:35,endLine:45}]);
  assert.ok(refreshHomes.every(edge => edge.to === 'review-file'));
  assert.equal(allEntities().find(entity => entity.id === 'request')?.data.comparisonStatus,'change');
  assert.equal(allEntities().find(entity => entity.id === 'review-file')?.data.comparisonStatus,'change');
@@ -75,3 +76,16 @@ test('kind-driven rows keep short commit/range and clearly describe unexecuted a
  assert.ok(relations.some(edge => edge.from === entity.id && ['located_in','defined_in'].includes(edge.relation)),entity.id+' has File evidence');
  }
  });
+
+test('unchanged locations retain both witness records without merging unsupported comparisons', () => {
+ const edge = allRelations().find(edge => edge.from === 'refresh' && edge.relation === 'located_in')!;
+ const witnesses = edge.data.witnesses as typeof edge[];
+ assert.equal(witnesses[0]?.data.commit, source.data.evidence.comparison.baseSha);
+ assert.equal(witnesses[1]?.data.commit, source.data.evidence.comparison.headSha);
+ assert.equal(edgeRows(edge).title,'located in · no change');
+ assert.deepEqual(edgeRows(edge).rows,['Before b096826 L34–44','After e3b270e L35–45']);
+ assert.equal(pairUnchangedLocations(witnesses,new Set()).length,2);
+ const changed = witnesses.map(witness=>({...witness,from:'modified-test'}));
+ assert.equal(pairUnchangedLocations(changed,new Set(['refresh'])).length,2);
+ assert.equal(allRelations().filter(edge=>edge.from==='owner-journey-test'&&edge.relation==='located_in').length,2);
+});

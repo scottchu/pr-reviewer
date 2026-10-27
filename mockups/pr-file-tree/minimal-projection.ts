@@ -40,6 +40,10 @@ export const cardRows = (entity: GraphEntity): CardRows => {
 };
 export const edgeRows = (edge: GraphRelation): CardRows => {
   const title = ['before', 'after'].includes(edge.relation) ? '' : edge.relation.replaceAll('_', ' ');
+  if (edge.relation === 'located_in' && edge.data.comparisonStatus === 'no change') {
+    const witnesses = edge.data.witnesses as readonly GraphRelation[];
+    return { title: 'located in · no change', rows: witnesses.map(witness => { const range = witness.data.range as { startLine: number; endLine: number }; return (witness.version === 'before' ? 'Before ' : 'After ') + text(witness.data.commit).slice(0,7) + ' L' + range.startLine + '–' + range.endLine; }) };
+  }
   if (edge.relation === 'located_in') {
     const range = edge.data.range as { startLine?: number; endLine?: number } | undefined;
     return { title, rows: [text(edge.data.commit).slice(0, 7), range ? `L${range.startLine}–${range.endLine}` : 'Range unavailable'] };
@@ -70,5 +74,5 @@ export const locationPeers = (fileId: string): readonly GraphRelation[] => allRe
     const side = (a.version === 'before' ? 0 : 1) - (b.version === 'before' ? 0 : 1);
     if (side) return side;
     if (a.from !== b.from) return a.from < b.from ? -1 : 1;
-    return ((a.data.range as { startLine: number }).startLine - (b.data.range as { startLine: number }).startLine);
+    return ((a.data.range as { startLine?: number } | undefined)?.startLine ?? 0) - ((b.data.range as { startLine?: number } | undefined)?.startLine ?? 0);
   });
