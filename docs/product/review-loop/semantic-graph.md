@@ -149,6 +149,49 @@ Every retained occurrence/call keeps its original packet ID/anchor/side/path/has
 Explanation organizes Claims about the Change. Exact Before29/After30 and helperAfter3 support the source-observed claim that header construction delegates to accessHeaders; the helper source distinguishes owner marker→no Authorization versus other strings→Bearer. An unchanged refresh body's participation in that changed downstream path is source-derived inference, not runtime/security proof. Calls, import binding, comparison and inferred consequence are distinct assertions. Diagram aliases/labels are inspection-only references to these records and add no meaning. The first slice's core data artifact supplies exact identities/evidence and coverage; its diagram is derived from those assertions, not an app projection.
 
 
-### Change, reason, goal and test inspection proposal
+## Change, reason, goal and test graph decisions
 
-Accepted for bounded standalone mockup exploration, not a runtime schema or delivered UI: nodes expose id/kind and label/name/value; relation records expose from/to/version/relation. A Change groups its Before/After subgraph, and may be motivated_by a Reason and intended_to_achieve a Goal; a Reason can impede that Goal. Reverse reading derives from the same edge. A test change uses the same comparison structure; an unchanged test is a separate verifying assertion, not a fabricated change. Expected behavior is distinct from execution evidence. Illustrative tests remain visibly illustrative until exact existing test evidence is admitted. Literal JSON and readable projections share the same records; display aliases must not replace canonical source identities.
+Date: 2026-10-27. Status: accepted semantic direction, not a delivered product schema/API or accepted projection. These decisions supersede the earlier flat-node mockup shape; they do not rewrite its historical JSON or existing canonical source identities. See the [general entity direction](../project-repository-ontology.md#general-entity-and-graph-direction).
+
+### Entity, graph and projection
+
+Entity/Node uses `id`, `kind`, `data`; `label`, `name`, `value` are data when present, not mandatory top-level fields or a closed union of every domain kind. Kinds retain meaning. Graph has its own `id`, `kind`, `data` plus nodes/edges and may participate in relationships; nodes can contain graphs. A node or graph may offer graph, summary and JSON projections. Unknown kinds have an honest generic JSON presentation. No projection may add assertions to make a picture more connected.
+
+Relation records retain the discussed `from`, `to`, `version`, `relation` concepts/keys. Relationship data carries contextual evidence where needed. Exact TypeScript signatures, graph nesting/registry/scoping/reference rules and serialized container placement are still drafts/open decisions. Do not silently settle them through a mockup or substitute new keys for the discussed ones.
+
+The user requests JSON visible inside graph nodes and on relation labels. A human-readable rendering is an alternate presentation of the same data, not independently authored meaning or different topology. This is accepted inspection intent; readable compact routing/layout remains unresolved, not established by JSON validity.
+
+### Change is the comparison subject
+
+A Change is an identity-bearing graph subject with `before` and `after` relationships to the old/new behavior subgraphs or supported absence. It need not duplicate an entire unchanged call graph on each side. Shared context is retained with its actual identities and evidence; this does not merge revision-specific occurrences. No mandatory layout or nesting implementation is selected.
+
+For the request example, the Before behavior **constructs** an Authorization Bearer value; the After behavior **calls** `accessHeaders`. Preserve these different relations. The function remains named `request()`; “header handling change” is explanatory material about the Change, not part of its function identity/name. In inspection examples, `token` is a readable alias; the exact prepared source uses `captured`. An alias must not be presented as exact source text. The existing core account supplies verified function, hunk and expression anchors separately.
+
+### Reasons, goals and intent
+
+- A Change may be `motivated_by` a Reason and `intended_to_achieve` one or multiple Goals. A reason is not automatically a goal or an executed result.
+- For an obstacle Reason X and Goal Y, store `X impedes Y`. Reading “Y is impeded by X” is a derived inverse, not a second duplicated assertion. A positive requirement is not the obstacle: here the obstacle is always constructing Bearer headers, not the desired absence of Authorization on an owner request.
+- Removing an obstacle does not prove achievement of its goal. The goal “open the review without manual token entry” remains intended behavior until supported outcome evidence exists. Explicitly sourced intent, attributed interpretation and source-derived inference retain their provenance and review-confirmation status independently; confirmation is not execution.
+- Optional intermediate intents are useful only when explanatory and supported. No forced tree, mandatory intent hierarchy, unsupported `requires` chain or author-edit-order/causation follows from graph adjacency.
+
+### Tests and their changes
+
+A test can change, remain unchanged, be new or be deleted. A test Change uses the same Before/After comparison-subgraph model and may be `motivated_by` the code Change. Added/deleted tests retain explicit supported absence, not fabricated old/new test definitions. An unchanged test retains its verification relation with no invented Change.
+
+A test **verifies a specific behavior/assertion**; it does not automatically verify an entire Change, goal, security claim or PR. TestDefinition and its expected/asserted behavior, actual TestRun, result and supporting execution Evidence are distinct. Source discovery or a before/after expected assertion does not establish PASS or even that the illustrative test exists.
+
+The mockup's owner-request Bearer→absent-Authorization assertion and unchanged explicit-credential Bearer assertion are ILLUSTRATIVE. Their descriptive labels are not verified existing test names. No run/result/PASS was supplied. The verified core request example includes no test-relevance/test-summary account; this broader prepared-input gap remains open.
+
+### Source entities relate to files
+
+Before/After source entities relate to a File entity, rather than repeating a nested duplicate source object in each node. Accepted direction: a source entity points to its file through a location relationship; `located_in` is the proposed relation spelling. File data identifies repository and path. The location edge data carries the immutable commit and range (`startLine`, `endLine`, 1-based inclusive); side/version identifies Before or After in the comparison. Keep discussed `version` semantics; the exact API/field placement remains draft. Hash, Snapshot/comparison and coordinate validation still follow the existing evidence contract, not a weakened line-only lookup.
+
+Each revision-specific source entity and its location remain distinct. A rename or missing side must be explicit; do not reuse an old path at a new commit or fabricate a location for absent source. Whether file identity is represented as a shared path entity plus revision location or revision-specific file occurrences must preserve the existing FileOccurrence identities; the final registry/serialization mapping is not settled here.
+
+Anchor granularity must match the entity: a whole function uses its actual declaration range, a native Change its native hunk ranges, and an expression its exact expression/callsite. The earlier chat illustration naming a `request-before` function but using Before26–32 was a GRANULARITY MISMATCH, not a canonical function anchor. Verified core evidence distinguishes request declarations Before24–32/After25–33, native header hunk Before26–32/After27–33, and changed expressions Before29/After30. Use the core account for exact hashes/IDs; no copied placeholder becomes admitted evidence.
+
+### Current evidence and open decisions
+
+The standalone mockup at docs pin34f0746 predates this generalization: it uses flat top-level label/name/value and `contains` plus version for the earlier exploratory comparison. Retain it as historical proposal, not the latest canonical schema or proof that the new direction is implemented. Its bounded semantic review found no remaining honesty blocker after correcting the obstacle Reason name. Its visual easy-reading gate FAILED: detached edge JSON, long/close routes, excessive vertical travel and some toolbar occlusion. Valid JSON and author interaction checks do not override that finding.
+
+Accepted semantic direction does not authorize product implementation. Open: exact TypeScript/public API and persistence, nesting/registry/scoping/reference details, source-location serialization mapping, reproducible general test preparation, readable graph projection and broader recovery acceptance. Existing canonical source admission, owner/draft/Return, runtime and business records remain unchanged.

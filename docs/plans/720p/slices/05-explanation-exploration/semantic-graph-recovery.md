@@ -85,3 +85,25 @@ Reused visual reviewer inspected all four static images: illustrative/not-execut
 This is a literal-data topology experiment available for inspection, not an accepted compact/readable UI. Product7ce22b7, business records, reader/control/state/runtime/dependencies remain frozen. The broader recovery semantic/model/projection gates and full-product knowledge gaps remain open.
 
 Semantic review of7136493 found one subject ambiguity: Reason.name stated the positive no-Authorization requirement while its impedes relation concerned the always-Bearer limitation. Corrected only that name to “Always-Bearer request headers” in proposal data/viewer; limitation value unchanged. Reviewer otherwise confirmed9nodes/9edges, matching Before/After structures, unchanged-test distinction, illustrative status and no duplicate reverse edge. This semantic correction does not close visual findings.
+
+
+## Knowledge reconciliation handoff v4 — accepted graph discussion
+
+Date: 2026-10-27. Baseline34f0746, clean. User requests persistence of all decisions, DOCS ONLY. Allow durable ontology/semantic docs plus this slice reconciliation; no app, static artifact, runtime, data, test or dependency changes. Earlier v3 remains a historical mockup packet, superseded for latest entity shape/comparison semantics.
+
+Decision map:
+
+| Decision | Owning durable section | Status / boundary |
+|---|---|---|
+| Entity id/kind/data; meaningful open kinds; unknown generic JSON | ontology: General entity and graph direction | Accepted direction, not closed union/API |
+| Graph has identity/nodes/edges and relationships; graph/summary/JSON projections; node can contain graph | same + semantic: Entity, graph and projection | Accepted direction; exact nesting/registry/scoping open |
+| Change subject with before/after behavior graphs; constructs differs from calls; request name unchanged | semantic: Change is the comparison subject | Accepted direction; no duplicated whole graphs |
+| motivated_by / intended_to_achieve; multiple goals; obstacle impedes goal; inverse derived; optional intents | semantic: Reasons, goals and intent | Accepted direction; provenance/intent/outcome distinct |
+| Changed/unchanged/new/deleted tests; assertion vs run/result/evidence | semantic: Tests and their changes | Accepted direction; owner-header example illustrative only |
+| Source→File location, commit/range/side, repository/path, granularity | semantic: Source entities relate to files | Direction accepted; located_in spelling and exact API mapping proposed |
+| Literal JSON nodes/edges; readable alternate same facts | semantic: Entity, graph and projection | Accepted inspection intent; visual design unresolved |
+| Historical34f0746 mockup | semantic: Current evidence and open decisions | Semantics bounded reviewed; visual FAILED; pre-generalization, not canonical latest schema |
+
+Independent docs-review handoff v4: reused primary reviewer checks the fixed diff for all decisions above, accepted-vs-draft boundaries, no fake verified test/source anchors, and explicit historical mockup status. No source/runtime review, fresh whole-product knowledge pass or UI acceptance is implied. Exact core evidence remains in reviews/core-request-graph-v1.json; the chat function/hunk mismatch is expressly rejected. No new diagram or UI derived from these decisions in this handoff.
+
+Temporary checkpoint: prior ignored mockup artifacts under public/elk-v25/change-reason-goal and /tmp/pr-reviewer-reading-journey-evidence/change-reason-goal-v1 are retained as sole local proposal/capture evidence for ongoing recovery. No active writer or running capture is known from this executor; runtime process ownership was not inspected or modified. Missing broader runtime metadata is not a cleanup grant. No files removed.

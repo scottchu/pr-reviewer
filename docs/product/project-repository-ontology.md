@@ -68,3 +68,14 @@ These explicit Project and Repository boxes can appear in a project-knowledge vi
 Existing public snapshot/source/analysis/test contracts remain authoritative. This conceptual vocabulary does not rename their identifiers, introduce a persistence schema or authorize a generic abstraction layer. The [architecture](architecture.md), [file-workspace requirements](pr-file-tree-first.md), [configured test execution](review-loop/test-execution.md) and [development rules](../rules/development.md) retain their responsibilities. Exact source anchors use their existing coordinate and hash contracts.
 
 Detailed vocabulary labels, global cardinalities and inference behavior remain proposals. No repository-wide extraction completeness, formal logic engine, ontology validation or automatic conformance proof is established. Source relationships and test mappings remain bounded by their evidence and explicit frontiers. Project and repository entities are meaningful conceptual distinctions; the current file mock does not yet render a complete project-knowledge ontology view.
+
+
+## General entity and graph direction
+
+Date: 2026-10-27. Status: accepted semantic direction; exact TypeScript API, persistence and registry are not finalized or implemented. This extends the conceptual vocabulary above without replacing existing public source/Story identities or admitting new facts.
+
+An Entity/Node has `id`, meaningful `kind` and `data`. Labels, names and values belong in `data`, rather than imposing a rigid application-wide union for every possible domain kind. `function`, `header`, `assertion`, `test`, `change`, `reason`, `goal` and `file` remain semantically distinct kinds; general storage/presentation does not make their meanings interchangeable. An unknown kind can receive a generic JSON projection without inventing domain behavior or evidence.
+
+A Graph also has identity (`id`, `kind`, `data`) and nodes/edges, can itself participate in relationships, and may be contained by a node. Graphs and nodes may have multiple projections, including graph, summary and JSON. Projection presents the same identity-bearing knowledge; it does not create semantic truth. Exact nesting layout, registry, identifier scoping, reference resolution and representation of graph participation remain open. This is not authorization to introduce a generic runtime layer or migrate current contracts.
+
+The maintained [change/reason/goal/test and source-location decisions](review-loop/semantic-graph.md#change-reason-goal-and-test-graph-decisions) define the current bounded meaning and distinguish accepted direction from examples and draft APIs.
