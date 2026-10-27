@@ -296,3 +296,6 @@ Finite gates: pure auto-layout/routing and label-on-path invariants; strict/buil
 
 
 V11 test-entry correction: the old reading-journey E2E config explicitly lists legacy full-shell files and does not discover the minimum route spec. Add a dedicated minimum-graph config/script for the current scope, with persistent test output and no server launch/global change. Earlier statements that the legacy entry auto-discovers all specs were incorrect; no legacy suite is claimed run.
+
+
+V11 wheel-pan correction: user still cannot pan because default ReactFlow wheel zoom remained enabled; prior gates covered pointer pan only. Explicitly enable free panOnScroll, disable unmodified zoomOnScroll, retain zoomOnPinch/Ctrl-wheel. Test horizontal and vertical wheel deltas at blank canvas, node and edge-label targets without scale change, intentional modified zoom, blank touch pan and retained shared-route interactions. SameURL successor is required; physical trackpad remains unverified. Retained minimum test config/command is part this scope, not the legacy full-shell entry.
