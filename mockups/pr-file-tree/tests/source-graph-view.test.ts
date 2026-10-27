@@ -36,3 +36,18 @@ test('actual entry consumes generated source graph rather than legacy curated st
     const adapter = readFileSync(new URL('../source-graph.ts', import.meta.url), 'utf8');
     assert.match(adapter, /generated-source-graph\.json/);
 });
+test('visible Tests retain their actual assertions and source locations without File pagination', () => {
+    const view = visibleSourceGraph({});
+    const visible = new Set(view.nodes.map(entity => entity.id));
+    const tests = new Set(view.nodes.filter(entity => entity.kind === 'test').map(entity => entity.id));
+    const ownership = allRelations().filter(edge => edge.relation === 'contains' && tests.has(edge.from));
+    assert.ok(ownership.length > 0);
+    for (const edge of ownership) {
+        assert.ok(visible.has(edge.to));
+        assert.ok(view.relations.some(actual => actual.id === edge.id));
+        assert.ok(view.relations.some(location => location.from === edge.to && location.relation === 'located_in'));
+    }
+    assert.ok(view.relations.some(edge => edge.relation === 'located_in'
+        && ownership.some(contains => contains.to === edge.from)
+        && JSON.stringify(edge.data).includes('418')));
+});

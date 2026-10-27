@@ -46,6 +46,13 @@ export const visibleSourceGraph = (limits: Readonly<Record<string, number>>) => 
     for (const entity of registry.filter(entity => visible.has(entity.id) && entity.nodes))
         for (const child of entity.nodes ?? [])
             visible.add(child.id);
+    const visibleTests = new Set(registry
+        .filter(entity => entity.kind === 'test' && visible.has(entity.id))
+        .map(entity => entity.id));
+    for (const relation of candidate.relations)
+        if (relation.relation === 'contains' && visibleTests.has(relation.from)
+            && registry.some(entity => entity.id === relation.to && entity.kind === 'assertion'))
+            visible.add(relation.to);
     const nodes = registry.filter(entity => visible.has(entity.id));
     return { nodes, relations: candidate.relations.filter(edge => visible.has(edge.from) && visible.has(edge.to)) };
 };
