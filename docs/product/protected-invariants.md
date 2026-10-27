@@ -8,6 +8,8 @@ Detailed contracts remain in [file workspace](pr-file-tree-first.md), [canvas re
 
 2026-10-27: user authorizes current candidate header+graph ONLY. The old file/reader/Story/panel/control composition remains retained source/history, not required visible content in this minimal entry. New entry must not import those UI systems; preserve public owners, domain, storage, source bytes, records and session/runtime boundaries. This is an explicit scoped supersession of entry visibility, not permission to delete retained systems or fabricate graph evidence. The durable semantic graph contract defines the minimum; no unrelated fixes or projection framework.
 
+Latest logical-entity correction (2026-10-27): the current small prepared comparison must compile one logical entity per function/File/Test, preserving revision occurrences as evidence. Status is change/no change/add/remove only where evidenced; intent/value contexts must not get invented source status. Neutral entity row cards, literal red/green Before/After EDGE cards, shortcommit/range and boundary clearance replace diagnostic JSON. Local source candidatec86e159 has passed focused source/pure/strict/build checks; actual geometry/readability/publication remain pending under the current network restriction. The frozen prior preview is not that new candidate. This does not claim all-repository identity analysis or restored owner data.
+
 ## Current boundaries and status
 
 | Invariant | Preserve / required behavior | Current status and evidence boundary |
