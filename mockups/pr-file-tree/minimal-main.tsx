@@ -1,180 +1,46 @@
-import React, { useEffect, useMemo, useState, useRef } from 'react';
-import { createRoot } from 'react-dom/client';
-import {
-  ReactFlow, Background, BaseEdge, EdgeLabelRenderer, Handle, Position,
-  MarkerType, getBezierPath, useNodesState, useReactFlow, type Node, type NodeProps, type Edge,
-  type EdgeProps,
-} from '@xyflow/react';
+import React, {useCallback,useEffect,useLayoutEffect,useMemo,useRef,useState} from 'react';
+import {createRoot} from 'react-dom/client';
+import {ReactFlow,Background,BaseEdge,EdgeLabelRenderer,Handle,Position,MarkerType,useNodesState,useNodesInitialized,useReactFlow,type Node,type NodeProps,type Edge,type EdgeProps} from '@xyflow/react';
 import '@xyflow/react/dist/style.css';
 import './minimal.css';
-import { installPageGestureBoundary } from './page-gestures.ts';
-import { comparisonGraph as minimalGraph, allEntities, allRelations, isPairedSubject, type GraphEntity, type GraphRelation } from './comparison-graph.ts';
+import {installPageGestureBoundary} from './page-gestures.ts';
+import {comparisonGraph,allEntities,allRelations,type GraphEntity,type GraphRelation} from './comparison-graph.ts';
+import {cardRows,edgeRows,omittedStructuralEdge} from './minimal-projection.ts';
+import {initialLayout,automaticRoutes,curve,type Point,type Routed,type Side} from './graph-geometry.ts';
 
-import { cardRows, edgeRows, entityVersion, groupSize, rowPositions, omittedStructuralEdge, locationPeers } from './minimal-projection.ts';
-
-type EntityNode = Node<{ entity: GraphEntity; viewId: string }, 'entity' | 'graph'>;
-type RelationEdge = Edge<{ relation: GraphRelation; locationLane: number; locationCount: number }, 'relation'>;
-
-const Ports = ({ entity }: { entity: GraphEntity }) => <>
-  {entity.kind === 'file' && locationPeers(entity.id).map((edge, index, peers) => (
-    <Handle key={edge.id} id={'file-in:' + edge.id} type="target" position={(rowPositions[entity.id]?.x ?? 0) < 0 ? Position.Right : Position.Left} style={{ top: ((index + 1) / (peers.length + 1) * 100) + '%' }} />
-  ))}
-  <Handle id="in-top" type="target" position={Position.Top} />
-  <Handle id="in-left" type="target" position={Position.Left} />
-  <Handle id="in-right" type="target" position={Position.Right} />
-  <Handle id="in-before" type="target" position={Position.Right} style={{ top: '30%' }} />
-  <Handle id="in-after-location" type="target" position={Position.Right} style={{ top: '70%' }} />
-  <Handle id="location-before" type="source" position={Position.Left} style={{ top: '30%' }} />
-  <Handle id="location-after" type="source" position={Position.Left} style={{ top: '70%' }} />
-  <Handle id="out-bottom" type="source" position={Position.Bottom} />
-  <Handle id="out-left" type="source" position={Position.Left} />
-  <Handle id="out-right" type="source" position={Position.Right} />
-</>;
-const Version = ({ value }: { value: GraphRelation['version'] }) => value === 'comparison' ? null : <span className="version-tag">{value === 'before' ? 'Before' : 'After'}</span>;
-const Entity = ({ data }: NodeProps<EntityNode>) => {
-  const card = cardRows(data.entity);
-  const paired = isPairedSubject(data.entity.id);
-  const version = paired ? 'comparison' : entityVersion(data.entity.id);
-  return <article className={'minimal-entity' + (typeof data.entity.data.comparisonStatus === 'string' ? ' status-' + data.entity.data.comparisonStatus.replaceAll(' ', '-') : '')} {...(data.entity.kind === 'file' ? { style: { minHeight: Math.max(70, locationPeers(data.entity.id).length * 18 + 40) } } : {})}>
-    <Ports entity={data.entity} />
-    {paired && <>
-      <Handle id="in-after" type="target" position={Position.Right} style={{ top: '30%' }} />
-      <Handle id="out-before" type="source" position={Position.Bottom} style={{ left: '30%' }} />
-      <Handle id="out-after" type="source" position={Position.Right} style={{ top: '70%' }} />
-    </>}
-    <h2>{card.title}</h2>
-    {card.rows.map((row, index) => <p key={index}>{row}</p>)}
-  </article>;
+const relations=allRelations().filter(edge=>!omittedStructuralEdge(edge));
+const links=relations.map(edge=>({id:edge.id,source:edge.from,target:edge.to}));
+const directions:readonly Side[]=['left','right','top','bottom'];
+const position=(side:Side)=>({left:Position.Left,right:Position.Right,top:Position.Top,bottom:Position.Bottom})[side];
+type EntityNode=Node<{entity:GraphEntity},'entity'|'graph'>;
+type RelationEdge=Edge<{relation:GraphRelation;routed:Routed;onBend:(id:string,offset:Point|undefined)=>void;onMeasure:(id:string,size:{width:number;height:number})=>void},'relation'>;
+const Ports=({id}:{id:string})=><>{(['source','target'] as const).flatMap(type=>{const peers=links.filter(edge=>type==='source'?edge.source===id:edge.target===id);return peers.flatMap((edge,index)=>directions.map(side=><Handle key={type+edge.id+side} id={type+':'+edge.id+':'+side} type={type} position={position(side)} style={side==='left'||side==='right'?{top:(index+1)/(peers.length+1)*100+'%'}:{left:(index+1)/(peers.length+1)*100+'%'}}/>));})}</>;
+const Entity=({data}:NodeProps<EntityNode>)=>{const card=cardRows(data.entity);return <article className={'minimal-entity'+(typeof data.entity.data.comparisonStatus==='string'?' status-'+data.entity.data.comparisonStatus.replaceAll(' ','-'):'')}><Ports id={data.entity.id}/><h2>{card.title}</h2>{card.rows.map((row,index)=><p key={index}>{row}</p>)}</article>;};
+const GraphBoundary=({data}:NodeProps<EntityNode>)=><section className="minimal-change-graph" aria-label={String(data.entity.data.name)+' graph'}><Ports id={data.entity.id}/><h2>{String(data.entity.data.name)}</h2></section>;
+const Relation=(props:EdgeProps<RelationEdge>)=>{
+ const {getZoom}=useReactFlow();const labelRef=useRef<HTMLDivElement>(null);
+ const drag=useRef<{pointer:number;clientX:number;clientY:number;offset:Point;zoom:number}|null>(null);
+ const data=props.data;
+ useLayoutEffect(()=>{const element=labelRef.current;if(!element||!data)return;const measure=()=>data.onMeasure(props.id,{width:element.offsetWidth,height:element.offsetHeight});measure();const observer=new ResizeObserver(measure);observer.observe(element);return()=>observer.disconnect();},[props.id,data?.onMeasure]);
+ if(!data)return null;
+ const route=curve({x:props.sourceX,y:props.sourceY},{x:props.targetX,y:props.targetY},data.routed.offset);const card=edgeRows(data.relation);
+ const begin=(event:React.PointerEvent<Element>)=>{if(event.button!==0)return;event.stopPropagation();event.preventDefault();event.currentTarget.setPointerCapture(event.pointerId);drag.current={pointer:event.pointerId,clientX:event.clientX,clientY:event.clientY,offset:data.routed.offset,zoom:getZoom()};};
+ const move=(event:React.PointerEvent<Element>)=>{const start=drag.current;if(!start||start.pointer!==event.pointerId)return;event.stopPropagation();event.preventDefault();data.onBend(props.id,{x:start.offset.x+(event.clientX-start.clientX)/start.zoom,y:start.offset.y+(event.clientY-start.clientY)/start.zoom});};
+ const end=(event:React.PointerEvent<Element>)=>{if(drag.current?.pointer!==event.pointerId)return;event.stopPropagation();drag.current=null;if(event.currentTarget.hasPointerCapture(event.pointerId))event.currentTarget.releasePointerCapture(event.pointerId);};
+ const key=(event:React.KeyboardEvent<Element>)=>{const delta=({ArrowLeft:[-10,0],ArrowRight:[10,0],ArrowUp:[0,-10],ArrowDown:[0,10]} as Record<string,number[]>)[event.key];if(event.key==='Home'){event.preventDefault();event.stopPropagation();data.onBend(props.id,undefined);}else if(delta){event.preventDefault();event.stopPropagation();data.onBend(props.id,{x:data.routed.offset.x+delta[0]!,y:data.routed.offset.y+delta[1]!});}};
+ return <><g data-route-id={props.id} className="minimal-route nodrag nopan" role="button" tabIndex={0} aria-label={'Move '+card.title+' route'} onPointerDown={begin} onPointerMove={move} onPointerUp={end} onPointerCancel={end} onKeyDown={key}><BaseEdge id={props.id} path={route.path} interactionWidth={24} {...(props.markerEnd?{markerEnd:props.markerEnd}:{})}/></g><EdgeLabelRenderer><div ref={labelRef} className={'minimal-edge-card version-'+data.relation.version+' nodrag nopan'} data-relation={data.relation.relation} data-edge-id={props.id} role="button" tabIndex={0} aria-label={'Move '+card.title+' label and route'} onPointerDown={begin} onPointerMove={move} onPointerUp={end} onPointerCancel={end} onKeyDown={key} style={{transform:'translate(-50%, -50%) translate('+route.label.x+'px, '+route.label.y+'px)'}}><div className="edge-main-row">{data.relation.version!=='comparison'&&<span className="version-tag">{data.relation.version==='before'?'Before':'After'}</span>}{card.title&&<span>{card.title}</span>}{data.relation.relation==='located_in'&&card.rows.map(row=><span key={row}>{row}</span>)}</div>{data.relation.relation!=='located_in'&&card.rows.map((row,index)=><p key={index}>{row}</p>)}</div></EdgeLabelRenderer></>;
 };
-const GraphBoundary = ({ data }: NodeProps<EntityNode>) => (
-  <section className="minimal-change-graph" aria-label={`${String(data.entity.data.name)} graph`}>
-    <h2>{String(data.entity.data.name)}</h2>
-    {data.entity.id !== 'change' && <Handle id="before" type="source" position={Position.Bottom} style={{ left: 190, top: 70, bottom: 'auto' }} />}
-    {data.entity.id !== 'change' && <Handle id="after" type="source" position={Position.Bottom} style={{ left: 790, top: 70, bottom: 'auto' }} />}
-    <Handle id="in-right" type="target" position={Position.Right} style={{ top: '25%' }} />
-    <Handle id="in-left" type="target" position={Position.Left} style={{ top: '25%' }} />
-    <Handle id="out-right" type="source" position={Position.Right} style={{ top: '65%' }} />
-    <Handle id="out-left" type="source" position={Position.Left} style={{ top: '65%' }} />
-    <Handle id="out-bottom" type="source" position={Position.Bottom} />
-  </section>
-);
-const Relation = (props: EdgeProps<RelationEdge>) => {
-  const { getZoom } = useReactFlow();
-  const [offset, setOffset] = useState({ x: 0, y: 0 });
-  const drag = useRef<{ pointer: number; clientX: number; clientY: number; x: number; y: number; zoom: number } | null>(null);
-  const beginDrag = (event: React.PointerEvent<HTMLDivElement>) => {
-    if (event.button !== 0) return;
-    event.stopPropagation(); event.preventDefault();
-    event.currentTarget.setPointerCapture(event.pointerId);
-    drag.current = { pointer: event.pointerId, clientX: event.clientX, clientY: event.clientY, ...offset, zoom: getZoom() };
-  };
-  const moveDrag = (event: React.PointerEvent<HTMLDivElement>) => {
-    const start = drag.current; if (!start || start.pointer !== event.pointerId) return;
-    event.stopPropagation(); event.preventDefault();
-    setOffset({ x: start.x + (event.clientX - start.clientX) / start.zoom, y: start.y + (event.clientY - start.clientY) / start.zoom });
-  };
-  const endDrag = (event: React.PointerEvent<HTMLDivElement>) => {
-    if (drag.current?.pointer !== event.pointerId) return;
-    event.stopPropagation(); drag.current = null;
-    if (event.currentTarget.hasPointerCapture(event.pointerId)) event.currentTarget.releasePointerCapture(event.pointerId);
-  };
-  const [defaultPath, defaultX, defaultY] = getBezierPath(props);
-  if (!props.data) return null;
-  const testLink = props.data.relation.from === 'test-change' && props.data.relation.to === 'change';
-  const outerLeft = testLink && props.data.relation.relation === 'motivated_by';
-  const outerRight = testLink && props.data.relation.relation === 'verifies';
-  const direction = outerLeft ? -1 : 1;
-  const versionedLocation = props.data.relation.relation === 'located_in' && props.targetX < 0;
-  const middleX = (props.sourceX + props.targetX) / 2;
-  const locationX = props.targetX + 330;
-  const locationY = props.targetY + (props.data.locationLane - (props.data.locationCount - 1) / 2) * 70;
-  const controlX = (locationX - (props.sourceX + props.targetX) / 8) / 0.75;
-  const locationOffset = (locationY - (props.sourceY + props.targetY) / 2) / 0.75;
-  const reverseCall = props.data.relation.relation === 'calls' && props.sourceX > props.targetX;
-  const callControlX = props.sourceX - 160;
-  const path = versionedLocation
-    ? `M${props.sourceX},${props.sourceY} C${controlX},${props.sourceY + locationOffset} ${controlX},${props.targetY + locationOffset} ${props.targetX},${props.targetY}`
-    : reverseCall
-    ? `M${props.sourceX},${props.sourceY} C${callControlX},${props.sourceY} ${callControlX},${props.targetY} ${props.targetX},${props.targetY}`
-    : outerLeft || outerRight
-    ? `M${props.sourceX},${props.sourceY} C${props.sourceX + direction * 320},${props.sourceY} ${props.targetX + direction * 320},${props.targetY} ${props.targetX},${props.targetY}`
-    : defaultPath;
-  const x = versionedLocation ? locationX : reverseCall ? (props.sourceX + props.targetX) / 8 + callControlX * 0.75 : outerLeft || outerRight ? (props.sourceX + props.targetX) / 2 + direction * 240 : defaultX;
-  const y = versionedLocation ? locationY : reverseCall ? (props.sourceY + props.targetY) / 2 : outerLeft || outerRight ? (props.sourceY + props.targetY) / 2 : defaultY;
-  const ownCall = props.data.relation.relation === 'calls' && props.data.relation.from.startsWith('callsite:') && props.sourceX < props.targetX;
-  // Follow the existing right-to-left cubic at t=.8, beyond the unrelated cross-graph path.
-  const t = 0.8; const u = 1 - t;
-  const callLabelX = u ** 3 * props.sourceX + 3 * u * t * ((props.sourceX + props.targetX) / 2) + t ** 3 * props.targetX;
-  const callLabelY = (u ** 3 + 3 * u ** 2 * t) * props.sourceY + (3 * u * t ** 2 + t ** 3) * props.targetY;
-  const card = edgeRows(props.data.relation);
-  return <>
-    <BaseEdge id={props.id} path={path} {...(props.markerEnd ? { markerEnd: props.markerEnd } : {})} />
-    <EdgeLabelRenderer>
-      <div className={`minimal-edge-card version-${props.data.relation.version} nodrag nopan`} data-relation={props.data.relation.relation} data-edge-id={props.id} role="button" tabIndex={0} aria-label={`Move ${card.title} label`} onPointerDown={beginDrag} onPointerMove={moveDrag} onPointerUp={endDrag} onPointerCancel={endDrag} onKeyDown={event => { const delta = ({ ArrowLeft: [-10,0], ArrowRight: [10,0], ArrowUp: [0,-10], ArrowDown: [0,10] } as Record<string, number[]>)[event.key]; if (event.key === 'Home') { event.preventDefault(); event.stopPropagation(); setOffset({x:0,y:0}); } else if (delta) { event.preventDefault(); event.stopPropagation(); setOffset(value => ({ x: value.x + delta[0]!, y: value.y + delta[1]! })); } }} style={{ transform: `translate(-50%, -50%) translate(${(ownCall ? callLabelX : x) + offset.x}px, ${(ownCall ? callLabelY : y) + offset.y}px)` }}>
-        <div className="edge-main-row"><Version value={props.data.relation.version} />{card.title && <span>{card.title}</span>}{props.data.relation.relation === 'located_in' && card.rows.map(row => <span key={row}>{row}</span>)}</div>
-        {props.data.relation.relation !== 'located_in' && card.rows.map((row, index) => <p key={index}>{row}</p>)}
-      </div>
-    </EdgeLabelRenderer>
-  </>;
+const nodeTypes={entity:Entity,graph:GraphBoundary};const edgeTypes={relation:Relation};
+const InitialLayout=({apply}:{apply:(nodes:EntityNode[])=>void})=>{const initialized=useNodesInitialized();const {getNodes}=useReactFlow<EntityNode>();const applied=useRef(false);useEffect(()=>{if(!initialized||applied.current)return;applied.current=true;apply(initialLayout(getNodes(),links));},[initialized,getNodes,apply]);return null;};
+const App=()=>{
+ useEffect(()=>installPageGestureBoundary(document.documentElement),[]);
+ const initialNodes=useMemo<EntityNode[]>(()=>allEntities().map(entity=>{const parent=comparisonGraph.nodes.find(graph=>graph.nodes?.some(child=>child.id===entity.id));const group=Boolean(entity.nodes&&entity.edges);return{id:entity.id,type:group?'graph':'entity',data:{entity},position:{x:0,y:0},draggable:true,...(parent?{parentId:parent.id,extent:'parent' as const}:{}),style:{opacity:0,...(group?{width:800,height:520}:{})}};}),[]);
+ const [nodes,setNodes,onNodesChange]=useNodesState<EntityNode>(initialNodes);const [ready,setReady]=useState(false);
+ const [manual,setManual]=useState<Record<string,Point>>({});const [sizes,setSizes]=useState<Record<string,{width:number;height:number}>>({});
+ const apply=useCallback((laidOut:EntityNode[])=>{setNodes(laidOut);setReady(true);},[setNodes]);
+ const onBend=useCallback((id:string,offset:Point|undefined)=>setManual(previous=>{const next={...previous};if(offset)next[id]=offset;else delete next[id];return next;}),[]);
+ const onMeasure=useCallback((id:string,size:{width:number;height:number})=>setSizes(previous=>previous[id]?.width===size.width&&previous[id]?.height===size.height?previous:{...previous,[id]:size}),[]);
+ const edges=useMemo<RelationEdge[]>(()=>{if(!ready)return[];const routes=automaticRoutes(nodes,links,sizes,manual);return relations.map(relation=>{const routed=routes.get(relation.id)!;return{id:relation.id,type:'relation',source:relation.from,target:relation.to,sourceHandle:'source:'+relation.id+':'+routed.sourceSide,targetHandle:'target:'+relation.id+':'+routed.targetSide,data:{relation,routed,onBend,onMeasure},markerEnd:{type:MarkerType.ArrowClosed,color:'#9db3c8'}};});},[ready,nodes,sizes,manual,onBend,onMeasure]);
+ return <><header className="minimal-header"><h1>PR25 · Request headers</h1><p>One Change graph + one actual modified-test graph · Source-declared indirect relevance · Tests not run</p></header><main aria-label="Request comparison graph"><ReactFlow<EntityNode,RelationEdge> nodes={nodes} onNodesChange={onNodesChange} edges={edges} nodeTypes={nodeTypes} edgeTypes={edgeTypes} defaultViewport={{x:20,y:35,zoom:1}} minZoom={0.25} maxZoom={2} nodesConnectable={false} nodesDraggable elementsSelectable={false} proOptions={{hideAttribution:true}}><InitialLayout apply={apply}/><Background color="#29333b" gap={24} size={1}/></ReactFlow></main></>;
 };
-const nodeTypes = { entity: Entity, graph: GraphBoundary };
-const edgeTypes = { relation: Relation };
-
-const App = () => {
-  const [narrow, setNarrow] = useState(() => window.innerWidth < 650);
-  useEffect(() => {
-    const media = matchMedia('(max-width: 649px)');
-    const update = () => setNarrow(media.matches);
-    media.addEventListener('change', update);
-    const dispose = installPageGestureBoundary(document.documentElement);
-    return () => { media.removeEventListener('change', update); dispose(); };
-  }, []);
-  const initialNodes = useMemo<EntityNode[]>(() => {
-    const layout = rowPositions;
-    return allEntities().map(entity => {
-      const parent = minimalGraph.nodes.find(graph => graph.nodes?.some(child => child.id === entity.id));
-      const isGraph = Boolean(entity.nodes && entity.edges);
-      return {
-        id: entity.id, type: isGraph ? 'graph' : 'entity', data: { entity, viewId: entity.id },
-        position: entity.kind === 'callsite' ? { x: 640, y: 350 } : layout[entity.id] ?? { x: 0, y: 0 }, draggable: true,
-        ...(parent ? { parentId: parent.id, extent: 'parent' as const } : {}),
-        ...(isGraph ? { style: { ...groupSize(entity.id) } } : {}),
-      };
-    });
-  }, [narrow]);
-  const [nodes, , onNodesChange] = useNodesState<EntityNode>(initialNodes);
-  const edges = useMemo<RelationEdge[]>(() => allRelations().filter(relation => !omittedStructuralEdge(relation)).map(relation => {
-    const fromGraph = relation.from === 'change' || relation.from === 'test-change';
-    const comparison = relation.relation === 'before' || relation.relation === 'after';
-    const testLink = relation.from === 'test-change' && relation.to === 'change';
-    const location = relation.relation === 'located_in';
-    const beforeLocation = location && relation.version === 'before';
-    const pairedLocation = location && ['review-file', 'test-file'].includes(relation.to);
-    return {
-      id: relation.id, type: 'relation', source: relation.from, target: relation.to,
-      sourceHandle: pairedLocation ? (beforeLocation ? 'location-before' : 'location-after') : isPairedSubject(relation.from) && relation.version === 'before' && relation.relation !== 'located_in' ? 'out-before' : isPairedSubject(relation.from) && relation.version === 'after' && relation.relation !== 'located_in' ? 'out-after' : comparison ? relation.relation : testLink ? (relation.relation === 'verifies' ? 'out-right' : 'out-left') : beforeLocation ? 'out-left' : location ? 'out-right' : relation.from === 'refresh' ? 'out-left' : relation.relation === 'calls' || relation.relation === 'impedes' ? 'out-right' : 'out-bottom',
-      targetHandle: location ? 'file-in:' + relation.id : pairedLocation ? (beforeLocation ? 'in-before' : 'in-after-location') : isPairedSubject(relation.to) && relation.relation === 'calls' && relation.version === 'after' ? 'in-after' : testLink ? (relation.relation === 'verifies' ? 'in-right' : 'in-left') : beforeLocation || relation.from === 'refresh' ? 'in-right' : location ? 'in-left' : comparison || fromGraph || relation.relation === 'constructs' || relation.relation === 'contains' ? 'in-top' : 'in-left',
-      data: { relation, locationLane: locationPeers(relation.to).findIndex(edge => edge.id === relation.id), locationCount: locationPeers(relation.to).length }, markerEnd: { type: MarkerType.ArrowClosed, color: '#9db3c8' },
-    };
-  }), []);
-
-  return <>
-    <header className="minimal-header">
-      <h1>PR25 · Request headers</h1>
-      <p>One Change graph + one actual modified-test graph · Source-declared indirect relevance · Tests not run</p>
-    </header>
-    <main aria-label="Request comparison graph">
-      <ReactFlow<EntityNode, RelationEdge>
-        nodes={nodes} onNodesChange={onNodesChange} edges={edges} nodeTypes={nodeTypes} edgeTypes={edgeTypes}
-        defaultViewport={{ x: 20, y: 35, zoom: 1 }}
-        minZoom={0.25} maxZoom={2} nodesConnectable={false}
-        nodesDraggable={true} elementsSelectable={false} proOptions={{ hideAttribution: true }}
-      >
-        <Background color="#29333b" gap={24} size={1} />
-      </ReactFlow>
-    </main>
-  </>;
-};
-const root = document.getElementById('root');
-if (!root) throw new Error('minimal_root_missing');
-createRoot(root).render(<App />);
+const root=document.getElementById('root');if(!root)throw new Error('minimal_root_missing');createRoot(root).render(<App/>);

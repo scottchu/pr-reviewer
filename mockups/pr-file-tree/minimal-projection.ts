@@ -1,13 +1,6 @@
-import { allEntities, allRelations, isPairedSubject, type GraphEntity, type GraphRelation } from './comparison-graph.ts';
+import { isPairedSubject, type GraphEntity, type GraphRelation } from './comparison-graph.ts';
 
 export type CardRows = Readonly<{ title: string; rows: readonly string[] }>;
-export const entityVersion = (id: string): GraphRelation['version'] => {
-  const values = allEntities().find(entity => entity.id === id)?.data.occurrences;
-  if (!Array.isArray(values)) return 'comparison';
-  const sides = new Set(values.map(value => (value as { side?: string; anchor?: { side?: string } }).side ?? (value as { anchor?: { side?: string } }).anchor?.side));
-  if (sides.has('base') && sides.has('head')) return 'comparison';
-  return sides.has('base') ? 'before' : sides.has('head') ? 'after' : 'comparison';
-};
 const text = (value: unknown) => typeof value === 'string' ? value : '';
 const assertionText = (value: string) => {
   if (value.includes('Local access token') && value.includes('toHaveCount(0)')) return 'No local access token field';
@@ -55,24 +48,5 @@ export const edgeRows = (edge: GraphRelation): CardRows => {
   if (edge.relation === 'impedes') return { title, rows: ['Inferred obstacle'] };
   return { title, rows: [] };
 };
-export const groupSize = (id: string) => ({ width: 1000, height: id === 'change' ? 520 : 780 });
-export const rowPositions: Readonly<Record<string, { x: number; y: number }>> = {
-  change: { x: 0, y: 0 }, request: { x: 340, y: 150 }, 'header-value': { x: 40, y: 380 },
-  refresh: { x: 1500, y: 0 }, helper: { x: 1500, y: 380 },
-  'review-file': { x: -950, y: 150 }, 'helper-file': { x: 2200, y: 380 },
-  reason: { x: 0, y: 900 }, goal: { x: 1500, y: 900 },
-  'test-change': { x: 0, y: 1400 }, 'owner-journey-test': { x: 340, y: 200 },
-  'old-test-step': { x: 40, y: 520 }, 'new-test-assertions': { x: 640, y: 520 },
-  'test-file': { x: -950, y: 1600 },
-};
 export const omittedStructuralEdge = (edge: GraphRelation): boolean =>
   edge.data.projection === 'metadata' || (['before', 'after'].includes(edge.relation) && isPairedSubject(edge.to));
-
-export const locationPeers = (fileId: string): readonly GraphRelation[] => allRelations()
-  .filter(edge => edge.relation === 'located_in' && edge.to === fileId)
-  .sort((a, b) => {
-    const side = (a.version === 'before' ? 0 : 1) - (b.version === 'before' ? 0 : 1);
-    if (side) return side;
-    if (a.from !== b.from) return a.from < b.from ? -1 : 1;
-    return ((a.data.range as { startLine?: number } | undefined)?.startLine ?? 0) - ((b.data.range as { startLine?: number } | undefined)?.startLine ?? 0);
-  });

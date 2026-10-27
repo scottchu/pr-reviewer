@@ -42,3 +42,6 @@ main { flex: 1; min-height: 0; }
 
 /* Anchors remain for edge geometry; this view does not edit connections. */
 .react-flow__handle { opacity: 0; pointer-events: none; }
+
+.minimal-route { cursor: grab; touch-action: none; }
+.minimal-route:active { cursor: grabbing; }
