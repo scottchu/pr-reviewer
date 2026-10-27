@@ -12,7 +12,7 @@ const ranks = (ids:readonly string[],links:readonly Link[]) => {
  for(let i=0;i<queue.length;i++){const id=queue[i]!;for(const edge of relevant.filter(edge=>edge.source===id)){values.set(edge.target,Math.max(values.get(edge.target)!,values.get(id)!+1));degree.set(edge.target,degree.get(edge.target)!-1);if(degree.get(edge.target)===0)queue.push(edge.target);}}
  return values;
 };
-export const initialLayout = <T extends LayoutNode>(input:readonly T[],links:readonly Link[],focus='change'):T[] => {
+export const initialLayout = <T extends LayoutNode>(input:readonly T[],links:readonly Link[],focus='change',bands?:ReadonlyMap<string,number>):T[] => {
  const nodes=input.map(node=>({...node,position:{...node.position},style:{...node.style,opacity:1}}));
  for(const group of nodes.filter(node=>nodes.some(child=>child.parentId===node.id))){
   const children=nodes.filter(node=>node.parentId===group.id);const rank=ranks(children.map(node=>node.id),links);let y=80;let width=600;
@@ -22,7 +22,7 @@ export const initialLayout = <T extends LayoutNode>(input:readonly T[],links:rea
   group.style={...group.style,width,height:y-100+40};
  }
  const rootOf=(id:string):string=>nodes.find(node=>node.id===id)?.parentId??id;
- const roots=nodes.filter(node=>!node.parentId);const rootLinks=links.map(edge=>({...edge,source:rootOf(edge.source),target:rootOf(edge.target)}));const levels=ranks(roots.map(node=>node.id),rootLinks);
+ const roots=nodes.filter(node=>!node.parentId);const rootLinks=links.map(edge=>({...edge,source:rootOf(edge.source),target:rootOf(edge.target)}));const levels=bands ? new Map(roots.map(node => [node.id, bands.get(node.id) ?? 1])) : ranks(roots.map(node=>node.id),rootLinks);
  const columns=[...new Set(levels.values())].sort((a,b)=>a-b);let x=0;const xs=new Map<number,number>();
  for(const level of columns){xs.set(level,x);x+=Math.max(...roots.filter(node=>levels.get(node.id)===level).map(node=>dimensions(node).width))+300;}
  const focusX=xs.get(levels.get(focus)??0)??0;
