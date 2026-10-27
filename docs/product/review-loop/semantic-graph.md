@@ -264,3 +264,10 @@ Nodes and Change/TestChange groups can be dragged directly; child positions stay
 
 
 Direct-construction status clarification: the Authorization content node represents the removed direct request-header construction at Before29, replaced by the After30 helper call; mark that scoped content remove/red. This does not claim Authorization headers are globally removed: the helper still emits Bearer for explicit credentials. Hide visual connector dots while retaining handle geometry and edge anchoring; connection editing remains disabled.
+
+
+## Measured initial layout and attached route labels
+
+The minimum graph previously used fixed coordinates, not an automatic layout engine; ReactFlow only refreshed endpoints after node movement. A free label offset also allowed labels to detach. The accepted correction runs one bounded layered initial layout from the current graph relationships, nested membership and measured card dimensions. It is not ELK integration or a whole-repository graph/layout claim. Automatic routing chooses a short clear curve against current node and label bounds; it reroutes as node positions change. Initial layout does not repeatedly overwrite manual positions.
+
+Each edge has one projection-only bend owner. The route and its label share that geometry: the label is evaluated on the same curve. Dragging the line or label moves that bend, preserves semantic endpoints/ports and cannot detach the label into a free-floating caption. Pointer deltas are graph-zoom aware. Node/group drag and layout-only scope remain; layout/route adjustments do not mutate the semantic graph or promise persistence. Direct X/Y canvas pan must be verified separately from node/group/label/route gestures; do not infer trackpad behavior from a screenshot.
