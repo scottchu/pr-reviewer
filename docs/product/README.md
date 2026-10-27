@@ -33,3 +33,5 @@ The merged runtime/pilot baseline includes repository-path import. The combined 
 Configured-test delivery status here refers to the engineering integration candidate at source `79ab8b09817b0d7eae8a2052d3ef6ff72ad17631`. These test jobs are not on main `e3b270e`; this documentation does not claim merge, production qualification, adoption of the provisional panel or native-host delivery.
 
 - [Canvas workspace and panels](review-loop/canvas-panels.md): current composition, independent targets, gesture ownership, constrained readers and acceptance limits.
+
+- [Ontology index](project-repository-ontology.md): [TBox](project-repository-tbox.md) definitions/constraints and [PR25 ABox](project-repository-abox-pr25.md) concrete multilevel source/evidence account.

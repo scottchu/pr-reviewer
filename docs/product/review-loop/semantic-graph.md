@@ -153,7 +153,7 @@ Explanation organizes Claims about the Change. Exact Before29/After30 and helper
 
 ## Change, reason, goal and test graph decisions
 
-Date: 2026-10-27. Status: accepted semantic direction, not a delivered product schema/API or accepted projection. These decisions supersede the earlier flat-node mockup shape; they do not rewrite its historical JSON or existing canonical source identities. See the [general entity direction](../project-repository-ontology.md#general-entity-and-graph-direction).
+Date: 2026-10-27. Status: accepted semantic direction, not a delivered product schema/API or accepted projection. These decisions supersede the earlier flat-node mockup shape; they do not rewrite its historical JSON or existing canonical source identities. See the [general entity direction](../project-repository-tbox.md#general-entity-and-graph-direction).
 
 ### Entity, graph and projection
 
