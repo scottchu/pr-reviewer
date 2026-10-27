@@ -43,11 +43,13 @@ export const automaticRoutes = (nodes:readonly LayoutNode[],links:readonly Link[
  const reserved:Box[]=[];const priorPoints:Point[][]=[];const output=new Map<string,Routed>();
  const priority=(edge:Link)=>{const source=nodes.find(node=>node.id===edge.source);const target=nodes.find(node=>node.id===edge.target);return source?.parentId&&source.parentId===target?.parentId?0:nodes.some(node=>node.parentId===edge.source||node.parentId===edge.target)?2:1;};
  for(const edge of [...links].sort((a,b)=>priority(a)-priority(b))){const source=boxes.get(edge.source)!;const target=boxes.get(edge.target)!;const [sourceSide,targetSide]=sides(source,target);const start=port(source,sourceSide);const end=port(target,targetSide);const size=sizes[edge.id]??{width:240,height:75};const dx=end.x-start.x,dy=end.y-start.y,length=Math.hypot(dx,dy)||1;
- const candidates=manual[edge.id]?[manual[edge.id]!]:[0,80,-80,160,-160,240,-240,320,-320].filter(distance=>Math.abs(distance)<=Math.max(80,Math.min(320,length/2))).map(distance=>({x:-dy/length*distance,y:dx/length*distance}));
+ const normal=[0,80,-80,160,-160,240,-240,320,-320].filter(distance=>Math.abs(distance)<=Math.max(80,Math.min(320,length/2)));
+ const tangent=[0,80,-80,160,-160,240,-240].filter(distance=>Math.abs(distance)<=length/4);
+ const candidates=manual[edge.id]?[manual[edge.id]!]:normal.flatMap(distance=>tangent.map(along=>({x:-dy/length*distance+dx/length*along,y:dx/length*distance+dy/length*along})));
  let best=candidates[0]!;let bestScore=Infinity;
- for(const candidate of candidates){const route=curve(start,end,candidate);const label={x:route.label.x-size.width/2,y:route.label.y-size.height/2,...size};const points=Array.from({length:39},(_,i)=>route.at((i+1)/40));let collisions=obstacles.filter(box=>overlaps(box,label)).length*30+reserved.filter(box=>overlaps(box,label)).length*30;
- for(const box of groups)if(overlaps(box,label)&&!(label.x>=box.x&&label.y>=box.y&&label.x+label.width<=box.x+box.width&&label.y+label.height<=box.y+box.height))collisions+=30;
- collisions+=points.filter(point=>obstacles.some(box=>contains(box,point))||reserved.some(box=>contains(box,point))).length;collisions+=priorPoints.flat().filter(point=>contains(label,point)).length;const score=collisions*10000+Math.hypot(candidate.x,candidate.y);if(score<bestScore){bestScore=score;best=candidate;}
+ for(const candidate of candidates){const route=curve(start,end,candidate);const label={x:route.label.x-size.width/2,y:route.label.y-size.height/2,...size};const points=Array.from({length:39},(_,i)=>route.at((i+1)/40));let hardCollisions=obstacles.filter(box=>overlaps(box,label)).length+reserved.filter(box=>overlaps(box,label)).length;let collisions=0;
+ for(const box of groups)if(overlaps(box,label)&&!(label.x>=box.x&&label.y>=box.y&&label.x+label.width<=box.x+box.width&&label.y+label.height<=box.y+box.height))hardCollisions++;
+ collisions+=points.filter(point=>obstacles.some(box=>contains(box,point))||reserved.some(box=>contains(box,point))).length;collisions+=priorPoints.flat().filter(point=>contains(label,point)).length;const score=hardCollisions*1000000000+collisions*10000+Math.hypot(candidate.x,candidate.y);if(score<bestScore){bestScore=score;best=candidate;}
  }
  const route=curve(start,end,best);reserved.push({x:route.label.x-size.width/2,y:route.label.y-size.height/2,...size});priorPoints.push(Array.from({length:39},(_,i)=>route.at((i+1)/40)));output.set(edge.id,{sourceSide,targetSide,offset:best,label:route.label});
  }return output;

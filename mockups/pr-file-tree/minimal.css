@@ -51,3 +51,6 @@ main { flex: 1; min-height: 0; }
 
 /* A noninteractive point anchor: ReactFlow uses its edge, so size must be zero. */
 .react-flow__handle { width: 0; height: 0; min-width: 0; min-height: 0; }
+
+/* Source cards always paint above cross-group edge strokes. */
+.react-flow__node-entity { z-index: 3 !important; }
