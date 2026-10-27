@@ -146,3 +146,8 @@ The fixed docs now explicitly integrate the full learning journey and four repor
 Residual documentation issue: protected-invariants arrow row still requires labels adjacent to their own final segment and describes compact own-path labels unresolved, while the current minimum's semantic-graph shared-curve contract and implementation use the on-curve midpoint with delivered shared bend dragging. Clearly scope the older row to legacy context or update it to the minimum exception; do not change correct product geometry to fit stale prose. Dense retained renderer/geometry bodies remain the separate DEV01 implementation finding, not authorization for an unrelated formatting rewrite.
 
 Author reports19focused checks, owning strict compilation and build passing; this reviewer ran none. Actual four-band/icon readability, original603 obstruction repair, exact endpoint identity and retained gesture checks remain separate required evidence. This source readback does not claim them passed or that unfamiliar-reader understanding/full journey improved.
+
+
+### b0a914a initial-focus delta
+
+Read fixed `b0a914ab00bf4218e2bb0a62a86f6e2f531016c8` against f0daa2. The sole application delta chooses the first non-test File-band entity as the initial layout focus, falling back to Change; semantic data, child membership, routes and gesture handlers are unchanged. No source blocker in that delta. Executor reports actual desktop/390 band/icon and obstruction checks plus retained gestures passing; these are executor/actual-reviewer evidence, not tests run by this reviewer. This result does not override the subsequently identified added-test absence/projection correction.

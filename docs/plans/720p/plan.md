@@ -80,3 +80,6 @@ Historical 2026-10-27 logical-identity checkpoint: [v8 local receipt](slices/05-
 
 
 Current bounded projection receipt (2026-10-27): applicationb0a914a is published at the existing HTTPS8478 endpoint with exact asset identity, type icons and measured File→codeChange→testChange/context→testFile bands. [Recoveryv14](slices/05-explanation-exploration/semantic-graph-recovery.md#implementationreview-handoff-v14--icons-and-semantic-reading-bands) records source/pure/strict checks, affected actual desktop390 closures, center/gesture tests, independent rules inventory and remaining full-journey gaps. This supersedes historical frozen-preview statements above; it does not establish whole-round acceptance, recovered gateway data or unfamiliar comprehension.
+
+
+Latest bounded correction (2026-10-27): [recoveryv15](slices/05-explanation-exploration/semantic-graph-recovery.md#implementationreview-handoff-v15--actual-added-subjects-not-synthetic-absence) publishes application7681e27 at the same endpoint, removing synthetic missing-side subjects and redundant parent→child arrows while retaining classification provenance and actual test relations. Source/19pure/strict/build and independent affected desktop390 checks pass in scope; whole-round learning/readiness gates remain open.
