@@ -219,3 +219,12 @@ Prepare actual relevant tests, rather than treating a skipped preparation as com
 
 
 Current bounded candidate0781583 implements the corrected semantic structure: request Change and actual modified-test Change each contain identity/data/nodes/edges and project visible nested groups; Before/After declaration entities have explicit File-location edges (immutable side/commit/hash/range), and actual test verification targets the code Change with indirect source-chain/not-run limits. Before fill is a source step; After observer and assertions are distinguished. Source and actual desktop390 checks establish these three scoped structures/links; they do not establish run/PASS, complete test coverage, compact first-frame comprehension or whole-product readiness. Opaque edge records now paint above strokes; this changes no meaning/connection. Header+graph only; no panels, floating bars or old owner UI imports. Owners/data remain retained.
+
+
+## Simple row-card projection
+
+2026-10-27 latest user direction supersedes literal JSON visibility for the current candidate ONLY. Preserve the full graph, IDs/kinds/data/nesting/relations/evidence/anchors unchanged; render simple human row cards selected by kind, without showing kind/id/hash/canonical/evidence/from/to diagnostics. Function shows request(), header shows Authorization and its value, File shows its path; test/assertion/reason/goal show essential actual meaning and source/inference/not-run limits. No new panel, floating control, registry or JSON toggle.
+
+Edge projection uses concise rows: Before/After literal tag, relation label (located in), short immutable commit, Lstart–end. The short commit remains intentionally visible; content/source hashes do not. Before entire edge card has light-red background/red border; After light-green/green border with readable text; other versions neutral. Test relevance stays indirect/not-run, not PASS.
+
+Compact geometry follows actual row dimensions. Child cards remain fully inside their purple Change graph; external edge cards lie wholly on one side of its boundary. Only arrows may cross a boundary. Clear node/label footprints and own-arrow placement, desktop390 readable at usable graph zoom. A canonical snapshot comparison must prove rendering/layout did not change graph semantics. Gateway data remains missing; this projection does not create/restore business data.
