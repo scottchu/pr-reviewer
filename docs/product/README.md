@@ -13,7 +13,7 @@ This is the durable product specification: what PR Reviewer does, why, and how i
 - [Semantic persistence and recovery](review-loop/semantic-storage.md): exact semantic record/identity/quota/command/query/lifecycle contracts.
 - [Semantic protocol values](review-loop/semantic-data.md): complete normalized hash inputs, fixed defaults, anchors/fact IDs and machine-readable conformance/recovery fixtures.
 - [Static source analysis](review-loop/source-analysis.md): exact supported declarations, static facts and honest unknowns.
-- [Retained semantic neighborhoods](review-loop/semantic-graph.md): slice04 integration contract and independent source/graph identities.
+- [Retained semantic neighborhoods](review-loop/semantic-graph.md): slice04 integration contract and independent source/graph identities; [relationship composition and inference limits](review-loop/semantic-graph.md#relationship-composition-and-inference-limits).
 - [Guided explanation, exploration and private recovery](review-loop/story-and-exploration.md): current attributed story/context values, single application player/draft/frame owner, exact supporting-source return and explicit write-ahead question recovery.
 - [Configured head tests](review-loop/test-execution.md): fixed-target execution design, complete isolated source/environment and owned job/result/cancel/recovery contract; delivered backend, gateway, CLI and application consumer engineering; exact-head production qualification, canvas UX adoption and whole-product acceptance remain separate.
 - [Test compatibility values](review-loop/test-compatibility.md): physical/public/nested test records, exact digests, private recovery and compiler qualification values.
