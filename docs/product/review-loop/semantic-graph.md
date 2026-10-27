@@ -277,3 +277,10 @@ Canvas scroll input: unmodified two-axis wheel/trackpad deltas pan the graph in 
 
 
 Connection geometry uses exactly one shared point at the center of each node side (top/right/bottom/left). Multiple relations on the same side share that point; no per-relation spacing. ReactFlow source/target adapters may coincide at that one geometric point, remain invisible and do not change semantic endpoints. Automatic side choice and shared curve/label editing remain.
+
+
+## Bounded represented test coverage
+
+Test preparation must include relevant unchanged public-entrypoint regression assertions and changed policy tests, not just a single selected E2E case or direct helper-name search. For this prepared PR25 example retain the modified E2E, the unchanged parameterized application credential test (three variants; exact Bearer assertion418) and the added gateway owner-policy test90–114. The application test has no TestChange and verifies retained explicit-credential behavior through an indirect bridge/login/refresh/request chain. The added gateway TestChange compares explicit Before absence with its After definition/assertions and verifies HTTP policy, not a client helper call or achieved goal. Definitions/expectations remain separate from execution; all represented tests are not run.
+
+These extra source witnesses come from pinned Git commit/blob/path/range/hash preparation; public retained-Snapshot admission is not asserted. The current minimum graph has no source-reader navigation extension. Record broader runtime/recovery suites as the inventory frontier rather than hiding them or claiming whole-PR coverage.

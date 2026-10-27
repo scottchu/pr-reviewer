@@ -1,0 +1,37 @@
+# Bounded PR25 request/test inventory review
+
+Status: source-only evidence review, 2026-10-27. No test execution, browser check, runtime action, or product edit.
+
+Reviewed Git comparison: base `b096826e31c0927190806de91ed70b8b64aa93d8`, head `e3b270e5f49a9215452b0b86702946043e979059`. This concerns represented PR25 tests, not tests of the current graph implementation.
+
+## Confirmed gap and cause
+
+There are relevant non-E2E tests. Neither pinned revision has `.test.*` or `.spec.*` files under `src/application`; the relevant suites are under `tests/`, rather than colocated with `review.ts` or `local-access.ts`.
+
+The current graph imports `reviews/request-test-evidence-v1.json` through `mockups/pr-file-tree/minimal-graph.ts:1`. That packet line 7 explicitly selects prepared exact function mappings and says “retain one review-owner-changed case and stop.” Thus E2E-only output follows a curated one-case selection boundary; it does not establish absence of unit/application tests. Searching only direct `accessHeaders`/`localOwnerSession` names misses tests entering through the public bridge.
+
+## Actual test evidence
+
+| Pinned source | Comparison | Exact relevance and limits |
+| --- | --- | --- |
+| `tests/application.test.ts:392–447` | Unchanged: both Git blobs `90fc45333960a14cf7f2dcbd2c387b875146e1dd` | Parameterized `disposed ignored-abort read settles ${obsoleteCompletion} without owning the reconnected lifetime`, with variants `before-new-read`, `after-new-read`, `failure-before-new-read` at line 391. Line 398 captures the actual fetch Authorization header; lines 404 and 415 login with old/fresh credentials; line 418 asserts `Bearer fresh-credential`. This is retained explicit-credential regression evidence, not a test of the new local-owner/no-header branch. |
+| `tests/application.test.ts:38–78` | Same unchanged blob | `application preserves unknown command identity, reads accepted revision and disposes/remounts routes`: real bridge login and request flow, assertions about command identity, accepted readback and route disposal. Its fetch mock does not assert header selection. |
+| `tests/recovery-application.test.ts:8–11` | Unchanged: both blobs `c1d41a39278e6b524d0070820210579f3b72ec7d` | Setup creates the real bridge/gateway; `S11 actual gateway commit then dropped ack survives new bridge; explicit same-credential replay retains one question` exercises recovery and same-credential replay. Application/integration context, not direct helper-branch verification. |
+| `tests/gateway.test.ts:90–114` (head) | Newly added test in modified existing file | `single local owner reads and writes without a Bearer while explicit invalid credentials never escalate`. Lines 97–109 issue no-Authorization HTTP requests and assert owner reads/writes/readback; lines 110–112 assert invalid and inappropriate connection credentials remain 401. This verifies the related server policy, not a call to the client helper. |
+| `tests/runtime.test.ts:14–108` (head) | Existing test modified | Added assertions at 39–44 and 88–97 cover no startup human credential, no userCredentialRef, no-auth reads, untrusted Host rejection, and retained legacy credential not required for restart. Supporting runtime-policy context; not client helper coverage. |
+
+The source-backed client path is explicit: test import/wrapper `application.test.ts:3–8` → public re-export `src/application/public.ts:29` → `review.ts:99` login calls refresh → `review.ts:38` refresh calls request → `review.ts:30` request spreads `accessHeaders(captured)` → `local-access.ts:3` preserves Bearer for explicit credentials. Before refresh calls request at B37 and request constructs Bearer at B29. This is a static source chain, not execution evidence from this review.
+
+A bounded pinned-head search under `tests/` found no direct mention of `accessHeaders` or `localOwnerSession`. This does not prove absence of indirect local-owner behavior coverage; the changed E2E/gateway tests must remain distinct evidence.
+
+## Smallest truthful correction
+
+1. Retain the already prepared modified `review-owner-changed` E2E comparison.
+2. Prepare the unchanged application credential test definition with exact before/head occurrences and all three parameter variants. Use one logical test identity with unchanged comparison evidence; do not invent a TestChange. Connect the source-observed bridge/request chain and the explicit Bearer assertion with their actual scope.
+3. Include the added gateway test as a genuine changed/added test case related to the same documented local-owner policy. Do not label its HTTP assertions as direct `accessHeaders` coverage. Record the modified runtime test as supporting context or an explicit remaining inventory frontier.
+4. Replace the one-case-stop selection with a reproducible bounded inventory: direct symbol tests, public-entrypoint callers, and explicitly asserted policy behavior; record included and excluded suites with reasons. Preserve canonical source packets and compile a new versioned test-preparation artifact.
+5. Preserve test definition/change/run distinctions. This review establishes source presence and assertion scope only; no new Run or PASS may be manufactured. Current graph implementation tests are outside represented PR25 test membership.
+
+This is not a whole-repository coverage audit. It identifies concrete omitted unchanged and changed tests and the selection rule causing the current misleadingly narrow projection.
+
+Machine-readable bounded evidence: `request-unit-test-evidence-v1.json` records fixed Git blobs, source/range SHA256, inclusive line ranges, UTF16 intervals, both unchanged application witnesses, the added gateway definition/native diff and indirect source chain. The exact Bearer assertion is line 418 (earlier dispatch said 419; corrected by numbered source readback).
