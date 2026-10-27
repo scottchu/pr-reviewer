@@ -125,9 +125,9 @@ export const allRelations = (): readonly GraphRelation[] => [...minimalGraph.edg
 export const positions = (_narrow: boolean): Readonly<Record<string, { x: number; y: number }>> => ({
   change: { x: 0, y: 0 }, 'request-before': { x: 50, y: 650 }, 'request-after': { x: 950, y: 650 }, 'bearer-before': { x: 50, y: 1200 },
   'helper-after': { x: 1750, y: 1200 }, 'refresh-after': { x: 1750, y: 0 },
-  'review-file-base': { x: 50, y: 2100 }, 'review-file-head': { x: 950, y: 2100 }, 'helper-file': { x: 2700, y: 1200 },
+  'review-file-base': { x: -900, y: 650 }, 'review-file-head': { x: 2500, y: 650 }, 'helper-file': { x: 2700, y: 1200 },
   reason: { x: 0, y: 2600 }, goal: { x: 1750, y: 2800 },
   'test-change': { x: 0, y: 3350 }, 'test-base': { x: 50, y: 650 }, 'test-head': { x: 950, y: 650 },
   'old-test-step': { x: 50, y: 1250 }, 'new-test-assertions': { x: 950, y: 1250 },
-  'test-file-base': { x: 50, y: 5650 }, 'test-file-head': { x: 950, y: 5650 },
+  'test-file-base': { x: -900, y: 4000 }, 'test-file-head': { x: 2500, y: 4000 },
 });

@@ -46,8 +46,7 @@ const GraphBoundary = ({ data }: NodeProps<EntityNode>) => (
 const Relation = (props: EdgeProps<RelationEdge>) => {
   const [defaultPath, defaultX, defaultY] = getBezierPath(props);
   if (!props.data) return null;
-  const beforeLocation = props.data.relation.relation === 'located_in' && props.data.relation.version === 'before';
-  const outerLeft = beforeLocation || (props.data.relation.from === 'test-change' && props.data.relation.relation === 'motivated_by');
+  const outerLeft = props.data.relation.from === 'test-change' && props.data.relation.relation === 'motivated_by';
   const path = outerLeft
     ? `M${props.sourceX},${props.sourceY} C${props.sourceX - 640},${props.sourceY} ${props.targetX - 640},${props.targetY} ${props.targetX},${props.targetY}`
     : defaultPath;
@@ -93,11 +92,10 @@ const App = () => {
     const testLink = relation.from === 'test-change' && relation.to === 'change';
     const location = relation.relation === 'located_in';
     const beforeLocation = location && relation.version === 'before';
-    const helperLocation = location && relation.from === 'helper-after';
     return {
       id: relation.id, type: 'relation', source: relation.from, target: relation.to,
-      sourceHandle: comparison ? relation.relation : testLink ? (relation.relation === 'verifies' ? 'out-right' : 'out-left') : beforeLocation ? 'out-left' : helperLocation ? 'out-right' : relation.relation === 'calls' || relation.relation === 'impedes' ? 'out-right' : 'out-bottom',
-      targetHandle: testLink ? (relation.relation === 'verifies' ? 'in-right' : 'in-left') : beforeLocation || helperLocation ? 'in-left' : comparison || location || fromGraph || relation.relation === 'constructs' || relation.relation === 'contains' ? 'in-top' : 'in-left',
+      sourceHandle: comparison ? relation.relation : testLink ? (relation.relation === 'verifies' ? 'out-right' : 'out-left') : beforeLocation ? 'out-left' : location ? 'out-right' : relation.relation === 'calls' || relation.relation === 'impedes' ? 'out-right' : 'out-bottom',
+      targetHandle: testLink ? (relation.relation === 'verifies' ? 'in-right' : 'in-left') : beforeLocation ? 'in-right' : location ? 'in-left' : comparison || fromGraph || relation.relation === 'constructs' || relation.relation === 'contains' ? 'in-top' : 'in-left',
       data: { relation }, markerEnd: { type: MarkerType.ArrowClosed, color: '#9db3c8' },
     };
   }), []);
