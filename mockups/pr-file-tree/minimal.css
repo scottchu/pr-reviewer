@@ -39,3 +39,6 @@ main { flex: 1; min-height: 0; }
 .minimal-edge-card:active { cursor: grabbing; }
 .minimal-edge-card:focus-visible { outline: 2px solid #bed8ed; outline-offset: 3px; }
 .react-flow__node { touch-action: none; }
+
+/* Anchors remain for edge geometry; this view does not edit connections. */
+.react-flow__handle { opacity: 0; pointer-events: none; }

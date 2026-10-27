@@ -20,7 +20,7 @@ const contentRows = (entity: GraphEntity): CardRows => {
   switch (kind) {
     case 'callsite': return { title: text(data.value) || text(data.name), rows: [] };
     case 'function': return { title: text(data.name), rows: data.comparisonStatus === 'no change' ? ['Source-body equality, not behavior equivalence'] : [] };
-    case 'header': return { title: 'Authorization', rows: [text(data.value).replace(/^Authorization:\s*/, '')] };
+    case 'header': return { title: 'Authorization', rows: [text(data.value).replace(/^Authorization:\s*/, ''), 'Direct request construction only'] };
     case 'file': return { title: text(data.path), rows: [] };
     case 'test': return { title: text(data.name), rows: ['Not run'] };
     case 'assertion': return {

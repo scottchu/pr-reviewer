@@ -34,7 +34,7 @@ test('comparison statuses are scoped/evidenced and never test outcomes or guesse
   assert.equal(allEntities().find(entity => entity.id === 'refresh')?.data.comparisonStatus, 'no change');
   assert.equal(allEntities().find(entity => entity.id === 'helper')?.data.comparisonStatus, 'add');
   assert.equal(allEntities().find(entity => entity.id === 'owner-journey-test')?.data.comparisonStatus, 'change');
-  assert.equal(allEntities().find(entity => entity.id === 'header-value')?.data.comparisonStatus, undefined);
+  assert.equal(allEntities().find(entity => entity.id === 'header-value')?.data.comparisonStatus, 'remove');
   assert.equal(allEntities().find(entity => entity.id === 'goal')?.data.comparisonStatus, undefined);
   assert.equal(allRelations().filter(omittedStructuralEdge).length, 5);
 });
@@ -88,4 +88,10 @@ test('unchanged locations retain both witness records without merging unsupporte
  const changed = witnesses.map(witness=>({...witness,from:'modified-test'}));
  assert.equal(pairUnchangedLocations(changed,new Set(['refresh'])).length,2);
  assert.equal(allRelations().filter(edge=>edge.from==='owner-journey-test'&&edge.relation==='located_in').length,2);
+});
+
+test('removed Authorization content is scoped to direct construction, not all headers',()=>{
+ const header=allEntities().find(entity=>entity.id==='header-value')!;assert.equal(header.data.comparisonStatus,'remove');
+ assert.match(String(header.data.statusScope),/explicit-credential helper still produces/);assert.match(cardRows(header).rows.join(' '),/Direct request construction only/);
+ assert.ok(allRelations().some(edge=>edge.relation==='calls'&&edge.to==='helper'));
 });

@@ -55,6 +55,7 @@ const entities = new Map<string, GraphEntity>(mapping.mapping.map(row => {
       comparisonBasis: row.basis,
       occurrences: occurrences(row.id),
       sourceRecords: records,
+      ...(row.id === 'header-value' ? { comparisonStatus: 'remove', comparisonBasis: 'Before29 direct request construction is replaced by After30 helper call', statusScope: 'Removed direct request construction only; explicit-credential helper still produces Authorization Bearer' } : {}),
       ...(!row.comparisonStatus ? { comparisonApplicability: 'unassessed or not revision-comparable' } : {}),
     },
   }];
