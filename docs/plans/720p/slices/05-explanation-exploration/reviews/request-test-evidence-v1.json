@@ -1,0 +1,522 @@
+{
+  "status": "Source-verified existing modified test; execution not performed",
+  "comparison": {
+    "base": "b096826e31c0927190806de91ed70b8b64aa93d8",
+    "head": "e3b270e5f49a9215452b0b86702946043e979059"
+  },
+  "selection": "Select prepared cases whose exact functionMappings target requestBefore/requestAfter/accessHeaders canonical IDs; retain one review-owner-changed case and stop. No direct test importing accessHeaders/localOwnerSession found by pinned-head git grep under tests. Not complete test-relevance analysis.",
+  "packet": "mockups/pr-file-tree/declared-tests.json",
+  "packetSHA256": "9252a4bae0b27b8841767b457f0f1a11a3988a48c1c1f82dfcc89bb86f2744ce",
+  "id": "review-owner-changed",
+  "name": "01-A/C/F/G controlled host: real React + PR14 \u2192 queue \u2192 MCP source/read/reply \u2192 authoritative UI/restart",
+  "path": "tests/review.e2e.ts",
+  "classification": "modified",
+  "basis": "react_user_journey_source_chain",
+  "limit": "Source-declared controlled-host journey through page.goto/UI workspace opening. Not a direct test call to request/accessHeaders, not real native-host causality, and not coverage of every helper branch.",
+  "execution": {
+    "state": "unrun_in_this_packet",
+    "result": null,
+    "coverage": null
+  },
+  "versions": {
+    "base": {
+      "availability": "available",
+      "definition": {
+        "snapshotId": "pr25-pinned-test-evidence",
+        "side": "base",
+        "path": "tests/review.e2e.ts",
+        "commit": "b096826e31c0927190806de91ed70b8b64aa93d8",
+        "contentHash": "03783a9bbefdf8bd565c19d0618b75b6b0c247f3e2e7ca9b66538e746372547c",
+        "start": 4999,
+        "end": 9241,
+        "startLine": 146,
+        "endLine": 244
+      }
+    },
+    "head": {
+      "availability": "available",
+      "definition": {
+        "snapshotId": "pr25-pinned-test-evidence",
+        "side": "head",
+        "path": "tests/review.e2e.ts",
+        "commit": "e3b270e5f49a9215452b0b86702946043e979059",
+        "contentHash": "e302f3daeb9dd4bac02c9256f85b3768681e0fa887bd74c53ea17994cd5277e0",
+        "start": 4833,
+        "end": 9336,
+        "startLine": 140,
+        "endLine": 242
+      }
+    }
+  },
+  "assertions": {
+    "base": [
+      {
+        "anchor": {
+          "snapshotId": "pr25-pinned-test-evidence",
+          "side": "base",
+          "path": "tests/review.e2e.ts",
+          "commit": "b096826e31c0927190806de91ed70b8b64aa93d8",
+          "contentHash": "03783a9bbefdf8bd565c19d0618b75b6b0c247f3e2e7ca9b66538e746372547c",
+          "start": 5163,
+          "end": 5221,
+          "startLine": 150,
+          "endLine": 150
+        },
+        "sourceText": "  await page.getByLabel(\"Local access token\").fill(token);"
+      }
+    ],
+    "head": [
+      {
+        "anchor": {
+          "snapshotId": "pr25-pinned-test-evidence",
+          "side": "head",
+          "path": "tests/review.e2e.ts",
+          "commit": "e3b270e5f49a9215452b0b86702946043e979059",
+          "contentHash": "e302f3daeb9dd4bac02c9256f85b3768681e0fa887bd74c53ea17994cd5277e0",
+          "start": 5006,
+          "end": 5153,
+          "startLine": 144,
+          "endLine": 144
+        },
+        "sourceText": "  page.on('request',request=>{if(new URL(request.url()).pathname.startsWith('/api/'))ownerRequests.push(request.headers()['authorization']??'');});"
+      },
+      {
+        "anchor": {
+          "snapshotId": "pr25-pinned-test-evidence",
+          "side": "head",
+          "path": "tests/review.e2e.ts",
+          "commit": "e3b270e5f49a9215452b0b86702946043e979059",
+          "contentHash": "e302f3daeb9dd4bac02c9256f85b3768681e0fa887bd74c53ea17994cd5277e0",
+          "start": 5180,
+          "end": 5249,
+          "startLine": 146,
+          "endLine": 146
+        },
+        "sourceText": "  await expect(page.getByLabel('Local access token')).toHaveCount(0);"
+      },
+      {
+        "anchor": {
+          "snapshotId": "pr25-pinned-test-evidence",
+          "side": "head",
+          "path": "tests/review.e2e.ts",
+          "commit": "e3b270e5f49a9215452b0b86702946043e979059",
+          "contentHash": "e302f3daeb9dd4bac02c9256f85b3768681e0fa887bd74c53ea17994cd5277e0",
+          "start": 5250,
+          "end": 5334,
+          "startLine": 147,
+          "endLine": 147
+        },
+        "sourceText": "  await expect(page.getByRole('button',{name:'Log out',exact:true})).toHaveCount(0);"
+      },
+      {
+        "anchor": {
+          "snapshotId": "pr25-pinned-test-evidence",
+          "side": "head",
+          "path": "tests/review.e2e.ts",
+          "commit": "e3b270e5f49a9215452b0b86702946043e979059",
+          "contentHash": "e302f3daeb9dd4bac02c9256f85b3768681e0fa887bd74c53ea17994cd5277e0",
+          "start": 9225,
+          "end": 9333,
+          "startLine": 241,
+          "endLine": 241
+        },
+        "sourceText": "  expect(ownerRequests.length).toBeGreaterThan(0);expect(ownerRequests.every(value=>value==='')).toBe(true);"
+      }
+    ]
+  },
+  "nativeHunks": [
+    {
+      "id": "tests/review.e2e.ts:native:4",
+      "header": "@@ -146,9 +140,13 @@ test.afterAll(async () => {",
+      "beforeStart": 146,
+      "beforeCount": 9,
+      "afterStart": 140,
+      "afterCount": 13,
+      "patchHash": "87c8141714b6c10dc750443a9d68a49768d59f6707fc21244e36e20a1cfdbf32",
+      "changeKind": "modified"
+    },
+    {
+      "id": "tests/review.e2e.ts:native:5",
+      "header": "@@ -231,8 +229,7 @@ test(\"01-A/C/F/G controlled host: real React + PR14 \u2192 queue \u2192 MCP source/rea",
+      "beforeStart": 231,
+      "beforeCount": 8,
+      "afterStart": 229,
+      "afterCount": 7,
+      "patchHash": "87c8141714b6c10dc750443a9d68a49768d59f6707fc21244e36e20a1cfdbf32",
+      "changeKind": "modified"
+    },
+    {
+      "id": "tests/review.e2e.ts:native:6",
+      "header": "@@ -241,6 +238,7 @@ test(\"01-A/C/F/G controlled host: real React + PR14 \u2192 queue \u2192 MCP source/rea",
+      "beforeStart": 241,
+      "beforeCount": 6,
+      "afterStart": 238,
+      "afterCount": 7,
+      "patchHash": "87c8141714b6c10dc750443a9d68a49768d59f6707fc21244e36e20a1cfdbf32",
+      "changeKind": "added"
+    }
+  ],
+  "functionMappings": [
+    {
+      "targetId": "083d938782f0e018df80fce707b355488710e75876f88bd92e398ca852879046",
+      "target": {
+        "snapshotId": "pr25-pinned-call-evidence",
+        "side": "base",
+        "path": "src/application/review.ts",
+        "contentHash": "7953f0b8486ae475717bdc749e23a31f12351f41c11a473280de9a2420265477",
+        "start": 2860,
+        "end": 3771,
+        "startLine": 24,
+        "endLine": 32
+      },
+      "certainty": "react_user_journey_source_chain",
+      "executionClaim": false,
+      "chain": [
+        "Test page.goto/reload and observed API header assertions",
+        "React workspace.open (head) / explicit workspace.login (base)",
+        "Workspace delegates review.login",
+        "Review login calls refresh; unchanged refresh calls request",
+        "Head request directly calls explicitly imported accessHeaders; absent on base"
+      ],
+      "bindingAnchors": [
+        {
+          "snapshotId": "pr25-pinned-test-evidence",
+          "side": "base",
+          "path": "src/ui/main.tsx",
+          "commit": "b096826e31c0927190806de91ed70b8b64aa93d8",
+          "contentHash": "dff9049f1bcdd972d42d7e317c9103fedbf23c60ce3ed60d5655687784cdef9f",
+          "start": 6176,
+          "end": 6213,
+          "startLine": 118,
+          "endLine": 118
+        },
+        {
+          "snapshotId": "pr25-pinned-test-evidence",
+          "side": "base",
+          "path": "src/application/public.ts",
+          "commit": "b096826e31c0927190806de91ed70b8b64aa93d8",
+          "contentHash": "94e20323156f2a3c31cdea3b84a453b8e19d27ecad031457412083c08502da64",
+          "start": 2080,
+          "end": 2133,
+          "startLine": 39,
+          "endLine": 39
+        },
+        {
+          "snapshotId": "pr25-pinned-test-evidence",
+          "side": "base",
+          "path": "src/application/workspace.ts",
+          "commit": "b096826e31c0927190806de91ed70b8b64aa93d8",
+          "contentHash": "6823857a1cbc1d474835cf6c00f5071a3b166366faa267c91e0ec1e74f7f522d",
+          "start": 1420,
+          "end": 1478,
+          "startLine": 16,
+          "endLine": 16
+        },
+        {
+          "snapshotId": "pr25-pinned-test-evidence",
+          "side": "base",
+          "path": "src/application/workspace.ts",
+          "commit": "b096826e31c0927190806de91ed70b8b64aa93d8",
+          "contentHash": "6823857a1cbc1d474835cf6c00f5071a3b166366faa267c91e0ec1e74f7f522d",
+          "start": 3139,
+          "end": 3168,
+          "startLine": 31,
+          "endLine": 31
+        },
+        {
+          "snapshotId": "pr25-pinned-test-evidence",
+          "side": "base",
+          "path": "src/application/review.ts",
+          "commit": "b096826e31c0927190806de91ed70b8b64aa93d8",
+          "contentHash": "7953f0b8486ae475717bdc749e23a31f12351f41c11a473280de9a2420265477",
+          "start": 11020,
+          "end": 11043,
+          "startLine": 98,
+          "endLine": 98
+        },
+        {
+          "snapshotId": "pr25-pinned-test-evidence",
+          "side": "base",
+          "path": "src/application/review.ts",
+          "commit": "b096826e31c0927190806de91ed70b8b64aa93d8",
+          "contentHash": "7953f0b8486ae475717bdc749e23a31f12351f41c11a473280de9a2420265477",
+          "start": 4111,
+          "end": 4147,
+          "startLine": 37,
+          "endLine": 37
+        }
+      ],
+      "limit": "Source-declared controlled-host journey through page.goto/UI workspace opening. Not a direct test call to request/accessHeaders, not real native-host causality, and not coverage of every helper branch."
+    },
+    {
+      "targetId": "a7c2131f067aee1cd64b01c90418ffa0da3b0f5469984249d91fa611723893f6",
+      "target": {
+        "snapshotId": "pr25-pinned-call-evidence",
+        "side": "head",
+        "path": "src/application/local-access.ts",
+        "contentHash": "811735e3599292c54af870134345249deed32f1d9b9705f8ca18fd086225d59d",
+        "start": 144,
+        "end": 264,
+        "startLine": 3,
+        "endLine": 3
+      },
+      "certainty": "react_user_journey_source_chain",
+      "executionClaim": false,
+      "chain": [
+        "Test page.goto/reload and observed API header assertions",
+        "React workspace.open (head) / explicit workspace.login (base)",
+        "Workspace delegates review.login",
+        "Review login calls refresh; unchanged refresh calls request",
+        "Head request directly calls explicitly imported accessHeaders; absent on base"
+      ],
+      "bindingAnchors": [
+        {
+          "snapshotId": "pr25-pinned-test-evidence",
+          "side": "head",
+          "path": "src/ui/main.tsx",
+          "commit": "e3b270e5f49a9215452b0b86702946043e979059",
+          "contentHash": "bacca7ee95b2fd9c588452810bdb99913f81620a6722d784b95a31710722ad6a",
+          "start": 4500,
+          "end": 4531,
+          "startLine": 101,
+          "endLine": 101
+        },
+        {
+          "snapshotId": "pr25-pinned-test-evidence",
+          "side": "head",
+          "path": "src/application/public.ts",
+          "commit": "e3b270e5f49a9215452b0b86702946043e979059",
+          "contentHash": "94e20323156f2a3c31cdea3b84a453b8e19d27ecad031457412083c08502da64",
+          "start": 2080,
+          "end": 2133,
+          "startLine": 39,
+          "endLine": 39
+        },
+        {
+          "snapshotId": "pr25-pinned-test-evidence",
+          "side": "head",
+          "path": "src/application/workspace.ts",
+          "commit": "e3b270e5f49a9215452b0b86702946043e979059",
+          "contentHash": "9f17dc7e6e81a8190df3ed521767e69796913e40e6f2f4cfbd694aaf66ae98f5",
+          "start": 1473,
+          "end": 1531,
+          "startLine": 17,
+          "endLine": 17
+        },
+        {
+          "snapshotId": "pr25-pinned-test-evidence",
+          "side": "head",
+          "path": "src/application/workspace.ts",
+          "commit": "e3b270e5f49a9215452b0b86702946043e979059",
+          "contentHash": "9f17dc7e6e81a8190df3ed521767e69796913e40e6f2f4cfbd694aaf66ae98f5",
+          "start": 1926,
+          "end": 1959,
+          "startLine": 22,
+          "endLine": 22
+        },
+        {
+          "snapshotId": "pr25-pinned-test-evidence",
+          "side": "head",
+          "path": "src/application/workspace.ts",
+          "commit": "e3b270e5f49a9215452b0b86702946043e979059",
+          "contentHash": "9f17dc7e6e81a8190df3ed521767e69796913e40e6f2f4cfbd694aaf66ae98f5",
+          "start": 3786,
+          "end": 3805,
+          "startLine": 41,
+          "endLine": 41
+        },
+        {
+          "snapshotId": "pr25-pinned-test-evidence",
+          "side": "head",
+          "path": "src/application/review.ts",
+          "commit": "e3b270e5f49a9215452b0b86702946043e979059",
+          "contentHash": "dae210c79cb019d6edfdbfacfcf3da1e5773ceb4d15cf747df15ffa498c28e4e",
+          "start": 11122,
+          "end": 11145,
+          "startLine": 99,
+          "endLine": 99
+        },
+        {
+          "snapshotId": "pr25-pinned-test-evidence",
+          "side": "head",
+          "path": "src/application/review.ts",
+          "commit": "e3b270e5f49a9215452b0b86702946043e979059",
+          "contentHash": "dae210c79cb019d6edfdbfacfcf3da1e5773ceb4d15cf747df15ffa498c28e4e",
+          "start": 4199,
+          "end": 4235,
+          "startLine": 38,
+          "endLine": 38
+        },
+        {
+          "snapshotId": "pr25-pinned-test-evidence",
+          "side": "head",
+          "path": "src/application/review.ts",
+          "commit": "e3b270e5f49a9215452b0b86702946043e979059",
+          "contentHash": "dae210c79cb019d6edfdbfacfcf3da1e5773ceb4d15cf747df15ffa498c28e4e",
+          "start": 3376,
+          "end": 3402,
+          "startLine": 30,
+          "endLine": 30
+        },
+        {
+          "snapshotId": "pr25-pinned-test-evidence",
+          "side": "head",
+          "path": "src/application/review.ts",
+          "commit": "e3b270e5f49a9215452b0b86702946043e979059",
+          "contentHash": "dae210c79cb019d6edfdbfacfcf3da1e5773ceb4d15cf747df15ffa498c28e4e",
+          "start": 0,
+          "end": 66,
+          "startLine": 1,
+          "endLine": 1
+        },
+        {
+          "snapshotId": "pr25-pinned-test-evidence",
+          "side": "head",
+          "path": "src/application/local-access.ts",
+          "commit": "e3b270e5f49a9215452b0b86702946043e979059",
+          "contentHash": "811735e3599292c54af870134345249deed32f1d9b9705f8ca18fd086225d59d",
+          "start": 131,
+          "end": 265,
+          "startLine": 3,
+          "endLine": 3
+        }
+      ],
+      "limit": "Source-declared controlled-host journey through page.goto/UI workspace opening. Not a direct test call to request/accessHeaders, not real native-host causality, and not coverage of every helper branch."
+    },
+    {
+      "targetId": "2e55daf0e1c5086b0eb7e2390e38003b26bb3cf463f5ae835837f3e95eb43368",
+      "target": {
+        "snapshotId": "pr25-pinned-call-evidence",
+        "side": "head",
+        "path": "src/application/review.ts",
+        "contentHash": "dae210c79cb019d6edfdbfacfcf3da1e5773ceb4d15cf747df15ffa498c28e4e",
+        "start": 2956,
+        "end": 3859,
+        "startLine": 25,
+        "endLine": 33
+      },
+      "certainty": "react_user_journey_source_chain",
+      "executionClaim": false,
+      "chain": [
+        "Test page.goto/reload and observed API header assertions",
+        "React workspace.open (head) / explicit workspace.login (base)",
+        "Workspace delegates review.login",
+        "Review login calls refresh; unchanged refresh calls request",
+        "Head request directly calls explicitly imported accessHeaders; absent on base"
+      ],
+      "bindingAnchors": [
+        {
+          "snapshotId": "pr25-pinned-test-evidence",
+          "side": "head",
+          "path": "src/ui/main.tsx",
+          "commit": "e3b270e5f49a9215452b0b86702946043e979059",
+          "contentHash": "bacca7ee95b2fd9c588452810bdb99913f81620a6722d784b95a31710722ad6a",
+          "start": 4500,
+          "end": 4531,
+          "startLine": 101,
+          "endLine": 101
+        },
+        {
+          "snapshotId": "pr25-pinned-test-evidence",
+          "side": "head",
+          "path": "src/application/public.ts",
+          "commit": "e3b270e5f49a9215452b0b86702946043e979059",
+          "contentHash": "94e20323156f2a3c31cdea3b84a453b8e19d27ecad031457412083c08502da64",
+          "start": 2080,
+          "end": 2133,
+          "startLine": 39,
+          "endLine": 39
+        },
+        {
+          "snapshotId": "pr25-pinned-test-evidence",
+          "side": "head",
+          "path": "src/application/workspace.ts",
+          "commit": "e3b270e5f49a9215452b0b86702946043e979059",
+          "contentHash": "9f17dc7e6e81a8190df3ed521767e69796913e40e6f2f4cfbd694aaf66ae98f5",
+          "start": 1473,
+          "end": 1531,
+          "startLine": 17,
+          "endLine": 17
+        },
+        {
+          "snapshotId": "pr25-pinned-test-evidence",
+          "side": "head",
+          "path": "src/application/workspace.ts",
+          "commit": "e3b270e5f49a9215452b0b86702946043e979059",
+          "contentHash": "9f17dc7e6e81a8190df3ed521767e69796913e40e6f2f4cfbd694aaf66ae98f5",
+          "start": 1926,
+          "end": 1959,
+          "startLine": 22,
+          "endLine": 22
+        },
+        {
+          "snapshotId": "pr25-pinned-test-evidence",
+          "side": "head",
+          "path": "src/application/workspace.ts",
+          "commit": "e3b270e5f49a9215452b0b86702946043e979059",
+          "contentHash": "9f17dc7e6e81a8190df3ed521767e69796913e40e6f2f4cfbd694aaf66ae98f5",
+          "start": 3786,
+          "end": 3805,
+          "startLine": 41,
+          "endLine": 41
+        },
+        {
+          "snapshotId": "pr25-pinned-test-evidence",
+          "side": "head",
+          "path": "src/application/review.ts",
+          "commit": "e3b270e5f49a9215452b0b86702946043e979059",
+          "contentHash": "dae210c79cb019d6edfdbfacfcf3da1e5773ceb4d15cf747df15ffa498c28e4e",
+          "start": 11122,
+          "end": 11145,
+          "startLine": 99,
+          "endLine": 99
+        },
+        {
+          "snapshotId": "pr25-pinned-test-evidence",
+          "side": "head",
+          "path": "src/application/review.ts",
+          "commit": "e3b270e5f49a9215452b0b86702946043e979059",
+          "contentHash": "dae210c79cb019d6edfdbfacfcf3da1e5773ceb4d15cf747df15ffa498c28e4e",
+          "start": 4199,
+          "end": 4235,
+          "startLine": 38,
+          "endLine": 38
+        },
+        {
+          "snapshotId": "pr25-pinned-test-evidence",
+          "side": "head",
+          "path": "src/application/review.ts",
+          "commit": "e3b270e5f49a9215452b0b86702946043e979059",
+          "contentHash": "dae210c79cb019d6edfdbfacfcf3da1e5773ceb4d15cf747df15ffa498c28e4e",
+          "start": 3376,
+          "end": 3402,
+          "startLine": 30,
+          "endLine": 30
+        },
+        {
+          "snapshotId": "pr25-pinned-test-evidence",
+          "side": "head",
+          "path": "src/application/review.ts",
+          "commit": "e3b270e5f49a9215452b0b86702946043e979059",
+          "contentHash": "dae210c79cb019d6edfdbfacfcf3da1e5773ceb4d15cf747df15ffa498c28e4e",
+          "start": 0,
+          "end": 66,
+          "startLine": 1,
+          "endLine": 1
+        },
+        {
+          "snapshotId": "pr25-pinned-test-evidence",
+          "side": "head",
+          "path": "src/application/local-access.ts",
+          "commit": "e3b270e5f49a9215452b0b86702946043e979059",
+          "contentHash": "811735e3599292c54af870134345249deed32f1d9b9705f8ca18fd086225d59d",
+          "start": 131,
+          "end": 265,
+          "startLine": 3,
+          "endLine": 3
+        }
+      ],
+      "limit": "Source-declared controlled-host journey through page.goto/UI workspace opening. Not a direct test call to request/accessHeaders, not real native-host causality, and not coverage of every helper branch."
+    }
+  ]
+}
