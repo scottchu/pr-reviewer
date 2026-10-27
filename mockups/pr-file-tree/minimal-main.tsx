@@ -82,11 +82,16 @@ const Relation = (props: EdgeProps<RelationEdge>) => {
     : defaultPath;
   const x = versionedLocation ? locationX : reverseCall ? (props.sourceX + props.targetX) / 8 + callControlX * 0.75 : outerLeft || outerRight ? (props.sourceX + props.targetX) / 2 + direction * 240 : defaultX;
   const y = versionedLocation ? locationY : reverseCall ? (props.sourceY + props.targetY) / 2 : outerLeft || outerRight ? (props.sourceY + props.targetY) / 2 : defaultY;
+  const ownCall = props.data.relation.relation === 'calls' && props.data.relation.from.startsWith('callsite:') && props.sourceX < props.targetX;
+  // Follow the existing right-to-left cubic at t=.8, beyond the unrelated cross-graph path.
+  const t = 0.8; const u = 1 - t;
+  const callLabelX = u ** 3 * props.sourceX + 3 * u * t * ((props.sourceX + props.targetX) / 2) + t ** 3 * props.targetX;
+  const callLabelY = (u ** 3 + 3 * u ** 2 * t) * props.sourceY + (3 * u * t ** 2 + t ** 3) * props.targetY;
   const card = edgeRows(props.data.relation);
   return <>
     <BaseEdge id={props.id} path={path} {...(props.markerEnd ? { markerEnd: props.markerEnd } : {})} />
     <EdgeLabelRenderer>
-      <div className={`minimal-edge-card version-${props.data.relation.version} nodrag nopan`} data-relation={props.data.relation.relation} data-edge-id={props.id} style={{ transform: `translate(-50%, -50%) translate(${x}px, ${y}px)` }}>
+      <div className={`minimal-edge-card version-${props.data.relation.version} nodrag nopan`} data-relation={props.data.relation.relation} data-edge-id={props.id} style={{ transform: `translate(-50%, -50%) translate(${ownCall ? callLabelX : x}px, ${ownCall ? callLabelY : y}px)` }}>
         <div className="edge-main-row"><Version value={props.data.relation.version} />{card.title && <span>{card.title}</span>}{props.data.relation.relation === 'located_in' && card.rows.map(row => <span key={row}>{row}</span>)}</div>
         {props.data.relation.relation !== 'located_in' && card.rows.map((row, index) => <p key={index}>{row}</p>)}
       </div>
