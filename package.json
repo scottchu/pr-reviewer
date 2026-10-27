@@ -14,11 +14,13 @@
     "mcp": "node --experimental-strip-types src/mcp/main.ts",
     "pair": "node --experimental-strip-types scripts/pair.ts",
     "mcp:client": "node --experimental-strip-types scripts/mcp-client.ts",
-    "test:reading-journey": "node --experimental-strip-types --test mockups/pr-file-tree/tests/*.test.ts",
+    "test:reading-journey": "npm run prepare:graph && node --experimental-strip-types --test mockups/pr-file-tree/tests/*.test.ts",
     "test:reading-journey:e2e": "playwright test --config mockups/pr-file-tree/playwright.config.ts",
     "test:minimum-graph:e2e": "playwright test --config mockups/pr-file-tree/minimal-playwright.config.ts",
-    "check:minimum-graph": "tsc --noEmit -p mockups/pr-file-tree/tsconfig.json",
-    "prepare:graph-facts": "node --experimental-strip-types mockups/pr-file-tree/prepare-source-facts.ts"
+    "check:minimum-graph": "npm run prepare:graph && tsc --noEmit -p mockups/pr-file-tree/tsconfig.json",
+    "prepare:graph-facts": "node --experimental-strip-types mockups/pr-file-tree/prepare-source-facts.ts",
+    "prepare:graph": "node --experimental-strip-types mockups/pr-file-tree/prepare-generated-graph.ts",
+    "build:minimum-graph": "npm run prepare:graph && vite build --config mockups/pr-file-tree/vite.config.ts"
   },
   "dependencies": {
     "@modelcontextprotocol/client": "2.4.0",

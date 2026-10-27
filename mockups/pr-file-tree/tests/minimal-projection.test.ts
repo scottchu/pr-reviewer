@@ -38,7 +38,7 @@ test('comparison statuses are scoped/evidenced and never test outcomes or guesse
   assert.equal(allEntities().find(entity => entity.id === 'header-value')?.data.comparisonStatus, 'remove');
   assert.equal(allEntities().find(entity => entity.id === 'goal')?.data.comparisonStatus, undefined);
   for (const parent of allEntities().filter(entity => entity.nodes)) {
-    for (const edge of allRelations().filter(edge => edge.from === parent.id && parent.nodes?.some(child => child.id === edge.to))) assert.equal(omittedStructuralEdge(edge), true);
+    for (const edge of allRelations().filter(edge => edge.from === parent.id && parent.nodes?.some(child => child.id === edge.to))) assert.equal(omittedStructuralEdge(edge, allEntities()), true);
   }
   const actualContains = allRelations().find(edge => edge.id === 'gateway-test:contains')!;
   assert.equal(omittedStructuralEdge(actualContains), false);
@@ -98,6 +98,6 @@ test('unchanged locations retain both witness records without merging unsupporte
 
 test('removed Authorization content is scoped to direct construction, not all headers',()=>{
  const header=allEntities().find(entity=>entity.id==='header-value')!;assert.equal(header.data.comparisonStatus,'remove');
- assert.match(String(header.data.statusScope),/explicit-credential helper still produces/);assert.match(cardRows(header).rows.join(' '),/Direct request construction only/);
+ assert.match(String(header.data.statusScope),/explicit-credential helper still produces/);assert.match(cardRows(header).rows.join(' '),/direct request construction only/i);
  assert.ok(allRelations().some(edge=>edge.relation==='calls'&&edge.to==='helper'));
 });

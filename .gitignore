@@ -8,3 +8,5 @@ dist/
 
 # Task-only static mockup exports served by the existing candidate.
 /mockups/pr-file-tree/public/elk-v25/
+
+/mockups/pr-file-tree/generated-source-graph.json
