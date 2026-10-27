@@ -95,7 +95,7 @@ Decision map:
 
 | Decision | Owning durable section | Status / boundary |
 |---|---|---|
-| Entity id/kind/data; meaningful open kinds; unknown generic JSON | ontology: General entity and graph direction | Accepted direction, not closed union/API |
+| Generalized nodes, meaningful open kinds, unknown generic JSON; proposed Entity id/kind/data envelope | ontology: General entity and graph direction | Generalization accepted; subsequently offered interface/envelope is proposal, not finalized |
 | Graph has identity/nodes/edges and relationships; graph/summary/JSON projections; node can contain graph | same + semantic: Entity, graph and projection | Accepted direction; exact nesting/registry/scoping open |
 | Change subject with before/after behavior graphs; constructs differs from calls; request name unchanged | semantic: Change is the comparison subject | Accepted direction; no duplicated whole graphs |
 | motivated_by / intended_to_achieve; multiple goals; obstacle impedes goal; inverse derived; optional intents | semantic: Reasons, goals and intent | Accepted direction; provenance/intent/outcome distinct |

@@ -155,7 +155,7 @@ Date: 2026-10-27. Status: accepted semantic direction, not a delivered product s
 
 ### Entity, graph and projection
 
-Entity/Node uses `id`, `kind`, `data`; `label`, `name`, `value` are data when present, not mandatory top-level fields or a closed union of every domain kind. Kinds retain meaning. Graph has its own `id`, `kind`, `data` plus nodes/edges and may participate in relationships; nodes can contain graphs. A node or graph may offer graph, summary and JSON projections. Unknown kinds have an honest generic JSON presentation. No projection may add assertions to make a picture more connected.
+The accepted direction is generalized identity-bearing nodes/graphs with meaningful kinds, rather than a rigid union for every domain kind. The later `Entity`/interface example proposes `id`, `kind`, `data`, placing label/name/value inside data when present; that exact envelope/API is not finalized. Keep those discussed keys visible as the proposal, not silently renamed or removed. A Graph has its own identity plus nodes/edges and may participate in relationships; nodes can contain graphs. A node or graph may offer graph, summary and JSON projections. Unknown kinds have an honest generic JSON presentation. No projection may add assertions to make a picture more connected.
 
 Relation records retain the discussed `from`, `to`, `version`, `relation` concepts/keys. Relationship data carries contextual evidence where needed. Exact TypeScript signatures, graph nesting/registry/scoping/reference rules and serialized container placement are still drafts/open decisions. Do not silently settle them through a mockup or substitute new keys for the discussed ones.
 
