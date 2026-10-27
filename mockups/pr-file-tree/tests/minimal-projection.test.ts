@@ -85,6 +85,7 @@ test('unchanged locations retain both witness records without merging unsupporte
  assert.equal(edgeRows(edge).title,'located in · no change');
  assert.deepEqual(edgeRows(edge).rows,['Before b096826 L34–44','After e3b270e L35–45']);
  assert.equal(pairUnchangedLocations(witnesses,new Set()).length,2);
+ const reversed=pairUnchangedLocations([...witnesses].reverse(),new Set(['refresh']));assert.equal(reversed.length,1);assert.deepEqual(reversed[0]?.data.witnesses,witnesses);
  const changed = witnesses.map(witness=>({...witness,from:'modified-test'}));
  assert.equal(pairUnchangedLocations(changed,new Set(['refresh'])).length,2);
  assert.equal(allRelations().filter(edge=>edge.from==='owner-journey-test'&&edge.relation==='located_in').length,2);

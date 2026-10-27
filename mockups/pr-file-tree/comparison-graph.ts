@@ -105,10 +105,10 @@ export const pairUnchangedLocations = (edges: readonly GraphRelation[], supporte
  const consumed = new Set<string>(); const result: GraphRelation[] = [];
  for (const edge of edges) {
   if (consumed.has(edge.id)) continue;
-  const pair = edge.relation === 'located_in' && edge.version === 'before' && supportedSubjects.has(edge.from) ? edges.find(other => other.from === edge.from && other.to === edge.to && other.relation === edge.relation && other.version === 'after') : undefined;
+  const pair = edge.relation === 'located_in' && ['before','after'].includes(edge.version) && supportedSubjects.has(edge.from) ? edges.find(other => other.from === edge.from && other.to === edge.to && other.relation === edge.relation && other.version === (edge.version === 'before' ? 'after' : 'before')) : undefined;
   if (!pair) { result.push(edge); continue; }
-  consumed.add(pair.id);
-  result.push({ ...edge, id: edge.from + ':unchanged-location:' + edge.to, version: 'comparison', data: { comparisonStatus: 'no change', basis: 'Explicit logical identity, exact unchanged refresh source body and same logical File; declaration line shifts retained as evidence', witnesses: [edge, pair] } });
+  consumed.add(edge.id); consumed.add(pair.id);
+  result.push({ ...edge, id: edge.from + ':unchanged-location:' + edge.to, version: 'comparison', data: { comparisonStatus: 'no change', basis: 'Explicit logical identity, exact unchanged refresh source body and same logical File; declaration line shifts retained as evidence', witnesses: edge.version === 'before' ? [edge, pair] : [pair, edge] } });
  }
  return result;
 };
