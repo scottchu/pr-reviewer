@@ -434,3 +434,12 @@ TBox owns domain/range/admission/non-inferences. PR25 ABox admits review.ts chan
 
 
 V20 review/validation receipt: independent primary reviewer read fixeda2cd13186 and found no scoped blocker in the explicitly authorized relation extension, two ABox facts and core graph. Reviewer independently confirmed native M/A statuses and all three present-side blob IDs against exact pinned Git, plus diffs.json base/head agreement; reduced call projection preserves H30/site/File versus H3/definition distinctions. Executor validated62relative links/fragments and docs-only four-file scope; whitespace check passes. Final wording only clarifies that the prior split preserved ontology while this later extension is explicit, and avoids ambiguous outcome prose. No app/schema/UI/build/test/deployment/network operation occurred; application7681e27 remains unchanged. This source-consistency receipt is not fresh reader comprehension, complete PR coverage or runtime acceptance.
+
+
+## Docs-only handoff v21 — relationship explanations, Reason/Goal and test associations
+
+Baseline6a09cc1. User approves behavior explanations on existing relations, connected existing Reason/Goal entities with inference/intent labels, then clarifies adding TESTS TO THE GRAPH associated with changed and unchanged code/behavior, not automated tests or test-status buckets. Root clarification resolves the dependent scope: docs/ABox illustrative graph only. No app/schema/newtypes/runtime/network/build/runs.
+
+TBox adds the explanation/presentation and supported-association contract; ABox core retains PR/changesFile/one request/header/helper plus neutral unchanged refresh, exact construct/call summaries and canonical Change→Reason/Goal relations. Linked test view shares identities, shows indirect application credential relevance through unchanged refresh/changed request, modified E2E indirect journey and added gateway policy verification separately. Keep exact source names/ranges/status/Notrun; no fake Before for added tests, no TestChange for unchanged test, no direct unit/helper/Goal verification invented from reachability. Reason is not a new Gap kind. Preserve claim/source/inference/outcome distinctions and H30 callsite witness in reduced view.
+
+Acceptance: independent primary docs consistency against prepared names/anchors/relations; local links/whitespace/docs-only scope checks. Source definition and code/test comparison statuses are distinct; no TestRun/PASS from source. This is an explanatory graph, not app implementation or whole-PR/comprehension acceptance.

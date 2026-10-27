@@ -94,14 +94,22 @@ flowchart TD
   subgraph change["request() Change graph"]
     request["request() · change"]
     header["Direct Authorization construction · remove"]
-    request -->|"Before constructs · B29"| header
+    request -->|"Before constructs · builds Bearer directly · B29"| header
   end
   helper["accessHeaders() · add"]
+  refresh["refresh() · no change in source"]
+  reason["Reason: Always-Bearer blocks header-free owner request · inferred"]
+  goal["Goal: Open review without manual token entry · intended, not measured"]
   pr -->|"changes · change"| reviewFile
   pr -->|"changes · add"| helperFile
   request -->|"defined_in · B24–32 / H25–33"| reviewFile
   header -->|"located_in · B29"| reviewFile
-  request -->|"After calls via H30 site · projection"| helper
+  request -->|"After calls via H30 · delegates header choice · projection"| helper
+  refresh -->|"calls · no change · B37 / H38"| request
+  refresh -->|"located_in · B34–44 / H35–45"| reviewFile
+  change -.->|"motivated_by · inferred"| reason
+  change -.->|"intended_to_achieve · intended"| goal
+  reason -.->|"impedes · inferred"| goal
   helper -->|"located_in · H3"| helperFile
   classDef changed fill:#fff0bd,stroke:#b79b43,color:#5c4918
   classDef added fill:#e3f3e8,stroke:#76ac89,color:#25543a
@@ -114,3 +122,68 @@ flowchart TD
 The PR remains in the complete **core teaching graph**, not a claim that this diagram contains all PR25 facts. There is one request and one logical File per path. Spatial Change membership draws no parent→child arrow. The reduced After call arrow is a projection of the existing request `contains_call` H30 site → `calls` helper path, not a newly materialized direct binding. The canonical callsite and its review.ts H30 `located_in` witness stay explicit in the crosswalk/evidence above; helperH3 belongs to local-access.ts. Before/After are comparison evidence, not goal transition or execution order.
 
 Unchanged refresh, relevant test definitions, intent/inference and their unknown runtime results remain in the account above, without being invented as changed Files or deleted to simplify this diagram. No test execution, goal achievement or app/UI change is established by documenting these facts.
+
+
+## Behavior explanations and Reason/Goal basis
+
+| Existing relation / path | Adjacent behavior explanation | Evidence and certainty |
+| --- | --- | --- |
+| Before request `constructs` direct Authorization | Request directly builds Bearer headers. | Source-observed review.ts Base29; removal applies to this construction, not every Authorization header. |
+| After request `contains_call` H30 site → `calls` helper | Delegate header selection: helperH3 returns no Authorization for owner marker, Bearer for other strings. | Source-observed review.ts Head30/local-access.ts Head3 conditional; not execution or complete input/branch testing. |
+| Change `motivated_by` Reason; Reason `impedes` Goal | Always constructing Bearer cannot express the header-free owner request. | Prepared source-derived inference from Before construction and helper conditional, not author testimony. Reason is the existing kind, not a new Gap entity. |
+| Change `intended_to_achieve` Goal | Open review without manual token entry. | Prepared intended outcome citing pinned runtime.md Head22–26 and single-user-access plan Head11–13; not measured success. |
+
+The same exact Change/Reason/Goal identities already occur in the prepared account. Summaries do not rename canonical relations, erase callsite evidence or change the function name request(). Claims about source behavior and inferred rationale retain separate support/status. No composition proves the goal achieved.
+
+## Test associations with changed and unchanged participants
+
+This second view uses the SAME request Change, request(), helper and unchanged refresh identities as the core graph; repeated view aliases are not new entities. It shows supported relevance across changed/unchanged code participants, not three buckets of test statuses. The source chain is indirect evidence of association, not direct unit verification or executed coverage. Test Files sit on the right of their definitions in this illustrative relation view; that is presentation, not semantic ownership beyond their source-location facts.
+
+| Exact prepared test definition | Source and test status | What its source supports / does not support |
+| --- | --- | --- |
+| `disposed ignored-abort read settles ${obsoleteCompletion} without owning the reconnected lifetime` | tests/application.test.ts B/H392–447, three variants at391, assertion418; unchanged Test, not run. | Assertion expects Bearer fresh-credential through public bridge/login→refresh→request→helper source relevance. This spans unchanged refresh and changed request/helper participants; no direct helper/refresh test, owner/no-header branch or all-unit coverage is established. |
+| `single local owner reads and writes without a Bearer while explicit invalid credentials never escalate` | tests/gateway.test.ts H90–114; added Test/TestChange with checked Base absence provenance; not run. | HTTP owner/no-header read/write and invalid credential401 expectations. Policy verification, not a client request/helper call or proven goal. |
+| `01-A/C/F/G controlled host: real React + PR14 → queue → MCP source/read/reply → authoritative UI/restart` | tests/review.e2e.ts B146–244/H140–242; modified Test/TestChange; not run. | Prepared indirect UI-journey owner-opening/no-Authorization expectations. PR14 in the declared case name is retained source context, not a change to this account's PR25 comparison; not direct helper/every-branch/native-host proof. |
+
+```mermaid
+flowchart LR
+  subgraph change["request() Change · same identity"]
+    request["request() · change"]
+  end
+  refresh["refresh() · no change in source"]
+  helper["accessHeaders() · add"]
+  refresh -->|"calls · B37 / H38"| request
+  request -->|"After calls via H30 site · projection"| helper
+  appTest["Unchanged credential regression · 3 variants · Not run"]
+  appAssertion["Asserts Bearer fresh-credential · Not run"]
+  appFile["tests/application.test.ts · no change"]
+  appTest -->|"contains"| appAssertion
+  appTest -->|"verifies retained credentials · indirect chain via refresh/request"| change
+  appTest -->|"located_in · B/H392–447"| appFile
+  appAssertion -->|"located_in · B/H418"| appFile
+  subgraph e2eChange["Modified E2E TestChange"]
+    e2e["Controlled-host review journey · change · Not run"]
+    e2eAssertion["After owner opening / no Authorization assertions · Not run"]
+    e2e -->|"After contains · H146–147,241"| e2eAssertion
+  end
+  e2eFile["tests/review.e2e.ts · change"]
+  e2eChange -->|"After verifies · indirect UI journey"| change
+  e2e -->|"located_in · B146–244 / H140–242"| e2eFile
+  subgraph gatewayChange["Added gateway policy TestChange"]
+    gatewayTest["Local-owner HTTP policy test · add · Not run"]
+    gatewayAssertion["Owner no-header R/W; invalid credential401 · Not run"]
+    gatewayTest -->|"After contains"| gatewayAssertion
+  end
+  gatewayFile["tests/gateway.test.ts · change"]
+  policy["Local-owner HTTP policy · source-declared expectation"]
+  gatewayTest -->|"verifies_policy · source assertions"| policy
+  gatewayTest -->|"located_in · H90–114"| gatewayFile
+  gatewayAssertion -->|"located_in · H99–103,105–109,110–112"| gatewayFile
+  change -.->|"related_policy · inference, not call"| policy
+  classDef changed fill:#fff0bd,stroke:#b79b43,color:#5c4918
+  classDef added fill:#e3f3e8,stroke:#76ac89,color:#25543a
+  class request,e2e,e2eFile,gatewayFile changed
+  class helper,gatewayTest,gatewayAssertion added
+```
+
+The explicit-credential association follows the packet's captured-Authorization assertion, public bridge/login evidence and login→refresh→request→helper chain. The neutral refresh call is visible so an unchanged participant is not hidden by the code Change boundary. No synthetic direct test→refresh/helper `verifies` edge is added. Unit-specific direct coverage remains unknown. Gateway's inferred shared-policy link is not promoted into client coverage, and no test verifies the Goal merely by being connected. The full E2E Before source step/assertions remain in its evidence account, not duplicated here; pure addition has no fabricated Before node. All definitions remain **Not run**; this view supplies no TestRun or PASS record. Underlying exact names, anchors, source hashes and chain evidence are in the linked prepared test packets above.
