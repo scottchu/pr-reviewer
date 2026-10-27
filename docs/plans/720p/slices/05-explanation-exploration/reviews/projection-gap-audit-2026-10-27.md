@@ -52,3 +52,21 @@ The next bounded review must cover **all currently prepared entities**: exactly 
 Status must describe what the evidence proves. Equal refresh body bytes justify source nochange, not unchanged downstream behavior. Removing an inline Bearer expression does not prove Authorization disappeared from every After path. Non-Git Reason/Goal entities need an explicit status/applicability basis rather than guessed revision history. Missing mapping/status evidence is a documented unresolved item, not permission to fabricate a pair or silently drop a required entity.
 
 Preventive acceptance therefore changes from “one request card plus unchanged old graph” to “one normalized logical node per current entity, truthful status and exact immutable occurrence/evidence mapping.” Tests and independent review must check that model contract before visual row/cardinality checks. This correction remains header+graph only, with no new framework, panels or owner/runtime changes.
+
+## Actual automation boundary and missing relation derivation
+
+The current candidate is not an end-to-end automatic PR-to-understanding compiler. Verified layers are different:
+
+| Layer | Actual mechanism / evidence | Limit |
+| --- | --- | --- |
+| Pinned source | `prepare-source.ts:9–15` reads Git objects and checks SHA256. | This verifies source bytes; it does not derive the explanatory graph. |
+| Syntax and static analysis | `prepare-context.ts:19,50` walks a TypeScript AST; `src/source-analysis/analyze.ts:181` builds a TypeScript program. | A parser/compiler exists, but its existence does not mean every current graph fact was statically resolved. The current client packet has zero admitted static edges and 16 explicitly source-observed manual relations. |
+| Representative knowledge | `core-request-graph-v1.json.membership.selection` explicitly declares a curated request-header seed and bounded membership. | Test relevance, rationale and logical-entity correspondence are prepared knowledge with source support, not demonstrated general automatic inference. |
+| Logical compilation | `comparison-graph.ts:1–7,61–84` reads an explicit mapping and remaps the hand-selected `minimal-graph.ts` graph. | This normalizes the supplied shape; it does not automatically compare every canonical relationship on both sides. |
+| Rendering | `minimal-main.tsx` renders the compiled records through the row projection. | Rendering cannot recover a supported relationship dropped earlier. |
+
+The refresh case demonstrates the missing step exactly. The immutable core already contains a Before refresh→request call at line37 and an After call at line38, both exact source-observed records. `minimal-graph.ts:45` selects only `headRefreshCall`, and `:111` emits only its After relationship. `comparison-graph.ts:84` copies/remaps those selected edges rather than deriving relationship comparison from the core calls. Thus unchanged source-call context can appear After-only, inviting a false reading that it is new.
+
+The bounded correction is to derive relationship comparison from those **existing canonical Before/After records**, using the explicit occurrence-to-logical-subject mapping and evidenced callsite correspondence. The paired refresh call should retain both original sites/provenance and a source-scoped no-change relationship status. The new helper call has separate head-only/add evidence; removing direct inline header construction has scoped removal meaning. Relationship comparison status must be independent of provenance version. This requires no new parser, dependency, whole-PR discovery or broad identity algorithm.
+
+Adding another handpicked Before arrow may fix one image but does not close this derivation gap. The acceptance check should remove that special selection and demonstrate that the bounded core input deterministically yields the paired relationship, with original IDs/sites and honest frontier. Documentation must keep this capability separate from curated seeds, manual source review, prepared test relevance and intended outcomes.
