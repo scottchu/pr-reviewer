@@ -1,3 +1,4 @@
+import { preparedTests } from './prepared-test-coverage.ts';
 import { derivePreparedCalls } from './derive-comparison-calls.ts';
 import mapping from '../../docs/plans/720p/slices/05-explanation-exploration/reviews/logical-entity-mapping-v1.json' with { type: 'json' };
 import { minimalGraph as source, allEntities as sourceEntities, type GraphEntity, type GraphRelation } from './minimal-graph.ts';
@@ -141,16 +142,16 @@ for (const call of derivedCalls) {
 const grouped = new Set(groups.flatMap(group => group.nodes.map(node => node.id)));
 export const comparisonGraph = {
   id: source.id, kind: source.kind,
-  data: { ...source.data, normalization: mapping, occurrenceInput: source, definitionLocations: requestDefinitions, callDerivation: derivedCalls },
-  nodes: [...groups, ...[...entities.values()].filter(node => !grouped.has(node.id))],
+  data: { ...source.data, normalization: mapping, occurrenceInput: source, definitionLocations: requestDefinitions, callDerivation: derivedCalls, supplementalTestPreparation: preparedTests.data },
+  nodes: [...groups, ...[...entities.values()].filter(node => !grouped.has(node.id)), ...preparedTests.nodes],
   edges: [
     ...source.edges.filter(edge => edge.relation !== 'calls' && edge.relation !== 'located_in').map(relation),
-    ...pairedSourceLocations, ...derivedCallEdges,
+    ...pairedSourceLocations, ...derivedCallEdges, ...preparedTests.edges,
     { id: 'request:defined_in:review-file', from: 'request', to: 'review-file', version: 'comparison' as const, relation: 'defined_in', data: { definitionOccurrences: requestDefinitions, projection: 'metadata' } },
   ],
 };
 export const allEntities = (): readonly GraphEntity[] => comparisonGraph.nodes.flatMap(node => [node, ...('nodes' in node ? node.nodes ?? [] : [])]);
-export const allRelations = (): readonly GraphRelation[] => [...comparisonGraph.edges, ...groups.flatMap(group => group.edges)];
+export const allRelations = (): readonly GraphRelation[] => [...comparisonGraph.edges, ...groups.flatMap(group => group.edges), ...preparedTests.nodes.flatMap(node => node.edges ?? [])];
 export const isPairedSubject = (id: string): boolean => {
   const entity = entities.get(id);
   return Boolean(entity && ['function', 'test'].includes(entity.kind) && (entity.data.occurrences as readonly unknown[]).length > 1);

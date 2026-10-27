@@ -8,8 +8,8 @@ test('explicit compiler emits one function/File/test entity and retains original
   const entities = allEntities();
   assert.equal(new Set(entities.map(entity => entity.id)).size, entities.length);
   assert.equal(entities.filter(entity => entity.kind === 'function').length, 3);
-  assert.equal(entities.filter(entity => entity.kind === 'file').length, 3);
-  assert.equal(entities.filter(entity => entity.kind === 'test').length, 1);
+  assert.equal(entities.filter(entity => entity.kind === 'file').length, 5);
+  assert.equal(entities.filter(entity => entity.kind === 'test').length, 3);
   const request = entities.find(entity => entity.id === 'request');
   assert.ok(request);
   const occurrences = request.data.occurrences as { canonicalId: string }[];
