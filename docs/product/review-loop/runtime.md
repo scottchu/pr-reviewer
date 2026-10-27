@@ -11,11 +11,13 @@ Use the installed Node 24, Bun 1.4 and Chrome runtimes. Dependencies are pinned 
 ```sh
 export PATH="/Applications/ChatGPT.app/Contents/Resources/cua_node/bin:/opt/homebrew/Caskroom/codex/0.164.0/bin:$PATH"
 bun install --frozen-lockfile
-export REVIEW_DATA_DIR="$(mktemp -d -t pr-reviewer-local)"
+export REVIEW_DATA_DIR="$HOME/.local/share/pr-reviewer/local-review"
 bun run dev
 ```
 
 The app binds UI `http://127.0.0.1:5184` and gateway `http://127.0.0.1:5185`. Override with `REVIEW_UI_PORT` and `REVIEW_GATEWAY_PORT`; both must be distinct unprivileged ports. An occupied port fails startup without stopping its owner. `REVIEW_CODEX_BIN` may select the installed matching CLI; it never changes model, sandbox or owner settings. `REVIEW_BUN_BIN` can name the existing Bun executable.
+
+Long-running task worktrees and retained business data must use persistent storage, never `/tmp`/`/private/tmp` or an automatically disposable directory. Temporary directories are for explicitly disposable fixtures only. A missing retained store is a recovery blocker: locate a consistent backup rather than starting an empty replacement.
 
 The data directory must be private to its OS user, outside every Git repository (including other checkouts and Git metadata) and outside `.decompozr`. The app prepares PR 14 directly from its immutable Git objects, verifies source bounds and hashes, and preserves SQLite and `snapshot.json` there. No reviewed code or install hook executes. `bun run prepare:source` can perform the same bounded preparation separately. A data-root ownership lock prevents competing runtimes. Only an absent prior PID allows stale-lock recovery; uncertainty is preserved.
 
@@ -141,3 +143,14 @@ The upgrade preserves trusted launch pairing and existing tools, including denia
 ### Task-owned candidate availability
 
 A candidate started in task terminal sessions is available only while those processes remain alive; a retained manifest saying running is provenance, not a liveness probe or an installed restart guarantee. Diagnose a proxy502 by checking its existing local UI/API upstreams before changing routing. Scoped recovery preserves a consistent store backup, old source/runtime manifests and retained question/reply/attachment identities; restart only the already authorized candidate processes and read back local plus exposed page/assets/API identities. A restarted process records its actual clean source inputs rather than inheriting an old process pin. Recovery must not reattach a participant, replay a business command or overwrite retained Story content. Host/task shutdown durability requires a separately authorized service-lifecycle design; do not infer installation or global configuration authority from a request to restore the existing candidate.
+
+
+## Current PR25 minimum-graph restart location
+
+2026-10-27 reboot incident: the former `/private/tmp/pr-reviewer-reading-journey` checkout, its owner-data and evidence directories were absent after reboot. Exact committed source0342765/application0781583 remained in Git. Restore/move the existing task branch to persistent `/Users/scottchu/.codex-workspaces/worktrees/pr-reviewer-reading-journey`, not back to temporary storage. Locked dependencies were restored without install scripts/version changes. This header+graph entry uses tracked prepared evidence and can serve independently of the gateway.
+
+Current UI is a detached task-owned Vite process on127.0.0.1:57943, reused existing Serve8478 destination. No Tailscale/global/autostart setting changed. Durable launch record/log/rendered receipt are under `/Users/scottchu/.codex-workspaces/artifacts/pr-reviewer-reading-journey-restart-2026-10-27/`. Read runtime.json for the current PID and source/cwd before recovery; confirm actual listener/HTTP before claiming health. Process start source0342765 stays distinct from later docs-only commits.
+
+Gateway57944 was NOT started: the original private owner store/Snapshot/attachment/question/reply data directory is missing. Bounded searches of documented PRReviewer artifact roots and original startup/task metadata locations found no candidate backup; recoverability beyond those locations is unknown. No empty store, source ingestion, participant connection or business command was created. Any recovered data must go outside Git on persistent storage; the old task-specific owner-runtime guard still names temporary storage and needs a narrow authorized path reconciliation before actual recovered-store startup, not a workaround that recreates an empty temporary store.
+
+Persistent checkout/logs survive reboot; the running process does not. No OS supervisor/reboot autostart was installed. This is graph availability restoration only, not recovery of the missing retained business history or old ignored mockup/evidence artifacts.
