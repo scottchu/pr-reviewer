@@ -20,8 +20,9 @@ Repository: github.com/scottchu/pr-reviewer
 
 Review subject: PR #25
   examinedAs → Comparison(base, head above)
-  hasChange → src/application/local-access.ts added
-  hasChange → src/application/review.ts request behavior modified
+  hasChange → request behavior Change account
+  changes → File: src/application/review.ts (comparisonStatus: change)
+  changes → File: src/application/local-access.ts (comparisonStatus: add)
 ```
 
 These explicit Project and Repository boxes can appear in a project-knowledge view. They represent distinct entities connected by `usesRepository`, not two decorative names for the same object. The same repository is both where PR Reviewer is developed and the subject of its own PR25 dogfood review. These are two roles of one repository; the product project, review session, candidate build and pinned comparison remain distinct. There is no circular “the UI verified itself” acceptance implication.
@@ -52,7 +53,7 @@ Comparison repository: scottchu/pr-reviewer. Base: `b096826e31c0927190806de91ed7
 
 | Unit / existing typed statement | Exact source / limit |
 | --- | --- |
-| PR25 review scope involves changed review.ts and added local-access.ts | Comparison membership, not lexical containment and not a new relation type. Local preparation does not cover every PR effect. |
+| PR25 `changes` review File and local-access File | Explicit comparison-qualified relation, admitted by native File diff evidence below; statuses change/add respectively. Not lexical containment or whole-PR effect coverage. |
 | request `defined_in` review File | Before declaration24–32 / After25–33; two witnesses of ONE logical function/File. Metadata declaration provenance is distinct from changed-content evidence. |
 | request Before `constructs` direct Authorization | review.ts Base29. Removed direct construction only, not global removal of Bearer headers. |
 | request After `contains_call` accessHeaders(captured) site | review.ts Head30. This is the actual caller's callsite, not the callee definition. |
@@ -72,3 +73,44 @@ Read top-down: PR scope → changed File role → request comparison → exact B
 - [Owning source/evidence/composition contract](review-loop/semantic-graph.md#relationship-composition-and-inference-limits): no runtime/PASS/author-causation or goal-transition inference from paths.
 
 Markdown owns accepted meaning, constraints and the explanation/status of this bounded ABox. Versioned JSON carries concrete prepared facts and evidence used by the current compilation; it is not an alternative ontology authority or a finalized persisted API. Observed source, prepared intent, source-derived inference and unknown execution remain separate. No app/UI changes or formal reasoning implementation follow from this document split.
+
+
+## PR25 changes File facts and full core graph
+
+This uses the explicitly accepted [PR→File changes contract](project-repository-tbox.md#pr-changes-file--comparison-qualified-relation). Both endpoints are logical identities, qualified by the repository and exact Base/Head Comparison above. The existing request Change account is a separate subject, not the File endpoint.
+
+| Direct fact | Comparison status | Native evidence at the pinned base/head |
+| --- | --- | --- |
+| PR25 `changes` File src/application/review.ts | change | `git diff --name-status` reports M. Base blob9da077b77bc0571d46a3805e5304f80bb56a442d → Head44b1953f925827b492fecace0925e5fe4eec87cd; native request hunk/expression witnesses remain in the core account. |
+| PR25 `changes` File src/application/local-access.ts | add | Native diff reports A; Base tree has no this path, Head blob99533c827fb57c291757dd27b54367ddb6185082. Checked absence is provenance, not a Before File/helper entity. |
+
+Evidence pointer: the exact [prepared native comparison/diff](../../mockups/pr-file-tree/diffs.json) pins the same base/head and File records; the [core request evidence](../plans/720p/slices/05-explanation-exploration/reviews/core-request-graph-v1.json) supplies granular source identities/hashes/anchors. A local read of those pinned Git trees/name-status diff confirms the two rows. This does not infer PR membership just from the function Change or admit all50 Files' effects.
+
+```mermaid
+flowchart TD
+  pr["PR25 · pinned comparison"]
+  reviewFile["src/application/review.ts · change"]
+  helperFile["src/application/local-access.ts · add"]
+  subgraph change["request() Change graph"]
+    request["request() · change"]
+    header["Direct Authorization construction · remove"]
+    request -->|"Before constructs · B29"| header
+  end
+  helper["accessHeaders() · add"]
+  pr -->|"changes · change"| reviewFile
+  pr -->|"changes · add"| helperFile
+  request -->|"defined_in · B24–32 / H25–33"| reviewFile
+  header -->|"located_in · B29"| reviewFile
+  request -->|"After calls via H30 site · projection"| helper
+  helper -->|"located_in · H3"| helperFile
+  classDef changed fill:#fff0bd,stroke:#b79b43,color:#5c4918
+  classDef added fill:#e3f3e8,stroke:#76ac89,color:#25543a
+  classDef removed fill:#fae5e4,stroke:#ca7e7b,color:#642b29
+  class request,reviewFile changed
+  class helper,helperFile added
+  class header removed
+```
+
+The PR remains in the complete **core teaching graph**, not a claim that this diagram contains all PR25 facts. There is one request and one logical File per path. Spatial Change membership draws no parent→child arrow. The reduced After call arrow is a projection of the existing request `contains_call` H30 site → `calls` helper path, not a newly materialized direct binding. The canonical callsite and its review.ts H30 `located_in` witness stay explicit in the crosswalk/evidence above; helperH3 belongs to local-access.ts. Before/After are comparison evidence, not goal transition or execution order.
+
+Unchanged refresh, relevant test definitions, intent/inference and their unknown runtime results remain in the account above, without being invented as changed Files or deleted to simplify this diagram. No tests ran, goal was proven or app/UI changed by defining these facts.

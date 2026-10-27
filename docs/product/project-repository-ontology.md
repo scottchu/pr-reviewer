@@ -47,3 +47,5 @@ See [TBox level rules](project-repository-tbox.md#multilevel-understanding-units
 ### ABox — bounded PR25 request example
 
 See [PR25 instance reading](project-repository-abox-pr25.md#pr25-units-top-down-and-bottom-up).
+
+The latest explicit ontology extension is [PR changes File](project-repository-tbox.md#pr-changes-file--comparison-qualified-relation), instantiated by the [PR25 core graph](project-repository-abox-pr25.md#pr25-changes-file-facts-and-full-core-graph). It is a documented relation, not an app/schema migration.

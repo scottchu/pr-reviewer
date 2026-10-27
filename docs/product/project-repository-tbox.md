@@ -75,3 +75,20 @@ Bottom-up composition can explain structural membership, a supported behavioral 
 ## Composition contract
 
 Use the existing [typed relationship composition and inference limits](review-loop/semantic-graph.md#relationship-composition-and-inference-limits) and [pure addition/removal membership contract](review-loop/semantic-graph.md#pure-additionsremovals-and-graph-membership). Those owning integration/evidence contracts are linked, not duplicated here.
+
+
+## PR changes File — comparison-qualified relation
+
+Date:2026-10-27. Status: explicitly accepted minimal ontology extension. The missing PR→File relation is **`changes`**; keep the PR as a subject rather than removing it because a relation was undefined.
+
+| Contract | Meaning |
+| --- | --- |
+| Domain / range | PR review subject → logical File, within one identified repository and pinned base/head Comparison. This does not equate PR, Review session or Comparison identities. |
+| Admission | Exact comparison/file-diff evidence establishes that this File changed: verified repository, base/head revisions, side/path/File correspondence, present-side blobs/content hashes and native diff status. A missing side needs checked absence, never a fabricated source entity. |
+| Classification | Comparison status belongs to the qualified fact/File account (`change`, `add`, `remove` as supported), not separate adds/modifies/removes predicates. Source Before/After witnesses and existing logical File/occurrence identities remain distinct. |
+| Scope | The pinned PR comparison includes a source-evidenced change to this File. It is review-scope membership, not lexical ownership, a call, author causation, goal achievement or runtime effect. |
+| Non-admission | An unchanged context File does not qualify merely because it is called, inspected or displayed. A changed function alone does not establish this relation without supporting File comparison/diff evidence. |
+| Matching / limits | Use existing explicit comparison identity evidence. Renames, copies, ambiguous paths or missing correspondence stay unresolved unless supported; this relation introduces no repository-wide matching algorithm. |
+| Existing relations | Preserve PR `hasChange` → Change accounts separately; `changes` → File is not a renaming of that relation. Review `examines` Comparison and File/source provenance relations keep their meanings. No transitive PR→Function or whole-PR impact conclusion follows automatically. |
+
+Typed paths may navigate PR→File→source units, but cannot manufacture this direct `changes` fact from unrelated smaller-unit evidence. The [PR25 ABox](project-repository-abox-pr25.md#pr25-changes-file-facts-and-full-core-graph) records two admitted instances and their native-diff basis. This docs decision does not modify an app/public schema or admit new runtime facts.
