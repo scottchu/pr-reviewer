@@ -45,18 +45,19 @@ const entities = new Map<string, GraphEntity>(mapping.mapping.map(row => {
   });
   const first = records[0];
   if (!first) throw new Error('prepared_identity_mapping_empty');
+  const comparisonStatus = row.id === 'header-value' ? 'remove' : row.comparisonStatus;
   const { canonicalId: _canonicalId, canonicalCaseId: _caseId, definitionEvidence: _definition, side: _side, commit: _commit, evidence: _evidence, classification: _classification, ...logicalData } = first.data;
   return [row.id, {
     id: row.id, kind: row.kind,
     data: {
       ...logicalData,
-      ...(row.comparisonStatus ? { comparisonStatus: row.comparisonStatus } : {}),
+      ...(comparisonStatus ? { comparisonStatus } : {}),
       identityBasis: row.basis,
       comparisonBasis: row.basis,
       occurrences: occurrences(row.id),
       sourceRecords: records,
-      ...(row.id === 'header-value' ? { comparisonStatus: 'remove', comparisonBasis: 'Before29 direct request construction is replaced by After30 helper call', statusScope: 'Removed direct request construction only; explicit-credential helper still produces Authorization Bearer' } : {}),
-      ...(!row.comparisonStatus ? { comparisonApplicability: 'unassessed or not revision-comparable' } : {}),
+      ...(row.id === 'header-value' ? { comparisonBasis: 'Before29 direct request construction is replaced by After30 helper call', statusScope: 'Removed direct request construction only; explicit-credential helper still produces Authorization Bearer' } : {}),
+      ...(!comparisonStatus ? { comparisonApplicability: 'unassessed or not revision-comparable' } : {}),
     },
   }];
 }));

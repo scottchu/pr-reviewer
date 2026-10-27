@@ -29,6 +29,7 @@ test('comparison statuses are scoped/evidenced and never test outcomes or guesse
     if (entity.data.comparisonStatus) {
       assert.ok(allowed.has(String(entity.data.comparisonStatus)));
       assert.ok(entity.data.comparisonBasis);
+      assert.equal(entity.data.comparisonApplicability,undefined);
     }
   }
   assert.equal(allEntities().find(entity => entity.id === 'refresh')?.data.comparisonStatus, 'no change');
