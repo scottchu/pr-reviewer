@@ -4,6 +4,10 @@ This register defines what a bounded change must preserve. It does not declare t
 
 Detailed contracts remain in [file workspace](pr-file-tree-first.md), [canvas reading](review-loop/canvas-reading.md), [panels](review-loop/canvas-panels.md), [Story and exploration](review-loop/story-and-exploration.md), [runtime](review-loop/runtime.md) and [ontology](project-repository-ontology.md). This is their preservation/status index, not a second implementation specification.
 
+## Latest explicit minimum-candidate exception
+
+2026-10-27: user authorizes current candidate header+graph ONLY. The old file/reader/Story/panel/control composition remains retained source/history, not required visible content in this minimal entry. New entry must not import those UI systems; preserve public owners, domain, storage, source bytes, records and session/runtime boundaries. This is an explicit scoped supersession of entry visibility, not permission to delete retained systems or fabricate graph evidence. The durable semantic graph contract defines the minimum; no unrelated fixes or projection framework.
+
 ## Current boundaries and status
 
 | Invariant | Preserve / required behavior | Current status and evidence boundary |
