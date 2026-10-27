@@ -1,0 +1,126 @@
+{
+  "status": "Explicit normalization of ONE pinned prepared comparison, not repository identity inference or a public schema",
+  "comparison": {
+    "base": "b096826e31c0927190806de91ed70b8b64aa93d8",
+    "head": "e3b270e5f49a9215452b0b86702946043e979059"
+  },
+  "statuses": [
+    "change",
+    "no change",
+    "add",
+    "remove"
+  ],
+  "mapping": [
+    {
+      "id": "request",
+      "kind": "function",
+      "sourceNodeIds": [
+        "request-before",
+        "request-after"
+      ],
+      "comparisonStatus": "change",
+      "basis": "Prepared native request-header Change explicitly pairs these declaration occurrences."
+    },
+    {
+      "id": "refresh",
+      "kind": "function",
+      "sourceNodeIds": [
+        "refresh-after"
+      ],
+      "comparisonStatus": "no change",
+      "basis": "Exact Before/After body SHA equal in core account; no claim of unchanged behavior."
+    },
+    {
+      "id": "helper",
+      "kind": "function",
+      "sourceNodeIds": [
+        "helper-after"
+      ],
+      "comparisonStatus": "add",
+      "basis": "Pinned Git reports local-access.ts added; no Before file/declaration exists at this scoped path."
+    },
+    {
+      "id": "review-file",
+      "kind": "file",
+      "sourceNodeIds": [
+        "review-file-base",
+        "review-file-head"
+      ],
+      "comparisonStatus": "change",
+      "basis": "Same repository/path in pinned comparison; full-file SHA differs."
+    },
+    {
+      "id": "helper-file",
+      "kind": "file",
+      "sourceNodeIds": [
+        "helper-file"
+      ],
+      "comparisonStatus": "add",
+      "basis": "Pinned Git added-file absence evidence, not same-name inference."
+    },
+    {
+      "id": "test-file",
+      "kind": "file",
+      "sourceNodeIds": [
+        "test-file-base",
+        "test-file-head"
+      ],
+      "comparisonStatus": "change",
+      "basis": "Same repository/path; exact source-file SHA differs."
+    },
+    {
+      "id": "owner-journey-test",
+      "kind": "test",
+      "sourceNodeIds": [
+        "test-base",
+        "test-head"
+      ],
+      "comparisonStatus": "change",
+      "basis": "Same source-reviewed prepared case and native-hunk comparison; actual definition changes."
+    },
+    {
+      "id": "header-value",
+      "kind": "header",
+      "sourceNodeIds": [
+        "bearer-before"
+      ],
+      "basis": "Authorization value context; no cross-construction logical match proven. Removed direct-construction RELATION is not globally removed header."
+    },
+    {
+      "id": "old-test-step",
+      "kind": "source_step",
+      "sourceNodeIds": [
+        "old-test-step"
+      ],
+      "comparisonStatus": "remove",
+      "basis": "Scoped Before150 fill action removed in actual test comparison; not an assertion."
+    },
+    {
+      "id": "new-test-assertions",
+      "kind": "assertion",
+      "sourceNodeIds": [
+        "new-test-assertions"
+      ],
+      "comparisonStatus": "add",
+      "basis": "Prepared aggregate of actual newly added After146/147/241 checks; source declarations, not executed results."
+    },
+    {
+      "id": "reason",
+      "kind": "reason",
+      "sourceNodeIds": [
+        "reason"
+      ],
+      "basis": "Descriptive inferred intent context, no comparable revision pair."
+    },
+    {
+      "id": "goal",
+      "kind": "goal",
+      "sourceNodeIds": [
+        "goal"
+      ],
+      "basis": "Normative intended outcome context, no comparable revision pair."
+    }
+  ],
+  "unassessed": "Reason/Goal/header-value applicability is unresolved or not revision-comparable; omitted status is not a fifth enum value or invented no change.",
+  "migration": "Source occurrence IDs/anchors remain in occurrence evidence. Same name alone never merges entities. Graph subject records remain graphs."
+}
