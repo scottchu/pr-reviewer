@@ -35,3 +35,11 @@ A bounded pinned-head search under `tests/` found no direct mention of `accessHe
 This is not a whole-repository coverage audit. It identifies concrete omitted unchanged and changed tests and the selection rule causing the current misleadingly narrow projection.
 
 Machine-readable bounded evidence: `request-unit-test-evidence-v1.json` records fixed Git blobs, source/range SHA256, inclusive line ranges, UTF16 intervals, both unchanged application witnesses, the added gateway definition/native diff and indirect source chain. The exact Bearer assertion is line 418 (earlier dispatch said 419; corrected by numbered source readback).
+
+## Fixed compilation source review
+
+Reviewed fixed candidate `020c6897c694adbc6c8e4f23a9c13dd43702a179` against centered-port application `af4c2674bde2f702d850b49dd31098aecbc8412f`, with docs packet `7e16a28`. Independently read the new `mockups/pr-file-tree/prepared-test-coverage.ts` and its comparison composition, row projection and durable/slice docs diff. No semantic blocker found within this bounded correction.
+
+The application test remains one unchanged definition with both revision witnesses and its line418 assertion; no TestChange is created. Its verification is explicitly retained credential behavior through an indirect source chain, not local-owner/helper-branch coverage. The added gateway test has an actual Change group, bounded named-definition Before absence and Head90–114 test/assertion/File evidence. Its source-declared HTTP-policy verification is separated from the client change’s inferred shared-policy relation. No false client call, measured goal or Run/PASS is introduced. The previous modified E2E remains. Runtime/recovery are explicitly outside this addition; supplemental source evidence does not claim retained Snapshot admission.
+
+Author reports nine targeted tests, owning mockup strict compilation and build passing; this reviewer did not execute them. This source result does not establish actual layout/label readability, gesture preservation, published candidate identity or fresh UI comprehension; those require the separate actual-candidate review. Original source packets and existing model behavior are outside a new full audit here.

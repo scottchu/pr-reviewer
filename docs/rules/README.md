@@ -15,3 +15,5 @@ These documents define development and acceptance rules across all delivery roun
 [AGENTS.md](../../AGENTS.md) remains the agent entry point for Git isolation, PR-only delivery and standing repository constraints. Product contracts such as attachment identity and stream ownership belong to [product knowledge](../product/README.md), and their workflow enforcement links here rather than duplicating them.
 
 Round- and slice-specific tasks, assignments, evaluation packets and review results belong beside their owning [delivery plan](../plans/README.md). A review result is evidence about one named revision; it is not a new shared rule.
+
+The [2026-10-27 rule inventory and compliance audit](../plans/720p/slices/05-explanation-exploration/reviews/repository-rule-audit-2026-10-27.md) enumerates applicable source families and observed violations/unknowns. Its clause index is not a count of adopted rules and neither artifact grants blanket compliance.
