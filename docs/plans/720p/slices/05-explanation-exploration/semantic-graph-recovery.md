@@ -322,3 +322,6 @@ Baseline0cc78bc/applicationac26148. User observes divergent refresh attachments:
 
 
 V12 verification correction: e67cc9b centered-port build failed on a malformed group fragment before deployment; corrected the fragment/adapters. Earlier root strict command excluded mockups, so it was not a renderer strict PASS. Running the owning mockups/pr-file-tree/tsconfig.json exposed type-only JSON import attributes and an overly broad geometry style constraint; both corrected without runtime semantic changes. Retain check:minimum-graph to use the actual renderer configuration. Do not retroactively call earlier root-only checks full renderer verification.
+
+
+V12 exact-endpoint RED: shared6px hidden handles still placed the actual ReactFlow path3px outside the side center because its anchor is the handle edge. Use zero-area noninteractive adapters at the exact side center, retaining DOM handle IDs/measurement entries. This intentionally corrects geometry, not merely visual dot hiding; no connection editing hit target is required. Keep the subpixel actual path/card-center assertion.

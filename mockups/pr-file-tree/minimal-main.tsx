@@ -14,7 +14,7 @@ const directions:readonly Side[]=['left','right','top','bottom'];
 const position=(side:Side)=>({left:Position.Left,right:Position.Right,top:Position.Top,bottom:Position.Bottom})[side];
 type EntityNode=Node<{entity:GraphEntity},'entity'|'graph'>;
 type RelationEdge=Edge<{relation:GraphRelation;routed:Routed;onBend:(id:string,offset:Point|undefined)=>void;onMeasure:(id:string,size:{width:number;height:number})=>void},'relation'>;
-const Ports=()=> <>{(['source','target'] as const).flatMap(type=>directions.map(side=><Handle key={type+side} id={type+':'+side} type={type} position={position(side)} style={side==='left'||side==='right'?{top:'50%'}:{left:'50%'}}/>))}</>;
+const Ports=()=> <>{(['source','target'] as const).flatMap(type=>directions.map(side=><Handle key={type+side} id={type+':'+side} type={type} position={position(side)} style={{[side]:0,...(side==='left'||side==='right'?{top:'50%'}:{left:'50%'}),transform:'none'}}/>))}</>;
 const Entity=({data}:NodeProps<EntityNode>)=>{const card=cardRows(data.entity);return <article className={'minimal-entity'+(typeof data.entity.data.comparisonStatus==='string'?' status-'+data.entity.data.comparisonStatus.replaceAll(' ','-'):'')}><Ports/><h2>{card.title}</h2>{card.rows.map((row,index)=><p key={index}>{row}</p>)}</article>;};
 const GraphBoundary=({data}:NodeProps<EntityNode>)=><><Ports/><section className="minimal-change-graph" aria-label={String(data.entity.data.name)+' graph'}><h2>{String(data.entity.data.name)}</h2></section></>;
 const Relation=(props:EdgeProps<RelationEdge>)=>{

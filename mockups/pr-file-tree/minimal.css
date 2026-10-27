@@ -48,3 +48,6 @@ main { flex: 1; min-height: 0; }
 
 /* Nonselectable ReactFlow edges remain directly draggable through their stroke. */
 .minimal-route .react-flow__edge-interaction { pointer-events: stroke; touch-action: none; }
+
+/* A noninteractive point anchor: ReactFlow uses its edge, so size must be zero. */
+.react-flow__handle { width: 0; height: 0; min-width: 0; min-height: 0; }
