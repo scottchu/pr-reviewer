@@ -123,7 +123,7 @@ Finite acceptance: pure projection checks exact canonical functions/calls/anchor
 Independent-review handoff v5: primary reads fixed packet+candidate for entry-only import isolation, facts/identity/anchor fidelity, typedcomparison/calls/constructs/intent/location, no fake tests and protected owner/data boundaries. Actual reviewer inspects frozen desktop390 header+graph/no bars or panels and visible node/edge ownership. No fresh whole-product readiness implied.
 
 
-## Minimum-entry receipt
+## Initial minimum-entry receipt — later rejected model completeness
 
 Application pin `2915dc58` replaces the existing root module with header+graph only. New React entry imports existing ReactFlow, minimal projection/CSS and existing page-gesture boundary; legacy main/reader/panels/Story/controls are not imported or CSS-hidden. The old source and public owner/domain/storage/runtime remain retained unchanged. The two dedicated minimum-entry Playwright files are a subsequent test-only addition; application/build identity remains2915dc58.
 
@@ -153,3 +153,23 @@ V6 actual-layout RED at897bfe9 (not accepted): actual reviewer found File nodes 
 
 
 578cc9b actual recheck: desktop and390 now read both whole-function File ranges24–32/25–33, nested code/test topology and full indirect/not-run verifies record. Remaining paint defect: parent/child arrow strokes crossed opaque JSON text (including range key), despite zero node/label rectangle intersections. Computed label renderer and edge layers had auto z-index. Minimal CSS-only correction explicitly paints the existing opaque edge-label layer above edge strokes; no graph facts, routes, positions, controls or owner state change. Actual stroke/text recheck is still required; no broader acceptance follows from geometry PASS.
+
+
+## V6 final bounded delivery receipt
+
+Application source `07815835e0f2d732bf647082be6bf1d7e1575164` (nested model897bfe9, measured layout578cc9b, CSS-only paint0781583). Existing URL https://mac-mini.duckbill-ionian.ts.net:8478/ remains the actual candidate root, not a static proposal. No service, route, security, attachment or business command changes.
+
+| Required semantic/behavioral structure kept | Model / code | Observable evidence and limit |
+|---|---|---|
+| Change IS an identity-bearing graph, with Before/After behavior | minimal-graph.ts codeChange has id/kind/data/nodes/edges; GraphBoundary plus parentId projects those same records | Independent source confirms data structure; actual desktop390 sees nested code/test topology. Not merely a kind/change card or page label. |
+| Both source entities visibly connect to real File occurrences | located_in edges; Before declaration24–32 / After25–33, exact immutable commit/hash; hunk26–32/27–33 remains separate | Actual desktop and390 read full Before b096826…24–32 and After e3b270…25–33 records and side file paths. |
+| Actual test relation retained | source-verified modified tests/review.e2e.ts definitions B146–244/H140–242, original nativehunks; testChange graph; verifies targets code Change | Actual desktop390 reads full indirect UI→workspace.open→review.login→refresh→request→helper chain plus not-direct/not-all-branches/not-native/not-run limits. Before150 is fill source step; After144 observer,146/147/241 actual expectations. No fabricated unchanged test or TestRun/PASS. |
+| Simplification removes chrome, not meaning | Only header+graph entry; existing rule keep/remove/acceptance mapping | Prior panel/count passes did not establish completeness. New tests/data preparation are completed work, not waived. Legacy owner/source/runtime retained. |
+
+Independent source report `/tmp/pr-reviewer-nested-change-test-source-review.md` covers fixed897bfe9 and narrow578cc9b delta with no bounded blocker. Early evidence review independently matched33definition/assertion/binding anchors over11pinned source sides. Actual reviewer report `/tmp/pr-reviewer-reading-journey-evidence/minimum-change-graph/independent-actual-ui-account.md` retains earlier failures. The following supplemental actual results are specifically attributed to reviewer collaboration messages, not asserted to exist in that report:578cc9b additional390 pass read BOTH complete file ranges and FULL verifies record at ordinary graphzoom about0.9; lowzoom showed nested topology. CSS0781583 exact paint recheck read desktop Before range and vertical contains, phone After25–33 range and vertical contains without strokes through text. Visible path stems/arrowheads remain identifiable; masking only the path behind its own opaque record introduced no newly misleading direction in those samples. This is reused source-informed review, not fresh unfamiliar comprehension.
+
+Author verification:3focused pure PASS;2targeted actual Chrome E2E PASS at1440/390; strictTS PASS;578 source build PASS and final078 CSS build PASS. CSS-only delta required the exact visual recheck, not another broad suite. Original897 three measured node/record overlaps are retained RED;578 same measurement is zero at1440/390, and actual visible reading (not geometry alone) closes their effects. Original full-shell suites not run because their UI is intentionally absent.
+
+Access/evidence limits: normal exec resumed with OS24 Too many open files; existing supported Node tool ordinary fs/git access succeeded without settings/process cleanup. Attempted final build with signed App Node failed native-binding Team-ID loading; retained as failed invocation, no dependency reinstall/signing/config change. Unchanged original project Node toolchain then built successfully. No claim of physical Safari, hardware gestures, native auto-delivery, whole50-file/test coverage, compact first-frame graph, fulljourney or round acceptance. Large JSON records/groups still require substantial2D pan; no extra aesthetic iteration.
+
+Final build/source/hash evidence retained under `/tmp/pr-reviewer-reading-journey-evidence/minimum-change-graph/0781583/`; preceding578 folder retains16captures, manifest,3pure/2E2E/build logs and public readback. Ten explicit protected inputs (including legacy UI/runtime and original evidence packets) matched a103388; src/scripts unchanged. Public author readback remains revision42,20questions/1reply, sameSnapshot22009… and attachmentd2e7a61d…. Gateway provenance stays separate, not restarted/relabelled. No queued legacy patches or broader framework becomes authorized by this checkpoint.
