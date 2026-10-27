@@ -1,4 +1,4 @@
-import { isPairedSubject, type GraphEntity, type GraphRelation } from './comparison-graph.ts';
+import { allEntities, type GraphEntity, type GraphRelation } from './comparison-graph.ts';
 
 export type CardRows = Readonly<{ title: string; rows: readonly string[] }>;
 const text = (value: unknown) => typeof value === 'string' ? value : '';
@@ -53,4 +53,5 @@ export const edgeRows = (edge: GraphRelation): CardRows => {
   return { title, rows: [] };
 };
 export const omittedStructuralEdge = (edge: GraphRelation): boolean =>
-  edge.data.projection === 'metadata' || (['before', 'after'].includes(edge.relation) && isPairedSubject(edge.to));
+  edge.data.projection === 'metadata' ||
+  allEntities().some(parent => parent.id === edge.from && parent.nodes?.some(child => child.id === edge.to));

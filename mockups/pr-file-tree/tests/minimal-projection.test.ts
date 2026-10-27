@@ -37,7 +37,11 @@ test('comparison statuses are scoped/evidenced and never test outcomes or guesse
   assert.equal(allEntities().find(entity => entity.id === 'owner-journey-test')?.data.comparisonStatus, 'change');
   assert.equal(allEntities().find(entity => entity.id === 'header-value')?.data.comparisonStatus, 'remove');
   assert.equal(allEntities().find(entity => entity.id === 'goal')?.data.comparisonStatus, undefined);
-  assert.equal(allRelations().filter(omittedStructuralEdge).length, 5);
+  for (const parent of allEntities().filter(entity => entity.nodes)) {
+    for (const edge of allRelations().filter(edge => edge.from === parent.id && parent.nodes?.some(child => child.id === edge.to))) assert.equal(omittedStructuralEdge(edge), true);
+  }
+  const actualContains = allRelations().find(edge => edge.id === 'gateway-test:contains')!;
+  assert.equal(omittedStructuralEdge(actualContains), false);
 });
 
 test('kind-driven rows keep short commit/range and clearly describe unexecuted assertions', () => {
