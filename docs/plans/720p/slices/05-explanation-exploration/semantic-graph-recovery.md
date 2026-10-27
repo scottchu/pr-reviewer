@@ -150,3 +150,6 @@ Acceptance hardgates: actual Change record graph/nestedgroup; visible Before+Aft
 
 
 V6 actual-layout RED at897bfe9 (not accepted): actual reviewer found File nodes masking reason/goal edge records and test assertion masking its File-location record. Author DOM measurement at1440/390 independently records three intersections: reason/FileBefore100×132, goal/FileAfter125×180, testHeadLocation/assertion320×177.75CSSpx. Geometry-only repair reserves external side columns for File occurrences and direct location attachments; nested data/facts/claims unchanged. Acceptance requires no node/edge-record intersection in measured rectangles PLUS actual visible group/file/test paths; measurement alone is insufficient.
+
+
+578cc9b actual recheck: desktop and390 now read both whole-function File ranges24–32/25–33, nested code/test topology and full indirect/not-run verifies record. Remaining paint defect: parent/child arrow strokes crossed opaque JSON text (including range key), despite zero node/label rectangle intersections. Computed label renderer and edge layers had auto z-index. Minimal CSS-only correction explicitly paints the existing opaque edge-label layer above edge strokes; no graph facts, routes, positions, controls or owner state change. Actual stroke/text recheck is still required; no broader acceptance follows from geometry PASS.
