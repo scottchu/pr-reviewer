@@ -154,24 +154,22 @@ flowchart LR
   helper["accessHeaders() · add"]
   refresh -->|"calls · B37 / H38"| request
   request -->|"After calls via H30 site · projection"| helper
-  appTest["Unchanged credential regression · 3 variants · Not run"]
-  appAssertion["Asserts Bearer fresh-credential · Not run"]
+  appTest["Unchanged credential regression · 3 variants"]
+  appAssertion["assert.equal(calls[3]!.credential, Bearer fresh-credential) · L418"]
   appFile["tests/application.test.ts · no change"]
   appTest -->|"contains"| appAssertion
-  appTest -->|"verifies retained credentials · indirect chain via refresh/request"| change
   appTest -->|"located_in · B/H392–447"| appFile
   appAssertion -->|"located_in · B/H418"| appFile
   subgraph e2eChange["Modified E2E TestChange"]
-    e2e["Controlled-host review journey · change · Not run"]
-    e2eAssertion["After owner opening / no Authorization assertions · Not run"]
+    e2e["Controlled-host review journey · change"]
+    e2eAssertion["After owner opening / no Authorization assertions"]
     e2e -->|"After contains · H146–147,241"| e2eAssertion
   end
   e2eFile["tests/review.e2e.ts · change"]
-  e2eChange -->|"After verifies · indirect UI journey"| change
   e2e -->|"located_in · B146–244 / H140–242"| e2eFile
   subgraph gatewayChange["Added gateway policy TestChange"]
-    gatewayTest["Local-owner HTTP policy test · add · Not run"]
-    gatewayAssertion["Owner no-header R/W; invalid credential401 · Not run"]
+    gatewayTest["Local-owner HTTP policy test · add"]
+    gatewayAssertion["Owner no-header R/W; invalid credential401"]
     gatewayTest -->|"After contains"| gatewayAssertion
   end
   gatewayFile["tests/gateway.test.ts · change"]
@@ -187,3 +185,10 @@ flowchart LR
 ```
 
 The explicit-credential association follows the packet's captured-Authorization assertion, public bridge/login evidence and login→refresh→request→helper chain. The neutral refresh call is visible so an unchanged participant is not hidden by the code Change boundary. No synthetic direct test→refresh/helper `verifies` edge is added. Unit-specific direct coverage remains unknown. Gateway's inferred shared-policy link is not promoted into client coverage, and no test verifies the Goal merely by being connected. The full E2E Before source step/assertions remain in its evidence account, not duplicated here; pure addition has no fabricated Before node. All definitions remain **Not run**; this view supplies no TestRun or PASS record. Underlying exact names, anchors, source hashes and chain evidence are in the linked prepared test packets above.
+
+
+## Current structural-fact correction and generation boundary
+
+The assertion's actual source subject is calls[3]!.credential, expected equal to Bearer fresh-credential at tests/application.test.ts418; capture398 reads Authorization from fetch init, and login415 supplies fresh-credential. Test contains Assertion and source locations are established. The source chain login99→refresh38→request30→helperH3 explains indirect relevance but does not establish direct verification of each function or a formal assertion-target relation. Earlier diagram TestChange/Test→requestChange verifies links were curated relevance summaries, not parser-established assertion targets; the current illustrative view omits those shortcuts and keeps source context separate. It does not delete supported gateway policy Claims or infer complete coverage. No TestRun is supplied; the current graph does not render absence placeholders or invent results.
+
+Current pipeline is partial: Git preparation scripts produce diff/bytes; AST preparation produces source ranges and supported analysis. Current clients packet has0admitted static edges and16supplemental source-observed calls over5selected files. Core/test/identity selection and the minimum graph assembly remain prepared/curated; no tracked complete generator for those packets was found in the bounded script inspection. A new deterministic source-fact stage is needed before claiming the complete application graph is mechanically generated. Explanation Reason/Goal and policy relevance stay an attributed layer, not structural truth. Coverage must distinguish native whole-comparison File inventory, actual parsed sources/units, unsupported bindings, selected semantic context and unknowns.
