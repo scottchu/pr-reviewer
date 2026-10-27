@@ -5,9 +5,9 @@ for (const width of [1440, 390]) {
     await page.setViewportSize({ width, height: 1000 });
     await page.goto('/');
     await expect(page.getByRole('heading', { name: 'PR25 · Request headers', exact: true })).toBeVisible();
-    await expect(page.locator('.minimal-entity')).toHaveCount(10);
+    await expect(page.locator('.minimal-entity')).toHaveCount(16);
     await expect(page.locator('aside,footer,[role="dialog"],.workspace-actions,.diff-controls')).toHaveCount(0);
-    const records = await page.locator('.minimal-outgoing pre').allTextContents();
+    const records = await page.locator('.minimal-edge-json').allTextContents();
     const edges = records.map(record => JSON.parse(record) as {
       from: string; to: string; relation: string; data: { commit?: string; range?: { startLine: number; endLine: number } };
     });
@@ -15,6 +15,13 @@ for (const width of [1440, 390]) {
       .toEqual({ startLine: 24, endLine: 32 });
     expect(edges.find(edge => edge.from === 'request-after' && edge.relation === 'located_in')?.data.commit)
       .toBe('e3b270e5f49a9215452b0b86702946043e979059');
+    await expect(page.locator('[aria-label="request() change graph"]')).toBeVisible();
+    await expect(page.locator('[data-id="request-before"]')).toHaveAttribute('data-id', 'request-before');
+    await expect(page.locator('.minimal-change-graph')).toHaveCount(2);
+    const sourceGroup = await page.locator('[data-id="change"]').boundingBox();
+    const beforeNode = await page.locator('[data-id="request-before"]').boundingBox();
+    expect(beforeNode && sourceGroup && beforeNode.x >= sourceGroup.x && beforeNode.y >= sourceGroup.y && beforeNode.x + beforeNode.width <= sourceGroup.x + sourceGroup.width).toBeTruthy();
+    expect(edges.some(edge => edge.from === 'test-change' && edge.to === 'change' && edge.relation === 'verifies')).toBe(true);
     const header = await page.locator('header').boundingBox();
     const before = await page.locator('[data-id="change"]').boundingBox();
     expect(before).not.toBeNull();

@@ -42,3 +42,8 @@ Use the [protected invariant register](../product/protected-invariants.md). Befo
 ## Graph-first recovery gates
 
 For graph work, semantic entities/identities, typed assertions, evidence basis and unknowns precede projection. A projection cannot authorize new meaning or coverage. The bounded packet names the user's learning task, negative example, control/command scopes, state owners/lifetimes, allowlist and protected exceptions before derived edits. Tests derive from that contract; do not encode an unadopted composition such as two floating bars merely not overlapping. Separate engineering/source/visible-task/comprehension/device evidence. Repeated same-kind perceptual or ownership failure stops local patches and returns to the responsible contract; it does not authorize broad CSS/model/backend changes. Blocked review is incomplete. Reconcile conflicting owning norms before projection implementation, then obtain the required fresh whole-product docs reassessment.
+
+
+## Simplification does not remove required semantics
+
+When stripping a presentation or implementation to its minimum, record an explicit keep/remove map. Keep every accepted semantic and behavioral requirement unless the user explicitly changes it. Map each retained requirement to its model structure, derived code and observable acceptance; fewer panels/imports is not a smaller semantic contract. Missing evidence is unfinished preparation, not a scope waiver. A simplified projection must still expose the required identity-bearing graphs, typed relations and evidence. Verify these structures/tasks directly before declaring delivery; render counts or absence of chrome do not substitute.
