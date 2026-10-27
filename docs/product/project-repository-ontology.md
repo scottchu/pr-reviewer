@@ -93,3 +93,22 @@ For applicable source-comparison entities the only comparisonStatus values are `
 ## Reconstructible planning knowledge
 
 Accepted direction2026-10-27: previous and current observed reality, intent, expected reality, gap, overall plan, slice plan and MR code+docs are connected knowledge, not isolated reports. Forward reading connects observed reality→expected gap→plan→slice→MR; backward reading connects MR→observed outcome→slice→overall plan→gap→expected reality→previous reality. Keep authored planned claims, source-derived reconstruction and actual observations distinct with provenance/scope; a diff does not prove runtime behavior. Unexpected observed gaps feed the next plan without retroactively inventing intent. This is product/workflow direction, not authorization for a planning schema, UI or runtime feature.
+
+
+## Multilevel understanding: units and their contribution
+
+### TBox — existing units, distinct scope and containment
+
+Accepted requirement (2026-10-27): support PR-level, File-level, Function-level and meaningful smaller-unit understanding, using the existing concepts and exact evidence. A PR/review Comparison involves changed Files and relevant context; that review-scope membership is not lexical containment. A File has its actual declarations; a Function contains supported callsites/expressions or other meaningful source units at their real bounds. Smaller units are included when they explain a change and have evidence, not as a mandatory expansion of every AST node. This adds no entity kinds, relation names, schema or inference engine.
+
+Top-down drilldown and bottom-up reading refer to the SAME logical entities and revision witnesses, not duplicate entities for each level/view. Each represented level should explain why it matters, what changes, its relevant relations and exact source/evidence, and how it contributes to the larger unit. Missing explanations, unresolved relations and coverage gaps stay explicit. A Change graph can span several Files and source units; it is a comparison/knowledge graph, not necessarily a lexical tree. A caller never contains a callee merely because it calls it.
+
+Bottom-up composition can explain structural membership, a supported behavioral path or an attributed contribution to intent. It does not automatically aggregate comparison status, propagate effects/causation, prove author intent, or establish a larger goal's achievement. Preserve the [typed-path/evidence limits](review-loop/semantic-graph.md#relationship-composition-and-inference-limits) at every level. No new goal-transition or whole-PR conclusion follows from a local example.
+
+### ABox — bounded PR25 request example
+
+Within the pinned PR25 Comparison, the logical review File contains the actual request declarations (Before24–32/After25–33). Its Before29 direct Authorization construction and After30 accessHeaders(captured) callsite explain the request Change at smaller granularity; their Before/After link is comparison, not an execution step between revisions. The After callsite targets accessHeaders at local-access.ts Head3 through the evidenced call relation. That helper belongs to another File: dependency across Files is not containment inside request or review.ts.
+
+Read bottom-up from these exact expressions/sites to request's header-behavior comparison, its changed File's role in PR25, and the prepared intended goal of opening review without manual token entry. The last step is an attributed intent/contribution explanation, not a proven source call, executed outcome or certified author intent. The unchanged refresh→request Before37/After38 path supplies affected caller context without claiming unchanged runtime behavior. Read top-down through the same evidence and logical identities to check those distinctions.
+
+Relevant test contexts remain separately supported: the unchanged application's explicit-credential assertion418, added gateway HTTP-policy test90–114 and modified E2E each have their own scope and not-run limits. Neither those source definitions nor this local contribution account explains every changed File or proves the PR goal. Scope/frontier remains the prepared example; do not silently turn it into whole-PR impact coverage. TBox and ABox remain distinct sections in this shared document, not physically split Markdown or a formal deployed ontology.
