@@ -14,7 +14,8 @@ export type SourceAnchor = Readonly<{
 export type StructuralUnit = Readonly<{
   id: string; kind: 'function' | 'callsite' | 'test' | 'assertion';
   name: string; sourceText: string; anchor: SourceAnchor; ownerId?: string;
-  basis: string; diagnostic?: string;
+  basis: string; diagnostic?: string; exportName?: string; identityPath?: string;
+  binding?: Readonly<{kind:'local-const'|'relative-import';targetId?:string;module?:string;name?:string}>;
 }>;
 export const sourceHash = (value: string): string => createHash('sha256').update(value).digest('hex');
 const frameworks = new Set(['node:test', 'bun:test', '@playwright/test']);
@@ -88,6 +89,14 @@ export const extractSourceFacts = (input: SourceInput): readonly StructuralUnit[
     const matcher = parts.names.at(-1);
     return matcher && matchers.has(matcher) && parts.names.slice(0,-1).every(name => ['not','resolves','rejects'].includes(name)) ? 'assertion' : 'unsupported';
   };
+  const assigned = new Set<ts.Symbol>();
+  const scanWrites = (node: ts.Node): void => {
+    const target = ts.isBinaryExpression(node) && node.operatorToken.kind >= ts.SyntaxKind.FirstAssignment && node.operatorToken.kind <= ts.SyntaxKind.LastAssignment ? node.left :
+      (ts.isPrefixUnaryExpression(node) || ts.isPostfixUnaryExpression(node)) && [ts.SyntaxKind.PlusPlusToken,ts.SyntaxKind.MinusMinusToken].includes(node.operator) ? node.operand : undefined;
+    if (target && ts.isIdentifier(target)) { const symbol=checker.getSymbolAtLocation(target); if(symbol)assigned.add(symbol); }
+    ts.forEachChild(node,scanWrites);
+  };
+  scanWrites(ast);
   const units: StructuralUnit[] = [];
   const anchor = (node: ts.Node): SourceAnchor => {
     const start = node.getStart(ast), end = node.getEnd();
@@ -118,6 +127,20 @@ export const extractSourceFacts = (input: SourceInput): readonly StructuralUnit[
     let test = testId;
     if (ts.isFunctionLike(node) && 'body' in node && node.body) {
       owner = add(node, 'function', functionName(node as ts.FunctionLikeDeclaration), ownerId);
+      const ownName = functionName(node as ts.FunctionLikeDeclaration);
+      const contexts: string[] = [];
+      let ancestor: ts.Node | undefined = node.parent;
+      while (ancestor && ancestor !== ast) {
+        if (ts.isClassDeclaration(ancestor) && ancestor.name) contexts.unshift(ancestor.name.text);
+        else if (ts.isPropertyAssignment(ancestor) || ts.isVariableDeclaration(ancestor)) contexts.unshift(ancestor.name.getText(ast));
+        else if (ts.isFunctionDeclaration(ancestor) && ancestor.name) contexts.unshift(ancestor.name.text);
+        ancestor=ancestor.parent;
+      }
+      const record=units.findIndex(unit=>unit.id===owner);
+      let declaration: ts.Node=node;
+      if (ts.isVariableDeclaration(node.parent)) declaration=node.parent.parent.parent;
+      const exported=ts.isVariableStatement(declaration) && Boolean(declaration.declarationList.flags & ts.NodeFlags.Const) && ts.canHaveModifiers(declaration) && ts.getModifiers(declaration)?.some(modifier=>modifier.kind===ts.SyntaxKind.ExportKeyword);
+      units[record]={...units[record]!,identityPath:[...contexts,ownName].join('/'),...(exported?{exportName:ownName}:{})};
     }
     if (ts.isCallExpression(node)) {
       if (isTest(node)) {
@@ -127,6 +150,20 @@ export const extractSourceFacts = (input: SourceInput): readonly StructuralUnit[
       const assertion = testId ? assertionKind(node) : null;
       if (assertion === 'assertion') add(node, 'assertion', node.getText(ast), testId);
       const siteId = add(node, 'callsite', node.expression.getText(ast), owner);
+      if (ts.isIdentifier(node.expression)) {
+        const symbol=checker.getSymbolAtLocation(node.expression);
+        const importedBinding=symbol?imports.get(symbol):undefined;
+        const record=units.findIndex(unit=>unit.id===siteId);
+        if (symbol && !assigned.has(symbol) && importedBinding?.module.startsWith('.') && !['default','*'].includes(importedBinding.name)) {
+          units[record]={...units[record]!,binding:{kind:'relative-import',module:importedBinding.module,name:importedBinding.name}};
+        } else if (symbol && !assigned.has(symbol)) {
+          const targets=(symbol.declarations??[]).flatMap<ts.FunctionDeclaration | ts.ArrowFunction | ts.FunctionExpression>(declaration=> {
+            if (ts.isVariableDeclaration(declaration) && ts.isVariableDeclarationList(declaration.parent) && (declaration.parent.flags & ts.NodeFlags.Const) && declaration.initializer && (ts.isArrowFunction(declaration.initializer)||ts.isFunctionExpression(declaration.initializer))) return [declaration.initializer];
+            return [];
+          });
+          if(targets.length===1)units[record]={...units[record]!,binding:{kind:'local-const',targetId:sourceHash(JSON.stringify({kind:'function',...anchor(targets[0]!)}))}};
+        }
+      }
       if (assertion === 'unsupported') {
         const index = units.findIndex(unit => unit.id === siteId);
         units[index] = {...units[index]!, diagnostic: 'Unsupported imported assertion API/matcher; no Assertion fact admitted'};

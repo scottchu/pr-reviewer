@@ -69,3 +69,21 @@ test('all Git reads use existing safe effects and literal no-lazy command flags'
     if(args.includes('diff')) assert.ok(args.includes('--no-textconv'));
   }
 });
+
+test('supported lexical call facts retain target identity and reject shadowed or written functions', () => {
+  const facts=extractSourceFacts(input("import {helper} from './helper.ts'; const target=()=>1; function caller(){ target(); helper(); ((target:any)=>target())(()=>2); }"));
+  const target=facts.find(unit=>unit.kind==='function'&&unit.name==='target')!;
+  const sites=facts.filter(unit=>unit.kind==='callsite'&&unit.name==='target');
+  assert.equal(sites.filter(site=>site.binding?.targetId===target.id).length,1);
+  assert.equal(sites.filter(site=>!site.binding).length,1);
+  assert.equal(facts.find(unit=>unit.kind==='callsite'&&unit.name==='helper')?.binding?.module,'./helper.ts');
+  const changed=extractSourceFacts(input('function target(){return 1;} target=()=>2; target();'));
+  assert.ok(!changed.find(unit=>unit.kind==='callsite'&&unit.name==='target')?.binding);
+});
+
+test('mutable function-declaration targets never acquire const-call admission',()=>{
+  for(const text of ['function target(){return 1;} for(target of [()=>2]){} target();','function target(){return 1;} ({target}={target:()=>2}); target();']) {
+    const units=extractSourceFacts(input(text));
+    assert.ok(!units.find(unit=>unit.kind==='callsite'&&unit.name==='target')?.binding);
+  }
+});
