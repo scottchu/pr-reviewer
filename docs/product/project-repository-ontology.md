@@ -1,6 +1,6 @@
 # Project and repository ontology: TBox and ABox
 
-Date:2026-10-27. This is the navigation/compatibility index. The accepted ontology is unchanged; its definitions and PR25 account now have separate canonical Markdown homes. No schema, UI, reasoner or runtime migration is implied.
+Date:2026-10-27. This is the navigation/compatibility index. The documentation split preserved the existing ontology; its definitions and PR25 account have separate canonical Markdown homes. Later explicitly accepted ontology extensions are linked below. No schema, UI, reasoner or runtime migration is implied.
 
 - [TBox: concepts, typed relationships, constraints, entity identity and multilevel contribution](project-repository-tbox.md).
 - [PR25 ABox: concrete project/comparison, source units and evidence-linked top-down/bottom-up account](project-repository-abox-pr25.md).

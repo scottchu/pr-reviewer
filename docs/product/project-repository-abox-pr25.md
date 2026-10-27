@@ -82,7 +82,7 @@ This uses the explicitly accepted [PR→File changes contract](project-repositor
 | Direct fact | Comparison status | Native evidence at the pinned base/head |
 | --- | --- | --- |
 | PR25 `changes` File src/application/review.ts | change | `git diff --name-status` reports M. Base blob9da077b77bc0571d46a3805e5304f80bb56a442d → Head44b1953f925827b492fecace0925e5fe4eec87cd; native request hunk/expression witnesses remain in the core account. |
-| PR25 `changes` File src/application/local-access.ts | add | Native diff reports A; Base tree has no this path, Head blob99533c827fb57c291757dd27b54367ddb6185082. Checked absence is provenance, not a Before File/helper entity. |
+| PR25 `changes` File src/application/local-access.ts | add | Native diff reports A; Base tree does not contain this path, Head blob99533c827fb57c291757dd27b54367ddb6185082. Checked absence is provenance, not a Before File/helper entity. |
 
 Evidence pointer: the exact [prepared native comparison/diff](../../mockups/pr-file-tree/diffs.json) pins the same base/head and File records; the [core request evidence](../plans/720p/slices/05-explanation-exploration/reviews/core-request-graph-v1.json) supplies granular source identities/hashes/anchors. A local read of those pinned Git trees/name-status diff confirms the two rows. This does not infer PR membership just from the function Change or admit all50 Files' effects.
 
@@ -113,4 +113,4 @@ flowchart TD
 
 The PR remains in the complete **core teaching graph**, not a claim that this diagram contains all PR25 facts. There is one request and one logical File per path. Spatial Change membership draws no parent→child arrow. The reduced After call arrow is a projection of the existing request `contains_call` H30 site → `calls` helper path, not a newly materialized direct binding. The canonical callsite and its review.ts H30 `located_in` witness stay explicit in the crosswalk/evidence above; helperH3 belongs to local-access.ts. Before/After are comparison evidence, not goal transition or execution order.
 
-Unchanged refresh, relevant test definitions, intent/inference and their unknown runtime results remain in the account above, without being invented as changed Files or deleted to simplify this diagram. No tests ran, goal was proven or app/UI changed by defining these facts.
+Unchanged refresh, relevant test definitions, intent/inference and their unknown runtime results remain in the account above, without being invented as changed Files or deleted to simplify this diagram. No test execution, goal achievement or app/UI change is established by documenting these facts.
