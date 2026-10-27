@@ -16,7 +16,8 @@
     "mcp:client": "node --experimental-strip-types scripts/mcp-client.ts",
     "test:reading-journey": "node --experimental-strip-types --test mockups/pr-file-tree/tests/*.test.ts",
     "test:reading-journey:e2e": "playwright test --config mockups/pr-file-tree/playwright.config.ts",
-    "test:minimum-graph:e2e": "playwright test --config mockups/pr-file-tree/minimal-playwright.config.ts"
+    "test:minimum-graph:e2e": "playwright test --config mockups/pr-file-tree/minimal-playwright.config.ts",
+    "check:minimum-graph": "tsc --noEmit -p mockups/pr-file-tree/tsconfig.json"
   },
   "dependencies": {
     "@modelcontextprotocol/client": "2.4.0",

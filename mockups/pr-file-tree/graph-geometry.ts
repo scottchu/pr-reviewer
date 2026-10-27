@@ -1,6 +1,6 @@
 export type Point = Readonly<{x:number;y:number}>;
 export type Box = Point & Readonly<{width:number;height:number}>;
-export type LayoutNode = Readonly<{id:string;parentId?:string;position:Point;measured?:{width?:number;height?:number};style?:Record<string,unknown>}>;
+export type LayoutNode = Readonly<{id:string;parentId?:string;position:Point;measured?:{width?:number;height?:number};style?:Readonly<{width?:unknown;height?:unknown;opacity?:unknown}>}>;
 export type Link = Readonly<{id:string;source:string;target:string}>;
 export type Side = 'left'|'right'|'top'|'bottom';
 export const dimensions = (node:LayoutNode) => ({width:Number(node.style?.width ?? node.measured?.width ?? 300),height:Number(node.style?.height ?? node.measured?.height ?? 90)});

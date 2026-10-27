@@ -1,4 +1,4 @@
-import type coreInput from '../../docs/plans/720p/slices/05-explanation-exploration/reviews/core-request-graph-v1.json' with { type: 'json' };
+import type coreInput from '../../docs/plans/720p/slices/05-explanation-exploration/reviews/core-request-graph-v1.json';
 import type { GraphEntity } from './minimal-graph.ts';
 
 type Core = typeof coreInput;
