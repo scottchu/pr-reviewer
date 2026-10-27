@@ -17,7 +17,8 @@
     "test:reading-journey": "node --experimental-strip-types --test mockups/pr-file-tree/tests/*.test.ts",
     "test:reading-journey:e2e": "playwright test --config mockups/pr-file-tree/playwright.config.ts",
     "test:minimum-graph:e2e": "playwright test --config mockups/pr-file-tree/minimal-playwright.config.ts",
-    "check:minimum-graph": "tsc --noEmit -p mockups/pr-file-tree/tsconfig.json"
+    "check:minimum-graph": "tsc --noEmit -p mockups/pr-file-tree/tsconfig.json",
+    "prepare:graph-facts": "node --experimental-strip-types mockups/pr-file-tree/prepare-source-facts.ts"
   },
   "dependencies": {
     "@modelcontextprotocol/client": "2.4.0",

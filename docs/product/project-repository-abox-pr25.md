@@ -155,7 +155,7 @@ flowchart LR
   refresh -->|"calls · B37 / H38"| request
   request -->|"After calls via H30 site · projection"| helper
   appTest["Unchanged credential regression · 3 variants"]
-  appAssertion["assert.equal(calls[3]!.credential, Bearer fresh-credential) · L418"]
+  appAssertion["assert.equal(calls[3]!.credential, 'Bearer fresh-credential') · L418"]
   appFile["tests/application.test.ts · no change"]
   appTest -->|"contains"| appAssertion
   appTest -->|"located_in · B/H392–447"| appFile
