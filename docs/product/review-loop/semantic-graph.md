@@ -274,3 +274,6 @@ Each edge has one projection-only bend owner. The route and its label share that
 
 
 Canvas scroll input: unmodified two-axis wheel/trackpad deltas pan the graph in X/Y, including over graph cards/labels. They must not zoom by default. Ctrl-wheel/pinch remains intentional graph-only zoom. Blank-canvas pointer/touch drag pans; node/group/route/label gestures edit only their respective layout. Synthetic wheel/touch browser checks are not physical trackpad/device evidence.
+
+
+Connection geometry uses exactly one shared point at the center of each node side (top/right/bottom/left). Multiple relations on the same side share that point; no per-relation spacing. ReactFlow source/target adapters may coincide at that one geometric point, remain invisible and do not change semantic endpoints. Automatic side choice and shared curve/label editing remain.
