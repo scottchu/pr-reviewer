@@ -37,3 +37,5 @@
 - Private source evidence and handoff history are retained at /Users/scottchu/.codex-workspaces/artifacts/pr-diff-teacher-2026-10-23, including receiver-context-readback.md and source-conversation-history.md. Use this archive for any additional historical readback. Do not read or write the retired source worktree or its former handoff location. PR Reviewer and Playground have separate product writers.
 - Keep .decompozr/ ignored and untracked. Its local contents have been cleared; do not assume old handoff files are available there or recreate them without a current need.
 - Preserve unrelated work and credentials. Keep generated files, secrets and local runtime state out of Git.
+
+- Optimize for unfamiliar-reviewer understanding, not feature/test counts. Before implementation reconcile accepted intent, gaps and observable reading acceptance; apply the learning/delivery contract in docs/rules/documentation.md and the independent graph-first gate. Reports answer its four reader-outcome questions.

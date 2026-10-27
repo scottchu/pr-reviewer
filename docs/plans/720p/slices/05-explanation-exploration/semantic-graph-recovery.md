@@ -339,3 +339,14 @@ Allow one small prepared-test compilation module, comparisonGraph composition, k
 
 
 V13 actual020c689 RED: unrelated elevated edge stroke paints through the root application assertion; neutral refresh source label overlaps retained E2E verification/limits label. Preserve both failures in reviewer report. Correct node-over-stroke paint ownership and prioritize hard node/label rectangle clearance in the generic route search; permit bounded along-route as well as perpendicular bend candidates. No per-test/manual coordinate override or semantic change. Recheck those exact regions plus readable application392–447 witnesses.
+
+
+## Implementation/review handoff v14 — icons and semantic reading bands
+
+Baseline application603ac1e. Ordinary local access restored;603 contains two obstruction repairs but had no HTTPS/render verification after the prior network revocation. Do not call those repairs accepted until actual checks. User now explicitly authorizes ordinary same-URL retry and completion of this projection.
+
+Allow entity type icons, measured root band placement and focused tests only; preserve semantic graph, immutable source packets, nested graph membership, identities/status/evidence, existing gestures and header-only shell. Read left to right: non-test Files → code Changes/context → TestChanges/unchanged test context → test Files. Unchanged tests must not acquire a TestChange; derive test-File classification from source subjects. Child layout stays inside the existing parent. No ontology/API/dependency/panel/runtime/store expansion.
+
+Acceptance: every entity has a recognizable non-success icon; root bands measured in that order; same logical entities/edges/evidence before/after byte-equal; boundaries/cards/labels readable in desktop/390; both603 obstruction regions clear, including application392–447 witnesses and retained E2E indirect/not-helper limits. Retain center/route/label/node/group/wheel gesture checks. Build immutable persistent candidate, verify exact sameURL assets and actual affected journey, then independent source/actual UI review. If permission fails, record last completed action and leave delivery incomplete.
+
+Full-journey gap/order: first make this bounded graph's source, change and test relations understandable. The original motivation→system comparison→in-graph evidence→Q&A→Return remains the learning objective; current minimum lacks that whole journey and does not authorize restoring prior panels. Next design work must reconcile a semantic learning task and adopted projection before implementation. Rules inventory/audit is normative-source coverage, not a blanket compliance or whole-product acceptance claim.

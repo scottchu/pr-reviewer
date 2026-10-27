@@ -60,3 +60,20 @@ When stripping a presentation or implementation to its minimum, record an explic
 ## Make plans reconstructible in both directions
 
 Retain links among previous/current observed reality, intent, expected reality, gap, overall plan, slice plan and resulting MR code+docs. Forward: reality→expected gap→plan→slice→MR. Backward: MR→observed outcome→slice→overall plan→gap→expected reality→previous reality. Record which statements are planned, observed or inferred reconstruction, with source/context/status. Do not infer runtime success or original intent solely from a diff. New unexpected gaps are inputs to the next plan; reconcile them rather than revising history to make prior delivery appear complete. This is a documentation responsibility, not a new planning implementation.
+
+
+## Reader understanding governs delivery
+
+The product goal is an unfamiliar engineer understanding why a change exists, what changes, its system impact and the supporting evidence, with less context switching and enough grounding to review it. Features, passing tests and graph coverage are engineering evidence, not that outcome. Before implementation cite original intent/handoff, the latest adopted design and later corrections; a verification screenshot is not design adoption. Record expected versus observed reality, concrete acceptance, core gaps and ordered work. Use existing ontology identities/relations/evidence; an actual ontology gap needs an explicit smallest decision, never a parallel model.
+
+The intended full reading journey is motivation → system Before/After → in-graph evidence → Q&A → exact return. Same-canvas hierarchy, meaningful levels of detail and Story/graph synchronization serve that journey. This is the product direction, not authorization to restore superseded panels or invent a projection. The current header+graph exception remains; unresolved journey/design pieces stay explicit gaps.
+
+Keep engineering acceptance separate from product understanding: a fresh reviewer freezes an actual-candidate UI-only account before source, then compares evidence. An understanding failure stops unrelated feature expansion: preserve the failure, repair the affected model/projection and rerun affected checks. Continue already-authorized work without repeated requests to continue. Track repaired-but-unverified, verified-in-scope and incomplete/blocked separately; completion requires the agreed reading experience at the exact authorized endpoint, not a checklist or local build.
+
+Delivery reports answer:
+1. What did this change make easier for the reader to understand?
+2. What actual evidence supports that?
+3. Which core gap remains?
+4. How does the next step directly serve the original goal while preserving ontology and design consistency?
+
+A rules inventory identifies every applicable source and cross-reference; a compliance audit separately records observed conformance, violations, unknowns and scope. A newly written rule is not evidence that existing code complies.
