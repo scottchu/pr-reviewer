@@ -1,0 +1,21 @@
+* { box-sizing: border-box; }
+html, body, #root { width: 100%; height: 100%; margin: 0; }
+body { background: #171d22; color: #e2e8ed; font-family: system-ui, sans-serif; }
+#root { display: flex; flex-direction: column; }
+.minimal-header { padding: 15px 20px; border-bottom: 1px solid #3b454e; flex: none; }
+.minimal-header h1 { margin: 0 0 5px; font-size: 18px; font-weight: 600; }
+.minimal-header p { margin: 0 0 5px; color: #afbfcc; font-size: 12px; }
+.minimal-header code { font-size: 11px; color: #95afc5; overflow-wrap: anywhere; }
+main { flex: 1; min-height: 0; }
+.minimal-entity { width: 320px; padding: 15px; background: #242c33; border: 1px solid #6f8291; border-radius: 7px; }
+.minimal-entity h2 { margin: 0 0 10px; font-size: 15px; font-weight: 600; line-height: 1.4; }
+.minimal-entity pre { margin: 0; white-space: pre-wrap; overflow-wrap: anywhere; font: 11px/1.5 ui-monospace, monospace; color: #d5dfe6; }
+.kind-change { border-color: #b6a2cf; background: #302b39; }
+.kind-reason, .kind-goal { border-color: #ac9568; }
+.minimal-relation { position: absolute; width: 190px; padding: 8px; margin: 0; background: #171d22; color: #adbfcc; border: 1px solid #405461; border-radius: 4px; font: 10px/1.4 ui-monospace, monospace; white-space: pre-wrap; pointer-events: none; }
+.react-flow__edge-path { stroke: #9db3c8; stroke-width: 1.6; }
+.react-flow__handle { width: 6px; height: 6px; background: #c2d5e4; border: 0; }
+@media (max-width: 649px) {
+  .minimal-header { padding: 12px 14px; }
+  .minimal-header h1 { font-size: 16px; }
+}
