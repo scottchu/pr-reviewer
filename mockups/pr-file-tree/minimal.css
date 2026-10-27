@@ -28,3 +28,8 @@ main { flex: 1; min-height: 0; }
   .minimal-header { padding: 12px 14px; }
   .minimal-header h1 { font-size: 16px; }
 }
+
+/* Entity comparison status is a separate axis from edge source-version color. */
+.minimal-entity.status-change { background: #fff0bd; border-color: #b79b43; color: #5c4918; }
+.minimal-entity.status-add { background: #e3f3e8; border-color: #76ac89; color: #25543a; }
+.minimal-entity.status-remove { background: #fae5e4; border-color: #ca7e7b; color: #642b29; }

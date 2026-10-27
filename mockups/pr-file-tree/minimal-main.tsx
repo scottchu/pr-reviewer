@@ -10,12 +10,15 @@ import './minimal.css';
 import { installPageGestureBoundary } from './page-gestures.ts';
 import { comparisonGraph as minimalGraph, allEntities, allRelations, isPairedSubject, type GraphEntity, type GraphRelation } from './comparison-graph.ts';
 
-import { cardRows, edgeRows, entityVersion, groupSize, rowPositions, omittedStructuralEdge } from './minimal-projection.ts';
+import { cardRows, edgeRows, entityVersion, groupSize, rowPositions, omittedStructuralEdge, locationPeers } from './minimal-projection.ts';
 
 type EntityNode = Node<{ entity: GraphEntity; viewId: string }, 'entity' | 'graph'>;
-type RelationEdge = Edge<{ relation: GraphRelation }, 'relation'>;
+type RelationEdge = Edge<{ relation: GraphRelation; locationLane: number; locationCount: number }, 'relation'>;
 
-const Ports = () => <>
+const Ports = ({ entity }: { entity: GraphEntity }) => <>
+  {entity.kind === 'file' && locationPeers(entity.id).map((edge, index, peers) => (
+    <Handle key={edge.id} id={'file-in:' + edge.id} type="target" position={(rowPositions[entity.id]?.x ?? 0) < 0 ? Position.Right : Position.Left} style={{ top: ((index + 1) / (peers.length + 1) * 100) + '%' }} />
+  ))}
   <Handle id="in-top" type="target" position={Position.Top} />
   <Handle id="in-left" type="target" position={Position.Left} />
   <Handle id="in-right" type="target" position={Position.Right} />
@@ -32,14 +35,13 @@ const Entity = ({ data }: NodeProps<EntityNode>) => {
   const card = cardRows(data.entity);
   const paired = isPairedSubject(data.entity.id);
   const version = paired ? 'comparison' : entityVersion(data.entity.id);
-  return <article className="minimal-entity">
-    <Ports />
+  return <article className={'minimal-entity' + (typeof data.entity.data.comparisonStatus === 'string' ? ' status-' + data.entity.data.comparisonStatus.replaceAll(' ', '-') : '')} {...(data.entity.kind === 'file' ? { style: { minHeight: Math.max(70, locationPeers(data.entity.id).length * 18 + 40) } } : {})}>
+    <Ports entity={data.entity} />
     {paired && <>
       <Handle id="in-after" type="target" position={Position.Right} style={{ top: '30%' }} />
       <Handle id="out-before" type="source" position={Position.Bottom} style={{ left: '30%' }} />
       <Handle id="out-after" type="source" position={Position.Right} style={{ top: '70%' }} />
     </>}
-    <Version value={version} />
     <h2>{card.title}</h2>
     {card.rows.map((row, index) => <p key={index}>{row}</p>)}
   </article>;
@@ -63,16 +65,23 @@ const Relation = (props: EdgeProps<RelationEdge>) => {
   const outerLeft = testLink && props.data.relation.relation === 'motivated_by';
   const outerRight = testLink && props.data.relation.relation === 'verifies';
   const direction = outerLeft ? -1 : 1;
-  const versionedLocation = props.data.relation.relation === 'located_in' && ['review-file', 'test-file'].includes(props.data.relation.to);
-  const locationOffset = props.data.relation.version === 'before' ? -120 : 120;
+  const versionedLocation = props.data.relation.relation === 'located_in' && props.targetX < 0;
   const middleX = (props.sourceX + props.targetX) / 2;
+  const locationX = props.targetX + 330;
+  const locationY = props.targetY + (props.data.locationLane - (props.data.locationCount - 1) / 2) * 70;
+  const controlX = (locationX - (props.sourceX + props.targetX) / 8) / 0.75;
+  const locationOffset = (locationY - (props.sourceY + props.targetY) / 2) / 0.75;
+  const reverseCall = props.data.relation.relation === 'calls' && props.sourceX > props.targetX;
+  const callControlX = props.sourceX - 160;
   const path = versionedLocation
-    ? `M${props.sourceX},${props.sourceY} C${middleX},${props.sourceY + locationOffset} ${middleX},${props.targetY + locationOffset} ${props.targetX},${props.targetY}`
+    ? `M${props.sourceX},${props.sourceY} C${controlX},${props.sourceY + locationOffset} ${controlX},${props.targetY + locationOffset} ${props.targetX},${props.targetY}`
+    : reverseCall
+    ? `M${props.sourceX},${props.sourceY} C${callControlX},${props.sourceY} ${callControlX},${props.targetY} ${props.targetX},${props.targetY}`
     : outerLeft || outerRight
     ? `M${props.sourceX},${props.sourceY} C${props.sourceX + direction * 320},${props.sourceY} ${props.targetX + direction * 320},${props.targetY} ${props.targetX},${props.targetY}`
     : defaultPath;
-  const x = versionedLocation ? middleX : outerLeft || outerRight ? (props.sourceX + props.targetX) / 2 + direction * 240 : defaultX;
-  const y = versionedLocation ? (props.sourceY + props.targetY) / 2 + locationOffset * 0.75 : outerLeft || outerRight ? (props.sourceY + props.targetY) / 2 : defaultY;
+  const x = versionedLocation ? locationX : reverseCall ? (props.sourceX + props.targetX) / 8 + callControlX * 0.75 : outerLeft || outerRight ? (props.sourceX + props.targetX) / 2 + direction * 240 : defaultX;
+  const y = versionedLocation ? locationY : reverseCall ? (props.sourceY + props.targetY) / 2 : outerLeft || outerRight ? (props.sourceY + props.targetY) / 2 : defaultY;
   const card = edgeRows(props.data.relation);
   return <>
     <BaseEdge id={props.id} path={path} {...(props.markerEnd ? { markerEnd: props.markerEnd } : {})} />
@@ -103,7 +112,7 @@ const App = () => {
       const isGraph = Boolean(entity.nodes && entity.edges);
       return {
         id: entity.id, type: isGraph ? 'graph' : 'entity', data: { entity, viewId: entity.id },
-        position: layout[entity.id] ?? { x: 0, y: 0 }, draggable: false,
+        position: entity.kind === 'callsite' ? { x: 640, y: 350 } : layout[entity.id] ?? { x: 0, y: 0 }, draggable: false,
         ...(parent ? { parentId: parent.id, extent: 'parent' as const } : {}),
         ...(isGraph ? { style: { ...groupSize(entity.id) } } : {}),
       };
@@ -119,8 +128,8 @@ const App = () => {
     return {
       id: relation.id, type: 'relation', source: relation.from, target: relation.to,
       sourceHandle: pairedLocation ? (beforeLocation ? 'location-before' : 'location-after') : isPairedSubject(relation.from) && relation.version === 'before' && relation.relation !== 'located_in' ? 'out-before' : isPairedSubject(relation.from) && relation.version === 'after' && relation.relation !== 'located_in' ? 'out-after' : comparison ? relation.relation : testLink ? (relation.relation === 'verifies' ? 'out-right' : 'out-left') : beforeLocation ? 'out-left' : location ? 'out-right' : relation.from === 'refresh' ? 'out-left' : relation.relation === 'calls' || relation.relation === 'impedes' ? 'out-right' : 'out-bottom',
-      targetHandle: pairedLocation ? (beforeLocation ? 'in-before' : 'in-after-location') : isPairedSubject(relation.to) && relation.relation === 'calls' ? 'in-after' : testLink ? (relation.relation === 'verifies' ? 'in-right' : 'in-left') : beforeLocation || relation.from === 'refresh' ? 'in-right' : location ? 'in-left' : comparison || fromGraph || relation.relation === 'constructs' || relation.relation === 'contains' ? 'in-top' : 'in-left',
-      data: { relation }, markerEnd: { type: MarkerType.ArrowClosed, color: '#9db3c8' },
+      targetHandle: location ? 'file-in:' + relation.id : pairedLocation ? (beforeLocation ? 'in-before' : 'in-after-location') : isPairedSubject(relation.to) && relation.relation === 'calls' && relation.version === 'after' ? 'in-after' : testLink ? (relation.relation === 'verifies' ? 'in-right' : 'in-left') : beforeLocation || relation.from === 'refresh' ? 'in-right' : location ? 'in-left' : comparison || fromGraph || relation.relation === 'constructs' || relation.relation === 'contains' ? 'in-top' : 'in-left',
+      data: { relation, locationLane: locationPeers(relation.to).findIndex(edge => edge.id === relation.id), locationCount: locationPeers(relation.to).length }, markerEnd: { type: MarkerType.ArrowClosed, color: '#9db3c8' },
     };
   }), []);
 

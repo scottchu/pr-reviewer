@@ -1,4 +1,4 @@
-import { allEntities, isPairedSubject, type GraphEntity, type GraphRelation } from './comparison-graph.ts';
+import { allEntities, allRelations, isPairedSubject, type GraphEntity, type GraphRelation } from './comparison-graph.ts';
 
 export type CardRows = Readonly<{ title: string; rows: readonly string[] }>;
 export const entityVersion = (id: string): GraphRelation['version'] => {
@@ -18,6 +18,7 @@ const assertionText = (value: string) => {
 const contentRows = (entity: GraphEntity): CardRows => {
   const { kind, data } = entity;
   switch (kind) {
+    case 'callsite': return { title: text(data.value) || text(data.name), rows: [] };
     case 'function': return { title: text(data.name), rows: data.comparisonStatus === 'no change' ? ['Source-body equality, not behavior equivalence'] : [] };
     case 'header': return { title: 'Authorization', rows: [text(data.value).replace(/^Authorization:\s*/, '')] };
     case 'file': return { title: text(data.path), rows: [] };
@@ -43,6 +44,7 @@ export const edgeRows = (edge: GraphRelation): CardRows => {
     const range = edge.data.range as { startLine?: number; endLine?: number } | undefined;
     return { title, rows: [text(edge.data.commit).slice(0, 7), range ? `L${range.startLine}–${range.endLine}` : 'Range unavailable'] };
   }
+  if (edge.relation === 'calls' && edge.data.comparisonStatus === 'no change') return { title, rows: ['no change · Before + After source evidence'] };
   if (edge.relation === 'verifies') return { title, rows: ['Indirect UI journey · not run', 'Not direct helper, every-branch or native-host proof'] };
   if (edge.relation === 'motivated_by') return { title, rows: ['Inferred rationale'] };
   if (edge.relation === 'intended_to_achieve') return { title, rows: ['Intended, not measured'] };
@@ -60,4 +62,13 @@ export const rowPositions: Readonly<Record<string, { x: number; y: number }>> = 
   'test-file': { x: -950, y: 1600 },
 };
 export const omittedStructuralEdge = (edge: GraphRelation): boolean =>
-  ['before', 'after'].includes(edge.relation) && isPairedSubject(edge.to);
+  edge.data.projection === 'metadata' || (['before', 'after'].includes(edge.relation) && isPairedSubject(edge.to));
+
+export const locationPeers = (fileId: string): readonly GraphRelation[] => allRelations()
+  .filter(edge => edge.relation === 'located_in' && edge.to === fileId)
+  .sort((a, b) => {
+    const side = (a.version === 'before' ? 0 : 1) - (b.version === 'before' ? 0 : 1);
+    if (side) return side;
+    if (a.from !== b.from) return a.from < b.from ? -1 : 1;
+    return ((a.data.range as { startLine: number }).startLine - (b.data.range as { startLine: number }).startLine);
+  });
