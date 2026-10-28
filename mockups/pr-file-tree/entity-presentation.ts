@@ -1,17 +1,22 @@
 import type {GraphEntity, GraphRelation} from './comparison-graph.ts';
 
-export type ReadingBand = -1 | 0 | 1 | 2;
+export type ReadingBand = -1 | 0 | 1 | 2 | 3;
 const testKinds = new Set(['test', 'assertion', 'source_step', 'absence']);
 
-/** Review leads; all files share one path lane, regardless of test membership. */
+/** Review leads; source-backed test files retain the rightmost path lane. */
 export const readingBands = (
   entities: readonly GraphEntity[],
-  _relations: readonly GraphRelation[],
+  relations: readonly GraphRelation[],
 ): ReadonlyMap<string, ReadingBand> => {
   const isTest = (entity: GraphEntity): boolean =>
     testKinds.has(entity.kind) || Boolean(entity.nodes?.some(isTest));
+  const byId = new Map(entities.map(entity => [entity.id, entity]));
+  const testFiles = new Set(relations.filter(relation => {
+    const source = byId.get(relation.from);
+    return source && isTest(source) && ['located_in', 'absence_checked_in'].includes(relation.relation);
+  }).map(relation => relation.to));
   return new Map(entities.map(entity => [entity.id,
-    entity.kind === 'review' ? -1 : entity.kind === 'file' ? 0 : isTest(entity) ? 2 : 1,
+    entity.kind === 'review' ? -1 : entity.kind === 'file' ? (testFiles.has(entity.id) || String(entity.data.sourceContextScope).startsWith('test-source-context') ? 3 : 0) : isTest(entity) ? 2 : 1,
   ] as const));
 };
 
@@ -20,6 +25,13 @@ export const filePaths = (entities: readonly GraphEntity[]): ReadonlyMap<string,
   new Map(entities.filter(entity => entity.kind === 'file' && typeof entity.data.path === 'string')
     .map(entity => [entity.id, entity.data.path as string]));
 
+/** Only docs/ roots participate in the separate upper document region. */
+export const documentPaths = (entities: readonly GraphEntity[]): ReadonlyMap<string, string> =>
+  new Map(entities.flatMap(entity => {
+    const path = entity.kind === 'file' ? entity.data.path : entity.data.documentPath;
+    return typeof path === 'string' && path.startsWith('docs/') ? [[entity.id, path]] : [];
+  }));
+
 export const iconFor = (entity: GraphEntity): string => {
   if (entity.nodes?.some(child => child.kind === 'test')) return 'test-change';
   return entity.kind;
@@ -27,6 +39,7 @@ export const iconFor = (entity: GraphEntity): string => {
 
 /** Decorative stroke paths: no success/checkmark icon implies a passing test. */
 export const iconPaths: Readonly<Record<string, readonly string[]>> = {
+  evidence: ['M5 2h14v20H5z', 'M8 7h8M8 11h8M8 15h8M8 19h5'],
   file: ['M5 2h9l5 5v15H5z', 'M14 2v6h5', 'M8 12h8M8 16h8'],
   function: ['M15 3h-3c-2 0-3 2-3 4v10c0 2-1 4-3 4H4', 'M5 10h10'],
   header: ['M3 5h18v14H3z', 'M3 10h18M8 10v9'],

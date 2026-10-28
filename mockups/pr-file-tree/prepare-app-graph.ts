@@ -3,6 +3,7 @@ import { createHash } from 'node:crypto';
 import { fileURLToPath } from 'node:url';
 import { compileSourceGraph, type FactDocument } from './compile-source-graph.ts';
 import type { GraphEntity, GraphRelation } from './minimal-graph.ts';
+import {nativeDocumentHunks} from './native-document-comparison.ts';
 import explanations from './graph-explanations.json' with { type: 'json' };
 const hash = (bytes: string | Buffer) => createHash('sha256').update(bytes).digest('hex');
 export const prepareAppGraph = (facts: FactDocument, inputHash: string) => {
@@ -60,6 +61,31 @@ export const prepareAppGraph = (facts: FactDocument, inputHash: string) => {
             }, nodes: unique, edges: []
         });
     }
+    // Native Markdown hunks are file-scoped evidence, not inferred structural units.
+    for (const file of facts.files.filter(file => /\.md$/i.test(file.path))) {
+        const fileId = paths.get(file.path)!;
+        const id = 'document-change:' + file.id;
+        const hunks = nativeDocumentHunks(file);
+        const evidence: GraphEntity = {id: id + ':evidence', kind: 'evidence', data: {
+            name: 'Native document comparison', nativeHunks: hunks,
+            comparisonStatus: file.comparisonStatus, comparisonBasis: 'Pinned native Markdown patch', patchHash: file.patchHash,
+        }};
+        groupFor.set(evidence.id, id);
+        groups.push({id, kind: 'change', data: {
+            name: file.path + ' change', documentPath: file.path,
+            comparisonStatus: file.comparisonStatus, comparisonBasis: 'Pinned native Markdown patch',
+        }, nodes: [evidence], edges: []});
+        for (const hunk of hunks) {
+            for (const witness of [hunk.before, hunk.after]) {
+                if (!witness) continue;
+                const {text: _text, ...anchor} = witness;
+                relations.push({id: id + ':hunk:' + hunk.index + ':location:' + witness.side,
+                    from: id, to: fileId, version: witness.side === 'base' ? 'before' : 'after', relation: 'located_in',
+                    data: {commit: witness.commit, range: {startLine: witness.startLine, endLine: witness.endLine},
+                        sourceHash: witness.contentHash, sourceEvidence: anchor}});
+            }
+        }
+    }
     const flat = [...entities, ...groups];
     const initial = new Set(['pr25', 'request', 'refresh', 'helper', 'header-value', 'reason', 'goal', 'owner-http-policy']);
     for (const edge of relations.filter(edge => edge.from === 'request' && edge.relation === 'contains_call'))
@@ -67,6 +93,7 @@ export const prepareAppGraph = (facts: FactDocument, inputHash: string) => {
     const namedTests = entities.filter(entity => entity.kind === 'test' && (String(entity.data.name).includes('disposed ignored-abort read settles') || String(entity.data.name).includes('single local owner reads and writes without a Bearer') || String(entity.data.name).startsWith('01-A/C/F/G controlled host')));
     for (const test of namedTests)
         initial.add(test.id);
+    for (const group of groups.filter(group => group.data.documentPath)) initial.add(group.id);
     for (const id of [...initial]) {
         const group = groupFor.get(id);
         if (group)
@@ -118,7 +145,7 @@ export const prepareAppGraph = (facts: FactDocument, inputHash: string) => {
             path: row.path, id: row.occurrence.id, kind: row.occurrence.kind, name: row.occurrence.name, anchor: row.occurrence.anchor, sourceTextHash: hash(row.occurrence.sourceText), reason: row.reason
         })),
         provenance: {
-            ...compiled.provenance, inputArtifactHash: inputHash, compilerHash: hash(readFileSync(new URL('./compile-source-graph.ts', import.meta.url))), appCompilerHash: hash(readFileSync(new URL('./prepare-app-graph.ts', import.meta.url))), explanationHash: hash(readFileSync(new URL('./graph-explanations.json', import.meta.url)))
+            ...compiled.provenance, inputArtifactHash: inputHash, compilerHash: hash(readFileSync(new URL('./compile-source-graph.ts', import.meta.url))), appCompilerHash: hash(readFileSync(new URL('./prepare-app-graph.ts', import.meta.url))), explanationHash: hash(readFileSync(new URL('./graph-explanations.json', import.meta.url))), documentCompilerHash: hash(readFileSync(new URL('./native-document-comparison.ts', import.meta.url)))
         }
     };
 };

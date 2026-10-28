@@ -20,7 +20,7 @@ const contentRows = (entity: GraphEntity): CardRows => {
         case 'review': return { title: text(data.name), rows: [] };
         case 'callsite': return { title: text(data.value) || text(data.name), rows: [] };
         case 'function': return { title: text(data.name), rows: data.comparisonStatus === 'no change' ? ['Source-body equality, not behavior equivalence'] : [] };
-        case 'header': return { title: 'Authorization', rows: [text(data.value).replace(/^Authorization:\s*/, ''), text(data.statusScope) || 'Direct headers.Authorization construction only'] };
+        case 'header': return { title: 'Authorization', rows: [text(data.value).replace(/^Authorization:\s*/, '')] };
         case 'file': return { title: text(data.path), rows: [] };
         case 'test': return { title: text(data.name), rows: [...(Array.isArray(data.variants) ? [String(data.variants.length) + ' parameter variants'] : []), ...(text(data.scope) ? [text(data.scope)] : [])] };
         case 'behavior': return { title: text(data.name), rows: Array.isArray(data.value) ? data.value.map(String) : [] };
@@ -29,8 +29,8 @@ const contentRows = (entity: GraphEntity): CardRows => {
             rows: [...(Array.isArray(data.value) ? data.value.map(value => assertionText(String(value))) : []),],
         };
         case 'source_step': return { title: text(data.name).replace(/^Before:\s*/, ''), rows: ['Source step · not an assertion'] };
-        case 'reason': return { title: text(data.name), rows: ['Source-derived inference'] };
-        case 'goal': return { title: text(data.name), rows: ['Intended outcome · not measured'] };
+        case 'reason': return { title: text(data.name), rows: [] };
+        case 'goal': return { title: text(data.name), rows: [] };
         default: return { title: text(data.name) || text(data.label), rows: text(data.value) ? [text(data.value)] : [] };
     }
 };
@@ -41,6 +41,8 @@ export const cardRows = (entity: GraphEntity): CardRows => {
 };
 export const edgeRows = (edge: GraphRelation): CardRows => {
     const title = ['before', 'after'].includes(edge.relation) ? '' : edge.relation.replaceAll('_', ' ');
+    if (edge.relation === 'constructs')
+        return {title, rows: [text(edge.data.scope), text(edge.data.scopeLimit)].filter(Boolean)};
     if (edge.relation === 'calls' && edge.data.projection === 'collapsed-callsite') {
         const proof = edge.data.projectionEvidence as CallProjectionEvidence;
         const source = proof.locations[0]!;

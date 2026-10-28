@@ -29,7 +29,7 @@ export const compareFilePaths = (left: string, right: string): number => {
 const fileIndent = (id: string, paths: ReadonlyMap<string, string>): number =>
  paths.has(id) ? (paths.get(id)!.split('/').length - 1) * 24 : 0;
 
-export const initialLayout = <T extends LayoutNode>(input:readonly T[],links:readonly Link[],focus='change',bands?:ReadonlyMap<string,number>,headers:Readonly<Record<string,number>>={},paths:ReadonlyMap<string,string>=new Map()):T[] => {
+export const initialLayout = <T extends LayoutNode>(input:readonly T[],links:readonly Link[],focus='change',bands?:ReadonlyMap<string,number>,headers:Readonly<Record<string,number>>={},paths:ReadonlyMap<string,string>=new Map(),documents:ReadonlyMap<string,string>=new Map()):T[] => {
  const nodes=input.map(node=>({...node,position:{...node.position},style:{...node.style,opacity:1}}));
  for(const group of nodes.filter(node=>nodes.some(child=>child.parentId===node.id))){
   const children=nodes.filter(node=>node.parentId===group.id);const rank=ranks(children.map(node=>node.id),links);let y=headers[group.id]??groupInterior.top;let width=600;
@@ -43,17 +43,24 @@ export const initialLayout = <T extends LayoutNode>(input:readonly T[],links:rea
  const columns=[...new Set(levels.values())].sort((a,b)=>a-b);let x=0;const xs=new Map<number,number>();
  for(const level of columns){xs.set(level,x);x+=Math.max(...roots.filter(node=>levels.get(node.id)===level).map(node=>dimensions(node).width+fileIndent(node.id,paths)))+300;}
  const focusX=xs.get(levels.get(focus)??0)??0;
+ const documentHeight = Math.max(0, ...columns.map(level => {
+  const column = roots.filter(node => levels.get(node.id) === level && documents.has(node.id));
+  return column.reduce((height, node) => height + dimensions(node).height + 180, 0);
+ }));
  for (const level of columns) {
-  let y = 0;
   const column = roots.filter(node => levels.get(node.id) === level).sort((a, b) => {
-   const aPath = paths.get(a.id);
-   const bPath = paths.get(b.id);
+   const aPath = paths.get(a.id) ?? documents.get(a.id);
+   const bPath = paths.get(b.id) ?? documents.get(b.id);
    if (aPath !== undefined && bPath !== undefined) return compareFilePaths(aPath, bPath);
    return a.id === focus ? -1 : b.id === focus ? 1 : a.id.localeCompare(b.id);
   });
+  let documentY = -documentHeight - 300;
+  let codeY = 0;
   for (const node of column) {
-   node.position = {x: xs.get(level)! - focusX + fileIndent(node.id, paths), y};
-   y += dimensions(node).height + 180;
+   const document = documents.has(node.id);
+   node.position = {x: xs.get(level)! - focusX + fileIndent(node.id, paths), y: document ? documentY : codeY};
+   if (document) documentY += dimensions(node).height + 180;
+   else codeY += dimensions(node).height + 180;
   }
  }
  return nodes as T[];

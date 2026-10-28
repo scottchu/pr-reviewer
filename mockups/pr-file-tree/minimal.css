@@ -13,7 +13,7 @@ main { flex: 1; min-height: 0; }
 .minimal-entity .version-tag { margin-bottom: 5px; }
 .version-before { background: #fae5e4; border-color: #ca7e7b; color: #642b29; }
 .version-after { background: #e3f3e8; border-color: #76ac89; color: #25543a; }
-.minimal-change-graph { position: relative; width: 100%; height: 100%; border: 2px solid #ad95c6; border-radius: 10px; background: #2b27314d; padding: 20px; }
+.minimal-change-graph { position: relative; width: 100%; height: 100%; border: 2px solid #718694; border-radius: 10px; background: #2631394d; padding: 20px; }
 .minimal-change-graph > h2 { margin: 0; font-size: 17px; font-weight: 500; }
 .minimal-edge-card { position: absolute; width: max-content; max-width: 280px; margin: 0; padding: 9px 12px; background: #263139; border: 1px solid #718694; border-radius: 5px; font-size: 12px; line-height: 1.45; pointer-events: none; }
 .minimal-edge-card.version-before { background: #fae5e4; border-color: #ca7e7b; color: #642b29; }
@@ -78,3 +78,19 @@ main { flex: 1; min-height: 0; }
 .coarse-input .minimal-route,
 .coarse-input .minimal-route path { pointer-events:none; touch-action:auto; }
 .coarse-input .react-flow__node { touch-action:none; }
+
+/* Group status uses the same comparison palette; temporal evidence stays independent. */
+.minimal-change-graph.status-change { border-color:#b79b43; background:#fff0bd14; color:#eee0b4; }
+.minimal-change-graph.status-add { border-color:#76ac89; background:#e3f3e814; color:#c6e6d1; }
+.minimal-change-graph.status-remove { border-color:#ca7e7b; background:#fae5e414; color:#edc5c3; }
+.native-document-evidence { width:min(600px, calc(100vw - 70px)); }
+.document-excerpt, .document-reading { overflow-y:auto; overflow-x:hidden; overscroll-behavior:contain; touch-action:pan-y; user-select:text; }
+.document-excerpt { max-height:180px; margin-top:10px; }
+.document-reading { max-height:400px; margin-top:10px; }
+.document-side { padding:8px; border:1px solid; border-radius:4px; margin-top:8px; }
+.document-side h3, .document-reading > section > h3 { margin:0 0 6px; font-size:12px; line-height:1.5; font-weight:600; overflow-wrap:anywhere; }
+.document-side pre { margin:0; font:12px/1.5 ui-monospace, monospace; white-space:pre-wrap; overflow-wrap:anywhere; }
+.document-provenance { font-size:10px !important; overflow-wrap:anywhere; margin-bottom:8px !important; }
+.document-details { margin-top:10px; font-size:12px; }
+.document-details summary { cursor:pointer; }
+.document-excerpt:focus-visible, .document-reading:focus-visible, .document-details summary:focus-visible { outline:2px solid currentColor; outline-offset:2px; }
