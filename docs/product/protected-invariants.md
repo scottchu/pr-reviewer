@@ -40,3 +40,8 @@ A reviewer checks the authorized delta AND the affected protected behavior. Chec
 Historical recovery checkpoint: product7ce22b7 was an unaccepted callback candidate; source review was blocked and partial actual source navigation failed. Later explicit authorization resumed the minimum header+graph candidate. That earlier docs-only freeze is superseded only within the accepted minimum scope; failures remain history, not claimed repaired legacy journeys.
 
 Current bounded wrap/gesture receipt: [reading-journey Revision26](../plans/720p/slices/05-explanation-exploration/reviews/reading-journey-v1.md). Product pin `99ee207` is distinct from later docs-only commits. A subsequent change must retain these protected behaviors and the open evidence limits, not infer whole-product acceptance.
+
+
+### Minimum projection path-order correction
+
+Date: 2026-10-28. Accepted: PR25 leftmost, all File cards grouped by path with 24-unit directory-depth indentation, as specified in [file arrangement](pr-file-tree-first.md#minimum-graph-path-based-file-arrangement). This replaces separate test-file placement and focus-first ordering only. Preserve every logical identity, typed relation, source witness, full-path title/status, explicit Show/Hide, child bounds, label-curve ownership and input/camera policy. Implementation and live acceptance are pending in the active recovery packet.
