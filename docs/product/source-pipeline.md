@@ -2,7 +2,7 @@
 
 Date: 2026-10-28.
 Accepted direction: read → parse → extraction → enrich(s). Only enrichment requires interpretive intelligence; the rest is codified.
-Accepted boundary correction: UI + UI Type + UI Projection; Experiment Service coordinates the pipeline and returns Domain Types; Domain Service provides capabilities.
+Accepted boundary correction: UI + UI Type + UI Projection; Experience Service (corrected name) uses Domain Types; Domain Service provides capabilities. Detailed use-case/pipeline ownership is critiqued below.
 Status: accepted directions with proposed concrete files/APIs and acceptance design. Existing implementation has not been reorganized to this structure.
 
 ## Goal and boundary
@@ -24,20 +24,34 @@ One logical entity stays one entity even when several enrichers discuss it. Enri
 
 ## Service and UI boundaries
 
-The accepted result path is Experiment Service → Domain Type → UI Projection → UI Type → UI. The command path is UI intent → Experiment Service → Domain Service capabilities. UI Projection may also take explicit experiment progress/failure state to produce loading/error UI; application lifecycle state must not become source facts.
+The accepted result path is Experience Service → Domain Type → UI Projection → UI Type → UI. The command path is UI intent → Experience Service → Domain Service capabilities. UI Projection may also take explicit experience progress/failure state to produce loading/error UI; application lifecycle state must not become source facts.
 
 | Boundary | Owns | Does not own |
 | --- | --- | --- |
 | Domain Types | Comparison identity, logical entities/occurrences, typed relationships, source evidence, qualified status and unresolved reasons | UI card/edge components, pixel positions, React state, presentation-only color tokens |
-| Domain Service | Explicit capabilities for source-fact admission, correspondence, relationship derivation, edit classification and evidence/enrichment validation | Experiment scheduling, provider/network setup, UI types or visual composition |
-| Experiment Service | Coordinates read → parse → extraction → enrich(s), invokes domain capabilities and permitted effect adapters, owns experiment inputs/results, progress, retries, cancellation and keyed stage lifetimes | Canonical semantic policy, UI markup or a second independent ontology |
+| Domain Service | Explicit capabilities for source-fact admission, correspondence, relationship derivation, edit classification and evidence/enrichment validation | Pipeline execution scheduling, provider/network setup, UI types or visual composition |
+| Experience Service | Coordinates read → parse → extraction → enrich(s), invokes domain capabilities and permitted effect adapters, owns use-case inputs/results and experience progress; the earlier assignment of all pipeline retries/cancellation/stage internals is under critique below | Canonical semantic policy, UI markup or a second independent ontology |
 | UI Projection | Deterministically maps domain results and explicit application state to UI Types: node/group membership at the chosen disclosure, supported labels/explanations, provenance fields and presentation status | Inventing facts, deciding logical correspondence, interpreting source through a model, mutating canonical inputs |
 | UI Types | Named view contracts consumed by the current React UI: node/card/edge/inspection content and permitted actions | Replacing domain identity/evidence with labels or making render count evidence of extraction |
 | UI | Rendering, accessibility, local interaction, camera/gesture ownership and dispatch of user intent | Git/parser/model effects, extraction or status inference, direct access to domain internals |
 
-Services name responsibilities and public functional capabilities; they do not prescribe classes or a dependency-injection framework. The experiment coordinator is one application composition boundary, not a new shared core. Keep cross-subsystem event wiring through the existing managed integration layer. UI consumes the experiment's public command/query boundary and projected view state; it does not invoke parser/domain internals directly. No reactive library or new subscription route is selected by this document.
+Services name responsibilities and public functional capabilities; they do not prescribe classes or a dependency-injection framework. The experience coordinator is one application composition boundary, not a new shared core. Keep cross-subsystem event wiring through the existing managed integration layer. UI consumes the experience's public command/query boundary and projected view state; it does not invoke parser/domain internals directly. No reactive library or new subscription route is selected by this document.
 
 Use ui/ for the responsibility boundary and components/ within it. React remains the implementation technology; it is not the owning responsibility name. React-specific hooks and library node types are allowed inside the UI boundary. This naming correction introduces no alternate-framework or portability requirement.
+
+## Critique and proposed refinement of the service boundary
+
+Naming correction: the user explicitly means Experience Service, not Experiment Service. The rename is accepted. The refinements in this section are recommendations responding to the request for critique, not an adopted API or implementation instruction.
+
+The terse Experience Service → Domain Type → UI Type chain omits experience state. Domain Types represent source knowledge, but an actual reading journey also has active comparison/inspection, progress/failure, retry/cancel/return ownership and allowed next actions. Propose a named ExperienceState containing immutable Domain Type references/results and use-case state. UI Projection then maps ExperienceState plus explicitly local UI state to UI Types. Do not duplicate canonical facts into a second mutable domain model.
+
+Experience Service should organize user intentions such as opening a comparison, inspecting evidence and returning to the previous reading context. A plain pipeline runner owns read/parse/extract/enrich sequencing and stage execution mechanics; the experience service invokes and observes it through a declared capability. These responsibilities may begin as a few functional modules, not two elaborate frameworks. Keep camera, pointer gestures and local component focus within their existing UI owners; put cross-step reading/return coordination with the experience owner only where required by the accepted journey.
+
+Domain Service must expose named domain capabilities rather than become a catch-all service. Group cohesive policies behind one public boundary initially; split services only when actual domain responsibility warrants it. Source admission, correspondence, relation qualification and edit classification remain codified domain policies, not experience/projection decisions. Effects stay behind permitted acquisition/enrichment adapters.
+
+UI Projection is an immutable deterministic function, not another mutable state service or a convenient place to invent semantics. It maps experience/domain data into view contracts, retaining identity and evidence. The rejected default raw-diff cards show why valid extraction data does not authorize a new reading experience: default disclosure and composition must follow the accepted experience specification. Tests need independent domain oracles, explicit experience tasks, expected UI Types and actual rendered journeys; testing the four folders by themselves proves no user outcome.
+
+Recommended flow: UI intent → Experience Service → pipeline/domain capabilities; Domain results + use-case state → ExperienceState → UI Projection → UI Type → UI. Concrete ExperienceState fields, capability APIs and file splits remain to be specified in a bounded implementation slice.
 
 ## Proportionate module proposal
 
@@ -55,10 +69,10 @@ src/review-graph/
       relations.ts
       edit-composition.ts
     validation.ts
-  experiment/
+  experience/
     types.ts
     service.ts
-    pipeline.ts
+  pipeline/run.ts
   read/git-snapshot.ts
   parse/typescript.ts
   parse/native-diff.ts
@@ -75,7 +89,7 @@ src/review-graph/
       SourceChanges.tsx
 ```
 
-The pipeline is the execution sequence; services/types/projection describe ownership. They are complementary, not competing architectures. Experiment Service coordinates stages; the extraction stage invokes Domain Service's deterministic capabilities. Enrichment adapters supply attributed candidate records; Domain Service validates their admission without calling a model itself. The resulting Domain Types then pass through UI Projection. Providers and pure domain policy remain separate.
+The pipeline is the execution sequence; services/types/projection describe ownership. They are complementary, not competing architectures. Experience Service coordinates user use cases through the pipeline runner; the extraction stage invokes Domain Service's deterministic capabilities. Enrichment adapters supply attributed candidate records; Domain Service validates their admission without calling a model itself. The resulting Domain Types and explicit experience state then pass through UI Projection. Providers and pure domain policy remain separate.
 
 Define named domain/stage/UI contracts independently of an effectful function's inferred return type. Domain code must not import UI Types, React, the prototype renderer or curated PR fixture modules. Preserve exact source/coordinate types, explicit diagnostics and input/version identities. Use current dependencies, functional immutable transforms and explicit effects. Preserve current public application interfaces and subscription ownership. Split ui/projection.ts further only when actual responsibilities require it; the diagram is not permission to create empty layers or a generic plugin framework.
 
@@ -101,7 +115,8 @@ Baseline: main5944d3b, read-only source inspection.
 | Correspondence | Small independently authored before/head expected matches and nonmatches | Add/remove/mixed/unchanged, reordered declarations, whole replacements, same-name unrelated units, additions to existing entities, unchanged units beside same-line edits. No guessed identity or absence. |
 | Relations | Hand-specified caller/callee/ownership/evidence expectations | Imports are not calls; unresolved dispatch stays unresolved; source tests do not imply execution or direct unit coverage. Qualify supported lexical relations rather than claiming a full runtime call graph. |
 | Domain Service | Independent expected/forbidden facts and evidence invariants | Capability policies use Domain Types only; no UI/framework/provider dependency or implicit effect. No duplicate logical versions/dangling references. |
-| Experiment Service | Fake stage ports plus real bounded integration | Stage order, declared enrichment dependencies, error/timeout/cancellation, stale-input fencing and preserved successful source results when enrichment fails. No reimplementation of domain rules. |
+| Experience Service | Explicit user journeys with fake public domain/pipeline ports | Open/inspect/return/cancel/retry behavior, selected comparison identity, error recovery and scope replacement. No extraction or rendering-policy duplication. |
+| Pipeline runner | Fake stage ports plus real bounded integration | Stage order, declared enrichment dependencies, error/timeout/cancellation, stale-input fencing and preserved successful source results when enrichment fails. |
 | UI Projection | Hand-authored Domain Type inputs and expected UI Types | Immutable inputs, exact identity/anchor retention, correct status mapping, symmetric relationship reading, chosen disclosure and default semantic children. Same domain result may produce different allowed views without changing facts. |
 | UI | Actual rendered React journey | Default composition, source-open/close, labels/interaction/accessibility and bounds. Domain/projection test success cannot substitute for actual UI evidence. |
 | Enrichment | Accepted facts and explicit allowed/forbidden claim rubrics | Valid citations/scope, no unsupported new facts, no TestRun from source, rejected hallucinations, timeout/retry/cancellation and stale-input fencing. Text generation may vary; admission checks remain deterministic. |
