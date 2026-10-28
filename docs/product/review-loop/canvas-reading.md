@@ -114,3 +114,6 @@ Story is optional attention over this map; it never replaces membership or gates
 
 
 Explicit function or exact-range navigation selects the existing changed comparison hunk overlapping that range on its source side for the current-source explanation. Programmatic focus scrolling must not replace that selection with an unrelated earlier visible hunk. A subsequent deliberate reading scroll/gesture or change-dot selection transfers comparison selection back to ordinary reading; an old evidence anchor must not permanently override it. An unchanged inspected range does not invent a changed hunk.
+
+
+The active SourceCanvas renderer exposes this existing metadata contract through `Show selected file’s changed spans`, the complete `Changed span` chooser and `Focused changed span` metadata. Choosing metadata delegates exact occurrence validation to the public owner and keeps the question anchor/draft independent; it is not source inspection. `Read selected changed span` (or existing Focus source) is the separate explicit read and verifies the selected source bytes/range/hash. A span-only saved frame may display its metadata in overview with no invented inspection. The complete chooser is not truncated to the bounded rendered source budget.
