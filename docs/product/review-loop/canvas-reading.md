@@ -117,3 +117,6 @@ Explicit function or exact-range navigation selects the existing changed compari
 
 
 The active SourceCanvas renderer exposes this existing metadata contract through `Show selected file’s changed spans`, the complete `Changed span` chooser and `Focused changed span` metadata. Choosing metadata delegates exact occurrence validation to the public owner and keeps the question anchor/draft independent; it is not source inspection. `Read selected changed span` (or existing Focus source) is the separate explicit read and verifies the selected source bytes/range/hash. A span-only saved frame may display its metadata in overview with no invented inspection. The complete chooser is not truncated to the bounded rendered source budget.
+
+
+The active canvas's complete source/relationship disclosure also presents every retained unresolved reference with its exact source side/path/range, destination and reason. These records remain unresolved evidence, not resolved graph edges or permission to follow an external destination. Replacing a renderer must not erase those supported limits.
