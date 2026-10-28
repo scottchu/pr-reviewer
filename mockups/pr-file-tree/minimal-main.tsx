@@ -190,7 +190,7 @@ const Relation = React.memo((props: EdgeProps<RelationEdge>) => {
     if (!data)
         return null;
     const route = curve({ x: props.sourceX, y: props.sourceY }, { x: props.targetX, y: props.targetY }, data.routed.offset);
-    const card = edgeRows(data.relation);
+    const card = edgeRows(data.relation, allEntities());
     const begin = (event: React.PointerEvent<Element>) => { if (event.button !== 0 || !beginsRouteDrag(event.pointerType, Boolean((event.target as Element).closest('.graph-drag-handle')), event.currentTarget.tagName.toLowerCase() === 'g'))
         return; data.onMoveStart(); event.stopPropagation(); event.preventDefault(); event.currentTarget.setPointerCapture(event.pointerId); drag.current = {
         pointer: event.pointerId, clientX: event.clientX, clientY: event.clientY, offset: data.routed.offset, zoom: getZoom()
