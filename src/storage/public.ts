@@ -47,7 +47,10 @@ export const createStore = (filename: string,options:{importLimits?:ImportLimits
   db.exec(
     "PRAGMA busy_timeout=3000; PRAGMA foreign_keys=ON; PRAGMA journal_mode=WAL; CREATE TABLE IF NOT EXISTS reviews(id TEXT PRIMARY KEY, body TEXT NOT NULL); CREATE TABLE IF NOT EXISTS receipts(id TEXT PRIMARY KEY, actor TEXT NOT NULL, fingerprint TEXT NOT NULL, body TEXT NOT NULL); CREATE TABLE IF NOT EXISTS credentials(hash TEXT PRIMARY KEY, body TEXT NOT NULL); CREATE TABLE IF NOT EXISTS challenges(id TEXT PRIMARY KEY, body TEXT NOT NULL); CREATE TABLE IF NOT EXISTS preparation_inputs(review_id TEXT PRIMARY KEY REFERENCES reviews(id), body TEXT NOT NULL); CREATE TABLE IF NOT EXISTS review_import_identities(review_id TEXT PRIMARY KEY REFERENCES reviews(id),provider TEXT NOT NULL,host TEXT NOT NULL,target_project TEXT NOT NULL,change_number INTEGER NOT NULL,current_snapshot_id TEXT NOT NULL);",
   );
+  let initializingStores = false;
   const tx = <T>(operation: () => T): T => {
+    // Only synchronous constructor recovery joins its surrounding startup unit.
+    if (initializingStores) return operation();
     db.exec("BEGIN IMMEDIATE");
     try {
       const result = operation();
@@ -197,17 +200,11 @@ export const createStore = (filename: string,options:{importLimits?:ImportLimits
       }
     });
   }catch(error){db.close();throw error;}
-  const execution=createExecutionLease(db);
-  let imports:ReturnType<typeof createImportStore>;
-  try{imports=createImportStore({db,tx,load,save,execution,...(options.importLimits?{limits:options.importLimits}:{})});}catch(error){db.close();throw error;}
-  const analysis=createAnalysisStore({db,tx,load,authorize,execution,...(options.analysisLimits?{limits:options.analysisLimits}:{})});
   const authenticate = (token: StorageAccess): Principal => {
     const owner=localPrincipal(accessReference(token));if(owner)return owner;
     const row=db.prepare("SELECT body FROM credentials WHERE hash=?").get(accessReference(token)) as {body:string}|undefined;
     if(!row)throw new Error("unauthorized");return JSON.parse(row.body) as Principal;
   };
-  const tests=createHeadTestStore({db,tx,load,authenticate,authorize,execution,...(options.testOptions?{options:options.testOptions}:{})});
-  let story:ReturnType<typeof createStoryStore>;
   const storyEvidence=(token:StorageAccess,input:StoryEvidenceQuery):StoryEvidence=>{
     const query=storyEvidenceQuerySchema.parse(input),principal=authenticate(token),review=load(query.reviewId);authorize(principal,review);
     const snapshot=(review.snapshots??[review.snapshot]).find(item=>item.snapshotId===query.snapshotId);if(!snapshot)throw new Error('source_unavailable');
@@ -279,7 +276,20 @@ export const createStore = (filename: string,options:{importLimits?:ImportLimits
     }catch(error){if(!knownInvalid(error))throw error;invalid.push({reference,reason:(error as Error).message});}
     return {reviewId:query.reviewId,snapshotId:query.snapshotId,selectedAnalysisId:selected,valid,invalid,facts,basisUnavailable};
   };
-  story=createStoryStore({db,tx,load,authenticate,authorize,resolveEvidence:storyEvidence,...(options.storyLimits?{limits:options.storyLimits}:{})});
+  const initializeStores = () => tx(() => {
+    initializingStores = true;
+    try {
+      const execution=createExecutionLease(db);
+      const imports=createImportStore({db,tx,load,save,execution,...(options.importLimits?{limits:options.importLimits}:{})});
+      const analysis=createAnalysisStore({db,tx,load,authorize,execution,...(options.analysisLimits?{limits:options.analysisLimits}:{})});
+      const tests=createHeadTestStore({db,tx,load,authenticate,authorize,execution,...(options.testOptions?{options:options.testOptions}:{})});
+      const story=createStoryStore({db,tx,load,authenticate,authorize,resolveEvidence:storyEvidence,...(options.storyLimits?{limits:options.storyLimits}:{})});
+      return {imports,analysis,tests,story};
+    } finally { initializingStores = false; }
+  });
+  let stores:ReturnType<typeof initializeStores>;
+  try{stores=initializeStores();}catch(error){db.close();throw error;}
+  const {imports,analysis,tests,story}=stores;
   return {
     tests,
     imports,

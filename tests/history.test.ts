@@ -64,3 +64,37 @@ test('02B separate-process expected-current race admits exactly one snapshot',as
  const results=await Promise.all([launch('one',second),launch('two',third)]);assert.equal(results.filter(result=>result.state==='applied').length,1);assert.equal(results.filter(result=>result.error==='current_snapshot_conflict').length,1);const read=createStore(database);assert.equal(read.review(owner,'r').snapshotSummaries?.length,2);read.close();
  }finally{rmSync(root,{recursive:true,force:true});}
 });
+
+test('store startup hides its uncommitted epoch and failed recovery preserves the prior owner',()=>{
+ const root=mkdtempSync(join(tmpdir(),'pr-reviewer-startup-')),database=join(root,'review.sqlite'),store=createStore(database,{testOptions:{testOnlyExecution:true}});
+ store.prepare('r',first);
+ const scope={reviewId:'r',snapshotId:first.snapshotId};
+ const receipt=store.tests.command(store.localOwner,{type:'RequestTest',commandId:'startup-test',...scope,targetId:'review-source-core-v1',expectedTargetRevision:2});
+ const claimed=store.tests.claim(store.tests.beginOwner());assert.ok(claimed);
+ const reader=new DatabaseSync(database,{readOnly:true});
+ const epoch=()=> (reader.prepare('SELECT epoch FROM execution_owner WHERE id=1').get() as {epoch:string}).epoch;
+ const retained=()=>({job:reader.prepare('SELECT body FROM test_jobs WHERE id=?').get(receipt.jobId),lease:reader.prepare('SELECT body FROM execution_lease WHERE id=1').get()});
+ const beforeRecovery=retained();
+ const prior=epoch(),prepare=DatabaseSync.prototype.prepare;let duringClaim:string|undefined;
+ try{
+  // Observe the competing connection exactly between epoch replacement and recovery.
+  DatabaseSync.prototype.prepare=function(sql){
+   const statement=prepare.call(this,sql);
+   if(sql==='INSERT OR REPLACE INTO execution_owner VALUES (1,?)'){
+    statement.run=new Proxy(statement.run,{apply:(run,receiver,parameters)=>{
+     const result=Reflect.apply(run,receiver,parameters);duringClaim=epoch();return result;
+    }});
+   }
+   return statement;
+  };
+  assert.throws(()=>createStore(database,{analysisLimits:{maxContextLaunches:0}}),/invalid_analysis_limit/);
+  assert.equal(duringClaim,prior,'a competing reader must not observe a partially initialized owner');
+  assert.equal(epoch(),prior,'failed initialization must roll back its execution claim');
+  assert.equal(store.tests.targets(store.localOwner,{reviewId:'r',snapshotId:first.snapshotId}).snapshotId,first.snapshotId);
+  assert.throws(()=>createStore(database,{storyLimits:{retainedBytes:-1}}),/invalid_request/);
+  assert.equal(epoch(),prior,'failure after effect recovery must also roll back its claim');
+  assert.deepEqual(retained(),beforeRecovery,'failed construction must restore the complete job journal and effect lease');
+  assert.equal(store.tests.control(claimed.grant).authorized,true,'the existing owner grant remains current after rollback');
+  assert.equal(store.tests.targets(store.localOwner,{reviewId:'r',snapshotId:first.snapshotId}).snapshotId,first.snapshotId);
+ }finally{DatabaseSync.prototype.prepare=prepare;reader.close();store.close();rmSync(root,{recursive:true,force:true});}
+});
