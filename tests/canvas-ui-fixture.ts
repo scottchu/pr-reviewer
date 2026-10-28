@@ -1,0 +1,22 @@
+import {spawn} from 'node:child_process';
+import {mkdtempSync,rmSync} from 'node:fs';
+import {tmpdir} from 'node:os';
+import {join} from 'node:path';
+import {createServer} from 'node:net';
+import {buildSnapshot} from '../src/source-preparation/public.ts';
+import {createStore} from '../src/storage/public.ts';
+import {graphFiles} from '../src/domain/public.ts';
+import type {StoryContent,StoryReference} from '../src/domain/public.ts';
+import {createGateway} from '../src/server/public.ts';
+export const canvasSourceInput={prNumber:25,prUrl:'https://github.com/scottchu/pr-reviewer/pull/25',baseSha:'b096826e31c0927190806de91ed70b8b64aa93d8',headSha:'e3b270e5f49a9215452b0b86702946043e979059',paths:['src/application/review.ts','docs/product/architecture.md']};
+export const canvasUiFixture=async()=>{
+ const root=mkdtempSync(join(tmpdir(),'pr-reviewer-canvas-e2e-')),store=createStore(join(root,'review.sqlite')),snapshot=buildSnapshot(canvasSourceInput);store.prepare('pr-25',snapshot);let notifications=0;
+ const fileKey=graphFiles(snapshot).find(file=>file.newPath==='src/application/review.ts')!.key,ref=(side:'base'|'head',line:number):Extract<StoryReference,{type:'snapshot_source'}>=>({type:'snapshot_source',anchor:{snapshotId:snapshot.snapshotId,side,path:'src/application/review.ts',startLine:line,endLine:line},contentHash:snapshot.sources.find(source=>source.side===side&&source.path==='src/application/review.ts')!.hash}),before=ref('base',29),after=ref('head',30);
+ const story:StoryContent={title:'Controlled author fixture · real PR25 source',captureIds:[],chapters:[{id:'headers',title:'Read retained request headers',why:'unknown',what:'after',how:'after',example:{scenarioKind:'source_derived',input:'before',before:'before',after:'after'},stepIds:['request']}],steps:[{id:'request',headline:'Inspect retained access headers',claimIds:['after'],focus:{type:'sources',fileKey,sources:[before,after]}}],claims:[{id:'unknown',text:'This controlled author test supplies no motivation or execution evidence.',basis:'unknown',references:[],uncertainty:'A live participant has not authored this fixture.'},{id:'before',text:'The earlier retained request explicitly constructed an Authorization header.',basis:'source_observation',references:[before]},{id:'after',text:'The retained request delegates header construction to accessHeaders(captured).',basis:'source_observation',references:[after]}],scope:graphFiles(snapshot).map(file=>file.key===fileKey?{type:'explained' as const,fileKey,chapterId:'headers',explanation:'Controlled fixture highlights the exact request line.',references:[before,after]}:{type:'unexplained' as const,fileKey:file.key,reason:'Outside this controlled author fixture account.'}),limitations:['Controlled test author account over real pinned Git source; no live agent, test execution or product acceptance.']};
+ const receipt=store.story.command(store.issueUser(),{type:'PublishStory',commandId:'canvas-author-fixture',reviewId:'pr-25',snapshotId:snapshot.snapshotId,expectedStoryRevision:0,contextRevision:0,story});if(receipt.state!=='applied')throw new Error(receipt.error);
+ const gateway=createGateway(store,async()=>{notifications++;return {state:'unknown',reason:'Controlled author test; no native session'};}),origin=`http://127.0.0.1:${await gateway.listen(0)}`;
+ const socket=createServer();await new Promise<void>(resolve=>socket.listen(0,'127.0.0.1',resolve));const address=socket.address();if(!address||typeof address==='string')throw new Error('port_unavailable');const port=address.port;await new Promise<void>(resolve=>socket.close(()=>resolve()));
+ const ui=spawn('/Users/scottchu/.asdf/installs/bun/1.4.2/bin/bun',['scripts/ui.ts'],{cwd:process.cwd(),env:{...process.env,REVIEW_UI_PORT:String(port),REVIEW_GATEWAY_URL:origin},stdio:['ignore','pipe','pipe']});let stderr='';ui.stderr.on('data',data=>{stderr+=String(data);});
+ await new Promise<void>((resolve,reject)=>{const timeout=setTimeout(()=>reject(new Error(stderr||'canvas_ui_start_timeout')),10000);ui.stdout.on('data',data=>{if(String(data).includes('PR_REVIEWER_UI_READY')){clearTimeout(timeout);resolve();}});ui.once('exit',()=>{clearTimeout(timeout);reject(new Error(stderr||'canvas_ui_exit'));});});
+ return {snapshot,store,origin,url:`http://127.0.0.1:${port}/?reviewId=pr-25`,notifications:()=>notifications,close:async()=>{await new Promise<void>(resolve=>{if(ui.exitCode!==null){resolve();return;}ui.once('exit',()=>resolve());ui.kill('SIGTERM');});await gateway.close();store.close();rmSync(root,{recursive:true,force:true});}};
+};

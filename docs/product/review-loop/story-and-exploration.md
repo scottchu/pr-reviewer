@@ -1,5 +1,7 @@
 # Guided explanations and exploration
 
+Latest composition: [canvas panels](canvas-panels.md) owns left context/right detail/bottom discussion and independent graph/detail/draft targets. Story remains an optional attention overlay. Historical implementation descriptions below do not authorize stacked-page or inline-composer geometry; existing frame/persistence contracts are unchanged.
+
 **Contract revision:** `review-story-v1`, planning amendment 4 (measured reading hierarchy and explicit question intent; existing semantic ports preserved)
 
 **Date:** 2026-10-24
@@ -323,3 +325,50 @@ The 2026-10-24 access correction supersedes product login/logout and credential 
 Current private scope is SHA256 of UTF-8 domain `pr-reviewer-local-owner-scope-v1`, NUL, decimal UTF-8 origin byte length, colon and exact browser-facing origin. A nonsecret in-memory local-owner marker selects that scope and is explicitly omitted from request headers. Generation/controller/fingerprint fences, write-ahead storage and explicit exact-command recovery remain unchanged. A new open invalidates older effects independently of the stable owner scope. Older credential-scoped pending or private-view records remain preserved and locked when incompatible; explain legacy reconciliation without requesting the original token or silently replaying. Authoritative retained history still loads.
 
 Story evidence and story store public calls accept either trusted in-process local-owner access or retained participant/user credentials. Gateway owner calls use the object, never a manufactured browser token; explicit agent credentials retain attachment and generation checks.
+
+
+## Unavailable semantic result recovery
+
+A failed compute result is diagnostic evidence, not an admitted historical analysis. Capture and source-inspection pinning use an analysis identity only for an analyzed result. Explicit selection commits only after a successful exact read; failure restores the prior valid selection and view, with epoch/abort fencing retained so later polls cannot repeat an invalid selection.
+
+For an old private frame, normalize only its analysis pin when the current authorized view for the exact snapshot shows that exact unavailable result, with the matching retained unavailable job and no selected admitted analysis. Preserve drafts, viewport, focus, source anchors and return frame fields, validating them normally; expose a recovery diagnostic. Missing identities, authorization failures, mismatched/newer results and invalid source/focus remain failures, never broad fallback. Storage's admitted-only explicit query rule is unchanged. Inventory failure with no compute result remains distinct.
+
+Normalization additionally requires a fresh successful current-owner semantic read at restoration time. Cached unavailable diagnostics, including a view retained after an authorization/network error, are not authority. Failed or superseded revalidation leaves the saved return frame and both drafts intact; it cannot consume the frame or rewrite its pin.
+
+## Structural canvas inspection and saved story state
+
+The [canvas inspection owner](canvas-reading.md#application-inspection-and-transactional-restoration) is separate from the active question draft, Story evidence account and first saved return frame. Reading a structural node, following an exact source link or inspecting a directly referenced retained document pauses playback and preserves the question anchor/text. Explicit Ask delegates the existing guarded selection; authored evidence adoption still uses its own confirmation protocol. Source-only inspection does not publish a story, wake a participant or create test evidence.
+
+The optional structural inspection field is part of both the current private maps and the saved return maps. Startup hydration awaits read-only canvas validation of BOTH maps against each exact retained snapshot before publishing a ready Resume state. Resume again awaits exact target readiness before consuming the first return frame or switching the active original draft. Missing/hash-mismatched/foreign/unavailable/canceled validation retains the frame and both drafts; existing startup quarantine/checkpoint blocks preserve the raw private record. Legacy absent inspection restores overview with no extra verification read. This transaction supplements the retained semantic readiness sequence above; neither owner can repair missing history with current data.
+
+Managed workspace routes restore the already validated map into the renderer owner. Initial, busy and error events cannot overwrite it. If explicit user focus cancels a held renderer verification, the newer settled authorized canvas revision must be captured before same-turn exploration freezes its return map; merely clearing a restore flag in a later promise continuation is insufficient. Scope/access replacement and disposal fence every old completion. The structural renderer does not call compatibility captureMap; the semantic renderer keeps its existing separate capture route until its own bounded integration.
+
+The candidate's actual React journeys verify source-link reading, first-frame preservation, separate original/exploration draft bodies, reload and exact structural inspection Resume with a controlled authored account over real fixed PR source. This fixture is not a native author/agent session. All other Story authoring, cursor, publication, semantic history and external-effect contracts remain as specified above. Partial structural presentation does not establish the complete one-canvas story contract or layout adoption.
+
+## Experience reconciliation pending design review
+
+The [reviewer experience](../review-experience.md) distinguishes current eight-second automatic progression from the original reference’s within-scene demonstration followed by a reading stop. The timer above records current engineering, not verified user adoption of that duration. The proposed next mock uses paused/manual reading and explicitly evaluates a current-scene replay stop before any timing implementation changes. Flow/Diff means different detail/framing of the same persistent canvas under the later canvas correction; it must not require a detached source pane. Basic inline disclosure is core, while advanced scale/motion refinement remains later work.
+
+
+## Story is an optional attention overlay
+
+The controlling October23 whole-PR canvas is maintained in [reviewer experience](../review-experience.md) and [the concrete PR25 graph](../pr25-whole-change-graph.md). For a fixed snapshot/analysis, story off, Next/Previous and Resume share the same graph/group/node/edge membership. Story updates emphasis and optional camera following; it cannot create/remove groups or make source available only after a step. Arbitrary node entry, both-side callers/callees and free pan/zoom work without a story. Existing cursor/draft/return safeguards apply, but a correct single-path player is not whole-product acceptance.
+
+
+### Explicit guided file attention (approved 2026-10-25)
+
+An explicit Previous/Next step may translate an offscreen exact source into the usable graph rectangle at the existing scale. Before its first movement, use the existing public original cursor/draft return frame and the existing local presentation capture. `enterExploration({ allowStoryNavigation: true })` selects this attention-only entry; default `enterExploration()` remains evidence exploration. Attention-only paused navigation may repeat without replacing the original. Entering actual evidence changes the existing frame to exploration and blocks further step navigation until Return. It must not be possible to reopen navigation by requesting attention-only entry over an active evidence excursion. No new persisted mode or parallel frame owner is introduced. Existing reload limits remain: public frames can persist, local camera/reading frames do not become newly durable.
+
+
+Attention admission can include the explicit Previous/Next navigation so the public owner validates the transition and publishes its original frame plus next cursor atomically. Submission locks, active restoration, evidence exploration and out-of-bounds steps reject before frame/draft mutation or private-intent invalidation. Default evidence entry promotes an attention frame to exploring without recapturing it. An existing evidence frame cannot be downgraded by attention or replay. The existing local camera/reading capture precedes first admission; already-readable targets need no frame or camera operation. Repeated explicit navigation cancels obsolete interpolation at the current camera before applying its new minimum translation; it adds no delayed follow callback or persisted frame schema.
+
+
+Guided attention retains original panel visibility and current reading scroll in the same local presentation frame before first translation. Return restores that panel/step/scroll together with the earlier camera/source/lens/folds/horizontal reading only after public restoration succeeds. Ordinary evidence-only capture keeps its established panel behavior. A local effect revision can prevent old panel cleanup from overwriting explicitly restored scroll; it is not another persistence/return owner. Guided close/rapid navigation/gesture supersedes any older camera interpolation, while a rejected owner admission cannot cancel an in-flight restore or move the camera. Narrow Story stays its foreground reader during underlying graph attention; no gesture or resize initiates guided navigation.
+
+
+### Supporting answer evidence within an existing exploration
+
+Opening a reply's evidence creates one transient supporting checkpoint owned by the same Story bridge, separate from its earliest originalStory return frame. It references the existing active draft identity and immutable Snapshot/version/cursor/evidence/maps, never draft bodies or a third draft. Repeated evidence citations retain that answer-reading origin. Back first restores the immediate answer/expanded-source/panel position transactionally; a later explicit originalStoryReturn still restores the earliest Story checkpoint. Public restoration succeeds before the associated local presentation is restored. Failure/locks/stale draft or source identity preserve both checkpoints; do not silently guess a replacement draft or consume the outer frame. Outer resume is unavailable until inner Back completes. Depth is one, re-entry reuses it, and scope changes reject. This supporting checkpoint is transient, not part of persisted private-view schema or a cross-reload guarantee; a missing/stale opaqueidentity cannot consume outer recovery. Ordinary citation and firstStory attention defaults remain unchanged. Inspection never silently adopts a question anchor.
+
+
+For desktop offscreen guided attention, show the relevant existing file/callee/call-row context near the readable top at unchanged zoom, rather than merely making a header touch the bottom edge. Context comes only from supported existing relations; no layout/membership/expansion change is implied. An already-readable selected target still causes no camera/frame operation. Oversized context is not shrunk to fit: preserve the readable target, explicit navigation and honest partial coverage. This refines header-only minimum vertical framing; original checkpoint and exact Return ownership remain unchanged.

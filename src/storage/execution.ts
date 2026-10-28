@@ -1,7 +1,9 @@
+import {headTestEffectOccupiesSlot} from '../domain/public.ts';
+import type {HeadTestJob} from '../domain/public.ts';
 import { randomUUID } from "node:crypto";
 import type { DatabaseSync } from "node:sqlite";
 type Occupant = {
-    kind: "import" | "analysis";
+    kind: "import" | "analysis" | "test";
     jobId: string;
     invocationId: string;
     phase: string;
@@ -19,13 +21,13 @@ export const createExecutionLease = (db: DatabaseSync) => {
         body: string;
     } | undefined; return row ? JSON.parse(row.body) as Occupant : null; };
     const unresolved = () => {
-        for (const table of ["import_jobs", "analysis_jobs"]) {
+        for (const table of ["import_jobs", "analysis_jobs", "test_jobs"]) {
             if (!db.prepare("SELECT name FROM sqlite_master WHERE type='table' AND name=?").get(table))
                 continue;
             const rows = db.prepare(`SELECT body FROM ${table}`).all() as {
                 body: string;
             }[];
-            if (rows.some(row => { const job = JSON.parse(row.body) as {
+            if (rows.some(row => { if (table === "test_jobs") return headTestEffectOccupiesSlot(JSON.parse(row.body) as HeadTestJob); const job = JSON.parse(row.body) as {
                 state: string;
                 invocations: {
                     state: string;
@@ -39,6 +41,7 @@ export const createExecutionLease = (db: DatabaseSync) => {
         assertCurrent: check,
         acquire: (next: Occupant) => { check(); if (occupant() || unresolved())
             return false; db.prepare("INSERT INTO execution_lease VALUES (1,?)").run(JSON.stringify(next)); return true; },
+        advance: (expected: Occupant, phase: string) => { check(); const current=occupant(); if(!current||JSON.stringify(current)!==JSON.stringify(expected))throw new Error('execution_lease_conflict'); db.prepare('UPDATE execution_lease SET body=? WHERE id=1').run(JSON.stringify({...current,phase})); },
         retain: (next: Occupant) => { check(); if (!occupant())
             db.prepare("INSERT INTO execution_lease VALUES (1,?)").run(JSON.stringify(next)); },
         release: (expected: Occupant) => { check(); const current = occupant(); if (!current || JSON.stringify(current) !== JSON.stringify(expected))

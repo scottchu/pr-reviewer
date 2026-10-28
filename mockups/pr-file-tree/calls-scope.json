@@ -1,0 +1,511 @@
+{
+  "format": "bounded-private-scope-source-context-v1",
+  "scope": {
+    "paths": [
+      "src/application/private-session.ts"
+    ],
+    "wholePRCoverage": false,
+    "boundary": "Only the three named lexical declarations and direct calls; platform calls and other callers are unresolved."
+  },
+  "seeds": [
+    {
+      "id": "33363a5f9dd645b117944d5fcc09f828eb0cb5b38e7584962f6b247180bccef0",
+      "name": "credentialScope",
+      "declaration": {
+        "snapshotId": "pr25-pinned-scope-evidence",
+        "side": "base",
+        "path": "src/application/private-session.ts",
+        "contentHash": "839159caebe8eab4adf9dfad3a35caf73e4628a79a9b72a457901ec886ed56a0",
+        "start": 4377,
+        "end": 4604,
+        "startLine": 29,
+        "endLine": 29
+      },
+      "body": {
+        "snapshotId": "pr25-pinned-scope-evidence",
+        "side": "base",
+        "path": "src/application/private-session.ts",
+        "contentHash": "839159caebe8eab4adf9dfad3a35caf73e4628a79a9b72a457901ec886ed56a0",
+        "start": 4441,
+        "end": 4603,
+        "startLine": 29,
+        "endLine": 29
+      },
+      "exactBodySHA256": "c6817772561ab0d1b9d18302081a4d4c2679b316610af2aaf99a9e5ca22d84cc"
+    },
+    {
+      "id": "5fc210098dcdbd5df7e5b75c37581be551c4f2e004ec693d37d8a9ea77ab5721",
+      "name": "credentialScope",
+      "declaration": {
+        "snapshotId": "pr25-pinned-scope-evidence",
+        "side": "head",
+        "path": "src/application/private-session.ts",
+        "contentHash": "8898cfa974b3033ef0d7bc0c54ef00fbdeeffb2eac7bb89554e29db383c7e8f4",
+        "start": 4430,
+        "end": 4784,
+        "startLine": 30,
+        "endLine": 30
+      },
+      "body": {
+        "snapshotId": "pr25-pinned-scope-evidence",
+        "side": "head",
+        "path": "src/application/private-session.ts",
+        "contentHash": "8898cfa974b3033ef0d7bc0c54ef00fbdeeffb2eac7bb89554e29db383c7e8f4",
+        "start": 4494,
+        "end": 4783,
+        "startLine": 30,
+        "endLine": 30
+      },
+      "exactBodySHA256": "9bba00bbd00f46496f7ed8ce9fbca9a23c791534aa88b3c0f273c70e5143a841"
+    }
+  ],
+  "nodes": [
+    {
+      "id": "7818667abd85c0a1be1b192ffd30ebdda74e7a1fb0980a6806e21630bafd5fcc",
+      "name": "encodedBytes",
+      "declaration": {
+        "snapshotId": "pr25-pinned-scope-evidence",
+        "side": "base",
+        "path": "src/application/private-session.ts",
+        "contentHash": "839159caebe8eab4adf9dfad3a35caf73e4628a79a9b72a457901ec886ed56a0",
+        "start": 4090,
+        "end": 4169,
+        "startLine": 27,
+        "endLine": 27
+      },
+      "body": {
+        "snapshotId": "pr25-pinned-scope-evidence",
+        "side": "base",
+        "path": "src/application/private-session.ts",
+        "contentHash": "839159caebe8eab4adf9dfad3a35caf73e4628a79a9b72a457901ec886ed56a0",
+        "start": 4131,
+        "end": 4168,
+        "startLine": 27,
+        "endLine": 27
+      },
+      "exactBodySHA256": "9a3f9b284968c268b9fcd402d7155f841a7c0879a0d39e7af0f468a5392bf9ed"
+    },
+    {
+      "id": "78ac516bab8a327db6f9ba8c832b4b37096284c9fc4c6804944208e7e36967ce",
+      "name": "requestFingerprint",
+      "declaration": {
+        "snapshotId": "pr25-pinned-scope-evidence",
+        "side": "base",
+        "path": "src/application/private-session.ts",
+        "contentHash": "839159caebe8eab4adf9dfad3a35caf73e4628a79a9b72a457901ec886ed56a0",
+        "start": 4170,
+        "end": 4376,
+        "startLine": 28,
+        "endLine": 28
+      },
+      "body": {
+        "snapshotId": "pr25-pinned-scope-evidence",
+        "side": "base",
+        "path": "src/application/private-session.ts",
+        "contentHash": "839159caebe8eab4adf9dfad3a35caf73e4628a79a9b72a457901ec886ed56a0",
+        "start": 4225,
+        "end": 4375,
+        "startLine": 28,
+        "endLine": 28
+      },
+      "exactBodySHA256": "445e7f3fa1f1b196b45feae80396d2cd67b4713d14e568a47aec83d8e45f60dd"
+    },
+    {
+      "id": "33363a5f9dd645b117944d5fcc09f828eb0cb5b38e7584962f6b247180bccef0",
+      "name": "credentialScope",
+      "declaration": {
+        "snapshotId": "pr25-pinned-scope-evidence",
+        "side": "base",
+        "path": "src/application/private-session.ts",
+        "contentHash": "839159caebe8eab4adf9dfad3a35caf73e4628a79a9b72a457901ec886ed56a0",
+        "start": 4377,
+        "end": 4604,
+        "startLine": 29,
+        "endLine": 29
+      },
+      "body": {
+        "snapshotId": "pr25-pinned-scope-evidence",
+        "side": "base",
+        "path": "src/application/private-session.ts",
+        "contentHash": "839159caebe8eab4adf9dfad3a35caf73e4628a79a9b72a457901ec886ed56a0",
+        "start": 4441,
+        "end": 4603,
+        "startLine": 29,
+        "endLine": 29
+      },
+      "exactBodySHA256": "c6817772561ab0d1b9d18302081a4d4c2679b316610af2aaf99a9e5ca22d84cc"
+    },
+    {
+      "id": "31319f455d5d50a2dd34ff38aa9665371d63559d0eb8a465afcd33a4caa169c3",
+      "name": "encodedBytes",
+      "declaration": {
+        "snapshotId": "pr25-pinned-scope-evidence",
+        "side": "head",
+        "path": "src/application/private-session.ts",
+        "contentHash": "8898cfa974b3033ef0d7bc0c54ef00fbdeeffb2eac7bb89554e29db383c7e8f4",
+        "start": 4143,
+        "end": 4222,
+        "startLine": 28,
+        "endLine": 28
+      },
+      "body": {
+        "snapshotId": "pr25-pinned-scope-evidence",
+        "side": "head",
+        "path": "src/application/private-session.ts",
+        "contentHash": "8898cfa974b3033ef0d7bc0c54ef00fbdeeffb2eac7bb89554e29db383c7e8f4",
+        "start": 4184,
+        "end": 4221,
+        "startLine": 28,
+        "endLine": 28
+      },
+      "exactBodySHA256": "9a3f9b284968c268b9fcd402d7155f841a7c0879a0d39e7af0f468a5392bf9ed"
+    },
+    {
+      "id": "283ea4a9f66dfd1d64d2e86e55ce49bc72fd12825e7a424effd9398fe3ed036b",
+      "name": "requestFingerprint",
+      "declaration": {
+        "snapshotId": "pr25-pinned-scope-evidence",
+        "side": "head",
+        "path": "src/application/private-session.ts",
+        "contentHash": "8898cfa974b3033ef0d7bc0c54ef00fbdeeffb2eac7bb89554e29db383c7e8f4",
+        "start": 4223,
+        "end": 4429,
+        "startLine": 29,
+        "endLine": 29
+      },
+      "body": {
+        "snapshotId": "pr25-pinned-scope-evidence",
+        "side": "head",
+        "path": "src/application/private-session.ts",
+        "contentHash": "8898cfa974b3033ef0d7bc0c54ef00fbdeeffb2eac7bb89554e29db383c7e8f4",
+        "start": 4278,
+        "end": 4428,
+        "startLine": 29,
+        "endLine": 29
+      },
+      "exactBodySHA256": "445e7f3fa1f1b196b45feae80396d2cd67b4713d14e568a47aec83d8e45f60dd"
+    },
+    {
+      "id": "5fc210098dcdbd5df7e5b75c37581be551c4f2e004ec693d37d8a9ea77ab5721",
+      "name": "credentialScope",
+      "declaration": {
+        "snapshotId": "pr25-pinned-scope-evidence",
+        "side": "head",
+        "path": "src/application/private-session.ts",
+        "contentHash": "8898cfa974b3033ef0d7bc0c54ef00fbdeeffb2eac7bb89554e29db383c7e8f4",
+        "start": 4430,
+        "end": 4784,
+        "startLine": 30,
+        "endLine": 30
+      },
+      "body": {
+        "snapshotId": "pr25-pinned-scope-evidence",
+        "side": "head",
+        "path": "src/application/private-session.ts",
+        "contentHash": "8898cfa974b3033ef0d7bc0c54ef00fbdeeffb2eac7bb89554e29db383c7e8f4",
+        "start": 4494,
+        "end": 4783,
+        "startLine": 30,
+        "endLine": 30
+      },
+      "exactBodySHA256": "9bba00bbd00f46496f7ed8ce9fbca9a23c791534aa88b3c0f273c70e5143a841"
+    }
+  ],
+  "contextDeclarations": [
+    {
+      "id": "7818667abd85c0a1be1b192ffd30ebdda74e7a1fb0980a6806e21630bafd5fcc",
+      "name": "encodedBytes",
+      "declaration": {
+        "snapshotId": "pr25-pinned-scope-evidence",
+        "side": "base",
+        "path": "src/application/private-session.ts",
+        "contentHash": "839159caebe8eab4adf9dfad3a35caf73e4628a79a9b72a457901ec886ed56a0",
+        "start": 4090,
+        "end": 4169,
+        "startLine": 27,
+        "endLine": 27
+      },
+      "body": {
+        "snapshotId": "pr25-pinned-scope-evidence",
+        "side": "base",
+        "path": "src/application/private-session.ts",
+        "contentHash": "839159caebe8eab4adf9dfad3a35caf73e4628a79a9b72a457901ec886ed56a0",
+        "start": 4131,
+        "end": 4168,
+        "startLine": 27,
+        "endLine": 27
+      },
+      "exactBodySHA256": "9a3f9b284968c268b9fcd402d7155f841a7c0879a0d39e7af0f468a5392bf9ed"
+    },
+    {
+      "id": "78ac516bab8a327db6f9ba8c832b4b37096284c9fc4c6804944208e7e36967ce",
+      "name": "requestFingerprint",
+      "declaration": {
+        "snapshotId": "pr25-pinned-scope-evidence",
+        "side": "base",
+        "path": "src/application/private-session.ts",
+        "contentHash": "839159caebe8eab4adf9dfad3a35caf73e4628a79a9b72a457901ec886ed56a0",
+        "start": 4170,
+        "end": 4376,
+        "startLine": 28,
+        "endLine": 28
+      },
+      "body": {
+        "snapshotId": "pr25-pinned-scope-evidence",
+        "side": "base",
+        "path": "src/application/private-session.ts",
+        "contentHash": "839159caebe8eab4adf9dfad3a35caf73e4628a79a9b72a457901ec886ed56a0",
+        "start": 4225,
+        "end": 4375,
+        "startLine": 28,
+        "endLine": 28
+      },
+      "exactBodySHA256": "445e7f3fa1f1b196b45feae80396d2cd67b4713d14e568a47aec83d8e45f60dd"
+    },
+    {
+      "id": "31319f455d5d50a2dd34ff38aa9665371d63559d0eb8a465afcd33a4caa169c3",
+      "name": "encodedBytes",
+      "declaration": {
+        "snapshotId": "pr25-pinned-scope-evidence",
+        "side": "head",
+        "path": "src/application/private-session.ts",
+        "contentHash": "8898cfa974b3033ef0d7bc0c54ef00fbdeeffb2eac7bb89554e29db383c7e8f4",
+        "start": 4143,
+        "end": 4222,
+        "startLine": 28,
+        "endLine": 28
+      },
+      "body": {
+        "snapshotId": "pr25-pinned-scope-evidence",
+        "side": "head",
+        "path": "src/application/private-session.ts",
+        "contentHash": "8898cfa974b3033ef0d7bc0c54ef00fbdeeffb2eac7bb89554e29db383c7e8f4",
+        "start": 4184,
+        "end": 4221,
+        "startLine": 28,
+        "endLine": 28
+      },
+      "exactBodySHA256": "9a3f9b284968c268b9fcd402d7155f841a7c0879a0d39e7af0f468a5392bf9ed"
+    },
+    {
+      "id": "283ea4a9f66dfd1d64d2e86e55ce49bc72fd12825e7a424effd9398fe3ed036b",
+      "name": "requestFingerprint",
+      "declaration": {
+        "snapshotId": "pr25-pinned-scope-evidence",
+        "side": "head",
+        "path": "src/application/private-session.ts",
+        "contentHash": "8898cfa974b3033ef0d7bc0c54ef00fbdeeffb2eac7bb89554e29db383c7e8f4",
+        "start": 4223,
+        "end": 4429,
+        "startLine": 29,
+        "endLine": 29
+      },
+      "body": {
+        "snapshotId": "pr25-pinned-scope-evidence",
+        "side": "head",
+        "path": "src/application/private-session.ts",
+        "contentHash": "8898cfa974b3033ef0d7bc0c54ef00fbdeeffb2eac7bb89554e29db383c7e8f4",
+        "start": 4278,
+        "end": 4428,
+        "startLine": 29,
+        "endLine": 29
+      },
+      "exactBodySHA256": "445e7f3fa1f1b196b45feae80396d2cd67b4713d14e568a47aec83d8e45f60dd"
+    }
+  ],
+  "edges": [],
+  "sourceObservedCalls": [
+    {
+      "id": "5ae9cac70009af95e7c93ac45d3cb60b9c7d532d2e9313375c6d61665739a119",
+      "caller": "33363a5f9dd645b117944d5fcc09f828eb0cb5b38e7584962f6b247180bccef0",
+      "callee": "78ac516bab8a327db6f9ba8c832b4b37096284c9fc4c6804944208e7e36967ce",
+      "target": {
+        "snapshotId": "pr25-pinned-scope-evidence",
+        "side": "base",
+        "path": "src/application/private-session.ts",
+        "contentHash": "839159caebe8eab4adf9dfad3a35caf73e4628a79a9b72a457901ec886ed56a0",
+        "start": 4170,
+        "end": 4376,
+        "startLine": 28,
+        "endLine": 28
+      },
+      "sites": [
+        {
+          "anchor": {
+            "snapshotId": "pr25-pinned-scope-evidence",
+            "side": "base",
+            "path": "src/application/private-session.ts",
+            "contentHash": "839159caebe8eab4adf9dfad3a35caf73e4628a79a9b72a457901ec886ed56a0",
+            "start": 4480,
+            "end": 4601,
+            "startLine": 29,
+            "endLine": 29
+          },
+          "sourceText": "requestFingerprint(`pr-reviewer-credential-scope-v1\\0${encodedBytes(origin)}:${origin}${encodedBytes(bearer)}:${bearer}`)"
+        }
+      ],
+      "certainty": "source_observed_manual",
+      "method": "bounded_same_file_lexical_observation",
+      "analyzerDisposition": {
+        "reason": "Supplemental pinned source observation; no semantic analyzer admission is asserted."
+      }
+    },
+    {
+      "id": "85b624e2602b39cefbb6ad01e716fd66de370cd2c23a97aec7fc373fc41e0ace",
+      "caller": "33363a5f9dd645b117944d5fcc09f828eb0cb5b38e7584962f6b247180bccef0",
+      "callee": "7818667abd85c0a1be1b192ffd30ebdda74e7a1fb0980a6806e21630bafd5fcc",
+      "target": {
+        "snapshotId": "pr25-pinned-scope-evidence",
+        "side": "base",
+        "path": "src/application/private-session.ts",
+        "contentHash": "839159caebe8eab4adf9dfad3a35caf73e4628a79a9b72a457901ec886ed56a0",
+        "start": 4090,
+        "end": 4169,
+        "startLine": 27,
+        "endLine": 27
+      },
+      "sites": [
+        {
+          "anchor": {
+            "snapshotId": "pr25-pinned-scope-evidence",
+            "side": "base",
+            "path": "src/application/private-session.ts",
+            "contentHash": "839159caebe8eab4adf9dfad3a35caf73e4628a79a9b72a457901ec886ed56a0",
+            "start": 4535,
+            "end": 4555,
+            "startLine": 29,
+            "endLine": 29
+          },
+          "sourceText": "encodedBytes(origin)"
+        },
+        {
+          "anchor": {
+            "snapshotId": "pr25-pinned-scope-evidence",
+            "side": "base",
+            "path": "src/application/private-session.ts",
+            "contentHash": "839159caebe8eab4adf9dfad3a35caf73e4628a79a9b72a457901ec886ed56a0",
+            "start": 4568,
+            "end": 4588,
+            "startLine": 29,
+            "endLine": 29
+          },
+          "sourceText": "encodedBytes(bearer)"
+        }
+      ],
+      "certainty": "source_observed_manual",
+      "method": "bounded_same_file_lexical_observation",
+      "analyzerDisposition": {
+        "reason": "Supplemental pinned source observation; no semantic analyzer admission is asserted."
+      }
+    },
+    {
+      "id": "6cc1849f575b1b3705411720bbac7d753d1dd231d2cd3825745a84ed35734be2",
+      "caller": "5fc210098dcdbd5df7e5b75c37581be551c4f2e004ec693d37d8a9ea77ab5721",
+      "callee": "283ea4a9f66dfd1d64d2e86e55ce49bc72fd12825e7a424effd9398fe3ed036b",
+      "target": {
+        "snapshotId": "pr25-pinned-scope-evidence",
+        "side": "head",
+        "path": "src/application/private-session.ts",
+        "contentHash": "8898cfa974b3033ef0d7bc0c54ef00fbdeeffb2eac7bb89554e29db383c7e8f4",
+        "start": 4223,
+        "end": 4429,
+        "startLine": 29,
+        "endLine": 29
+      },
+      "sites": [
+        {
+          "anchor": {
+            "snapshotId": "pr25-pinned-scope-evidence",
+            "side": "head",
+            "path": "src/application/private-session.ts",
+            "contentHash": "8898cfa974b3033ef0d7bc0c54ef00fbdeeffb2eac7bb89554e29db383c7e8f4",
+            "start": 4563,
+            "end": 4652,
+            "startLine": 30,
+            "endLine": 30
+          },
+          "sourceText": "requestFingerprint(`pr-reviewer-local-owner-scope-v1\\0${encodedBytes(origin)}:${origin}`)"
+        },
+        {
+          "anchor": {
+            "snapshotId": "pr25-pinned-scope-evidence",
+            "side": "head",
+            "path": "src/application/private-session.ts",
+            "contentHash": "8898cfa974b3033ef0d7bc0c54ef00fbdeeffb2eac7bb89554e29db383c7e8f4",
+            "start": 4660,
+            "end": 4781,
+            "startLine": 30,
+            "endLine": 30
+          },
+          "sourceText": "requestFingerprint(`pr-reviewer-credential-scope-v1\\0${encodedBytes(origin)}:${origin}${encodedBytes(bearer)}:${bearer}`)"
+        }
+      ],
+      "certainty": "source_observed_manual",
+      "method": "bounded_same_file_lexical_observation",
+      "analyzerDisposition": {
+        "reason": "Supplemental pinned source observation; no semantic analyzer admission is asserted."
+      }
+    },
+    {
+      "id": "701b1527d0ce8ecd2b1dc366449401ef18d1a7e4a69475254ccbe4ed73509706",
+      "caller": "5fc210098dcdbd5df7e5b75c37581be551c4f2e004ec693d37d8a9ea77ab5721",
+      "callee": "31319f455d5d50a2dd34ff38aa9665371d63559d0eb8a465afcd33a4caa169c3",
+      "target": {
+        "snapshotId": "pr25-pinned-scope-evidence",
+        "side": "head",
+        "path": "src/application/private-session.ts",
+        "contentHash": "8898cfa974b3033ef0d7bc0c54ef00fbdeeffb2eac7bb89554e29db383c7e8f4",
+        "start": 4143,
+        "end": 4222,
+        "startLine": 28,
+        "endLine": 28
+      },
+      "sites": [
+        {
+          "anchor": {
+            "snapshotId": "pr25-pinned-scope-evidence",
+            "side": "head",
+            "path": "src/application/private-session.ts",
+            "contentHash": "8898cfa974b3033ef0d7bc0c54ef00fbdeeffb2eac7bb89554e29db383c7e8f4",
+            "start": 4619,
+            "end": 4639,
+            "startLine": 30,
+            "endLine": 30
+          },
+          "sourceText": "encodedBytes(origin)"
+        },
+        {
+          "anchor": {
+            "snapshotId": "pr25-pinned-scope-evidence",
+            "side": "head",
+            "path": "src/application/private-session.ts",
+            "contentHash": "8898cfa974b3033ef0d7bc0c54ef00fbdeeffb2eac7bb89554e29db383c7e8f4",
+            "start": 4715,
+            "end": 4735,
+            "startLine": 30,
+            "endLine": 30
+          },
+          "sourceText": "encodedBytes(origin)"
+        },
+        {
+          "anchor": {
+            "snapshotId": "pr25-pinned-scope-evidence",
+            "side": "head",
+            "path": "src/application/private-session.ts",
+            "contentHash": "8898cfa974b3033ef0d7bc0c54ef00fbdeeffb2eac7bb89554e29db383c7e8f4",
+            "start": 4748,
+            "end": 4768,
+            "startLine": 30,
+            "endLine": 30
+          },
+          "sourceText": "encodedBytes(bearer)"
+        }
+      ],
+      "certainty": "source_observed_manual",
+      "method": "bounded_same_file_lexical_observation",
+      "analyzerDisposition": {
+        "reason": "Supplemental pinned source observation; no semantic analyzer admission is asserted."
+      }
+    }
+  ]
+}

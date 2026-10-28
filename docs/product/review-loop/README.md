@@ -47,3 +47,7 @@ The [slice plan](../../plans/480p/slices/01-review-loop/plan.md) sequences deliv
 
 
 Repository-path import operations, limits and persisted recovery are maintained in [durable import jobs](import-jobs.md). Static neighborhoods establish supported source relationships and honest coverage, not the user/lifecycle narrative or complete understanding. The current explanation/exploration contract keeps authored rationale, static facts and observed execution distinct. No unrun live-provider/native/human or whole-round gate is implied.
+
+[Configured head tests](test-execution.md) has delivered backend/job/result/cleanup/gateway, CLI and application consumer engineering. The standalone React panel remains provisional and is not the adopted same-canvas UX. Exact-head production qualification, actual own-PR comprehension, native delivery, deployment and later comparison/enrichment retain their separate gates. [Test compatibility values](test-compatibility.md) specifies physical/public formats, private recovery, exact compiler qualification and digest vectors.
+
+Configured-test delivery status here refers to the engineering integration candidate at source `79ab8b09817b0d7eae8a2052d3ef6ff72ad17631`. These test jobs are not on main `e3b270e`; this documentation does not claim merge, production qualification, adoption of the provisional panel or native-host delivery.

@@ -1,0 +1,202 @@
+[
+  {
+    "group": "G8",
+    "path": "docs/plans/1080p/plan.md"
+  },
+  {
+    "group": "G8",
+    "path": "docs/plans/480p/plan.md"
+  },
+  {
+    "group": "G8",
+    "path": "docs/plans/480p/slices/01-review-loop/plan.md"
+  },
+  {
+    "group": "G8",
+    "path": "docs/plans/480p/slices/01-review-loop/single-user-access/evidence.md"
+  },
+  {
+    "group": "G8",
+    "path": "docs/plans/480p/slices/01-review-loop/single-user-access/plan.md"
+  },
+  {
+    "group": "G8",
+    "path": "docs/plans/480p/slices/02-review-continuation/plan.md"
+  },
+  {
+    "group": "G8",
+    "path": "docs/plans/720p/slices/03-whole-change/plan.md"
+  },
+  {
+    "group": "G8",
+    "path": "docs/plans/720p/slices/04-behavior-neighborhood/plan.md"
+  },
+  {
+    "group": "G8",
+    "path": "docs/plans/720p/slices/05-explanation-exploration/plan.md"
+  },
+  {
+    "group": "G8",
+    "path": "docs/plans/delivery-through-1080p.md"
+  },
+  {
+    "group": "G8",
+    "path": "docs/plans/roadmap.md"
+  },
+  {
+    "group": "G7",
+    "path": "docs/product/architecture.md"
+  },
+  {
+    "group": "G7",
+    "path": "docs/product/review-loop/contracts.md"
+  },
+  {
+    "group": "G7",
+    "path": "docs/product/review-loop/evolution.md"
+  },
+  {
+    "group": "G7",
+    "path": "docs/product/review-loop/import-jobs.md"
+  },
+  {
+    "group": "G7",
+    "path": "docs/product/review-loop/persistence-compatibility.md"
+  },
+  {
+    "group": "G7",
+    "path": "docs/product/review-loop/presentation.md"
+  },
+  {
+    "group": "G7",
+    "path": "docs/product/review-loop/runtime.md"
+  },
+  {
+    "group": "G7",
+    "path": "docs/product/review-loop/semantic-storage.md"
+  },
+  {
+    "group": "G7",
+    "path": "docs/product/review-loop/story-and-exploration.md"
+  },
+  {
+    "group": "G5",
+    "path": "scripts/add-snapshot.ts"
+  },
+  {
+    "group": "G5",
+    "path": "scripts/capture-review.ts"
+  },
+  {
+    "group": "G5",
+    "path": "scripts/dev.ts"
+  },
+  {
+    "group": "G5",
+    "path": "scripts/local.ts"
+  },
+  {
+    "group": "G5",
+    "path": "scripts/pair.ts"
+  },
+  {
+    "group": "G2",
+    "path": "src/application/analysis.ts"
+  },
+  {
+    "group": "G2",
+    "path": "src/application/imports.ts"
+  },
+  {
+    "group": "G2",
+    "path": "src/application/local-access.ts"
+  },
+  {
+    "group": "G4",
+    "path": "src/application/private-session.ts"
+  },
+  {
+    "group": "G2",
+    "path": "src/application/review.ts"
+  },
+  {
+    "group": "G2",
+    "path": "src/application/story.ts"
+  },
+  {
+    "group": "G1",
+    "path": "src/application/workspace.ts"
+  },
+  {
+    "group": "G3",
+    "path": "src/server/public.ts"
+  },
+  {
+    "group": "G3",
+    "path": "src/storage/access.ts"
+  },
+  {
+    "group": "G3",
+    "path": "src/storage/analysis.ts"
+  },
+  {
+    "group": "G3",
+    "path": "src/storage/imports.ts"
+  },
+  {
+    "group": "G3",
+    "path": "src/storage/public.ts"
+  },
+  {
+    "group": "G3",
+    "path": "src/storage/story.ts"
+  },
+  {
+    "group": "G1",
+    "path": "src/ui/main.tsx"
+  },
+  {
+    "group": "G1",
+    "path": "src/ui/style.css"
+  },
+  {
+    "group": "G6",
+    "path": "tests/exploration-recovery.e2e.ts"
+  },
+  {
+    "group": "G6",
+    "path": "tests/gateway.test.ts"
+  },
+  {
+    "group": "G6",
+    "path": "tests/import-jobs.test.ts"
+  },
+  {
+    "group": "G6",
+    "path": "tests/import.e2e.ts"
+  },
+  {
+    "group": "G6",
+    "path": "tests/question-recovery.test.ts"
+  },
+  {
+    "group": "G6",
+    "path": "tests/review.e2e.ts"
+  },
+  {
+    "group": "G6",
+    "path": "tests/runtime.test.ts"
+  },
+  {
+    "group": "G6",
+    "path": "tests/semantic-storage.test.ts"
+  },
+  {
+    "group": "G6",
+    "path": "tests/semantic.e2e.ts"
+  },
+  {
+    "group": "G6",
+    "path": "tests/story.e2e.ts"
+  }
+]

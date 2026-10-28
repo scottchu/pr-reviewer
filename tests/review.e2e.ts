@@ -1,4 +1,5 @@
 import { test, expect } from "@playwright/test";
+import {createHash} from 'node:crypto';
 import type {Page} from "@playwright/test";
 import { spawn, execFileSync } from "node:child_process";
 import type { ChildProcess } from "node:child_process";
@@ -10,9 +11,10 @@ import {
   rmSync,
 } from "node:fs";
 import { tmpdir } from "node:os";
+import {reserveBrowserPorts} from "./browser-ports.ts";
 import { join, resolve } from "node:path";
-import { Client } from "@modelcontextprotocol/sdk/client/index.js";
-import { StdioClientTransport } from "@modelcontextprotocol/sdk/client/stdio.js";
+import { Client } from "@modelcontextprotocol/client";
+import { StdioClientTransport } from "@modelcontextprotocol/client/stdio";
 import type { LaunchBinding } from "../src/mcp/public.ts";
 import type { Review, Anchor } from "../src/domain/public.ts";
 let root: string,
@@ -21,7 +23,7 @@ let root: string,
   gatewayUrl: string,
   uiUrl: string,
   launch: LaunchBinding;
-let stderr = "";
+let stderr = "",uiPort=0,gatewayPort=0;
 const delay = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 const api = async (path: string, body?: unknown) => {
   const response = await fetch(`${gatewayUrl}${path}`, {
@@ -42,8 +44,8 @@ const start = async () => {
       env: {
         ...process.env,
         REVIEW_DATA_DIR: root,
-        REVIEW_UI_PORT: "5284",
-        REVIEW_GATEWAY_PORT: "5285",
+        REVIEW_UI_PORT: String(uiPort),
+        REVIEW_GATEWAY_PORT: String(gatewayPort),
         REVIEW_CODEX_BIN: join(root, "controlled-codex"),
       },
       stdio: ["ignore", "pipe", "pipe"],
@@ -83,6 +85,7 @@ const tool = async (name: string, args: Record<string, unknown> = {}) => {
   return JSON.parse(content[0]?.text ?? "{}") as Record<string, unknown>;
 };
 test.beforeAll(async () => {
+  const ports=await reserveBrowserPorts();uiPort=ports[0]!;gatewayPort=ports[1]!;
   root = mkdtempSync(join(tmpdir(), "pr-reviewer-browser-"));
   writeFileSync(
     join(root, "controlled-codex"),
@@ -114,7 +117,7 @@ test.beforeAll(async () => {
   };
   const launchRef = join(root, "mcp-launch.json");
   writeFileSync(launchRef, JSON.stringify(launch), { mode: 0o600 });
-  client = new Client({ name: "controlled-browser-agent", version: "1.0.0" });
+  client = new Client({ name: "controlled-browser-agent", version: "1.0.0" }, { versionNegotiation: { mode: { pin: "2026-07-28" } } });
   await client.connect(
     new StdioClientTransport({
       command: process.execPath,
@@ -204,11 +207,14 @@ test("01-A/C/F/G controlled host: real React + PR14 → queue → MCP source/rea
   expect(await tool("reply_submit", input)).toEqual(receipt);
   await expect(page.getByText(input.body, { exact: true })).toBeVisible();
   await expect(page.getByText("Answered", { exact: true })).toBeVisible();
+  const questionSelection=await page.locator("#selection").innerText();
   await page
     .getByRole("link", { name: "Source: head docs/README.md:5–13" })
     .click();
-  await expect(page).toHaveURL(/#source-head-5$/);
-  await expect(page.getByLabel("Start line")).toHaveValue("5");
+  await expect(page).toHaveURL(/#review-canvas$/);
+  await expect(page.getByRole('region',{name:'Review canvas',exact:true}).getByLabel('Inspected source identity')).toContainText('head · docs/README.md:5–13');
+  // Reply evidence inspection preserves the independently saved question anchor.
+  await expect(page.locator("#selection")).toHaveText(questionSelection);
   const persisted = (await api(
     `/api/reviews/pr-14?minimumRevision=${String(receipt.revision)}`,
   )) as unknown as Review;
@@ -273,7 +279,7 @@ test("explicit manual PR19 target renders its own path and saves the declared re
     page.getByRole("link", { name: "PR 19", exact: true }),
   ).toBeVisible();
   await expect(
-    page.getByRole("heading", {
+    page.getByRole('region',{name:'After overview',exact:true}).getByRole("heading", {
       name: "docs/product/review-loop/contracts.md",
       exact: true,
     }),
@@ -309,36 +315,37 @@ test('02-G real PR20 graph → keyboard source → anchored question → return,
  const spec=join(root,'owner-selection.json');writeFileSync(spec,JSON.stringify({prNumber:20,prUrl:'https://github.com/scottchu/pr-reviewer/pull/20',title:'Private preview and repository-path entry',baseSha:'aeadce0ace7f509160d0630ee18c75d74e4537b2',headSha:'df171b2ce8aee0c2e72249fc68138cf2f0e507d6',paths:['docs/product/review-loop/runtime.md','docs/product/review-loop/README.md','docs/plans/480p/slices/01-review-loop/implementation-evidence.md']}));
  const previous=process.env.REVIEW_SOURCE_SPEC;process.env.REVIEW_SOURCE_SPEC=spec;try{await start();}finally{if(previous===undefined)delete process.env.REVIEW_SOURCE_SPEC;else process.env.REVIEW_SOURCE_SPEC=previous;}
  await page.setViewportSize({width:1600,height:1200});await page.goto(uiUrl);
- await expect(page.getByRole('heading',{name:'Change map',exact:true})).toBeVisible();
+ await expect(page.getByRole('heading',{name:'Read the change in context',exact:true})).toBeVisible();
  await expect(page.locator('.react-flow__node').first()).toBeVisible();
- await expect(page.getByText(/Callers\/callees not analyzed/)).toBeVisible();
+ await expect(page.getByText(/Static callers\/callees remain unknown/)).toBeVisible();
  await expect(page.getByRole('checkbox',{name:'Show referenced context'})).not.toBeChecked();
  // Capture only the actual graph before source drilldown/question; no answer key
  // or separate diff/source enters the graph-first review bundle.
  const artifacts=process.env.REVIEW_E2E_ARTIFACT_DIR!;
- await page.locator('.review-graph').screenshot({path:join(artifacts,'pr20-graph-only.png')});
- writeFileSync(join(artifacts,'pr20-graph-only.aria.txt'),await page.locator('.review-graph').ariaSnapshot());
+ await page.getByRole('region',{name:'Review canvas',exact:true}).screenshot({path:join(artifacts,'pr20-graph-only.png')});
+ writeFileSync(join(artifacts,'pr20-graph-only.aria.txt'),await page.getByRole('region',{name:'Review canvas',exact:true}).ariaSnapshot());
  const persisted=(await api('/api/reviews/pr-20')) as unknown as Review;
  writeFileSync(join(artifacts,'pr20-target-identity.json'),JSON.stringify({reviewId:persisted.reviewId,snapshotId:persisted.snapshot.snapshotId,prUrl:persisted.snapshot.prUrl,baseSha:persisted.snapshot.baseSha,headSha:persisted.snapshot.headSha},null,2));
  await page.getByRole('button',{name:'Focus docs/product/review-loop/runtime.md',exact:true}).click();
- const open=page.getByRole('button',{name:'Open head docs/product/review-loop/runtime.md',exact:true});await open.focus();await page.keyboard.press('Enter');
+ const canvas=page.getByRole('region',{name:'Review canvas',exact:true});const open=canvas.getByRole('button',{name:'Focus source',exact:true});await open.focus();await page.keyboard.press('Enter');await canvas.getByRole('button',{name:'Ask about selected lines',exact:true}).click();
  await expect(page.getByLabel('Source file')).toHaveValue('docs/product/review-loop/runtime.md');
  await page.getByLabel('Start line').fill('35');await page.getByLabel('End line').fill('57');
  await page.getByLabel('Your question').fill('Which boundaries and rollback does the private preview retain, and what does the source leave unverified?');
- await expect(page.getByText('Source selection is held while your question draft is nonempty. Save or clear it before navigating.')).toBeVisible();
+ await expect(page.getByLabel('Source file')).toBeDisabled();
+ const originalInspection=await canvas.getByLabel('Inspected source identity').textContent();const originalFrame=await page.evaluate(()=>JSON.parse(sessionStorage.getItem('pr-reviewer:private-view:v1')!).value.maps.structural);
  await page.getByRole('button',{name:'Focus docs/product/review-loop/README.md',exact:true}).click();await expect(page.getByLabel('Source file')).toHaveValue('docs/product/review-loop/runtime.md');await expect(page.getByLabel('Start line')).toHaveValue('35');
- await page.getByRole('button',{name:'Focus docs/product/review-loop/runtime.md',exact:true}).click();
- await page.getByRole('button',{name:'Save question'}).click();await expect(page.getByText('1 saved question · 0 answers')).toBeVisible();
+ await canvas.getByRole('button',{name:'Back to previous frame',exact:true}).click();await expect(canvas.getByLabel('Inspected source identity')).toHaveText(originalInspection!);await expect.poll(()=>page.evaluate(()=>JSON.parse(sessionStorage.getItem('pr-reviewer:private-view:v1')!).value.maps.structural)).toEqual(originalFrame);
+ await canvas.getByRole('button',{name:'Focus question',exact:true}).click();await page.getByRole('button',{name:'Save question'}).click();await expect(page.getByText('1 saved question · 0 answers')).toBeVisible();
  const saved=(await api('/api/reviews/pr-20')) as unknown as Review;expect(saved.questions[0]?.anchor).toMatchObject({snapshotId:persisted.snapshot.snapshotId,path:'docs/product/review-loop/runtime.md',startLine:35,endLine:57});expect(saved.attempts).toHaveLength(0);
  const invalid=await api('/api/commands',{type:'AskQuestion',commandId:'unsupported-graph-anchor',reviewId:'pr-20',text:'forged',anchor:{snapshotId:persisted.snapshot.snapshotId,path:'missing.ts',side:'head',startLine:1,endLine:1}});expect(invalid.state).toBe('rejected');expect(invalid.error).toBe('invalid_anchor');
  const unauth=await fetch(`${gatewayUrl}/api/reviews/pr-20`);expect(unauth.status).toBe(200);
- await page.getByRole('link',{name:'Return to change map'}).click();await expect(page.getByRole('heading',{name:'Change map',exact:true})).toBeFocused();
- await expect(page.getByRole('navigation',{name:'Changed files'}).getByRole('button')).toHaveCount(3);
- await page.getByRole('checkbox',{name:'Show selected file’s changed spans'}).check();await expect(page.locator('.react-flow__node').filter({hasText:'After lines'}).first()).toBeVisible();
+ await canvas.getByRole('button',{name:'Focus After',exact:true}).click();await expect(canvas.getByRole('region',{name:'After source',exact:true})).toBeVisible();await expect(canvas.getByLabel('Inspected source identity')).toHaveText(originalInspection!);await expect.poll(()=>page.evaluate(()=>JSON.parse(sessionStorage.getItem('pr-reviewer:private-view:v1')!).value.maps.structural.viewport)).toEqual({x:14,y:18,zoom:1});
+ await expect(canvas.getByRole('navigation',{name:'Prepared changed files'}).getByRole('button')).toHaveCount(3);
+ await page.getByRole('checkbox',{name:'Show selected file’s changed spans'}).check();const chosenSpan=await canvas.getByRole('combobox',{name:'Changed span',exact:true}).inputValue();expect(chosenSpan).not.toBe('');await expect(canvas.getByLabel('Focused changed span')).toHaveAttribute('data-span-id',chosenSpan);await expect(canvas.getByLabel('Focused changed span')).toContainText('docs/product/review-loop/runtime.md:');
  const boxes=await page.locator('.react-flow__node').evaluateAll(nodes=>nodes.map(node=>{const rect=node.getBoundingClientRect();return {left:rect.left,right:rect.right,top:rect.top,bottom:rect.bottom};}));
  for(let i=0;i<boxes.length;i++)for(let j=i+1;j<boxes.length;j++){const a=boxes[i]!,b=boxes[j]!;expect(a.right<=b.left||b.right<=a.left||a.bottom<=b.top||b.bottom<=a.top).toBe(true);}
- await page.locator('.review-graph').screenshot({path:join(artifacts,'pr20-graph-spans.png')});
- await page.getByText(/Unresolved references and changed-path dispositions/).click();await expect(page.getByText('external destination').first()).toBeVisible();
+ await page.getByRole('region',{name:'Review canvas',exact:true}).screenshot({path:join(artifacts,'pr20-graph-spans.png')});
+ await canvas.getByText('Complete source and relationship evidence',{exact:true}).click();await expect(canvas.getByText(/external destination/).first()).toBeVisible();
  await page.screenshot({path:join(artifacts,'pr20-source-question-return.png'),fullPage:true});
 });
 
@@ -349,9 +356,9 @@ test('many changed spans retain full inventory and readable bounded selection on
  await page.getByRole('checkbox',{name:'Show selected file’s changed spans'}).check();await expect(page.getByRole('combobox',{name:'Changed span',exact:true})).toBeVisible({timeout:2000});
  const options=page.getByRole('combobox',{name:'Changed span',exact:true}).getByRole('option');expect(await options.count()).toBeGreaterThan(10);await expect(page.locator('.react-flow__node')).toHaveCount(3);
  const last=await options.last().getAttribute('value');await page.getByRole('combobox',{name:'Changed span',exact:true}).selectOption(last!);await expect(page.getByLabel('Start line')).toHaveValue('1');await expect(page.getByLabel('Your question')).toHaveValue('UNSENT bounded-span navigation probe');await expect(page.locator('.react-flow__node')).toHaveCount(3);
- const paintedSize=await page.locator('.react-flow__node strong').first().evaluate(el=>{const transform=getComputedStyle(document.querySelector('.react-flow__viewport')!).transform;return Number.parseFloat(getComputedStyle(el).fontSize)*new DOMMatrix(transform).a;});expect(paintedSize).toBeGreaterThanOrEqual(11);
+ const paintedSize=await page.locator('.canvas-card h3').first().evaluate(el=>{const transform=getComputedStyle(document.querySelector('.react-flow__viewport')!).transform;return Number.parseFloat(getComputedStyle(el).fontSize)*new DOMMatrix(transform).a;});expect(paintedSize).toBeGreaterThanOrEqual(11);
  const persisted=(await api('/api/reviews/pr-21')) as unknown as Review;expect(persisted.questions).toHaveLength(0);expect(persisted.attempts).toHaveLength(0);
- await page.locator('.review-graph').screenshot({path:join(process.env.REVIEW_E2E_ARTIFACT_DIR!,'pr21-bounded-many-spans.png')});
+ await page.getByRole('region',{name:'Review canvas',exact:true}).screenshot({path:join(process.env.REVIEW_E2E_ARTIFACT_DIR!,'pr21-bounded-many-spans.png')});
 });
 
 // These view-only probes supply every workspace read model. A fake review
@@ -366,9 +373,9 @@ const mockEmptyWorkspace=async(page:Page,reviewId:string,currentSnapshotId:strin
 };
 test('controlled deleted-source view keeps Before left and absent After right in real React',async({page})=>{
  // A view-only absence fixture, not real provider provenance or own-PR acceptance.
- const fixture:Review={reviewId:'controlled-ui-deletion',snapshot:{title:'Controlled deleted-source presentation fixture',snapshotId:'controlled-ui-deletion',repository:'fixture/not-a-provider',prUrl:'https://example.invalid/controlled-ui-deletion',prNumber:0,baseSha:'controlled-base',headSha:'controlled-head',sources:[{path:'deleted.md',side:'base',content:'Deleted source\n',hash:'fixture',lineCount:1}],changedFiles:[{status:'deleted',oldPath:'deleted.md',newPath:null,dispositions:[{side:'base',path:'deleted.md',state:'prepared',reason:'controlled UI fixture'}]}]},revision:1,attachment:null,questions:[],replies:[],inbox:[],attempts:[]};
+ const fixture:Review={reviewId:'controlled-ui-deletion',snapshot:{title:'Controlled deleted-source presentation fixture',snapshotId:'controlled-ui-deletion',repository:'fixture/not-a-provider',prUrl:'https://example.invalid/controlled-ui-deletion',prNumber:0,baseSha:'controlled-base',headSha:'controlled-head',sources:[{path:'deleted.md',side:'base',content:'Deleted source\n',hash:createHash('sha256').update('Deleted source\n').digest('hex'),lineCount:1}],changedFiles:[{status:'deleted',oldPath:'deleted.md',newPath:null,dispositions:[{side:'base',path:'deleted.md',state:'prepared',reason:'controlled UI fixture'}]}]},revision:1,attachment:null,questions:[],replies:[],inbox:[],attempts:[]};
  await mockEmptyWorkspace(page,fixture.reviewId,fixture.snapshot.snapshotId);
- await page.route('**/api/reviews/controlled-ui-deletion?**',route=>route.fulfill({json:fixture}));await page.goto(`${uiUrl.split('?')[0]}?reviewId=controlled-ui-deletion`);const panes=page.locator('.source-grid > .source-pane');await expect(panes).toHaveCount(2);await expect(panes.nth(0).getByRole('heading',{name:'Before',exact:true})).toBeVisible({timeout:2000});await expect(panes.nth(1).getByRole('heading',{name:'After',exact:true})).toBeVisible();await expect(panes.nth(0).getByText('Deleted source',{exact:true})).toBeVisible();await expect(panes.nth(1).getByText(/no prepared source/)).toBeVisible();
+ await page.route('**/api/reviews/controlled-ui-deletion?**',route=>route.fulfill({json:fixture}));await page.goto(`${uiUrl.split('?')[0]}?reviewId=controlled-ui-deletion`);const canvas=page.getByRole('region',{name:'Review canvas',exact:true});await canvas.getByRole('button',{name:'Focus source',exact:true}).click();const before=canvas.getByRole('region',{name:'Before source',exact:true}),after=canvas.getByRole('region',{name:'After source',exact:true});await expect(before.getByText('Deleted source',{exact:true})).toBeVisible();await expect(after.getByRole('status')).toContainText('Absent or unprepared');const boxes=await Promise.all([before.boundingBox(),after.boundingBox()]);expect(boxes[0]!.x).toBeLessThan(boxes[1]!.x);
 });
 
 test('02B real PR21 two heads: restart, historical MCP answer, explicit selection and immutable follow-up',async({page})=>{
@@ -380,7 +387,7 @@ test('02B real PR21 two heads: restart, historical MCP answer, explicit selectio
  // Restart before attachment/answer delivery. This is not an addressed-launch race;
  // the independent delivery fault test covers durable claimed/unknown restart.
  await stop();await start();await page.reload();await expect(page.getByText(question.text,{exact:true})).toBeVisible();
- const connection=await api('/api/connections',{host:'codex',sessionId:'controlled-history-session',connectionId:'controlled-history-connection',corroborated:true}),challenge=await api('/api/challenges',{reviewId:'pr-21',host:'codex',sessionId:'controlled-history-session',connectionId:'controlled-history-connection'});const launchRef=join(root,'history-mcp.json');writeFileSync(launchRef,JSON.stringify({gatewayUrl,bootstrapToken:connection.token,challengeId:challenge.challengeId,proof:challenge.proof,reviewId:'pr-21',host:'codex',sessionId:'controlled-history-session',connectionId:'controlled-history-connection'}),{mode:0o600});client=new Client({name:'controlled-history-browser',version:'1.0.0'});await client.connect(new StdioClientTransport({command:process.execPath,args:['--experimental-strip-types',resolve('src/mcp/main.ts')],env:{PATH:process.env.PATH??'',REVIEW_MCP_LAUNCH_REF:launchRef}}));await tool('session_attach');
+ const connection=await api('/api/connections',{host:'codex',sessionId:'controlled-history-session',connectionId:'controlled-history-connection',corroborated:true}),challenge=await api('/api/challenges',{reviewId:'pr-21',host:'codex',sessionId:'controlled-history-session',connectionId:'controlled-history-connection'});const launchRef=join(root,'history-mcp.json');writeFileSync(launchRef,JSON.stringify({gatewayUrl,bootstrapToken:connection.token,challengeId:challenge.challengeId,proof:challenge.proof,reviewId:'pr-21',host:'codex',sessionId:'controlled-history-session',connectionId:'controlled-history-connection'}),{mode:0o600});client=new Client({name:'controlled-history-browser',version:'1.0.0'}, {versionNegotiation:{mode:'legacy'}});await client.connect(new StdioClientTransport({command:process.execPath,args:['--experimental-strip-types',resolve('src/mcp/main.ts')],env:{PATH:process.env.PATH??'',REVIEW_MCP_LAUNCH_REF:launchRef}}));await tool('session_attach');
  const added=buildSnapshot({...spec,headSha:newHead}),nextSpec=join(root,'next-snapshot.json');writeFileSync(nextSpec,JSON.stringify({...spec,headSha:newHead}));const admissionEnv={...process.env,REVIEW_DATA_DIR:root,REVIEW_SOURCE_SPEC:nextSpec,REVIEW_EXPECTED_SNAPSHOT_ID:oldId,REVIEW_COMMAND_ID:'browser-history-add'};const receipt=JSON.parse(execFileSync(process.execPath,['--experimental-strip-types','scripts/add-snapshot.ts'],{env:admissionEnv,encoding:'utf8'})) as Record<string,unknown>;expect(JSON.parse(execFileSync(process.execPath,['--experimental-strip-types','scripts/add-snapshot.ts'],{env:admissionEnv,encoding:'utf8'}))).toEqual(receipt);expect(receipt.state).toBe('applied');await expect(page.getByText(/Viewing historical snapshot/)).toBeVisible();expect(await page.getByRole('combobox',{name:'Snapshot',exact:true}).inputValue()).toBe(oldId);
  await page.getByRole('combobox',{name:'Snapshot',exact:true}).selectOption(added.snapshotId);await expect(page.getByText(/Viewing current snapshot/)).toBeVisible();
  const read=await tool('question_get',{questionId:question.questionId});expect((read.snapshot as Review['snapshot']).headSha).toBe(oldHead);
@@ -395,7 +402,7 @@ test('02B real PR21 two heads: restart, historical MCP answer, explicit selectio
 test('controlled overlapping history choices preserve displayed source and intercepted Save anchor through polling',async({page})=>{
  const ids=['1','2','3'].map(value=>value.repeat(64)),requests:string[]=[];let deferred=true,captured:Record<string,unknown>|null=null;
  await mockEmptyWorkspace(page,'controlled-history',ids[2]!);
- const projection=(id:string):Review=>({reviewId:'controlled-history',snapshot:{snapshotId:id,repository:'fixture/controlled',prUrl:'https://example.invalid/controlled-history',prNumber:1,baseSha:'a'.repeat(40),headSha:id.slice(0,40),sources:[{side:'head',path:'source.md',content:`Source visible for snapshot ${id[0]}\n`,lineCount:1,hash:'0'.repeat(64)}]},snapshotSummaries:ids.map(snapshotId=>({snapshotId,baseSha:'a'.repeat(40),headSha:snapshotId.slice(0,40)})),currentSnapshotId:ids[2]!,revision:1,questions:[],replies:[],inbox:[],attempts:[],attachment:null});
+ const projection=(id:string):Review=>({reviewId:'controlled-history',snapshot:{snapshotId:id,repository:'fixture/controlled',prUrl:'https://example.invalid/controlled-history',prNumber:1,baseSha:'a'.repeat(40),headSha:id.slice(0,40),sources:[{side:'head',path:'source.md',content:`Source visible for snapshot ${id[0]}\n`,lineCount:1,hash:createHash('sha256').update(`Source visible for snapshot ${id[0]}\n`).digest('hex')}]},snapshotSummaries:ids.map(snapshotId=>({snapshotId,baseSha:'a'.repeat(40),headSha:snapshotId.slice(0,40)})),currentSnapshotId:ids[2]!,revision:1,questions:[],replies:[],inbox:[],attempts:[],attachment:null});
  await page.route('**/api/reviews/controlled-history?**',async route=>{
   const id=new URL(route.request().url()).searchParams.get('snapshotId')??ids[0]!;requests.push(id);
   if(deferred&&id!==ids[0])await delay(id===ids[1]?1600:1100);
@@ -405,8 +412,8 @@ test('controlled overlapping history choices preserve displayed source and inter
  const url=new URL(uiUrl);url.searchParams.set('reviewId','controlled-history');await page.goto(url.toString());
  await expect(page.getByLabel('Your question')).toBeEnabled();
  const select=page.getByRole('combobox',{name:'Snapshot',exact:true});await select.selectOption(ids[1]!);await expect.poll(()=>requests.includes(ids[1]!)).toBe(true);await select.selectOption(ids[2]!);const compositionHeld=await page.getByLabel('Your question').isDisabled();await expect(select).toHaveValue(ids[2]!);expect(compositionHeld).toBe(true);
- await expect(page.locator('.source-grid code')).toHaveText(['Source visible for snapshot 3']);deferred=false;const beforePoll=requests.length;await expect.poll(()=>requests.length).toBeGreaterThan(beforePoll);
- await expect(select).toHaveValue(ids[2]!);await expect(page.locator('.source-grid code')).toHaveText(['Source visible for snapshot 3']);
+ const canvas=page.getByRole('region',{name:'Review canvas',exact:true});await canvas.getByRole('button',{name:'Focus source',exact:true}).click();await expect(canvas.getByRole('region',{name:'After source',exact:true}).locator('code')).toHaveText(['Source visible for snapshot 3']);deferred=false;const beforePoll=requests.length;await expect.poll(()=>requests.length).toBeGreaterThan(beforePoll);
+ await expect(select).toHaveValue(ids[2]!);await expect(canvas.getByRole('region',{name:'After source',exact:true}).locator('code')).toHaveText(['Source visible for snapshot 3']);
  await page.getByLabel('Your question').fill('Controlled source consistency probe');await page.getByRole('button',{name:'Save question'}).click();await expect(page.getByText('controlled_probe_only',{exact:true}).last()).toBeVisible();
  expect((captured as unknown as {anchor:Anchor}).anchor.snapshotId).toBe(ids[2]);await expect(select).toHaveValue(ids[2]!);
  await page.screenshot({path:join(process.env.REVIEW_E2E_ARTIFACT_DIR!,'controlled-history-selection-race.png'),fullPage:true});

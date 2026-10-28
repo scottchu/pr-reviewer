@@ -1,0 +1,2182 @@
+{
+  "format": "task-local-change-centered-call-evidence-v1",
+  "implementation": "066828b54a14611c35f37b20f7d6b85ada780b91",
+  "commits": {
+    "base": "b096826e31c0927190806de91ed70b8b64aa93d8",
+    "head": "e3b270e5f49a9215452b0b86702946043e979059"
+  },
+  "scope": {
+    "paths": [
+      "src/application/review.ts",
+      "src/application/local-access.ts",
+      "src/application/analysis.ts",
+      "src/application/imports.ts",
+      "src/application/story.ts"
+    ],
+    "inventory": "selected-context",
+    "wholePRCoverage": false,
+    "budgets": {
+      "inventoryPathsPerSide": 4096,
+      "inventoryBytes": 2097152,
+      "filesPerSide": 128,
+      "fileBytes": 262144,
+      "totalBytes": 4194304,
+      "seeds": 64,
+      "astNodes": 200000,
+      "invocationSites": 10000,
+      "outputNodes": 2000,
+      "outputSites": 4000,
+      "aliasPatterns": 32,
+      "aliasTargets": 4,
+      "reExportLinks": 32
+    }
+  },
+  "analyzer": "source-neighborhood-v1.0.1",
+  "parser": "typescript@6.0.3",
+  "analysisId": "ea828fdf06ad24d52e764b6db7ac0013e27a9a01cab1bda7c7a839a044cc18cd",
+  "corpusDigest": "ea3788ce5b4a5839e13f4104fa5649486976a5eb06eac5cc6339c1afc25ca919",
+  "observed": {
+    "bytes": 178628,
+    "inventoryBytes": 2727,
+    "astNodes": 39329,
+    "invocationSites": 1939
+  },
+  "coverage": [
+    {
+      "side": "base",
+      "path": "src/application/analysis.ts",
+      "role": "changed",
+      "selected": true,
+      "prepared": true,
+      "status": "scanned",
+      "parseStatus": "parsed",
+      "examined": 211,
+      "resolved": 63,
+      "unresolved": 148
+    },
+    {
+      "side": "base",
+      "path": "src/application/imports.ts",
+      "role": "changed",
+      "selected": true,
+      "prepared": true,
+      "status": "scanned",
+      "parseStatus": "parsed",
+      "examined": 90,
+      "resolved": 29,
+      "unresolved": 61
+    },
+    {
+      "side": "base",
+      "path": "src/application/local-access.ts",
+      "role": "changed",
+      "selected": true,
+      "prepared": false,
+      "status": "missing",
+      "parseStatus": "not_parsed",
+      "examined": null,
+      "resolved": null,
+      "unresolved": null,
+      "reason": "missing"
+    },
+    {
+      "side": "base",
+      "path": "src/application/review.ts",
+      "role": "changed",
+      "selected": true,
+      "prepared": true,
+      "status": "scanned",
+      "parseStatus": "parsed",
+      "examined": 181,
+      "resolved": 47,
+      "unresolved": 134
+    },
+    {
+      "side": "base",
+      "path": "src/application/story.ts",
+      "role": "changed",
+      "selected": true,
+      "prepared": true,
+      "status": "scanned",
+      "parseStatus": "parsed",
+      "examined": 485,
+      "resolved": 162,
+      "unresolved": 323
+    },
+    {
+      "side": "head",
+      "path": "src/application/analysis.ts",
+      "role": "changed",
+      "selected": true,
+      "prepared": true,
+      "status": "scanned",
+      "parseStatus": "parsed",
+      "examined": 212,
+      "resolved": 63,
+      "unresolved": 149
+    },
+    {
+      "side": "head",
+      "path": "src/application/imports.ts",
+      "role": "changed",
+      "selected": true,
+      "prepared": true,
+      "status": "scanned",
+      "parseStatus": "parsed",
+      "examined": 92,
+      "resolved": 29,
+      "unresolved": 63
+    },
+    {
+      "side": "head",
+      "path": "src/application/local-access.ts",
+      "role": "changed",
+      "selected": true,
+      "prepared": true,
+      "status": "scanned",
+      "parseStatus": "parsed",
+      "examined": 0,
+      "resolved": 0,
+      "unresolved": 0
+    },
+    {
+      "side": "head",
+      "path": "src/application/review.ts",
+      "role": "changed",
+      "selected": true,
+      "prepared": true,
+      "status": "scanned",
+      "parseStatus": "parsed",
+      "examined": 182,
+      "resolved": 47,
+      "unresolved": 135
+    },
+    {
+      "side": "head",
+      "path": "src/application/story.ts",
+      "role": "changed",
+      "selected": true,
+      "prepared": true,
+      "status": "scanned",
+      "parseStatus": "parsed",
+      "examined": 486,
+      "resolved": 162,
+      "unresolved": 324
+    }
+  ],
+  "diagnostics": {
+    "count": 1061,
+    "byCode": {
+      "2304": 667,
+      "2307": 34,
+      "2318": 6,
+      "2339": 50,
+      "2571": 2,
+      "2583": 48,
+      "2697": 42,
+      "7006": 174,
+      "7031": 4,
+      "18046": 34
+    },
+    "limits": "Missing globals and deliberately omitted modules remain; these diagnostics are not compile failures of the project.",
+    "relevant": [
+      {
+        "side": "base",
+        "path": "src/application/review.ts",
+        "start": 1100,
+        "code": "2304",
+        "message": "Cannot find name 'AbortController'."
+      },
+      {
+        "side": "base",
+        "path": "src/application/review.ts",
+        "start": 1311,
+        "code": "2304",
+        "message": "Cannot find name 'AbortController'."
+      },
+      {
+        "side": "base",
+        "path": "src/application/review.ts",
+        "start": 2924,
+        "code": "2304",
+        "message": "Cannot find name 'AbortSignal'."
+      },
+      {
+        "side": "base",
+        "path": "src/application/review.ts",
+        "start": 2980,
+        "code": "2304",
+        "message": "Cannot find name 'AbortController'."
+      },
+      {
+        "side": "base",
+        "path": "src/application/review.ts",
+        "start": 3089,
+        "code": "2304",
+        "message": "Cannot find name 'AbortSignal'."
+      },
+      {
+        "side": "base",
+        "path": "src/application/review.ts",
+        "start": 3204,
+        "code": "2304",
+        "message": "Cannot find name 'Error'."
+      },
+      {
+        "side": "base",
+        "path": "src/application/review.ts",
+        "start": 3259,
+        "code": "2304",
+        "message": "Cannot find name 'fetch'."
+      },
+      {
+        "side": "base",
+        "path": "src/application/review.ts",
+        "start": 3422,
+        "code": "2304",
+        "message": "Cannot find name 'JSON'."
+      },
+      {
+        "side": "base",
+        "path": "src/application/review.ts",
+        "start": 3571,
+        "code": "2304",
+        "message": "Cannot find name 'Error'."
+      },
+      {
+        "side": "base",
+        "path": "src/application/review.ts",
+        "start": 3627,
+        "code": "2304",
+        "message": "Cannot find name 'Error'."
+      },
+      {
+        "side": "base",
+        "path": "src/application/review.ts",
+        "start": 3633,
+        "code": "2304",
+        "message": "Cannot find name 'String'."
+      },
+      {
+        "side": "head",
+        "path": "src/application/local-access.ts",
+        "start": 175,
+        "code": "2304",
+        "message": "Cannot find name 'Record'."
+      },
+      {
+        "side": "head",
+        "path": "src/application/review.ts",
+        "start": 1167,
+        "code": "2304",
+        "message": "Cannot find name 'AbortController'."
+      },
+      {
+        "side": "head",
+        "path": "src/application/review.ts",
+        "start": 1378,
+        "code": "2304",
+        "message": "Cannot find name 'AbortController'."
+      },
+      {
+        "side": "head",
+        "path": "src/application/review.ts",
+        "start": 3020,
+        "code": "2304",
+        "message": "Cannot find name 'AbortSignal'."
+      },
+      {
+        "side": "head",
+        "path": "src/application/review.ts",
+        "start": 3076,
+        "code": "2304",
+        "message": "Cannot find name 'AbortController'."
+      },
+      {
+        "side": "head",
+        "path": "src/application/review.ts",
+        "start": 3185,
+        "code": "2304",
+        "message": "Cannot find name 'AbortSignal'."
+      },
+      {
+        "side": "head",
+        "path": "src/application/review.ts",
+        "start": 3300,
+        "code": "2304",
+        "message": "Cannot find name 'Error'."
+      },
+      {
+        "side": "head",
+        "path": "src/application/review.ts",
+        "start": 3355,
+        "code": "2304",
+        "message": "Cannot find name 'fetch'."
+      },
+      {
+        "side": "head",
+        "path": "src/application/review.ts",
+        "start": 3510,
+        "code": "2304",
+        "message": "Cannot find name 'JSON'."
+      },
+      {
+        "side": "head",
+        "path": "src/application/review.ts",
+        "start": 3659,
+        "code": "2304",
+        "message": "Cannot find name 'Error'."
+      },
+      {
+        "side": "head",
+        "path": "src/application/review.ts",
+        "start": 3715,
+        "code": "2304",
+        "message": "Cannot find name 'Error'."
+      },
+      {
+        "side": "head",
+        "path": "src/application/review.ts",
+        "start": 3721,
+        "code": "2304",
+        "message": "Cannot find name 'String'."
+      }
+    ]
+  },
+  "seeds": [
+    {
+      "id": "083d938782f0e018df80fce707b355488710e75876f88bd92e398ca852879046",
+      "name": "request",
+      "kind": "const-arrow",
+      "declaration": {
+        "snapshotId": "pr25-pinned-call-evidence",
+        "side": "base",
+        "path": "src/application/review.ts",
+        "contentHash": "7953f0b8486ae475717bdc749e23a31f12351f41c11a473280de9a2420265477",
+        "start": 2860,
+        "end": 3771,
+        "startLine": 24,
+        "endLine": 32
+      },
+      "body": {
+        "snapshotId": "pr25-pinned-call-evidence",
+        "side": "base",
+        "path": "src/application/review.ts",
+        "contentHash": "7953f0b8486ae475717bdc749e23a31f12351f41c11a473280de9a2420265477",
+        "start": 2938,
+        "end": 3771,
+        "startLine": 24,
+        "endLine": 32
+      },
+      "role": "changed"
+    },
+    {
+      "id": "a7c2131f067aee1cd64b01c90418ffa0da3b0f5469984249d91fa611723893f6",
+      "name": "accessHeaders",
+      "kind": "const-arrow",
+      "declaration": {
+        "snapshotId": "pr25-pinned-call-evidence",
+        "side": "head",
+        "path": "src/application/local-access.ts",
+        "contentHash": "811735e3599292c54af870134345249deed32f1d9b9705f8ca18fd086225d59d",
+        "start": 144,
+        "end": 264,
+        "startLine": 3,
+        "endLine": 3
+      },
+      "body": {
+        "snapshotId": "pr25-pinned-call-evidence",
+        "side": "head",
+        "path": "src/application/local-access.ts",
+        "contentHash": "811735e3599292c54af870134345249deed32f1d9b9705f8ca18fd086225d59d",
+        "start": 198,
+        "end": 264,
+        "startLine": 3,
+        "endLine": 3
+      },
+      "role": "changed"
+    },
+    {
+      "id": "2e55daf0e1c5086b0eb7e2390e38003b26bb3cf463f5ae835837f3e95eb43368",
+      "name": "request",
+      "kind": "const-arrow",
+      "declaration": {
+        "snapshotId": "pr25-pinned-call-evidence",
+        "side": "head",
+        "path": "src/application/review.ts",
+        "contentHash": "dae210c79cb019d6edfdbfacfcf3da1e5773ceb4d15cf747df15ffa498c28e4e",
+        "start": 2956,
+        "end": 3859,
+        "startLine": 25,
+        "endLine": 33
+      },
+      "body": {
+        "snapshotId": "pr25-pinned-call-evidence",
+        "side": "head",
+        "path": "src/application/review.ts",
+        "contentHash": "dae210c79cb019d6edfdbfacfcf3da1e5773ceb4d15cf747df15ffa498c28e4e",
+        "start": 3034,
+        "end": 3859,
+        "startLine": 25,
+        "endLine": 33
+      },
+      "role": "changed"
+    }
+  ],
+  "contextDeclarations": [
+    {
+      "id": "a20856fb11d475904819c271121db3847354140d979958c77b2763c8ec2f8180",
+      "name": "refresh",
+      "kind": "const-arrow",
+      "declaration": {
+        "snapshotId": "pr25-pinned-call-evidence",
+        "side": "base",
+        "path": "src/application/review.ts",
+        "contentHash": "7953f0b8486ae475717bdc749e23a31f12351f41c11a473280de9a2420265477",
+        "start": 3944,
+        "end": 5384,
+        "startLine": 34,
+        "endLine": 44
+      },
+      "body": {
+        "snapshotId": "pr25-pinned-call-evidence",
+        "side": "base",
+        "path": "src/application/review.ts",
+        "contentHash": "7953f0b8486ae475717bdc749e23a31f12351f41c11a473280de9a2420265477",
+        "start": 3978,
+        "end": 5384,
+        "startLine": 34,
+        "endLine": 44
+      },
+      "role": "changed",
+      "exactBodySHA256": "5dedaff001ad7d36cd09747c513402d9fb5c18d23d950243c4365347affc7550",
+      "sourceText": "{\n  const expected=generation,captured=token;inflight?.abort();const controller=new AbortController();inflight=controller;\n  try{\n   const review=await request(captured,`/api/reviews/${encodeURIComponent(reviewId)}?minimumRevision=${minimumRevision}${selectedSnapshotId?`&snapshotId=${encodeURIComponent(selectedSnapshotId)}`:''}`,undefined,controller.signal) as Review;\n   if(owns(expected,captured)&&!controller.signal.aborted){if(review.reviewId!==reviewId||selectedSnapshotId&&review.snapshot.snapshotId!==selectedSnapshotId)throw new Error('selection_mismatch');selectedSnapshotId??=review.snapshot.snapshotId;\n    const source=review.snapshot.sources.find(source=>source.side==='head'&&source.lineCount>0)??review.snapshot.sources.find(source=>source.lineCount>0);\n    publish({...state,review,sources:state.review?.snapshot.snapshotId===review.snapshot.snapshotId?state.sources:sourceViews(review.snapshot),graph:state.review?.snapshot.snapshotId===review.snapshot.snapshotId?state.graph:projectGraph(review.snapshot),error:'',initialSelection:source?{snapshotId:review.snapshot.snapshotId,side:source.side,path:source.path,startLine:1,endLine:1}:null,authenticated:true});return review;\n   }\n  }catch(error){if(owns(expected,captured)&&!controller.signal.aborted)publish({...state,error:error instanceof Error?error.message:'request_failed'});}\n  finally{if(inflight===controller)inflight=null;}\n }"
+    },
+    {
+      "id": "9ee077ffe9012fff58ab69d946edf1e60dbf36df40f006f46893f6d614493453",
+      "name": "refresh",
+      "kind": "const-arrow",
+      "declaration": {
+        "snapshotId": "pr25-pinned-call-evidence",
+        "side": "head",
+        "path": "src/application/review.ts",
+        "contentHash": "dae210c79cb019d6edfdbfacfcf3da1e5773ceb4d15cf747df15ffa498c28e4e",
+        "start": 4032,
+        "end": 5472,
+        "startLine": 35,
+        "endLine": 45
+      },
+      "body": {
+        "snapshotId": "pr25-pinned-call-evidence",
+        "side": "head",
+        "path": "src/application/review.ts",
+        "contentHash": "dae210c79cb019d6edfdbfacfcf3da1e5773ceb4d15cf747df15ffa498c28e4e",
+        "start": 4066,
+        "end": 5472,
+        "startLine": 35,
+        "endLine": 45
+      },
+      "role": "changed",
+      "exactBodySHA256": "5dedaff001ad7d36cd09747c513402d9fb5c18d23d950243c4365347affc7550",
+      "sourceText": "{\n  const expected=generation,captured=token;inflight?.abort();const controller=new AbortController();inflight=controller;\n  try{\n   const review=await request(captured,`/api/reviews/${encodeURIComponent(reviewId)}?minimumRevision=${minimumRevision}${selectedSnapshotId?`&snapshotId=${encodeURIComponent(selectedSnapshotId)}`:''}`,undefined,controller.signal) as Review;\n   if(owns(expected,captured)&&!controller.signal.aborted){if(review.reviewId!==reviewId||selectedSnapshotId&&review.snapshot.snapshotId!==selectedSnapshotId)throw new Error('selection_mismatch');selectedSnapshotId??=review.snapshot.snapshotId;\n    const source=review.snapshot.sources.find(source=>source.side==='head'&&source.lineCount>0)??review.snapshot.sources.find(source=>source.lineCount>0);\n    publish({...state,review,sources:state.review?.snapshot.snapshotId===review.snapshot.snapshotId?state.sources:sourceViews(review.snapshot),graph:state.review?.snapshot.snapshotId===review.snapshot.snapshotId?state.graph:projectGraph(review.snapshot),error:'',initialSelection:source?{snapshotId:review.snapshot.snapshotId,side:source.side,path:source.path,startLine:1,endLine:1}:null,authenticated:true});return review;\n   }\n  }catch(error){if(owns(expected,captured)&&!controller.signal.aborted)publish({...state,error:error instanceof Error?error.message:'request_failed'});}\n  finally{if(inflight===controller)inflight=null;}\n }"
+    }
+  ],
+  "nodes": [
+    {
+      "id": "083d938782f0e018df80fce707b355488710e75876f88bd92e398ca852879046",
+      "name": "request",
+      "kind": "const-arrow",
+      "declaration": {
+        "snapshotId": "pr25-pinned-call-evidence",
+        "side": "base",
+        "path": "src/application/review.ts",
+        "contentHash": "7953f0b8486ae475717bdc749e23a31f12351f41c11a473280de9a2420265477",
+        "start": 2860,
+        "end": 3771,
+        "startLine": 24,
+        "endLine": 32
+      },
+      "body": {
+        "snapshotId": "pr25-pinned-call-evidence",
+        "side": "base",
+        "path": "src/application/review.ts",
+        "contentHash": "7953f0b8486ae475717bdc749e23a31f12351f41c11a473280de9a2420265477",
+        "start": 2938,
+        "end": 3771,
+        "startLine": 24,
+        "endLine": 32
+      },
+      "role": "changed"
+    },
+    {
+      "id": "a20856fb11d475904819c271121db3847354140d979958c77b2763c8ec2f8180",
+      "name": "refresh",
+      "kind": "const-arrow",
+      "declaration": {
+        "snapshotId": "pr25-pinned-call-evidence",
+        "side": "base",
+        "path": "src/application/review.ts",
+        "contentHash": "7953f0b8486ae475717bdc749e23a31f12351f41c11a473280de9a2420265477",
+        "start": 3944,
+        "end": 5384,
+        "startLine": 34,
+        "endLine": 44
+      },
+      "body": {
+        "snapshotId": "pr25-pinned-call-evidence",
+        "side": "base",
+        "path": "src/application/review.ts",
+        "contentHash": "7953f0b8486ae475717bdc749e23a31f12351f41c11a473280de9a2420265477",
+        "start": 3978,
+        "end": 5384,
+        "startLine": 34,
+        "endLine": 44
+      },
+      "role": "changed"
+    },
+    {
+      "id": "4f271e3ee4ca171c98db3b1d063150cf869dc41af5cb13e33561fe44c7b3d97c",
+      "name": "hydrateRecovery",
+      "kind": "const-arrow",
+      "declaration": {
+        "snapshotId": "pr25-pinned-call-evidence",
+        "side": "base",
+        "path": "src/application/review.ts",
+        "contentHash": "7953f0b8486ae475717bdc749e23a31f12351f41c11a473280de9a2420265477",
+        "start": 5393,
+        "end": 6462,
+        "startLine": 45,
+        "endLine": 56
+      },
+      "body": {
+        "snapshotId": "pr25-pinned-call-evidence",
+        "side": "base",
+        "path": "src/application/review.ts",
+        "contentHash": "7953f0b8486ae475717bdc749e23a31f12351f41c11a473280de9a2420265477",
+        "start": 5449,
+        "end": 6462,
+        "startLine": 45,
+        "endLine": 56
+      },
+      "role": "changed"
+    },
+    {
+      "id": "7faee740e7ffe667aaea7bf81438370115c91650852552fdb3441114b72cddb7",
+      "name": "reconcile",
+      "kind": "const-arrow",
+      "declaration": {
+        "snapshotId": "pr25-pinned-call-evidence",
+        "side": "base",
+        "path": "src/application/review.ts",
+        "contentHash": "7953f0b8486ae475717bdc749e23a31f12351f41c11a473280de9a2420265477",
+        "start": 7031,
+        "end": 9442,
+        "startLine": 61,
+        "endLine": 87
+      },
+      "body": {
+        "snapshotId": "pr25-pinned-call-evidence",
+        "side": "base",
+        "path": "src/application/review.ts",
+        "contentHash": "7953f0b8486ae475717bdc749e23a31f12351f41c11a473280de9a2420265477",
+        "start": 7114,
+        "end": 9442,
+        "startLine": 61,
+        "endLine": 87
+      },
+      "role": "changed"
+    },
+    {
+      "id": "f564a7aa61fa869b026ae950ef1efc63afc6c17e73c62e10e2c1112122bd1ecf",
+      "name": "<callback@11440>",
+      "kind": "callback",
+      "declaration": {
+        "snapshotId": "pr25-pinned-call-evidence",
+        "side": "base",
+        "path": "src/application/review.ts",
+        "contentHash": "7953f0b8486ae475717bdc749e23a31f12351f41c11a473280de9a2420265477",
+        "start": 11440,
+        "end": 11987,
+        "startLine": 100,
+        "endLine": 100
+      },
+      "body": {
+        "snapshotId": "pr25-pinned-call-evidence",
+        "side": "base",
+        "path": "src/application/review.ts",
+        "contentHash": "7953f0b8486ae475717bdc749e23a31f12351f41c11a473280de9a2420265477",
+        "start": 11504,
+        "end": 11987,
+        "startLine": 100,
+        "endLine": 100
+      },
+      "role": "changed"
+    },
+    {
+      "id": "0b2d05161a2dc2e65e674e8162f100c89b442f4e3222a33a831b354dddf59443",
+      "name": "<callback@14815>",
+      "kind": "callback",
+      "declaration": {
+        "snapshotId": "pr25-pinned-call-evidence",
+        "side": "base",
+        "path": "src/application/review.ts",
+        "contentHash": "7953f0b8486ae475717bdc749e23a31f12351f41c11a473280de9a2420265477",
+        "start": 14815,
+        "end": 15086,
+        "startLine": 117,
+        "endLine": 117
+      },
+      "body": {
+        "snapshotId": "pr25-pinned-call-evidence",
+        "side": "base",
+        "path": "src/application/review.ts",
+        "contentHash": "7953f0b8486ae475717bdc749e23a31f12351f41c11a473280de9a2420265477",
+        "start": 14824,
+        "end": 15086,
+        "startLine": 117,
+        "endLine": 117
+      },
+      "role": "changed"
+    },
+    {
+      "id": "ba101649b449d03e523f4b35cc1178e48806c62f8660979499896c7bc02bb99f",
+      "name": "request",
+      "kind": "const-arrow",
+      "declaration": {
+        "snapshotId": "pr25-pinned-call-evidence",
+        "side": "head",
+        "path": "src/application/analysis.ts",
+        "contentHash": "52ba83af9ba583a0300ebcd4037111e71ad54c640e766db5f847085c9dbc7512",
+        "start": 6100,
+        "end": 6588,
+        "startLine": 49,
+        "endLine": 54
+      },
+      "body": {
+        "snapshotId": "pr25-pinned-call-evidence",
+        "side": "head",
+        "path": "src/application/analysis.ts",
+        "contentHash": "52ba83af9ba583a0300ebcd4037111e71ad54c640e766db5f847085c9dbc7512",
+        "start": 6170,
+        "end": 6588,
+        "startLine": 49,
+        "endLine": 54
+      },
+      "role": "changed"
+    },
+    {
+      "id": "81b6354dfc7fff007cfdffe4f39c85abf3834a64a4091c27422a932a160a6903",
+      "name": "request",
+      "kind": "const-arrow",
+      "declaration": {
+        "snapshotId": "pr25-pinned-call-evidence",
+        "side": "head",
+        "path": "src/application/imports.ts",
+        "contentHash": "83ffd185ba98079b9e46fefd542774cfe33d403c91d897c2efcea13b1ca716da",
+        "start": 1392,
+        "end": 1905,
+        "startLine": 22,
+        "endLine": 30
+      },
+      "body": {
+        "snapshotId": "pr25-pinned-call-evidence",
+        "side": "head",
+        "path": "src/application/imports.ts",
+        "contentHash": "83ffd185ba98079b9e46fefd542774cfe33d403c91d897c2efcea13b1ca716da",
+        "start": 1469,
+        "end": 1905,
+        "startLine": 22,
+        "endLine": 30
+      },
+      "role": "changed"
+    },
+    {
+      "id": "a7c2131f067aee1cd64b01c90418ffa0da3b0f5469984249d91fa611723893f6",
+      "name": "accessHeaders",
+      "kind": "const-arrow",
+      "declaration": {
+        "snapshotId": "pr25-pinned-call-evidence",
+        "side": "head",
+        "path": "src/application/local-access.ts",
+        "contentHash": "811735e3599292c54af870134345249deed32f1d9b9705f8ca18fd086225d59d",
+        "start": 144,
+        "end": 264,
+        "startLine": 3,
+        "endLine": 3
+      },
+      "body": {
+        "snapshotId": "pr25-pinned-call-evidence",
+        "side": "head",
+        "path": "src/application/local-access.ts",
+        "contentHash": "811735e3599292c54af870134345249deed32f1d9b9705f8ca18fd086225d59d",
+        "start": 198,
+        "end": 264,
+        "startLine": 3,
+        "endLine": 3
+      },
+      "role": "changed"
+    },
+    {
+      "id": "2e55daf0e1c5086b0eb7e2390e38003b26bb3cf463f5ae835837f3e95eb43368",
+      "name": "request",
+      "kind": "const-arrow",
+      "declaration": {
+        "snapshotId": "pr25-pinned-call-evidence",
+        "side": "head",
+        "path": "src/application/review.ts",
+        "contentHash": "dae210c79cb019d6edfdbfacfcf3da1e5773ceb4d15cf747df15ffa498c28e4e",
+        "start": 2956,
+        "end": 3859,
+        "startLine": 25,
+        "endLine": 33
+      },
+      "body": {
+        "snapshotId": "pr25-pinned-call-evidence",
+        "side": "head",
+        "path": "src/application/review.ts",
+        "contentHash": "dae210c79cb019d6edfdbfacfcf3da1e5773ceb4d15cf747df15ffa498c28e4e",
+        "start": 3034,
+        "end": 3859,
+        "startLine": 25,
+        "endLine": 33
+      },
+      "role": "changed"
+    },
+    {
+      "id": "9ee077ffe9012fff58ab69d946edf1e60dbf36df40f006f46893f6d614493453",
+      "name": "refresh",
+      "kind": "const-arrow",
+      "declaration": {
+        "snapshotId": "pr25-pinned-call-evidence",
+        "side": "head",
+        "path": "src/application/review.ts",
+        "contentHash": "dae210c79cb019d6edfdbfacfcf3da1e5773ceb4d15cf747df15ffa498c28e4e",
+        "start": 4032,
+        "end": 5472,
+        "startLine": 35,
+        "endLine": 45
+      },
+      "body": {
+        "snapshotId": "pr25-pinned-call-evidence",
+        "side": "head",
+        "path": "src/application/review.ts",
+        "contentHash": "dae210c79cb019d6edfdbfacfcf3da1e5773ceb4d15cf747df15ffa498c28e4e",
+        "start": 4066,
+        "end": 5472,
+        "startLine": 35,
+        "endLine": 45
+      },
+      "role": "changed"
+    },
+    {
+      "id": "204e9b8151e06c98ec53f2ee52e604966b009fadb166d7b392bff6c7b143026c",
+      "name": "hydrateRecovery",
+      "kind": "const-arrow",
+      "declaration": {
+        "snapshotId": "pr25-pinned-call-evidence",
+        "side": "head",
+        "path": "src/application/review.ts",
+        "contentHash": "dae210c79cb019d6edfdbfacfcf3da1e5773ceb4d15cf747df15ffa498c28e4e",
+        "start": 5481,
+        "end": 6550,
+        "startLine": 46,
+        "endLine": 57
+      },
+      "body": {
+        "snapshotId": "pr25-pinned-call-evidence",
+        "side": "head",
+        "path": "src/application/review.ts",
+        "contentHash": "dae210c79cb019d6edfdbfacfcf3da1e5773ceb4d15cf747df15ffa498c28e4e",
+        "start": 5537,
+        "end": 6550,
+        "startLine": 46,
+        "endLine": 57
+      },
+      "role": "changed"
+    },
+    {
+      "id": "60f5cab63d4f54955a40cbbc010785fd53c73011678985a003c0f7611feaa001",
+      "name": "reconcile",
+      "kind": "const-arrow",
+      "declaration": {
+        "snapshotId": "pr25-pinned-call-evidence",
+        "side": "head",
+        "path": "src/application/review.ts",
+        "contentHash": "dae210c79cb019d6edfdbfacfcf3da1e5773ceb4d15cf747df15ffa498c28e4e",
+        "start": 7119,
+        "end": 9530,
+        "startLine": 62,
+        "endLine": 88
+      },
+      "body": {
+        "snapshotId": "pr25-pinned-call-evidence",
+        "side": "head",
+        "path": "src/application/review.ts",
+        "contentHash": "dae210c79cb019d6edfdbfacfcf3da1e5773ceb4d15cf747df15ffa498c28e4e",
+        "start": 7202,
+        "end": 9530,
+        "startLine": 62,
+        "endLine": 88
+      },
+      "role": "changed"
+    },
+    {
+      "id": "e53a0e1e550c70319e0631dc972ac9cd3de731a2f2fe7f12f5c9c128a3678420",
+      "name": "<callback@11542>",
+      "kind": "callback",
+      "declaration": {
+        "snapshotId": "pr25-pinned-call-evidence",
+        "side": "head",
+        "path": "src/application/review.ts",
+        "contentHash": "dae210c79cb019d6edfdbfacfcf3da1e5773ceb4d15cf747df15ffa498c28e4e",
+        "start": 11542,
+        "end": 12089,
+        "startLine": 101,
+        "endLine": 101
+      },
+      "body": {
+        "snapshotId": "pr25-pinned-call-evidence",
+        "side": "head",
+        "path": "src/application/review.ts",
+        "contentHash": "dae210c79cb019d6edfdbfacfcf3da1e5773ceb4d15cf747df15ffa498c28e4e",
+        "start": 11606,
+        "end": 12089,
+        "startLine": 101,
+        "endLine": 101
+      },
+      "role": "changed"
+    },
+    {
+      "id": "6ec7df3cad91eb8a4b9f24ef980cf0487ef73c648951d2a416b55c74b2a53cd5",
+      "name": "<callback@14917>",
+      "kind": "callback",
+      "declaration": {
+        "snapshotId": "pr25-pinned-call-evidence",
+        "side": "head",
+        "path": "src/application/review.ts",
+        "contentHash": "dae210c79cb019d6edfdbfacfcf3da1e5773ceb4d15cf747df15ffa498c28e4e",
+        "start": 14917,
+        "end": 15188,
+        "startLine": 118,
+        "endLine": 118
+      },
+      "body": {
+        "snapshotId": "pr25-pinned-call-evidence",
+        "side": "head",
+        "path": "src/application/review.ts",
+        "contentHash": "dae210c79cb019d6edfdbfacfcf3da1e5773ceb4d15cf747df15ffa498c28e4e",
+        "start": 14926,
+        "end": 15188,
+        "startLine": 118,
+        "endLine": 118
+      },
+      "role": "changed"
+    },
+    {
+      "id": "d073fe36c5371585ebfa1d14fe245229693cb8cdeadb8618c20d8cacb331b405",
+      "name": "request",
+      "kind": "const-arrow",
+      "declaration": {
+        "snapshotId": "pr25-pinned-call-evidence",
+        "side": "head",
+        "path": "src/application/story.ts",
+        "contentHash": "1fdf81528e3e1b658123e2ae1992d5406e1a2217819b4a0e0547669d4fea5f9f",
+        "start": 24185,
+        "end": 24973,
+        "startLine": 166,
+        "endLine": 169
+      },
+      "body": {
+        "snapshotId": "pr25-pinned-call-evidence",
+        "side": "head",
+        "path": "src/application/story.ts",
+        "contentHash": "1fdf81528e3e1b658123e2ae1992d5406e1a2217819b4a0e0547669d4fea5f9f",
+        "start": 24282,
+        "end": 24973,
+        "startLine": 166,
+        "endLine": 169
+      },
+      "role": "changed"
+    }
+  ],
+  "edges": [],
+  "sourceObservedCalls": [
+    {
+      "id": "source-observed:a3ac0b81d9bd0eec1f2e429a9443527ea5458372c569ac834c240f4b62b02030",
+      "caller": "a20856fb11d475904819c271121db3847354140d979958c77b2763c8ec2f8180",
+      "callee": "083d938782f0e018df80fce707b355488710e75876f88bd92e398ca852879046",
+      "target": {
+        "snapshotId": "pr25-pinned-call-evidence",
+        "side": "base",
+        "path": "src/application/review.ts",
+        "contentHash": "7953f0b8486ae475717bdc749e23a31f12351f41c11a473280de9a2420265477",
+        "start": 2860,
+        "end": 3771,
+        "startLine": 24,
+        "endLine": 32
+      },
+      "site": {
+        "anchor": {
+          "snapshotId": "pr25-pinned-call-evidence",
+          "side": "base",
+          "path": "src/application/review.ts",
+          "contentHash": "7953f0b8486ae475717bdc749e23a31f12351f41c11a473280de9a2420265477",
+          "start": 4130,
+          "end": 4337,
+          "startLine": 37,
+          "endLine": 37
+        },
+        "sourceText": "request(captured,`/api/reviews/${encodeURIComponent(reviewId)}?minimumRevision=${minimumRevision}${selectedSnapshotId?`&snapshotId=${encodeURIComponent(selectedSnapshotId)}`:''}`,undefined,controller.signal)"
+      },
+      "lexicalBinding": {
+        "kind": "enclosing_const_declaration",
+        "anchor": {
+          "snapshotId": "pr25-pinned-call-evidence",
+          "side": "base",
+          "path": "src/application/review.ts",
+          "contentHash": "7953f0b8486ae475717bdc749e23a31f12351f41c11a473280de9a2420265477",
+          "start": 2860,
+          "end": 3771,
+          "startLine": 24,
+          "endLine": 32
+        },
+        "sourceText": "request=async(captured:string,path:string,body?:unknown,signal?:AbortSignal)=>{\n  const controller=body===undefined?new AbortController():null;if(controller)readControllers.add(controller);\n  const ownedSignal=controller?(signal?AbortSignal.any([signal,controller.signal]):controller.signal):signal;\n  try{\n   if(ownedSignal?.aborted)throw new Error('selection_superseded');\n   const response=await fetch(path,{headers:{Authorization:`Bearer ${captured}`,'Content-Type':'application/json'},...(body===undefined?{}:{method:'POST',body:typeof body==='string'?body:JSON.stringify(body)}),...(ownedSignal?{signal:ownedSignal}:{})});\n   const value=await response.json() as unknown;if(ownedSignal?.aborted)throw new Error('selection_superseded');if(!response.ok)throw new Error(String((value as {error?:string}).error??'request_failed'));return value;\n  }finally{if(controller)readControllers.delete(controller);}\n }"
+      },
+      "certainty": "source_observed_manual",
+      "method": "exact_call_expression_and_source_lexical_binding_review",
+      "analyzerDisposition": {
+        "id": "a3ac0b81d9bd0eec1f2e429a9443527ea5458372c569ac834c240f4b62b02030",
+        "reason": "semantic_obstruction"
+      }
+    },
+    {
+      "id": "source-observed:ad6c9c6b608558f1e3f321e34aa3f561721259610de0dfb0282dfacf7986dc27",
+      "caller": "4f271e3ee4ca171c98db3b1d063150cf869dc41af5cb13e33561fe44c7b3d97c",
+      "callee": "083d938782f0e018df80fce707b355488710e75876f88bd92e398ca852879046",
+      "target": {
+        "snapshotId": "pr25-pinned-call-evidence",
+        "side": "base",
+        "path": "src/application/review.ts",
+        "contentHash": "7953f0b8486ae475717bdc749e23a31f12351f41c11a473280de9a2420265477",
+        "start": 2860,
+        "end": 3771,
+        "startLine": 24,
+        "endLine": 32
+      },
+      "site": {
+        "anchor": {
+          "snapshotId": "pr25-pinned-call-evidence",
+          "side": "base",
+          "path": "src/application/review.ts",
+          "contentHash": "7953f0b8486ae475717bdc749e23a31f12351f41c11a473280de9a2420265477",
+          "start": 5890,
+          "end": 6022,
+          "startLine": 52,
+          "endLine": 52
+        },
+        "sourceText": "request(captured,`/api/reviews/${encodeURIComponent(pending.reviewId)}?snapshotId=${encodeURIComponent(command.anchor.snapshotId)}`)"
+      },
+      "lexicalBinding": {
+        "kind": "enclosing_const_declaration",
+        "anchor": {
+          "snapshotId": "pr25-pinned-call-evidence",
+          "side": "base",
+          "path": "src/application/review.ts",
+          "contentHash": "7953f0b8486ae475717bdc749e23a31f12351f41c11a473280de9a2420265477",
+          "start": 2860,
+          "end": 3771,
+          "startLine": 24,
+          "endLine": 32
+        },
+        "sourceText": "request=async(captured:string,path:string,body?:unknown,signal?:AbortSignal)=>{\n  const controller=body===undefined?new AbortController():null;if(controller)readControllers.add(controller);\n  const ownedSignal=controller?(signal?AbortSignal.any([signal,controller.signal]):controller.signal):signal;\n  try{\n   if(ownedSignal?.aborted)throw new Error('selection_superseded');\n   const response=await fetch(path,{headers:{Authorization:`Bearer ${captured}`,'Content-Type':'application/json'},...(body===undefined?{}:{method:'POST',body:typeof body==='string'?body:JSON.stringify(body)}),...(ownedSignal?{signal:ownedSignal}:{})});\n   const value=await response.json() as unknown;if(ownedSignal?.aborted)throw new Error('selection_superseded');if(!response.ok)throw new Error(String((value as {error?:string}).error??'request_failed'));return value;\n  }finally{if(controller)readControllers.delete(controller);}\n }"
+      },
+      "certainty": "source_observed_manual",
+      "method": "exact_call_expression_and_source_lexical_binding_review",
+      "analyzerDisposition": {
+        "id": "ad6c9c6b608558f1e3f321e34aa3f561721259610de0dfb0282dfacf7986dc27",
+        "reason": "semantic_obstruction"
+      }
+    },
+    {
+      "id": "source-observed:d54558adf957c589a942669d1a4c4f9454b7b000812c7823135555aaa555829e",
+      "caller": "7faee740e7ffe667aaea7bf81438370115c91650852552fdb3441114b72cddb7",
+      "callee": "083d938782f0e018df80fce707b355488710e75876f88bd92e398ca852879046",
+      "target": {
+        "snapshotId": "pr25-pinned-call-evidence",
+        "side": "base",
+        "path": "src/application/review.ts",
+        "contentHash": "7953f0b8486ae475717bdc749e23a31f12351f41c11a473280de9a2420265477",
+        "start": 2860,
+        "end": 3771,
+        "startLine": 24,
+        "endLine": 32
+      },
+      "site": {
+        "anchor": {
+          "snapshotId": "pr25-pinned-call-evidence",
+          "side": "base",
+          "path": "src/application/review.ts",
+          "contentHash": "7953f0b8486ae475717bdc749e23a31f12351f41c11a473280de9a2420265477",
+          "start": 7724,
+          "end": 7772,
+          "startLine": 69,
+          "endLine": 69
+        },
+        "sourceText": "request(captured,'/api/commands',record.request)"
+      },
+      "lexicalBinding": {
+        "kind": "enclosing_const_declaration",
+        "anchor": {
+          "snapshotId": "pr25-pinned-call-evidence",
+          "side": "base",
+          "path": "src/application/review.ts",
+          "contentHash": "7953f0b8486ae475717bdc749e23a31f12351f41c11a473280de9a2420265477",
+          "start": 2860,
+          "end": 3771,
+          "startLine": 24,
+          "endLine": 32
+        },
+        "sourceText": "request=async(captured:string,path:string,body?:unknown,signal?:AbortSignal)=>{\n  const controller=body===undefined?new AbortController():null;if(controller)readControllers.add(controller);\n  const ownedSignal=controller?(signal?AbortSignal.any([signal,controller.signal]):controller.signal):signal;\n  try{\n   if(ownedSignal?.aborted)throw new Error('selection_superseded');\n   const response=await fetch(path,{headers:{Authorization:`Bearer ${captured}`,'Content-Type':'application/json'},...(body===undefined?{}:{method:'POST',body:typeof body==='string'?body:JSON.stringify(body)}),...(ownedSignal?{signal:ownedSignal}:{})});\n   const value=await response.json() as unknown;if(ownedSignal?.aborted)throw new Error('selection_superseded');if(!response.ok)throw new Error(String((value as {error?:string}).error??'request_failed'));return value;\n  }finally{if(controller)readControllers.delete(controller);}\n }"
+      },
+      "certainty": "source_observed_manual",
+      "method": "exact_call_expression_and_source_lexical_binding_review",
+      "analyzerDisposition": {
+        "id": "d54558adf957c589a942669d1a4c4f9454b7b000812c7823135555aaa555829e",
+        "reason": "semantic_obstruction"
+      }
+    },
+    {
+      "id": "source-observed:532d5ed338216fb7ad16f6fb400d1858e7a384a87ca9e68f3eeb5dc16846c4b8",
+      "caller": "7faee740e7ffe667aaea7bf81438370115c91650852552fdb3441114b72cddb7",
+      "callee": "083d938782f0e018df80fce707b355488710e75876f88bd92e398ca852879046",
+      "target": {
+        "snapshotId": "pr25-pinned-call-evidence",
+        "side": "base",
+        "path": "src/application/review.ts",
+        "contentHash": "7953f0b8486ae475717bdc749e23a31f12351f41c11a473280de9a2420265477",
+        "start": 2860,
+        "end": 3771,
+        "startLine": 24,
+        "endLine": 32
+      },
+      "site": {
+        "anchor": {
+          "snapshotId": "pr25-pinned-call-evidence",
+          "side": "base",
+          "path": "src/application/review.ts",
+          "contentHash": "7953f0b8486ae475717bdc749e23a31f12351f41c11a473280de9a2420265477",
+          "start": 8703,
+          "end": 8870,
+          "startLine": 82,
+          "endLine": 82
+        },
+        "sourceText": "request(captured,`/api/reviews/${encodeURIComponent(record.reviewId)}?snapshotId=${encodeURIComponent(command.anchor.snapshotId)}&minimumRevision=${receipt.revision}`)"
+      },
+      "lexicalBinding": {
+        "kind": "enclosing_const_declaration",
+        "anchor": {
+          "snapshotId": "pr25-pinned-call-evidence",
+          "side": "base",
+          "path": "src/application/review.ts",
+          "contentHash": "7953f0b8486ae475717bdc749e23a31f12351f41c11a473280de9a2420265477",
+          "start": 2860,
+          "end": 3771,
+          "startLine": 24,
+          "endLine": 32
+        },
+        "sourceText": "request=async(captured:string,path:string,body?:unknown,signal?:AbortSignal)=>{\n  const controller=body===undefined?new AbortController():null;if(controller)readControllers.add(controller);\n  const ownedSignal=controller?(signal?AbortSignal.any([signal,controller.signal]):controller.signal):signal;\n  try{\n   if(ownedSignal?.aborted)throw new Error('selection_superseded');\n   const response=await fetch(path,{headers:{Authorization:`Bearer ${captured}`,'Content-Type':'application/json'},...(body===undefined?{}:{method:'POST',body:typeof body==='string'?body:JSON.stringify(body)}),...(ownedSignal?{signal:ownedSignal}:{})});\n   const value=await response.json() as unknown;if(ownedSignal?.aborted)throw new Error('selection_superseded');if(!response.ok)throw new Error(String((value as {error?:string}).error??'request_failed'));return value;\n  }finally{if(controller)readControllers.delete(controller);}\n }"
+      },
+      "certainty": "source_observed_manual",
+      "method": "exact_call_expression_and_source_lexical_binding_review",
+      "analyzerDisposition": {
+        "id": "532d5ed338216fb7ad16f6fb400d1858e7a384a87ca9e68f3eeb5dc16846c4b8",
+        "reason": "semantic_obstruction"
+      }
+    },
+    {
+      "id": "source-observed:a0abdb3e219b9a29bd70d6cc5419e2020a85b35b43f2175026738135e01471e0",
+      "caller": "f564a7aa61fa869b026ae950ef1efc63afc6c17e73c62e10e2c1112122bd1ecf",
+      "callee": "083d938782f0e018df80fce707b355488710e75876f88bd92e398ca852879046",
+      "target": {
+        "snapshotId": "pr25-pinned-call-evidence",
+        "side": "base",
+        "path": "src/application/review.ts",
+        "contentHash": "7953f0b8486ae475717bdc749e23a31f12351f41c11a473280de9a2420265477",
+        "start": 2860,
+        "end": 3771,
+        "startLine": 24,
+        "endLine": 32
+      },
+      "site": {
+        "anchor": {
+          "snapshotId": "pr25-pinned-call-evidence",
+          "side": "base",
+          "path": "src/application/review.ts",
+          "contentHash": "7953f0b8486ae475717bdc749e23a31f12351f41c11a473280de9a2420265477",
+          "start": 11632,
+          "end": 11758,
+          "startLine": 100,
+          "endLine": 100
+        },
+        "sourceText": "request(captured,`/api/reviews/${encodeURIComponent(reviewId)}?snapshotId=${encodeURIComponent(snapshotId)}`,undefined,signal)"
+      },
+      "lexicalBinding": {
+        "kind": "enclosing_const_declaration",
+        "anchor": {
+          "snapshotId": "pr25-pinned-call-evidence",
+          "side": "base",
+          "path": "src/application/review.ts",
+          "contentHash": "7953f0b8486ae475717bdc749e23a31f12351f41c11a473280de9a2420265477",
+          "start": 2860,
+          "end": 3771,
+          "startLine": 24,
+          "endLine": 32
+        },
+        "sourceText": "request=async(captured:string,path:string,body?:unknown,signal?:AbortSignal)=>{\n  const controller=body===undefined?new AbortController():null;if(controller)readControllers.add(controller);\n  const ownedSignal=controller?(signal?AbortSignal.any([signal,controller.signal]):controller.signal):signal;\n  try{\n   if(ownedSignal?.aborted)throw new Error('selection_superseded');\n   const response=await fetch(path,{headers:{Authorization:`Bearer ${captured}`,'Content-Type':'application/json'},...(body===undefined?{}:{method:'POST',body:typeof body==='string'?body:JSON.stringify(body)}),...(ownedSignal?{signal:ownedSignal}:{})});\n   const value=await response.json() as unknown;if(ownedSignal?.aborted)throw new Error('selection_superseded');if(!response.ok)throw new Error(String((value as {error?:string}).error??'request_failed'));return value;\n  }finally{if(controller)readControllers.delete(controller);}\n }"
+      },
+      "certainty": "source_observed_manual",
+      "method": "exact_call_expression_and_source_lexical_binding_review",
+      "analyzerDisposition": {
+        "id": "a0abdb3e219b9a29bd70d6cc5419e2020a85b35b43f2175026738135e01471e0",
+        "reason": "semantic_obstruction"
+      }
+    },
+    {
+      "id": "source-observed:717e14ff95ca9bfe40fe725af4ab70cf5c722f94a057ddb4236398ee6b8c9929",
+      "caller": "0b2d05161a2dc2e65e674e8162f100c89b442f4e3222a33a831b354dddf59443",
+      "callee": "083d938782f0e018df80fce707b355488710e75876f88bd92e398ca852879046",
+      "target": {
+        "snapshotId": "pr25-pinned-call-evidence",
+        "side": "base",
+        "path": "src/application/review.ts",
+        "contentHash": "7953f0b8486ae475717bdc749e23a31f12351f41c11a473280de9a2420265477",
+        "start": 2860,
+        "end": 3771,
+        "startLine": 24,
+        "endLine": 32
+      },
+      "site": {
+        "anchor": {
+          "snapshotId": "pr25-pinned-call-evidence",
+          "side": "base",
+          "path": "src/application/review.ts",
+          "contentHash": "7953f0b8486ae475717bdc749e23a31f12351f41c11a473280de9a2420265477",
+          "start": 14909,
+          "end": 15041,
+          "startLine": 117,
+          "endLine": 117
+        },
+        "sourceText": "request(token,'/api/commands',{type:'RevokeAttachment',commandId:crypto.randomUUID(),reviewId,attachmentId:attachment.attachmentId})"
+      },
+      "lexicalBinding": {
+        "kind": "enclosing_const_declaration",
+        "anchor": {
+          "snapshotId": "pr25-pinned-call-evidence",
+          "side": "base",
+          "path": "src/application/review.ts",
+          "contentHash": "7953f0b8486ae475717bdc749e23a31f12351f41c11a473280de9a2420265477",
+          "start": 2860,
+          "end": 3771,
+          "startLine": 24,
+          "endLine": 32
+        },
+        "sourceText": "request=async(captured:string,path:string,body?:unknown,signal?:AbortSignal)=>{\n  const controller=body===undefined?new AbortController():null;if(controller)readControllers.add(controller);\n  const ownedSignal=controller?(signal?AbortSignal.any([signal,controller.signal]):controller.signal):signal;\n  try{\n   if(ownedSignal?.aborted)throw new Error('selection_superseded');\n   const response=await fetch(path,{headers:{Authorization:`Bearer ${captured}`,'Content-Type':'application/json'},...(body===undefined?{}:{method:'POST',body:typeof body==='string'?body:JSON.stringify(body)}),...(ownedSignal?{signal:ownedSignal}:{})});\n   const value=await response.json() as unknown;if(ownedSignal?.aborted)throw new Error('selection_superseded');if(!response.ok)throw new Error(String((value as {error?:string}).error??'request_failed'));return value;\n  }finally{if(controller)readControllers.delete(controller);}\n }"
+      },
+      "certainty": "source_observed_manual",
+      "method": "exact_call_expression_and_source_lexical_binding_review",
+      "analyzerDisposition": {
+        "id": "717e14ff95ca9bfe40fe725af4ab70cf5c722f94a057ddb4236398ee6b8c9929",
+        "reason": "semantic_obstruction"
+      }
+    },
+    {
+      "id": "source-observed:cab45a26976632cdf77cee8667c1465c311d172052c492c2c9d720d7f7965566",
+      "caller": "ba101649b449d03e523f4b35cc1178e48806c62f8660979499896c7bc02bb99f",
+      "callee": "a7c2131f067aee1cd64b01c90418ffa0da3b0f5469984249d91fa611723893f6",
+      "target": {
+        "snapshotId": "pr25-pinned-call-evidence",
+        "side": "head",
+        "path": "src/application/local-access.ts",
+        "contentHash": "811735e3599292c54af870134345249deed32f1d9b9705f8ca18fd086225d59d",
+        "start": 144,
+        "end": 264,
+        "startLine": 3,
+        "endLine": 3
+      },
+      "site": {
+        "anchor": {
+          "snapshotId": "pr25-pinned-call-evidence",
+          "side": "head",
+          "path": "src/application/analysis.ts",
+          "contentHash": "52ba83af9ba583a0300ebcd4037111e71ad54c640e766db5f847085c9dbc7512",
+          "start": 6219,
+          "end": 6241,
+          "startLine": 50,
+          "endLine": 50
+        },
+        "sourceText": "accessHeaders(o.token)"
+      },
+      "lexicalBinding": {
+        "kind": "explicit_named_import",
+        "anchor": {
+          "snapshotId": "pr25-pinned-call-evidence",
+          "side": "head",
+          "path": "src/application/analysis.ts",
+          "contentHash": "52ba83af9ba583a0300ebcd4037111e71ad54c640e766db5f847085c9dbc7512",
+          "start": 0,
+          "end": 66,
+          "startLine": 1,
+          "endLine": 1
+        },
+        "sourceText": "import {localOwnerSession,accessHeaders} from './local-access.ts';"
+      },
+      "certainty": "source_observed_manual",
+      "method": "exact_call_expression_and_source_lexical_binding_review",
+      "analyzerDisposition": {
+        "id": "cab45a26976632cdf77cee8667c1465c311d172052c492c2c9d720d7f7965566",
+        "reason": "semantic_obstruction"
+      }
+    },
+    {
+      "id": "source-observed:e679adef7d270ac86348586e706023eaaee52ed6c555b3a36dc83c6aa7d58d83",
+      "caller": "81b6354dfc7fff007cfdffe4f39c85abf3834a64a4091c27422a932a160a6903",
+      "callee": "a7c2131f067aee1cd64b01c90418ffa0da3b0f5469984249d91fa611723893f6",
+      "target": {
+        "snapshotId": "pr25-pinned-call-evidence",
+        "side": "head",
+        "path": "src/application/local-access.ts",
+        "contentHash": "811735e3599292c54af870134345249deed32f1d9b9705f8ca18fd086225d59d",
+        "start": 144,
+        "end": 264,
+        "startLine": 3,
+        "endLine": 3
+      },
+      "site": {
+        "anchor": {
+          "snapshotId": "pr25-pinned-call-evidence",
+          "side": "head",
+          "path": "src/application/imports.ts",
+          "contentHash": "83ffd185ba98079b9e46fefd542774cfe33d403c91d897c2efcea13b1ca716da",
+          "start": 1522,
+          "end": 1551,
+          "startLine": 24,
+          "endLine": 24
+        },
+        "sourceText": "accessHeaders(expected.token)"
+      },
+      "lexicalBinding": {
+        "kind": "explicit_named_import",
+        "anchor": {
+          "snapshotId": "pr25-pinned-call-evidence",
+          "side": "head",
+          "path": "src/application/imports.ts",
+          "contentHash": "83ffd185ba98079b9e46fefd542774cfe33d403c91d897c2efcea13b1ca716da",
+          "start": 0,
+          "end": 66,
+          "startLine": 1,
+          "endLine": 1
+        },
+        "sourceText": "import {localOwnerSession,accessHeaders} from './local-access.ts';"
+      },
+      "certainty": "source_observed_manual",
+      "method": "exact_call_expression_and_source_lexical_binding_review",
+      "analyzerDisposition": {
+        "id": "e679adef7d270ac86348586e706023eaaee52ed6c555b3a36dc83c6aa7d58d83",
+        "reason": "semantic_obstruction"
+      }
+    },
+    {
+      "id": "source-observed:a85050ec78bc58582f63a7ec50f322f46655c4a1656700e919ca78f117b826f1",
+      "caller": "2e55daf0e1c5086b0eb7e2390e38003b26bb3cf463f5ae835837f3e95eb43368",
+      "callee": "a7c2131f067aee1cd64b01c90418ffa0da3b0f5469984249d91fa611723893f6",
+      "target": {
+        "snapshotId": "pr25-pinned-call-evidence",
+        "side": "head",
+        "path": "src/application/local-access.ts",
+        "contentHash": "811735e3599292c54af870134345249deed32f1d9b9705f8ca18fd086225d59d",
+        "start": 144,
+        "end": 264,
+        "startLine": 3,
+        "endLine": 3
+      },
+      "site": {
+        "anchor": {
+          "snapshotId": "pr25-pinned-call-evidence",
+          "side": "head",
+          "path": "src/application/review.ts",
+          "contentHash": "dae210c79cb019d6edfdbfacfcf3da1e5773ceb4d15cf747df15ffa498c28e4e",
+          "start": 3379,
+          "end": 3402,
+          "startLine": 30,
+          "endLine": 30
+        },
+        "sourceText": "accessHeaders(captured)"
+      },
+      "lexicalBinding": {
+        "kind": "explicit_named_import",
+        "anchor": {
+          "snapshotId": "pr25-pinned-call-evidence",
+          "side": "head",
+          "path": "src/application/review.ts",
+          "contentHash": "dae210c79cb019d6edfdbfacfcf3da1e5773ceb4d15cf747df15ffa498c28e4e",
+          "start": 0,
+          "end": 66,
+          "startLine": 1,
+          "endLine": 1
+        },
+        "sourceText": "import {localOwnerSession,accessHeaders} from './local-access.ts';"
+      },
+      "certainty": "source_observed_manual",
+      "method": "exact_call_expression_and_source_lexical_binding_review",
+      "analyzerDisposition": {
+        "id": "a85050ec78bc58582f63a7ec50f322f46655c4a1656700e919ca78f117b826f1",
+        "reason": "semantic_obstruction"
+      }
+    },
+    {
+      "id": "source-observed:1f62e2349ec4860c22f4dcdc5c5b9a65e5f31ae5b718b358d497879e9c7883c7",
+      "caller": "9ee077ffe9012fff58ab69d946edf1e60dbf36df40f006f46893f6d614493453",
+      "callee": "2e55daf0e1c5086b0eb7e2390e38003b26bb3cf463f5ae835837f3e95eb43368",
+      "target": {
+        "snapshotId": "pr25-pinned-call-evidence",
+        "side": "head",
+        "path": "src/application/review.ts",
+        "contentHash": "dae210c79cb019d6edfdbfacfcf3da1e5773ceb4d15cf747df15ffa498c28e4e",
+        "start": 2956,
+        "end": 3859,
+        "startLine": 25,
+        "endLine": 33
+      },
+      "site": {
+        "anchor": {
+          "snapshotId": "pr25-pinned-call-evidence",
+          "side": "head",
+          "path": "src/application/review.ts",
+          "contentHash": "dae210c79cb019d6edfdbfacfcf3da1e5773ceb4d15cf747df15ffa498c28e4e",
+          "start": 4218,
+          "end": 4425,
+          "startLine": 38,
+          "endLine": 38
+        },
+        "sourceText": "request(captured,`/api/reviews/${encodeURIComponent(reviewId)}?minimumRevision=${minimumRevision}${selectedSnapshotId?`&snapshotId=${encodeURIComponent(selectedSnapshotId)}`:''}`,undefined,controller.signal)"
+      },
+      "lexicalBinding": {
+        "kind": "enclosing_const_declaration",
+        "anchor": {
+          "snapshotId": "pr25-pinned-call-evidence",
+          "side": "head",
+          "path": "src/application/review.ts",
+          "contentHash": "dae210c79cb019d6edfdbfacfcf3da1e5773ceb4d15cf747df15ffa498c28e4e",
+          "start": 2956,
+          "end": 3859,
+          "startLine": 25,
+          "endLine": 33
+        },
+        "sourceText": "request=async(captured:string,path:string,body?:unknown,signal?:AbortSignal)=>{\n  const controller=body===undefined?new AbortController():null;if(controller)readControllers.add(controller);\n  const ownedSignal=controller?(signal?AbortSignal.any([signal,controller.signal]):controller.signal):signal;\n  try{\n   if(ownedSignal?.aborted)throw new Error('selection_superseded');\n   const response=await fetch(path,{headers:{...accessHeaders(captured),'Content-Type':'application/json'},...(body===undefined?{}:{method:'POST',body:typeof body==='string'?body:JSON.stringify(body)}),...(ownedSignal?{signal:ownedSignal}:{})});\n   const value=await response.json() as unknown;if(ownedSignal?.aborted)throw new Error('selection_superseded');if(!response.ok)throw new Error(String((value as {error?:string}).error??'request_failed'));return value;\n  }finally{if(controller)readControllers.delete(controller);}\n }"
+      },
+      "certainty": "source_observed_manual",
+      "method": "exact_call_expression_and_source_lexical_binding_review",
+      "analyzerDisposition": {
+        "id": "1f62e2349ec4860c22f4dcdc5c5b9a65e5f31ae5b718b358d497879e9c7883c7",
+        "reason": "semantic_obstruction"
+      }
+    },
+    {
+      "id": "source-observed:346906d08b68fa02be72e3ac14635dd5328fbd3ecdce7ca8c87c20ce3bd5f391",
+      "caller": "204e9b8151e06c98ec53f2ee52e604966b009fadb166d7b392bff6c7b143026c",
+      "callee": "2e55daf0e1c5086b0eb7e2390e38003b26bb3cf463f5ae835837f3e95eb43368",
+      "target": {
+        "snapshotId": "pr25-pinned-call-evidence",
+        "side": "head",
+        "path": "src/application/review.ts",
+        "contentHash": "dae210c79cb019d6edfdbfacfcf3da1e5773ceb4d15cf747df15ffa498c28e4e",
+        "start": 2956,
+        "end": 3859,
+        "startLine": 25,
+        "endLine": 33
+      },
+      "site": {
+        "anchor": {
+          "snapshotId": "pr25-pinned-call-evidence",
+          "side": "head",
+          "path": "src/application/review.ts",
+          "contentHash": "dae210c79cb019d6edfdbfacfcf3da1e5773ceb4d15cf747df15ffa498c28e4e",
+          "start": 5978,
+          "end": 6110,
+          "startLine": 53,
+          "endLine": 53
+        },
+        "sourceText": "request(captured,`/api/reviews/${encodeURIComponent(pending.reviewId)}?snapshotId=${encodeURIComponent(command.anchor.snapshotId)}`)"
+      },
+      "lexicalBinding": {
+        "kind": "enclosing_const_declaration",
+        "anchor": {
+          "snapshotId": "pr25-pinned-call-evidence",
+          "side": "head",
+          "path": "src/application/review.ts",
+          "contentHash": "dae210c79cb019d6edfdbfacfcf3da1e5773ceb4d15cf747df15ffa498c28e4e",
+          "start": 2956,
+          "end": 3859,
+          "startLine": 25,
+          "endLine": 33
+        },
+        "sourceText": "request=async(captured:string,path:string,body?:unknown,signal?:AbortSignal)=>{\n  const controller=body===undefined?new AbortController():null;if(controller)readControllers.add(controller);\n  const ownedSignal=controller?(signal?AbortSignal.any([signal,controller.signal]):controller.signal):signal;\n  try{\n   if(ownedSignal?.aborted)throw new Error('selection_superseded');\n   const response=await fetch(path,{headers:{...accessHeaders(captured),'Content-Type':'application/json'},...(body===undefined?{}:{method:'POST',body:typeof body==='string'?body:JSON.stringify(body)}),...(ownedSignal?{signal:ownedSignal}:{})});\n   const value=await response.json() as unknown;if(ownedSignal?.aborted)throw new Error('selection_superseded');if(!response.ok)throw new Error(String((value as {error?:string}).error??'request_failed'));return value;\n  }finally{if(controller)readControllers.delete(controller);}\n }"
+      },
+      "certainty": "source_observed_manual",
+      "method": "exact_call_expression_and_source_lexical_binding_review",
+      "analyzerDisposition": {
+        "id": "346906d08b68fa02be72e3ac14635dd5328fbd3ecdce7ca8c87c20ce3bd5f391",
+        "reason": "semantic_obstruction"
+      }
+    },
+    {
+      "id": "source-observed:ba39afd74011b685877629b64f3a76dc11d11c10ffaf7f04fb3415ce8b5e1166",
+      "caller": "60f5cab63d4f54955a40cbbc010785fd53c73011678985a003c0f7611feaa001",
+      "callee": "2e55daf0e1c5086b0eb7e2390e38003b26bb3cf463f5ae835837f3e95eb43368",
+      "target": {
+        "snapshotId": "pr25-pinned-call-evidence",
+        "side": "head",
+        "path": "src/application/review.ts",
+        "contentHash": "dae210c79cb019d6edfdbfacfcf3da1e5773ceb4d15cf747df15ffa498c28e4e",
+        "start": 2956,
+        "end": 3859,
+        "startLine": 25,
+        "endLine": 33
+      },
+      "site": {
+        "anchor": {
+          "snapshotId": "pr25-pinned-call-evidence",
+          "side": "head",
+          "path": "src/application/review.ts",
+          "contentHash": "dae210c79cb019d6edfdbfacfcf3da1e5773ceb4d15cf747df15ffa498c28e4e",
+          "start": 7812,
+          "end": 7860,
+          "startLine": 70,
+          "endLine": 70
+        },
+        "sourceText": "request(captured,'/api/commands',record.request)"
+      },
+      "lexicalBinding": {
+        "kind": "enclosing_const_declaration",
+        "anchor": {
+          "snapshotId": "pr25-pinned-call-evidence",
+          "side": "head",
+          "path": "src/application/review.ts",
+          "contentHash": "dae210c79cb019d6edfdbfacfcf3da1e5773ceb4d15cf747df15ffa498c28e4e",
+          "start": 2956,
+          "end": 3859,
+          "startLine": 25,
+          "endLine": 33
+        },
+        "sourceText": "request=async(captured:string,path:string,body?:unknown,signal?:AbortSignal)=>{\n  const controller=body===undefined?new AbortController():null;if(controller)readControllers.add(controller);\n  const ownedSignal=controller?(signal?AbortSignal.any([signal,controller.signal]):controller.signal):signal;\n  try{\n   if(ownedSignal?.aborted)throw new Error('selection_superseded');\n   const response=await fetch(path,{headers:{...accessHeaders(captured),'Content-Type':'application/json'},...(body===undefined?{}:{method:'POST',body:typeof body==='string'?body:JSON.stringify(body)}),...(ownedSignal?{signal:ownedSignal}:{})});\n   const value=await response.json() as unknown;if(ownedSignal?.aborted)throw new Error('selection_superseded');if(!response.ok)throw new Error(String((value as {error?:string}).error??'request_failed'));return value;\n  }finally{if(controller)readControllers.delete(controller);}\n }"
+      },
+      "certainty": "source_observed_manual",
+      "method": "exact_call_expression_and_source_lexical_binding_review",
+      "analyzerDisposition": {
+        "id": "ba39afd74011b685877629b64f3a76dc11d11c10ffaf7f04fb3415ce8b5e1166",
+        "reason": "semantic_obstruction"
+      }
+    },
+    {
+      "id": "source-observed:6ed6575bad0dc84fff693371c95070000e16d4d74489d08634131e571297dab1",
+      "caller": "60f5cab63d4f54955a40cbbc010785fd53c73011678985a003c0f7611feaa001",
+      "callee": "2e55daf0e1c5086b0eb7e2390e38003b26bb3cf463f5ae835837f3e95eb43368",
+      "target": {
+        "snapshotId": "pr25-pinned-call-evidence",
+        "side": "head",
+        "path": "src/application/review.ts",
+        "contentHash": "dae210c79cb019d6edfdbfacfcf3da1e5773ceb4d15cf747df15ffa498c28e4e",
+        "start": 2956,
+        "end": 3859,
+        "startLine": 25,
+        "endLine": 33
+      },
+      "site": {
+        "anchor": {
+          "snapshotId": "pr25-pinned-call-evidence",
+          "side": "head",
+          "path": "src/application/review.ts",
+          "contentHash": "dae210c79cb019d6edfdbfacfcf3da1e5773ceb4d15cf747df15ffa498c28e4e",
+          "start": 8791,
+          "end": 8958,
+          "startLine": 83,
+          "endLine": 83
+        },
+        "sourceText": "request(captured,`/api/reviews/${encodeURIComponent(record.reviewId)}?snapshotId=${encodeURIComponent(command.anchor.snapshotId)}&minimumRevision=${receipt.revision}`)"
+      },
+      "lexicalBinding": {
+        "kind": "enclosing_const_declaration",
+        "anchor": {
+          "snapshotId": "pr25-pinned-call-evidence",
+          "side": "head",
+          "path": "src/application/review.ts",
+          "contentHash": "dae210c79cb019d6edfdbfacfcf3da1e5773ceb4d15cf747df15ffa498c28e4e",
+          "start": 2956,
+          "end": 3859,
+          "startLine": 25,
+          "endLine": 33
+        },
+        "sourceText": "request=async(captured:string,path:string,body?:unknown,signal?:AbortSignal)=>{\n  const controller=body===undefined?new AbortController():null;if(controller)readControllers.add(controller);\n  const ownedSignal=controller?(signal?AbortSignal.any([signal,controller.signal]):controller.signal):signal;\n  try{\n   if(ownedSignal?.aborted)throw new Error('selection_superseded');\n   const response=await fetch(path,{headers:{...accessHeaders(captured),'Content-Type':'application/json'},...(body===undefined?{}:{method:'POST',body:typeof body==='string'?body:JSON.stringify(body)}),...(ownedSignal?{signal:ownedSignal}:{})});\n   const value=await response.json() as unknown;if(ownedSignal?.aborted)throw new Error('selection_superseded');if(!response.ok)throw new Error(String((value as {error?:string}).error??'request_failed'));return value;\n  }finally{if(controller)readControllers.delete(controller);}\n }"
+      },
+      "certainty": "source_observed_manual",
+      "method": "exact_call_expression_and_source_lexical_binding_review",
+      "analyzerDisposition": {
+        "id": "6ed6575bad0dc84fff693371c95070000e16d4d74489d08634131e571297dab1",
+        "reason": "semantic_obstruction"
+      }
+    },
+    {
+      "id": "source-observed:4a95665134fc2e53df4709bf44404d5c5c6941ee7e5556ba40ed66c08cf17803",
+      "caller": "e53a0e1e550c70319e0631dc972ac9cd3de731a2f2fe7f12f5c9c128a3678420",
+      "callee": "2e55daf0e1c5086b0eb7e2390e38003b26bb3cf463f5ae835837f3e95eb43368",
+      "target": {
+        "snapshotId": "pr25-pinned-call-evidence",
+        "side": "head",
+        "path": "src/application/review.ts",
+        "contentHash": "dae210c79cb019d6edfdbfacfcf3da1e5773ceb4d15cf747df15ffa498c28e4e",
+        "start": 2956,
+        "end": 3859,
+        "startLine": 25,
+        "endLine": 33
+      },
+      "site": {
+        "anchor": {
+          "snapshotId": "pr25-pinned-call-evidence",
+          "side": "head",
+          "path": "src/application/review.ts",
+          "contentHash": "dae210c79cb019d6edfdbfacfcf3da1e5773ceb4d15cf747df15ffa498c28e4e",
+          "start": 11734,
+          "end": 11860,
+          "startLine": 101,
+          "endLine": 101
+        },
+        "sourceText": "request(captured,`/api/reviews/${encodeURIComponent(reviewId)}?snapshotId=${encodeURIComponent(snapshotId)}`,undefined,signal)"
+      },
+      "lexicalBinding": {
+        "kind": "enclosing_const_declaration",
+        "anchor": {
+          "snapshotId": "pr25-pinned-call-evidence",
+          "side": "head",
+          "path": "src/application/review.ts",
+          "contentHash": "dae210c79cb019d6edfdbfacfcf3da1e5773ceb4d15cf747df15ffa498c28e4e",
+          "start": 2956,
+          "end": 3859,
+          "startLine": 25,
+          "endLine": 33
+        },
+        "sourceText": "request=async(captured:string,path:string,body?:unknown,signal?:AbortSignal)=>{\n  const controller=body===undefined?new AbortController():null;if(controller)readControllers.add(controller);\n  const ownedSignal=controller?(signal?AbortSignal.any([signal,controller.signal]):controller.signal):signal;\n  try{\n   if(ownedSignal?.aborted)throw new Error('selection_superseded');\n   const response=await fetch(path,{headers:{...accessHeaders(captured),'Content-Type':'application/json'},...(body===undefined?{}:{method:'POST',body:typeof body==='string'?body:JSON.stringify(body)}),...(ownedSignal?{signal:ownedSignal}:{})});\n   const value=await response.json() as unknown;if(ownedSignal?.aborted)throw new Error('selection_superseded');if(!response.ok)throw new Error(String((value as {error?:string}).error??'request_failed'));return value;\n  }finally{if(controller)readControllers.delete(controller);}\n }"
+      },
+      "certainty": "source_observed_manual",
+      "method": "exact_call_expression_and_source_lexical_binding_review",
+      "analyzerDisposition": {
+        "id": "4a95665134fc2e53df4709bf44404d5c5c6941ee7e5556ba40ed66c08cf17803",
+        "reason": "semantic_obstruction"
+      }
+    },
+    {
+      "id": "source-observed:f2ead383de6122a9a32b9e76588465004b0cf05f27c659e7d3f2536abd2a6384",
+      "caller": "6ec7df3cad91eb8a4b9f24ef980cf0487ef73c648951d2a416b55c74b2a53cd5",
+      "callee": "2e55daf0e1c5086b0eb7e2390e38003b26bb3cf463f5ae835837f3e95eb43368",
+      "target": {
+        "snapshotId": "pr25-pinned-call-evidence",
+        "side": "head",
+        "path": "src/application/review.ts",
+        "contentHash": "dae210c79cb019d6edfdbfacfcf3da1e5773ceb4d15cf747df15ffa498c28e4e",
+        "start": 2956,
+        "end": 3859,
+        "startLine": 25,
+        "endLine": 33
+      },
+      "site": {
+        "anchor": {
+          "snapshotId": "pr25-pinned-call-evidence",
+          "side": "head",
+          "path": "src/application/review.ts",
+          "contentHash": "dae210c79cb019d6edfdbfacfcf3da1e5773ceb4d15cf747df15ffa498c28e4e",
+          "start": 15011,
+          "end": 15143,
+          "startLine": 118,
+          "endLine": 118
+        },
+        "sourceText": "request(token,'/api/commands',{type:'RevokeAttachment',commandId:crypto.randomUUID(),reviewId,attachmentId:attachment.attachmentId})"
+      },
+      "lexicalBinding": {
+        "kind": "enclosing_const_declaration",
+        "anchor": {
+          "snapshotId": "pr25-pinned-call-evidence",
+          "side": "head",
+          "path": "src/application/review.ts",
+          "contentHash": "dae210c79cb019d6edfdbfacfcf3da1e5773ceb4d15cf747df15ffa498c28e4e",
+          "start": 2956,
+          "end": 3859,
+          "startLine": 25,
+          "endLine": 33
+        },
+        "sourceText": "request=async(captured:string,path:string,body?:unknown,signal?:AbortSignal)=>{\n  const controller=body===undefined?new AbortController():null;if(controller)readControllers.add(controller);\n  const ownedSignal=controller?(signal?AbortSignal.any([signal,controller.signal]):controller.signal):signal;\n  try{\n   if(ownedSignal?.aborted)throw new Error('selection_superseded');\n   const response=await fetch(path,{headers:{...accessHeaders(captured),'Content-Type':'application/json'},...(body===undefined?{}:{method:'POST',body:typeof body==='string'?body:JSON.stringify(body)}),...(ownedSignal?{signal:ownedSignal}:{})});\n   const value=await response.json() as unknown;if(ownedSignal?.aborted)throw new Error('selection_superseded');if(!response.ok)throw new Error(String((value as {error?:string}).error??'request_failed'));return value;\n  }finally{if(controller)readControllers.delete(controller);}\n }"
+      },
+      "certainty": "source_observed_manual",
+      "method": "exact_call_expression_and_source_lexical_binding_review",
+      "analyzerDisposition": {
+        "id": "f2ead383de6122a9a32b9e76588465004b0cf05f27c659e7d3f2536abd2a6384",
+        "reason": "semantic_obstruction"
+      }
+    },
+    {
+      "id": "source-observed:bdad516183bc1082e109227a07312e6292c48d558e5bda04f6c54b7fd3e84cc1",
+      "caller": "d073fe36c5371585ebfa1d14fe245229693cb8cdeadb8618c20d8cacb331b405",
+      "callee": "a7c2131f067aee1cd64b01c90418ffa0da3b0f5469984249d91fa611723893f6",
+      "target": {
+        "snapshotId": "pr25-pinned-call-evidence",
+        "side": "head",
+        "path": "src/application/local-access.ts",
+        "contentHash": "811735e3599292c54af870134345249deed32f1d9b9705f8ca18fd086225d59d",
+        "start": 144,
+        "end": 264,
+        "startLine": 3,
+        "endLine": 3
+      },
+      "site": {
+        "anchor": {
+          "snapshotId": "pr25-pinned-call-evidence",
+          "side": "head",
+          "path": "src/application/story.ts",
+          "contentHash": "1fdf81528e3e1b658123e2ae1992d5406e1a2217819b4a0e0547669d4fea5f9f",
+          "start": 24544,
+          "end": 24572,
+          "startLine": 168,
+          "endLine": 168
+        },
+        "sourceText": "accessHeaders(capturedToken)"
+      },
+      "lexicalBinding": {
+        "kind": "explicit_named_import",
+        "anchor": {
+          "snapshotId": "pr25-pinned-call-evidence",
+          "side": "head",
+          "path": "src/application/story.ts",
+          "contentHash": "1fdf81528e3e1b658123e2ae1992d5406e1a2217819b4a0e0547669d4fea5f9f",
+          "start": 0,
+          "end": 48,
+          "startLine": 1,
+          "endLine": 1
+        },
+        "sourceText": "import {accessHeaders} from './local-access.ts';"
+      },
+      "certainty": "source_observed_manual",
+      "method": "exact_call_expression_and_source_lexical_binding_review",
+      "analyzerDisposition": {
+        "id": "bdad516183bc1082e109227a07312e6292c48d558e5bda04f6c54b7fd3e84cc1",
+        "reason": "semantic_obstruction"
+      }
+    }
+  ],
+  "unresolved": [
+    {
+      "id": "5cf8677d6f03563683e50a610f0e34e31541a4d7a2b7b7df61fc31779802358e",
+      "caller": "083d938782f0e018df80fce707b355488710e75876f88bd92e398ca852879046",
+      "anchor": {
+        "snapshotId": "pr25-pinned-call-evidence",
+        "side": "base",
+        "path": "src/application/review.ts",
+        "contentHash": "7953f0b8486ae475717bdc749e23a31f12351f41c11a473280de9a2420265477",
+        "start": 2976,
+        "end": 2997,
+        "startLine": 25,
+        "endLine": 25
+      },
+      "syntax": "NewExpression",
+      "reason": "unsupported_dispatch",
+      "candidates": [],
+      "sourceText": "new AbortController()"
+    },
+    {
+      "id": "5ba436c0079334531a00ce9cd904b37c7c7c982e850a8d9a287fcf4d8772d867",
+      "caller": "083d938782f0e018df80fce707b355488710e75876f88bd92e398ca852879046",
+      "anchor": {
+        "snapshotId": "pr25-pinned-call-evidence",
+        "side": "base",
+        "path": "src/application/review.ts",
+        "contentHash": "7953f0b8486ae475717bdc749e23a31f12351f41c11a473280de9a2420265477",
+        "start": 3017,
+        "end": 3048,
+        "startLine": 25,
+        "endLine": 25
+      },
+      "syntax": "CallExpression",
+      "reason": "unsupported_dispatch",
+      "candidates": [],
+      "sourceText": "readControllers.add(controller)"
+    },
+    {
+      "id": "ac579b4d73f5c1af2eb7e42889679cf4abf9bbcf85bee9e03eb37c32e3adcec3",
+      "caller": "083d938782f0e018df80fce707b355488710e75876f88bd92e398ca852879046",
+      "anchor": {
+        "snapshotId": "pr25-pinned-call-evidence",
+        "side": "base",
+        "path": "src/application/review.ts",
+        "contentHash": "7953f0b8486ae475717bdc749e23a31f12351f41c11a473280de9a2420265477",
+        "start": 3089,
+        "end": 3132,
+        "startLine": 26,
+        "endLine": 26
+      },
+      "syntax": "CallExpression",
+      "reason": "unsupported_dispatch",
+      "candidates": [],
+      "sourceText": "AbortSignal.any([signal,controller.signal])"
+    },
+    {
+      "id": "cb0d2077ab795745f43f0cd5fd7a379c78ed9ec1cd9882bad64e9a4200b70d83",
+      "caller": "083d938782f0e018df80fce707b355488710e75876f88bd92e398ca852879046",
+      "anchor": {
+        "snapshotId": "pr25-pinned-call-evidence",
+        "side": "base",
+        "path": "src/application/review.ts",
+        "contentHash": "7953f0b8486ae475717bdc749e23a31f12351f41c11a473280de9a2420265477",
+        "start": 3200,
+        "end": 3233,
+        "startLine": 28,
+        "endLine": 28
+      },
+      "syntax": "NewExpression",
+      "reason": "unsupported_dispatch",
+      "candidates": [],
+      "sourceText": "new Error('selection_superseded')"
+    },
+    {
+      "id": "b87b2d67e0acf73c135d07435b701d6e075d6e07e1053e43145581d30f3bf22e",
+      "caller": "083d938782f0e018df80fce707b355488710e75876f88bd92e398ca852879046",
+      "anchor": {
+        "snapshotId": "pr25-pinned-call-evidence",
+        "side": "base",
+        "path": "src/application/review.ts",
+        "contentHash": "7953f0b8486ae475717bdc749e23a31f12351f41c11a473280de9a2420265477",
+        "start": 3259,
+        "end": 3487,
+        "startLine": 29,
+        "endLine": 29
+      },
+      "syntax": "CallExpression",
+      "reason": "missing_binding",
+      "candidates": [],
+      "sourceText": "fetch(path,{headers:{Authorization:`Bearer ${captured}`,'Content-Type':'application/json'},...(body===undefined?{}:{method:'POST',body:typeof body==='string'?body:JSON.stringify(body)}),...(ownedSignal?{signal:ownedSignal}:{})})"
+    },
+    {
+      "id": "97db6dca93adaa6848671d746a629a70f88d776bea871a09a7d533edd2f3b32b",
+      "caller": "083d938782f0e018df80fce707b355488710e75876f88bd92e398ca852879046",
+      "anchor": {
+        "snapshotId": "pr25-pinned-call-evidence",
+        "side": "base",
+        "path": "src/application/review.ts",
+        "contentHash": "7953f0b8486ae475717bdc749e23a31f12351f41c11a473280de9a2420265477",
+        "start": 3422,
+        "end": 3442,
+        "startLine": 29,
+        "endLine": 29
+      },
+      "syntax": "CallExpression",
+      "reason": "unsupported_dispatch",
+      "candidates": [],
+      "sourceText": "JSON.stringify(body)"
+    },
+    {
+      "id": "3b8cb5b7067e0b66955aa6ef60d0c679d975300bee857d41a53ed83218f32320",
+      "caller": "083d938782f0e018df80fce707b355488710e75876f88bd92e398ca852879046",
+      "anchor": {
+        "snapshotId": "pr25-pinned-call-evidence",
+        "side": "base",
+        "path": "src/application/review.ts",
+        "contentHash": "7953f0b8486ae475717bdc749e23a31f12351f41c11a473280de9a2420265477",
+        "start": 3510,
+        "end": 3525,
+        "startLine": 30,
+        "endLine": 30
+      },
+      "syntax": "CallExpression",
+      "reason": "unsupported_dispatch",
+      "candidates": [],
+      "sourceText": "response.json()"
+    },
+    {
+      "id": "5d3f80fec120017e3bc45a6e58543530ccad9e403aabcbaab3ff417916063a4d",
+      "caller": "083d938782f0e018df80fce707b355488710e75876f88bd92e398ca852879046",
+      "anchor": {
+        "snapshotId": "pr25-pinned-call-evidence",
+        "side": "base",
+        "path": "src/application/review.ts",
+        "contentHash": "7953f0b8486ae475717bdc749e23a31f12351f41c11a473280de9a2420265477",
+        "start": 3567,
+        "end": 3600,
+        "startLine": 30,
+        "endLine": 30
+      },
+      "syntax": "NewExpression",
+      "reason": "unsupported_dispatch",
+      "candidates": [],
+      "sourceText": "new Error('selection_superseded')"
+    },
+    {
+      "id": "d9cc5b38156f0431f7e6e2fc86d20b2d3dc2b4018df9d4cf5146226a5b27f046",
+      "caller": "083d938782f0e018df80fce707b355488710e75876f88bd92e398ca852879046",
+      "anchor": {
+        "snapshotId": "pr25-pinned-call-evidence",
+        "side": "base",
+        "path": "src/application/review.ts",
+        "contentHash": "7953f0b8486ae475717bdc749e23a31f12351f41c11a473280de9a2420265477",
+        "start": 3623,
+        "end": 3692,
+        "startLine": 30,
+        "endLine": 30
+      },
+      "syntax": "NewExpression",
+      "reason": "unsupported_dispatch",
+      "candidates": [],
+      "sourceText": "new Error(String((value as {error?:string}).error??'request_failed'))"
+    },
+    {
+      "id": "071702e6bbe7bbabe1f56d6cf7e8135b251dfb4d77f10b547dfa7d4ceb822831",
+      "caller": "083d938782f0e018df80fce707b355488710e75876f88bd92e398ca852879046",
+      "anchor": {
+        "snapshotId": "pr25-pinned-call-evidence",
+        "side": "base",
+        "path": "src/application/review.ts",
+        "contentHash": "7953f0b8486ae475717bdc749e23a31f12351f41c11a473280de9a2420265477",
+        "start": 3633,
+        "end": 3691,
+        "startLine": 30,
+        "endLine": 30
+      },
+      "syntax": "CallExpression",
+      "reason": "missing_binding",
+      "candidates": [],
+      "sourceText": "String((value as {error?:string}).error??'request_failed')"
+    },
+    {
+      "id": "703c12a5efa4a76d3ac19ef5a9d96065fd07d5333a0ac7bf53702a5e69acc4cf",
+      "caller": "083d938782f0e018df80fce707b355488710e75876f88bd92e398ca852879046",
+      "anchor": {
+        "snapshotId": "pr25-pinned-call-evidence",
+        "side": "base",
+        "path": "src/application/review.ts",
+        "contentHash": "7953f0b8486ae475717bdc749e23a31f12351f41c11a473280de9a2420265477",
+        "start": 3732,
+        "end": 3766,
+        "startLine": 31,
+        "endLine": 31
+      },
+      "syntax": "CallExpression",
+      "reason": "unsupported_dispatch",
+      "candidates": [],
+      "sourceText": "readControllers.delete(controller)"
+    },
+    {
+      "id": "4789c802371f47feb562d89bc6f7417338bf5fd51367d04d1c2637cdcd604a6e",
+      "caller": "2e55daf0e1c5086b0eb7e2390e38003b26bb3cf463f5ae835837f3e95eb43368",
+      "anchor": {
+        "snapshotId": "pr25-pinned-call-evidence",
+        "side": "head",
+        "path": "src/application/review.ts",
+        "contentHash": "dae210c79cb019d6edfdbfacfcf3da1e5773ceb4d15cf747df15ffa498c28e4e",
+        "start": 3072,
+        "end": 3093,
+        "startLine": 26,
+        "endLine": 26
+      },
+      "syntax": "NewExpression",
+      "reason": "unsupported_dispatch",
+      "candidates": [],
+      "sourceText": "new AbortController()"
+    },
+    {
+      "id": "b66edf937231d6a8e0454153bb8de6ee93321ffe57249edfede26f3104456452",
+      "caller": "2e55daf0e1c5086b0eb7e2390e38003b26bb3cf463f5ae835837f3e95eb43368",
+      "anchor": {
+        "snapshotId": "pr25-pinned-call-evidence",
+        "side": "head",
+        "path": "src/application/review.ts",
+        "contentHash": "dae210c79cb019d6edfdbfacfcf3da1e5773ceb4d15cf747df15ffa498c28e4e",
+        "start": 3113,
+        "end": 3144,
+        "startLine": 26,
+        "endLine": 26
+      },
+      "syntax": "CallExpression",
+      "reason": "unsupported_dispatch",
+      "candidates": [],
+      "sourceText": "readControllers.add(controller)"
+    },
+    {
+      "id": "6d385e78dd8ae22270616e922b21f97249fcfa0441e2acb5c487af14e3ee784f",
+      "caller": "2e55daf0e1c5086b0eb7e2390e38003b26bb3cf463f5ae835837f3e95eb43368",
+      "anchor": {
+        "snapshotId": "pr25-pinned-call-evidence",
+        "side": "head",
+        "path": "src/application/review.ts",
+        "contentHash": "dae210c79cb019d6edfdbfacfcf3da1e5773ceb4d15cf747df15ffa498c28e4e",
+        "start": 3185,
+        "end": 3228,
+        "startLine": 27,
+        "endLine": 27
+      },
+      "syntax": "CallExpression",
+      "reason": "unsupported_dispatch",
+      "candidates": [],
+      "sourceText": "AbortSignal.any([signal,controller.signal])"
+    },
+    {
+      "id": "ed81d128c847d62b9b92dd5531c8fea1705739fe378b1724f3de38a4db051d15",
+      "caller": "2e55daf0e1c5086b0eb7e2390e38003b26bb3cf463f5ae835837f3e95eb43368",
+      "anchor": {
+        "snapshotId": "pr25-pinned-call-evidence",
+        "side": "head",
+        "path": "src/application/review.ts",
+        "contentHash": "dae210c79cb019d6edfdbfacfcf3da1e5773ceb4d15cf747df15ffa498c28e4e",
+        "start": 3296,
+        "end": 3329,
+        "startLine": 29,
+        "endLine": 29
+      },
+      "syntax": "NewExpression",
+      "reason": "unsupported_dispatch",
+      "candidates": [],
+      "sourceText": "new Error('selection_superseded')"
+    },
+    {
+      "id": "d3924f4043b32168c8fc8048c06c53ea45733c441923badd2cdfc3f8aa0036c8",
+      "caller": "2e55daf0e1c5086b0eb7e2390e38003b26bb3cf463f5ae835837f3e95eb43368",
+      "anchor": {
+        "snapshotId": "pr25-pinned-call-evidence",
+        "side": "head",
+        "path": "src/application/review.ts",
+        "contentHash": "dae210c79cb019d6edfdbfacfcf3da1e5773ceb4d15cf747df15ffa498c28e4e",
+        "start": 3355,
+        "end": 3575,
+        "startLine": 30,
+        "endLine": 30
+      },
+      "syntax": "CallExpression",
+      "reason": "missing_binding",
+      "candidates": [],
+      "sourceText": "fetch(path,{headers:{...accessHeaders(captured),'Content-Type':'application/json'},...(body===undefined?{}:{method:'POST',body:typeof body==='string'?body:JSON.stringify(body)}),...(ownedSignal?{signal:ownedSignal}:{})})"
+    },
+    {
+      "id": "a85050ec78bc58582f63a7ec50f322f46655c4a1656700e919ca78f117b826f1",
+      "caller": "2e55daf0e1c5086b0eb7e2390e38003b26bb3cf463f5ae835837f3e95eb43368",
+      "anchor": {
+        "snapshotId": "pr25-pinned-call-evidence",
+        "side": "head",
+        "path": "src/application/review.ts",
+        "contentHash": "dae210c79cb019d6edfdbfacfcf3da1e5773ceb4d15cf747df15ffa498c28e4e",
+        "start": 3379,
+        "end": 3402,
+        "startLine": 30,
+        "endLine": 30
+      },
+      "syntax": "CallExpression",
+      "reason": "semantic_obstruction",
+      "candidates": [],
+      "sourceText": "accessHeaders(captured)"
+    },
+    {
+      "id": "087162b98c259e1b2f7e5002c7fb771519644427f79c64c97fd80e372cade0bd",
+      "caller": "2e55daf0e1c5086b0eb7e2390e38003b26bb3cf463f5ae835837f3e95eb43368",
+      "anchor": {
+        "snapshotId": "pr25-pinned-call-evidence",
+        "side": "head",
+        "path": "src/application/review.ts",
+        "contentHash": "dae210c79cb019d6edfdbfacfcf3da1e5773ceb4d15cf747df15ffa498c28e4e",
+        "start": 3510,
+        "end": 3530,
+        "startLine": 30,
+        "endLine": 30
+      },
+      "syntax": "CallExpression",
+      "reason": "unsupported_dispatch",
+      "candidates": [],
+      "sourceText": "JSON.stringify(body)"
+    },
+    {
+      "id": "093689a11b46d1d10bddb5ce51249ade3b25f5245f13337aba5a1c89c4508c3c",
+      "caller": "2e55daf0e1c5086b0eb7e2390e38003b26bb3cf463f5ae835837f3e95eb43368",
+      "anchor": {
+        "snapshotId": "pr25-pinned-call-evidence",
+        "side": "head",
+        "path": "src/application/review.ts",
+        "contentHash": "dae210c79cb019d6edfdbfacfcf3da1e5773ceb4d15cf747df15ffa498c28e4e",
+        "start": 3598,
+        "end": 3613,
+        "startLine": 31,
+        "endLine": 31
+      },
+      "syntax": "CallExpression",
+      "reason": "unsupported_dispatch",
+      "candidates": [],
+      "sourceText": "response.json()"
+    },
+    {
+      "id": "4762fe28f5b3de7401c90c819bb581c0f51daea8d17c57f7052cf1195c982375",
+      "caller": "2e55daf0e1c5086b0eb7e2390e38003b26bb3cf463f5ae835837f3e95eb43368",
+      "anchor": {
+        "snapshotId": "pr25-pinned-call-evidence",
+        "side": "head",
+        "path": "src/application/review.ts",
+        "contentHash": "dae210c79cb019d6edfdbfacfcf3da1e5773ceb4d15cf747df15ffa498c28e4e",
+        "start": 3655,
+        "end": 3688,
+        "startLine": 31,
+        "endLine": 31
+      },
+      "syntax": "NewExpression",
+      "reason": "unsupported_dispatch",
+      "candidates": [],
+      "sourceText": "new Error('selection_superseded')"
+    },
+    {
+      "id": "b2778f557a8006adf8cb4710ab29980a8783b989c016a0d16678fefb58e54b39",
+      "caller": "2e55daf0e1c5086b0eb7e2390e38003b26bb3cf463f5ae835837f3e95eb43368",
+      "anchor": {
+        "snapshotId": "pr25-pinned-call-evidence",
+        "side": "head",
+        "path": "src/application/review.ts",
+        "contentHash": "dae210c79cb019d6edfdbfacfcf3da1e5773ceb4d15cf747df15ffa498c28e4e",
+        "start": 3711,
+        "end": 3780,
+        "startLine": 31,
+        "endLine": 31
+      },
+      "syntax": "NewExpression",
+      "reason": "unsupported_dispatch",
+      "candidates": [],
+      "sourceText": "new Error(String((value as {error?:string}).error??'request_failed'))"
+    },
+    {
+      "id": "8f2e611846ba7fb95abfe7ab117bf79221599118a4aad1233cc953cceec4ba0b",
+      "caller": "2e55daf0e1c5086b0eb7e2390e38003b26bb3cf463f5ae835837f3e95eb43368",
+      "anchor": {
+        "snapshotId": "pr25-pinned-call-evidence",
+        "side": "head",
+        "path": "src/application/review.ts",
+        "contentHash": "dae210c79cb019d6edfdbfacfcf3da1e5773ceb4d15cf747df15ffa498c28e4e",
+        "start": 3721,
+        "end": 3779,
+        "startLine": 31,
+        "endLine": 31
+      },
+      "syntax": "CallExpression",
+      "reason": "missing_binding",
+      "candidates": [],
+      "sourceText": "String((value as {error?:string}).error??'request_failed')"
+    },
+    {
+      "id": "eceb6efff3e7fbe5c622eff10d690d6365e95fe0bc4d0a5b150504d35c2036a1",
+      "caller": "2e55daf0e1c5086b0eb7e2390e38003b26bb3cf463f5ae835837f3e95eb43368",
+      "anchor": {
+        "snapshotId": "pr25-pinned-call-evidence",
+        "side": "head",
+        "path": "src/application/review.ts",
+        "contentHash": "dae210c79cb019d6edfdbfacfcf3da1e5773ceb4d15cf747df15ffa498c28e4e",
+        "start": 3820,
+        "end": 3854,
+        "startLine": 32,
+        "endLine": 32
+      },
+      "syntax": "CallExpression",
+      "reason": "unsupported_dispatch",
+      "candidates": [],
+      "sourceText": "readControllers.delete(controller)"
+    }
+  ],
+  "neighborhoods": [
+    {
+      "seed": {
+        "side": "base",
+        "path": "src/application/review.ts",
+        "contentHash": "7953f0b8486ae475717bdc749e23a31f12351f41c11a473280de9a2420265477",
+        "start": 2860,
+        "end": 3771
+      },
+      "nodeId": "083d938782f0e018df80fce707b355488710e75876f88bd92e398ca852879046",
+      "unresolvedSeed": null,
+      "incoming": [],
+      "outgoing": [],
+      "unresolved": [
+        "5cf8677d6f03563683e50a610f0e34e31541a4d7a2b7b7df61fc31779802358e",
+        "5ba436c0079334531a00ce9cd904b37c7c7c982e850a8d9a287fcf4d8772d867",
+        "ac579b4d73f5c1af2eb7e42889679cf4abf9bbcf85bee9e03eb37c32e3adcec3",
+        "cb0d2077ab795745f43f0cd5fd7a379c78ed9ec1cd9882bad64e9a4200b70d83",
+        "b87b2d67e0acf73c135d07435b701d6e075d6e07e1053e43145581d30f3bf22e",
+        "97db6dca93adaa6848671d746a629a70f88d776bea871a09a7d533edd2f3b32b",
+        "3b8cb5b7067e0b66955aa6ef60d0c679d975300bee857d41a53ed83218f32320",
+        "5d3f80fec120017e3bc45a6e58543530ccad9e403aabcbaab3ff417916063a4d",
+        "d9cc5b38156f0431f7e6e2fc86d20b2d3dc2b4018df9d4cf5146226a5b27f046",
+        "071702e6bbe7bbabe1f56d6cf7e8135b251dfb4d77f10b547dfa7d4ceb822831",
+        "703c12a5efa4a76d3ac19ef5a9d96065fd07d5333a0ac7bf53702a5e69acc4cf"
+      ],
+      "outgoingAssessment": "invocations_present",
+      "incomingAssessment": "No resolved callers found in these supplied files",
+      "incomingScope": "supplied_files_only",
+      "limitations": [
+        "static-binding-is-not-runtime-execution",
+        "test-path-classification-is-not-execution-evidence",
+        "incomplete-incoming-source-scope"
+      ]
+    },
+    {
+      "seed": {
+        "side": "head",
+        "path": "src/application/local-access.ts",
+        "contentHash": "811735e3599292c54af870134345249deed32f1d9b9705f8ca18fd086225d59d",
+        "start": 144,
+        "end": 264
+      },
+      "nodeId": "a7c2131f067aee1cd64b01c90418ffa0da3b0f5469984249d91fa611723893f6",
+      "unresolvedSeed": null,
+      "incoming": [],
+      "outgoing": [],
+      "unresolved": [],
+      "outgoingAssessment": "No explicit invocation sites in this function body under the supported syntax scan.",
+      "incomingAssessment": "No resolved callers found in these supplied files",
+      "incomingScope": "supplied_files_only",
+      "limitations": [
+        "static-binding-is-not-runtime-execution",
+        "test-path-classification-is-not-execution-evidence",
+        "incomplete-incoming-source-scope"
+      ]
+    },
+    {
+      "seed": {
+        "side": "head",
+        "path": "src/application/review.ts",
+        "contentHash": "dae210c79cb019d6edfdbfacfcf3da1e5773ceb4d15cf747df15ffa498c28e4e",
+        "start": 2956,
+        "end": 3859
+      },
+      "nodeId": "2e55daf0e1c5086b0eb7e2390e38003b26bb3cf463f5ae835837f3e95eb43368",
+      "unresolvedSeed": null,
+      "incoming": [],
+      "outgoing": [],
+      "unresolved": [
+        "4789c802371f47feb562d89bc6f7417338bf5fd51367d04d1c2637cdcd604a6e",
+        "b66edf937231d6a8e0454153bb8de6ee93321ffe57249edfede26f3104456452",
+        "6d385e78dd8ae22270616e922b21f97249fcfa0441e2acb5c487af14e3ee784f",
+        "ed81d128c847d62b9b92dd5531c8fea1705739fe378b1724f3de38a4db051d15",
+        "d3924f4043b32168c8fc8048c06c53ea45733c441923badd2cdfc3f8aa0036c8",
+        "a85050ec78bc58582f63a7ec50f322f46655c4a1656700e919ca78f117b826f1",
+        "087162b98c259e1b2f7e5002c7fb771519644427f79c64c97fd80e372cade0bd",
+        "093689a11b46d1d10bddb5ce51249ade3b25f5245f13337aba5a1c89c4508c3c",
+        "4762fe28f5b3de7401c90c819bb581c0f51daea8d17c57f7052cf1195c982375",
+        "b2778f557a8006adf8cb4710ab29980a8783b989c016a0d16678fefb58e54b39",
+        "8f2e611846ba7fb95abfe7ab117bf79221599118a4aad1233cc953cceec4ba0b",
+        "eceb6efff3e7fbe5c622eff10d690d6365e95fe0bc4d0a5b150504d35c2036a1"
+      ],
+      "outgoingAssessment": "invocations_present",
+      "incomingAssessment": "No resolved callers found in these supplied files",
+      "incomingScope": "supplied_files_only",
+      "limitations": [
+        "static-binding-is-not-runtime-execution",
+        "test-path-classification-is-not-execution-evidence",
+        "incomplete-incoming-source-scope"
+      ]
+    }
+  ]
+}

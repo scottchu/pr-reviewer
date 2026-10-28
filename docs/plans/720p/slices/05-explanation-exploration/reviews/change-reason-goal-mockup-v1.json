@@ -1,0 +1,124 @@
+{
+  "status": "Static projection proposal; illustrative tests are neither existing-test evidence nor executed results",
+  "nodes": [
+    {
+      "id": "owner-request-change",
+      "kind": "change",
+      "name": "Request header construction",
+      "value": "Source-grounded comparison; token is a display alias",
+      "label": "Code change"
+    },
+    {
+      "id": "request-before",
+      "kind": "function",
+      "name": "request()",
+      "value": "Authorization: `Bearer ${token}`",
+      "label": "Always construct Bearer"
+    },
+    {
+      "id": "request-after",
+      "kind": "function",
+      "name": "request()",
+      "value": "accessHeaders(token)",
+      "label": "Delegate header choice"
+    },
+    {
+      "id": "reason",
+      "kind": "reason",
+      "name": "Always-Bearer request headers",
+      "value": "Always constructing Bearer cannot express an owner request without Authorization",
+      "label": "Why change?"
+    },
+    {
+      "id": "goal",
+      "kind": "goal",
+      "name": "Open the review without manual token entry",
+      "value": "Owner-direct access; explicit credentials retain their separate path",
+      "label": "Intended outcome"
+    },
+    {
+      "id": "owner-test-change",
+      "kind": "change",
+      "name": "Owner-request headers assertion",
+      "value": "ILLUSTRATIVE \u2014 not a verified existing test; not executed",
+      "label": "Illustrative test change"
+    },
+    {
+      "id": "test-before",
+      "kind": "assertion",
+      "name": "Owner request sends Bearer",
+      "value": "expect(headers.Authorization).toBe(`Bearer ${ownerMarker}`)",
+      "label": "Old expected behavior \u00b7 illustrative"
+    },
+    {
+      "id": "test-after",
+      "kind": "assertion",
+      "name": "Owner request omits Authorization",
+      "value": "expect(headers.Authorization).toBeUndefined()",
+      "label": "New expected behavior \u00b7 illustrative"
+    },
+    {
+      "id": "credential-test",
+      "kind": "test",
+      "name": "Explicit credential retains Bearer header",
+      "value": "ILLUSTRATIVE \u2014 expect(accessHeaders(credential).Authorization).toBe(`Bearer ${credential}`); not executed",
+      "label": "Unchanged expectation \u00b7 illustrative"
+    }
+  ],
+  "edges": [
+    {
+      "to": "reason",
+      "version": "comparison",
+      "relation": "motivated_by",
+      "from": "owner-request-change"
+    },
+    {
+      "to": "goal",
+      "version": "comparison",
+      "relation": "impedes",
+      "from": "reason"
+    },
+    {
+      "to": "goal",
+      "version": "comparison",
+      "relation": "intended_to_achieve",
+      "from": "owner-request-change"
+    },
+    {
+      "to": "owner-request-change",
+      "version": "comparison",
+      "relation": "motivated_by",
+      "from": "owner-test-change"
+    },
+    {
+      "to": "request-after",
+      "version": "after",
+      "relation": "verifies",
+      "from": "credential-test"
+    },
+    {
+      "to": "request-before",
+      "version": "before",
+      "relation": "contains",
+      "from": "owner-request-change"
+    },
+    {
+      "to": "request-after",
+      "version": "after",
+      "relation": "contains",
+      "from": "owner-request-change"
+    },
+    {
+      "to": "test-before",
+      "version": "before",
+      "relation": "contains",
+      "from": "owner-test-change"
+    },
+    {
+      "to": "test-after",
+      "version": "after",
+      "relation": "contains",
+      "from": "owner-test-change"
+    }
+  ]
+}

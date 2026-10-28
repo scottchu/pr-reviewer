@@ -120,6 +120,9 @@ The original packet was planning-only; subsequent implementation and review rece
 
 **Final bounded disposition:** See [02B review receipts](review-receipts-02b.md): cumulative engineering and whole-current-product documentation sufficiency accepted at e068502, actual PR22 029→e068 continuation/navigation accepted with controlled-host/source/semantic limits. Final receipt reconciliation is docs-only and separate from that code candidate and reviewed target. Root owns publication/merge/runtime update. Full slice/native dual-host/human/480p acceptance remains open.
 
+## Active-turn Codex correction
+
+The [versioned Codex steering correction packet](codex-steer-correction.md) defines the required replacement for unconditional queue delivery during active Codex work. Implementation remains blocked on a supported existing-owner route; the coordinator retained current queue behavior meanwhile. Existing native delivery receipts remain historical; owner-route and active-turn evidence must be independently established. The packet also records MCP subscription feasibility without adopting a new subscription or wake service.
 ## 2026-10-24 single-owner access input
 
 **Accepted correction:** The durable runtime/access specification now removes manual owner login/token entry. Credential-free workspace opening uses a server-derived local-user principal and trusted storage access; retained history, legacy credential rows/receipts and exact-session agent attachment/generation fences remain. New import/analysis jobs use a stable internal local-owner reference; the local owner can manage its older credential-scoped jobs. Browser private state uses origin/local-owner scope and preserves incompatible legacy records without automatic rekey/replay. See [runtime policy](../../../../product/review-loop/runtime.md) and [correction packet](../01-review-loop/single-user-access/plan.md).

@@ -1,0 +1,22 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import paths from '../paths.json' with { type: 'json' };
+import imports from '../imports.json' with { type: 'json' };
+import { buildTree } from '../tree.ts';
+import { projectImports } from '../imports.ts';
+import { explainRelationship } from '../relationship.ts';
+test('edge explanations bind exact selected module identity and separate source facts, inference and unknown', () => {
+  const tree = buildTree(paths.paths, paths.changes);
+  const dev = projectImports(tree, imports, 'scripts/dev.ts').links.find(l => l.targetPath === 'node:fs')!;
+  const review = projectImports(tree, imports, 'src/application/review.ts').links;
+  const removed = explainRelationship(dev);
+  assert.equal(removed.status, 'removed');
+  assert.match(removed.why, /Inference:/);
+  assert.match(removed.boundary, /no repository target/);
+  assert.equal(dev.citations.length, 1);
+  assert.equal(dev.citations[0]?.side, 'before');
+  const helper = explainRelationship(review.find(l => l.targetPath === 'src/application/local-access.ts')!);
+  assert.match(helper.why, /Source fact:/);
+  assert.match(helper.why, /Inference:/);
+  assert.match(explainRelationship(review.find(l => l.change === 'unchanged')!).why, /Unknown:/);
+});

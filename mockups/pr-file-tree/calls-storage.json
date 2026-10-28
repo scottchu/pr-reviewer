@@ -1,0 +1,1720 @@
+{
+  "format": "task-local-change-centered-call-evidence-v1",
+  "implementation": "066828b54a14611c35f37b20f7d6b85ada780b91",
+  "commits": {
+    "base": "b096826e31c0927190806de91ed70b8b64aa93d8",
+    "head": "e3b270e5f49a9215452b0b86702946043e979059"
+  },
+  "scope": {
+    "paths": [
+      "src/storage/public.ts",
+      "src/storage/access.ts",
+      "src/storage/imports.ts",
+      "src/storage/analysis.ts",
+      "src/storage/story.ts",
+      "src/server/public.ts"
+    ],
+    "inventory": "selected-context",
+    "wholePRCoverage": false,
+    "budgets": {
+      "inventoryPathsPerSide": 4096,
+      "inventoryBytes": 2097152,
+      "filesPerSide": 128,
+      "fileBytes": 262144,
+      "totalBytes": 4194304,
+      "seeds": 64,
+      "astNodes": 200000,
+      "invocationSites": 10000,
+      "outputNodes": 2000,
+      "outputSites": 4000,
+      "aliasPatterns": 32,
+      "aliasTargets": 4,
+      "reExportLinks": 32
+    }
+  },
+  "analyzer": "source-neighborhood-v1.0.1",
+  "parser": "typescript@6.0.3",
+  "analysisId": "214f117d8fadd899db6c3744717fe10625382f82d679e860ad74383cce3ec47d",
+  "corpusDigest": "279ba52a280eab3fdb1f6a43f62ab1b0474e02ba371fc439cf6c8744d7e2efb3",
+  "observed": {
+    "bytes": 226786,
+    "inventoryBytes": 3229,
+    "astNodes": 40193,
+    "invocationSites": 2430
+  },
+  "coverage": [
+    {
+      "side": "base",
+      "path": "src/server/public.ts",
+      "role": "changed",
+      "selected": true,
+      "prepared": true,
+      "status": "scanned",
+      "parseStatus": "parsed",
+      "examined": 169,
+      "resolved": 22,
+      "unresolved": 147
+    },
+    {
+      "side": "base",
+      "path": "src/storage/access.ts",
+      "role": "changed",
+      "selected": true,
+      "prepared": false,
+      "status": "missing",
+      "parseStatus": "not_parsed",
+      "examined": null,
+      "resolved": null,
+      "unresolved": null,
+      "reason": "missing"
+    },
+    {
+      "side": "base",
+      "path": "src/storage/analysis.ts",
+      "role": "changed",
+      "selected": true,
+      "prepared": true,
+      "status": "scanned",
+      "parseStatus": "parsed",
+      "examined": 342,
+      "resolved": 99,
+      "unresolved": 243
+    },
+    {
+      "side": "base",
+      "path": "src/storage/imports.ts",
+      "role": "changed",
+      "selected": true,
+      "prepared": true,
+      "status": "scanned",
+      "parseStatus": "parsed",
+      "examined": 237,
+      "resolved": 65,
+      "unresolved": 172
+    },
+    {
+      "side": "base",
+      "path": "src/storage/public.ts",
+      "role": "changed",
+      "selected": true,
+      "prepared": true,
+      "status": "scanned",
+      "parseStatus": "parsed",
+      "examined": 312,
+      "resolved": 52,
+      "unresolved": 260
+    },
+    {
+      "side": "base",
+      "path": "src/storage/story.ts",
+      "role": "changed",
+      "selected": true,
+      "prepared": true,
+      "status": "scanned",
+      "parseStatus": "parsed",
+      "examined": 155,
+      "resolved": 55,
+      "unresolved": 100
+    },
+    {
+      "side": "head",
+      "path": "src/server/public.ts",
+      "role": "changed",
+      "selected": true,
+      "prepared": true,
+      "status": "scanned",
+      "parseStatus": "parsed",
+      "examined": 161,
+      "resolved": 22,
+      "unresolved": 139
+    },
+    {
+      "side": "head",
+      "path": "src/storage/access.ts",
+      "role": "changed",
+      "selected": true,
+      "prepared": true,
+      "status": "scanned",
+      "parseStatus": "parsed",
+      "examined": 6,
+      "resolved": 0,
+      "unresolved": 6
+    },
+    {
+      "side": "head",
+      "path": "src/storage/analysis.ts",
+      "role": "changed",
+      "selected": true,
+      "prepared": true,
+      "status": "scanned",
+      "parseStatus": "parsed",
+      "examined": 344,
+      "resolved": 101,
+      "unresolved": 243
+    },
+    {
+      "side": "head",
+      "path": "src/storage/imports.ts",
+      "role": "changed",
+      "selected": true,
+      "prepared": true,
+      "status": "scanned",
+      "parseStatus": "parsed",
+      "examined": 240,
+      "resolved": 68,
+      "unresolved": 172
+    },
+    {
+      "side": "head",
+      "path": "src/storage/public.ts",
+      "role": "changed",
+      "selected": true,
+      "prepared": true,
+      "status": "scanned",
+      "parseStatus": "parsed",
+      "examined": 309,
+      "resolved": 53,
+      "unresolved": 256
+    },
+    {
+      "side": "head",
+      "path": "src/storage/story.ts",
+      "role": "changed",
+      "selected": true,
+      "prepared": true,
+      "status": "scanned",
+      "parseStatus": "parsed",
+      "examined": 155,
+      "resolved": 55,
+      "unresolved": 100
+    }
+  ],
+  "diagnostics": {
+    "count": 1025,
+    "byCode": {
+      "2304": 519,
+      "2307": 79,
+      "2318": 4,
+      "2339": 78,
+      "2583": 54,
+      "2591": 41,
+      "2697": 4,
+      "7006": 216,
+      "7031": 10,
+      "18046": 20
+    },
+    "limits": "Missing globals and deliberately omitted modules remain; these diagnostics are not compile failures of the project.",
+    "relevant": []
+  },
+  "seeds": [
+    {
+      "id": "bc21ae0e1c83ba2ee39ca558a858869285bf5ce950d508ffb965bb054f43f891",
+      "name": "authenticate",
+      "kind": "const-arrow",
+      "declaration": {
+        "snapshotId": "pr25-pinned-call-evidence",
+        "side": "base",
+        "path": "src/storage/public.ts",
+        "contentHash": "61878e4c266549993e81985919feaf17995ee53790e49db5ad91d0b278725175",
+        "start": 10189,
+        "end": 10440,
+        "startLine": 198,
+        "endLine": 201
+      },
+      "body": {
+        "snapshotId": "pr25-pinned-call-evidence",
+        "side": "base",
+        "path": "src/storage/public.ts",
+        "contentHash": "61878e4c266549993e81985919feaf17995ee53790e49db5ad91d0b278725175",
+        "start": 10234,
+        "end": 10440,
+        "startLine": 198,
+        "endLine": 201
+      },
+      "role": "changed"
+    },
+    {
+      "id": "9b58606b4a652f7f9bc9500debd30f6d6fc0ccda0d44c170b031c444a909b7d8",
+      "name": "accessReference",
+      "kind": "const-arrow",
+      "declaration": {
+        "snapshotId": "pr25-pinned-call-evidence",
+        "side": "head",
+        "path": "src/storage/access.ts",
+        "contentHash": "0440486de82e136ffe430e4f1bed2b6f57f491319c59a71fad0f9d8507053b4c",
+        "start": 401,
+        "end": 618,
+        "startLine": 8,
+        "endLine": 12
+      },
+      "body": {
+        "snapshotId": "pr25-pinned-call-evidence",
+        "side": "head",
+        "path": "src/storage/access.ts",
+        "contentHash": "0440486de82e136ffe430e4f1bed2b6f57f491319c59a71fad0f9d8507053b4c",
+        "start": 441,
+        "end": 618,
+        "startLine": 8,
+        "endLine": 12
+      },
+      "role": "changed"
+    },
+    {
+      "id": "87929f42616495b59d0eddf0b7fae74b9f7bb9b59370fa7ecc9ef43f91917f68",
+      "name": "localPrincipal",
+      "kind": "const-arrow",
+      "declaration": {
+        "snapshotId": "pr25-pinned-call-evidence",
+        "side": "head",
+        "path": "src/storage/access.ts",
+        "contentHash": "0440486de82e136ffe430e4f1bed2b6f57f491319c59a71fad0f9d8507053b4c",
+        "start": 633,
+        "end": 741,
+        "startLine": 13,
+        "endLine": 13
+      },
+      "body": {
+        "snapshotId": "pr25-pinned-call-evidence",
+        "side": "head",
+        "path": "src/storage/access.ts",
+        "contentHash": "0440486de82e136ffe430e4f1bed2b6f57f491319c59a71fad0f9d8507053b4c",
+        "start": 683,
+        "end": 741,
+        "startLine": 13,
+        "endLine": 13
+      },
+      "role": "changed"
+    },
+    {
+      "id": "2e0dfcb2b5c914737ae3bcf51e1c56c15e5a65f8d29ee4b9f55571e694df0263",
+      "name": "authenticate",
+      "kind": "const-arrow",
+      "declaration": {
+        "snapshotId": "pr25-pinned-call-evidence",
+        "side": "head",
+        "path": "src/storage/public.ts",
+        "contentHash": "ebf680d4d62a47f92af2123a60673e4ba58c7236257ffc12cea2ddc981791d58",
+        "start": 10314,
+        "end": 10661,
+        "startLine": 200,
+        "endLine": 204
+      },
+      "body": {
+        "snapshotId": "pr25-pinned-call-evidence",
+        "side": "head",
+        "path": "src/storage/public.ts",
+        "contentHash": "ebf680d4d62a47f92af2123a60673e4ba58c7236257ffc12cea2ddc981791d58",
+        "start": 10366,
+        "end": 10661,
+        "startLine": 200,
+        "endLine": 204
+      },
+      "role": "changed"
+    }
+  ],
+  "contextDeclarations": [],
+  "nodes": [
+    {
+      "id": "c0960f46df6346c7a63510fa8e85e940eb3e4d7a60f58a5adfeac3135cce9c17",
+      "name": "hash",
+      "kind": "const-arrow",
+      "declaration": {
+        "snapshotId": "pr25-pinned-call-evidence",
+        "side": "base",
+        "path": "src/storage/public.ts",
+        "contentHash": "61878e4c266549993e81985919feaf17995ee53790e49db5ad91d0b278725175",
+        "start": 1138,
+        "end": 1210,
+        "startLine": 29,
+        "endLine": 29
+      },
+      "body": {
+        "snapshotId": "pr25-pinned-call-evidence",
+        "side": "base",
+        "path": "src/storage/public.ts",
+        "contentHash": "61878e4c266549993e81985919feaf17995ee53790e49db5ad91d0b278725175",
+        "start": 1163,
+        "end": 1210,
+        "startLine": 29,
+        "endLine": 29
+      },
+      "role": "changed"
+    },
+    {
+      "id": "bc21ae0e1c83ba2ee39ca558a858869285bf5ce950d508ffb965bb054f43f891",
+      "name": "authenticate",
+      "kind": "const-arrow",
+      "declaration": {
+        "snapshotId": "pr25-pinned-call-evidence",
+        "side": "base",
+        "path": "src/storage/public.ts",
+        "contentHash": "61878e4c266549993e81985919feaf17995ee53790e49db5ad91d0b278725175",
+        "start": 10189,
+        "end": 10440,
+        "startLine": 198,
+        "endLine": 201
+      },
+      "body": {
+        "snapshotId": "pr25-pinned-call-evidence",
+        "side": "base",
+        "path": "src/storage/public.ts",
+        "contentHash": "61878e4c266549993e81985919feaf17995ee53790e49db5ad91d0b278725175",
+        "start": 10234,
+        "end": 10440,
+        "startLine": 198,
+        "endLine": 201
+      },
+      "role": "changed"
+    },
+    {
+      "id": "7c3f9246cbf61c473379d361bc61699f42f2492fe8e11183d725a80c6d7c6f62",
+      "name": "storyEvidence",
+      "kind": "const-arrow",
+      "declaration": {
+        "snapshotId": "pr25-pinned-call-evidence",
+        "side": "base",
+        "path": "src/storage/public.ts",
+        "contentHash": "61878e4c266549993e81985919feaf17995ee53790e49db5ad91d0b278725175",
+        "start": 10499,
+        "end": 16954,
+        "startLine": 203,
+        "endLine": 273
+      },
+      "body": {
+        "snapshotId": "pr25-pinned-call-evidence",
+        "side": "base",
+        "path": "src/storage/public.ts",
+        "contentHash": "61878e4c266549993e81985919feaf17995ee53790e49db5ad91d0b278725175",
+        "start": 10568,
+        "end": 16954,
+        "startLine": 203,
+        "endLine": 273
+      },
+      "role": "changed"
+    },
+    {
+      "id": "9b58606b4a652f7f9bc9500debd30f6d6fc0ccda0d44c170b031c444a909b7d8",
+      "name": "accessReference",
+      "kind": "const-arrow",
+      "declaration": {
+        "snapshotId": "pr25-pinned-call-evidence",
+        "side": "head",
+        "path": "src/storage/access.ts",
+        "contentHash": "0440486de82e136ffe430e4f1bed2b6f57f491319c59a71fad0f9d8507053b4c",
+        "start": 401,
+        "end": 618,
+        "startLine": 8,
+        "endLine": 12
+      },
+      "body": {
+        "snapshotId": "pr25-pinned-call-evidence",
+        "side": "head",
+        "path": "src/storage/access.ts",
+        "contentHash": "0440486de82e136ffe430e4f1bed2b6f57f491319c59a71fad0f9d8507053b4c",
+        "start": 441,
+        "end": 618,
+        "startLine": 8,
+        "endLine": 12
+      },
+      "role": "changed"
+    },
+    {
+      "id": "87929f42616495b59d0eddf0b7fae74b9f7bb9b59370fa7ecc9ef43f91917f68",
+      "name": "localPrincipal",
+      "kind": "const-arrow",
+      "declaration": {
+        "snapshotId": "pr25-pinned-call-evidence",
+        "side": "head",
+        "path": "src/storage/access.ts",
+        "contentHash": "0440486de82e136ffe430e4f1bed2b6f57f491319c59a71fad0f9d8507053b4c",
+        "start": 633,
+        "end": 741,
+        "startLine": 13,
+        "endLine": 13
+      },
+      "body": {
+        "snapshotId": "pr25-pinned-call-evidence",
+        "side": "head",
+        "path": "src/storage/access.ts",
+        "contentHash": "0440486de82e136ffe430e4f1bed2b6f57f491319c59a71fad0f9d8507053b4c",
+        "start": 683,
+        "end": 741,
+        "startLine": 13,
+        "endLine": 13
+      },
+      "role": "changed"
+    },
+    {
+      "id": "45de9228f9ba425ac31b6caf52a5a8e38eed2453afae9ded8675cfea9cc5d270",
+      "name": "credential",
+      "kind": "const-arrow",
+      "declaration": {
+        "snapshotId": "pr25-pinned-call-evidence",
+        "side": "head",
+        "path": "src/storage/analysis.ts",
+        "contentHash": "584ddbec662b403ed2b9dfe50f5b54382347494c12ee735d3442f0db75aca153",
+        "start": 5391,
+        "end": 5713,
+        "startLine": 78,
+        "endLine": 81
+      },
+      "body": {
+        "snapshotId": "pr25-pinned-call-evidence",
+        "side": "head",
+        "path": "src/storage/analysis.ts",
+        "contentHash": "584ddbec662b403ed2b9dfe50f5b54382347494c12ee735d3442f0db75aca153",
+        "start": 5427,
+        "end": 5713,
+        "startLine": 78,
+        "endLine": 81
+      },
+      "role": "changed"
+    },
+    {
+      "id": "a8c654ca7c7645434c5bf747f7663b16400bc283df5d90e8b8aba78510c6928f",
+      "name": "command",
+      "kind": "const-arrow",
+      "declaration": {
+        "snapshotId": "pr25-pinned-call-evidence",
+        "side": "head",
+        "path": "src/storage/analysis.ts",
+        "contentHash": "584ddbec662b403ed2b9dfe50f5b54382347494c12ee735d3442f0db75aca153",
+        "start": 11901,
+        "end": 21811,
+        "startLine": 152,
+        "endLine": 264
+      },
+      "body": {
+        "snapshotId": "pr25-pinned-call-evidence",
+        "side": "head",
+        "path": "src/storage/analysis.ts",
+        "contentHash": "584ddbec662b403ed2b9dfe50f5b54382347494c12ee735d3442f0db75aca153",
+        "start": 11978,
+        "end": 21811,
+        "startLine": 152,
+        "endLine": 264
+      },
+      "role": "changed"
+    },
+    {
+      "id": "8fe18a55b8a787bcd525e502160a59c43dd16ad0f5fe3b3b6cb8549dba77a95d",
+      "name": "<callback@21859>",
+      "kind": "callback",
+      "declaration": {
+        "snapshotId": "pr25-pinned-call-evidence",
+        "side": "head",
+        "path": "src/storage/analysis.ts",
+        "contentHash": "584ddbec662b403ed2b9dfe50f5b54382347494c12ee735d3442f0db75aca153",
+        "start": 21859,
+        "end": 22474,
+        "startLine": 267,
+        "endLine": 272
+      },
+      "body": {
+        "snapshotId": "pr25-pinned-call-evidence",
+        "side": "head",
+        "path": "src/storage/analysis.ts",
+        "contentHash": "584ddbec662b403ed2b9dfe50f5b54382347494c12ee735d3442f0db75aca153",
+        "start": 21923,
+        "end": 22474,
+        "startLine": 267,
+        "endLine": 272
+      },
+      "role": "changed"
+    },
+    {
+      "id": "a475293cfc0f2f7af4e712052918194edc66814a757a3273e83f525bd89cfd08",
+      "name": "<callback@22494>",
+      "kind": "callback",
+      "declaration": {
+        "snapshotId": "pr25-pinned-call-evidence",
+        "side": "head",
+        "path": "src/storage/analysis.ts",
+        "contentHash": "584ddbec662b403ed2b9dfe50f5b54382347494c12ee735d3442f0db75aca153",
+        "start": 22494,
+        "end": 23362,
+        "startLine": 273,
+        "endLine": 279
+      },
+      "body": {
+        "snapshotId": "pr25-pinned-call-evidence",
+        "side": "head",
+        "path": "src/storage/analysis.ts",
+        "contentHash": "584ddbec662b403ed2b9dfe50f5b54382347494c12ee735d3442f0db75aca153",
+        "start": 22562,
+        "end": 23362,
+        "startLine": 273,
+        "endLine": 279
+      },
+      "role": "changed"
+    },
+    {
+      "id": "252d218a5c2df3a0d1c79147df393b0103f976928721cd1ebbae4b0b64d7b4e6",
+      "name": "<callback@23379>",
+      "kind": "callback",
+      "declaration": {
+        "snapshotId": "pr25-pinned-call-evidence",
+        "side": "head",
+        "path": "src/storage/analysis.ts",
+        "contentHash": "584ddbec662b403ed2b9dfe50f5b54382347494c12ee735d3442f0db75aca153",
+        "start": 23379,
+        "end": 25673,
+        "startLine": 280,
+        "endLine": 293
+      },
+      "body": {
+        "snapshotId": "pr25-pinned-call-evidence",
+        "side": "head",
+        "path": "src/storage/analysis.ts",
+        "contentHash": "584ddbec662b403ed2b9dfe50f5b54382347494c12ee735d3442f0db75aca153",
+        "start": 23441,
+        "end": 25673,
+        "startLine": 280,
+        "endLine": 293
+      },
+      "role": "changed"
+    },
+    {
+      "id": "376da0b707c557d3d10e60107943e3d27826d37dc779fdc4011e7b99023c191a",
+      "name": "<callback@25691>",
+      "kind": "callback",
+      "declaration": {
+        "snapshotId": "pr25-pinned-call-evidence",
+        "side": "head",
+        "path": "src/storage/analysis.ts",
+        "contentHash": "584ddbec662b403ed2b9dfe50f5b54382347494c12ee735d3442f0db75aca153",
+        "start": 25691,
+        "end": 26536,
+        "startLine": 294,
+        "endLine": 305
+      },
+      "body": {
+        "snapshotId": "pr25-pinned-call-evidence",
+        "side": "head",
+        "path": "src/storage/analysis.ts",
+        "contentHash": "584ddbec662b403ed2b9dfe50f5b54382347494c12ee735d3442f0db75aca153",
+        "start": 25761,
+        "end": 26536,
+        "startLine": 294,
+        "endLine": 305
+      },
+      "role": "changed"
+    },
+    {
+      "id": "50519257613c9640191a31809e9f740706ad9e8603333adbd57d5adf4262df85",
+      "name": "user",
+      "kind": "const-arrow",
+      "declaration": {
+        "snapshotId": "pr25-pinned-call-evidence",
+        "side": "head",
+        "path": "src/storage/imports.ts",
+        "contentHash": "f29c76c6b9202f53e9d29752ff75f558eeea79739d3c476a93fe3a1e232fa1e2",
+        "start": 3000,
+        "end": 3352,
+        "startLine": 29,
+        "endLine": 29
+      },
+      "body": {
+        "snapshotId": "pr25-pinned-call-evidence",
+        "side": "head",
+        "path": "src/storage/imports.ts",
+        "contentHash": "f29c76c6b9202f53e9d29752ff75f558eeea79739d3c476a93fe3a1e232fa1e2",
+        "start": 3035,
+        "end": 3352,
+        "startLine": 29,
+        "endLine": 29
+      },
+      "role": "changed"
+    },
+    {
+      "id": "a57e3e1634779dac9fb2a6cbce1097811f5c77d8ef8c152cd286194fae42a183",
+      "name": "command",
+      "kind": "const-arrow",
+      "declaration": {
+        "snapshotId": "pr25-pinned-call-evidence",
+        "side": "head",
+        "path": "src/storage/imports.ts",
+        "contentHash": "f29c76c6b9202f53e9d29752ff75f558eeea79739d3c476a93fe3a1e232fa1e2",
+        "start": 5159,
+        "end": 9346,
+        "startLine": 37,
+        "endLine": 73
+      },
+      "body": {
+        "snapshotId": "pr25-pinned-call-evidence",
+        "side": "head",
+        "path": "src/storage/imports.ts",
+        "contentHash": "f29c76c6b9202f53e9d29752ff75f558eeea79739d3c476a93fe3a1e232fa1e2",
+        "start": 5224,
+        "end": 9346,
+        "startLine": 37,
+        "endLine": 73
+      },
+      "role": "changed"
+    },
+    {
+      "id": "244c1cfb44dd9d17493deab78f5a019cf1651844a75350b8f952b41996ba28f9",
+      "name": "<callback@9376>",
+      "kind": "callback",
+      "declaration": {
+        "snapshotId": "pr25-pinned-call-evidence",
+        "side": "head",
+        "path": "src/storage/imports.ts",
+        "contentHash": "f29c76c6b9202f53e9d29752ff75f558eeea79739d3c476a93fe3a1e232fa1e2",
+        "start": 9376,
+        "end": 9594,
+        "startLine": 76,
+        "endLine": 76
+      },
+      "body": {
+        "snapshotId": "pr25-pinned-call-evidence",
+        "side": "head",
+        "path": "src/storage/imports.ts",
+        "contentHash": "f29c76c6b9202f53e9d29752ff75f558eeea79739d3c476a93fe3a1e232fa1e2",
+        "start": 9399,
+        "end": 9594,
+        "startLine": 76,
+        "endLine": 76
+      },
+      "role": "changed"
+    },
+    {
+      "id": "2e0dfcb2b5c914737ae3bcf51e1c56c15e5a65f8d29ee4b9f55571e694df0263",
+      "name": "authenticate",
+      "kind": "const-arrow",
+      "declaration": {
+        "snapshotId": "pr25-pinned-call-evidence",
+        "side": "head",
+        "path": "src/storage/public.ts",
+        "contentHash": "ebf680d4d62a47f92af2123a60673e4ba58c7236257ffc12cea2ddc981791d58",
+        "start": 10314,
+        "end": 10661,
+        "startLine": 200,
+        "endLine": 204
+      },
+      "body": {
+        "snapshotId": "pr25-pinned-call-evidence",
+        "side": "head",
+        "path": "src/storage/public.ts",
+        "contentHash": "ebf680d4d62a47f92af2123a60673e4ba58c7236257ffc12cea2ddc981791d58",
+        "start": 10366,
+        "end": 10661,
+        "startLine": 200,
+        "endLine": 204
+      },
+      "role": "changed"
+    },
+    {
+      "id": "cd343671bea6c89f3bcd6b949a3f3e7f18157565caa6310f7c23ffa5f0d5140e",
+      "name": "storyEvidence",
+      "kind": "const-arrow",
+      "declaration": {
+        "snapshotId": "pr25-pinned-call-evidence",
+        "side": "head",
+        "path": "src/storage/public.ts",
+        "contentHash": "ebf680d4d62a47f92af2123a60673e4ba58c7236257ffc12cea2ddc981791d58",
+        "start": 10720,
+        "end": 17182,
+        "startLine": 206,
+        "endLine": 276
+      },
+      "body": {
+        "snapshotId": "pr25-pinned-call-evidence",
+        "side": "head",
+        "path": "src/storage/public.ts",
+        "contentHash": "ebf680d4d62a47f92af2123a60673e4ba58c7236257ffc12cea2ddc981791d58",
+        "start": 10796,
+        "end": 17182,
+        "startLine": 206,
+        "endLine": 276
+      },
+      "role": "changed"
+    }
+  ],
+  "edges": [
+    {
+      "id": "752a113ae80646508c4e4d8e83a2ae4a9532dcb9a240376281dc8c4f6d189aec",
+      "caller": "bc21ae0e1c83ba2ee39ca558a858869285bf5ce950d508ffb965bb054f43f891",
+      "callee": "c0960f46df6346c7a63510fa8e85e940eb3e4d7a60f58a5adfeac3135cce9c17",
+      "target": {
+        "snapshotId": "pr25-pinned-call-evidence",
+        "side": "base",
+        "path": "src/storage/public.ts",
+        "contentHash": "61878e4c266549993e81985919feaf17995ee53790e49db5ad91d0b278725175",
+        "start": 1138,
+        "end": 1210,
+        "startLine": 29,
+        "endLine": 29
+      },
+      "sites": [
+        {
+          "anchor": {
+            "snapshotId": "pr25-pinned-call-evidence",
+            "side": "base",
+            "path": "src/storage/public.ts",
+            "contentHash": "61878e4c266549993e81985919feaf17995ee53790e49db5ad91d0b278725175",
+            "start": 10310,
+            "end": 10321,
+            "startLine": 199,
+            "endLine": 199
+          },
+          "conditional": false,
+          "linkage": [],
+          "signatures": [],
+          "sourceText": "hash(token)"
+        }
+      ],
+      "method": "ts-static-binding-v1",
+      "certainty": "resolved_static"
+    },
+    {
+      "id": "628ab4e1693f10bab191860c6853239aae6066f3c1a83da53740726cfd14bb93",
+      "caller": "7c3f9246cbf61c473379d361bc61699f42f2492fe8e11183d725a80c6d7c6f62",
+      "callee": "bc21ae0e1c83ba2ee39ca558a858869285bf5ce950d508ffb965bb054f43f891",
+      "target": {
+        "snapshotId": "pr25-pinned-call-evidence",
+        "side": "base",
+        "path": "src/storage/public.ts",
+        "contentHash": "61878e4c266549993e81985919feaf17995ee53790e49db5ad91d0b278725175",
+        "start": 10189,
+        "end": 10440,
+        "startLine": 198,
+        "endLine": 201
+      },
+      "sites": [
+        {
+          "anchor": {
+            "snapshotId": "pr25-pinned-call-evidence",
+            "side": "base",
+            "path": "src/storage/public.ts",
+            "contentHash": "61878e4c266549993e81985919feaf17995ee53790e49db5ad91d0b278725175",
+            "start": 10634,
+            "end": 10653,
+            "startLine": 204,
+            "endLine": 204
+          },
+          "conditional": false,
+          "linkage": [],
+          "signatures": [],
+          "sourceText": "authenticate(token)"
+        }
+      ],
+      "method": "ts-static-binding-v1",
+      "certainty": "resolved_static"
+    },
+    {
+      "id": "0d90b810856bf58cc2e12fcdbfb82130de7f9cc6f92cc684149b757fef363acb",
+      "caller": "45de9228f9ba425ac31b6caf52a5a8e38eed2453afae9ded8675cfea9cc5d270",
+      "callee": "87929f42616495b59d0eddf0b7fae74b9f7bb9b59370fa7ecc9ef43f91917f68",
+      "target": {
+        "snapshotId": "pr25-pinned-call-evidence",
+        "side": "head",
+        "path": "src/storage/access.ts",
+        "contentHash": "0440486de82e136ffe430e4f1bed2b6f57f491319c59a71fad0f9d8507053b4c",
+        "start": 633,
+        "end": 741,
+        "startLine": 13,
+        "endLine": 13
+      },
+      "sites": [
+        {
+          "anchor": {
+            "snapshotId": "pr25-pinned-call-evidence",
+            "side": "head",
+            "path": "src/storage/analysis.ts",
+            "contentHash": "584ddbec662b403ed2b9dfe50f5b54382347494c12ee735d3442f0db75aca153",
+            "start": 5441,
+            "end": 5466,
+            "startLine": 78,
+            "endLine": 78
+          },
+          "conditional": false,
+          "linkage": [
+            {
+              "snapshotId": "pr25-pinned-call-evidence",
+              "side": "head",
+              "path": "src/storage/analysis.ts",
+              "contentHash": "584ddbec662b403ed2b9dfe50f5b54382347494c12ee735d3442f0db75aca153",
+              "start": 24,
+              "end": 38,
+              "startLine": 1,
+              "endLine": 1
+            }
+          ],
+          "signatures": [],
+          "sourceText": "localPrincipal(reference)"
+        }
+      ],
+      "method": "ts-static-binding-v1",
+      "certainty": "resolved_static"
+    },
+    {
+      "id": "531280f76abd7f27f81ea240291d9c9b06d37ca17cae6b84a1f5b1757258012d",
+      "caller": "a8c654ca7c7645434c5bf747f7663b16400bc283df5d90e8b8aba78510c6928f",
+      "callee": "9b58606b4a652f7f9bc9500debd30f6d6fc0ccda0d44c170b031c444a909b7d8",
+      "target": {
+        "snapshotId": "pr25-pinned-call-evidence",
+        "side": "head",
+        "path": "src/storage/access.ts",
+        "contentHash": "0440486de82e136ffe430e4f1bed2b6f57f491319c59a71fad0f9d8507053b4c",
+        "start": 401,
+        "end": 618,
+        "startLine": 8,
+        "endLine": 12
+      },
+      "sites": [
+        {
+          "anchor": {
+            "snapshotId": "pr25-pinned-call-evidence",
+            "side": "head",
+            "path": "src/storage/analysis.ts",
+            "contentHash": "584ddbec662b403ed2b9dfe50f5b54382347494c12ee735d3442f0db75aca153",
+            "start": 12006,
+            "end": 12028,
+            "startLine": 153,
+            "endLine": 153
+          },
+          "conditional": false,
+          "linkage": [
+            {
+              "snapshotId": "pr25-pinned-call-evidence",
+              "side": "head",
+              "path": "src/storage/analysis.ts",
+              "contentHash": "584ddbec662b403ed2b9dfe50f5b54382347494c12ee735d3442f0db75aca153",
+              "start": 8,
+              "end": 23,
+              "startLine": 1,
+              "endLine": 1
+            }
+          ],
+          "signatures": [],
+          "sourceText": "accessReference(token)"
+        }
+      ],
+      "method": "ts-static-binding-v1",
+      "certainty": "resolved_static"
+    },
+    {
+      "id": "e4d16a3589f4598deaef022eba742613170c50f710356f4da6cb041d254c0d99",
+      "caller": "8fe18a55b8a787bcd525e502160a59c43dd16ad0f5fe3b3b6cb8549dba77a95d",
+      "callee": "9b58606b4a652f7f9bc9500debd30f6d6fc0ccda0d44c170b031c444a909b7d8",
+      "target": {
+        "snapshotId": "pr25-pinned-call-evidence",
+        "side": "head",
+        "path": "src/storage/access.ts",
+        "contentHash": "0440486de82e136ffe430e4f1bed2b6f57f491319c59a71fad0f9d8507053b4c",
+        "start": 401,
+        "end": 618,
+        "startLine": 8,
+        "endLine": 12
+      },
+      "sites": [
+        {
+          "anchor": {
+            "snapshotId": "pr25-pinned-call-evidence",
+            "side": "head",
+            "path": "src/storage/analysis.ts",
+            "contentHash": "584ddbec662b403ed2b9dfe50f5b54382347494c12ee735d3442f0db75aca153",
+            "start": 22002,
+            "end": 22024,
+            "startLine": 268,
+            "endLine": 268
+          },
+          "conditional": false,
+          "linkage": [
+            {
+              "snapshotId": "pr25-pinned-call-evidence",
+              "side": "head",
+              "path": "src/storage/analysis.ts",
+              "contentHash": "584ddbec662b403ed2b9dfe50f5b54382347494c12ee735d3442f0db75aca153",
+              "start": 8,
+              "end": 23,
+              "startLine": 1,
+              "endLine": 1
+            }
+          ],
+          "signatures": [],
+          "sourceText": "accessReference(token)"
+        }
+      ],
+      "method": "ts-static-binding-v1",
+      "certainty": "resolved_static"
+    },
+    {
+      "id": "ac6dd6d48575a0760993cc22328bdd716583c84fec5282402dc217eb9ba50ca6",
+      "caller": "a475293cfc0f2f7af4e712052918194edc66814a757a3273e83f525bd89cfd08",
+      "callee": "9b58606b4a652f7f9bc9500debd30f6d6fc0ccda0d44c170b031c444a909b7d8",
+      "target": {
+        "snapshotId": "pr25-pinned-call-evidence",
+        "side": "head",
+        "path": "src/storage/access.ts",
+        "contentHash": "0440486de82e136ffe430e4f1bed2b6f57f491319c59a71fad0f9d8507053b4c",
+        "start": 401,
+        "end": 618,
+        "startLine": 8,
+        "endLine": 12
+      },
+      "sites": [
+        {
+          "anchor": {
+            "snapshotId": "pr25-pinned-call-evidence",
+            "side": "head",
+            "path": "src/storage/analysis.ts",
+            "contentHash": "584ddbec662b403ed2b9dfe50f5b54382347494c12ee735d3442f0db75aca153",
+            "start": 22643,
+            "end": 22665,
+            "startLine": 274,
+            "endLine": 274
+          },
+          "conditional": false,
+          "linkage": [
+            {
+              "snapshotId": "pr25-pinned-call-evidence",
+              "side": "head",
+              "path": "src/storage/analysis.ts",
+              "contentHash": "584ddbec662b403ed2b9dfe50f5b54382347494c12ee735d3442f0db75aca153",
+              "start": 8,
+              "end": 23,
+              "startLine": 1,
+              "endLine": 1
+            }
+          ],
+          "signatures": [],
+          "sourceText": "accessReference(token)"
+        }
+      ],
+      "method": "ts-static-binding-v1",
+      "certainty": "resolved_static"
+    },
+    {
+      "id": "a5564092182a2d9437d3a743b77b632f5c860a8ee0412054525f798a7637147e",
+      "caller": "252d218a5c2df3a0d1c79147df393b0103f976928721cd1ebbae4b0b64d7b4e6",
+      "callee": "9b58606b4a652f7f9bc9500debd30f6d6fc0ccda0d44c170b031c444a909b7d8",
+      "target": {
+        "snapshotId": "pr25-pinned-call-evidence",
+        "side": "head",
+        "path": "src/storage/access.ts",
+        "contentHash": "0440486de82e136ffe430e4f1bed2b6f57f491319c59a71fad0f9d8507053b4c",
+        "start": 401,
+        "end": 618,
+        "startLine": 8,
+        "endLine": 12
+      },
+      "sites": [
+        {
+          "anchor": {
+            "snapshotId": "pr25-pinned-call-evidence",
+            "side": "head",
+            "path": "src/storage/analysis.ts",
+            "contentHash": "584ddbec662b403ed2b9dfe50f5b54382347494c12ee735d3442f0db75aca153",
+            "start": 23521,
+            "end": 23543,
+            "startLine": 281,
+            "endLine": 281
+          },
+          "conditional": false,
+          "linkage": [
+            {
+              "snapshotId": "pr25-pinned-call-evidence",
+              "side": "head",
+              "path": "src/storage/analysis.ts",
+              "contentHash": "584ddbec662b403ed2b9dfe50f5b54382347494c12ee735d3442f0db75aca153",
+              "start": 8,
+              "end": 23,
+              "startLine": 1,
+              "endLine": 1
+            }
+          ],
+          "signatures": [],
+          "sourceText": "accessReference(token)"
+        }
+      ],
+      "method": "ts-static-binding-v1",
+      "certainty": "resolved_static"
+    },
+    {
+      "id": "2037b3bd53681ca45ba4263822c2c85faf8f12493e5f2e3c3c21b4a33ba48708",
+      "caller": "376da0b707c557d3d10e60107943e3d27826d37dc779fdc4011e7b99023c191a",
+      "callee": "9b58606b4a652f7f9bc9500debd30f6d6fc0ccda0d44c170b031c444a909b7d8",
+      "target": {
+        "snapshotId": "pr25-pinned-call-evidence",
+        "side": "head",
+        "path": "src/storage/access.ts",
+        "contentHash": "0440486de82e136ffe430e4f1bed2b6f57f491319c59a71fad0f9d8507053b4c",
+        "start": 401,
+        "end": 618,
+        "startLine": 8,
+        "endLine": 12
+      },
+      "sites": [
+        {
+          "anchor": {
+            "snapshotId": "pr25-pinned-call-evidence",
+            "side": "head",
+            "path": "src/storage/analysis.ts",
+            "contentHash": "584ddbec662b403ed2b9dfe50f5b54382347494c12ee735d3442f0db75aca153",
+            "start": 25847,
+            "end": 25869,
+            "startLine": 295,
+            "endLine": 295
+          },
+          "conditional": false,
+          "linkage": [
+            {
+              "snapshotId": "pr25-pinned-call-evidence",
+              "side": "head",
+              "path": "src/storage/analysis.ts",
+              "contentHash": "584ddbec662b403ed2b9dfe50f5b54382347494c12ee735d3442f0db75aca153",
+              "start": 8,
+              "end": 23,
+              "startLine": 1,
+              "endLine": 1
+            }
+          ],
+          "signatures": [],
+          "sourceText": "accessReference(token)"
+        }
+      ],
+      "method": "ts-static-binding-v1",
+      "certainty": "resolved_static"
+    },
+    {
+      "id": "b284c5f6464aa692f3907d5dcf9a3c4eb483ca33887d33dedec96fb7f0d6027b",
+      "caller": "50519257613c9640191a31809e9f740706ad9e8603333adbd57d5adf4262df85",
+      "callee": "87929f42616495b59d0eddf0b7fae74b9f7bb9b59370fa7ecc9ef43f91917f68",
+      "target": {
+        "snapshotId": "pr25-pinned-call-evidence",
+        "side": "head",
+        "path": "src/storage/access.ts",
+        "contentHash": "0440486de82e136ffe430e4f1bed2b6f57f491319c59a71fad0f9d8507053b4c",
+        "start": 633,
+        "end": 741,
+        "startLine": 13,
+        "endLine": 13
+      },
+      "sites": [
+        {
+          "anchor": {
+            "snapshotId": "pr25-pinned-call-evidence",
+            "side": "head",
+            "path": "src/storage/imports.ts",
+            "contentHash": "f29c76c6b9202f53e9d29752ff75f558eeea79739d3c476a93fe3a1e232fa1e2",
+            "start": 3048,
+            "end": 3073,
+            "startLine": 29,
+            "endLine": 29
+          },
+          "conditional": false,
+          "linkage": [
+            {
+              "snapshotId": "pr25-pinned-call-evidence",
+              "side": "head",
+              "path": "src/storage/imports.ts",
+              "contentHash": "f29c76c6b9202f53e9d29752ff75f558eeea79739d3c476a93fe3a1e232fa1e2",
+              "start": 24,
+              "end": 38,
+              "startLine": 1,
+              "endLine": 1
+            }
+          ],
+          "signatures": [],
+          "sourceText": "localPrincipal(reference)"
+        }
+      ],
+      "method": "ts-static-binding-v1",
+      "certainty": "resolved_static"
+    },
+    {
+      "id": "cb09ce33d57e4fd15953fee9bdbb91355244a78d9c1ce21be48835e9941904e8",
+      "caller": "a57e3e1634779dac9fb2a6cbce1097811f5c77d8ef8c152cd286194fae42a183",
+      "callee": "9b58606b4a652f7f9bc9500debd30f6d6fc0ccda0d44c170b031c444a909b7d8",
+      "target": {
+        "snapshotId": "pr25-pinned-call-evidence",
+        "side": "head",
+        "path": "src/storage/access.ts",
+        "contentHash": "0440486de82e136ffe430e4f1bed2b6f57f491319c59a71fad0f9d8507053b4c",
+        "start": 401,
+        "end": 618,
+        "startLine": 8,
+        "endLine": 12
+      },
+      "sites": [
+        {
+          "anchor": {
+            "snapshotId": "pr25-pinned-call-evidence",
+            "side": "head",
+            "path": "src/storage/imports.ts",
+            "contentHash": "f29c76c6b9202f53e9d29752ff75f558eeea79739d3c476a93fe3a1e232fa1e2",
+            "start": 5244,
+            "end": 5266,
+            "startLine": 38,
+            "endLine": 38
+          },
+          "conditional": false,
+          "linkage": [
+            {
+              "snapshotId": "pr25-pinned-call-evidence",
+              "side": "head",
+              "path": "src/storage/imports.ts",
+              "contentHash": "f29c76c6b9202f53e9d29752ff75f558eeea79739d3c476a93fe3a1e232fa1e2",
+              "start": 8,
+              "end": 23,
+              "startLine": 1,
+              "endLine": 1
+            }
+          ],
+          "signatures": [],
+          "sourceText": "accessReference(token)"
+        }
+      ],
+      "method": "ts-static-binding-v1",
+      "certainty": "resolved_static"
+    },
+    {
+      "id": "c5857bd25fbc9c3529b5bed79ced3cf36015cc2ab0c999334d0df859e4a0ea65",
+      "caller": "244c1cfb44dd9d17493deab78f5a019cf1651844a75350b8f952b41996ba28f9",
+      "callee": "9b58606b4a652f7f9bc9500debd30f6d6fc0ccda0d44c170b031c444a909b7d8",
+      "target": {
+        "snapshotId": "pr25-pinned-call-evidence",
+        "side": "head",
+        "path": "src/storage/access.ts",
+        "contentHash": "0440486de82e136ffe430e4f1bed2b6f57f491319c59a71fad0f9d8507053b4c",
+        "start": 401,
+        "end": 618,
+        "startLine": 8,
+        "endLine": 12
+      },
+      "sites": [
+        {
+          "anchor": {
+            "snapshotId": "pr25-pinned-call-evidence",
+            "side": "head",
+            "path": "src/storage/imports.ts",
+            "contentHash": "f29c76c6b9202f53e9d29752ff75f558eeea79739d3c476a93fe3a1e232fa1e2",
+            "start": 9416,
+            "end": 9438,
+            "startLine": 76,
+            "endLine": 76
+          },
+          "conditional": false,
+          "linkage": [
+            {
+              "snapshotId": "pr25-pinned-call-evidence",
+              "side": "head",
+              "path": "src/storage/imports.ts",
+              "contentHash": "f29c76c6b9202f53e9d29752ff75f558eeea79739d3c476a93fe3a1e232fa1e2",
+              "start": 8,
+              "end": 23,
+              "startLine": 1,
+              "endLine": 1
+            }
+          ],
+          "signatures": [],
+          "sourceText": "accessReference(token)"
+        }
+      ],
+      "method": "ts-static-binding-v1",
+      "certainty": "resolved_static"
+    },
+    {
+      "id": "11d5f31e563ea22a055c57fc88d171066f6471fb7a0ef2187c6410d8cb6f51d5",
+      "caller": "2e0dfcb2b5c914737ae3bcf51e1c56c15e5a65f8d29ee4b9f55571e694df0263",
+      "callee": "9b58606b4a652f7f9bc9500debd30f6d6fc0ccda0d44c170b031c444a909b7d8",
+      "target": {
+        "snapshotId": "pr25-pinned-call-evidence",
+        "side": "head",
+        "path": "src/storage/access.ts",
+        "contentHash": "0440486de82e136ffe430e4f1bed2b6f57f491319c59a71fad0f9d8507053b4c",
+        "start": 401,
+        "end": 618,
+        "startLine": 8,
+        "endLine": 12
+      },
+      "sites": [
+        {
+          "anchor": {
+            "snapshotId": "pr25-pinned-call-evidence",
+            "side": "head",
+            "path": "src/storage/public.ts",
+            "contentHash": "ebf680d4d62a47f92af2123a60673e4ba58c7236257ffc12cea2ddc981791d58",
+            "start": 10399,
+            "end": 10421,
+            "startLine": 201,
+            "endLine": 201
+          },
+          "conditional": false,
+          "linkage": [
+            {
+              "snapshotId": "pr25-pinned-call-evidence",
+              "side": "head",
+              "path": "src/storage/public.ts",
+              "contentHash": "ebf680d4d62a47f92af2123a60673e4ba58c7236257ffc12cea2ddc981791d58",
+              "start": 25,
+              "end": 40,
+              "startLine": 1,
+              "endLine": 1
+            }
+          ],
+          "signatures": [],
+          "sourceText": "accessReference(token)"
+        },
+        {
+          "anchor": {
+            "snapshotId": "pr25-pinned-call-evidence",
+            "side": "head",
+            "path": "src/storage/public.ts",
+            "contentHash": "ebf680d4d62a47f92af2123a60673e4ba58c7236257ffc12cea2ddc981791d58",
+            "start": 10520,
+            "end": 10542,
+            "startLine": 202,
+            "endLine": 202
+          },
+          "conditional": false,
+          "linkage": [
+            {
+              "snapshotId": "pr25-pinned-call-evidence",
+              "side": "head",
+              "path": "src/storage/public.ts",
+              "contentHash": "ebf680d4d62a47f92af2123a60673e4ba58c7236257ffc12cea2ddc981791d58",
+              "start": 25,
+              "end": 40,
+              "startLine": 1,
+              "endLine": 1
+            }
+          ],
+          "signatures": [],
+          "sourceText": "accessReference(token)"
+        }
+      ],
+      "method": "ts-static-binding-v1",
+      "certainty": "resolved_static"
+    },
+    {
+      "id": "c1bc0a6bc8e661aaf924521b0f2f7ed5ef2b74017fb737b08555bb2d01965094",
+      "caller": "2e0dfcb2b5c914737ae3bcf51e1c56c15e5a65f8d29ee4b9f55571e694df0263",
+      "callee": "87929f42616495b59d0eddf0b7fae74b9f7bb9b59370fa7ecc9ef43f91917f68",
+      "target": {
+        "snapshotId": "pr25-pinned-call-evidence",
+        "side": "head",
+        "path": "src/storage/access.ts",
+        "contentHash": "0440486de82e136ffe430e4f1bed2b6f57f491319c59a71fad0f9d8507053b4c",
+        "start": 633,
+        "end": 741,
+        "startLine": 13,
+        "endLine": 13
+      },
+      "sites": [
+        {
+          "anchor": {
+            "snapshotId": "pr25-pinned-call-evidence",
+            "side": "head",
+            "path": "src/storage/public.ts",
+            "contentHash": "ebf680d4d62a47f92af2123a60673e4ba58c7236257ffc12cea2ddc981791d58",
+            "start": 10384,
+            "end": 10422,
+            "startLine": 201,
+            "endLine": 201
+          },
+          "conditional": false,
+          "linkage": [
+            {
+              "snapshotId": "pr25-pinned-call-evidence",
+              "side": "head",
+              "path": "src/storage/public.ts",
+              "contentHash": "ebf680d4d62a47f92af2123a60673e4ba58c7236257ffc12cea2ddc981791d58",
+              "start": 41,
+              "end": 55,
+              "startLine": 1,
+              "endLine": 1
+            }
+          ],
+          "signatures": [],
+          "sourceText": "localPrincipal(accessReference(token))"
+        }
+      ],
+      "method": "ts-static-binding-v1",
+      "certainty": "resolved_static"
+    },
+    {
+      "id": "839deeba342df3613ebd683325e0d330ae47d51afb4bd91ef5c94f95aabd1948",
+      "caller": "cd343671bea6c89f3bcd6b949a3f3e7f18157565caa6310f7c23ffa5f0d5140e",
+      "callee": "2e0dfcb2b5c914737ae3bcf51e1c56c15e5a65f8d29ee4b9f55571e694df0263",
+      "target": {
+        "snapshotId": "pr25-pinned-call-evidence",
+        "side": "head",
+        "path": "src/storage/public.ts",
+        "contentHash": "ebf680d4d62a47f92af2123a60673e4ba58c7236257ffc12cea2ddc981791d58",
+        "start": 10314,
+        "end": 10661,
+        "startLine": 200,
+        "endLine": 204
+      },
+      "sites": [
+        {
+          "anchor": {
+            "snapshotId": "pr25-pinned-call-evidence",
+            "side": "head",
+            "path": "src/storage/public.ts",
+            "contentHash": "ebf680d4d62a47f92af2123a60673e4ba58c7236257ffc12cea2ddc981791d58",
+            "start": 10862,
+            "end": 10881,
+            "startLine": 207,
+            "endLine": 207
+          },
+          "conditional": false,
+          "linkage": [],
+          "signatures": [],
+          "sourceText": "authenticate(token)"
+        }
+      ],
+      "method": "ts-static-binding-v1",
+      "certainty": "resolved_static"
+    }
+  ],
+  "sourceObservedCalls": [],
+  "unresolved": [
+    {
+      "id": "7b84eac28bba86764d383090662066697f341149642badaaa7f6a068b8492e79",
+      "caller": "bc21ae0e1c83ba2ee39ca558a858869285bf5ce950d508ffb965bb054f43f891",
+      "anchor": {
+        "snapshotId": "pr25-pinned-call-evidence",
+        "side": "base",
+        "path": "src/storage/public.ts",
+        "contentHash": "61878e4c266549993e81985919feaf17995ee53790e49db5ad91d0b278725175",
+        "start": 10250,
+        "end": 10305,
+        "startLine": 199,
+        "endLine": 199
+      },
+      "syntax": "CallExpression",
+      "reason": "unsupported_dispatch",
+      "candidates": [],
+      "sourceText": "db.prepare(\"SELECT body FROM credentials WHERE hash=?\")"
+    },
+    {
+      "id": "3e21dfc70958c37fa794688be17f594cbec07a3b28f68342842e21f52971e350",
+      "caller": "bc21ae0e1c83ba2ee39ca558a858869285bf5ce950d508ffb965bb054f43f891",
+      "anchor": {
+        "snapshotId": "pr25-pinned-call-evidence",
+        "side": "base",
+        "path": "src/storage/public.ts",
+        "contentHash": "61878e4c266549993e81985919feaf17995ee53790e49db5ad91d0b278725175",
+        "start": 10250,
+        "end": 10322,
+        "startLine": 199,
+        "endLine": 199
+      },
+      "syntax": "CallExpression",
+      "reason": "unsupported_dispatch",
+      "candidates": [],
+      "sourceText": "db.prepare(\"SELECT body FROM credentials WHERE hash=?\").get(hash(token))"
+    },
+    {
+      "id": "7f1c2718e009ae557dc0eda7b04197ffaeef500bb421308bda05af6e2a4f6cde",
+      "caller": "bc21ae0e1c83ba2ee39ca558a858869285bf5ce950d508ffb965bb054f43f891",
+      "anchor": {
+        "snapshotId": "pr25-pinned-call-evidence",
+        "side": "base",
+        "path": "src/storage/public.ts",
+        "contentHash": "61878e4c266549993e81985919feaf17995ee53790e49db5ad91d0b278725175",
+        "start": 10369,
+        "end": 10394,
+        "startLine": 200,
+        "endLine": 200
+      },
+      "syntax": "NewExpression",
+      "reason": "unsupported_dispatch",
+      "candidates": [],
+      "sourceText": "new Error(\"unauthorized\")"
+    },
+    {
+      "id": "f68982ca75c2d5289d3b82c83ede5d960c19607d00b6788cedbe98105626eeb3",
+      "caller": "bc21ae0e1c83ba2ee39ca558a858869285bf5ce950d508ffb965bb054f43f891",
+      "anchor": {
+        "snapshotId": "pr25-pinned-call-evidence",
+        "side": "base",
+        "path": "src/storage/public.ts",
+        "contentHash": "61878e4c266549993e81985919feaf17995ee53790e49db5ad91d0b278725175",
+        "start": 10402,
+        "end": 10422,
+        "startLine": 200,
+        "endLine": 200
+      },
+      "syntax": "CallExpression",
+      "reason": "unsupported_dispatch",
+      "candidates": [],
+      "sourceText": "JSON.parse(row.body)"
+    },
+    {
+      "id": "8bb8621f1d766d362a9cd402b235d3ed075113780bb69b95b06ace9b9b84a750",
+      "caller": "9b58606b4a652f7f9bc9500debd30f6d6fc0ccda0d44c170b031c444a909b7d8",
+      "anchor": {
+        "snapshotId": "pr25-pinned-call-evidence",
+        "side": "head",
+        "path": "src/storage/access.ts",
+        "contentHash": "0440486de82e136ffe430e4f1bed2b6f57f491319c59a71fad0f9d8507053b4c",
+        "start": 479,
+        "end": 499,
+        "startLine": 9,
+        "endLine": 9
+      },
+      "syntax": "CallExpression",
+      "reason": "external_module",
+      "candidates": [],
+      "sourceText": "createHash('sha256')"
+    },
+    {
+      "id": "49d1058a4a936f15bb75eb8e0aacadc72f0a2c2a1175af690b255e4ff20f6195",
+      "caller": "9b58606b4a652f7f9bc9500debd30f6d6fc0ccda0d44c170b031c444a909b7d8",
+      "anchor": {
+        "snapshotId": "pr25-pinned-call-evidence",
+        "side": "head",
+        "path": "src/storage/access.ts",
+        "contentHash": "0440486de82e136ffe430e4f1bed2b6f57f491319c59a71fad0f9d8507053b4c",
+        "start": 479,
+        "end": 514,
+        "startLine": 9,
+        "endLine": 9
+      },
+      "syntax": "CallExpression",
+      "reason": "unsupported_dispatch",
+      "candidates": [],
+      "sourceText": "createHash('sha256').update(access)"
+    },
+    {
+      "id": "289907fbda2c1df35a9ac307b79193693383752608bcb56423dc3096eec23215",
+      "caller": "9b58606b4a652f7f9bc9500debd30f6d6fc0ccda0d44c170b031c444a909b7d8",
+      "anchor": {
+        "snapshotId": "pr25-pinned-call-evidence",
+        "side": "head",
+        "path": "src/storage/access.ts",
+        "contentHash": "0440486de82e136ffe430e4f1bed2b6f57f491319c59a71fad0f9d8507053b4c",
+        "start": 479,
+        "end": 528,
+        "startLine": 9,
+        "endLine": 9
+      },
+      "syntax": "CallExpression",
+      "reason": "unsupported_dispatch",
+      "candidates": [],
+      "sourceText": "createHash('sha256').update(access).digest('hex')"
+    },
+    {
+      "id": "19e9747e648dd2c689063707e69333bc9b2dd2a2c026d56b93f6ecc4356228fa",
+      "caller": "9b58606b4a652f7f9bc9500debd30f6d6fc0ccda0d44c170b031c444a909b7d8",
+      "anchor": {
+        "snapshotId": "pr25-pinned-call-evidence",
+        "side": "head",
+        "path": "src/storage/access.ts",
+        "contentHash": "0440486de82e136ffe430e4f1bed2b6f57f491319c59a71fad0f9d8507053b4c",
+        "start": 566,
+        "end": 591,
+        "startLine": 10,
+        "endLine": 10
+      },
+      "syntax": "NewExpression",
+      "reason": "unsupported_dispatch",
+      "candidates": [],
+      "sourceText": "new Error('unauthorized')"
+    },
+    {
+      "id": "f183f934f55d3dd643df4fb98b25a79a93e04be2ad40ba9878e998b64955ab77",
+      "caller": "2e0dfcb2b5c914737ae3bcf51e1c56c15e5a65f8d29ee4b9f55571e694df0263",
+      "anchor": {
+        "snapshotId": "pr25-pinned-call-evidence",
+        "side": "head",
+        "path": "src/storage/public.ts",
+        "contentHash": "ebf680d4d62a47f92af2123a60673e4ba58c7236257ffc12cea2ddc981791d58",
+        "start": 10460,
+        "end": 10515,
+        "startLine": 202,
+        "endLine": 202
+      },
+      "syntax": "CallExpression",
+      "reason": "unsupported_dispatch",
+      "candidates": [],
+      "sourceText": "db.prepare(\"SELECT body FROM credentials WHERE hash=?\")"
+    },
+    {
+      "id": "afabc1298883adac8cd4bfd546b3dbfd7c3fe015e943992c2dc5247031854558",
+      "caller": "2e0dfcb2b5c914737ae3bcf51e1c56c15e5a65f8d29ee4b9f55571e694df0263",
+      "anchor": {
+        "snapshotId": "pr25-pinned-call-evidence",
+        "side": "head",
+        "path": "src/storage/public.ts",
+        "contentHash": "ebf680d4d62a47f92af2123a60673e4ba58c7236257ffc12cea2ddc981791d58",
+        "start": 10460,
+        "end": 10543,
+        "startLine": 202,
+        "endLine": 202
+      },
+      "syntax": "CallExpression",
+      "reason": "unsupported_dispatch",
+      "candidates": [],
+      "sourceText": "db.prepare(\"SELECT body FROM credentials WHERE hash=?\").get(accessReference(token))"
+    },
+    {
+      "id": "caa96ea8cc4f3f0497ce3bf2751df37b8363da12a7c967e33aef334de6b456bd",
+      "caller": "2e0dfcb2b5c914737ae3bcf51e1c56c15e5a65f8d29ee4b9f55571e694df0263",
+      "anchor": {
+        "snapshotId": "pr25-pinned-call-evidence",
+        "side": "head",
+        "path": "src/storage/public.ts",
+        "contentHash": "ebf680d4d62a47f92af2123a60673e4ba58c7236257ffc12cea2ddc981791d58",
+        "start": 10590,
+        "end": 10615,
+        "startLine": 203,
+        "endLine": 203
+      },
+      "syntax": "NewExpression",
+      "reason": "unsupported_dispatch",
+      "candidates": [],
+      "sourceText": "new Error(\"unauthorized\")"
+    },
+    {
+      "id": "4da099a93c80c3b6a5d978531994f5f6d67501b527faffd6543369594915d23b",
+      "caller": "2e0dfcb2b5c914737ae3bcf51e1c56c15e5a65f8d29ee4b9f55571e694df0263",
+      "anchor": {
+        "snapshotId": "pr25-pinned-call-evidence",
+        "side": "head",
+        "path": "src/storage/public.ts",
+        "contentHash": "ebf680d4d62a47f92af2123a60673e4ba58c7236257ffc12cea2ddc981791d58",
+        "start": 10623,
+        "end": 10643,
+        "startLine": 203,
+        "endLine": 203
+      },
+      "syntax": "CallExpression",
+      "reason": "unsupported_dispatch",
+      "candidates": [],
+      "sourceText": "JSON.parse(row.body)"
+    }
+  ],
+  "neighborhoods": [
+    {
+      "seed": {
+        "side": "base",
+        "path": "src/storage/public.ts",
+        "contentHash": "61878e4c266549993e81985919feaf17995ee53790e49db5ad91d0b278725175",
+        "start": 10189,
+        "end": 10440
+      },
+      "nodeId": "bc21ae0e1c83ba2ee39ca558a858869285bf5ce950d508ffb965bb054f43f891",
+      "unresolvedSeed": null,
+      "incoming": [
+        "628ab4e1693f10bab191860c6853239aae6066f3c1a83da53740726cfd14bb93"
+      ],
+      "outgoing": [
+        "752a113ae80646508c4e4d8e83a2ae4a9532dcb9a240376281dc8c4f6d189aec"
+      ],
+      "unresolved": [
+        "7b84eac28bba86764d383090662066697f341149642badaaa7f6a068b8492e79",
+        "3e21dfc70958c37fa794688be17f594cbec07a3b28f68342842e21f52971e350",
+        "7f1c2718e009ae557dc0eda7b04197ffaeef500bb421308bda05af6e2a4f6cde",
+        "f68982ca75c2d5289d3b82c83ede5d960c19607d00b6788cedbe98105626eeb3"
+      ],
+      "outgoingAssessment": "invocations_present",
+      "incomingAssessment": "resolved_callers_found",
+      "incomingScope": "supplied_files_only",
+      "limitations": [
+        "static-binding-is-not-runtime-execution",
+        "test-path-classification-is-not-execution-evidence",
+        "incomplete-incoming-source-scope"
+      ]
+    },
+    {
+      "seed": {
+        "side": "head",
+        "path": "src/storage/access.ts",
+        "contentHash": "0440486de82e136ffe430e4f1bed2b6f57f491319c59a71fad0f9d8507053b4c",
+        "start": 401,
+        "end": 618
+      },
+      "nodeId": "9b58606b4a652f7f9bc9500debd30f6d6fc0ccda0d44c170b031c444a909b7d8",
+      "unresolvedSeed": null,
+      "incoming": [
+        "531280f76abd7f27f81ea240291d9c9b06d37ca17cae6b84a1f5b1757258012d",
+        "e4d16a3589f4598deaef022eba742613170c50f710356f4da6cb041d254c0d99",
+        "ac6dd6d48575a0760993cc22328bdd716583c84fec5282402dc217eb9ba50ca6",
+        "a5564092182a2d9437d3a743b77b632f5c860a8ee0412054525f798a7637147e",
+        "2037b3bd53681ca45ba4263822c2c85faf8f12493e5f2e3c3c21b4a33ba48708",
+        "cb09ce33d57e4fd15953fee9bdbb91355244a78d9c1ce21be48835e9941904e8",
+        "c5857bd25fbc9c3529b5bed79ced3cf36015cc2ab0c999334d0df859e4a0ea65",
+        "11d5f31e563ea22a055c57fc88d171066f6471fb7a0ef2187c6410d8cb6f51d5"
+      ],
+      "outgoing": [],
+      "unresolved": [
+        "8bb8621f1d766d362a9cd402b235d3ed075113780bb69b95b06ace9b9b84a750",
+        "49d1058a4a936f15bb75eb8e0aacadc72f0a2c2a1175af690b255e4ff20f6195",
+        "289907fbda2c1df35a9ac307b79193693383752608bcb56423dc3096eec23215",
+        "19e9747e648dd2c689063707e69333bc9b2dd2a2c026d56b93f6ecc4356228fa"
+      ],
+      "outgoingAssessment": "invocations_present",
+      "incomingAssessment": "resolved_callers_found",
+      "incomingScope": "supplied_files_only",
+      "limitations": [
+        "static-binding-is-not-runtime-execution",
+        "test-path-classification-is-not-execution-evidence",
+        "incomplete-incoming-source-scope"
+      ]
+    },
+    {
+      "seed": {
+        "side": "head",
+        "path": "src/storage/access.ts",
+        "contentHash": "0440486de82e136ffe430e4f1bed2b6f57f491319c59a71fad0f9d8507053b4c",
+        "start": 633,
+        "end": 741
+      },
+      "nodeId": "87929f42616495b59d0eddf0b7fae74b9f7bb9b59370fa7ecc9ef43f91917f68",
+      "unresolvedSeed": null,
+      "incoming": [
+        "0d90b810856bf58cc2e12fcdbfb82130de7f9cc6f92cc684149b757fef363acb",
+        "b284c5f6464aa692f3907d5dcf9a3c4eb483ca33887d33dedec96fb7f0d6027b",
+        "c1bc0a6bc8e661aaf924521b0f2f7ed5ef2b74017fb737b08555bb2d01965094"
+      ],
+      "outgoing": [],
+      "unresolved": [],
+      "outgoingAssessment": "No explicit invocation sites in this function body under the supported syntax scan.",
+      "incomingAssessment": "resolved_callers_found",
+      "incomingScope": "supplied_files_only",
+      "limitations": [
+        "static-binding-is-not-runtime-execution",
+        "test-path-classification-is-not-execution-evidence",
+        "incomplete-incoming-source-scope"
+      ]
+    },
+    {
+      "seed": {
+        "side": "head",
+        "path": "src/storage/public.ts",
+        "contentHash": "ebf680d4d62a47f92af2123a60673e4ba58c7236257ffc12cea2ddc981791d58",
+        "start": 10314,
+        "end": 10661
+      },
+      "nodeId": "2e0dfcb2b5c914737ae3bcf51e1c56c15e5a65f8d29ee4b9f55571e694df0263",
+      "unresolvedSeed": null,
+      "incoming": [
+        "839deeba342df3613ebd683325e0d330ae47d51afb4bd91ef5c94f95aabd1948"
+      ],
+      "outgoing": [
+        "11d5f31e563ea22a055c57fc88d171066f6471fb7a0ef2187c6410d8cb6f51d5",
+        "c1bc0a6bc8e661aaf924521b0f2f7ed5ef2b74017fb737b08555bb2d01965094"
+      ],
+      "unresolved": [
+        "f183f934f55d3dd643df4fb98b25a79a93e04be2ad40ba9878e998b64955ab77",
+        "afabc1298883adac8cd4bfd546b3dbfd7c3fe015e943992c2dc5247031854558",
+        "caa96ea8cc4f3f0497ce3bf2751df37b8363da12a7c967e33aef334de6b456bd",
+        "4da099a93c80c3b6a5d978531994f5f6d67501b527faffd6543369594915d23b"
+      ],
+      "outgoingAssessment": "invocations_present",
+      "incomingAssessment": "resolved_callers_found",
+      "incomingScope": "supplied_files_only",
+      "limitations": [
+        "static-binding-is-not-runtime-execution",
+        "test-path-classification-is-not-execution-evidence",
+        "incomplete-incoming-source-scope"
+      ]
+    }
+  ]
+}

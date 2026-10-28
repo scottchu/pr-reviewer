@@ -1,5 +1,10 @@
 # Slice05: follow an explanation and explore
 
+Date: 2026-10-25.
+Status: active; root/reader and one impact example are bounded-reviewed; real meaningfully anchored question/reply plus inner-answer/outerStory Return are source/actualUI verified at34f9a59. Desktop top-call-context framing is author-verified for a fixed recheck; mobile same-canvas v2 proposal awaits explicit adoption. See [current reading-journey handoff](reviews/reading-journey-v1.md#revision21-fixed-candidate-handoff). This is source-informed own-PR dogfood, not unfamiliar whole-journey/human acceptance.
+
+Real business state is20questions/1source-backed root-owner reply, original19placeholder records unchanged. Native generation1 attachment/SAME93894manualSDK is genuine; automatic notifier/catalog remains unavailable. Exact actual source/answer Return follows immediate inner checkpoint first, then earliestStory origin. The measured desktop7.5px change occurred during focus BEFORE capture, not an observed owner restoration clamp. Complete impact coverage, physicaliOS, unfamiliar-understanding and full05/720p gates remain open. No push/merge/runtime authority is implied.
+
 **Packet revision:** 3
 
 **Date:** 2026-10-24
@@ -113,3 +118,27 @@ The [7b6 acceptance receipt](acceptance-7b6.md) closes the original04 G14 bounde
 **Accepted correction:** The durable runtime/access specification now removes manual owner login/token entry. Credential-free workspace opening uses a server-derived local-user principal and trusted storage access; retained history, legacy credential rows/receipts and exact-session agent attachment/generation fences remain. New import/analysis jobs use a stable internal local-owner reference; the local owner can manage its older credential-scoped jobs. Browser private state uses origin/local-owner scope and preserves incompatible legacy records without automatic rekey/replay. See [runtime policy](../../../../product/review-loop/runtime.md) and [correction packet](../../../480p/slices/01-review-loop/single-user-access/plan.md).
 
 Prior passkey/login deferrals are superseded by this correction. Required successor work must use credential-free normal owner calls; old programmatic credential APIs remain compatibility seams. Implementer HTTP, storage, runtime and actual React/reload checks are recorded in the packet; they do not close this slice's independent review, own-PR, native or comprehension gates. Existing pilot routing and data are preserved; deployment remains the coordinator's separate gate.
+
+
+The pre-existing failed-compute selection/reload defect is tracked in the [bounded semantic recovery correction](semantic-recovery-fix.md). Its source checks do not replace UI-first or native acceptance.
+
+## Reviewer-experience design reset
+
+The user rejected the functional preview as the UX target and requested original-reference dissection and design specifications first. [Design review packet v1](reviews/reviewer-experience-design-v1.md) is the next design gate; earlier implementation/check receipts remain bounded engineering history. Do not continue UI composition from those receipts. Independent specification review precedes the next authorized inspectable mockup and its separate adoption decision.
+
+
+## Controlling whole-PR design recovery
+
+The October23 handoff, now paired with the actual three October23 visual concepts, requires a persistent whole-PR spatial graph rather than a single-path teaching mock. The8476 product-fit target/readiness is withdrawn. [Whole-graph mockup v2](whole-pr-graph-mockup-v2.md) is the next bounded implementation/review packet, contingent on coordinator consumption of independent design review. Its complete50-file/163-hunk target and both-side source neighborhoods are durable in [PR25 whole graph](../../../../product/pr25-whole-change-graph.md). No code/runtime work is authorized by this documentation-only correction itself.
+
+## Latest composition gate: panel design v3
+
+[Versioned intake, integrated role decisions and readback handoff](canvas-panel-design-v3.md) supersede v2 composition readiness. Whole-map content remains required. No further UI/mock implementation until the coordinator consumes all three bounded design readbacks.
+
+
+Latest bounded continuation: [reading-journey Revision23 closure](reviews/reading-journey-v1.md) records adopted continuous direct file-call arrows at3f8206b, source/hash and actualdesktop390rechecks, protectedreader/owner state and unchangedreal20Q1reply. Rootpresentation correction is delivered within explicitlimits; mobileStorysamecanvasv2adoption and fullgoalacceptance remain open. Existing source-informed engineering checks do not replace the preserved frozen unfamiliar desktopaccount or establish nativeautomaticdelivery/physicaldevice/crossreloadexactlocalframe guarantees.
+
+Latest live correction: [Revision26 receipt](reviews/reading-journey-v1.md) pins99ee207 for wrapped Split/Unified/source-focus and scoped page-versus-graph gestures, independent source/hash and actual glyph evidence. Preserve the [durable invariant register](../../../../product/protected-invariants.md); physical Safari/independent multitouch, compact own-arrow labels/library integration and mobile Story adoption remain distinct open limits. ELK viewer is a static proposal, not the live app.
+
+
+Controlling2026-10-26: [graph-first recovery](semantic-graph-recovery.md) and [reflection](reviews/reflection-recovery-2026-10-26.md) supersede earlier candidate readiness. Product7ce22b7 and product/test/runtime/data work are frozen. Only docs/model reconciliation is active; source/actual/fresh-docs acceptance remains incomplete. Prior bounded outcomes remain evidence, not current blanket acceptance.

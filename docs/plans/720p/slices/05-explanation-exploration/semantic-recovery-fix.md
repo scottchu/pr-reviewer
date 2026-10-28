@@ -1,0 +1,67 @@
+# Unavailable analysis recovery correction
+
+Date: 2026-10-24
+
+Status: independent source recheck READY and affected author Chrome journey passed; draft publication authorized. Own-PR graph-first, native and deployment acceptance remain open.
+
+Parent: [slice05](plan.md). Durable contract: [story and exploration](../../../../product/review-loop/story-and-exploration.md).
+
+Diagnosis: /tmp/pr-reviewer-semantic-diagnosis/report.md, SHA-256 de8b7b651248a59588ffcd01c86db4bd2dc7e297865ef8dd868e499026b92d07. Reproduced on PR25 head and base: legitimate unavailable compute was captured as an explicit admitted ID; restoration failed and poisoned polling.
+
+Implementation handoff v1: on base e3b270e, change only semantic panel capture and analysis/story application boundaries plus their registered regression tests. No storage/API admission relaxation, workspace wiring, public exports, test jobs, mockups or dependencies. Use existing Node24/Bun and read-only package links from the source-analysis donor. No live pilot/browser/native/config changes or publication.
+
+Regression acceptance: real failed compute through capture/reload preserves drafts and unavailable diagnostics without repeated400; admitted history stays exact; missing/stale/auth/newer IDs do not silently normalize; failed explicit selection restores prior valid polling scope; source inspection cannot pin unavailable compute; inventory-only failure remains separate. Existing generation, abort and late-response tests must pass.
+
+Independent-review handoff v1: root assigns exact returned commit, reads diff against e3b270e and this diagnosis, reproduces focused tests and checks strict/boundaries. Inspect positive normalization proof and negative exclusions, exact rollback and preserved private fields. Source/test evidence is not native or UI-first comprehension acceptance.
+
+
+## Implementation and evidence
+
+Docs-first source: a51f894. The subsequent implementation commit contains this receipt. Diff base: e3b270e5f49a9215452b0b86702946043e979059.
+
+The application bridge now supplies the admitted/analyzed capture identity to the semantic panel and source-inspection pin. Failed explicit selection restores the previous valid snapshot/analysis/view and interrupts the rejected read owner; a later failure from a superseded selection cannot roll back its replacement. Existing pending command identity is retained. Story restoration normalizes only an exact displayed unavailable result backed by a retained unavailable job, with no selected admitted result; it rechecks this proof after readiness before publishing the restored private state. The normalization changes only analysisId and preserves viewport, source anchor/corpus, full-source choice and draft state. The recovery notice survives ordinary checkpoints and resets at a new login/logout/reset lifetime. Arbitrary missing or replaced result IDs are not normalized. Storage and HTTP interfaces are untouched.
+
+TDD: both added regressions failed before the fix: prior valid view was lost after a failed selection; real unavailable compute reload surfaced analysis_record_unavailable. Log: /private/tmp/semantic-recovery-red.log. The real fixture uses 4001 actual calls, successful declaration inventory and a real bounded compute failure; no fabricated storage result or private database edit is used.
+
+Verification (existing Node v24.21.0 and Bun 1.4.2; read-only dependency entry links from /tmp/pr-reviewer-source-analysis/node_modules; no installation):
+
+- Focused semantic application, private recovery and story exploration: 54 passed, 0 failed. Log: /private/tmp/semantic-recovery-green.log. Includes real failed-compute capture/reload, preserved draft/viewport/source/full-source fields, unavailable capture and source-open without invalid pin, arbitrary missing and newer-preparation negative cases, prior valid scope rollback and superseded authorization failure. Existing admitted historical hydration, missing historical-frame failures, credential changes, abort/disposal and return-frame cases pass.
+- Unchanged normal entrypoint: 47 Bun and 308 Node passed, 0 failed. Log: /private/tmp/semantic-recovery-all.log. This includes the existing real inventory-only invocation-site failure, which separately asserts analysis=null and no graph admission. The final focused run additionally strengthened source-field and stale-authorization assertions after that full run; production code was unchanged.
+- Strict TypeScript passed. Log: /private/tmp/semantic-recovery-strict.log. Subsystem boundary and whitespace checks passed.
+
+This is source/application integration evidence, not actual React/browser execution, new own-PR comprehension, native host validation or deployment. The UI change only delegates capture identity to the tested application boundary; its next actual UI acceptance remains open. No browser user state, pilot, native session/configuration, SDK branch, design PR or mockup worktree was changed. No publication is authorized. Root independently reviews the final clean pin, with particular attention to rollback epochs and the narrow unavailable-proof predicate. Effective inherited model/effort telemetry was unavailable; no override or nested agent was used.
+
+
+## Controlled React verification handoff
+
+Reviewed implementation remains 47e3233cb92aa4173027b48466d49f6aea2d10f5. The authorized follow-up adds only documentation and an existing-suite Chrome regression. Use a real Git snapshot, actual gateway/SQLite and owned worker to produce a 4001-call unavailable compute. In actual React, verify new captures have no analysis pin; seed only the documented legacy private-view frame (never analysis storage/results), reload and verify preserved draft/source/view plus honest diagnostic without recurring400. Missing or newer-result pins must remain explicit failures. Use the existing declared Chrome, Playwright, Node24 and Bun with private context/data/ports; no live pilot/user-browser/native or policy/configuration change. One focused author-engineering journey suffices; it does not repeat an independent reviewer's denied action or establish fresh comprehension. A real product defect must be reported before changing the reviewed implementation.
+
+
+## Independent P2 authorization correction
+
+Independent review of 47e3233 reproduced a retained unavailable view after refresh403 followed by Resume performing zero semantic reads, normalizing the pin and consuming the return frame. Evidence: /tmp/pr-reviewer-semantic-recovery-independent/authorization-counterexample.mjs and .log. This invalidates the earlier source-readiness claim for authorization freshness. Require a fresh successful current-owner semantic read before this narrow normalization; failures/supersession retain frame and drafts. Add the exact regression before repair and request original-reviewer recheck. Browser regression work is paused until correction; its first run failed because no initial semantic frame had been captured, not because an admitted result was forged. Browser test changes remain isolated and unaccepted.
+
+
+Correction result: the independent counterexample was reproduced as a registered failing test (missing expected unauthorized rejection) before the repair. Restoration now treats cached diagnostic data only as a candidate and calls the semantic bridge's current-owner refresh before normalization; unauthorized, failed or superseded reads reject without consuming the return frame or drafts. The regression also verifies recovery after authorization succeeds again. Focused suites pass 55/55; strict TypeScript, boundary and whitespace checks pass. Logs: /private/tmp/semantic-recovery-auth-red.log, /private/tmp/semantic-recovery-auth-green.log, /private/tmp/semantic-recovery-auth-strict.log. The earlier whole-suite result remains attributed to 47e3233; no unchanged broad rerun is claimed. Original-reviewer recheck remains required. Browser WIP is retained separately until this corrected implementation is frozen.
+
+
+## Actual Chrome correction verification
+
+Implementation under test: 70f930fc9dc1a310ab8f4605bc5b7d81be1700f5. The subsequent tail contains only the existing semantic browser suite and this receipt; application code remains identical to that review pin.
+
+PASS: one coherent actual React/Chrome journey, 1/1 in 8.8 seconds. Command: existing Node24 runs node_modules/@playwright/test/cli.js test tests/semantic.e2e.ts --grep 'unavailable compute React capture', with its declared Chrome and REVIEW_E2E_ARTIFACT_DIR=/private/tmp/semantic-recovery-browser-artifacts-3. Log: /private/tmp/semantic-recovery-browser-3.log. The test creates real Git source with4001 calls, admits a genuine inventory and runs the actual owned compute to outputSites unavailable; no analysis result, gateway response or admitted storage is fabricated. No participant is attached and no question is sent.
+
+The browser observes persisted draft readiness before compute, then confirms React captures analysisId=null for the new unavailable result. A clearly labeled old-format private session frame is seeded before the next application startup. Reload visibly preserves the draft, exact retained source, full-source state and viewport with the recovery notice. At least three actual semantic reads succeed without an analysis pin. Missing and newer-preparation IDs produce explicit analysis_record_unavailable; subsequent polls remain unpinned200. Screenshot and exact source identities/read statuses are retained in unavailable-recovered.png and unavailable-recovery-evidence.json under the artifact directory; reload-state.json records actual rendered text and the restored frame. Final strict TypeScript and whitespace checks pass. Log: /private/tmp/semantic-recovery-browser-final-strict.log.
+
+Earlier failures are retained: /private/tmp/semantic-recovery-browser.log and artifacts (initial expectation incorrectly required a semantic frame before an authenticated capture transition); /private/tmp/semantic-recovery-browser-2.log and artifacts (live unload/checkpoint replaced a manually seeded current-page frame before reload). The test now waits on real persisted draft state, produces compute afterward, and seeds the legacy envelope before application startup. No arbitrary sleeps, output interception or product behavior change was used to satisfy these assertions. Original WIP remains /private/tmp/semantic-recovery-browser-wip.patch.
+
+This closes the affected author-engineering React regression gap. Independent source recheck, actual own-PR graph-first comprehension and native/deployment acceptance remain separate. No independent browser-policy denial was retried, and no user browser, pilot, native session, permission or global setting was changed.
+
+
+## Independent recheck and draft delivery receipt
+
+Date: 2026-10-24. Independent verdict: READY for bounded source engineering; cached-403 P2 closed with no remaining blocker in the narrow recheck. Exact reviewed implementation: 70f930fc9dc1a310ab8f4605bc5b7d81be1700f5. Report: /tmp/pr-reviewer-semantic-recovery-independent/recheck-70f930f.md. SHA-256: 89b280c56da6c4709d8d1c5e2d43dd910c35fcdc5f8dc25e4b84dc4045dd4a0d. Root read the complete report and the separately attributed Chrome evidence.
+
+The unchanged independent counterexample now exits0, observes one fresh semantic read, rejects unauthorized, preserves the original analysis pin and return frame, and emits no recovery-success notice. Independently rerun focused tests pass55/55; strict TypeScript, boundaries and correction whitespace checks pass. The reviewer did not run the subsequent Chrome journey. The author Chrome test/docs tail614a01f changes no application code from70f930f; this final receipt is documentation-only. The earlier47Bun/308Node result remains attributed to47e3233, not relabeled as a full run of the correction.
+
+Root subsequently authorized draft GitHub publication of this exact recovery branch against main; earlier local-only instructions describe their historical stage. No additional code/dependency changes or unchanged-test reruns accompany this receipt. Independent source readiness and the one author engineering Chrome pass do not establish actual own-PR graph-first comprehension, native host acceptance or deployment. Those gates remain open; no merge/deployment is authorized here.

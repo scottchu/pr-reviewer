@@ -1,6 +1,6 @@
 import {test} from 'node:test';
 import assert from 'node:assert/strict';
-import {createStoryBridge,createPrivateSession,createAnalysisBridge} from '../src/application/public.ts';
+import {createStoryBridge,createPrivateSession,createAnalysisBridge,createCanvasFrameValidator} from '../src/application/public.ts';
 import {graphFiles} from '../src/domain/public.ts';
 import type {StoryContent} from '../src/domain/public.ts';
 import {storyFixture} from './story-fixture.ts';
@@ -21,3 +21,224 @@ test('S11 an oversized draft remains explicitly unavailable after reload and sub
 test('S12 duplicate Resume shares one owned stage and logout aborts its read even when transport ignores abort',async()=>{const h=setup(),b=h.bridge();const transport=globalThis.fetch,calls:{signal:AbortSignal|null|undefined;resolve:(value:Response)=>void}[]=[];try{await b.login(h.f.token,h.snapshot);b.editDraft('Original private draft');b.enterExploration();globalThis.fetch=((input:Parameters<typeof fetch>[0],init?:RequestInit)=>{if(new URL(String(input),'http://local').pathname==='/api/story')return new Promise<Response>(resolve=>calls.push({signal:init?.signal,resolve}));return transport(input,init);}) as typeof fetch;const first=b.resumeStory().catch(error=>error),second=b.resumeStory().catch(error=>error);await new Promise(resolve=>setImmediate(resolve));const count=calls.length;b.logout();const aborted=calls.every(call=>call.signal?.aborted);for(const call of calls)call.resolve(Response.json(h.f.store.story.query(h.f.token,{reviewId:'explore',snapshotId:h.snapshot.snapshotId})));const [old,duplicate]=await Promise.all([first,second]);assert.equal(count,1);assert.equal(aborted,true);assert.match(String(old),/superseded|abort/i);assert.match(String(duplicate),/resume_in_progress/);assert.deepEqual(b.getSnapshot().drafts,[]);assert.equal(b.getSnapshot().returnFrame,null);}finally{b.logout();h.cleanup();}});
 test('S09 explicit cross-snapshot retained draft choice preserves both bodies under its new selection owner',async()=>{const h=setup(),b=h.bridge({selectSnapshot:id=>Promise.resolve({...h.snapshot,snapshotId:id}),readSnapshot:id=>Promise.resolve({...h.snapshot,snapshotId:id})});try{await b.login(h.f.token,h.snapshot);b.editDraft('Original source');b.enterExploration();await b.select({...h.snapshot,snapshotId:'other'});b.editDraft('Other source exploration');await b.resumeStory();const explored=b.getSnapshot().drafts.find(draft=>draft.id!==b.activeDraft()!.id)!;await b.chooseDraft(explored.id);assert.equal(b.getSnapshot().snapshotId,'other');assert.equal(b.activeDraft()?.anchor?.snapshotId,'other');assert.equal(b.activeDraft()?.text,'Other source exploration');assert.equal(b.getSnapshot().drafts.find(draft=>draft.id!==explored.id)?.text,'Original source');}finally{b.logout();h.cleanup();}});
 test('S12 story disposal aborts the staged return and retains its frame through an ignored-abort response',async()=>{const h=setup(),b=h.bridge(),transport=globalThis.fetch;let release!:(value:Response)=>void,signal:AbortSignal|null|undefined;const disconnect=b.connect();try{await b.login(h.f.token,h.snapshot);b.editDraft('Original');b.enterExploration();b.editDraft('Exploration');const frame=b.getSnapshot().returnFrame;globalThis.fetch=((input:Parameters<typeof fetch>[0],init?:RequestInit)=>{if(new URL(String(input),'http://local').pathname==='/api/story'){signal=init?.signal;return new Promise<Response>(resolve=>{release=resolve;});}return transport(input,init);}) as typeof fetch;const resuming=b.resumeStory().catch(error=>error);disconnect();assert.equal(signal?.aborted,true);release(Response.json(h.f.store.story.query(h.f.token,{reviewId:'explore',snapshotId:h.snapshot.snapshotId})));assert.match(String(await resuming),/superseded|abort/i);assert.equal(b.getSnapshot().returnFrame,frame);assert.deepEqual(b.getSnapshot().drafts.map(draft=>draft.text),['Original','Exploration']);assert.deepEqual(b.diagnostics(),[]);}finally{disconnect();b.logout();h.cleanup();}});
+
+test('unavailable-frame normalization revalidates semantic authority and preserves return drafts after403',async()=>{
+ const h=setup(),storyFetch=globalThis.fetch,id='a'.repeat(64);let forbidden=false,reads=0;
+ const diagnostic={reviewId:'explore',snapshotId:h.snapshot.snapshotId,currentSnapshotId:h.snapshot.snapshotId,analysisGeneration:1,graphRevision:0,selectedAnalysisId:null,jobs:[{analysisId:id,state:'unavailable'}],preparation:null,corpus:null,inventory:null,analysis:{analysisId:id,status:'unavailable'},clarifications:[]};
+ globalThis.fetch=(async(input:Parameters<typeof fetch>[0],init?:RequestInit)=>{if(new URL(String(input),'http://local').pathname==='/api/analysis'){reads++;return forbidden?Response.json({error:'unauthorized'},{status:403}):Response.json(diagnostic);}return storyFetch(input,init);}) as typeof fetch;
+ const analysis=createAnalysisBridge('explore'),story=h.bridge({semantic:analysis});
+ try{
+  await analysis.login(h.f.token,h.snapshot.snapshotId);await story.login(h.f.token,h.snapshot);story.editDraft('Original retained draft');story.updateGraphFrame('semantic',{analysisId:id,focus:'',viewport:{x:1,y:2,zoom:1},fullSource:true,sourceAnchor:null,corpusId:null});story.enterExploration();story.editDraft('Exploration draft');
+  forbidden=true;await assert.rejects(analysis.refresh(),/unauthorized/);const frame=story.getSnapshot().returnFrame,drafts=story.getSnapshot().drafts,before=reads;
+  await assert.rejects(story.resumeStory(),/unauthorized/);assert.ok(reads>before);assert.equal(story.getSnapshot().returnFrame,frame);assert.equal(story.getSnapshot().drafts,drafts);assert.equal(story.getSnapshot().mode,'exploring');
+  forbidden=false;await story.resumeStory();assert.equal(story.getSnapshot().returnFrame,null);assert.equal(story.getSnapshot().maps.semantic?.analysisId,null);assert.deepEqual(story.getSnapshot().drafts.map(item=>item.text),['Original retained draft','Exploration draft']);
+ }finally{story.logout();analysis.logout();h.cleanup();}
+});
+
+test('canvas inspection preflight rejects Resume before consuming the exact frame or either draft',async()=>{const h=setup();let checked=0;const b=h.bridge({canvasFrames:{validate:async(snapshot,frame)=>{checked++;assert.equal(snapshot.snapshotId,h.snapshot.snapshotId);assert.equal(frame?.inspection?.anchor.snapshotId,h.snapshot.snapshotId);throw new Error('source_checksum_mismatch');}}});try{await b.login(h.f.token,h.snapshot);b.editDraft('Original canvas draft');b.updateGraphFrame('structural',{fileKey:h.key,context:false,spans:false,spanId:'',viewport:{x:7,y:8,zoom:1},inspection:{anchor:h.ref.anchor,contentHash:'a'.repeat(64)}});b.enterExploration();b.editDraft('Separate canvas exploration draft');const frame=b.getSnapshot().returnFrame,drafts=b.getSnapshot().drafts;await assert.rejects(b.resumeStory(),/checksum/);assert.equal(checked,1);assert.equal(b.getSnapshot().returnFrame,frame);assert.equal(b.getSnapshot().drafts,drafts);assert.equal(b.getSnapshot().mode,'exploring');}finally{b.logout();h.cleanup();}});
+test('canvas preflight is abort-fenced and positive legacy absence adds no validation read',async()=>{const h=setup();let release!:()=>void,signal:AbortSignal|undefined,checks=0,entered!:()=>void;const ready=new Promise<void>(done=>{entered=done;});const b=h.bridge({canvasFrames:{validate:async(_snapshot,_frame,abort)=>{checks++;signal=abort;entered();await new Promise<void>(done=>{release=done;});}}});try{await b.login(h.f.token,h.snapshot);b.editDraft('Original');b.enterExploration();b.editDraft('Exploration');await b.resumeStory();assert.equal(checks,0);b.updateGraphFrame('structural',{fileKey:h.key,context:false,spans:false,spanId:'',viewport:{x:0,y:0,zoom:1},inspection:{anchor:h.ref.anchor,contentHash:h.snapshot.sources[0]!.hash}});b.enterExploration();const resuming=b.resumeStory().catch(error=>error);await ready;assert.ok(signal);const frame=b.getSnapshot().returnFrame;b.editDraft('Newer exploration input');assert.equal(signal.aborted,true);release();assert.match(String(await resuming),/superseded|abort/i);assert.equal(b.getSnapshot().returnFrame,frame);assert.equal(b.activeDraft()?.text,'Newer exploration input');}finally{b.logout();h.cleanup();}});
+
+test('startup canvas preflight preserves rejected saved frame and both drafts, then valid exact source hydrates and resumes',async()=>{const h=setup(),b=h.bridge();try{await b.login(h.f.token,h.snapshot);b.editDraft('Original saved canvas');b.updateGraphFrame('structural',{fileKey:h.key,context:false,spans:false,spanId:'',viewport:{x:3,y:4,zoom:.8},inspection:{anchor:h.ref.anchor,contentHash:'a'.repeat(64)}});b.enterExploration();b.editDraft('Saved exploration canvas');b.updateGraphFrame('structural',{fileKey:h.key,context:false,spans:false,spanId:'',viewport:{x:3,y:4,zoom:.8},inspection:{anchor:h.ref.anchor,contentHash:h.snapshot.sources[0]!.hash}});const before=[...h.m.values.entries()],next=h.bridge({canvasFrames:createCanvasFrameValidator()});await next.login(h.f.token,h.snapshot);assert.match(next.getSnapshot().viewRecoveryMessage,/checksum/);assert.deepEqual([...h.m.values.entries()],before);next.logout();b.updateGraphFrame('structural',{fileKey:h.key,context:false,spans:false,spanId:'',viewport:{x:3,y:4,zoom:.8},inspection:{anchor:h.ref.anchor,contentHash:h.snapshot.sources[0]!.hash}});const saved=JSON.parse([...h.m.values.values()][0]!) as {value:{returnFrame:{maps:{structural:{inspection:{contentHash:string}}}}}};saved.value.returnFrame.maps.structural.inspection.contentHash=h.snapshot.sources[0]!.hash;h.m.values.set([...h.m.values.keys()][0]!,JSON.stringify(saved));const valid=h.bridge({canvasFrames:createCanvasFrameValidator()});await valid.login(h.f.token,h.snapshot);assert.equal(valid.getSnapshot().mode,'exploring');assert.deepEqual(valid.getSnapshot().drafts.map(draft=>draft.text),['Original saved canvas','Saved exploration canvas']);await valid.resumeStory();assert.equal(valid.activeDraft()?.text,'Original saved canvas');assert.equal(valid.getSnapshot().maps.structural?.inspection?.contentHash,h.snapshot.sources[0]!.hash);valid.logout();}finally{b.logout();h.cleanup();}});
+
+test('attention captures the original cursor and dirty draft atomically, repeats, then promotes to evidence', async () => {
+  const h = setup();
+  const b = h.bridge();
+  try {
+    await b.login(h.f.token, h.snapshot);
+    b.editDraft('Original attention draft');
+    const original = b.activeDraft()!;
+    const cursor = b.getSnapshot().cursor;
+    const publications: { cursor: string | undefined; original: string | undefined }[] = [];
+    const unsubscribe = b.subscribe(() => publications.push({
+      cursor: b.getSnapshot().cursor?.stepId,
+      original: b.getSnapshot().returnFrame?.cursor?.stepId,
+    }));
+    assert.equal(b.enterExploration({ allowStoryNavigation: true, navigation: { type: 'next' } }), true);
+    unsubscribe();
+    assert.deepEqual(publications, [{ cursor: 'second', original: 'first' }]);
+    assert.equal(b.getSnapshot().mode, 'paused');
+    const frame = b.getSnapshot().returnFrame;
+    assert.deepEqual(frame?.cursor, cursor);
+    assert.equal(frame?.originalDraftId, original.id);
+    assert.equal(b.getSnapshot().drafts.length, 2);
+    assert.equal(b.enterExploration({ allowStoryNavigation: true, navigation: { type: 'previous' } }), true);
+    assert.equal(b.getSnapshot().returnFrame, frame);
+    assert.equal(b.getSnapshot().drafts.length, 2);
+    b.enterExploration();
+    assert.equal(b.getSnapshot().mode, 'exploring');
+    const explored = b.getSnapshot();
+    assert.equal(b.enterExploration({ allowStoryNavigation: true, navigation: { type: 'next' } }), false);
+    assert.equal(b.getSnapshot(), explored);
+    b.intent({ type: 'next' });
+    assert.equal(b.getSnapshot().cursor?.stepId, 'first');
+    await b.resumeStory();
+    assert.equal(b.activeDraft()?.id, original.id);
+    assert.equal(b.activeDraft()?.text, 'Original attention draft');
+    assert.deepEqual(b.getSnapshot().cursor, cursor);
+  } finally { b.logout(); h.cleanup(); }
+});
+
+test('attention rejects boundaries and pending submission before allocating or mutating a frame', async () => {
+  const h = setup();
+  const b = h.bridge();
+  try {
+    await b.login(h.f.token, h.snapshot);
+    const before = b.getSnapshot();
+    assert.equal(b.enterExploration({ allowStoryNavigation: true, navigation: { type: 'previous' } }), false);
+    assert.equal(b.getSnapshot(), before);
+    b.setQuestionGuard(true);
+    const guarded = b.getSnapshot();
+    assert.throws(() => b.enterExploration({ allowStoryNavigation: true, navigation: { type: 'next' } }), /submission_pending/);
+    assert.throws(() => b.intent({ type: 'next' }), /submission_pending/);
+    assert.equal(b.getSnapshot(), guarded);
+    assert.equal(b.getSnapshot().returnFrame, null);
+    assert.equal(b.getSnapshot().drafts.length, 1);
+  } finally { b.logout(); h.cleanup(); }
+});
+
+test('attention cannot invalidate an in-flight public return', async () => {
+  const h = setup();
+  const b = h.bridge();
+  try {
+    await b.login(h.f.token, h.snapshot);
+    b.enterExploration({ allowStoryNavigation: true, navigation: { type: 'next' } });
+    const frame = b.getSnapshot().returnFrame;
+    const fetchBefore = globalThis.fetch;
+    let release!: () => void;
+    let started!: () => void;
+    const pending = new Promise<void>(resolve => { release = resolve; });
+    const ready = new Promise<void>(resolve => { started = resolve; });
+    globalThis.fetch = (async (...args: Parameters<typeof fetch>) => {
+      if (String(args[0]).startsWith('/api/story?')) { started(); await pending; }
+      return fetchBefore(...args);
+    }) as typeof fetch;
+    const returning = b.resumeStory();
+    await ready;
+    assert.throws(() => b.enterExploration({ allowStoryNavigation: true, navigation: { type: 'previous' } }), /resume_in_progress/);
+    assert.throws(() => b.intent({ type: 'previous' }), /resume_in_progress/);
+    assert.equal(b.getSnapshot().returnFrame, frame);
+    release();
+    await returning;
+    assert.equal(b.getSnapshot().returnFrame, null);
+    assert.equal(b.getSnapshot().cursor?.stepId, 'first');
+  } finally { b.logout(); h.cleanup(); }
+});
+
+
+test('opening real evidence promotes attention without recapturing its original or permitting replay', async () => {
+  const h = setup();
+  const b = h.bridge();
+  try {
+    await b.login(h.f.token, h.snapshot);
+    b.enterExploration({ allowStoryNavigation: true, navigation: { type: 'next' } });
+    const frame = b.getSnapshot().returnFrame;
+    const originalDraftId = frame?.originalDraftId;
+    b.intent({ type: 'replay' });
+    assert.equal(b.getSnapshot().mode, 'paused');
+    await b.openEvidence(h.ref);
+    assert.equal(b.getSnapshot().mode, 'exploring');
+    assert.equal(b.getSnapshot().returnFrame, frame);
+    assert.equal(b.getSnapshot().returnFrame?.originalDraftId, originalDraftId);
+    assert.equal(b.getSnapshot().drafts.length, 2);
+    b.intent({ type: 'previous' });
+    assert.equal(b.getSnapshot().cursor?.stepId, 'second');
+    await b.resumeStory();
+    assert.equal(b.getSnapshot().cursor?.stepId, 'first');
+  } finally { b.logout(); h.cleanup(); }
+});
+
+test('supporting evidence has one answer origin, keeps two drafts and restores inner before the original Story', async () => {
+  const h = setup();
+  const b = h.bridge();
+  try {
+    await b.login(h.f.token, h.snapshot);
+    b.editDraft('Original Story draft');
+    b.enterExploration({ allowStoryNavigation: true, navigation: { type: 'next' } });
+    await b.openEvidence(h.ref);
+    b.editDraft('Current answer draft');
+    const outer = b.getSnapshot().returnFrame;
+    const active = b.getSnapshot().activeDraftId;
+    const id = b.beginSupportingEvidence();
+    const inner = b.getSnapshot().supportingCheckpoint;
+    await b.openEvidence({ ...h.ref, anchor: { ...h.ref.anchor, path: 'support.ts' } });
+    assert.equal(b.beginSupportingEvidence(), id);
+    assert.equal(b.getSnapshot().supportingCheckpoint, inner);
+    assert.equal(b.getSnapshot().returnFrame, outer);
+    assert.equal(b.getSnapshot().drafts.length, 2);
+    await assert.rejects(b.resumeStory(), /supporting_return_required/);
+    await b.resumeSupportingEvidence(id);
+    assert.equal(b.getSnapshot().supportingCheckpoint, null);
+    assert.equal(b.getSnapshot().returnFrame, outer);
+    assert.equal(b.getSnapshot().cursor?.stepId, 'second');
+    assert.deepEqual(b.getSnapshot().evidence, h.ref);
+    assert.equal(b.getSnapshot().activeDraftId, active);
+    assert.equal(b.activeDraft()?.text, 'Current answer draft');
+    await b.resumeStory();
+    assert.equal(b.getSnapshot().cursor?.stepId, 'first');
+    assert.equal(b.activeDraft()?.text, 'Original Story draft');
+  } finally { b.logout(); h.cleanup(); }
+});
+
+test('supporting restore failure and submission lock preserve both checkpoints for exact retry', async () => {
+  const h = setup();
+  let fail = true;
+  const semantic = createAnalysisBridge('explore');
+  const b = h.bridge({ semantic: { ...semantic, select: async () => { if (fail) throw new Error('supporting_analysis_unavailable'); } } });
+  try {
+    await b.login(h.f.token, h.snapshot);
+    b.enterExploration({ allowStoryNavigation: true, navigation: { type: 'next' } });
+    const outer = b.getSnapshot().returnFrame;
+    b.updateGraphFrame('semantic', { analysisId: 'retained', focus: 'fact', fullSource: false, viewport: { x: 2, y: 3, zoom: 1 }, sourceAnchor: null, corpusId: null });
+    const id = b.beginSupportingEvidence();
+    const inner = b.getSnapshot().supportingCheckpoint;
+    await assert.rejects(b.resumeSupportingEvidence(id), /supporting_analysis_unavailable/);
+    assert.equal(b.getSnapshot().supportingCheckpoint, inner);
+    assert.equal(b.getSnapshot().returnFrame, outer);
+    b.setQuestionGuard(true);
+    assert.throws(() => b.beginSupportingEvidence(), /submission_pending/);
+    await assert.rejects(b.resumeSupportingEvidence(id), /submission_pending/);
+    b.setQuestionGuard(false);
+    assert.equal(b.getSnapshot().supportingCheckpoint, inner);
+    fail = false;
+    // Retained semantic lookup remains unavailable in this fixture; no guessed restoration.
+    await assert.rejects(b.resumeSupportingEvidence('another-checkpoint'), /supporting_return_unavailable/);
+    assert.equal(b.getSnapshot().returnFrame, outer);
+  } finally { b.logout(); h.cleanup(); }
+});
+
+test('supporting draft identity changes fail without guessing a replacement or creating a third draft', async () => {
+  const h = setup();
+  const b = h.bridge();
+  try {
+    await b.login(h.f.token, h.snapshot);
+    b.enterExploration({ allowStoryNavigation: true, navigation: { type: 'next' } });
+    const id = b.beginSupportingEvidence();
+    const inner = b.getSnapshot().supportingCheckpoint;
+    const outer = b.getSnapshot().returnFrame;
+    b.confirmDraft(b.getSnapshot().activeDraftId);
+    b.editDraft('New question after submission');
+    await assert.rejects(b.resumeSupportingEvidence(id), /supporting_return_draft_unavailable/);
+    assert.equal(b.getSnapshot().supportingCheckpoint, inner);
+    assert.equal(b.getSnapshot().returnFrame, outer);
+    assert.equal(b.activeDraft()?.text, 'New question after submission');
+    assert.equal(b.getSnapshot().drafts.length, 2);
+  } finally { b.logout(); h.cleanup(); }
+});
+
+test('supporting checkpoints are transient; stale IDs after reload cannot consume the original frame', async () => {
+  const h = setup();
+  const b = h.bridge();
+  try {
+    await b.login(h.f.token, h.snapshot);
+    b.enterExploration({ allowStoryNavigation: true, navigation: { type: 'next' } });
+    const id = b.beginSupportingEvidence();
+    assert.equal(JSON.stringify(b.getPrivateView()).includes('supportingCheckpoint'), false);
+    const reloaded = h.bridge();
+    await reloaded.login(h.f.token, h.snapshot);
+    const outer = reloaded.getSnapshot().returnFrame;
+    assert.equal(reloaded.getSnapshot().supportingCheckpoint, null);
+    await assert.rejects(reloaded.resumeSupportingEvidence(id), /supporting_return_unavailable/);
+    assert.equal(reloaded.getSnapshot().returnFrame, outer);
+    reloaded.logout();
+  } finally { b.logout(); h.cleanup(); }
+});

@@ -1,0 +1,157 @@
+{
+  "records": [
+    {
+      "id": "f564a7aa61fa869b026ae950ef1efc63afc6c17e73c62e10e2c1112122bd1ecf",
+      "canonicalName": "<callback@11440>",
+      "displayName": "review.readSnapshot",
+      "propertyName": "readSnapshot",
+      "basis": "static-object-property",
+      "declaration": {
+        "snapshotId": "pr25-pinned-call-evidence",
+        "side": "base",
+        "path": "src/application/review.ts",
+        "contentHash": "7953f0b8486ae475717bdc749e23a31f12351f41c11a473280de9a2420265477",
+        "start": 11440,
+        "end": 11987,
+        "startLine": 100,
+        "endLine": 100
+      }
+    },
+    {
+      "id": "0b2d05161a2dc2e65e674e8162f100c89b442f4e3222a33a831b354dddf59443",
+      "canonicalName": "<callback@14815>",
+      "displayName": "review.revoke",
+      "propertyName": "revoke",
+      "basis": "static-object-property",
+      "declaration": {
+        "snapshotId": "pr25-pinned-call-evidence",
+        "side": "base",
+        "path": "src/application/review.ts",
+        "contentHash": "7953f0b8486ae475717bdc749e23a31f12351f41c11a473280de9a2420265477",
+        "start": 14815,
+        "end": 15086,
+        "startLine": 117,
+        "endLine": 117
+      }
+    },
+    {
+      "id": "e53a0e1e550c70319e0631dc972ac9cd3de731a2f2fe7f12f5c9c128a3678420",
+      "canonicalName": "<callback@11542>",
+      "displayName": "review.readSnapshot",
+      "propertyName": "readSnapshot",
+      "basis": "static-object-property",
+      "declaration": {
+        "snapshotId": "pr25-pinned-call-evidence",
+        "side": "head",
+        "path": "src/application/review.ts",
+        "contentHash": "dae210c79cb019d6edfdbfacfcf3da1e5773ceb4d15cf747df15ffa498c28e4e",
+        "start": 11542,
+        "end": 12089,
+        "startLine": 101,
+        "endLine": 101
+      }
+    },
+    {
+      "id": "6ec7df3cad91eb8a4b9f24ef980cf0487ef73c648951d2a416b55c74b2a53cd5",
+      "canonicalName": "<callback@14917>",
+      "displayName": "review.revoke",
+      "propertyName": "revoke",
+      "basis": "static-object-property",
+      "declaration": {
+        "snapshotId": "pr25-pinned-call-evidence",
+        "side": "head",
+        "path": "src/application/review.ts",
+        "contentHash": "dae210c79cb019d6edfdbfacfcf3da1e5773ceb4d15cf747df15ffa498c28e4e",
+        "start": 14917,
+        "end": 15188,
+        "startLine": 118,
+        "endLine": 118
+      }
+    },
+    {
+      "id": "8fe18a55b8a787bcd525e502160a59c43dd16ad0f5fe3b3b6cb8549dba77a95d",
+      "canonicalName": "<callback@21859>",
+      "displayName": "analysis.marker",
+      "propertyName": "marker",
+      "basis": "static-object-property",
+      "declaration": {
+        "snapshotId": "pr25-pinned-call-evidence",
+        "side": "head",
+        "path": "src/storage/analysis.ts",
+        "contentHash": "584ddbec662b403ed2b9dfe50f5b54382347494c12ee735d3442f0db75aca153",
+        "start": 21859,
+        "end": 22474,
+        "startLine": 267,
+        "endLine": 272
+      }
+    },
+    {
+      "id": "a475293cfc0f2f7af4e712052918194edc66814a757a3273e83f525bd89cfd08",
+      "canonicalName": "<callback@22494>",
+      "displayName": "analysis.evidence",
+      "propertyName": "evidence",
+      "basis": "static-object-property",
+      "declaration": {
+        "snapshotId": "pr25-pinned-call-evidence",
+        "side": "head",
+        "path": "src/storage/analysis.ts",
+        "contentHash": "584ddbec662b403ed2b9dfe50f5b54382347494c12ee735d3442f0db75aca153",
+        "start": 22494,
+        "end": 23362,
+        "startLine": 273,
+        "endLine": 279
+      }
+    },
+    {
+      "id": "252d218a5c2df3a0d1c79147df393b0103f976928721cd1ebbae4b0b64d7b4e6",
+      "canonicalName": "<callback@23379>",
+      "displayName": "analysis.query",
+      "propertyName": "query",
+      "basis": "static-object-property",
+      "declaration": {
+        "snapshotId": "pr25-pinned-call-evidence",
+        "side": "head",
+        "path": "src/storage/analysis.ts",
+        "contentHash": "584ddbec662b403ed2b9dfe50f5b54382347494c12ee735d3442f0db75aca153",
+        "start": 23379,
+        "end": 25673,
+        "startLine": 280,
+        "endLine": 293
+      }
+    },
+    {
+      "id": "376da0b707c557d3d10e60107943e3d27826d37dc779fdc4011e7b99023c191a",
+      "canonicalName": "<callback@25691>",
+      "displayName": "analysis.source",
+      "propertyName": "source",
+      "basis": "static-object-property",
+      "declaration": {
+        "snapshotId": "pr25-pinned-call-evidence",
+        "side": "head",
+        "path": "src/storage/analysis.ts",
+        "contentHash": "584ddbec662b403ed2b9dfe50f5b54382347494c12ee735d3442f0db75aca153",
+        "start": 25691,
+        "end": 26536,
+        "startLine": 294,
+        "endLine": 305
+      }
+    },
+    {
+      "id": "244c1cfb44dd9d17493deab78f5a019cf1651844a75350b8f952b41996ba28f9",
+      "canonicalName": "<callback@9376>",
+      "displayName": "imports.list",
+      "propertyName": "list",
+      "basis": "static-object-property",
+      "declaration": {
+        "snapshotId": "pr25-pinned-call-evidence",
+        "side": "head",
+        "path": "src/storage/imports.ts",
+        "contentHash": "f29c76c6b9202f53e9d29752ff75f558eeea79739d3c476a93fe3a1e232fa1e2",
+        "start": 9376,
+        "end": 9594,
+        "startLine": 76,
+        "endLine": 76
+      }
+    }
+  ]
+}

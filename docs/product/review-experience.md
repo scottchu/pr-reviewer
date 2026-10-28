@@ -1,0 +1,204 @@
+# The reviewer experience
+
+Latest user correction controls the composition: [canvas workspace and panels](review-loop/canvas-panels.md). No top-down page; context left, detail right, discussion below, gesture-driven persistent graph. The whole-map requirements remain; earlier composition readiness is historical.
+
+Date of organization correction: 2026-10-25.
+Status: accepted direct user correction; file-default candidate rejected as the primary experience.
+The opening graph is organized by supported caller→callee behavior, including necessary unchanged callers and callees, not folders. The file tree is an alternate icon-switched lens over the same PR/source identities. Preserve reading, selection, public story/drafts and exact return across this switch; a lens does not redefine facts or membership. The current partial call evidence must show its actual connected neighborhoods and precise unprepared frontiers while retaining all50source homes. See [F18](pr-file-tree-first.md#f18--same-file-node-callercallee-projection-and-explicit-icon-switching). Prior file-default engineering totals are historical checkpoints, not approval of that experience.
+
+Date: 2026-10-24.
+
+Status: corrected design specification for independent review. The controlling October23 direction is a persistent spatial graph of the whole PR. The user rejected both the8474 control-wall composition and the8476 single-path/locked-pan-zoom mock as product-fit targets. Earlier mock readiness is withdrawn for that scope. No new runtime or accepted product layout is claimed.
+
+Read the [vision](vision.md), [original reference dissection](review-reference-dissection.md), [canvas reading](review-loop/canvas-reading.md), [story ownership](review-loop/story-and-exploration.md) and [contextual comments](review-loop/canvas-comments.md) together. This document owns the coherent reviewer journey; subsystem contracts own their data, authority and recovery. A subsystem is not automatically a top-level destination.
+
+## The person and the outcome
+
+An experienced reviewer is tired and unfamiliar with this PR. They open our own real change to decide what deserves attention. They should not first learn the application's architecture or reconstruct an explanation from imports, function bodies and file counts.
+
+The opening should let them say: “This change tries to solve this problem. This behavior changes here; this consumer or consequence matters. These supporting changes belong to it. Here is what the evidence does and does not tell me.” They can start at a detail instead, question the explanation, and return without losing their place. Seeing a graph or completing its story does not itself establish understanding or correctness.
+
+The next design uses the entire pinned PR25 change graph, with all behavior/support groups present independently of story. The [concrete whole-change map](pr25-whole-change-graph.md) specifies its eight groups,50 primary files, source-backed neighborhoods and unmodeled frontiers. A focused region is a viewport/detail choice, never the data scope. All quoted code, source relationships, scope counts and execution claims must come from that pinned PR/evidence. A short authored explanation has visible attribution. If intent is unknown, say so and explain the observed change; do not fill the gap with a persuasive invented purpose.
+
+## Controlling recovery boundary: semantic graph before projection
+
+Accepted user direction: first settle entities, exact source/comparison identities, typed relations, explanation claims, evidence and unknowns. UIUX is a projection of that account. A prose section, card, count or route cannot supply semantic meaning. Representative changes must be explainable before projection design resumes.
+
+Before implementing a projection, name global/file/change command scope and one owner/lifetime for selected Change, per-file view, reader position/folds/mode, camera, focus and public nested/outer Return. Components must not independently decide window chrome. The observed two-floating-control composition is an unresolved design divergence, not preserved acceptance; no replacement layout is selected here.
+
+Current7ce22b7 is not independently accepted. R30 aliases have author/partial desktop evidence, but source/phone/exact-source visibility gates are incomplete. Whole-product fresh docs review found material input-contract/ownership/norm conflicts; prior knowledge receipts do not close them. Recovery is docs/model-only until its gates and later adopted projection brief. Feedback becomes a scoped task, rationale, counterexample and pre-implementation signal, not another UI patch.
+
+## Feedback as feed-forward design input
+
+Accepted direction: turn situated feedback into guidance before planning and implementation, rather than using it only as a retrospective regression check. Feedback is one input alongside requirements, exact source evidence and unknowns. Preserve its origin, scenario, affected scope, rationale and status (observed, proposed or accepted); later explicit corrections take precedence. An observed complaint is not automatically a universal rule or a frozen invariant.
+
+For accepted feedback, derive intended behavior, scoped constraints, concrete examples/counterexamples and observable pre-implementation acceptance signals. For example, smaller relationship labels must remain subordinate to filenames and beside their OWN arrow, not merely fit a bounding box; softwrap must retain exact source bytes/logical anchors and paired Split heights, not rewrite long lines; mobile controls belong at the fixed bottom with safe-area clearance, not at the desktop's former top position. These examples guide the next design before code. They do not establish that unresolved label placement or physical-device behavior has passed. Use the [invariant register](protected-invariants.md) for accepted preservation boundaries and the [delivery contract](../rules/documentation.md) for the workflow.
+
+## Decision ledger
+
+| Status | Decision |
+|---|---|
+| Accepted user direction | One persistent whole-PR graph canvas; every changed hunk has a graph home, and code neighborhoods expose one-hop callers AND callees on BOTH source sides, including unchanged context or explicit relation gaps; overview → focused group/inline diff → return; source inspection never silently changes a question draft. Basic canvas reading is core. |
+| Accepted user direction | Graph-led optional explanation with why, what/how and a concrete example; all behavior/supporting groups remain canvas members with story off, during steps and after Resume. Arbitrary top-down/bottom-up entry is primary; a story never gates membership or navigation. No API/Helpers orientation selector. |
+| Accepted user direction | Slim one-row floating player, mobile reading pause and exploration/Resume; contextual comments on selected code/prose with human/agent identity. |
+| Selected visual baseline with specific later corrections | Use the actual October23 Behavior Atlas, Dependency Lens and Scope Microscope as the primary spatial/visual references: dark editor foundation, connected nested source/explanation/test nodes, unchanged neighbors and semantic detail. The earlier October11 lesson image is historical, not the controlling layout. Remove orientation controls as the later user correction requires. Exact geometry/tokens remain mockup proposals; no individual variant is claimed selected. |
+| Proposed for design inspection | Whole-map opening hierarchy, group-connected explanation nodes, stable free pan/zoom with independently expandable groups, contextual source/comment actions, narrow spatial reading composition and burden thresholds below. |
+| Unresolved design decision | Replay timing: original demonstrates within the current scene then stops; current engineering advances after eight seconds. Next design proposes a current-scene demonstration ending paused, with explicit Next for the reading boundary. Independent design review and maintainer adoption must settle this before changing application semantics. No automatic progression is necessary to inspect the first mockup. |
+| Outside this decision | New analysis capability, generalized prose persistence, host wake guarantees, test qualification, backend uncertainty fixes or expanding public APIs. Existing technical findings remain backlog, not the current design objective. |
+
+## First viewport: give the reviewer something to understand
+
+Current composition: a viewport-filling graph with default open left context; right sliding explanation and bottom sliding discussion initially closed. There is no outer top-down page. The canvas shows all behavior/support groups and meaningful relations, with source, short claims and tests as connected members. Extended prose and full conversation use the panels described in [canvas panels](review-loop/canvas-panels.md). The single-row player is an optional attention overlay, not the main navigation. Background material is available from the question/context area. It separates captured PR/ticket statements from attributed understanding and missing input. Do not require a ticket service or manufacture one.
+
+The canvas initially shows the whole change map and its multiple responsibilities, their evidenced relations and visible unmodeled boundaries. A suggested starting region may be emphasized, but other groups and unchanged neighboring context remain discoverable and freely navigable. It does not expand every source body. Change markers and relationship kinds are visible without opening a legend; the full legend remains available. Compact group envelopes identify central and supporting/unexplained responsibilities. The full file/hunk membership expands inside those canvas groups; it must not exist only in an off-canvas inventory. History, import, participant administration and job diagnostics are secondary disclosures. A concise unavailable/unknown badge remains beside the affected claim; a hidden details panel cannot be the only warning that an assertion lacks support.
+
+Narrow composition preserves the same graph, with named Context/detail/discussion edge cues and one foreground reader at a time. Readers open from their declared edges and retain hidden target/draft/scroll state; they do not stack into a page. Exact source remains inside graph groups. A phone keyboard may obscure the graph during composition, requiring exact anchor/quote and Reveal origin rather than an impossible simultaneous-content promise. Geometry at390×844 and320×720 is proposed for inspection, not physical-device evidence.
+
+Icons are appropriate for familiar operations with accessible names; they do not replace behavior labels, evidence status or a meaningful question. The obvious primary intent is to explore any meaningful group or relationship; an optional story action is secondary. In-graph semantic zoom or manual expansion reveals source, with equivalent keyboard/touch access; meaningful node/claim activation opens right-side detail under the panel action contract. Do not present “Focus source” and “Zoom into selected group” as competing global primary actions. Back is shown when a prior exploration frame exists; Resume appears when a saved story position exists. Disabled controls do not occupy the opening simply to enumerate capabilities.
+
+## Concrete design content: our own PR25
+
+Use `https://github.com/scottchu/pr-reviewer/pull/25`, comparison baseline `b096826e31c0927190806de91ed70b8b64aa93d8`, head `e3b270e5f49a9215452b0b86702946043e979059`. These local immutable objects were read for this specification; no live PR fetch or runtime was performed. The future whole-graph mock's candidate/build identity is separate and does not yet exist. The path below is one optional example through the [full PR25 graph](pr25-whole-change-graph.md), not its membership boundary or required opening sequence.
+
+Proposed opening question: **“How can I open my local review without a token, while agent requests still have credentials?”** Proposed short account: “The review client now omits the Bearer header for its local-owner session. The gateway treats a request with no Authorization header as its configured local owner; an explicit credential still takes the credential path. The review refresh still requests the same pinned review/snapshot.” Those are source observations below. “This removes a credential-paste interruption for the owner” is attributed product rationale, supported by PR25's recorded single-user-access requirement; the client helper alone does not prove successful opening, network protection or correct agent authentication.
+
+| Claim and proposed displayed node/group | Exact source to follow | What that step establishes / leaves open |
+|---|---|---|
+| Group “Open the local review”; selected node “Build request headers” | Before `src/application/review.ts:24–31`, especially29; after same path25–32, especially30 | Before constructs a Bearer header from captured access; after delegates to accessHeaders. Comparison connection means before/after source, not a call. Source reading opens these ranges inside the same group. |
+| Node “Choose owner or credential headers” | After `src/application/local-access.ts:1–3`; file absent in baseline | The new helper returns no header for local-owner:v1 and a Bearer header otherwise. Concrete source-derived example: local-owner:v1 → no Authorization; a synthetic nonsecret example credential → a Bearer header. This is a branch illustration, not a recorded network run. The request→helper call is directly visible at after review.ts30; render it as a source-observed reference only with its citation or a matching admitted static fact, never as runtime traffic. |
+| Unchanged context node “Refresh the pinned review” | Before review.ts34–44; after35–45; the source bodies are unchanged aside from line shift | The call at after38 still passes the review ID, minimum revision and optional selected snapshot to request. Follow it to understand a consumer of the header change. Unchanged does not mean unaffected: its request policy changes through its dependency. Do not imply it is a new call. |
+| Supporting node “Derive the local owner at the gateway” | After `src/server/public.ts:61–66`; owner capability `src/storage/access.ts:4–14` | Missing Authorization selects store.localOwner; a supplied credential remains separate. Show as an attributed cross-layer explanation with citations, not an invented direct function-call edge from browser fetch to storage. Host/origin validation and complete agent capability enforcement require additional evidence. |
+| Evidence node “Check credential-free owner access” | After `tests/gateway.test.ts:89–110` | Test source includes owner reads/writes and explicit invalid-credential rejection. Label “test definition; not run in this design review.” It is not a passing result or proof of native agent delivery. |
+
+The labels above are proposed reviewer-facing labels, not fabricated persisted node IDs. The mock must bind each to the actual retained snapshot occurrence/side/span and original content hash; preserve real graph IDs where available. If current structural analysis cannot supply a call edge, present the cited relationship as authored source-backed explanation, visibly distinct from an admitted static edge. No demonstration may turn an omitted relation into a confirmed leaf.
+
+One optional route, available without story or Next: read the opening account → select “Build request headers” → see removed direct Bearer construction and added helper use → follow the helper's local-owner branch → inspect unchanged Refresh and see the same selected-snapshot read → ask on after local-access.ts3 “What prevents an explicit invalid credential from becoming the owner?” → inspect the gateway/test-source citations and their unrun limit → Back/Resume restores the original request-header focus and the preserved draft. The comment is a proposed reviewer question, not an existing user's saved message. The answer is not generated or marked delivered by this spec.
+
+For whole-PR scope, disclose that other application consumers, private recovery, gateway/storage adaptation, runtime scripts, UI removal, tests and documentation changed; the selected path explains only one connected part. Derive exact membership/counts from the actual complete PR ledger, rather than presenting these design labels as an exhaustive grouping. Recovery, storage authority, runtime tools, tests and documentation already have their own persistent groups in the whole-map design. Incomplete interpretation is displayed there, not deferred until a later chapter. “No token” must never become “no authorization.”
+
+### Useful first-open when no explanation or participant is ready
+
+The real workspace may have source but no published story and no attached agent. It must still show the pinned change, an honest comparison, complete scope access and the selected source detail. Display “Explanation not available” beside that content; a factual description such as “Request-header construction changed” may come from prepared source, but a full rationale, caller account or the curated story above cannot be silently invented. Do not show a fabricated player count or pretend loading will eventually produce a story without an actual request.
+
+The reviewer can inspect source now or explicitly ask for an explanation on a valid source anchor through the existing question flow. If no responsible session is attached, say that delivery is unavailable and offer the existing attachment guidance contextually; the user initiates attachment from their existing Codex/Claude work session. Do not launch a replacement session or turn opening the PR into a settings wizard. Any saved question and notification disposition follow the existing contract; saving does not mean the agent was notified.
+
+Once an authorized attached participant supplies source-backed context/story via the existing publication ports and answers through the existing reply port, offer the newly available explanation with its author/version. Adoption is explicit and starts paused; publication does not steal the current inspected span or draft. Unsupported native delivery remains pending/unknown. A preauthored PR25 mock story must be labeled prepared design content, not evidence that first-open automatically creates it.
+
+## Actions available anywhere in the persistent graph
+
+The following are reviewer intentions, not ordered screens, a slideshow or a required sequence. A reviewer may begin with a test, recovery function or document and trace up/down. Story selection changes attention only; the spatial contract and acceptance in [the whole-PR map](pr25-whole-change-graph.md) control graph membership and detail.
+
+### 1. Arrive: “Why am I reviewing this?”
+
+**Understand:** the observed change, its stated purpose or missing rationale, the important before/after consequence, and the boundary of the current account. The first viewport uses the hierarchy above; a behavioral sentence points to the already-highlighted group. It does not instruct the reviewer to hunt for a method before offering an explanation.
+
+**Primary interaction:** pan/zoom or select any visible behavior/support group and follow a relationship in either direction. No story or prior step is required. An optional story can suggest a region without hiding others. Context/source provenance, complete scope and historical versions are secondary disclosures beside the relevant content. The initial story is paused, with no comment panel or arbitrary source body forced open. No graph selection creates a question.
+
+**Incomplete state:** loading identifies the pinned PR being prepared without inventing a skeleton call graph. Missing story shows the available source/change map and “Explanation not available”; it does not synthesize a generic tutorial. No review selected offers the existing open/import path in that empty state. Import failure preserves the previously open review. A missing graph relation is “not established”, not “no dependents”.
+
+**Input/narrow behavior:** keyboard reading order follows identity → question/answer → focused group → player; an accessible node list provides the same identities and actions. On mobile, context disclosure returns to the same focused group and reading position. Opening context never starts playback.
+
+### 2. Follow: “What changes, and who or what feels it?”
+
+**Understand:** one concrete decision and its consequence, the direction/kind of a supported relationship, and relevant unchanged behavior. The active graph segment and a short explanation move together. A concrete before/after example uses real inputs/outcomes when evidenced; otherwise it is labeled an illustrative explanation and does not claim observed execution.
+
+**Primary interaction:** choose the connected neighbor or advance one story step. The graph emphasizes the relevant endpoints/edge without removing the surrounding orientation. Source-backed static calls, document links, comparison relations and authored explanation links are visibly different. A proposed impact is attributed as interpretation. Supporting tests/config/docs appear as responsibility groups or explicit unassigned scope, not arbitrary call arrows.
+
+**State/disclosure:** one current explanation is visible; the chapter list opens from player progress rather than duplicating the entire lesson beside every view. Expanded scope offers the actual supporting file list and unexplained counts. Step changes are deliberate, preserve drafts and stop for reading under the proposed mockup behavior. Graph pan/selection/reading pauses playback. Current runtime's different timing is not silently relabeled compliant. Neither timing nor step selection adds/removes graph members.
+
+**Incomplete state:** absent context retains the selected change and names the missing relation/source; failure to load a neighbor does not jump to another one. Keyboard edge/node activation and touch taps reach the same focus; reduced motion conveys the same change through static emphasis. Narrow framing keeps the active relation and an upstream/return cue rather than scaling all text to fit the whole PR.
+
+### 3. Inspect: “Show me exactly what supports that statement.”
+
+**Understand:** the actual removed/added/modified lines, enough unchanged context to interpret them, and whether the claim exceeds its evidence. Activate the highlighted source or use zoom/focused reading to expand that same group in place. The claim remains associated with its source, and the nearest neighbor/return cue remains legible.
+
+**Primary interaction:** read and select source inside the canvas. Desktop before-left/after-right and narrow labeled stacking preserve both identities. Show exact side/path/range and short commit identity close to source; full immutable identity is disclosed there. Inline change markers accompany color. More context belongs at a truncated boundary inside this source group, not in a global toolbar. Horizontal source scrolling is local; text selection must not pan the graph. Zooming out returns detail level without changing story or selecting another node.
+
+**State/disclosure:** inspection has its own focus/span. It does not populate or retarget the question composer. A selected range offers Comment nearby. The player stays paused and outside selected lines; the focused group can reflow without changing node/edge identities. Back restores the prior framing; following an unchanged neighbor makes its unchanged role clear, not a new changed-file claim.
+
+**Incomplete state:** show busy/error inside the requested group while preserving the last valid frame. Binary, absent side, ambiguous counterpart, unavailable source and failed verification have distinct honest labels. Never substitute checkout bytes or invent a partner. An unavailable anchor cannot become a comment submission. Keyboard range selection and a named focus-source action avoid reliance on wheel precision; narrow code remains readable with its neighborhood cue.
+
+### 4. Ask: “Does this mean what I think it means?”
+
+**Understand:** what the question is about, who said what, and whether an answer supplies evidence or leaves a gap. Selecting prose or code reveals one nearby Comment action. Opening it creates a contextual composer with visible anchor/quote, current author identity and applicable persistence limits. Sending is a distinct action; selecting or reading is not a command.
+
+**Primary interaction:** ask about that selection, or open the anchor-adjacent thread marker and reply in context. Human/agent kind and message authors remain visible. Markers use a reserved lane; clusters count threads at the current scope and disclose their anchors/authors. One active thread is enough; zooming out clusters inactive markers rather than covering the graph with bubbles.
+
+**State/disclosure:** the existing draft, anchor and saved story frame survive pan, zoom, lens and reply-source inspection. A dirty or uncertain other draft requires explicit reconciliation rather than silent replacement. Code uses exact retained source anchors. Prose requires stable content identity/version/selection; where unsupported by the backend the mockup visibly says local-only and cannot claim Saved/Delivered/Answered. Server-derived actor identity remains authoritative. Attachment/delivery diagnostics appear with the affected question, not as a prerequisite control wall on arrival.
+
+**Incomplete state:** distinguish saving, saved, notification pending/unknown, working and answered. An answer may be incomplete even when transport succeeded. Unknown submission preserves the existing recovery path, never a second fresh command. A stale prose version shows its anchor as unavailable rather than attaching the quote to equal text in a new version. Close restores focus to the originating selection/marker; Escape closes the local panel without discarding a draft. Touch selection keeps native handles; on narrow screens the thread uses the bottom foreground reader with keyboard/player clearance and retained exact anchor, never an inline group composer.
+
+### 5. Challenge: “What makes this credible, and what remains unchecked?”
+
+**Understand:** which supporting change or test addresses the selected behavior, whether it is only present, claimed relevant, actually run, or unable to establish the claim. Show evidence beside the affected group with source/result provenance and limitation. Do not paint an added test as a passing result.
+
+**Primary interaction:** inspect that evidence in context. A test-source selection focuses its real node/source; an actual result opens its attributed summary and output on demand. A run request appears only for an available configured target, with its exact scope; the design cannot invent per-node executable targets. Full jobs/history, raw output, import and participant setup remain contextual secondary tasks.
+
+**State/disclosure:** evidence inspection pauses and preserves the story return. Missing/unrun/unknown is useful information, not a blank success tile. Pending work never freezes reading or auto-selects a new snapshot when it finishes. Unavailable qualification explains the affected action without blocking unrelated source review. Keyboard/touch can inspect the same evidence; narrow reading retains the behavior/claim heading so a log cannot become an unexplained detached screen.
+
+### 6. Return: “Where was I, and what is my judgment now?”
+
+**Understand:** the original claim in light of the inspected evidence and remaining uncertainty. Back returns one local exploration level; Resume restores the saved exact story position/frame and pauses. The explanation target, inspected source and discussion anchor remain separately labeled and recover their own declared state; no new story version or newest analysis replaces them silently.
+
+**Primary interaction:** Resume then continue, or state a question/judgment supported by specific evidence. End of story offers the remaining scope and unresolved questions, not a “review understood” or automatic approval badge. A complete story is not an acceptance decision.
+
+**Incomplete state:** failed or unauthorized restoration retains the return frame and drafts with a contextual error; do not consume it or substitute current source. A newer available version is offered explicitly. Reload recovery remains bounded by current private-state contracts and their visible limits. Keyboard focus returns to the relevant explanation/group; narrow layout restores readable framing rather than requiring the reviewer to locate the old section manually.
+
+## Preserve state without making the reviewer manage it
+
+The experience distinguishes review snapshot, graph/analysis identity, story version/cursor, canvas viewport/detail, inspected span, explicit question anchor/draft and open thread. They have separate meanings but should not appear as seven setup controls. The current application/domain owners and managed routes preserve their identities. A rendering change cannot bypass authority, reinterpret a failed read as valid restoration, or change persistence schemas without a separate documented implementation scope.
+
+A source fact can support a claim; it cannot prove business intent or execution. A reply can revise the explanation without overwriting the immutable source. A new PR head is an explicit new snapshot. These boundaries should be readable at the relevant decision, not repeated as implementation prose across every band of the opening screen.
+
+## What to retain, what to stop composing
+
+| Current evidence | Reuse or correction |
+|---|---|
+| Retained source/history, structural comparisons, analysis facts/unknowns, story/context values and exact question/reply identities | Reuse through their existing public boundaries. A redesigned journey is not a backend rewrite or a reason to discard recovery safeguards. |
+| Candidate structural in-canvas inspection, source links, hunk focus, separate question intent and transactional Resume | Useful partial foundations. They do not establish that the overall UX helps a tired reviewer. Keep the safeguards while designing the information hierarchy. |
+| Current source separately composes import, story, semantic and structural presentation; rejected mock shows subsystem tabs and global action rows | Stop treating successful individual panels or scenarios as a finished product screen. Integrate around the current review question, group and return state. Separate subsystem mocks remain design investigations, not production navigation requirements. |
+| Supplied 8474 functional mock | Preserve as historical functional evidence only. It is superseded as a UX target; passing selection/return checks cannot make its hierarchy accepted. |
+| Existing source/schema/recovery/test evidence | Retain its bounded engineering meaning. Validation repair, more passing tests and complete inventories are not the current design goal or a substitute for understanding. Known technical findings remain separate backlog. |
+
+## Next inspectable design and acceptance
+
+The next artifact must be the [whole PR25 spatial graph](pr25-whole-change-graph.md), not six screens of a single request/header route. Inspect its overview and two unscripted routes first: start at storage authority (G3), trace its incoming gateway and outgoing owner/authorization context; separately start at private recovery's unchanged hashing helper or its test (G4/G6), trace upward to the changed scope and across to a client consumer. Show both source sides, including missing/added/deleted relations honestly. G1 opening remains one optional region. G5 tools and collapsed G7/G8 docs remain real canvas members.
+
+Acceptance gates for the next mock:
+
+1. **Whole graph before playback:** with no story/explanation selected, all eight groups and their scope are spatially discoverable. Every changed hunk of all50 files has a selectable file/group home, even when its interpretation is marked incomplete. Counts alone do not pass.
+2. **Stable membership:** compare group/node/edge identities at story-off opening, after Next/Previous, exploration and Resume. Same source/analysis means same membership. Culling/collapse affects painting/detail only; story cannot add/remove groups or make unmentioned nodes inaccessible. Actual enrichment/version changes are separately identified.
+3. **Unscripted traversal:** use the two non-opening routes above, then an independently selected group. No Next/chapter is needed to inspect its source, trace caller/callee or cross a supported group relation. A missing relation retains place and shows its gap.
+4. **Both versions and directions:** each changed executable member in the prepared mock exposes B incoming/B outgoing/H incoming/H outgoing facts or explicit unresolved/external/not-modeled status. Show unchanged neighbors and an actual added/removed relation where supported. No invented edge or fake leaf is acceptable.
+5. **Semantic detail:** freely zoom from overview into a non-opening group's actual inline diff, connected explanation and test nodes, then out. Manual/keyboard expansion reaches identical content. No locked pan/zoom, separate file page or step-dependent source swap. The local neighborhood and overview cue remain recognizable at narrow width.
+6. **Inspectable coverage:** verify arbitrary hunk-to-group access against the full immutable diff. Test/docs/support groups are actual canvas members, not an unexplained “other” list. Source coverage and explanation completeness remain different.
+7. **Evidence neighbors:** inspect changed and unchanged test source where present; independently state source status, why it relates, and whether it ran at this exact head. Unrun/unknown cannot appear as green success. A mock does not acquire execution authority.
+8. **Optional story and comments:** only after free exploration, enable story emphasis, leave for another group, ask on exact source/prose, inspect a thread and Resume paused. Original frame/selection/drafts and membership survive. Unsupported prose stays mock-only, and replay timing remains explicitly unresolved.
+
+Evaluate tired-reviewer burden across the **whole PR**, not just the prepared opening question: what changed across responsibilities, where another change belongs, how an unchanged neighbor is affected, which source supports that account and what remains unknown. Freeze a graph-first account before source drilldown, then retain source-corrected understanding and ease critique. A correct answer obtained by manually rebuilding all context remains burdensome. Measure text readability, connectedness, occlusion and narrow navigation when the mock exists; current geometry is proposed, not measured proof.
+
+The next mock is authorized only after the coordinator consumes independent design review. Existing engineering counts, source-informed screenshots, UI-first comprehension and unfamiliar-human/device evidence remain separate. The prior denied browser route remains denied/unrun; do not retry or bypass it.
+
+## Historical learning from the rejected bounded mock
+
+Date: 2026-10-24. Evidence scope: authored PR25 design mock source 43617b7dfc66cf2e80d05200813887c805b8b75a and source-informed supplied-capture critique. The [owning mockup packet](../plans/720p/slices/05-explanation-exploration/reviews/reviewer-experience-mockup-v1.md) records identity and limits. These observations are historical only. The8476 mock is rejected for single-group scope and locked spatial navigation; previous ready judgments do not establish product fit. Readability/clearance observations may inform the whole-graph mock but cannot reinstate its narrowed interaction.
+
+- The narrow opening needs the **changed relationship**, not merely the first node of an upstream chain. A compact named unchanged-refresh cue can preserve direction and citation while request → accessHeaders and the owner/credential outcomes occupy the first reading area. Replacing generic helper labels with their source-supported branch consequence reduces translation between prose and graph. This is an authored visual observation, not a measured comprehension improvement.
+- A fixed player needs an actual reserved reading region. End-of-page padding alone still permits overlap in the middle of a long source view. The mock's scrolling reading viewport ends above its player rail; the shortest composer view retains a compact side/path/line cue beside its draft label. A reduced-height browser simulation is not physical software-keyboard evidence.
+- Exact bytes alone do not make source readable. Long compressed request lines hid the decisive header expression in a side-by-side viewport. The mock first shows that exact changed line, soft-wrapped without changing its bytes or offsets; retained surrounding function context remains inline. Supporting test source stays explicitly unrun. This establishes a useful reading treatment to inspect, not a new parser, inferred function pairing or execution result.
+
+The mock retains the selected dark editor foundation, question-led hierarchy and quiet single-row paused player. Source inspection is within the same authored group, with a held source/step and independent local anchored draft. Pan/zoom was locked in this rejected bounded version; direct activation alone did not satisfy semantic zoom or a navigable whole-PR map. It does not establish the complete persistent canvas, native graph projection, reload recovery, backend prose comments, participant notification, native delivery or real test execution. The prepared agent example is visibly separate from the unsent draft. Independent UI-first comprehension remains unrun under the retained policy denial; supplied screenshots and source-informed critique are separate evidence.
+
+
+## Review feedback and implementation feed-forward share an account
+
+The same graph can support reviewing a Change and preparing future work. Forward reading: observed reality → expected reality → identified gap → optional chosen partial scope → Change (code + docs). Backward reading: Change (code + docs) → addressed slice (targeted gap or chosen partial scope) → original observed gap → expected reality → previous observed reality. A partial gap is optional scoped work within the original evidenced gap, not an invented problem or mandatory new ontology level. Record actual links and distinguish recorded author intent from a later inferred reconstruction; do not invent missing provenance or runtime claims from the diff.
+
+A Change targeting or implementing a gap does not mean that gap is resolved. Compare subsequent observed reality with expectations before asserting closure. Unexpected gaps become the next feed-forward input. This accepted product direction adds no planning UI, mandatory entity types or new hierarchy in the current minimum projection.
+
+
+## Understand how smaller units build the larger account
+
+Reviewers need PR, File, Function and supported meaningful smaller-unit views. Top-down reading asks why/what at the larger scope, then drills into the actual units, relationships and evidence. Bottom-up reading explains how those units contribute to the larger structural/behavioral account and intended change, with uncertainty retained. Use the [multilevel ontology contract](project-repository-tbox.md#multilevel-understanding-units-and-their-contribution): review-scope membership, lexical containment and cross-file dependency are different. The same entity can appear in multiple projections; positions or summary levels do not create duplicate identities or new relations.
+
+At each represented level keep why, what changed, related context, exact source/evidence and parent contribution inspectable; label gaps rather than manufacture explanation. Smaller units are optional when meaningful/evidenced, not an AST inventory requirement. Rollup does not imply automatic status/causation/goal aggregation. This is accepted reading direction; its exact projection remains to be designed within the current no-panel scope, not delivered by writing this requirement.

@@ -1,0 +1,80 @@
+* { box-sizing: border-box; }
+html, body, #root { width: 100%; height: 100%; margin: 0; }
+body { background: #171d22; color: #e2e8ed; font-family: system-ui, sans-serif; }
+#root { display: flex; flex-direction: column; }
+.minimal-header { padding: 14px 20px; border-bottom: 1px solid #3b454e; flex: none; }
+.minimal-header h1 { margin: 0 0 5px; font-size: 18px; font-weight: 600; }
+.minimal-header p { margin: 0; color: #afbfcc; font-size: 12px; }
+main { flex: 1; min-height: 0; }
+.minimal-entity { width: 300px; padding: 12px 14px; background: #263139; color: #e2e8ed; border: 1px solid #718694; border-radius: 6px; }
+.minimal-entity h2 { margin: 0; font-size: 14px; font-weight: 500; line-height: 1.45; overflow-wrap: anywhere; }
+.minimal-entity p { margin: 6px 0 0; font-size: 12px; line-height: 1.45; overflow-wrap: anywhere; }
+.version-tag { display: inline-block; font-size: 11px; line-height: 1.5; font-weight: 600; }
+.minimal-entity .version-tag { margin-bottom: 5px; }
+.version-before { background: #fae5e4; border-color: #ca7e7b; color: #642b29; }
+.version-after { background: #e3f3e8; border-color: #76ac89; color: #25543a; }
+.minimal-change-graph { position: relative; width: 100%; height: 100%; border: 2px solid #ad95c6; border-radius: 10px; background: #2b27314d; padding: 20px; }
+.minimal-change-graph > h2 { margin: 0; font-size: 17px; font-weight: 500; }
+.minimal-edge-card { position: absolute; width: max-content; max-width: 280px; margin: 0; padding: 9px 12px; background: #263139; border: 1px solid #718694; border-radius: 5px; font-size: 12px; line-height: 1.45; pointer-events: none; }
+.minimal-edge-card.version-before { background: #fae5e4; border-color: #ca7e7b; color: #642b29; }
+.minimal-edge-card.version-after { background: #e3f3e8; border-color: #76ac89; color: #25543a; }
+.edge-main-row { display: flex; align-items: baseline; gap: 9px; flex-wrap: wrap; }
+.minimal-edge-card p { margin: 4px 0 0; font-size: 11px; }
+.react-flow__edgelabel-renderer { z-index: 2; }
+.react-flow__node-graph { z-index: -1 !important; }
+.react-flow__edge-path { stroke: #9db3c8; stroke-width: 1.6; }
+.react-flow__handle { width: 6px; height: 6px; background: #91a9ba; border: 0; }
+@media (max-width: 649px) {
+  .minimal-header { padding: 12px 14px; }
+  .minimal-header h1 { font-size: 16px; }
+}
+
+/* Entity comparison status is a separate axis from edge source-version color. */
+.minimal-entity.status-change { background: #fff0bd; border-color: #b79b43; color: #5c4918; }
+.minimal-entity.status-add { background: #e3f3e8; border-color: #76ac89; color: #25543a; }
+.minimal-entity.status-remove { background: #fae5e4; border-color: #ca7e7b; color: #642b29; }
+
+/* Local layout gestures own their pointer, without canvas pan or text selection. */
+.minimal-edge-card { pointer-events: all; touch-action: none; user-select: none; cursor: grab; }
+.minimal-edge-card:active { cursor: grabbing; }
+.minimal-edge-card:focus-visible { outline: 2px solid #bed8ed; outline-offset: 3px; }
+.react-flow__node { touch-action: none; }
+
+/* Anchors remain for edge geometry; this view does not edit connections. */
+.react-flow__handle { opacity: 0; pointer-events: none; }
+
+.minimal-route { cursor: grab; touch-action: none; }
+.minimal-route:active { cursor: grabbing; }
+
+/* Nonselectable ReactFlow edges remain directly draggable through their stroke. */
+.minimal-route .react-flow__edge-interaction { pointer-events: stroke; touch-action: none; }
+
+/* A noninteractive point anchor: ReactFlow uses its edge, so size must be zero. */
+.react-flow__handle { width: 0; height: 0; min-width: 0; min-height: 0; }
+
+/* Source cards always paint above cross-group edge strokes. */
+.react-flow__node-entity { z-index: 3 !important; }
+
+/* Type icons are decorative; name, status and evidence remain readable text. */
+.minimal-entity h2, .minimal-change-graph > h2 { display: flex; align-items: flex-start; gap: 9px; }
+.entity-icon { width: 20px; height: 20px; flex: 0 0 20px; }
+.minimal-change-graph > h2 .entity-icon { width: 23px; height: 23px; flex-basis: 23px; }
+
+.file-unit-actions { display:flex; gap:8px; margin-top:10px; flex-wrap:wrap; }
+.file-unit-actions button { color:inherit; background:transparent; border:1px solid currentColor; border-radius:4px; padding:5px 7px; font:inherit; font-size:11px; cursor:pointer; }
+.unpaired-source { font-size:11px; margin-top:8px; }
+.unpaired-source summary { cursor:pointer; }
+
+/* Coarse input reserves movement for explicit controls; other card/line regions pan. */
+.graph-drag-handle { display:none; }
+.coarse-input .graph-drag-handle { display:inline-flex; align-items:center; justify-content:center; width:32px; height:32px; padding:0; border:1px solid currentColor; border-radius:4px; background:transparent; color:inherit; font:inherit; font-size:20px; cursor:grab; touch-action:none; user-select:none; }
+.coarse-input .minimal-entity { position:relative; }
+.coarse-input .minimal-entity > .graph-drag-handle,
+.coarse-input .minimal-change-graph > .graph-drag-handle { position:absolute; right:8px; top:8px; }
+.coarse-input .minimal-entity h2,
+.coarse-input .minimal-change-graph > h2 { padding-right:34px; }
+.coarse-input .minimal-edge-card > .graph-drag-handle { float:right; margin-left:8px; }
+.coarse-input .graph-drag-handle:focus-visible { outline:2px solid #bed8ed; outline-offset:3px; }
+.coarse-input .minimal-route,
+.coarse-input .minimal-route path { pointer-events:none; touch-action:auto; }
+.coarse-input .react-flow__node { touch-action:none; }

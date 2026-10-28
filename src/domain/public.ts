@@ -402,5 +402,14 @@ export type {AnalysisMarker,AnalysisMarkerQuery} from './semantic.ts';
 export {analysisEvidenceQuerySchema} from './semantic.ts';
 export type {AnalysisEvidence,AnalysisEvidenceQuery} from './semantic.ts';
 
+export {headTestEffectOccupiesSlot,headTestDefinition,headTestCanonical,HEAD_TEST_DEFINITION_DIGEST,headTestCommandSchema,headTestScopeSchema,headTestQuerySchema} from "./head-tests.ts";
+export type {HeadTestDefinition,HeadTestCommand,HeadTestScope,HeadTestQuery,HeadTestTarget,HeadTestTargets,HeadTestInvocation,HeadTestJob,HeadTestReceipt,HeadTestView} from "./head-tests.ts";
 export {processQuiescenceEligible} from './process.ts';
 export type {ProcessQuiescenceRecord} from './process.ts';
+
+export {headTestArtifactQuerySchema} from "./head-tests.ts";
+export type {HeadTestResult,HeadTestArtifact,HeadTestAdmissionReceipt,HeadTestArtifactQuery,HeadTestArtifactView} from "./head-tests.ts";
+
+export type {HeadTestProcessExecution,HeadTestVerification} from './head-tests.ts';
+
+export {headTestTargetsSchema,headTestReceiptSchema,headTestViewSchema,headTestArtifactViewSchema} from './head-test-responses.ts';

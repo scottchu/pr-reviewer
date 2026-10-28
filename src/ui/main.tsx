@@ -1,10 +1,10 @@
 import React, { useCallback, useEffect, useState, useSyncExternalStore } from "react";
 import { createRoot } from "react-dom/client";
 import { createReviewWorkspace, createImportsBridge, storyProjection, questionStatus } from "../application/public.ts";
-import {sourceComparison} from "../domain/public.ts";
-import type { Anchor, Review, SourceView } from "../domain/public.ts";
+import type { Anchor } from "../domain/public.ts";
 import "./style.css";
-import { ReviewGraph } from "./graph.tsx";
+import {SourceCanvasGraph} from "./source-canvas.tsx";
+import {HeadTests} from './head-tests.tsx';
 import {Imports} from "./imports.tsx";
 import {StoryPanel,QuestionEvidenceStatus} from "./story.tsx";
 import {SemanticPanel} from "./semantic-panel.tsx";
@@ -12,80 +12,6 @@ const initialWorkspace = () => createReviewWorkspace(
   new URLSearchParams(window.location.search).get("reviewId") ?? "pr-14",
   new URLSearchParams(window.location.search).get("snapshotId")??undefined,
 );
-const SourcePane = ({
-  source,
-  review,
-  selected,
-  onSelect,
-}: {
-  source: SourceView;
-  review: Review;
-  selected: Anchor;
-  onSelect: (anchor: Anchor) => void;
-}) => {
-  return (
-    <section
-      className="source-pane"
-      aria-label={`${source.side === "base" ? "Before" : "After"} source`}
-    >
-      <header>
-        <h2>{source.side === "base" ? "Before" : "After"}</h2><span>{source.path}</span>
-        <span>
-          {source.side === "base"
-            ? "− removals · ∼ modifications"
-            : "＋ additions · ∼ modifications"}
-        </span>
-      </header>
-      {source.lines.some(line=>line.status==="not_analyzed")&&<p className="comparison-unknown">Comparison not analyzed: the opposite source is unavailable or exceeds the comparison budget. These lines are not labeled additions/removals.</p>}
-      <div className="source-scroll">
-        <ol>
-          {source.lines.map(({ text: line, number, status }) => {
-            const changed = status !== "unchanged" && status !== "not_analyzed",
-              active =
-                selected.path === source.path &&
-                selected.side === source.side &&
-                number >= selected.startLine &&
-                number <= selected.endLine;
-            return (
-              <li
-                key={number}
-                id={`source-${source.side}-${number}`}
-                className={`${status} ${active ? "selected" : ""}`}
-              >
-                <button
-                  type="button"
-                  aria-label={`Select ${source.side} line ${number}`}
-                  aria-pressed={active}
-                  onClick={() =>
-                    onSelect({
-                      snapshotId: review.snapshot.snapshotId,
-                      path: source.path,
-                      side: source.side,
-                      startLine: number,
-                      endLine: number,
-                    })
-                  }
-                >
-                  {number}
-                </button>
-                <span className="change-marker" aria-label={`${status} line`}>
-                  {status === "not_analyzed" ? "?" : status === "modified"
-                    ? "∼"
-                    : changed
-                      ? source.side === "base"
-                        ? "−"
-                        : "+"
-                      : " "}
-                </span>
-                <code>{line || " "}</code>
-              </li>
-            );
-          })}
-        </ol>
-      </div>
-    </section>
-  );
-};
 const App = () => {
   const [workspace,setWorkspace]=useState(initialWorkspace);
   const {review:bridge,analysis:analysisBridge,story:storyBridge}=workspace;
@@ -105,7 +31,6 @@ const App = () => {
   useEffect(()=>{const current=state.review;if(!state.authenticated||!current)return;const url=new URL(window.location.href);url.searchParams.set('reviewId',current.reviewId);url.searchParams.set('snapshotId',current.snapshot.snapshotId);window.history.replaceState(null,'',url);},[state.authenticated,state.review?.reviewId,state.review?.snapshot.snapshotId]);
   useEffect(()=>{const scroll=()=>storyBridge.setPageScroll(window.scrollY);window.addEventListener('scroll',scroll,{passive:true});return()=>window.removeEventListener('scroll',scroll);},[storyBridge]);
   useEffect(()=>{if(storyState.mapRestoreId)requestAnimationFrame(()=>window.scrollTo({top:storyState.pageScroll}));},[storyBridge,storyState.mapRestoreId]);
-  const captureStructural=useCallback((frame:import('../application/public.ts').GraphFrames['structural'])=>workspace.captureMap('structural',state.review?.snapshot.snapshotId??null,frame),[workspace,state.review?.snapshot.snapshotId,storyState.snapshotId]);
   const captureSemantic=useCallback((frame:import('../application/public.ts').GraphFrames['semantic'],snapshotId:string|null)=>workspace.captureMap('semantic',snapshotId,frame),[workspace,storyState.snapshotId]);
   const review=state.review;
   if (!state.authenticated || !review)
@@ -122,89 +47,17 @@ const App = () => {
   };
   const pauseStory=()=>storyBridge.intent({type:"pause",reason:"reading"});
   const openSource=async(anchor:Anchor,fileKey?:string)=>{
-    pauseStory();try{await workspace.openSource(anchor,fileKey);}catch(error){setInteractionError(error instanceof Error?error.message:'source_unavailable');return;}
-    const url=new URL(window.location.href);url.searchParams.set('snapshotId',anchor.snapshotId);url.hash=`source-${anchor.side}-${anchor.startLine}`;window.history.replaceState(null,'',url);
-    requestAnimationFrame(()=>document.getElementById(`source-${anchor.side}-${anchor.startLine}`)?.scrollIntoView({block:'center'}));
+    pauseStory();try{await workspace.inspectSource(anchor,fileKey);}catch(error){setInteractionError(error instanceof Error?error.message:'source_unavailable');return;}
+    const url=new URL(window.location.href);url.searchParams.set('snapshotId',anchor.snapshotId);url.hash="review-canvas";window.history.replaceState(null,'',url);
+    requestAnimationFrame(()=>document.getElementById("graph-title")?.scrollIntoView({block:'start'}));
   };
-  return (
-    <main>
-      <Imports bridge={importsBridge} review={review} canOpen={workspace.canLeaveReview()} onOpen={reviewId=>{
-        if(!workspace.canLeaveReview())return;const next=createReviewWorkspace(reviewId);workspace.logout();setWorkspace(next);
-        const url=new URL(window.location.href);url.searchParams.set('reviewId',reviewId);url.searchParams.delete('snapshotId');url.hash='';window.history.replaceState(null,'',url);
-      }}/>
-      <header className="identity">
-        <div>
-          <p className="eyebrow">Pinned source · source structure review</p>
-          <h1>
-            <a href={review.snapshot.prUrl} target="_blank" rel="noreferrer">
-              PR {review.snapshot.prNumber}
-            </a>{" "}
-            <span>{review.snapshot.title ?? "Pinned source review"}</span>
-          </h1>
-          <p className="sha">
-            Base {review.snapshot.baseSha} → Head {review.snapshot.headSha}
-          </p>
-          <p className="sha">Snapshot {review.snapshot.snapshotId}</p>
-        </div>
-        <div className="attachment">
-          <strong>
-            {attachment?.active
-              ? "Session attached"
-              : attachment
-                ? "Session revoked"
-                : "Attachment pending"}
-          </strong>
-          {attachment?.active ? (
-            <>
-              <span>
-                {attachment.host} · {attachment.sessionId}
-              </span>
-              <span>Generation {attachment.generation}</span>
-              <button
-                className="quiet"
-                onClick={() => {
-                  void bridge.revoke();
-                }}
-              >
-                Revoke attachment
-              </button>
-            </>
-          ) : (
-            <p>
-              Run the task-local owner pairing setup, then call session_attach
-              from the initiating session. Questions remain saved.
-            </p>
-          )}
-        </div>
-      </header>
-      <section className="snapshot-selection" aria-label="Snapshot history"><label>Snapshot<select value={review.snapshot.snapshotId} disabled={Boolean(draft.trim())||state.busy||storyState.questionLocked} onChange={event=>{void chooseSnapshot(event.target.value);}}>{(review.snapshotSummaries??[{snapshotId:review.snapshot.snapshotId,baseSha:review.snapshot.baseSha,headSha:review.snapshot.headSha}]).map(snapshot=><option key={snapshot.snapshotId} value={snapshot.snapshotId}>{snapshot.snapshotId===(review.currentSnapshotId??review.snapshot.snapshotId)?"Current":"History"} · {snapshot.headSha.slice(0,12)} · {snapshot.snapshotId.slice(0,12)}</option>)}</select></label><p role="status">{review.snapshot.snapshotId===(review.currentSnapshotId??review.snapshot.snapshotId)?"Viewing current snapshot":"Viewing historical snapshot"}. Selection is private and does not move saved source or discussion.</p>{state.error&&<p role="alert">{state.error}</p>}</section>
-      {state.selecting&&<p role="status">Opening the selected snapshot. Question composition is held until its source is ready.</p>}
-      {interactionError&&<p role="alert">{interactionError}</p>}
-      {state.recovery.state!=='none'&&<section className="question-recovery" aria-label="Question recovery"><h2>Unresolved question</h2><p role="status">{state.recovery.message}</p>{state.recovery.commandId&&<p>Original source: {state.recovery.snapshotId} · saved command {state.recovery.commandId}</p>}{['awaiting_ack','accepted_awaiting_readback','storage_unavailable'].includes(state.recovery.state)&&<button disabled={state.busy} onClick={()=>act(()=>bridge.recoverPendingQuestion())}>Recover saved question</button>}</section>}
-      <StoryPanel key={`story:${review.reviewId}`} bridge={storyBridge}/>
-      <div onFocusCapture={pauseStory} onPointerDownCapture={pauseStory} onScrollCapture={pauseStory}><SemanticPanel key={`semantic:${review.reviewId}`} bridge={analysisBridge} onGraphState={captureSemantic} graphRestore={storyState.maps.semantic?{id:storyState.mapRestoreId,frame:storyState.maps.semantic}:undefined}/></div>
-      {state.graph && <div onFocusCapture={pauseStory} onPointerDownCapture={pauseStory}><ReviewGraph graph={state.graph} selectedPath={storyFocus?.sources[0]?.reference.anchor.path??selected?.path??""} selectedFileKey={storyFocus?.comparisonKey??comparisonKey} storyFocus={storyFocus?.graphFocus} onStateChange={captureStructural} restore={storyState.maps.structural?{id:storyState.mapRestoreId,frame:storyState.maps.structural}:undefined} onOpen={openSource}/></div>}
-      <section className="source-identity" onFocusCapture={pauseStory}>
-        <h2>{selected?.path ?? state.sources[0]?.path}</h2>
-        <p>
-          Read the fixed before and after. Select a line or specify an inclusive
-          range below.
-        </p>
-        <a href="#graph-title" onClick={()=>document.getElementById("graph-title")?.focus()}>Return to change map</a>
-        {draft.trim()&&<p role="status">Source selection is held while your question draft is nonempty. Save or clear it before navigating.</p>}
-        <label>Source file<select value={selected?.path??""} disabled={Boolean(draft.trim())||storyState.questionLocked} onChange={e=>act(()=>workspace.openPath(e.target.value))}>{[...new Set(state.sources.filter(s=>s.lineCount>0).map(s=>s.path))].map(path=><option key={path}>{path}</option>)}</select></label>
-      </section>
-      {selected && <div className="source-grid" onFocusCapture={pauseStory} onPointerDownCapture={pauseStory} onScrollCapture={pauseStory}>
-            {(["base", "head"] as const).map(side => {
-              const source = sourceComparison(review.snapshot,selected,comparisonKey).find(item=>item.side===side);
-              return source ? <SourcePane key={side} source={source} review={review} selected={selected} onSelect={anchor=>{void openSource(anchor,comparisonKey);}} /> : <section key={side} className="source-pane"><header><h2>{side === "base" ? "Before" : "After"}</h2></header><p>This side has no prepared source for {selected.path}. {review.snapshot.changedFiles?.find(file => file.oldPath === selected.path || file.newPath === selected.path)?.dispositions.find(item => item.side === side)?.reason ?? "Absent from the pinned change or not prepared; no selectable anchor."}</p></section>;
-            })}
-          </div>}
-          <section className="conversation" onFocusCapture={pauseStory}>
+  const conversation=(
+<section className="conversation" onFocusCapture={pauseStory}>
             {selected?<div className="composer">
               <p className="eyebrow">Ask about this source</p>
               {storyState.drafts.length>1&&<label>Active question draft<select value={storyState.activeDraftId} disabled={Boolean(storyState.returnFrame)||storyState.questionLocked} onChange={event=>act(()=>storyBridge.chooseDraft(event.target.value))}>{storyState.drafts.map((item,index)=><option key={item.id} value={item.id}>{index===0?'Original draft':'Exploration draft'}{item.submitted?' · submitted':''}</option>)}</select></label>}
               <h2>One question, grounded in the change</h2>
+              <label>Source file<select value={selected.path} disabled={Boolean(draft.trim())||storyState.questionLocked} onChange={event=>act(()=>workspace.openPath(event.target.value))}>{[...new Set(state.sources.filter(source=>source.lineCount>0).map(source=>source.path))].map(path=><option key={path}>{path}</option>)}</select></label>
               <form
                 onSubmit={(event) => {
                   event.preventDefault();
@@ -346,8 +199,68 @@ const App = () => {
               })}
             </section>
           </section>
+  );
+  return (
+    <main>
+      <Imports bridge={importsBridge} review={review} canOpen={workspace.canLeaveReview()} onOpen={reviewId=>{
+        if(!workspace.canLeaveReview())return;const next=createReviewWorkspace(reviewId);workspace.logout();setWorkspace(next);
+        const url=new URL(window.location.href);url.searchParams.set('reviewId',reviewId);url.searchParams.delete('snapshotId');url.hash='';window.history.replaceState(null,'',url);
+      }}/>
+      <header className="identity">
+        <div>
+          <p className="eyebrow">Pinned source · source structure review</p>
+          <h1>
+            <a href={review.snapshot.prUrl} target="_blank" rel="noreferrer">
+              PR {review.snapshot.prNumber}
+            </a>{" "}
+            <span>{review.snapshot.title ?? "Pinned source review"}</span>
+          </h1>
+          <p className="sha">
+            Base {review.snapshot.baseSha} → Head {review.snapshot.headSha}
+          </p>
+          <p className="sha">Snapshot {review.snapshot.snapshotId}</p>
+        </div>
+        <div className="attachment">
+          <strong>
+            {attachment?.active
+              ? "Session attached"
+              : attachment
+                ? "Session revoked"
+                : "Attachment pending"}
+          </strong>
+          {attachment?.active ? (
+            <>
+              <span>
+                {attachment.host} · {attachment.sessionId}
+              </span>
+              <span>Generation {attachment.generation}</span>
+              <button
+                className="quiet"
+                onClick={() => {
+                  void bridge.revoke();
+                }}
+              >
+                Revoke attachment
+              </button>
+            </>
+          ) : (
+            <p>
+              Run the task-local owner pairing setup, then call session_attach
+              from the initiating session. Questions remain saved.
+            </p>
+          )}
+        </div>
+      </header>
+      <section className="snapshot-selection" aria-label="Snapshot history"><label>Snapshot<select value={review.snapshot.snapshotId} disabled={Boolean(draft.trim())||state.busy||storyState.questionLocked} onChange={event=>{void chooseSnapshot(event.target.value);}}>{(review.snapshotSummaries??[{snapshotId:review.snapshot.snapshotId,baseSha:review.snapshot.baseSha,headSha:review.snapshot.headSha}]).map(snapshot=><option key={snapshot.snapshotId} value={snapshot.snapshotId}>{snapshot.snapshotId===(review.currentSnapshotId??review.snapshot.snapshotId)?"Current":"History"} · {snapshot.headSha.slice(0,12)} · {snapshot.snapshotId.slice(0,12)}</option>)}</select></label><p role="status">{review.snapshot.snapshotId===(review.currentSnapshotId??review.snapshot.snapshotId)?"Viewing current snapshot":"Viewing historical snapshot"}. Selection is private and does not move saved source or discussion.</p>{state.error&&<p role="alert">{state.error}</p>}</section>
+      {state.selecting&&<p role="status">Opening the selected snapshot. Question composition is held until its source is ready.</p>}
+      {interactionError&&<p role="alert">{interactionError}</p>}
+      {state.recovery.state!=='none'&&<section className="question-recovery" aria-label="Question recovery"><h2>Unresolved question</h2><p role="status">{state.recovery.message}</p>{state.recovery.commandId&&<p>Original source: {state.recovery.snapshotId} · saved command {state.recovery.commandId}</p>}{['awaiting_ack','accepted_awaiting_readback','storage_unavailable'].includes(state.recovery.state)&&<button disabled={state.busy} onClick={()=>act(()=>bridge.recoverPendingQuestion())}>Recover saved question</button>}</section>}
+      <HeadTests bridge={workspace.tests}/>
+      <StoryPanel key={`story:${review.reviewId}`} bridge={storyBridge} onInspect={async reference=>{await workspace.inspectReference(reference);document.getElementById("graph-title")?.scrollIntoView({block:"start"});}}/>
+      <div onFocusCapture={pauseStory} onPointerDownCapture={pauseStory} onScrollCapture={pauseStory}><SemanticPanel key={`semantic:${review.reviewId}`} bridge={analysisBridge} onGraphState={captureSemantic} graphRestore={storyState.maps.semantic?{id:storyState.mapRestoreId,frame:storyState.maps.semantic}:undefined}/></div>
+      <SourceCanvasGraph owner={workspace.canvas} onInspect={openSource} onAsk={async(anchor,fileKey)=>{await workspace.openSource(anchor,fileKey);}} onRead={pauseStory} question={conversation}/>
       <footer>
-        Immutable source review · bounded read-only acquisition · no target program execution
+        Immutable source review · bounded acquisition · exact-head test evidence
       </footer>
     </main>
   );

@@ -1,0 +1,138 @@
+# Slice 06 integration and role handoffs
+
+**Date:** 2026-10-24
+
+**Handoff revision:** 7; current delivered consumer values are pinned in [the B1 public-port checkpoint](consumer-ports-06b.md); original revision6 input10bc29e and review pins remain historical.
+
+**Status:** B1 and CLI independently ready at their original pins; current combined single-owner/SDK/CLI integration is governed by [B4](integration-06b4.md). B2 and full product acceptance remain root-gated.
+
+**Owner:** `plan_head_test_slice06` is the named B1 backend integrator in [I6](execution-06b.md#i6-named-b1-implementation-assignment); root owns acceptance and dispatch. B3 is delivered; B2 remains unassigned.
+
+**Parent:** [Slice plan and gates](plan.md).
+
+**Normative knowledge:** [head-test-v1](../../../../product/review-loop/test-execution.md). Existing [reactive ownership](../../../../product/reactive-design.md), [development](../../../../rules/development.md), [handoff](../../../../rules/agent-handoffs.md), [graph-first review](../../../../rules/graph-first-review.md) and [own-PR](../../../../rules/own-pr-dogfood.md) rules apply.
+
+## Versioned boundary and composition
+
+The following retains the planned responsibility map. The linked public-port checkpoint is the exact delivered B1 export/HTTP inventory; B2/B3 responsibilities remain proposed and unassigned. Implementers may choose local helper names but cannot change values/authority/evidence meanings without first updating the durable specification and this handoff.
+
+| Owner / public surface | Inputs, outputs and boundary |
+|---|---|
+| Domain/public | Strict RequestTest/CancelTest, TestReceipt, ConfiguredTarget, TestJobView/TestResult and artifact query values from head-test-v1; canonical target/manifest identity and deterministic transitions. No process, filesystem, database or UI work. |
+| Store/public test owner | Authenticated test command/query methods under the existing store; globally colliding receipts, snapshot membership, active credential recheck, short atomic job/reservation/result transactions; private TestOwner/TestGrant. Existing source resolver becomes a narrow owner-composition/public value port, never another subsystem's SQL/internal import. |
+| Store/private execution lease | Add test kind and startup unresolved test occupancy to the same epoch/lease. Test job effect disposition distinguishes unknown-unresolved from unknown-confirmed-quiescent. All import/analysis/test claims use that predicate atomically; old owners cannot journal/lookup/admit/release. |
+| Test jobs/public | One gateway-owned runner over store public ports, injected qualified target/runtime/environment/source locator and owned artifacts. `wake`, `stop`, bounded diagnostics; no-op wake retains actual active promise. Fixed test process policy is separate from acquisition commands and semantic worker framing. |
+| Test jobs/private preparation/artifacts | Raw complete Git object tree and verified copied closure; task-owned path factory; immutable manifest/log artifact ports. Witness construction private to verified preparation. This may stay within test jobs; no generic materializer/SDK/storage framework. |
+| Server/public | Existing commands plus strict authorized POST test read routes; compose one test runner with existing owners. Signal all owners before awaiting shutdown; no UI-bound runner. Runtime root/config remains owner supplied and private. |
+| Application/public | TestBridge immutable authorized state, exact request/cancel/readback intent, pending identity, lifecycle fences and bounded polling; workspace owns selected source/story/drafts as before. Connect after review authorization without parallelizing analysis/story hydration. |
+| Integration registry | Three declared test routes and bounded diagnostic projections from head-test-v1; no direct internal subscriptions. |
+| React UI | Configured target/select/run/cancel/history/evidence components use application public ports. Inert output, keyboard/focus/status affordances, stable source context; no policy or command fabrication in components. |
+| Owner CLI | Thin TypeScript HTTP client using the same schemas and receipts; [B3](cli-06b.md) uses an explicit loopback gateway without token or credential-file input. No native participant utility reuse as execution authority, second store, shell runner or token stdout. |
+
+Initial storage support is additive: existing records/receipt meanings are retained, test tables/columns are created under the owning store, and legacy DBs without tests still initialize. Initialize one epoch before all runners. The migration/check order must allow the shared unresolved scan to find test occupancy before any runner claims. Pure domain validation and heavy source/closure/result hashing occur outside transactions; apply-time authority, limits, cancellation and immutable identity conflicts are checked again inside them.
+
+Boundary checker additions are only the test-owned edges needed above. The gateway may import test-jobs/public; application/UI may not import storage/process internals. Any extraction of existing process helpers must preserve fixed acquisition and semantic authorities and their independently tested behavior. No widening of `Command` to a public arbitrary executable is permitted. Maintain explicit functional/immutable inputs and testable effect ports; no new reactive library or package split.
+
+## Implementation handoff I2 (historical; I6 controls current B1 scope)
+
+**Requested endpoint:** Complete T01–T09 and provide evidence for T10 through06A–06C; do not accept the slice or deliver main/pilot yourself.
+
+**Assignment state:** Unassigned. Root must name the executor, exact packet/source commit, descriptive task branch and isolated worktree in a committed amendment before dispatch. Root may retain one executor across these sequential chunks. The sole integration writer owns shared files and durable knowledge; bounded helpers may be delegated only with separate nonoverlapping committed scopes.
+
+**Required source reads:** README/AGENTS; this packet and parent; head-test-v1; owning import/semantic/story/reactive public contracts; applicable development/documentation/handoff rules. Read current immutable source only where needed to reconcile actual seams. The external readiness memo is historical rationale, not an additional authority.
+
+**Editable scope after assignment:** New test domain/storage/runner/application/CLI and React components/tests; narrow existing store/shared lease/gateway/workspace/integration boundary checker changes; this slice and its owning durable docs. Existing package scripts may change only for an explicitly required CLI/check/test entry under the sole integration writer; no new dependency/runtime/lock change without documented need. Do not edit05 evidence or another agent's worktree. No native adapters/auth/passkey/pilot/global configuration changes.
+
+**Inputs/readiness:** G0 review and committed assignment, reconciled G1 source/owner boundaries;06A preserves unavailable production configuration as unavailable; it rejects production requests before queuing while that configuration is unavailable. Use a separately injected TEST-ONLY available registry for the queued/cancel/no-runner journey, explicitly without environment proof.06B consumes the observed target revision2, exact runtime flags, source/dependency copy/environment recipe and digest from the durable specification/probe; fresh checks bind the actual implementation target head.06C requires06B committed interfaces and real result/termination observations. No source fallback, install or external effects to satisfy a blocked environment.
+
+**Steps:** Implement the numbered vertical chunks in the parent sequentially, with public values and short owner transitions tested before effects. Each commit updates the slice's observed outcome and durable design before the next consumer begins. At each chunk exercise actual React behavior stated in its row, plus strict checks/relevant tests. Reserve full actual own-PR comprehension for the fresh reviewer; implementer dogfood does not consume that role.
+
+**Run authority:** Candidate/test-only data root and loopback runtime provided by root's assignment; owned source/dependency/temp copies beneath its declared execution root; existing Bun/Node only; reviewed local Git raw reads. A root path/port not yet assigned is a missing dispatch input, not an invitation to reuse pilot/old data. Use test-only registry injection for controlled child fixtures; ensure it cannot be selected via production target IDs or public fields. Never expose credentials in fixture output.
+
+**Stop conditions:** New network/install/runtime/native/global/security/destination need; missing source object or unverifiable closure; broken predecessor auth/source/atomicity; unknown ownership that cannot be reconciled; tests revealing arbitrary source/config execution or shared mutation. Preserve precise evidence and pause dependent effects, continue independent authorized validation. Do not weaken an acceptance criterion to match code.
+
+**Required return:** Committed candidate/head; changed contracts and owned paths; T01–T09 trace with commands/outcomes and actual versus fixture labels; actual React/CLI screenshots/readbacks; exact source/target/runtime/environment/artifact identities; process fault/quiescence evidence and limits; regression results; promoted durable knowledge; blockers and next consumer inputs. No bare test counts or ready claim without source/environment identity.
+
+## Independent plan-review handoff P1
+
+**Role:** Fresh reviewer other than this planning author. Read-only. Root assigns the exact planning commit/worktree and receives findings; no product writes or implementation dispatch.
+
+**Question:** Can the proposed source/target/environment/authority/lifecycle contracts be implemented as one bounded useful head-test journey without weakening predecessor guarantees or requiring ungranted effects? Does durable knowledge suffice to derive the behavior without the temporary proposal or old plans?
+
+Review G0–G5 readiness honestly, registry literal matching, script-only metadata rule, direct runtime-option gate, complete source vs bounded snapshot, dependency isolation/provenance, atomic shared unknown occupancy, result/cancel/receipt/epoch races, artifact/quota semantics, exact CLI identity and React-owned state. Evaluate whether T01–T10 and chunk scopes establish observable acceptance with appropriate effort limits. Identify any unresolved policy masquerading as executable readiness. Read immutable67 source only to validate actual public seam feasibility; do not run target/pilot/native effects or mutate dependency donor.
+
+Return PASS FOR DESIGN REVIEW, CHANGES NEEDED or BLOCKED with concrete document location, rationale, severity, affected gate/acceptance and proposed minimal repair; distinguish plan readiness from implementation dispatch and product acceptance. A passed plan review does not fill missing runtime qualification, real PR or named executor inputs.
+
+## Independent engineering handoff R1
+
+**Assignment state:** Not ready until candidate/evidence exists. Root assigns a reviewer other than the implementer, exact clean candidate commit/build, packet revision, diff base/head and isolated read-only source. Reproduction runtime authority/root is explicit in that dispatch.
+
+**Scope:** All T01–T09 and relevant T10 code/spec consistency, no edits by default. Reproduce highest-risk real process/transaction/fault evidence through public ports; inspect effective target/environment/source preparation and artifact admission, not only mocks or output snapshots. Read actual diff against accepted durable spec and packet. Check existing import/analysis/schema migration and05C story/question/startup regressions. Test fixtures, real target, native/user evidence remain separately attributed.
+
+**Required attacks:** Extra command fields and cross-family IDs; target revision drift; old/revoked owner/attachment reads and grants; shared lease row missing at restart; quiescent unknown versus unresolved unknown; cancel/exit/admission order; source/dependency donor mutation; symlink/path/config/autoinstall escape; truncation/invalid artifacts/quota reservation races; reused PID/TERM-resistant descendants/inherited pipes; loss between intent/spawn/start/result publication/DB acknowledgement; stale UI/CLI readback against a newer job; subscriber disposal without duplicate effects.
+
+**Return:** Concrete source/evidence-backed findings with affected acceptance and severity; actual independent checks and limits; READY FOR BOUNDED ENGINEERING, CHANGES NEEDED or BLOCKED. Missing actual React/CLI/process evidence cannot be converted to pass by API-only verification. Fixes require new pinned candidate and affected rechecks.
+
+## Independent product/graph handoff U1
+
+This role must remain fresh: do not preload this implementation boundary table, candidate diff, source answer key or engineering report. Root supplies only actual UI access, pinned own-PR/candidate identities, the neutral task in the plan, supported scope and the graph-first protocol. Source-informed verification is a different role.
+
+First freeze A using actual story/graph; then source/diff B and ease critique. Retain immutable A and timestamps, observed interactions and gaps. Review the actual configured run/result UI and same CLI evidence, and ask a meaningful anchored question without inferring host causality from a fixture. Report fast-run/queued-cancel/unknown limitations exactly. Required result is a bounded understanding disposition, not control coverage or graph edge count. Visual design critique uses decompozr/design-system guidelines separately from React E2E and comprehension.
+
+## Acceptance and successor handback
+
+Root reconciles engineering and product findings, promotes learning to durable knowledge and assigns fresh whole-current-product docs-only rebuild audit after the milestone. An auditor reads maintained product/rule docs only, not this packet/plans/code/chat; the audit is knowledge readiness, not an actual rebuild or native outcome.
+
+After06 acceptance, update the1080p07/08 dependency rows with delivered exact target-definition schema/revision, source/environment manifests, job/result/artifact IDs and query/CLI semantics, lease/quiescence and authority interfaces, verified limits/test assets and remaining gates.07 must establish two separately qualified pinned environments and explicit incompatibility;08 must design subscribed terminal-event eligibility later. No base/head comparison, terminal-event inbox, agent wake, correction workflow or automatic successor readiness is implemented here. Create their individual slice plans only when root plans those actual deliveries.
+
+Root alone records PR/merge/pilot version/health/use and retained rollback. The planning author returns a locally committed docs-only packet and retained worktree for review/integration; publication/deployment is not part of this handoff.
+
+## Prerequisite executor and narrow review handback Q2
+
+Root assigned the original planning owner only the bounded G2/G3 engineering probe on source67, in external task-owned storage, with docs-only promotion on this branch. That work ran the existing direct Bun binary, nonsecret option traps and exactly the four configured tests against a complete raw-object source tree and copied local two-package closure. It changed no application/test/config/package/lock source, pilot, native session, global setting or shared dependency content. [Probe](probe.md) contains exact identities, results, artifact retention and limits. The assignment ends at this committed handback; it is not I2 implementation authority.
+
+A fresh or already independent P1 reviewer may read the changed durable recipe, recorded probe and raw manifests/logs to check: actual invocation collects four files, `--config=` syntax and empty config binding, disabled install/dotenv controls, complete source/raw object identity, non-script manifest equality, copy/donor hashes, isolated caches and honest provenance limits. Verify target-definition digest and note the observed fast successful process supplies no active cancellation/lease/restart/UI/CLI evidence. Return qualified evidence-ready or concrete changes needed; root assigns the actual executor and run root afterward.
+
+## I3 assigned internal checkpoint: intent/store/gateway only
+
+Root's explicit [sequencing amendment](plan.md#root-sequencing-decision-06a-internal-backend-checkpoint) assigns `plan_head_test_slice06` to `/tmp/pr-reviewer-06-head-test-core`, branch `implement-head-test-intent-core`, base0117de999b6562f63e2ca959567abe67ef122474. Q2 PASS receipt/hash and the still-open full G1 gate are in that amendment. This assignment is executable after its documentation commit; no further generic approval gate applies.
+
+Editable: new head-test domain/storage values and tests; narrow existing store, shared lease, cross-family receipt guards, public gateway and owning test-execution knowledge/slice/round records.05D separately owns UI/application/story presentation and its tests; do not edit those, main.tsx, worker/runner modules, CLI/native/runtime config, package/lock/dependency declarations or another worktree. No server launched against existing data; only isolated ephemeral API test fixtures may listen on loopback.
+
+Implement one cohesive internal checkpoint with the fixed catalog and unavailable default, strict user-only intent/cancel, authorized exact-scope reads and durable receipts. Constructor-only TEST-ONLY available injection has no runner and returns explicit fixture provenance. Extend the existing single execution slot's kind and startup test-unknown predicate without adding a new scheduler or exposing process authority. Keep expensive effects absent, transactions short and existing import/analysis grants unchanged. Reopen preserves queued and cancelled jobs; unfinished test invocation records become unknown, never relaunch or invent success. No public clear-unknown/reset endpoint is added.
+
+Required return: exact packet commit, then candidate commit; strict check and meaningful tests with failures/limits; API/storage evidence versus unrun React/process/CLI/own-PR acceptance; changed durable interfaces and any recovery or successor implications. Source07/08 work is not assigned. Root assigns independent review of the exact candidate before integration; this executor does not push, create a PR, merge or deploy.
+
+## R3 independent internal06A review handoff
+
+Root assigns a reviewer other than the executor to the exact committed candidate. Diff base is assignment commit `01def717880b89c331f90dc7f3153f910afed835`; inherited source/qualified recipe is unchanged67 through0117. Read the durable internal06A contract and [checkpoint](checkpoint-06a.md), inspect only the backend/owning-doc diff and independently reproduce the intent/gateway tests and high-risk shared-store regressions. Read-only source review and isolated test fixtures are appropriate; no live data, UI, native, installation or product runner exercise is required or authorized by this packet.
+
+Check unavailable-by-default and immutable constructor configuration; fixed definition/digest; strict no-effect commands; current actor/attachment/epoch authorization before replay; snapshot/head attribution; cross-family IDs and old receipt compatibility; durable cancel/CAS/reopen; quota/pagination; missing-lease recovery and inconsistent quiescence; comments while queued/unknown; absence of a test launch/result authority. Seeded recovery records establish storage behavior only. Return concrete findings and READY FOR INTERNAL CHECKPOINT, CHANGES NEEDED or BLOCKED, with actual independent checks and limits. This review cannot pass full T01–T10, G1, React, real process, CLI or own-PR gates.
+
+Next consumer inputs are `store.tests.{targets,command,query}`, `HeadTest*` public values, target revision2/digest and the shared test occupancy predicate. There is deliberately no test owner/grant/claim/result port yet.06B must document those interfaces before implementation and requalify actual source/environment; it cannot reinterpret test-only queued fixtures as execution readiness. Root retains sequential integration and final G1 reconciliation.
+
+## Revision4 successor execution roles
+
+The [06B packet](execution-06b.md) supersedes generic I2 assumptions for the next executable work. It pins db03505/af39 and reconciliation08889d0, promotes R3, divides B1 backend/B2 React/B3 CLI/B4 integration ownership and supplies the Q4 independent design review. This planning assignment names `plan_head_test_slice06` as sole06 docs writer only, in `/tmp/pr-reviewer-06-head-test-execution-plan` on `plan-head-test-execution`. No backend/UI/CLI executor is assigned by this revision. Root names them and their exact isolated worktrees after Q4 and after required public-port stability; the source-integrating backend owner alone changes shared schemas/gateway and coordinates narrow workspace/main edits. No parallel writer touches another role's owned files.
+
+R3 is engineering readiness of intent/storage only. Q4 evaluates the new durable process authority and consumer design, not runtime availability or product acceptance. Future engineering review reproduces matrix B01–B06/C01–C02 against the actual candidate and distinguishes controlled process faults from real fixed-target/own-PR evidence. The U1 fresh graph-first reader remains uncontaminated by the source-informed verifier key. No final G1/own-PR/knowledge or07/08 readiness is implied by either review.
+
+## Q4 revision5 narrow recheck
+
+The3191ebc design candidate had two required P2 corrections: early preparation settlement lacked a valid witness variant, and fixed Git batch I/O conflicted with the general test-process I/O rule. [Execution06B revision5](execution-06b.md#q4-required-corrections-at-revision5) and its owning durable amendment specify both repairs and negative vectors. The independent reviewer should check early unavailable/error/cancel/deadline and uncertain preparation child settlement without invented identities, then verify the bounded binary Git channel still permits Q2's recipe without arbitrary public stdin/argv or log-cap bypass. No implementer assignment follows until the narrow recheck and any remaining coalesced findings are resolved by root.
+
+## Revision6 successor and assignment
+
+[Execution revision6](execution-06b.md#revision6-delivered05e-and-preserved-q4-review) records delivered7b6dc03, actual merge10bc29e, the single export-append conflict resolution, preserved Q4 review pins and the required05E journal/quiescence contract. [I6](execution-06b.md#i6-named-b1-implementation-assignment) supersedes I2 for B1 only: exact source-object repository, existing runtime/copied-closure recipe, new private task roots and transient loopback observations are named. Combined inherited06A/05E checks are the first implementation task, not claimed planning evidence.
+
+A missing PID, missing journal/version, requested-only row or legacy exited/no-PID row remains unknown; explicit definitive not_spawned and fresh owned-group absence have separate evidentiary meanings. Preserve test-specific unknown outcomes and all three Q4 completion witnesses. Actual af39 D6 accepted/D7 PASS stays pinned to af39; corrected05E own-PR/full G1 remains root-owned and pending. No test runner, UI or CLI has been delivered by this amendment.
+
+### B1 full-review correction checkpoint
+
+Status: four P2 corrections implemented in the sole backend worktree; narrow independent recheck pending
+
+Consume the [execution checkpoint](checkpoint-06b-execution.md) and corrected [consumer ports](consumer-ports-06b.md). `1e35644` remains the negative review pin. The successor changes byte transport, result evidence and persisted owned-root cleanup; B2/B3 remain gated until root consumes the independent recheck. Separately assigned SDK dependency changes require a later clean integration and fresh exact-head/closure qualification; existing receipts do not transfer qualification automatically.
+
+## Current B4 consumer integration
+
+[B4](integration-06b4.md) reconciles released auth a63293d, SDK9a271e and CLIc7111d1 over B1e9f107d. Root consumed CLI independent READY (report SHA25692258fc570b3fd119c5485ce92c340f32a2c4f58d2ae8f0fb05a280619bdda1a;9 CLI plus4 adversarial checks). Historical gates above retain their original pins. Current test consumers use the shared local-owner access and same stored result/artifact ports; there is no owner token input. The combined candidate needs independent review and fresh production qualification after freeze. No B2 app/UI, native runtime or own-PR acceptance is claimed.
