@@ -133,7 +133,7 @@ for (const width of [1440, 390]) {
 
 for (const width of [1440, 390]) {
   test(`native document evidence, group colors and relationship scope at ${width}`, async ({browser}) => {
-    const {allEntities, allRelations} = await import('../source-graph.ts');
+    const {allEntities, allRelations, visibleSourceGraph} = await import('../source-graph.ts');
     const {readingBands, documentPaths} = await import('../entity-presentation.ts');
     const context = await browser.newContext({viewport: {width, height: 1000},
       ...(width === 390 ? {hasTouch: true, isMobile: true} : {})});
@@ -144,7 +144,7 @@ for (const width of [1440, 390]) {
     const docs = documentPaths(entities);
     const bands = readingBands(entities, allRelations());
     const documentGroups = entities.filter(entity => entity.kind === 'change' && entity.data.documentPath);
-    await expect(page.locator('.native-document-evidence')).toHaveCount(documentGroups.length);
+    await expect(page.locator('.native-document-evidence')).toHaveCount(visibleSourceGraph({}).nodes.filter(entity=>entity.kind==='evidence'&&entity.data.nativeHunks).length);
     const geometry = await page.locator('.react-flow__node').evaluateAll(nodes => nodes.map(node => {
       const rect = node.getBoundingClientRect();
       return {id: node.getAttribute('data-id')!, y: rect.y, bottom: rect.bottom};
@@ -162,8 +162,7 @@ for (const width of [1440, 390]) {
     await expect(page.locator('.react-flow__node[data-id="header-value"] article')).not.toContainText('Direct request construction only');
     await expect(page.locator('[data-edge-id="constructs:request:header-value"]')).toContainText('Direct request construction only');
     const evidence = documentGroups[0]!.nodes![0]!;
-    const card = page.locator('.react-flow__node').filter({has: page.locator('article.native-document-evidence')})
-      .filter({has: page.locator('[aria-label="First native hunk excerpt"]')}).first();
+    const card = page.locator('.react-flow__node[data-id="' + evidence.id + '"]');
     const summary = card.locator('summary');
     const camera = await page.locator('.react-flow__viewport').getAttribute('style');
     await summary.focus(); await summary.press('Enter');
@@ -178,12 +177,59 @@ for (const width of [1440, 390]) {
         if (witness) {
           expect(await row.locator('.version-' + side + ' pre').textContent()).toBe(witness.text);
           await expect(row.locator('.version-' + side)).toContainText(witness.contentHash);
-        } else await expect(row.locator('.version-' + side)).toContainText('absent in this hunk');
+        } else await expect(row.locator('.version-' + side)).toContainText('absent in this scope');
       }
     }
     expect(await reading.evaluate(node => node.clientHeight)).toBeLessThanOrEqual(400);
     expect(await page.locator('.react-flow__viewport').getAttribute('style')).toBe(camera);
     expect([...bands.values()]).toContain(3);
+    await context.close();
+  });
+}
+
+
+for (const width of [1440,390]) {
+  test('visible scoped edits and symmetric edge reading at '+width,async({browser})=>{
+    const {allEntities,visibleSourceGraph}=await import('../source-graph.ts');
+    const {editPreview}=await import('../minimal-projection.ts');
+    const context=await browser.newContext({viewport:{width,height:1000},...(width===390?{hasTouch:true,isMobile:true}:{})});
+    const page=await context.newPage();
+    await page.goto(test.info().project.use.baseURL??'http://127.0.0.1:57943');
+    await expect(page.locator('.react-flow__node[data-id="pr25"]')).toBeVisible();
+    const entities=allEntities();
+    const control=entities.find(entity=>entity.nodes?.some(child=>child.kind==='test'&&String(child.data.name).startsWith('01-A/C/F/G controlled host')))!;
+    const groups=[...['docs/product/architecture.md','docs/product/review-loop/story-and-exploration.md'].map(path=>entities.find(entity=>entity.data.documentPath===path)!),control];
+    for (const group of groups) {
+      const evidence=group.nodes!.find(child=>child.kind==='evidence')!;
+      const card=page.locator('.react-flow__node[data-id="'+evidence.id+'"]');
+      const preview=editPreview(group.data.editComposition as import('../edit-composition.ts').EditComposition);
+      await expect(card.locator('.edit-preview [data-edit-kind="remove"]')).toHaveCount(preview.removed.length);
+      await expect(card.locator('.edit-preview [data-edit-kind="add"]')).toHaveCount(preview.added.length);
+      expect(preview.removed.length).toBeGreaterThan(0); expect(preview.added.length).toBeGreaterThan(0);
+      for (const [kind,rows] of [['remove',preview.removed],['add',preview.added]] as const) {
+        expect(await card.locator('.edit-preview [data-edit-kind="'+kind+'"] code').first().textContent()).toBe(rows[0]!.text);
+        const visible=await card.locator('.preview-'+kind+' .edit-preview-rows').evaluate(pane=>{
+          const row=pane.querySelector('code')!.getBoundingClientRect(),box=pane.getBoundingClientRect();
+          return row.top>=box.top-1&&row.top<box.bottom;
+        });
+        expect(visible).toBe(true);
+      }
+      const panes=await card.locator('.edit-preview-pane').evaluateAll(nodes=>nodes.map(node=>node.getBoundingClientRect().top));
+      expect(Math.abs(panes[0]!-panes[1]!)).toBeLessThan(1);
+      await expect(page.locator('.react-flow__node[data-id="'+group.id+'"] .minimal-change-graph')).toHaveClass(/status-change/);
+    }
+    const removed=page.locator('.react-flow__node[data-id="'+control.nodes!.find(child=>child.kind==='evidence')!.id+'"] .preview-remove code');
+    await expect(removed).toHaveCount(4);
+    expect((await removed.allTextContents()).filter(text=>text.includes('Local access token')).length).toBe(2);
+    expect((await removed.allTextContents()).filter(text=>text.includes('Open review')).length).toBe(2);
+    const before=page.locator('[data-edge-id="constructs:request:header-value"]');
+    await expect(before).toContainText('Source constructs'); await expect(before).toContainText('Direct request construction only');
+    await expect(before).toContainText('Before b096826 · src/application/review.ts · L29');
+    const after=visibleSourceGraph({}).relations.find(edge=>edge.from==='request'&&edge.relation==='calls')!;
+    const call=page.locator('[data-edge-id="'+after.id+'"]');
+    await expect(call).toContainText('Source call: accessHeaders(captured)');
+    await expect(call).toContainText('After e3b270e · src/application/review.ts · L30');
+    await expect(page.locator('.react-flow__node[data-id="refresh"] article')).toHaveClass(/status-no-change/);
     await context.close();
   });
 }

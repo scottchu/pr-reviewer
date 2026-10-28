@@ -79,6 +79,11 @@ test('mixed presentation always retains both categories, scoped rows and neutral
     assert.ok(preview.removed.every(row=>row.kind==='remove'&&row.afterLine===null));
     assert.ok(preview.added.length<=4&&preview.removed.length<=4);
   }
+  for (const [id,status] of [['helper','add'],['header-value','remove'],['refresh','no change']] as const) {
+    const entity=entities.find(entity=>entity.id===id)!;
+    assert.equal(entity.data.comparisonStatus,status);
+    assert.equal((entity.data.editComposition as import('../edit-composition.ts').EditComposition).status,status);
+  }
   const controlled = entities.find(entity => entity.nodes?.some(child=>child.kind==='test'&&String(child.data.name).startsWith('01-A/C/F/G controlled host')))!;
   assert.equal(editPreview(controlled.data.editComposition as import('../edit-composition.ts').EditComposition).removed.length,4);
 });

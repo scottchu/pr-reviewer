@@ -43,3 +43,16 @@ test('every current relation kind goes through the same reading fields and repor
     assert.ok(card.provenance.every(row=>card.rows.includes(row)),edge.id);
   }
 });
+
+
+test('one-sided and partial evidence exposes absence or unavailable fields without inventing a witness',()=>{
+  const edge:GraphRelation={id:'one-sided',from:'pr',to:'file',version:'comparison',relation:'changes',data:{sourceEvidence:{path:'docs/new.md',sides:[
+    {side:'base',commit:'a'.repeat(40),available:false},
+    {side:'head',commit:'b'.repeat(40),available:true},
+  ]}}};
+  const card=edgeRows(edge,[]);
+  assert.deepEqual(card.provenance,['Before aaaaaaa · docs/new.md · absent in pinned tree','After bbbbbbb · docs/new.md · line range unavailable']);
+  assert.ok(card.provenance.every(row=>!row.includes('L0')));
+  const partial=edgeRows({...edge,data:{sourceEvidence:{side:'head',path:'docs/unknown.md',startLine:4,endLine:6}}},[]);
+  assert.deepEqual(partial.provenance,['After commit unavailable · docs/unknown.md · L4–6']);
+});
