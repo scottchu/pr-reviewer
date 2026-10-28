@@ -3,7 +3,7 @@
 Date: 2026-10-28.
 Accepted direction: read → parse → extraction → enrich(s). Only enrichment requires interpretive intelligence; the rest is codified.
 Accepted boundary correction: UI + UI Type + UI Projection; Experience Service (corrected name) uses Domain Types; Domain Service provides capabilities. Detailed use-case/pipeline ownership is critiqued below.
-Status: accepted directions with proposed concrete files/APIs and acceptance design. Existing implementation has not been reorganized to this structure.
+Status: user adopted the architecture and authorized refactoring with proper extraction/projection tests, preserved UI and deployment. Concrete implementation contracts are established below; delivery evidence belongs to the owning slice.
 
 ## Goal and boundary
 
@@ -41,9 +41,9 @@ Use ui/ for the responsibility boundary and components/ within it. React remains
 
 ## Critique and proposed refinement of the service boundary
 
-Naming correction: the user explicitly means Experience Service, not Experiment Service. The rename is accepted. The refinements in this section are recommendations responding to the request for critique, not an adopted API or implementation instruction.
+Naming correction: the user explicitly means Experience Service, not Experiment Service. The rename is accepted. The user subsequently adopted these refinements and authorized implementation. The exact API below remains bounded to existing product behavior.
 
-The terse Experience Service → Domain Type → UI Type chain omits experience state. Domain Types represent source knowledge, but an actual reading journey also has active comparison/inspection, progress/failure, retry/cancel/return ownership and allowed next actions. Propose a named ExperienceState containing immutable Domain Type references/results and use-case state. UI Projection then maps ExperienceState plus explicitly local UI state to UI Types. Do not duplicate canonical facts into a second mutable domain model.
+The terse Experience Service → Domain Type → UI Type chain omits experience state. Domain Types represent source knowledge, but an actual reading journey also has active comparison/inspection, progress/failure, retry/cancel/return ownership and allowed next actions. Use a named ExperienceState containing immutable Domain Type references/results and use-case state. UI Projection then maps ExperienceState plus explicitly local UI state to UI Types. Do not duplicate canonical facts into a second mutable domain model.
 
 Experience Service should organize user intentions such as opening a comparison, inspecting evidence and returning to the previous reading context. A plain pipeline runner owns read/parse/extract/enrich sequencing and stage execution mechanics; the experience service invokes and observes it through a declared capability. These responsibilities may begin as a few functional modules, not two elaborate frameworks. Keep camera, pointer gestures and local component focus within their existing UI owners; put cross-step reading/return coordination with the experience owner only where required by the accepted journey.
 
@@ -51,11 +51,11 @@ Domain Service must expose named domain capabilities rather than become a catch-
 
 UI Projection is an immutable deterministic function, not another mutable state service or a convenient place to invent semantics. It maps experience/domain data into view contracts, retaining identity and evidence. The rejected default raw-diff cards show why valid extraction data does not authorize a new reading experience: default disclosure and composition must follow the accepted experience specification. Tests need independent domain oracles, explicit experience tasks, expected UI Types and actual rendered journeys; testing the four folders by themselves proves no user outcome.
 
-Recommended flow: UI intent → Experience Service → pipeline/domain capabilities; Domain results + use-case state → ExperienceState → UI Projection → UI Type → UI. Concrete ExperienceState fields, capability APIs and file splits remain to be specified in a bounded implementation slice.
+Recommended flow: UI intent → Experience Service → pipeline/domain capabilities; Domain results + use-case state → ExperienceState → UI Projection → UI Type → UI. The bounded implementation must expose immutable domain results plus existing source disclosure/inspection use-case state, explicit intentions and deterministic UI projection; keep camera/gestures/local focus with current UI owners.
 
 ## Proportionate module proposal
 
-Keep one React application and an ordinary subsystem folder, not multiple packages. These concrete names remain proposed; create files when moving an actual responsibility:
+Keep one React application and an ordinary subsystem folder, not multiple packages. Use these responsibility boundaries; introduce concrete files only for actual moved responsibilities:
 
 ```
 src/review-graph/
@@ -132,4 +132,17 @@ A future extraction corpus reports per-supported-kind true positives, false posi
 3. Add the first bounded enrichment only after its input/output authority and deterministic validation are ready. An enrichment outage must leave the verified source graph usable.
 4. Integrate the validated result through the existing application boundary, then verify actual reviewer tasks at the authorized endpoint. UI/deployment acceptance is not inferred from source tests.
 
-No implementation refactor is authorized by this proposal alone. The accepted pipeline and service/UI boundary directions are durable; concrete module names, extraction corpus size and enricher implementations remain proposed until the next bounded slice is established.
+Implementation is now authorized for the existing source-comparison slice and UI-preserving boundary refactor. New enrichment execution, arbitrary-PR intake, ontology changes and UI redesign remain outside this scope. Preserve canonical behavior; record any discovered correctness defect explicitly rather than silently changing expectations during a move.
+
+
+## Adopted bounded implementation acceptance
+
+Domain Service exposes real named parsing/extraction/comparison/validation capabilities backed by moved production policies, with no import from UI or prototype/fixture modules. Named Domain Types replace inferred effect-return contracts and renderer-owned domain definitions. Read/Parse/extraction/enrichment coordination remains explicit; existing attributed enrichment is preserved with validation, not replaced by a model call. Fixture-specific familiar IDs/default selection remain in declared preparation adapters rather than generic domain policies; preserve the current prepared PR25 account at that adapter boundary.
+
+Experience Service owns the existing comparison/source-disclosure or inspection intentions and immutable ExperienceState and is invoked by the actual current UI, not an unused wrapper. UI Projection maps that state/domain evidence into named UI Types consumed by the current UI. Presentation rules are implemented once in the projection; React keeps rendering, measurement, pointer/camera/local focus and native source disclosure behavior. Use ui/components naming for moved render components when useful; do not create empty directories or relocate unrelated retained application features. Compatibility entrypoints for existing scripts/tests may delegate into the new owning modules, but new owners must not import the old prototype internals back.
+
+Preservation oracle: compare canonical source entities, relation endpoints/kinds/versions, source witnesses, qualified correspondence, edit composition, unknown ledger, initial/default projected membership, entity/edge text/status and source-disclosure controls against immutable main5944d3b. Exclude only explicitly named producer/module-location hashes from identity comparison; actual source hashes/anchors cannot change. UI markup/class/style/assets/layout/gesture policies remain unchanged except necessary type/import/owner wiring. Any intentional correctness correction needs separate evidence and documented acceptance.
+
+New independent extraction fixtures include manually authored expected and forbidden facts/spans for positive supported declarations/tests/assertions/calls and negative shadowing/reassignment/unsupported/ambiguous cases, Unicode/newline coordinates and conservative cross-version correspondence. Expected output cannot be generated by invoking the production extractor. Test exact evidence round trips and independently authored projection outputs covering mixed/add/remove/unchanged/unresolved, temporal witnesses distinct from edits, Before/After explanation/provenance symmetry, semantic default children and explicit source reading. Experience tests cover actual disclosure intentions, comparison scope/inspection, immutable state and invalid/stale intent handling where implemented. Pipeline tests cover actual stage order and failure/enrichment separation with existing effects; no speculative scheduler is required.
+
+All new tests are part of normal declared owning entrypoints. Check strict TypeScript and dependency direction, owning pure tests and production build. Preserve the exact-source native PR25 integration tests and all latest source/raw-card rejection regressions. Required actual React/browser UI-preservation checks stay separately reported; supported-browser unavailability is not a pass or permission to bypass that route. Existing user deployment authorization continues with such missing evidence explicit.
