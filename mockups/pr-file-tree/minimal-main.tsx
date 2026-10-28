@@ -8,7 +8,8 @@ import { sourceGraph, visibleSourceGraph, allEntities, allRelations } from './so
 import type { GraphEntity, GraphRelation } from './minimal-graph.ts';
 import { cardRows, edgeRows, omittedStructuralEdge } from './minimal-projection.ts';
 import { readingBands, iconFor, iconPaths } from './entity-presentation.ts';
-import { initialLayout, automaticRoutes, curve, type Point, type Routed, type Side } from './graph-geometry.ts';
+import { projectionRoutes } from './projection-routes.ts';
+import { initialLayout, curve, type Point, type Routed, type Side } from './graph-geometry.ts';
 const bands = readingBands(allEntities(), allRelations());
 const directions: readonly Side[] = ['left', 'right', 'top', 'bottom'];
 const position = (side: Side) => ({
@@ -198,7 +199,9 @@ const App = () => {
     const edges = useMemo<RelationEdge[]>(() => {
         if (!ready)
             return [];
-        const routes = automaticRoutes(nodes, links, sizes, manual);
+        const routes = projectionRoutes(nodes, view.nodes, links, sizes, manual);
+        if (!routes)
+            return [];
         return relations.map(relation => {
             const routed = routes.get(relation.id)!;
             return {
@@ -208,7 +211,7 @@ const App = () => {
                 }, markerEnd: { type: MarkerType.ArrowClosed, color: '#9db3c8' }
             };
         });
-    }, [ready, nodes, links, sizes, manual, relations, onBend, onMeasure]);
+    }, [ready, nodes, view.nodes, links, sizes, manual, relations, onBend, onMeasure]);
     const revision = JSON.stringify(limits) + ':' + geometryRevision;
     return <><header className="minimal-header"><h1>PR25 · Changes and evidence</h1><p>Files, code changes, tests and their source context</p></header>
   <main aria-label="PR25 source comparison graph"><ReactFlow<EntityNode, RelationEdge> nodes={nodes} onNodesChange={changes} edges={edges} nodeTypes={nodeTypes} edgeTypes={edgeTypes} defaultViewport={{

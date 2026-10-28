@@ -273,3 +273,8 @@ Graph-first correction (2026-10-26): the prose narrative/card section is rejecte
 
 
 Semantic graph first, projection later: establish the existing domain entities/occurrences, typed relations, exact evidence, interpretation basis and unknowns before choosing any diagram or UIUX layout. The standalone SVG is one inspection projection of that account; its coordinates, colors or shorthand must not define domain identity or invent relations. The current review.ts inspection account reuses Change/Comparison/FunctionOccurrence/Claim/Evidence concepts and exact source references; local diagram aliases are not a new persisted model/schema. Panel/toggle/projection design stays frozen until the graph account is adopted.
+
+
+## Generated source-unit visibility transitions
+
+For the current generated comparison candidate, explicit Show source units / Show more source units / Hide source units changes view membership only. The renderer must reconcile its node projection before computing routes for that membership. During the short transition, defer edge geometry until the actual node identities match the desired projection; keep the header, graph and controls mounted. Do not route new relations against old/missing endpoints, fabricate geometry, or mutate canonical facts to hide an invalid transition. After reconciliation, render all eligible relations for the selected membership with their original identities and evidence. Acceptance includes expansion, additional expansion and collapse in the actual browser plus a regression for a new relation arriving before its endpoint node. This coordination requirement grants no new semantic binding, execution result or layout redesign.
