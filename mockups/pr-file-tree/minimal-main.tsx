@@ -8,8 +8,19 @@ import { sourceGraph, visibleSourceGraph, allEntities, allRelations } from './so
 import type { GraphEntity, GraphRelation } from './minimal-graph.ts';
 import { cardRows, edgeRows, omittedStructuralEdge } from './minimal-projection.ts';
 import { readingBands, iconFor, iconPaths } from './entity-presentation.ts';
-import { projectionRoutes } from './projection-routes.ts';
+import { beginsRouteDrag, keyboardDelta, movedNodePosition } from './gesture-policy.ts';
+import { projectionRoutes, liveProjectionRoutes } from './projection-routes.ts';
 import { initialLayout, curve, type Point, type Routed, type Side } from './graph-geometry.ts';
+const useCoarseInput = () => {
+    const [coarse, setCoarse] = useState(() => matchMedia('(pointer: coarse)').matches);
+    useEffect(() => {
+        const query = matchMedia('(pointer: coarse)');
+        const update = () => setCoarse(query.matches);
+        query.addEventListener('change', update);
+        return () => query.removeEventListener('change', update);
+    }, []);
+    return coarse;
+};
 const bands = readingBands(allEntities(), allRelations());
 const directions: readonly Side[] = ['left', 'right', 'top', 'bottom'];
 const position = (side: Side) => ({
@@ -21,10 +32,16 @@ type EntityNode = Node<{
     unitCount?: number;
     onExpand?: (id: string, hide?: boolean) => void;
     onReflow?: () => void;
+    onMoveStart: () => void;
+    onMoveEnd: () => void;
+    onMove: (id: string, delta: Point) => void;
 }, 'entity' | 'graph'>;
 type RelationEdge = Edge<{
     relation: GraphRelation;
     routed: Routed;
+    coarse: boolean;
+    onMoveStart: () => void;
+    onMoveEnd: () => void;
     onBend: (id: string, offset: Point | undefined) => void;
     onMeasure: (id: string, size: {
         width: number;
@@ -43,11 +60,39 @@ const EntityIcon = ({ entity }: {
   {paths.map((path, index) => <path key={index} d={path}/>)}
  </svg>;
 };
-const Entity = ({ data }: NodeProps<EntityNode>) => {
+const NodeDragHandle = ({ data }: { data: EntityNode['data'] }) => {
+    const { getZoom } = useReactFlow();
+    const pointer = useRef<{ id: number; x: number; y: number; zoom: number } | null>(null);
+    return <button type="button" className="graph-drag-handle nodrag nopan" aria-label={'Move ' + cardRows(data.entity).title}
+        onPointerDown={event => {
+            if (event.button !== 0) return;
+            event.preventDefault(); event.stopPropagation(); event.currentTarget.setPointerCapture(event.pointerId);
+            pointer.current = { id: event.pointerId, x: event.clientX, y: event.clientY, zoom: getZoom() };
+            data.onMoveStart();
+        }}
+        onPointerMove={event => {
+            const start = pointer.current;
+            if (!start || start.id !== event.pointerId) return;
+            event.preventDefault(); event.stopPropagation();
+            data.onMove(data.entity.id, { x: (event.clientX - start.x) / start.zoom, y: (event.clientY - start.y) / start.zoom });
+        }}
+        onPointerUp={event => {
+            if (pointer.current?.id !== event.pointerId) return;
+            event.stopPropagation(); pointer.current = null; data.onMoveEnd();
+            if (event.currentTarget.hasPointerCapture(event.pointerId)) event.currentTarget.releasePointerCapture(event.pointerId);
+        }}
+        onPointerCancel={() => { pointer.current = null; data.onMoveEnd(); }}
+        onKeyDown={event => {
+            const delta = keyboardDelta(event.key);
+            if (!delta) return;
+            event.preventDefault(); event.stopPropagation(); data.onMoveStart(); data.onMove(data.entity.id, delta); data.onMoveEnd();
+        }}>⠿</button>;
+};
+const Entity = React.memo(({ data }: NodeProps<EntityNode>) => {
     const card = cardRows(data.entity);
     const status = data.entity.data.comparisonStatus;
     return <article className={'minimal-entity' + (typeof status === 'string' ? ' status-' + status.replaceAll(' ', '-') : '')}>
-  <Ports />
+  <Ports /><NodeDragHandle data={data}/>
   <h2><EntityIcon entity={data.entity}/><span>{card.title}</span></h2>
   {card.rows.map((row, index) => <p key={index}>{row}</p>)}
   {data.entity.kind === 'file' && Boolean(data.unitCount) && <div className="file-unit-actions nodrag nopan">
@@ -59,14 +104,14 @@ const Entity = ({ data }: NodeProps<EntityNode>) => {
    {sourceGraph.unresolved.filter(row => row.path === data.entity.data.path).map(row => <p key={row.anchor.side + ':' + row.anchor.startLine + ':' + row.name}>{row.anchor.side === 'base' ? 'Before' : 'After'} L{row.anchor.startLine}–{row.anchor.endLine} · {row.name}</p>)}
   </details>}
  </article>;
-};
-const GraphBoundary = ({ data }: NodeProps<EntityNode>) => <>
+});
+const GraphBoundary = React.memo(({ data }: NodeProps<EntityNode>) => <>
  <Ports />
  <section className="minimal-change-graph" aria-label={String(data.entity.data.name) + ' graph'}>
-  <h2><EntityIcon entity={data.entity}/><span>{String(data.entity.data.name)}</span></h2>
+  <NodeDragHandle data={data}/><h2><EntityIcon entity={data.entity}/><span>{String(data.entity.data.name)}</span></h2>
  </section>
-</>;
-const Relation = (props: EdgeProps<RelationEdge>) => {
+</>);
+const Relation = React.memo((props: EdgeProps<RelationEdge>) => {
     const { getZoom } = useReactFlow();
     const labelRef = useRef<HTMLDivElement>(null);
     const drag = useRef<{
@@ -83,14 +128,14 @@ const Relation = (props: EdgeProps<RelationEdge>) => {
         return null;
     const route = curve({ x: props.sourceX, y: props.sourceY }, { x: props.targetX, y: props.targetY }, data.routed.offset);
     const card = edgeRows(data.relation);
-    const begin = (event: React.PointerEvent<Element>) => { if (event.button !== 0)
-        return; event.stopPropagation(); event.preventDefault(); event.currentTarget.setPointerCapture(event.pointerId); drag.current = {
+    const begin = (event: React.PointerEvent<Element>) => { if (event.button !== 0 || !beginsRouteDrag(event.pointerType, Boolean((event.target as Element).closest('.graph-drag-handle')), event.currentTarget.tagName.toLowerCase() === 'g'))
+        return; data.onMoveStart(); event.stopPropagation(); event.preventDefault(); event.currentTarget.setPointerCapture(event.pointerId); drag.current = {
         pointer: event.pointerId, clientX: event.clientX, clientY: event.clientY, offset: data.routed.offset, zoom: getZoom()
     }; };
     const move = (event: React.PointerEvent<Element>) => { const start = drag.current; if (!start || start.pointer !== event.pointerId)
         return; event.stopPropagation(); event.preventDefault(); data.onBend(props.id, { x: start.offset.x + (event.clientX - start.clientX) / start.zoom, y: start.offset.y + (event.clientY - start.clientY) / start.zoom }); };
     const end = (event: React.PointerEvent<Element>) => { if (drag.current?.pointer !== event.pointerId)
-        return; event.stopPropagation(); drag.current = null; if (event.currentTarget.hasPointerCapture(event.pointerId))
+        return; event.stopPropagation(); drag.current = null; data.onMoveEnd(); if (event.currentTarget.hasPointerCapture(event.pointerId))
         event.currentTarget.releasePointerCapture(event.pointerId); };
     const key = (event: React.KeyboardEvent<Element>) => { const delta = ({
         ArrowLeft: [-10, 0], ArrowRight: [10, 0], ArrowUp: [0, -10], ArrowDown: [0, 10]
@@ -104,8 +149,8 @@ const Relation = (props: EdgeProps<RelationEdge>) => {
         event.stopPropagation();
         data.onBend(props.id, { x: data.routed.offset.x + delta[0]!, y: data.routed.offset.y + delta[1]! });
     } };
-    return <><g data-route-id={props.id} className="minimal-route nodrag nopan" role="button" tabIndex={0} aria-label={'Move ' + card.title + ' route'} onPointerDown={begin} onPointerMove={move} onPointerUp={end} onPointerCancel={end} onKeyDown={key}><BaseEdge id={props.id} path={route.path} interactionWidth={24} {...(props.markerEnd ? { markerEnd: props.markerEnd } : {})}/></g><EdgeLabelRenderer><div ref={labelRef} className={'minimal-edge-card version-' + data.relation.version + ' nodrag nopan'} data-relation={data.relation.relation} data-edge-id={props.id} role="button" tabIndex={0} aria-label={'Move ' + card.title + ' label and route'} onPointerDown={begin} onPointerMove={move} onPointerUp={end} onPointerCancel={end} onKeyDown={key} style={{ transform: 'translate(-50%, -50%) translate(' + route.label.x + 'px, ' + route.label.y + 'px)' }}><div className="edge-main-row">{data.relation.version !== 'comparison' && <span className="version-tag">{data.relation.version === 'before' ? 'Before' : 'After'}</span>}{card.title && <span>{card.title}</span>}{data.relation.relation === 'located_in' && card.rows.map(row => <span key={row}>{row}</span>)}</div>{data.relation.relation !== 'located_in' && card.rows.map((row, index) => <p key={index}>{row}</p>)}</div></EdgeLabelRenderer></>;
-};
+    return <><g data-route-id={props.id} className={'minimal-route nodrag' + (data.coarse ? '' : ' nopan')} role="button" tabIndex={0} aria-label={'Move ' + card.title + ' route'} onPointerDown={begin} onPointerMove={move} onPointerUp={end} onPointerCancel={end} onKeyDown={key}><BaseEdge id={props.id} path={route.path} interactionWidth={24} {...(props.markerEnd ? { markerEnd: props.markerEnd } : {})}/></g><EdgeLabelRenderer><div ref={labelRef} className={'minimal-edge-card version-' + data.relation.version + ' nodrag' + (data.coarse ? '' : ' nopan')} data-relation={data.relation.relation} data-edge-id={props.id} role={data.coarse ? undefined : 'button'} tabIndex={data.coarse ? -1 : 0} aria-label={'Move ' + card.title + ' label and route'} onPointerDown={begin} onPointerMove={move} onPointerUp={end} onPointerCancel={end} onKeyDown={key} style={{ transform: 'translate(-50%, -50%) translate(' + route.label.x + 'px, ' + route.label.y + 'px)' }}><span className="graph-drag-handle nodrag nopan" role="button" tabIndex={0} aria-label={'Move ' + card.title + ' label and route'} onKeyDown={key}>⠿</span><div className="edge-main-row">{data.relation.version !== 'comparison' && <span className="version-tag">{data.relation.version === 'before' ? 'Before' : 'After'}</span>}{card.title && <span>{card.title}</span>}{data.relation.relation === 'located_in' && card.rows.map(row => <span key={row}>{row}</span>)}</div>{data.relation.relation !== 'located_in' && card.rows.map((row, index) => <p key={index}>{row}</p>)}</div></EdgeLabelRenderer></>;
+});
 const nodeTypes = { entity: Entity, graph: GraphBoundary };
 const edgeTypes = { relation: Relation };
 const InitialLayout = ({ apply, links, revision }: {
@@ -136,6 +181,7 @@ const InitialLayout = ({ apply, links, revision }: {
     return null;
 };
 const App = () => {
+    const coarse = useCoarseInput();
     useEffect(() => installPageGestureBoundary(document.documentElement), []);
     const [limits, setLimits] = useState<Record<string, number>>({});
     const [geometryRevision, setGeometryRevision] = useState(0);
@@ -152,6 +198,22 @@ const App = () => {
         width: number;
         height: number;
     }>>({});
+    type Movement = { nodes: readonly EntityNode[]; manual: Record<string, Point> };
+    const latest = useRef<Movement>({ nodes, manual });
+    const movementRef = useRef<Movement | null>(null);
+    const [movement, setMovement] = useState<Movement | null>(null);
+    useLayoutEffect(() => { latest.current = { nodes, manual }; }, [nodes, manual]);
+    const beginMove = useCallback(() => {
+        movementRef.current = latest.current;
+        setMovement(latest.current);
+    }, []);
+    const endMove = useCallback(() => { movementRef.current = null; setMovement(null); }, []);
+    const moveNode = useCallback((id: string, delta: Point) => {
+        const position = movedNodePosition((movementRef.current ?? latest.current).nodes, id, delta);
+        if (!position) return;
+        manualPositions.current[id] = position;
+        setNodes(previous => previous.map(node => node.id === id ? { ...node, position } : node));
+    }, [setNodes]);
     const onExpand = useCallback((id: string, hide = false) => setLimits(previous => ({ ...previous, [id]: hide ? 0 : (previous[id] ?? 0) + 20 })), []);
     const onReflow = useCallback(() => setGeometryRevision(value => value + 1), []);
     useEffect(() => {
@@ -164,16 +226,16 @@ const App = () => {
                 const group = Boolean(entity.nodes && entity.edges);
                 return {
                     id: entity.id, type: group ? 'graph' : 'entity', data: {
-                        entity, limit: limits[entity.id] ?? 0, unitCount: sourceGraph.fileUnits[entity.id]?.length ?? 0, onExpand, onReflow
+                        entity, limit: limits[entity.id] ?? 0, unitCount: sourceGraph.fileUnits[entity.id]?.length ?? 0, onExpand, onReflow, onMoveStart: beginMove, onMoveEnd: endMove, onMove: moveNode
                     },
-                    position: known?.position ?? { x: 0, y: 0 }, draggable: true, ...(parent ? { parentId: parent.id, extent: 'parent' as const } : {}),
+                    position: known?.position ?? { x: 0, y: 0 }, draggable: !coarse, ...(parent ? { parentId: parent.id, extent: 'parent' as const } : {}),
                     ...(known?.measured ? { measured: known.measured } : {}), style: {
                         ...known?.style, opacity: known ? 1 : 0, ...(group ? { width: known?.style?.width ?? 800, height: known?.style?.height ?? 520 } : {})
                     }
                 };
             });
         });
-    }, [view, limits, onExpand, onReflow, setNodes]);
+    }, [view, limits, coarse, beginMove, endMove, moveNode, onExpand, onReflow, setNodes]);
     const apply = useCallback((laidOut: EntityNode[]) => {
         setNodes(laidOut.map(node => manualPositions.current[node.id] ? { ...node, position: manualPositions.current[node.id]! } : node));
         setReady(true);
@@ -196,25 +258,34 @@ const App = () => {
         width: number;
         height: number;
     }) => setSizes(previous => previous[id]?.width === size.width && previous[id]?.height === size.height ? previous : { ...previous, [id]: size }), []);
+    const placementNodes = movement?.nodes ?? nodes;
+    const placementManual = movement?.manual ?? manual;
+    const placements = useMemo(() => ready ? projectionRoutes(placementNodes, view.nodes, links, sizes, placementManual) : null,
+        [ready, placementNodes, view.nodes, links, sizes, placementManual]);
+    const edgeCache = useRef(new Map<string, RelationEdge>());
     const edges = useMemo<RelationEdge[]>(() => {
         if (!ready)
             return [];
-        const routes = projectionRoutes(nodes, view.nodes, links, sizes, manual);
-        if (!routes)
+        if (!placements)
             return [];
+        const routes = liveProjectionRoutes(nodes, links, placements, manual);
         return relations.map(relation => {
             const routed = routes.get(relation.id)!;
-            return {
+            const prior = edgeCache.current.get(relation.id);
+            if (prior?.data?.routed === routed && prior.data.coarse === coarse) return prior;
+            const edge: RelationEdge = {
                 id: relation.id, type: 'relation', source: relation.from, target: relation.to, sourceHandle: 'source:' + routed.sourceSide, targetHandle: 'target:' + routed.targetSide,
                 data: {
-                    relation, routed, onBend, onMeasure
+                    relation, routed, coarse, onBend, onMeasure, onMoveStart: beginMove, onMoveEnd: endMove
                 }, markerEnd: { type: MarkerType.ArrowClosed, color: '#9db3c8' }
             };
+            edgeCache.current.set(relation.id, edge);
+            return edge;
         });
-    }, [ready, nodes, view.nodes, links, sizes, manual, relations, onBend, onMeasure]);
-    const revision = JSON.stringify(limits) + ':' + geometryRevision;
+    }, [ready, placements, nodes, links, manual, relations, coarse, beginMove, endMove, onBend, onMeasure]);
+    const revision = JSON.stringify(limits) + ':' + geometryRevision + ':' + coarse;
     return <><header className="minimal-header"><h1>PR25 · Changes and evidence</h1><p>Files, code changes, tests and their source context</p></header>
-  <main aria-label="PR25 source comparison graph"><ReactFlow<EntityNode, RelationEdge> nodes={nodes} onNodesChange={changes} edges={edges} nodeTypes={nodeTypes} edgeTypes={edgeTypes} defaultViewport={{
+  <main className={coarse ? 'coarse-input' : undefined} aria-label="PR25 source comparison graph"><ReactFlow<EntityNode, RelationEdge> nodes={nodes} onNodesChange={changes} onNodeDragStart={beginMove} onNodeDragStop={endMove} edges={edges} nodeTypes={nodeTypes} edgeTypes={edgeTypes} defaultViewport={{
         x: 20, y: 35, zoom: 1
     }} minZoom={0.25} maxZoom={2} panOnScroll panOnScrollMode={PanOnScrollMode.Free} zoomOnScroll={false} zoomOnPinch nodesConnectable={false} nodesDraggable elementsSelectable={false} proOptions={{ hideAttribution: true }}>
    <InitialLayout apply={apply} links={links} revision={revision}/><Background color="#29333b" gap={24} size={1}/>

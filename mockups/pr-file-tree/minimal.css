@@ -64,3 +64,17 @@ main { flex: 1; min-height: 0; }
 .file-unit-actions button { color:inherit; background:transparent; border:1px solid currentColor; border-radius:4px; padding:5px 7px; font:inherit; font-size:11px; cursor:pointer; }
 .unpaired-source { font-size:11px; margin-top:8px; }
 .unpaired-source summary { cursor:pointer; }
+
+/* Coarse input reserves movement for explicit controls; other card/line regions pan. */
+.graph-drag-handle { display:none; }
+.coarse-input .graph-drag-handle { display:inline-flex; align-items:center; justify-content:center; width:32px; height:32px; padding:0; border:1px solid currentColor; border-radius:4px; background:transparent; color:inherit; font:inherit; font-size:20px; cursor:grab; touch-action:none; user-select:none; }
+.coarse-input .minimal-entity { position:relative; }
+.coarse-input .minimal-entity > .graph-drag-handle,
+.coarse-input .minimal-change-graph > .graph-drag-handle { position:absolute; right:8px; top:8px; }
+.coarse-input .minimal-entity h2,
+.coarse-input .minimal-change-graph > h2 { padding-right:34px; }
+.coarse-input .minimal-edge-card > .graph-drag-handle { float:right; margin-left:8px; }
+.coarse-input .graph-drag-handle:focus-visible { outline:2px solid #bed8ed; outline-offset:3px; }
+.coarse-input .minimal-route,
+.coarse-input .minimal-route path { pointer-events:none; touch-action:auto; }
+.coarse-input .react-flow__node { touch-action:none; }

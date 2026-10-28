@@ -1,6 +1,6 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { projectionRoutes } from '../projection-routes.ts';
+import { projectionRoutes, liveProjectionRoutes } from '../projection-routes.ts';
 import { visibleSourceGraph } from '../source-graph.ts';
 
 test('real review-file expansion defers routes while the node effect still holds the previous projection', () => {
@@ -24,4 +24,17 @@ test('settled membership restores all routes; replacement and collapse defer sta
     assert.equal(projectionRoutes(nodes, [first, { id: 'replacement' }], [link], {}, {}), null);
     assert.equal(projectionRoutes([first], [first], [], {}, {})?.size, 0);
     assert.equal(JSON.stringify(nodes), before);
+});
+
+
+test('live gesture routes follow endpoints and manual bends without repeating placement search', () => {
+    const nodes = [{ id: 'a', position: { x: 0, y: 0 } }, { id: 'b', position: { x: 800, y: 0 } }];
+    const links = [{ id: 'call', source: 'a', target: 'b' }];
+    const placements = projectionRoutes(nodes, nodes, links, {}, {})!;
+    assert.equal(liveProjectionRoutes(nodes, links, placements, {}).get('call'), placements.get('call'));
+    const moved = [nodes[0]!, { ...nodes[1]!, position: { x: 900, y: 100 } }];
+    const route = liveProjectionRoutes(moved, links, placements, { call: { x: 25, y: 30 } }).get('call')!;
+    assert.deepEqual(route.offset, { x: 25, y: 30 });
+    assert.notDeepEqual(route.label, placements.get('call')!.label);
+    assert.deepEqual(placements.get('call')!.offset, { x: 0, y: 0 });
 });
