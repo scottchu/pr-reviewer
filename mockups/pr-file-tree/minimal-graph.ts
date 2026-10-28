@@ -1,21 +1,8 @@
 import preparedTest from '../../docs/plans/720p/slices/05-explanation-exploration/reviews/request-test-evidence-v1.json' with { type: 'json' };
 import core from '../../docs/plans/720p/slices/05-explanation-exploration/reviews/core-request-graph-v1.json' with { type: 'json' };
 
-export type GraphEntity = Readonly<{
-  id: string;
-  kind: string;
-  data: Readonly<Record<string, unknown>>;
-  nodes?: readonly GraphEntity[];
-  edges?: readonly GraphRelation[];
-}>;
-export type GraphRelation = Readonly<{
-  id: string;
-  from: string;
-  to: string;
-  version: 'before' | 'after' | 'comparison';
-  relation: string;
-  data: Readonly<Record<string, unknown>>;
-}>;
+import type {GraphEntity,GraphRelation} from '../../src/review-graph/domain/types.ts';
+export type {GraphEntity,GraphRelation} from '../../src/review-graph/domain/types.ts';
 
 const entity = (id: string, kind: string, data: Record<string, unknown>): GraphEntity => ({ id, kind, data });
 const edge = (

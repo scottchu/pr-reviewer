@@ -1,0 +1,19 @@
+{
+  "baseline": "5944d3b358930bfd1739e1e3ea4f2e087d28eda2",
+  "originalInputArtifactHash": "2be6e49ce83d782624a60fe910912d513de31f2afd0154ea7d7af91766fb57c4",
+  "excludedGraphModuleHashes": [
+    "compilerHash",
+    "appCompilerHash",
+    "explanationHash",
+    "documentCompilerHash",
+    "editCompilerHash"
+  ],
+  "sourceProducerHashes": {
+    "extractor": "fdf1c25be73886b8b2bd3cd4584b37a00e1e4128d4527bf6a41a0e583137df4e",
+    "gitStage": "e7737e4a04d0e07b4bef25110027f465b77a6f62355312f88a54c7cf21e4ab71"
+  },
+  "facts": "cf36e1500745c1c0445778dfd2dbeac87874aa85654a2e3996953dcd9427d9d8",
+  "canonical": "4a180c01a200d5612ce3f3eb2bb265a14efd9c423c6ceea1d90484bc536c9ea3",
+  "projection": "ee5055a6d19b1cce66cb086c0dd4ffcdc71c10935e947c578e30c7a9da1c4507",
+  "compiled": "42cd40ca2c93a23598fafded1eda53579bb729cd8bf6c4f19bab630a73cb81e8"
+}
