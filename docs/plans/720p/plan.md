@@ -83,3 +83,10 @@ Current bounded projection receipt (2026-10-27): applicationb0a914a is published
 
 
 Latest bounded correction (2026-10-27): [recoveryv15](slices/05-explanation-exploration/semantic-graph-recovery.md#implementationreview-handoff-v15--actual-added-subjects-not-synthetic-absence) publishes application7681e27 at the same endpoint, removing synthetic missing-side subjects and redundant parent→child arrows while retaining classification provenance and actual test relations. Source/19pure/strict/build and independent affected desktop390 checks pass in scope; whole-round learning/readiness gates remain open.
+
+
+## Current source-comparison architecture refactor
+
+Date:2026-10-28. Accepted user scope: implement Experience Service/Domain Service/UI Projection boundaries, add independent extraction/projection tests and preserve the current minimum React UI before direct deployment. The owning [slice V35 packet](slices/05-explanation-exploration/semantic-graph-recovery.md#v35-adopted-experiencedomain-refactor) pins main5944d3b, acceptance, sole writer/reviewer and existing8478target. [Durable source-pipeline specification](../../product/source-pipeline.md) owns the adopted design.
+
+Sequence: freeze semantic/default-and-expanded projection oracles and independent fixtures → move real capabilities and wire ExperienceState/UI Types → owning checks plus independent source review → authorized main-source deployment/readback. New model calls, UI redesign, owner-data restoration and broader arbitrary-PR support are excluded. No downstream slice is automatically ready from this refactor; preserve existing interfaces and reconcile any changed source/projection contract into its direct consumers. Actual UI/comprehension remains separate from engineering evidence while browser access is unavailable.

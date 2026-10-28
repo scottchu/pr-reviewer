@@ -16,3 +16,5 @@ Keep related delivery material together. Each round lives under `docs/plans/<rou
 - [Ontology index](product/project-repository-ontology.md), [TBox definitions/constraints](product/project-repository-tbox.md) and [PR25 ABox facts/evidence](product/project-repository-abox-pr25.md): separate canonical Markdown homes, unchanged ontology.
 
 - [Protected product invariants](product/protected-invariants.md): authoritative preservation/status register; every bounded change declares allowed seams and protected behavior.
+
+- [Source understanding pipeline](product/source-pipeline.md): accepted read/parse/extraction/enrichment direction, proposed module boundaries and independent correctness tests.

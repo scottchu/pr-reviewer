@@ -1,0 +1,96 @@
+{
+  "status": "Attributed prepared explanations, not mechanically extracted structural facts",
+  "nodes": [
+    {
+      "id": "reason",
+      "kind": "reason",
+      "data": {
+        "name": "Always constructing Bearer cannot express a header-free owner request",
+        "basis": "Prepared source-derived inference",
+        "sourceRefs": [
+          {
+            "path": "src/application/review.ts",
+            "side": "base",
+            "startLine": 29,
+            "endLine": 29
+          },
+          {
+            "path": "src/application/local-access.ts",
+            "side": "head",
+            "startLine": 3,
+            "endLine": 3
+          }
+        ]
+      }
+    },
+    {
+      "id": "goal",
+      "kind": "goal",
+      "data": {
+        "name": "Open review without manual token entry",
+        "basis": "Prepared intended outcome, not measured achievement",
+        "sourceRefs": [
+          {
+            "path": "docs/product/review-loop/runtime.md",
+            "side": "head",
+            "startLine": 22,
+            "endLine": 26
+          }
+        ]
+      }
+    },
+    {
+      "id": "owner-http-policy",
+      "kind": "behavior",
+      "data": {
+        "name": "Local-owner HTTP policy",
+        "value": [
+          "Owner requests without Authorization; invalid explicit credentials rejected"
+        ],
+        "basis": "Prepared source-declared HTTP policy expectation, not execution"
+      }
+    }
+  ],
+  "edges": [
+    {
+      "id": "change:motivated_by:reason",
+      "from": "change",
+      "to": "reason",
+      "version": "comparison",
+      "relation": "motivated_by",
+      "data": {
+        "basis": "Prepared inference, not author testimony"
+      }
+    },
+    {
+      "id": "change:intended_to_achieve:goal",
+      "from": "change",
+      "to": "goal",
+      "version": "comparison",
+      "relation": "intended_to_achieve",
+      "data": {
+        "basis": "Intended outcome, not measured achievement"
+      }
+    },
+    {
+      "id": "reason:impedes:goal",
+      "from": "reason",
+      "to": "goal",
+      "version": "comparison",
+      "relation": "impedes",
+      "data": {
+        "basis": "Inferred obstacle; removal does not prove goal achieved"
+      }
+    },
+    {
+      "id": "change:related-policy",
+      "from": "change",
+      "to": "owner-http-policy",
+      "version": "comparison",
+      "relation": "related_policy",
+      "data": {
+        "basis": "Prepared shared policy inference, not call or runtime proof"
+      }
+    }
+  ]
+}
