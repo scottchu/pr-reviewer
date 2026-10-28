@@ -53,3 +53,72 @@ for (const width of [1440, 390]) {
     expect(await page.locator('header').boundingBox()).toEqual(header);
   });
 }
+
+// V30: execute against the exact candidate URL; browser availability is a separate gate.
+for (const width of [1440, 390]) {
+  test(`path lane and Show/Hide preserve layout ownership at ${width}`, async ({ browser }) => {
+    const {allEntities} = await import('../source-graph.ts');
+    const {compareFilePaths} = await import('../graph-geometry.ts');
+    const files = allEntities().filter(entity => entity.kind === 'file')
+      .map(entity => ({id: entity.id, path: String(entity.data.path)}));
+    const context = await browser.newContext({viewport: {width, height: 1000},
+      ...(width === 390 ? {hasTouch: true, isMobile: true} : {})});
+    const page = await context.newPage();
+    await page.goto(test.info().project.use.baseURL ?? 'http://127.0.0.1:57943');
+    const review = page.locator('.react-flow__node[data-id="pr25"]');
+    await expect(review).toBeVisible();
+    await expect.poll(async () => (await review.boundingBox())!.x).toBe(20);
+    const camera = page.locator('.react-flow__viewport');
+    const initialCamera = await camera.getAttribute('style');
+    const inspect = async () => page.evaluate(fileMetadata => {
+      const zoom = new DOMMatrix(getComputedStyle(document.querySelector('.react-flow__viewport')!).transform).a;
+      const boxes = [...document.querySelectorAll<HTMLElement>('.react-flow__node')].map(node => {
+        const box = node.getBoundingClientRect();
+        return {id: node.dataset.id!, x: box.x / zoom, y: box.y / zoom, right: box.right / zoom};
+      });
+      return {boxes, files: fileMetadata.map(file => ({...file, ...boxes.find(box => box.id === file.id)!}))};
+    }, files);
+    const assertArrangement = async () => {
+      const geometry = await inspect();
+      const pr = geometry.boxes.find(box => box.id === 'pr25')!;
+      // Root IDs come from the actual visible source graph, not CSS parent heuristics.
+      const children = new Set(allEntities().flatMap(entity => entity.nodes?.map(child => child.id) ?? []));
+      for (const box of geometry.boxes.filter(box => box.id !== 'pr25' && !children.has(box.id))) {
+        expect(box.x).toBeGreaterThan(pr.right);
+      }
+      const ordered = [...geometry.files].sort((a, b) => a.y - b.y);
+      expect(ordered.map(file => file.path)).toEqual(files.map(file => file.path).sort(compareFilePaths));
+      const origin = ordered[0]!.x - (ordered[0]!.path.split('/').length - 1) * 24;
+      for (const file of ordered) expect(file.x - origin).toBeCloseTo((file.path.split('/').length - 1) * 24, 1);
+      const fileIds = new Set(files.map(file => file.id));
+      const laneRight = Math.max(...ordered.map(file => file.right));
+      for (const box of geometry.boxes.filter(box => box.id !== 'pr25' && !children.has(box.id) && !fileIds.has(box.id))) {
+        expect(box.x).toBeGreaterThan(laneRight);
+      }
+    };
+    await assertArrangement();
+    const file = page.locator('.react-flow__node[data-id="review-file"]');
+    const show = file.getByRole('button', {name: 'Show source units', exact: true});
+    await show.focus();
+    await show.press('Enter');
+    await expect(file.getByRole('button', {name: 'Hide source units', exact: true})).toBeVisible();
+    await assertArrangement();
+    await file.getByRole('button', {name: 'Hide source units', exact: true}).focus();
+    await file.getByRole('button', {name: 'Hide source units', exact: true}).press('Enter');
+    await expect(show).toBeVisible();
+    await assertArrangement();
+    const handle = file.getByRole('button', {name: 'Move src/application/review.ts', exact: true});
+    await handle.focus();
+    const before = (await file.boundingBox())!;
+    await handle.press('ArrowRight');
+    await expect.poll(async () => (await file.boundingBox())!.x - before.x).toBe(10);
+    const manual = await file.getAttribute('style');
+    await show.focus(); await show.press('Enter');
+    await file.getByRole('button', {name: 'Hide source units', exact: true}).focus();
+    await file.getByRole('button', {name: 'Hide source units', exact: true}).press('Enter');
+    await expect(show).toBeVisible();
+    expect(await file.getAttribute('style')).toBe(manual);
+    expect(await camera.getAttribute('style')).toBe(initialCamera);
+    await context.close();
+  });
+}

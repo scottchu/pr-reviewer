@@ -1,25 +1,24 @@
 import type {GraphEntity, GraphRelation} from './comparison-graph.ts';
 
-export type ReadingBand = 0 | 1 | 2 | 3;
+export type ReadingBand = -1 | 0 | 1 | 2;
 const testKinds = new Set(['test', 'assertion', 'source_step', 'absence']);
 
-/** Projection classification uses prepared membership and source relations, never names. */
+/** Review leads; all files share one path lane, regardless of test membership. */
 export const readingBands = (
   entities: readonly GraphEntity[],
-  relations: readonly GraphRelation[],
+  _relations: readonly GraphRelation[],
 ): ReadonlyMap<string, ReadingBand> => {
-  const byId = new Map(entities.map(entity => [entity.id, entity]));
   const isTest = (entity: GraphEntity): boolean =>
     testKinds.has(entity.kind) || Boolean(entity.nodes?.some(isTest));
-  const testFiles = new Set(relations.filter(relation => {
-    const source = byId.get(relation.from);
-    return source && isTest(source) &&
-      (relation.relation === 'located_in' || relation.relation === 'absence_checked_in');
-  }).map(relation => relation.to));
   return new Map(entities.map(entity => [entity.id,
-    entity.kind === 'file' ? (testFiles.has(entity.id) ? 3 : 0) : isTest(entity) ? 2 : 1,
+    entity.kind === 'review' ? -1 : entity.kind === 'file' ? 0 : isTest(entity) ? 2 : 1,
   ] as const));
 };
+
+/** Use repository paths as presentation metadata without changing canonical entities. */
+export const filePaths = (entities: readonly GraphEntity[]): ReadonlyMap<string, string> =>
+  new Map(entities.filter(entity => entity.kind === 'file' && typeof entity.data.path === 'string')
+    .map(entity => [entity.id, entity.data.path as string]));
 
 export const iconFor = (entity: GraphEntity): string => {
   if (entity.nodes?.some(child => child.kind === 'test')) return 'test-change';
