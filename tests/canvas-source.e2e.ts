@@ -15,7 +15,7 @@ test.describe('retained own-PR source canvas',()=>{
   const question=await page.locator('#selection').textContent();
   await canvas.getByRole('button',{name:'Focus src/application/review.ts',exact:true}).click();
   const graph=projectGraph(fixture.snapshot),file=graph.files.find(file=>file.newPath==='src/application/review.ts')!;
-  const spans=graph.nodes.filter(node=>node.kind==='hunk'&&node.fileKey===file.key);
+  const spans=graph.nodes.filter(node=>node.kind==='hunk'&&(node.fileKey?node.fileKey===file.key:(node.side==='base'?node.path===file.oldPath:node.path===file.newPath)));
   expect(spans.length).toBeGreaterThan(1);
   await canvas.getByRole('checkbox',{name:'Show selected file’s changed spans',exact:true}).check();
   const chooser=canvas.getByRole('combobox',{name:'Changed span',exact:true});
