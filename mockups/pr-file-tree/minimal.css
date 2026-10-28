@@ -94,3 +94,23 @@ main { flex: 1; min-height: 0; }
 .document-details { margin-top:10px; font-size:12px; }
 .document-details summary { cursor:pointer; }
 .document-excerpt:focus-visible, .document-reading:focus-visible, .document-details summary:focus-visible { outline:2px solid currentColor; outline-offset:2px; }
+
+/* Edit composition is independent from temporal Before/After witness labels. */
+.group-edit-caption { display:block; margin-top:5px; font-size:12px; font-weight:400; }
+.edit-preview { display:grid; grid-template-columns:minmax(0,1fr) minmax(0,1fr); gap:10px; margin-top:10px; }
+.edit-preview-pane { min-width:0; border:1px solid; border-radius:4px; padding:8px; }
+.preview-remove { background:#fae5e4; color:#642b29; border-color:#ca7e7b; }
+.preview-add { background:#e3f3e8; color:#25543a; border-color:#76ac89; }
+.edit-preview-pane h3 { margin:0; font-size:12px; font-weight:600; }
+.edit-preview-pane p { margin:4px 0; font-size:10px; }
+.edit-preview-rows { max-height:140px; overflow-y:auto; overflow-x:hidden; overscroll-behavior:contain; touch-action:pan-y; user-select:text; }
+.edit-preview-row { display:grid; grid-template-columns:auto minmax(0,1fr); gap:5px; padding:3px 0; }
+.edit-line { font-size:10px; }
+.edit-preview-row code { white-space:pre-wrap; overflow-wrap:anywhere; font:11px/1.45 ui-monospace, monospace; }
+.edit-preview-rows:focus-visible { outline:2px solid currentColor; outline-offset:2px; }
+.document-side.version-before, .document-side.version-after { background:#263139; border-color:#718694; color:#e2e8ed; }
+.document-side.version-before h3 { color:#edc5c3; }
+.document-side.version-after h3 { color:#c6e6d1; }
+.native-row-remove { background:#fae5e4; color:#642b29; }
+.native-row-add { background:#e3f3e8; color:#25543a; }
+.native-row-context { background:transparent; color:inherit; }

@@ -1,4 +1,5 @@
-import type { CallProjectionEvidence } from './call-projection.ts';
+import type {EditComposition} from './edit-composition.ts';
+import {relationshipProvenance} from './relationship-evidence.ts';
 import type { GraphEntity, GraphRelation } from './minimal-graph.ts';
 export type CardRows = Readonly<{
     title: string;
@@ -34,53 +35,57 @@ const contentRows = (entity: GraphEntity): CardRows => {
         default: return { title: text(data.name) || text(data.label), rows: text(data.value) ? [text(data.value)] : [] };
     }
 };
+export const presentationStatus = (entity: GraphEntity): string | undefined => {
+    const composition = entity.data.editComposition as EditComposition | undefined;
+    return composition ? composition.status === 'unresolved' ? undefined : composition.status :
+        typeof entity.data.comparisonStatus === 'string' ? entity.data.comparisonStatus : undefined;
+};
+export const editPreview = (composition: EditComposition) => ({
+    removed: composition.rows.filter(row => row.kind === 'remove').slice(0, 4),
+    added: composition.rows.filter(row => row.kind === 'add').slice(0, 4),
+});
+export const editCaption = (composition: EditComposition): string => composition.status === 'unresolved'
+    ? 'Scoped source edits unresolved'
+    : 'Scoped ' + composition.scope + ' edits: +' + composition.added + ' / −' + composition.removed;
 export const cardRows = (entity: GraphEntity): CardRows => {
     const content = contentRows(entity);
-    const status = text(entity.data.comparisonStatus);
+    const composition = entity.data.editComposition as EditComposition | undefined;
+    const status = composition ? editCaption(composition) : text(entity.data.comparisonStatus);
     return { ...content, rows: status ? [status, ...content.rows] : content.rows };
 };
-export const edgeRows = (edge: GraphRelation): CardRows => {
-    const title = ['before', 'after'].includes(edge.relation) ? '' : edge.relation.replaceAll('_', ' ');
-    if (edge.relation === 'constructs')
-        return {title, rows: [text(edge.data.scope), text(edge.data.scopeLimit)].filter(Boolean)};
-    if (edge.relation === 'calls' && edge.data.projection === 'collapsed-callsite') {
-        const proof = edge.data.projectionEvidence as CallProjectionEvidence;
-        const source = proof.locations[0]!;
-        const range = source.data.range as { startLine: number; endLine: number };
-        const path = text(edge.data.sourcePath).split('/').at(-1);
-        return { title, rows: [text(source.data.commit).slice(0, 7) + ' · ' + path + ' L' + range.startLine + (range.endLine === range.startLine ? '' : '–' + range.endLine)] };
-    }
-    if (edge.relation === 'located_in' && edge.data.comparisonStatus === 'no change') {
-        const witnesses = edge.data.witnesses as readonly GraphRelation[];
-        return { title: 'located in · no change', rows: witnesses.map(witness => { const range = witness.data.range as {
-                startLine: number;
-                endLine: number;
-            }; return (witness.version === 'before' ? 'Before ' : 'After ') + text(witness.data.commit).slice(0, 7) + ' L' + range.startLine + '–' + range.endLine; }) };
-    }
-    if (['located_in', 'absence_checked_in'].includes(edge.relation)) {
-        const range = edge.data.range as {
-            startLine?: number;
-            endLine?: number;
-        } | undefined;
-        return { title, rows: [text(edge.data.commit).slice(0, 7), range ? `L${range.startLine}–${range.endLine}` : 'Range unavailable'] };
-    }
-    if (edge.relation === 'calls' && edge.data.comparisonStatus === 'no change')
-        return { title, rows: ['no change · Before + After source evidence'] };
+export type RelationRows = CardRows & Readonly<{
+    explanation: string; scope: readonly string[]; provenance: readonly string[];
+}>;
+const relationMeanings: Readonly<Record<string, string>> = {
+    before: 'Before source witness for this comparison', after: 'After source witness for this comparison',
+    located_in: 'Source occurrence is located in this file', defined_in: 'Source definition is located in this file',
+    absence_checked_in: 'Source absence assertion is located in this file',
+    changes: 'Native diff records edits in this file', constructs: 'Source constructs this header property',
+    contains: 'Source contains this member', contains_call: 'Source body contains this callsite',
+    calls: 'Source call to the target declaration', verifies: 'Prepared source assertion concerns this behavior',
+    verifies_policy: 'Prepared source assertions concern HTTP policy',
+    motivated_by: 'Prepared source-derived rationale', intended_to_achieve: 'Prepared intended outcome',
+    impedes: 'Prepared inferred obstacle', related_policy: 'Prepared shared policy inference',
+};
+export const edgeRows = (edge: GraphRelation, entities: readonly GraphEntity[] = []): RelationRows => {
+    const title = edge.relation.replaceAll('_', ' ') + (edge.data.comparisonStatus === 'no change' ? ' · no change' : '');
+    const calls = edge.data.sourceCalls as {site?: {sourceText?: string}}[] | undefined;
+    const callText = calls?.find(call=>call.site?.sourceText)?.site?.sourceText;
+    const explanation = edge.relation === 'calls' && callText ? 'Source call: ' + callText : relationMeanings[edge.relation] ?? 'Relationship explanation unavailable';
+    const scopes = [text(edge.data.scope), text(edge.data.scopeLimit)];
+    if (['calls','contains_call'].includes(edge.relation)) scopes.push('Lexical source relation; not runtime execution');
+    if (edge.data.comparisonStatus === 'no change') scopes.push('Before and After source witnesses; not runtime stability');
     if (edge.relation === 'verifies' && edge.data.verificationKind === 'credential-preservation')
-        return { title: 'verifies retained credential behavior', rows: ['Indirect bridge → login → refresh → request', 'Not run · not local-owner/helper-branch proof'] };
-    if (edge.relation === 'verifies_policy')
-        return { title: 'verifies HTTP policy', rows: ['Prepared policy context', 'Not client helper coverage or goal proof'] };
-    if (edge.relation === 'related_policy')
-        return { title: 'related policy', rows: ['Source-derived inference · not a call'] };
-    if (edge.relation === 'verifies')
-        return { title, rows: ['Indirect source context', 'Not direct helper or every-branch proof'] };
-    if (edge.relation === 'motivated_by')
-        return { title, rows: ['Inferred rationale'] };
-    if (edge.relation === 'intended_to_achieve')
-        return { title, rows: ['Intended, not measured'] };
-    if (edge.relation === 'impedes')
-        return { title, rows: ['Inferred obstacle'] };
-    return { title, rows: [] };
+        scopes.push('Indirect bridge → login → refresh → request', 'Not run · not local-owner/helper-branch proof');
+    else if (edge.relation === 'verifies') scopes.push('Indirect source context', 'Not direct helper or every-branch proof');
+    if (edge.relation === 'verifies_policy') scopes.push('Prepared policy context', 'Not client helper coverage or goal proof');
+    if (edge.relation === 'related_policy') scopes.push('Source-derived inference · not a call');
+    if (edge.relation === 'motivated_by') scopes.push('Inferred rationale · not author testimony');
+    if (edge.relation === 'intended_to_achieve') scopes.push('Intended, not measured');
+    if (edge.relation === 'impedes') scopes.push('Inferred obstacle; no measured outcome');
+    const scope = [...new Set(scopes.filter(Boolean))];
+    const provenance = relationshipProvenance(edge, entities);
+    return {title, explanation, scope, provenance, rows: [explanation, ...scope, ...provenance]};
 };
 export const omittedStructuralEdge = (edge: GraphRelation, entities: readonly GraphEntity[] = []): boolean => edge.data.projection === 'metadata' ||
     entities.some(parent => parent.id === edge.from && parent.nodes?.some(child => child.id === edge.to));

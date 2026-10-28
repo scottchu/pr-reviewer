@@ -28,7 +28,7 @@ test('actual generated default request calls helper directly while retaining can
     assert.ok(proof.canonicalRelations.some(edge => edge.from === site.id && edge.to === 'helper'));
     assert.equal(proof.locations[0]!.data.commit, 'e3b270e5f49a9215452b0b86702946043e979059');
     assert.deepEqual(proof.locations[0]!.data.range, { startLine: 30, endLine: 30 });
-    assert.match(edgeRows(projected).rows.join(' '), /review\.ts L30/);
+    assert.match(edgeRows(projected).rows.join(' '), /review\.ts.*L30/);
     assert.equal(view.nodes.filter(entity => entity.kind === 'file').length, 97);
     assert.equal(view.relations.filter(edge => edge.relation === 'changes').length, 50);
     assert.equal(JSON.stringify(sourceGraph), before);
