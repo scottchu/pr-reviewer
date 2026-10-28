@@ -43,3 +43,14 @@ Remaining root full-suite/CI/full-diff review evidence must be established again
 ## Evidence and successor reconciliation
 
 Owning v27/v28 record: ../semantic-graph-recovery.md. Source/implementation history is Git-tracked in this same slice directory; durable contracts are under docs/product and docs/rules. Exact private build/runtime/UI receipts live under /Users/scottchu/.codex-workspaces/artifacts/pr-reviewer-row-projection-2026-10-27/. The new containment source/build identity, actual UI results, PR URL/head/base, hosted/local checks and independent findings will be appended before merge. Preserve original review accounts and make corrections explicit.
+
+### Published successor checkpoint
+
+Date (UTC): 2026-10-28
+Publication status: [draft PR 30](https://github.com/scottchu/pr-reviewer/pull/30), base e3b270e5f49a9215452b0b86702946043e979059. The branch was first published at 59c7881367417950547d136a75a1c0d65fdd3d6a and then advanced to c0c2791. No hosted checks were reported by GitHub at this checkpoint; an empty check list is not a CI pass.
+
+The screenshot containment correction is independently source/UI checked and served from application 53e91939aff7c8fb9eb394fb0556530859875d75 at the same URL. Its immutable asset and desktop/coarse evidence are recorded in v28 of the owning record. That candidate still reviews PR25, so it does not establish understanding of PR30. The fresh full-scope review froze this subject mismatch before source inspection; the original account remains under milestone-review/ui-first-account.md in the private evidence archive.
+
+Root check and the declared root pure suite passed (47 Bun and 423 Node checks); the separate graph suite passed 104 checks. The first complete root E2E run failed (21 passed, 11 failed, 3 unrun). Independent triage identified stale retired-view assumptions, a fixture-isolation defect and two genuine active-canvas omissions. Commits 4dcc6af and c0c2791 restore complete selectable hunk metadata with separately explicit reading, and retained unresolved-reference evidence respectively. Commit 59c7881 corrects the new test's expected inventory for supported legacy path/side identities. The test-only migration and combined E2E rerun remain in progress at this checkpoint. No failure is waived for merge, and a test writer cannot independently approve their own delta.
+
+The independent baseline full-diff risk review found no confirmed P1/P2 after targeted checks; its final successor-delta gate is still pending. Graph-first understanding, arbitrary-MR semantics, cold mobile loading and physical-phone smoothness remain separate incomplete product outcomes. This PR is an authorized engineering checkpoint, not acceptance of the whole slice or round.
