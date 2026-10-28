@@ -9,7 +9,7 @@ test('prepared source subjects classify Files and test graphs without inventing 
   const before = JSON.stringify(comparisonGraph);
   const bands = readingBands(entities, allRelations());
   for (const id of ['review-file', 'helper-file']) assert.equal(bands.get(id), 0);
-  for (const id of ['test-file', 'application-test-file', 'gateway-test-file']) assert.equal(bands.get(id), 0);
+  for (const id of ['test-file', 'application-test-file', 'gateway-test-file']) assert.equal(bands.get(id), 3);
   assert.equal(bands.get('change'), 1);
   assert.equal(bands.get('test-change'), 2);
   assert.equal(bands.get('gateway-policy-test-change'), 2);
@@ -50,13 +50,13 @@ test('each current entity has a type icon; test imagery does not assert success'
 });
 
 // V30: presentation derives paths from full file metadata, independently of opaque IDs.
-test('path arrangement keeps review leftmost and every file in one directory-first lane', async () => {
+test('path arrangement keeps review leftmost and files path-ordered within each lane', async () => {
   const {filePaths} = await import('../entity-presentation.ts');
   const entities = [
     {id: 'z', kind: 'file', data: {path: 'src/z.ts'}},
     {id: 'a', kind: 'file', data: {path: 'README.md'}},
     {id: 'review-file', kind: 'file', data: {path: 'src/b/deep.ts'}},
-    {id: 'test', kind: 'file', data: {path: 'tests/a.ts'}},
+    {id: 'test', kind: 'file', data: {path: 'tests/a.ts', sourceContextScope: 'test-source-context; unchanged'}},
     {id: 'other', kind: 'file', data: {path: 'src/a.ts'}},
     {id: 'pr', kind: 'review', data: {}},
     {id: 'code', kind: 'change', data: {}},
@@ -72,15 +72,19 @@ test('path arrangement keeps review leftmost and every file in one directory-fir
   const layout = initialLayout(nodes, [], 'pr', bands, {}, paths);
   const boxes = absoluteBoxes(layout);
   const files = layout.filter(node => paths.has(node.id)).sort((a, b) => a.position.y - b.position.y);
-  assert.deepEqual(files.map(node => paths.get(node.id)), [...paths.values()].sort(compareFilePaths));
+  for (const band of [0, 3]) {
+    assert.deepEqual(files.filter(node => bands.get(node.id) === band).map(node => paths.get(node.id)),
+      [...paths].filter(([id]) => bands.get(id) === band).map(([, path]) => path).sort(compareFilePaths));
+  }
   for (const node of layout.filter(node => node.id !== 'pr')) {
     assert.ok(boxes.get('pr')!.x + boxes.get('pr')!.width < node.position.x);
   }
   const origin = boxes.get('a')!.x;
-  for (const file of files) {
+  for (const file of files.filter(file => bands.get(file.id) === 0)) {
     assert.equal(file.position.x - origin, (paths.get(file.id)!.split('/').length - 1) * 24);
     assert.ok(file.position.x + boxes.get(file.id)!.width < boxes.get('code')!.x);
   }
+  assert.ok(boxes.get('test')!.x > boxes.get('code')!.x + boxes.get('code')!.width);
   assert.equal(boxes.get('pr')!.x, 0);
   assert.equal(JSON.stringify(nodes), before);
   const shuffled = initialLayout([...nodes].reverse(), [], 'pr', bands, {}, paths);
@@ -89,11 +93,12 @@ test('path arrangement keeps review leftmost and every file in one directory-fir
 
 
 test('actual generated File inventory remains path-ordered through source-unit reflow', async () => {
-  const {sourceGraph, allEntities, visibleSourceGraph} = await import('../source-graph.ts');
-  const {filePaths} = await import('../entity-presentation.ts');
+  const {sourceGraph, allEntities, allRelations, visibleSourceGraph} = await import('../source-graph.ts');
+  const {filePaths, documentPaths} = await import('../entity-presentation.ts');
   const before = JSON.stringify(sourceGraph);
   const paths = filePaths(allEntities());
-  const bands = readingBands(allEntities(), []);
+  const bands = readingBands(allEntities(), allRelations());
+  const documents = documentPaths(allEntities());
   for (const limits of [{}, {'review-file': 20}, {}]) {
     const view = visibleSourceGraph(limits);
     const nodes = view.nodes.map(entity => {
@@ -101,10 +106,22 @@ test('actual generated File inventory remains path-ordered through source-unit r
       return {id: entity.id, ...(parent ? {parentId: parent.id} : {}), position: {x: 0, y: 0},
         measured: {width: entity.id === 'review-file' ? 740 : 300, height: 100}};
     });
-    const layout = initialLayout(nodes, view.relations.map(edge => ({id: edge.id, source: edge.from, target: edge.to})), 'pr25', bands, {}, paths);
+    const layout = initialLayout(nodes, view.relations.map(edge => ({id: edge.id, source: edge.from, target: edge.to})), 'pr25', bands, {}, paths, documents);
     const files = layout.filter(node => paths.has(node.id)).sort((a, b) => a.position.y - b.position.y);
     assert.equal(files.length, 97);
-    assert.deepEqual(files.map(node => paths.get(node.id)), [...paths.values()].sort(compareFilePaths));
+    for (const band of [0, 3]) {
+      const lane = files.filter(node => bands.get(node.id) === band);
+      assert.deepEqual(lane.map(node => paths.get(node.id)), [...paths].filter(([id]) => bands.get(id) === band).map(([, path]) => path).sort(compareFilePaths));
+      const origin = lane[0]!.position.x - (paths.get(lane[0]!.id)!.split('/').length - 1) * 24;
+      for (const file of lane) assert.equal(file.position.x - origin, (paths.get(file.id)!.split('/').length - 1) * 24);
+    }
+    const boxes = absoluteBoxes(layout);
+    const documentRoots = layout.filter(node => !node.parentId && documents.has(node.id));
+    const codeRoots = layout.filter(node => !node.parentId && !documents.has(node.id));
+    for (const doc of documentRoots) for (const code of codeRoots)
+      assert.ok(doc.position.y + boxes.get(doc.id)!.height + 300 <= code.position.y);
+    for (const context of allEntities().filter(entity => String(entity.data.sourceContextScope).startsWith('test-source-context')))
+      assert.equal(bands.get(context.id), 3);
     const pr = layout.find(node => node.id === 'pr25')!;
     for (const root of layout.filter(node => !node.parentId && node.id !== 'pr25')) {
       assert.ok(root.position.x > pr.position.x + 300);

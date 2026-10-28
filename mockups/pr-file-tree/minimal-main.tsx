@@ -6,8 +6,9 @@ import './minimal.css';
 import { installPageGestureBoundary } from './page-gestures.ts';
 import { sourceGraph, visibleSourceGraph, allEntities, allRelations } from './source-graph.ts';
 import type { GraphEntity, GraphRelation } from './minimal-graph.ts';
+import type {NativeDocumentHunk, DocumentWitness} from './native-document-comparison.ts';
 import { cardRows, edgeRows, omittedStructuralEdge } from './minimal-projection.ts';
-import { readingBands, filePaths, iconFor, iconPaths } from './entity-presentation.ts';
+import { readingBands, filePaths, documentPaths, iconFor, iconPaths } from './entity-presentation.ts';
 import { childContentBounds } from './graph-bounds.ts';
 import { beginsRouteDrag, keyboardDelta, movedNodePosition } from './gesture-policy.ts';
 import { projectionRoutes, liveProjectionRoutes } from './projection-routes.ts';
@@ -24,6 +25,7 @@ const useCoarseInput = () => {
 };
 const bands = readingBands(allEntities(), allRelations());
 const paths = filePaths(allEntities());
+const documents = documentPaths(allEntities());
 const directions: readonly Side[] = ['left', 'right', 'top', 'bottom'];
 const position = (side: Side) => ({
     left: Position.Left, right: Position.Right, top: Position.Top, bottom: Position.Bottom
@@ -91,12 +93,37 @@ const NodeDragHandle = ({ data }: { data: EntityNode['data'] }) => {
             event.preventDefault(); event.stopPropagation(); data.onMoveStart(); data.onMove(data.entity.id, delta); data.onMoveEnd();
         }}>⠿</button>;
 };
+const DocumentSide = ({label, witness, preview = false}: {
+    label: 'Before' | 'After'; witness: DocumentWitness | null; preview?: boolean;
+}) => <section className={'document-side version-' + label.toLowerCase()}>
+    <h3>{label}{witness ? ' · ' + witness.commit.slice(0, 7) + ' L' + witness.startLine + '–' + witness.endLine : ' · absent in this hunk'}</h3>
+    {witness && <>
+        {!preview && <p className="document-provenance">{witness.path}<br />{witness.commit}<br />SHA256 {witness.contentHash}</p>}
+        <pre>{witness.text}</pre>
+    </>}
+</section>;
+const DocumentEvidence = ({hunks, onReflow}: {hunks: readonly NativeDocumentHunk[]; onReflow: (() => void) | undefined}) => <>
+    <div className="document-excerpt nodrag nopan nowheel" tabIndex={0} aria-label="First native hunk excerpt">
+        {hunks[0] ? <><DocumentSide label="Before" witness={hunks[0].before} preview /><DocumentSide label="After" witness={hunks[0].after} preview /></> : <p>No textual hunks in the pinned patch.</p>}
+    </div>
+    {hunks.length > 0 && <details className="document-details nodrag nopan" onToggle={onReflow}>
+        <summary>Read all {hunks.length} native hunks and source identities</summary>
+        <div className="document-reading nowheel" tabIndex={0} aria-label="All native document hunks">
+            {hunks.map(hunk => <section key={hunk.index} data-native-hunk={hunk.index}>
+                <h3>Hunk {hunk.index} · {hunk.header}</h3>
+                <DocumentSide label="Before" witness={hunk.before} /><DocumentSide label="After" witness={hunk.after} />
+            </section>)}
+        </div>
+    </details>}
+</>;
 const Entity = React.memo(({ data }: NodeProps<EntityNode>) => {
     const card = cardRows(data.entity);
     const status = data.entity.data.comparisonStatus;
-    return <article className={'minimal-entity' + (typeof status === 'string' ? ' status-' + status.replaceAll(' ', '-') : '')}>
+    const hunks = data.entity.data.nativeHunks as readonly NativeDocumentHunk[] | undefined;
+    return <article className={'minimal-entity' + (hunks ? ' native-document-evidence' : '') + (typeof status === 'string' ? ' status-' + status.replaceAll(' ', '-') : '')}>
   <Ports /><NodeDragHandle data={data}/>
   <h2><EntityIcon entity={data.entity}/><span>{card.title}</span></h2>
+  {hunks && <DocumentEvidence hunks={hunks} onReflow={data.onReflow}/>}
   {card.rows.map((row, index) => <p key={index}>{row}</p>)}
   {data.entity.kind === 'file' && Boolean(data.unitCount) && <div className="file-unit-actions nodrag nopan">
    {(!data.limit || data.limit < (data.unitCount ?? 0)) && <button onClick={() => data.onExpand?.(data.entity.id)}>{data.limit ? 'Show more source units' : 'Show source units'}</button>}
@@ -121,7 +148,7 @@ const GraphBoundary = React.memo(({ data }: NodeProps<EntityNode>) => {
     }, [data.entity.id, data.onHeaderMeasure]);
     return <>
  <Ports />
- <section className="minimal-change-graph" aria-label={String(data.entity.data.name) + ' graph'}>
+ <section className={'minimal-change-graph' + (typeof data.entity.data.comparisonStatus === 'string' ? ' status-' + data.entity.data.comparisonStatus.replaceAll(' ', '-') : '')} aria-label={String(data.entity.data.name) + ' graph'}>
   <NodeDragHandle data={data}/><h2 ref={heading}><EntityIcon entity={data.entity}/><span>{String(data.entity.data.name)}</span></h2>
  </section>
 </>;
@@ -189,7 +216,7 @@ const InitialLayout = ({ apply, links, revision, headers }: {
             second = requestAnimationFrame(() => {
                 applied.current = revision;
                 const focus = allEntities().find(entity => entity.kind === 'review')?.id ?? 'pr25';
-                apply(initialLayout(getNodes(), links, focus, bands, headers, paths));
+                apply(initialLayout(getNodes(), links, focus, bands, headers, paths, documents));
             });
         });
         return () => { cancelAnimationFrame(first); cancelAnimationFrame(second); };

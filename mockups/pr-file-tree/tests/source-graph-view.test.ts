@@ -7,7 +7,7 @@ test('actual generated render input retains all changed Files and context withou
     const view = visibleSourceGraph({});
     assert.equal(view.nodes.filter(entity => entity.kind === 'file').length, 97);
     assert.equal(view.relations.filter(edge => edge.relation === 'changes').length, 50);
-    assert.ok(view.nodes.length < 200);
+    assert.ok(view.nodes.length < 250); // Twenty bounded document groups and their evidence cards.
     assert.equal(allEntities().filter(entity => entity.id === 'request').length, 1);
     assert.ok(sourceGraph.provenance.inputArtifactHash);
     assert.ok(sourceGraph.provenance.compilerHash);

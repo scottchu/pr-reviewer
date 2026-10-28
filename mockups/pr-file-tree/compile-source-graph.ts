@@ -107,7 +107,8 @@ export const compileSourceGraph = (facts: FactDocument) => {
         entities.push({
             id, kind: 'file', data: {
                 repository: facts.repository, path: file.path, comparisonStatus: file.comparisonStatus,
-                comparisonBasis: 'Pinned native diff or identical context blob evidence', sourceEvidence: file.sides
+                comparisonBasis: 'Pinned native diff or identical context blob evidence', sourceEvidence: file.sides,
+                ...('scope' in file ? {sourceContextScope: file.scope} : {})
             }
         });
         fileUnits.set(id, []);
@@ -262,7 +263,8 @@ export const compileSourceGraph = (facts: FactDocument) => {
         if (from && to)
             relations.push({
                 id: 'constructs:' + from + ':' + to, from, to, version: version(unit.anchor.side), relation: 'constructs', data: {
-                    sourceEvidence: unit.anchor, comparisonStatus: entities.find(entity => entity.id === to)?.data.comparisonStatus, scope: 'Direct headers property construction, not global header removal'
+                    sourceEvidence: unit.anchor, comparisonStatus: entities.find(entity => entity.id === to)?.data.comparisonStatus, scope: from === 'request' ? 'Direct request construction only' : 'Direct headers.Authorization construction only',
+                    scopeLimit: 'Not global header removal'
                 }
             });
     }

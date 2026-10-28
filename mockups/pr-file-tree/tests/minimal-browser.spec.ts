@@ -59,6 +59,9 @@ for (const width of [1440, 390]) {
   test(`path lane and Show/Hide preserve layout ownership at ${width}`, async ({ browser }) => {
     const {allEntities} = await import('../source-graph.ts');
     const {compareFilePaths} = await import('../graph-geometry.ts');
+    const {readingBands} = await import('../entity-presentation.ts');
+    const {allRelations} = await import('../source-graph.ts');
+    const bands = readingBands(allEntities(), allRelations());
     const files = allEntities().filter(entity => entity.kind === 'file')
       .map(entity => ({id: entity.id, path: String(entity.data.path)}));
     const context = await browser.newContext({viewport: {width, height: 1000},
@@ -86,14 +89,18 @@ for (const width of [1440, 390]) {
       for (const box of geometry.boxes.filter(box => box.id !== 'pr25' && !children.has(box.id))) {
         expect(box.x).toBeGreaterThan(pr.right);
       }
-      const ordered = [...geometry.files].sort((a, b) => a.y - b.y);
-      expect(ordered.map(file => file.path)).toEqual(files.map(file => file.path).sort(compareFilePaths));
-      const origin = ordered[0]!.x - (ordered[0]!.path.split('/').length - 1) * 24;
-      for (const file of ordered) expect(file.x - origin).toBeCloseTo((file.path.split('/').length - 1) * 24, 1);
+      for (const band of [0, 3]) {
+        const ordered = geometry.files.filter(file => bands.get(file.id) === band).sort((a, b) => a.y - b.y);
+        expect(ordered.map(file => file.path)).toEqual(files.filter(file => bands.get(file.id) === band).map(file => file.path).sort(compareFilePaths));
+        const origin = ordered[0]!.x - (ordered[0]!.path.split('/').length - 1) * 24;
+        for (const file of ordered) expect(file.x - origin).toBeCloseTo((file.path.split('/').length - 1) * 24, 1);
+      }
+      const ordinaryRight = Math.max(...geometry.files.filter(file => bands.get(file.id) === 0).map(file => file.right));
+      const testLeft = Math.min(...geometry.files.filter(file => bands.get(file.id) === 3).map(file => file.x));
       const fileIds = new Set(files.map(file => file.id));
-      const laneRight = Math.max(...ordered.map(file => file.right));
       for (const box of geometry.boxes.filter(box => box.id !== 'pr25' && !children.has(box.id) && !fileIds.has(box.id))) {
-        expect(box.x).toBeGreaterThan(laneRight);
+        expect(box.x).toBeGreaterThan(ordinaryRight);
+        expect(box.right).toBeLessThan(testLeft);
       }
     };
     await assertArrangement();
@@ -119,6 +126,64 @@ for (const width of [1440, 390]) {
     await expect(show).toBeVisible();
     expect(await file.getAttribute('style')).toBe(manual);
     expect(await camera.getAttribute('style')).toBe(initialCamera);
+    await context.close();
+  });
+}
+
+
+for (const width of [1440, 390]) {
+  test(`native document evidence, group colors and relationship scope at ${width}`, async ({browser}) => {
+    const {allEntities, allRelations} = await import('../source-graph.ts');
+    const {readingBands, documentPaths} = await import('../entity-presentation.ts');
+    const context = await browser.newContext({viewport: {width, height: 1000},
+      ...(width === 390 ? {hasTouch: true, isMobile: true} : {})});
+    const page = await context.newPage();
+    await page.goto(test.info().project.use.baseURL ?? 'http://127.0.0.1:57943');
+    await expect(page.locator('.react-flow__node[data-id="pr25"]')).toBeVisible();
+    const entities = allEntities();
+    const docs = documentPaths(entities);
+    const bands = readingBands(entities, allRelations());
+    const documentGroups = entities.filter(entity => entity.kind === 'change' && entity.data.documentPath);
+    await expect(page.locator('.native-document-evidence')).toHaveCount(documentGroups.length);
+    const geometry = await page.locator('.react-flow__node').evaluateAll(nodes => nodes.map(node => {
+      const rect = node.getBoundingClientRect();
+      return {id: node.getAttribute('data-id')!, y: rect.y, bottom: rect.bottom};
+    }));
+    const children = new Set(entities.flatMap(entity => entity.nodes?.map(child => child.id) ?? []));
+    const roots = geometry.filter(node => !children.has(node.id));
+    for (const document of roots.filter(node => docs.has(node.id))) {
+      for (const code of roots.filter(node => !docs.has(node.id))) expect(document.bottom).toBeLessThan(code.y);
+    }
+    const request = page.locator('.react-flow__node[data-id="change"] .minimal-change-graph');
+    const helper = page.locator('.react-flow__node[data-id="change:helper"] .minimal-change-graph');
+    await expect(request).toHaveCSS('border-color', 'rgb(183, 155, 67)');
+    await expect(helper).toHaveCSS('border-color', 'rgb(118, 172, 137)');
+    await expect(page.locator('.react-flow__node[data-id="goal"] article')).not.toHaveClass(/status-add/);
+    await expect(page.locator('.react-flow__node[data-id="header-value"] article')).not.toContainText('Direct request construction only');
+    await expect(page.locator('[data-edge-id="constructs:request:header-value"]')).toContainText('Direct request construction only');
+    const evidence = documentGroups[0]!.nodes![0]!;
+    const card = page.locator('.react-flow__node').filter({has: page.locator('article.native-document-evidence')})
+      .filter({has: page.locator('[aria-label="First native hunk excerpt"]')}).first();
+    const summary = card.locator('summary');
+    const camera = await page.locator('.react-flow__viewport').getAttribute('style');
+    await summary.focus(); await summary.press('Enter');
+    const reading = card.locator('[aria-label="All native document hunks"]');
+    await expect(reading).toBeVisible();
+    const hunks = evidence.data.nativeHunks as {before: {text:string; contentHash:string} | null; after: {text:string; contentHash:string} | null}[];
+    await expect(card.locator('[data-native-hunk]')).toHaveCount(hunks.length);
+    for (let index = 0; index < hunks.length; index++) {
+      const hunk = hunks[index]!;
+      const row = card.locator('[data-native-hunk]').nth(index);
+      for (const [side, witness] of [['before', hunk.before], ['after', hunk.after]] as const) {
+        if (witness) {
+          expect(await row.locator('.version-' + side + ' pre').textContent()).toBe(witness.text);
+          await expect(row.locator('.version-' + side)).toContainText(witness.contentHash);
+        } else await expect(row.locator('.version-' + side)).toContainText('absent in this hunk');
+      }
+    }
+    expect(await reading.evaluate(node => node.clientHeight)).toBeLessThanOrEqual(400);
+    expect(await page.locator('.react-flow__viewport').getAttribute('style')).toBe(camera);
+    expect([...bands.values()]).toContain(3);
     await context.close();
   });
 }
