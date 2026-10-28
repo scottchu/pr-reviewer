@@ -85,7 +85,8 @@ export const prepareAppGraph = (facts: FactDocument, inputHash: string, compiled
     for (const file of facts.files.filter(file => /\.md$/i.test(file.path))) {
         const fileId = paths.get(file.path)!;
         const id = 'document-change:' + file.id;
-        const hunks = nativeDiffs?.get(file.id) ?? nativeDocumentHunks(file);
+        const hunks = nativeDiffs ? nativeDiffs.get(file.id) : nativeDocumentHunks(file);
+        if (!hunks) continue;
         const evidence: GraphEntity = {id: id + ':evidence', kind: 'evidence', data: {
             name: 'Native document comparison', nativeHunks: hunks,
             comparisonStatus: file.comparisonStatus, comparisonBasis: 'Pinned native Markdown patch', patchHash: file.patchHash,

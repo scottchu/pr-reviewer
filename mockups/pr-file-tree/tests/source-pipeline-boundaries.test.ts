@@ -82,3 +82,19 @@ test('enrichment failure leaves source graph usable and forbidden claims cannot 
  }
  assert.throws(()=>domainService.validateEnrichment(extracted.facts,extracted.comparison.entities,{nodes:[{id:extracted.comparison.entities[0]!.id,kind:'reason',data:{basis:'override'}}],edges:[]}),/override/);
 });
+
+test('malformed Markdown assembly retains the file and diagnostic without retrying failed native parsing',()=>{
+ const prior=snapshot('@@ -0,0 +1,2 @@\n+# source\n');
+ const input={...prior,files:prior.files.map(file=>({...file,path:'docs/a.md'}))};
+ const parsed=domainService.parseSnapshot(input);
+ const extracted=extractPreparedComparison(parsed);
+ assert.deepEqual(extracted.nativeDiagnostics,[{fileId:'file',reason:'document_patch_hunk_count_mismatch'}]);
+ const assembled=assemblePreparedResult({status:'failed',stage:'enrich',error:new Error('unavailable'),facts:extracted.facts,source:extracted},facts=>hash(JSON.stringify(facts)));
+ assert.equal(assembled.enrichmentStatus,'unavailable');
+ assert.deepEqual(assembled.nativeDiagnostics,extracted.nativeDiagnostics);
+ const file=assembled.graph.entities.find(entity=>entity.kind==='file'&&entity.data.path==='docs/a.md')!;
+ assert.ok(file);
+ assert.equal((file.data.editComposition as {status:string}).status,'unresolved');
+ assert.equal(assembled.graph.entities.some(entity=>entity.data.documentPath==='docs/a.md'),false);
+ domainService.validateGraph(assembled.graph.entities,assembled.graph.relations);
+});
