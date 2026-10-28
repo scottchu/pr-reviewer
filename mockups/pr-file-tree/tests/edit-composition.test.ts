@@ -82,3 +82,18 @@ test('mixed presentation always retains both categories, scoped rows and neutral
   const controlled = entities.find(entity => entity.nodes?.some(child=>child.kind==='test'&&String(child.data.name).startsWith('01-A/C/F/G controlled host')))!;
   assert.equal(editPreview(controlled.data.editComposition as import('../edit-composition.ts').EditComposition).removed.length,4);
 });
+
+
+test('same source body stays neutral when another expression changes on the same native row',async()=>{
+  const {scopedEditComposition}=await import('../edit-composition.ts');
+  const {sourceHash}=await import('../source-facts.ts');
+  const before='const fn=()=>1; const other=1;\n',after='const fn=()=>1; const other=2;\n';
+  const patch='@@ -1 +1 @@\n-const fn=()=>1; const other=1;\n+const fn=()=>1; const other=2;\n';
+  const sides=(['base','head'] as const).map(side=>({side,commit:(side==='base'?'a':'b').repeat(40),available:true,disposition:'text',contentHash:sourceHash(side==='base'?before:after)}));
+  const file={id:'one',path:'src/a.ts',nativeStatus:'M',comparisonStatus:'change',patch,patchHash:sourceHash(patch),sides};
+  const entity={id:'fn',kind:'function',data:{comparisonStatus:'no change',sourceWitnesses:sides.map(side=>({anchor:{...side,path:file.path,startLine:1,endLine:1},sourceText:'()=>1'}))}};
+  const facts={files:[file],contextFiles:[]} as unknown as import('../compile-source-graph.ts').FactDocument;
+  assert.equal(scopedEditComposition(entity,facts).status,'no change');
+  const unchangedContext={...file,comparisonStatus:'no change',sides:[sides[0]!,{...sides[1]!,contentHash:sides[0]!.contentHash}]};
+  assert.equal(scopedEditComposition({id:'context',kind:'file',data:{path:file.path}}, {files:[],contextFiles:[unchangedContext]} as unknown as import('../compile-source-graph.ts').FactDocument).status,'no change');
+});

@@ -50,7 +50,9 @@ test('kind-driven rows keep short commit/range and clearly describe unexecuted a
   assert.deepEqual(cardRows(file), { title: 'src/application/review.ts', rows: ['change'] });
   const before = allRelations().find(edge => edge.from === 'header-value' && edge.relation === 'located_in' && edge.version === 'before');
   assert.ok(before);
-  assert.deepEqual(edgeRows(before), { title: 'located in', rows: ['b096826', 'L29–29'] });
+  assert.equal(edgeRows(before, allEntities()).title, 'located in');
+  assert.deepEqual(edgeRows(before, allEntities()).provenance, ['Before b096826 · src/application/review.ts · L29']);
+  assert.match(edgeRows(before, allEntities()).explanation, /Source occurrence/);
   const assertions = allEntities().find(entity => entity.id === 'new-test-assertions');
   assert.ok(assertions);
   assert.match(cardRows(assertions).rows.join(' '), /Asserts API requests/);
@@ -88,7 +90,8 @@ test('unchanged locations retain both witness records without merging unsupporte
  assert.equal(witnesses[0]?.data.commit, source.data.evidence.comparison.baseSha);
  assert.equal(witnesses[1]?.data.commit, source.data.evidence.comparison.headSha);
  assert.equal(edgeRows(edge).title,'located in · no change');
- assert.deepEqual(edgeRows(edge).rows,['Before b096826 L34–44','After e3b270e L35–45']);
+ assert.deepEqual(edgeRows(edge,allEntities()).provenance,['Before b096826 · src/application/review.ts · L34–44','After e3b270e · src/application/review.ts · L35–45']);
+ assert.match(edgeRows(edge,allEntities()).scope.join(' '),/not runtime stability/);
  assert.equal(pairUnchangedLocations(witnesses,new Set()).length,2);
  const reversed=pairUnchangedLocations([...witnesses].reverse(),new Set(['refresh']));assert.equal(reversed.length,1);assert.deepEqual(reversed[0]?.data.witnesses,witnesses);
  const changed = witnesses.map(witness=>({...witness,from:'modified-test'}));
