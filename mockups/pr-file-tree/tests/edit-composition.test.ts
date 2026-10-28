@@ -29,7 +29,8 @@ test('actual mixed controlled-host test exposes four removed actions plus added 
   assert.equal(removed.filter(row => row.text.includes('Local access token')).length, 2);
   assert.equal(removed.filter(row => row.text.includes('Open review')).length, 2);
   assert.ok(removed.every(row => row.beforeLine! >= 146 && row.beforeLine! <= 244));
-  assert.ok(group.nodes!.some(child => child.kind === 'evidence' && child.data.editComposition));
+  const source = group.nodes!.find(child => child.kind === 'test')!;
+  assert.deepEqual((source.data.editComposition as typeof composition).rows, composition.rows);
 });
 
 

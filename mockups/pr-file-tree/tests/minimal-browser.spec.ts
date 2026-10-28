@@ -200,8 +200,13 @@ for (const width of [1440,390]) {
     const control=entities.find(entity=>entity.nodes?.some(child=>child.kind==='test'&&String(child.data.name).startsWith('01-A/C/F/G controlled host')))!;
     const groups=[...['docs/product/architecture.md','docs/product/review-loop/story-and-exploration.md'].map(path=>entities.find(entity=>entity.data.documentPath===path)!),control];
     for (const group of groups) {
-      const evidence=group.nodes!.find(child=>child.kind==='evidence')!;
-      const card=page.locator('.react-flow__node[data-id="'+evidence.id+'"]');
+      const source=group.nodes!.find(child=>child.kind==='evidence'||child.kind==='test'||child.kind==='function')!;
+      const card=page.locator('.react-flow__node[data-id="'+source.id+'"]');
+      if(source.kind!=='evidence') {
+        const disclosure=card.locator('details').first();
+        await expect(disclosure).not.toHaveAttribute('open','');
+        await disclosure.locator('summary').first().focus(); await disclosure.locator('summary').first().press('Enter');
+      }
       const preview=editPreview(group.data.editComposition as import('../edit-composition.ts').EditComposition);
       await expect(card.locator('.edit-preview [data-edit-kind="remove"]')).toHaveCount(preview.removed.length);
       await expect(card.locator('.edit-preview [data-edit-kind="add"]')).toHaveCount(preview.added.length);
@@ -218,7 +223,7 @@ for (const width of [1440,390]) {
       expect(Math.abs(panes[0]!-panes[1]!)).toBeLessThan(1);
       await expect(page.locator('.react-flow__node[data-id="'+group.id+'"] .minimal-change-graph')).toHaveClass(/status-change/);
     }
-    const removed=page.locator('.react-flow__node[data-id="'+control.nodes!.find(child=>child.kind==='evidence')!.id+'"] .preview-remove code');
+    const removed=page.locator('.react-flow__node[data-id="'+control.nodes!.find(child=>child.kind==='test')!.id+'"] .preview-remove code');
     await expect(removed).toHaveCount(4);
     expect((await removed.allTextContents()).filter(text=>text.includes('Local access token')).length).toBe(2);
     expect((await removed.allTextContents()).filter(text=>text.includes('Open review')).length).toBe(2);
@@ -230,6 +235,35 @@ for (const width of [1440,390]) {
     await expect(call).toContainText('Source call: accessHeaders(captured)');
     await expect(call).toContainText('After e3b270e · src/application/review.ts · L30');
     await expect(page.locator('.react-flow__node[data-id="refresh"] article')).toHaveClass(/status-no-change/);
+    await context.close();
+  });
+}
+
+
+for(const width of [1440,390]) {
+  test('semantic defaults and explicit source reading restore compact bounds at '+width,async({browser})=>{
+    const context=await browser.newContext({viewport:{width,height:1000},...(width===390?{hasTouch:true,isMobile:true}:{})});
+    const page=await context.newPage();
+    await page.goto(test.info().project.use.baseURL??'http://127.0.0.1:57943');
+    await expect(page.locator('.react-flow__node[data-id="request"]')).toBeVisible();
+    await expect(page.locator('.react-flow__node[data-id$=":edit-evidence"]')).toHaveCount(0);
+    await expect(page.locator('.group-edit-caption')).toHaveCount(0);
+    const card=page.locator('.react-flow__node[data-id="request"]');
+    const group=page.locator('.react-flow__node[data-id="change"]');
+    const disclosure=card.locator('details').first();
+    await expect(disclosure.locator('summary').first()).toHaveText('View source changes');
+    await expect(disclosure).not.toHaveAttribute('open','');
+    await expect(disclosure.locator('.edit-preview')).toBeHidden();
+    const original=(await group.boundingBox())!;
+    const camera=await page.locator('.react-flow__viewport').getAttribute('style');
+    await disclosure.locator('summary').first().focus(); await disclosure.locator('summary').first().press('Enter');
+    await expect(disclosure.locator('.edit-preview')).toBeVisible();
+    await expect.poll(async()=>(await group.boundingBox())!.height).toBeGreaterThan(original.height);
+    await disclosure.locator('summary').first().press('Enter');
+    await expect(disclosure.locator('.edit-preview')).toBeHidden();
+    await expect.poll(async()=>Math.round((await group.boundingBox())!.height)).toBe(Math.round(original.height));
+    expect(await page.locator('.react-flow__viewport').getAttribute('style')).toBe(camera);
+    await expect(page.locator('.native-document-evidence')).toHaveCount(20);
     await context.close();
   });
 }

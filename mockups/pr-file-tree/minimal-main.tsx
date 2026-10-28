@@ -141,11 +141,17 @@ const Entity = React.memo(({ data }: NodeProps<EntityNode>) => {
     const card = cardRows(data.entity);
     const status = presentationStatus(data.entity);
     const hunks = data.entity.data.nativeHunks as readonly NativeDocumentHunk[] | undefined;
+    const composition = data.entity.data.editComposition as EditComposition | undefined;
     return <article className={'minimal-entity' + (hunks ? ' native-document-evidence' : '') + (typeof status === 'string' ? ' status-' + status.replaceAll(' ', '-') : '')}>
   <Ports /><NodeDragHandle data={data}/>
   <h2><EntityIcon entity={data.entity}/><span>{card.title}</span></h2>
   {hunks && <DocumentEvidence hunks={hunks} composition={data.entity.data.editComposition as EditComposition | undefined} onReflow={data.onReflow}/>}
   {card.rows.map((row, index) => <p key={index}>{row}</p>)}
+  {['function', 'test'].includes(data.entity.kind) && composition && <details className="document-details nodrag nopan" onToggle={() => data.onReflow?.()}>
+    <summary>View source changes</summary>
+    <p>{editCaption(composition)}</p>
+    <DocumentEvidence hunks={composition.hunks} composition={composition} onReflow={data.onReflow}/>
+  </details>}
   {data.entity.kind === 'file' && Boolean(data.unitCount) && <div className="file-unit-actions nodrag nopan">
    {(!data.limit || data.limit < (data.unitCount ?? 0)) && <button onClick={() => data.onExpand?.(data.entity.id)}>{data.limit ? 'Show more source units' : 'Show source units'}</button>}
    {Boolean(data.limit) && <button onClick={() => data.onExpand?.(data.entity.id, true)}>Hide source units</button>}
@@ -170,7 +176,7 @@ const GraphBoundary = React.memo(({ data }: NodeProps<EntityNode>) => {
     return <>
  <Ports />
  <section className={'minimal-change-graph' + (presentationStatus(data.entity) ? ' status-' + presentationStatus(data.entity)!.replaceAll(' ', '-') : '')} aria-label={String(data.entity.data.name) + ' graph'}>
-  <NodeDragHandle data={data}/><h2 ref={heading}><EntityIcon entity={data.entity}/><span>{String(data.entity.data.name)}{data.entity.data.editComposition ? <small className="group-edit-caption">{editCaption(data.entity.data.editComposition as EditComposition)}</small> : null}</span></h2>
+  <NodeDragHandle data={data}/><h2 ref={heading}><EntityIcon entity={data.entity}/><span>{String(data.entity.data.name)}</span></h2>
  </section>
 </>;
 });

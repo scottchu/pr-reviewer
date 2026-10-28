@@ -50,7 +50,7 @@ export const editCaption = (composition: EditComposition): string => composition
 export const cardRows = (entity: GraphEntity): CardRows => {
     const content = contentRows(entity);
     const composition = entity.data.editComposition as EditComposition | undefined;
-    const status = composition ? editCaption(composition) : text(entity.data.comparisonStatus);
+    const status = composition ? composition.status : text(entity.data.comparisonStatus);
     return { ...content, rows: status ? [status, ...content.rows] : content.rows };
 };
 export type RelationRows = CardRows & Readonly<{
