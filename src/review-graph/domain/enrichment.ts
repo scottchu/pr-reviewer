@@ -9,6 +9,7 @@ export const validateEnrichment = (facts: FactDocument, source: readonly GraphEn
     const permittedKinds = new Set(['reason', 'goal', 'behavior']);
     const permittedRelations = new Set(['motivated_by', 'intended_to_achieve', 'impedes', 'related_policy']);
     for (const node of candidate.nodes) {
+        if(node.nodes!==undefined||node.edges!==undefined)throw new Error('enrichment_nested_payload_rejected');
         if (existing.has(node.id) || !permittedKinds.has(node.kind) || !node.data.basis || node.data.comparisonStatus)
             throw new Error('enrichment_fact_override_rejected');
         for (const ref of (node.data.sourceRefs ?? []) as {

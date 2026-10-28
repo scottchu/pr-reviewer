@@ -1,3 +1,4 @@
+import {createGraphSession} from '../../../src/review-graph/ui/session.ts';
 import {test} from 'node:test';
 import assert from 'node:assert/strict';
 import {createHash} from 'node:crypto';
@@ -20,7 +21,7 @@ test('independent UIType oracle preserves semantic defaults, scoped status and s
  const state=experienceService.openComparison(graph),before=JSON.stringify(state);
  const view=projectExperience(state);
  assert.deepEqual(view.nodes.map(entity=>entity.id),['file','group','fn','unknown','neutral','docs','doc-evidence']);
- assert.deepEqual(view.nodes.find(entity=>entity.id==='fn')!.ui,{card:{title:'f()',rows:['add']},status:'add',icon:'function',sourceControl:true,sourceOpen:false,fileControl:false});
+ assert.deepEqual(view.nodes.find(entity=>entity.id==='fn')!.ui,{card:{title:'f()',rows:['add']},status:'add',icon:'function',sourceControl:true,sourceOpen:false,fileControl:false,inlineSourceReading:false,unitCount:0,unpairedRows:[],sourceReading:{caption:'Scoped source unit edits: +1 / −0',available:true,hunks:[],panes:[{kind:'remove',title:'Removed −0',versionLabel:'Before',emptyLabel:'No removed rows in this scope.',footer:'First 0 source rows · all evidence below',rows:[]},{kind:'add',title:'Added +1',versionLabel:'After',emptyLabel:'No added rows in this scope.',footer:'First 0 source rows · all evidence below',rows:[]}]}});
  assert.deepEqual(view.nodes.find(entity=>entity.id==='neutral')!.ui.card,{title:'same()',rows:['no change','Source-body equality, not behavior equivalence']});
  assert.equal(view.nodes.find(entity=>entity.id==='unknown')!.ui.status,undefined);
  assert.deepEqual(view.nodes.find(entity=>entity.id==='group')!.nodes!.map(entity=>entity.id),['fn']);
@@ -29,6 +30,11 @@ test('independent UIType oracle preserves semantic defaults, scoped status and s
 });
 
 test('actual Experience intentions are immutable, scoped and reflected by UIProjection',()=>{
+ const session=createGraphSession(graph);
+ const expanded=session.expand('file',false);
+ assert.equal(expanded.limits.file,20);assert.equal(session.limits.file,undefined);
+ assert.equal(expanded.inspect('fn',true).view.entities.find(entity=>entity.id==='fn')!.ui.sourceOpen,true);
+ assert.equal(session.inspect('fn',true).inspect('fn',false).view.entities.find(entity=>entity.id==='fn')!.ui.sourceOpen,false);
  const state=experienceService.openComparison(graph),before=JSON.stringify(state);
  const show=experienceService.handleIntent(state,{type:'show-source-units',comparisonId:state.comparisonId,fileId:'file'});
  assert.equal(show.state.limits.file,20);assert.equal(state.limits.file,undefined);
@@ -53,7 +59,7 @@ test('real stage ports compare before enrichment and preserve extracted source o
  const content='const f=()=>1;\n',contentHash=createHash('sha256').update(content).digest('hex');
  const snapshot:SourceSnapshot={format:'manual',producer:{version:'manual',parser:'typescript',sourceHashes:{}},repository:'example/repo',base:'a'.repeat(40),head:'b'.repeat(40),files:[{id:'file',path:'src/a.ts',nativeStatus:'A',comparisonStatus:'add',sides:[{side:'base',commit:'a'.repeat(40),available:false},{side:'head',commit:'b'.repeat(40),available:true,contentHash,disposition:'text'}],patch:'@@ -0,0 +1 @@\n+const f=()=>1;\n',patchHash:'manual'}],contextFiles:[],coverage:{},sources:[{repository:'example/repo',side:'head',commit:'b'.repeat(40),path:'src/a.ts',content,contentHash,gitBlob:'c'.repeat(40)}]};
  const order:string[]=[];
- const result=await runSourcePipeline({read:()=>snapshot,parse:domainService.parseSnapshot,extract:parsed=>{const facts=domainService.extractSnapshot(parsed);const comparison=domainService.compare(facts);order.push('compared');return {facts,comparison,nativeDiffs:parsed.nativeDiffs,editCompositions:new Map()};},enrich:source=>{assert.ok(source.comparison.entities.some(entity=>entity.kind==='function'));throw new Error('enricher_unavailable');}},stage=>order.push(stage));
+ const result=await runSourcePipeline({read:()=>snapshot,parse:domainService.parseSnapshot,extract:parsed=>{const facts=domainService.extractSnapshot(parsed);const comparison=domainService.compare(facts);order.push('compared');return {facts,comparison,nativeDiffs:parsed.nativeDiffs,nativeDiagnostics:parsed.nativeDiagnostics,editCompositions:new Map()};},enrich:source=>{assert.ok(source.comparison.entities.some(entity=>entity.kind==='function'));throw new Error('enricher_unavailable');}},stage=>order.push(stage));
  assert.deepEqual(order,['read','parse','extract','compared','enrich']);
  assert.equal(result.status,'failed');if(result.status!=='failed')return;
  assert.equal(result.stage,'enrich');assert.equal(result.source!.facts.units[0]!.name,'f');

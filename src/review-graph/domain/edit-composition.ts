@@ -12,7 +12,7 @@ export const editCategory = (added: number, removed: number): EditComposition['s
   added > 0 ? removed > 0 ? 'change' : 'add' : removed > 0 ? 'remove' : 'no change';
 
 /** Presentation only. Canonical identity, presence and call admission never consume this result. */
-export const scopedEditComposition = (entity: GraphEntity, facts: FactDocument, nativeDiffs?:ReadonlyMap<string,readonly NativeDocumentHunk[]>): EditComposition => {
+export const scopedEditComposition = (entity: GraphEntity, facts: FactDocument, nativeDiffs?:ReadonlyMap<string,readonly NativeDocumentHunk[]>,nativeDiagnostics:readonly {fileId:string;reason:string}[]=[]): EditComposition => {
   const scope = entity.kind === 'file' || entity.data.documentPath ? 'file' : 'source unit';
   const unresolved = (reason: string): EditComposition => ({status: 'unresolved', scope, added: 0, removed: 0, rows: [], hunks: [], reason});
   const witnesses = entity.data.sourceWitnesses as {anchor: Span; sourceText?: string}[] | undefined;
@@ -33,6 +33,7 @@ export const scopedEditComposition = (entity: GraphEntity, facts: FactDocument, 
   if (unchangedText || unchangedBlob)
     return {status: 'no change', scope, added: 0, removed: 0, rows: [], hunks: []};
   if (!('patch' in file)) return unresolved('Native patch unavailable');
+  if(nativeDiffs&&!nativeDiffs.has(file.id))return unresolved(nativeDiagnostics.find(entry=>entry.fileId===file.id)?.reason??'Native parse unavailable');
   let source: readonly NativeDocumentHunk[];
   try { source = nativeDiffs?.get(file.id) ?? nativeDocumentHunks(file); }
   catch { return unresolved('Native patch or source identity unavailable'); }

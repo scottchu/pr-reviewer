@@ -161,6 +161,7 @@ export type ExtractedComparison = Readonly<{
     facts: FactDocument;
     comparison: CompiledSourceGraph;
     nativeDiffs: ReadonlyMap<string, readonly NativeDocumentHunk[]>;
+    nativeDiagnostics: readonly {fileId:string;reason:string}[];
     editCompositions: ReadonlyMap<string, import('./edit-composition.ts').EditComposition>;
 }>;
 export type DocumentWitness = Readonly<{

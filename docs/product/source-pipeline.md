@@ -151,3 +151,13 @@ All new tests are part of normal declared owning entrypoints. Check strict TypeS
 ### Producer provenance and fresh artifact identity
 
 Moving producer code changes producer.sourceHashes, and thus the SHA256 of the complete freshly produced FactDocument bytes. That artifact identity is not the identity of a source File/Function/Test. Preserve both raw artifacts and assert each inputArtifactHash against its own complete artifact bytes. Compare old/new semantic FactDocument content with only producer.sourceHashes excluded; parser version, actual source/content/patch hashes, units, source anchors, membership and status remain checked. Keep the frozen original2be6 corpus graph/projection oracle unchanged apart from the named module-producer hash keys. Fresh pipeline projection must independently preserve the same semantic result; provenance comparison follows the explicit artifact-hash dependency contract, never an arbitrary hash-field exclusion.
+
+
+Native parse failure contract: ParsedSnapshot and ExtractedComparison retain each unavailable native file diagnostic outside the immutable FactDocument. Supplying a parsed-cache context means a missing parsed entry is unavailable, not unparsed: extraction/edit classification abstains and retains the diagnostic without rerunning that parser. Compatibility callers with no cache context may invoke native parsing. Enrichment failure keeps the verified extracted source result usable; it cannot mutate that retained result.
+
+Current attributed enrichment is flat claim data only. Claim-level nodes or edges payloads are rejected; they cannot introduce nested source facts or bypass relationship admission. Any future nested claim model requires an explicit separate contract rather than inheriting source-graph containment semantics.
+
+Source-reading projection contract: UI Types carry the bounded removed/added preview rows, their labels/count captions and full-witness references. UI Projection selects the four-row previews and formats captions once. React renders those projected fields; it does not independently select preview membership or recompute edit captions. This preserves existing markup, source-open/close defaults and exact evidence text.
+
+
+UI state boundary: React may own camera, dragging, measurement, focus and other local interaction state. Its public inputs and retained state use named UI Types. A UI session adapter opens the Domain comparison through Experience Service and returns projected views plus scoped UI intent operations; React does not receive Domain comparison/state or parser types. Immutable source-witness references may be carried deliberately by named UI reading types without duplicating or reinterpreting evidence.

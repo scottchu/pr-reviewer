@@ -10,8 +10,8 @@ import { prepareAppGraph, prepareAttribution } from './pr25.ts';
 export const extractPreparedComparison = (parsed: ParsedSnapshot): ExtractedComparison => {
     const facts = domainService.extractSnapshot(parsed);
     const comparison = domainService.compare(facts, pr25Aliases);
-    const editCompositions = new Map(comparison.entities.filter(entity => entity.data.comparisonStatus).map(entity => [entity.id, domainService.classifyEdits(entity, facts, parsed.nativeDiffs)]));
-    return { facts, comparison, nativeDiffs: parsed.nativeDiffs, editCompositions };
+    const editCompositions = new Map(comparison.entities.filter(entity => entity.data.comparisonStatus).map(entity => [entity.id, domainService.classifyEdits(entity, facts, parsed.nativeDiffs,parsed.nativeDiagnostics)]));
+    return { facts, comparison, nativeDiffs: parsed.nativeDiffs,nativeDiagnostics:parsed.nativeDiagnostics, editCompositions };
 };
 export const prepareFacts = async (repository: string, base: string, head: string, effects?: AcquisitionEffects): Promise<FactDocument> => {
     const result = await runSourcePipeline({ read: () => readSourceSnapshot(repository, base, head, effects), parse: domainService.parseSnapshot, extract: extractPreparedComparison, enrich: () => null });
@@ -33,5 +33,5 @@ export const assemblePreparedResult = (result: PipelineResult<AttributedEnrichme
         throw result.error;
     const source = result.status === 'ready' ? result.source : result.source!;
     const attribution = result.status === 'ready' ? result.enrichment : { nodes: [], edges: [] };
-    return { facts: source.facts, graph: prepareAppGraph(source.facts, inputHash(source.facts), source.comparison, attribution, source.nativeDiffs, source.editCompositions), enrichmentStatus: result.status === 'ready' ? 'ready' as const : 'unavailable' as const };
+    return { facts: source.facts, graph: prepareAppGraph(source.facts, inputHash(source.facts), source.comparison, attribution, source.nativeDiffs, source.editCompositions), enrichmentStatus: result.status === 'ready' ? 'ready' as const : 'unavailable' as const,nativeDiagnostics:source.nativeDiagnostics };
 };

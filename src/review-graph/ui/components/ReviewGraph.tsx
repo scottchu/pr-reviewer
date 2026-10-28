@@ -4,23 +4,18 @@ import { ReactFlow, Background, BaseEdge, EdgeLabelRenderer, Handle, Position, M
 import '@xyflow/react/dist/style.css';
 import '../../../../mockups/pr-file-tree/minimal.css';
 import { installPageGestureBoundary } from '../page-gestures.ts';
-import {experienceService} from '../../experience/service.ts';
-import {projectExperience} from '../projection.ts';
-import type {SourceGraph} from '../../domain/types.ts';
-import type {UIEntity as GraphEntity, UIRelation as GraphRelation} from '../types.ts';
-import type {NativeDocumentHunk, DocumentWitness} from '../../parse/native-diff.ts';
-import type {EditComposition} from '../../domain/edit-composition.ts';
-import { omittedStructuralEdge, editCaption, editPreview } from '../content.ts';
+import type {UIEntity as GraphEntity, UIRelation as GraphRelation,SourceReadingUI, GraphSessionUI, SourceHunkUI, SourceWitnessUI} from '../types.ts';
+import { omittedStructuralEdge } from '../content.ts';
 import { readingBands, filePaths, documentPaths, iconPaths } from '../entity-presentation.ts';
 import { childContentBounds } from '../graph-bounds.ts';
 import { beginsRouteDrag, keyboardDelta, movedNodePosition } from '../gesture-policy.ts';
 import { projectionRoutes, liveProjectionRoutes } from '../projection-routes.ts';
 import { initialLayout, curve, groupInterior, type Point, type Routed, type Side } from '../graph-geometry.ts';
 
-export const mountReviewGraph = (root:HTMLElement,sourceGraph:SourceGraph) => {
-const initial = projectExperience(experienceService.openComparison(sourceGraph));
+export const mountReviewGraph = (root:HTMLElement,initialSession:GraphSessionUI) => {
+const initial = initialSession.view;
 const allEntities=()=>initial.entities;
-const allRelations=()=>sourceGraph.relations;
+const allRelations=()=>initialSession.layoutRelations;
 const useCoarseInput = () => {
     const [coarse, setCoarse] = useState(() => matchMedia('(pointer: coarse)').matches);
     useEffect(() => {
@@ -103,7 +98,7 @@ const NodeDragHandle = ({ data }: { data: EntityNode['data'] }) => {
         }}>⠿</button>;
 };
 const DocumentSide = ({label, witness, hunk}: {
-    label: 'Before' | 'After'; witness: DocumentWitness | null; hunk: NativeDocumentHunk;
+    label: 'Before' | 'After'; witness: SourceWitnessUI | null; hunk: SourceHunkUI;
 }) => <section className={'document-side version-' + label.toLowerCase()}>
     <h3>{label}{witness ? ' · ' + witness.commit.slice(0, 7) + ' L' + witness.startLine + '–' + witness.endLine : ' · absent in this scope'}</h3>
     {witness && <>
@@ -112,29 +107,19 @@ const DocumentSide = ({label, witness, hunk}: {
             .map((row, index) => <span key={index} data-edit-kind={row.kind} className={'native-row-' + row.kind}>{row.text}</span>)}</pre>
     </>}
 </section>;
-const EditPreview = ({composition}: {composition: EditComposition}) => {
-    const preview = editPreview(composition);
-    return <div className="edit-preview nodrag nopan" aria-label="Scoped removed and added source preview">
-        {(['remove', 'add'] as const).map(kind => {
-            const rows = kind === 'remove' ? preview.removed : preview.added;
-            const side = composition.hunks.map(hunk => kind === 'remove' ? hunk.before : hunk.after).find(Boolean);
-            return <section key={kind} className={'edit-preview-pane preview-' + kind}>
-                <h3>{kind === 'remove' ? 'Removed −' + composition.removed : 'Added +' + composition.added}</h3>
-                <p>{kind === 'remove' ? 'Before' : 'After'}{side ? ' · ' + side.commit.slice(0, 7) : ''}</p>
-                <div className="edit-preview-rows nowheel" tabIndex={0} aria-label={kind === 'remove' ? 'Removed source rows' : 'Added source rows'}>
-                    {rows.length ? rows.map((row, index) => <div key={index} className="edit-preview-row" data-edit-kind={row.kind}>
-                        <span className="edit-line">L{kind === 'remove' ? row.beforeLine : row.afterLine}</span><code>{row.text}</code>
-                    </div>) : <p>No {kind === 'remove' ? 'removed' : 'added'} rows in this scope.</p>}
-                </div>
-                {rows.length > 0 && <p>First {rows.length} source rows · all evidence below</p>}
-            </section>;
-        })}
-    </div>;
-};
-const DocumentEvidence = ({hunks, composition, onReflow}: {
-    hunks: readonly NativeDocumentHunk[]; composition: EditComposition | undefined; onReflow: (() => void) | undefined;
+const EditPreview = ({reading}: {reading:SourceReadingUI}) => <div className="edit-preview nodrag nopan" aria-label="Scoped removed and added source preview">
+    {reading.panes.map(pane=><section key={pane.kind} className={'edit-preview-pane preview-'+pane.kind}>
+        <h3>{pane.title}</h3><p>{pane.versionLabel}</p>
+        <div className="edit-preview-rows nowheel" tabIndex={0} aria-label={pane.kind==='remove'?'Removed source rows':'Added source rows'}>
+            {pane.rows.length?pane.rows.map((row,index)=><div key={index} className="edit-preview-row" data-edit-kind={row.kind}><span className="edit-line">L{row.line}</span><code>{row.text}</code></div>):<p>{pane.emptyLabel}</p>}
+        </div>
+        {pane.rows.length>0&&<p>{pane.footer}</p>}
+    </section>)}
+</div>;
+const DocumentEvidence = ({hunks, reading, onReflow}: {
+    hunks: readonly SourceHunkUI[]; reading: SourceReadingUI | undefined; onReflow: (() => void) | undefined;
 }) => <>
-    {composition && composition.status !== 'unresolved' ? <EditPreview composition={composition}/> : <p>Scoped source edits unresolved.</p>}
+    {reading?.available ? <EditPreview reading={reading}/> : <p>Scoped source edits unresolved.</p>}
     {hunks.length > 0 && <details className="document-details nodrag nopan" onToggle={onReflow}>
         <summary>Read all {hunks.length} native hunks and source identities</summary>
         <div className="document-reading nowheel" tabIndex={0} aria-label="All native document hunks">
@@ -148,25 +133,25 @@ const DocumentEvidence = ({hunks, composition, onReflow}: {
 const Entity = React.memo(({ data }: NodeProps<EntityNode>) => {
     const card = data.entity.ui.card;
     const status = data.entity.ui.status;
-    const hunks = data.entity.data.nativeHunks as readonly NativeDocumentHunk[] | undefined;
-    const composition = data.entity.data.editComposition as EditComposition | undefined;
+    const hunks = data.entity.ui.inlineSourceReading ? data.entity.ui.sourceReading?.hunks : undefined;
+    const reading = data.entity.ui.sourceReading;
     return <article className={'minimal-entity' + (hunks ? ' native-document-evidence' : '') + (typeof status === 'string' ? ' status-' + status.replaceAll(' ', '-') : '')}>
   <Ports /><NodeDragHandle data={data}/>
   <h2><EntityIcon entity={data.entity}/><span>{card.title}</span></h2>
-  {hunks && <DocumentEvidence hunks={hunks} composition={data.entity.data.editComposition as EditComposition | undefined} onReflow={data.onReflow}/>}
+  {hunks && <DocumentEvidence hunks={hunks} reading={reading} onReflow={data.onReflow}/>}
   {card.rows.map((row, index) => <p key={index}>{row}</p>)}
-  {data.entity.ui.sourceControl && composition && <details className="document-details nodrag nopan" open={data.entity.ui.sourceOpen} onToggle={event => {data.onInspect?.(data.entity.id,event.currentTarget.open);data.onReflow?.();}}>
+  {data.entity.ui.sourceControl && reading && <details className="document-details nodrag nopan" open={data.entity.ui.sourceOpen} onToggle={event => {data.onInspect?.(data.entity.id,event.currentTarget.open);data.onReflow?.();}}>
     <summary>View source changes</summary>
-    <p>{editCaption(composition)}</p>
-    <DocumentEvidence hunks={composition.hunks} composition={composition} onReflow={data.onReflow}/>
+    <p>{reading.caption}</p>
+    <DocumentEvidence hunks={reading.hunks} reading={reading} onReflow={data.onReflow}/>
   </details>}
   {data.entity.ui.fileControl && Boolean(data.unitCount) && <div className="file-unit-actions nodrag nopan">
    {(!data.limit || data.limit < (data.unitCount ?? 0)) && <button onClick={() => data.onExpand?.(data.entity.id)}>{data.limit ? 'Show more source units' : 'Show source units'}</button>}
    {Boolean(data.limit) && <button onClick={() => data.onExpand?.(data.entity.id, true)}>Hide source units</button>}
   </div>}
-  {data.entity.kind === 'file' && Boolean(data.limit) && sourceGraph.unresolved.some(row => row.path === data.entity.data.path) && <details className="unpaired-source nodrag nopan" onToggle={() => data.onReflow?.()}>
+  {data.entity.kind === 'file' && Boolean(data.limit) && data.entity.ui.unpairedRows.length > 0 && <details className="unpaired-source nodrag nopan" onToggle={() => data.onReflow?.()}>
    <summary>Source without an established counterpart</summary>
-   {sourceGraph.unresolved.filter(row => row.path === data.entity.data.path).map(row => <p key={row.anchor.side + ':' + row.anchor.startLine + ':' + row.name}>{row.anchor.side === 'base' ? 'Before' : 'After'} L{row.anchor.startLine}–{row.anchor.endLine} · {row.name}</p>)}
+   {data.entity.ui.unpairedRows.map((row,index) => <p key={index}>{row}</p>)}
   </details>}
  </article>;
 });
@@ -183,8 +168,8 @@ const GraphBoundary = React.memo(({ data }: NodeProps<EntityNode>) => {
     }, [data.entity.id, data.onHeaderMeasure]);
     return <>
  <Ports />
- <section className={'minimal-change-graph' + (data.entity.ui.status ? ' status-' + data.entity.ui.status!.replaceAll(' ', '-') : '')} aria-label={String(data.entity.data.name) + ' graph'}>
-  <NodeDragHandle data={data}/><h2 ref={heading}><EntityIcon entity={data.entity}/><span>{String(data.entity.data.name)}</span></h2>
+ <section className={'minimal-change-graph' + (data.entity.ui.status ? ' status-' + data.entity.ui.status!.replaceAll(' ', '-') : '')} aria-label={data.entity.ui.card.title + ' graph'}>
+  <NodeDragHandle data={data}/><h2 ref={heading}><EntityIcon entity={data.entity}/><span>{data.entity.ui.card.title}</span></h2>
  </section>
 </>;
 });
@@ -261,12 +246,12 @@ const InitialLayout = ({ apply, links, revision, headers }: {
 const App = () => {
     const coarse = useCoarseInput();
     useEffect(() => installPageGestureBoundary(document.documentElement), []);
-    const [experience, setExperience] = useState(() => experienceService.openComparison(sourceGraph));
+    const [experience, setExperience] = useState<GraphSessionUI>(() => initialSession);
     const limits = experience.limits;
     const [geometryRevision, setGeometryRevision] = useState(0);
     const [headerClearances, setHeaderClearances] = useState<Record<string, number>>({});
     const onHeaderMeasure = useCallback((id: string, clearance: number) => setHeaderClearances(previous => (previous[id] ?? groupInterior.top) === clearance ? previous : { ...previous, [id]: clearance }), []);
-    const view = useMemo(() => projectExperience(experience), [experience]);
+    const view = experience.view;
     const relations = useMemo(() => view.relations.filter(edge => !omittedStructuralEdge(edge, allEntities())), [view]);
     const links = useMemo(() => relations.map(edge => ({
         id: edge.id, source: edge.from, target: edge.to
@@ -295,8 +280,8 @@ const App = () => {
         manualPositions.current[id] = position;
         setNodes(previous => previous.map(node => node.id === id ? { ...node, position } : node));
     }, [setNodes, headerClearances]);
-    const onExpand = useCallback((id: string, hide = false) => setExperience(previous => experienceService.handleIntent(previous, {type:'show-source-units', comparisonId:previous.comparisonId,fileId:id,hide}).state), []);
-    const onInspect = useCallback((id:string,open:boolean)=>setExperience(previous=>experienceService.handleIntent(previous,{type:'source-disclosure',comparisonId:previous.comparisonId,entityId:id,open}).state),[]);
+    const onExpand = useCallback((id: string, hide = false) => setExperience(previous => previous.expand(id,hide)), []);
+    const onInspect = useCallback((id:string,open:boolean)=>setExperience(previous=>previous.inspect(id,open)),[]);
     const onReflow = useCallback(() => setGeometryRevision(value => value + 1), []);
     useEffect(() => {
         setReady(false);
@@ -308,7 +293,7 @@ const App = () => {
                 const group = Boolean(entity.nodes && entity.edges);
                 return {
                     id: entity.id, type: group ? 'graph' : 'entity', data: {
-                        entity, limit: limits[entity.id] ?? 0, unitCount: sourceGraph.fileUnits[entity.id]?.length ?? 0, onExpand, onInspect, onReflow, onHeaderMeasure, onMoveStart: beginMove, onMoveEnd: endMove, onMove: moveNode
+                        entity, limit: limits[entity.id] ?? 0, unitCount: entity.ui.unitCount, onExpand, onInspect, onReflow, onHeaderMeasure, onMoveStart: beginMove, onMoveEnd: endMove, onMove: moveNode
                     },
                     position: known?.position ?? { x: 0, y: 0 }, draggable: !coarse, ...(parent ? { parentId: parent.id, extent: 'parent' as const } : {}),
                     ...(known?.measured ? { measured: known.measured } : {}), style: {
