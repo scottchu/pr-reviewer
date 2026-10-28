@@ -2,7 +2,8 @@
 
 Date: 2026-10-28.
 Accepted direction: read → parse → extraction → enrich(s). Only enrichment requires interpretive intelligence; the rest is codified.
-Status: architecture proposal and acceptance design. Existing implementation has not been reorganized to this structure.
+Accepted boundary correction: UI + UI Type + UI Projection; Experiment Service coordinates the pipeline and returns Domain Types; Domain Service provides capabilities.
+Status: accepted directions with proposed concrete files/APIs and acceptance design. Existing implementation has not been reorganized to this structure.
 
 ## Goal and boundary
 
@@ -21,38 +22,62 @@ Validation runs at every boundary. After enrichment, deterministic validation ch
 
 One logical entity stays one entity even when several enrichers discuss it. Enrichment output is separate from extracted evidence and rendering artifacts. Proposed enrichers may run sequentially only for declared dependencies; independent enrichers may run concurrently over the same immutable input. Coordination, retries, budgets, keyed results and cancellation belong to the existing application lifecycle/effect boundary, not UI components or business rules hidden inside stream operators. No reactive library is selected by this proposal.
 
+## Service and UI boundaries
+
+The accepted result path is Experiment Service → Domain Type → UI Projection → UI Type → UI. The command path is UI intent → Experiment Service → Domain Service capabilities. UI Projection may also take explicit experiment progress/failure state to produce loading/error UI; application lifecycle state must not become source facts.
+
+| Boundary | Owns | Does not own |
+| --- | --- | --- |
+| Domain Types | Comparison identity, logical entities/occurrences, typed relationships, source evidence, qualified status and unresolved reasons | UI card/edge components, pixel positions, React state, presentation-only color tokens |
+| Domain Service | Explicit capabilities for source-fact admission, correspondence, relationship derivation, edit classification and evidence/enrichment validation | Experiment scheduling, provider/network setup, UI types or visual composition |
+| Experiment Service | Coordinates read → parse → extraction → enrich(s), invokes domain capabilities and permitted effect adapters, owns experiment inputs/results, progress, retries, cancellation and keyed stage lifetimes | Canonical semantic policy, UI markup or a second independent ontology |
+| UI Projection | Deterministically maps domain results and explicit application state to UI Types: node/group membership at the chosen disclosure, supported labels/explanations, provenance fields and presentation status | Inventing facts, deciding logical correspondence, interpreting source through a model, mutating canonical inputs |
+| UI Types | Named view contracts consumed by the current React UI: node/card/edge/inspection content and permitted actions | Replacing domain identity/evidence with labels or making render count evidence of extraction |
+| UI | Rendering, accessibility, local interaction, camera/gesture ownership and dispatch of user intent | Git/parser/model effects, extraction or status inference, direct access to domain internals |
+
+Services name responsibilities and public functional capabilities; they do not prescribe classes or a dependency-injection framework. The experiment coordinator is one application composition boundary, not a new shared core. Keep cross-subsystem event wiring through the existing managed integration layer. UI consumes the experiment's public command/query boundary and projected view state; it does not invoke parser/domain internals directly. No reactive library or new subscription route is selected by this document.
+
+Use ui/ for the responsibility boundary and components/ within it. React remains the implementation technology; it is not the owning responsibility name. React-specific hooks and library node types are allowed inside the UI boundary. This naming correction introduces no alternate-framework or portability requirement.
+
 ## Proportionate module proposal
 
-Keep one React application and an ordinary subsystem folder, not multiple packages. These are proposed responsibilities, not an instruction to create empty files in advance:
+Keep one React application and an ordinary subsystem folder, not multiple packages. These concrete names remain proposed; create files when moving an actual responsibility:
 
 ```
 src/review-graph/
-  contracts.ts
+  domain/
+    types.ts
+    service.ts
+    extraction/
+      source-units.ts
+      bindings.ts
+      correspondence.ts
+      relations.ts
+      edit-composition.ts
+    validation.ts
+  experiment/
+    types.ts
+    service.ts
+    pipeline.ts
   read/git-snapshot.ts
   parse/typescript.ts
   parse/native-diff.ts
-  extract/source-units.ts
-  extract/bindings.ts
-  extract/correspondence.ts
-  extract/relations.ts
-  extract/edit-composition.ts
-  enrich/contracts.ts
+  enrich/types.ts
   enrich/run-enrichers.ts
-  validate/evidence.ts
-  validate/graph.ts
-  pipeline.ts
-  projection/entities.ts
-  projection/relationships.ts
-  projection/visibility.ts
-  projection/layout.ts
-  react/ReviewGraph.tsx
-  react/EntityNode.tsx
-  react/ChangeGroup.tsx
-  react/RelationEdge.tsx
-  react/SourceChanges.tsx
+  ui/
+    types.ts
+    projection.ts
+    components/
+      ReviewGraph.tsx
+      EntityNode.tsx
+      ChangeGroup.tsx
+      RelationEdge.tsx
+      SourceChanges.tsx
 ```
 
-Define named stage contracts independently of an effectful function's inferred return type. Domain contracts must not import the prototype renderer or curated PR fixture module. Preserve exact source/coordinate types, explicit diagnostics and input/version identities. Use current dependencies, functional immutable transforms and explicit effects. Introduce a file only when moving an actual responsibility, and preserve current public application interfaces and subscription ownership. Actual enricher implementations are later bounded work; this proposal does not create a generic plugin framework.
+The pipeline is the execution sequence; services/types/projection describe ownership. They are complementary, not competing architectures. Experiment Service coordinates stages; the extraction stage invokes Domain Service's deterministic capabilities. Enrichment adapters supply attributed candidate records; Domain Service validates their admission without calling a model itself. The resulting Domain Types then pass through UI Projection. Providers and pure domain policy remain separate.
+
+Define named domain/stage/UI contracts independently of an effectful function's inferred return type. Domain code must not import UI Types, React, the prototype renderer or curated PR fixture modules. Preserve exact source/coordinate types, explicit diagnostics and input/version identities. Use current dependencies, functional immutable transforms and explicit effects. Preserve current public application interfaces and subscription ownership. Split ui/projection.ts further only when actual responsibilities require it; the diagram is not permission to create empty layers or a generic plugin framework.
 
 ## Observed current gaps
 
@@ -75,7 +100,10 @@ Baseline: main5944d3b, read-only source inspection.
 | Extraction | Human-audited expected facts and forbidden facts, authored separately from production extraction | Entity kind/owner/span, aliases/shadowing/reassignment, overloaded/ambiguous names, relative imports, test factories/custom matchers. Every admitted fact has valid evidence; unsupported cases are measured separately. |
 | Correspondence | Small independently authored before/head expected matches and nonmatches | Add/remove/mixed/unchanged, reordered declarations, whole replacements, same-name unrelated units, additions to existing entities, unchanged units beside same-line edits. No guessed identity or absence. |
 | Relations | Hand-specified caller/callee/ownership/evidence expectations | Imports are not calls; unresolved dispatch stays unresolved; source tests do not imply execution or direct unit coverage. Qualify supported lexical relations rather than claiming a full runtime call graph. |
-| Graph/projection | Ontology invariants plus expected semantic tasks | No duplicate logical versions/dangling endpoints, correct source anchors, same canonical input across projection/expansion, symmetric relationship reading, default semantic children and explicit source inspection. |
+| Domain Service | Independent expected/forbidden facts and evidence invariants | Capability policies use Domain Types only; no UI/framework/provider dependency or implicit effect. No duplicate logical versions/dangling references. |
+| Experiment Service | Fake stage ports plus real bounded integration | Stage order, declared enrichment dependencies, error/timeout/cancellation, stale-input fencing and preserved successful source results when enrichment fails. No reimplementation of domain rules. |
+| UI Projection | Hand-authored Domain Type inputs and expected UI Types | Immutable inputs, exact identity/anchor retention, correct status mapping, symmetric relationship reading, chosen disclosure and default semantic children. Same domain result may produce different allowed views without changing facts. |
+| UI | Actual rendered React journey | Default composition, source-open/close, labels/interaction/accessibility and bounds. Domain/projection test success cannot substitute for actual UI evidence. |
 | Enrichment | Accepted facts and explicit allowed/forbidden claim rubrics | Valid citations/scope, no unsupported new facts, no TestRun from source, rejected hallucinations, timeout/retry/cancellation and stale-input fencing. Text generation may vary; admission checks remain deterministic. |
 
 Add metamorphic checks: prefixing neutral source shifts anchors without inventing facts; shadowing removes call admission; changing an unrelated expression preserves equal-body status; input ordering does not change canonical facts. Use an independent test oracle for source/row expectations instead of calling production extraction to generate expected data. Use small temporary Git repositories for read/diff verification; retain the pinned PR25 regression corpus as integration evidence, not the sole benchmark.
@@ -89,4 +117,4 @@ A future extraction corpus reports per-supported-kind true positives, false posi
 3. Add the first bounded enrichment only after its input/output authority and deterministic validation are ready. An enrichment outage must leave the verified source graph usable.
 4. Integrate the validated result through the existing application boundary, then verify actual reviewer tasks at the authorized endpoint. UI/deployment acceptance is not inferred from source tests.
 
-No implementation refactor is authorized by this proposal alone. The accepted pipeline direction is durable; concrete module names, extraction corpus size and enricher implementations remain proposed until the next bounded slice is established.
+No implementation refactor is authorized by this proposal alone. The accepted pipeline and service/UI boundary directions are durable; concrete module names, extraction corpus size and enricher implementations remain proposed until the next bounded slice is established.
