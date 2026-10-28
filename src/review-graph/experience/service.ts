@@ -3,8 +3,9 @@ import { collectEntities, validateGraph } from '../domain/validation.ts';
 import type { ExperienceState, ExperienceIntent, IntentResult } from './types.ts';
 export const openComparison = (comparison: SourceGraph): ExperienceState => {
     validateGraph(comparison.entities, comparison.relations);
-    const identity=[comparison.provenance.repository,comparison.provenance.base,comparison.provenance.head];
-    if(identity.some(value=>typeof value!=='string'||!value))throw new Error('comparison_identity_unavailable');
+    const identity = [comparison.provenance.repository, comparison.provenance.base, comparison.provenance.head];
+    if (identity.some(value => typeof value !== 'string' || !value))
+        throw new Error('comparison_identity_unavailable');
     return { comparison, comparisonId: JSON.stringify(identity), limits: {}, sourceDisclosure: {}, inspection: null, revision: 0 };
 };
 export const handleIntent = (state: ExperienceState, intent: ExperienceIntent): IntentResult => {

@@ -128,7 +128,12 @@ export type ParsedSource = Readonly<{
 }>);
 export type ParsedSnapshot = Readonly<{
     snapshot: SourceSnapshot;
-    sources: readonly ParsedSource[];nativeDiffs:ReadonlyMap<string,readonly NativeDocumentHunk[]>;nativeDiagnostics:readonly {fileId:string;reason:string}[];
+    sources: readonly ParsedSource[];
+    nativeDiffs: ReadonlyMap<string, readonly NativeDocumentHunk[]>;
+    nativeDiagnostics: readonly {
+        fileId: string;
+        reason: string;
+    }[];
 }>;
 export type PreparationAliases = Readonly<{
     fileId?: (path: string, fallback: string) => string;
@@ -139,18 +144,44 @@ export type PreparationAliases = Readonly<{
     reviewName?: string;
     graphId?: string;
 }>;
-
-export type CompiledSourceGraph=Readonly<{id:string;kind:string;entities:readonly GraphEntity[];relations:readonly GraphRelation[];fileUnits:Readonly<Record<string,readonly string[]>>;unresolved:readonly {path:string;occurrence:StructuralUnit;reason:string}[];provenance:Readonly<Record<string,unknown>>}>;
-export type ExtractedComparison=Readonly<{facts:FactDocument;comparison:CompiledSourceGraph;nativeDiffs:ReadonlyMap<string,readonly NativeDocumentHunk[]>;editCompositions:ReadonlyMap<string,import('./edit-composition.ts').EditComposition>}>;
+export type CompiledSourceGraph = Readonly<{
+    id: string;
+    kind: string;
+    entities: readonly GraphEntity[];
+    relations: readonly GraphRelation[];
+    fileUnits: Readonly<Record<string, readonly string[]>>;
+    unresolved: readonly {
+        path: string;
+        occurrence: StructuralUnit;
+        reason: string;
+    }[];
+    provenance: Readonly<Record<string, unknown>>;
+}>;
+export type ExtractedComparison = Readonly<{
+    facts: FactDocument;
+    comparison: CompiledSourceGraph;
+    nativeDiffs: ReadonlyMap<string, readonly NativeDocumentHunk[]>;
+    editCompositions: ReadonlyMap<string, import('./edit-composition.ts').EditComposition>;
+}>;
 export type DocumentWitness = Readonly<{
-  side: 'base' | 'head'; commit: string; path: string; contentHash: string;
-  startLine: number; endLine: number; text: string;
+    side: 'base' | 'head';
+    commit: string;
+    path: string;
+    contentHash: string;
+    startLine: number;
+    endLine: number;
+    text: string;
 }>;
 export type NativeEditRow = Readonly<{
-  kind: 'add' | 'remove' | 'context'; text: string;
-  beforeLine: number | null; afterLine: number | null;
+    kind: 'add' | 'remove' | 'context';
+    text: string;
+    beforeLine: number | null;
+    afterLine: number | null;
 }>;
 export type NativeDocumentHunk = Readonly<{
-  index: number; header: string; rows: readonly NativeEditRow[];
-  before: DocumentWitness | null; after: DocumentWitness | null;
+    index: number;
+    header: string;
+    rows: readonly NativeEditRow[];
+    before: DocumentWitness | null;
+    after: DocumentWitness | null;
 }>;

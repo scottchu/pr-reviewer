@@ -4,7 +4,7 @@ export type AttributedEnrichment = Readonly<{
     nodes: readonly GraphEntity[];
     edges: readonly GraphRelation[];
 }>;
-export const validateEnrichment = (facts: FactDocument, source: readonly GraphEntity[], candidate: AttributedEnrichment, sources?:readonly SourceInput[]): AttributedEnrichment => {
+export const validateEnrichment = (facts: FactDocument, source: readonly GraphEntity[], candidate: AttributedEnrichment, sources?: readonly SourceInput[]): AttributedEnrichment => {
     const existing = new Set(collectEntities(source).map(entity => entity.id));
     const permittedKinds = new Set(['reason', 'goal', 'behavior']);
     const permittedRelations = new Set(['motivated_by', 'intended_to_achieve', 'impedes', 'related_policy']);
@@ -15,15 +15,19 @@ export const validateEnrichment = (facts: FactDocument, source: readonly GraphEn
             path: string;
             side: string;
             startLine: number;
-            endLine: number;commit?:string;contentHash?:string;
+            endLine: number;
+            commit?: string;
+            contentHash?: string;
         }[]) {
             const file = [...facts.files, ...facts.contextFiles].find(file => file.path === ref.path);
-            if (!file?.sides.some(side => side.side === ref.side && side.available) || !Number.isInteger(ref.startLine) || ref.startLine < 1 || ref.endLine < ref.startLine)
+            if (!file?.sides.some(side => side.side === ref.side && side.available) || !Number.isInteger(ref.startLine) || !Number.isInteger(ref.endLine) || ref.startLine < 1 || ref.endLine < ref.startLine)
                 throw new Error('enrichment_source_reference_invalid');
-            const side=file.sides.find(side=>side.side===ref.side&&side.available)!;
-            if((ref.commit&&ref.commit!==side.commit)||(ref.contentHash&&ref.contentHash!==side.contentHash))throw new Error('enrichment_source_identity_invalid');
-            const source=sources?.find(source=>source.path===ref.path&&source.side===ref.side);
-            if(source&&ref.endLine>source.content.split(/(?<=\n)/).length)throw new Error('enrichment_source_range_invalid');
+            const side = file.sides.find(side => side.side === ref.side && side.available)!;
+            if (('commit' in ref && ref.commit !== side.commit) || ('contentHash' in ref && ref.contentHash !== side.contentHash))
+                throw new Error('enrichment_source_identity_invalid');
+            const source = sources?.find(source => source.path === ref.path && source.side === ref.side);
+            if (source && ref.endLine > source.content.split(/(?<=\n)/).length)
+                throw new Error('enrichment_source_range_invalid');
         }
         existing.add(node.id);
     }

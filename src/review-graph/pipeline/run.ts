@@ -22,8 +22,12 @@ export const runSourcePipeline = async <T>(ports: PipelinePorts<T>, onStage: (st
     let stage: PipelineStage = 'read';
     let facts: FactDocument | undefined;
     let source: ExtractedComparison | undefined;
-    const enter = (next: PipelineStage) => { stage = next; if (signal?.aborted)
-        throw new Error('source_pipeline_cancelled'); onStage(next); };
+    const enter = (next: PipelineStage) => {
+        stage = next;
+        if (signal?.aborted)
+            throw new Error('source_pipeline_cancelled');
+        onStage(next);
+    };
     try {
         enter('read');
         const snapshot = await ports.read();
@@ -33,12 +37,12 @@ export const runSourcePipeline = async <T>(ports: PipelinePorts<T>, onStage: (st
         source = ports.extract(parsed);
         facts = source.facts;
         enter('enrich');
-        const enrichment = await ports.enrich(source);
+        const enrichment = await ports.enrich(structuredClone(source));
         if (signal?.aborted)
             throw new Error('source_pipeline_cancelled');
         return { status: 'ready', facts, source, enrichment };
     }
     catch (error) {
-        return { status: 'failed', stage, error, ...(facts ? { facts } : {}), ...(source ? {source} : {}) };
+        return { status: 'failed', stage, error, ...(facts ? { facts } : {}), ...(source ? { source } : {}) };
     }
 };

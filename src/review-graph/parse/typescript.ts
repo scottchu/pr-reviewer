@@ -1,4 +1,4 @@
-import {nativeDocumentHunks} from './native-diff.ts';
+import { nativeDocumentHunks } from './native-diff.ts';
 import ts from 'typescript-analysis';
 import { sourceHash } from '../domain/hash.ts';
 import type { SourceInput, ParsedSource, SourceSnapshot, ParsedSnapshot } from '../domain/types.ts';
@@ -27,7 +27,18 @@ export const parseSource = (input: SourceInput): ParsedSource => {
     return { input, kind: 'typescript', ast, checker };
 };
 export const parseSnapshot = (snapshot: SourceSnapshot): ParsedSnapshot => {
- const nativeDiffs=new Map<string,ReturnType<typeof nativeDocumentHunks>>();const nativeDiagnostics:{fileId:string;reason:string}[]=[];
- for(const file of snapshot.files){try{nativeDiffs.set(file.id,nativeDocumentHunks(file));}catch(error){nativeDiagnostics.push({fileId:file.id,reason:error instanceof Error?error.message:String(error)});}}
- return {snapshot,sources:snapshot.sources.map(parseSource),nativeDiffs,nativeDiagnostics};
+    const nativeDiffs = new Map<string, ReturnType<typeof nativeDocumentHunks>>();
+    const nativeDiagnostics: {
+        fileId: string;
+        reason: string;
+    }[] = [];
+    for (const file of snapshot.files) {
+        try {
+            nativeDiffs.set(file.id, nativeDocumentHunks(file));
+        }
+        catch (error) {
+            nativeDiagnostics.push({ fileId: file.id, reason: error instanceof Error ? error.message : String(error) });
+        }
+    }
+    return { snapshot, sources: snapshot.sources.map(parseSource), nativeDiffs, nativeDiagnostics };
 };
