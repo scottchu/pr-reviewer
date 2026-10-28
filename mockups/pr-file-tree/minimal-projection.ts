@@ -1,3 +1,4 @@
+import type { CallProjectionEvidence } from './call-projection.ts';
 import type { GraphEntity, GraphRelation } from './minimal-graph.ts';
 export type CardRows = Readonly<{
     title: string;
@@ -40,6 +41,13 @@ export const cardRows = (entity: GraphEntity): CardRows => {
 };
 export const edgeRows = (edge: GraphRelation): CardRows => {
     const title = ['before', 'after'].includes(edge.relation) ? '' : edge.relation.replaceAll('_', ' ');
+    if (edge.relation === 'calls' && edge.data.projection === 'collapsed-callsite') {
+        const proof = edge.data.projectionEvidence as CallProjectionEvidence;
+        const source = proof.locations[0]!;
+        const range = source.data.range as { startLine: number; endLine: number };
+        const path = text(edge.data.sourcePath).split('/').at(-1);
+        return { title, rows: [text(source.data.commit).slice(0, 7) + ' · ' + path + ' L' + range.startLine + (range.endLine === range.startLine ? '' : '–' + range.endLine)] };
+    }
     if (edge.relation === 'located_in' && edge.data.comparisonStatus === 'no change') {
         const witnesses = edge.data.witnesses as readonly GraphRelation[];
         return { title: 'located in · no change', rows: witnesses.map(witness => { const range = witness.data.range as {

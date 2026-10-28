@@ -1,4 +1,5 @@
 import input from './generated-source-graph.json' with { type: 'json' };
+import { reducedCallProjection } from './call-projection.ts';
 import type { GraphEntity, GraphRelation } from './minimal-graph.ts';
 export type SourceGraph = Readonly<{
     entities: readonly GraphEntity[];
@@ -54,5 +55,6 @@ export const visibleSourceGraph = (limits: Readonly<Record<string, number>>) => 
             && registry.some(entity => entity.id === relation.to && entity.kind === 'assertion'))
             visible.add(relation.to);
     const nodes = registry.filter(entity => visible.has(entity.id));
-    return { nodes, relations: candidate.relations.filter(edge => visible.has(edge.from) && visible.has(edge.to)) };
+    return reducedCallProjection(nodes, candidate.relations.filter(edge => visible.has(edge.from) && visible.has(edge.to)),
+        new Set(Object.entries(limits).filter(([, limit]) => limit > 0).map(([file]) => file)), candidate.relations);
 };
