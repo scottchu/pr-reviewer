@@ -179,6 +179,8 @@ test('actual React unavailable worker result cannot label a corpus admitted and 
 test('unavailable compute React capture and legacy reload preserve draft/source without poisoned polling',async({page},info)=>{
  test.setTimeout(60000);
  const id='unavailable-recovery-browser';
+ // The preceding limit probe owns a dense tree; this case starts from its own known source head.
+ fixture.git('read-tree','--reset','-u',snapshot.headSha);
  writeFileSync(join(fixture.root,'caller.ts'),'import {callee} from "./callee";\nexport const caller=()=>{'+ 'callee({});'.repeat(4001)+'};\n');
  fixture.git('add','caller.ts');fixture.git('commit','-qm','real bounded compute recovery fixture');
  const target=pinned(snapshot.baseSha,fixture.git('rev-parse','HEAD'));fixture.store.prepare(id,target);
