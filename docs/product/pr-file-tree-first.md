@@ -291,3 +291,10 @@ Gesture coordination rationale: keep the expensive automatic placement decision 
 
 
 Default call reading uses the supported reduced Function→Function projection, with a concise callsite source line retained on its edge. Do not place an invocation such as accessHeaders(captured) between request() and the helper in the default view or present it as the helper identity. File source-unit expansion remains the explicit detailed view: it may reveal the same canonical callsite and its original contains_call/calls/location evidence. This changes presentation membership only, preserving source facts, exact Before/After evidence, full File inventory and existing gestures.
+
+
+## Child containment and relationship-label boundaries
+
+A draggable child entity stays within its actual parent group's padded interior and below the measured heading/drag area. Camera zoom does not change these graph-coordinate bounds. Mobile grip movement, keyboard movement, desktop drag extents and restored presentation positions share this policy. Initial/reflowed layout reserves enough room for the header and child dimensions. Outer-rectangle clipping alone is insufficient because it permits heading overlap.
+
+A relationship label is not a grouped child. An external label may sit outside the related groups, with its curve and label derived from the same bend, but must not overlap or straddle a purple group boundary. Apply a bounded geometry correction to the requested label center without changing its relation endpoints or semantic membership. Internal labels may remain fully within their owning group; external labels remain outside group rectangles. This is a view-containment correction, not a new graph fact or redesign.
