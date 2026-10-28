@@ -130,13 +130,6 @@ export const prepareAppGraph = (facts: FactDocument, inputHash: string) => {
         if (!entity.data.comparisonStatus) return entity;
         const composition = (entity.data.editComposition as EditComposition | undefined) ?? scopedEditComposition(entity, facts);
         const children = entity.nodes?.map(child => child.kind === 'evidence' ? {...child, data: {...child.data, editComposition: composition}} : decorateEdits(child));
-        if (entity.kind === 'change' && children && !children.some(child => child.kind === 'evidence') && composition.hunks.length) {
-            const id = entity.id + ':edit-evidence';
-            children.push({id, kind: 'evidence', data: {name: 'Scoped source edits',
-                comparisonStatus: entity.data.comparisonStatus, editComposition: composition,
-                nativeHunks: composition.hunks, comparisonBasis: 'Exact native rows intersecting source ranges'}});
-            groupFor.set(id, entity.id);
-        }
         return {...entity, data: {...entity.data, editComposition: composition}, ...(children ? {nodes: children} : {})};
     };
     const compact = (entity: GraphEntity): GraphEntity => {
