@@ -7,7 +7,7 @@ import { installPageGestureBoundary } from './page-gestures.ts';
 import { sourceGraph, visibleSourceGraph, allEntities, allRelations } from './source-graph.ts';
 import type { GraphEntity, GraphRelation } from './minimal-graph.ts';
 import { cardRows, edgeRows, omittedStructuralEdge } from './minimal-projection.ts';
-import { readingBands, iconFor, iconPaths } from './entity-presentation.ts';
+import { readingBands, filePaths, iconFor, iconPaths } from './entity-presentation.ts';
 import { childContentBounds } from './graph-bounds.ts';
 import { beginsRouteDrag, keyboardDelta, movedNodePosition } from './gesture-policy.ts';
 import { projectionRoutes, liveProjectionRoutes } from './projection-routes.ts';
@@ -23,6 +23,7 @@ const useCoarseInput = () => {
     return coarse;
 };
 const bands = readingBands(allEntities(), allRelations());
+const paths = filePaths(allEntities());
 const directions: readonly Side[] = ['left', 'right', 'top', 'bottom'];
 const position = (side: Side) => ({
     left: Position.Left, right: Position.Right, top: Position.Top, bottom: Position.Bottom
@@ -187,8 +188,8 @@ const InitialLayout = ({ apply, links, revision, headers }: {
         const first = requestAnimationFrame(() => {
             second = requestAnimationFrame(() => {
                 applied.current = revision;
-                const focus = allEntities().find(entity => entity.id === 'review-file')?.id ?? allEntities().find(entity => bands.get(entity.id) === 0)?.id ?? 'pr25';
-                apply(initialLayout(getNodes(), links, focus, bands, headers));
+                const focus = allEntities().find(entity => entity.kind === 'review')?.id ?? 'pr25';
+                apply(initialLayout(getNodes(), links, focus, bands, headers, paths));
             });
         });
         return () => { cancelAnimationFrame(first); cancelAnimationFrame(second); };

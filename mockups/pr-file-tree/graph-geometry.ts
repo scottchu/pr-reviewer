@@ -14,7 +14,22 @@ const ranks = (ids:readonly string[],links:readonly Link[]) => {
  for(let i=0;i<queue.length;i++){const id=queue[i]!;for(const edge of relevant.filter(edge=>edge.source===id)){values.set(edge.target,Math.max(values.get(edge.target)!,values.get(id)!+1));degree.set(edge.target,degree.get(edge.target)!-1);if(degree.get(edge.target)===0)queue.push(edge.target);}}
  return values;
 };
-export const initialLayout = <T extends LayoutNode>(input:readonly T[],links:readonly Link[],focus='change',bands?:ReadonlyMap<string,number>,headers:Readonly<Record<string,number>>={}):T[] => {
+/** Directory-first depth-first traversal; direct files follow child directory subtrees. */
+export const compareFilePaths = (left: string, right: string): number => {
+ const a = left.split('/');
+ const b = right.split('/');
+ for (let index = 0; index < Math.min(a.length, b.length); index++) {
+  const aDirectory = index < a.length - 1;
+  const bDirectory = index < b.length - 1;
+  if (aDirectory !== bDirectory) return aDirectory ? -1 : 1;
+  if (a[index] !== b[index]) return a[index]! < b[index]! ? -1 : 1;
+ }
+ return a.length - b.length;
+};
+const fileIndent = (id: string, paths: ReadonlyMap<string, string>): number =>
+ paths.has(id) ? (paths.get(id)!.split('/').length - 1) * 24 : 0;
+
+export const initialLayout = <T extends LayoutNode>(input:readonly T[],links:readonly Link[],focus='change',bands?:ReadonlyMap<string,number>,headers:Readonly<Record<string,number>>={},paths:ReadonlyMap<string,string>=new Map()):T[] => {
  const nodes=input.map(node=>({...node,position:{...node.position},style:{...node.style,opacity:1}}));
  for(const group of nodes.filter(node=>nodes.some(child=>child.parentId===node.id))){
   const children=nodes.filter(node=>node.parentId===group.id);const rank=ranks(children.map(node=>node.id),links);let y=headers[group.id]??groupInterior.top;let width=600;
@@ -26,9 +41,21 @@ export const initialLayout = <T extends LayoutNode>(input:readonly T[],links:rea
  const rootOf=(id:string):string=>nodes.find(node=>node.id===id)?.parentId??id;
  const roots=nodes.filter(node=>!node.parentId);const rootLinks=links.map(edge=>({...edge,source:rootOf(edge.source),target:rootOf(edge.target)}));const levels=bands ? new Map(roots.map(node => [node.id, bands.get(node.id) ?? 1])) : ranks(roots.map(node=>node.id),rootLinks);
  const columns=[...new Set(levels.values())].sort((a,b)=>a-b);let x=0;const xs=new Map<number,number>();
- for(const level of columns){xs.set(level,x);x+=Math.max(...roots.filter(node=>levels.get(node.id)===level).map(node=>dimensions(node).width))+300;}
+ for(const level of columns){xs.set(level,x);x+=Math.max(...roots.filter(node=>levels.get(node.id)===level).map(node=>dimensions(node).width+fileIndent(node.id,paths)))+300;}
  const focusX=xs.get(levels.get(focus)??0)??0;
- for(const level of columns){let y=0;const column=roots.filter(node=>levels.get(node.id)===level).sort((a,b)=>a.id===focus?-1:b.id===focus?1:a.id.localeCompare(b.id));for(const node of column){node.position={x:xs.get(level)!-focusX,y};y+=dimensions(node).height+180;}}
+ for (const level of columns) {
+  let y = 0;
+  const column = roots.filter(node => levels.get(node.id) === level).sort((a, b) => {
+   const aPath = paths.get(a.id);
+   const bPath = paths.get(b.id);
+   if (aPath !== undefined && bPath !== undefined) return compareFilePaths(aPath, bPath);
+   return a.id === focus ? -1 : b.id === focus ? 1 : a.id.localeCompare(b.id);
+  });
+  for (const node of column) {
+   node.position = {x: xs.get(level)! - focusX + fileIndent(node.id, paths), y};
+   y += dimensions(node).height + 180;
+  }
+ }
  return nodes as T[];
 };
 export const absoluteBoxes = (nodes:readonly LayoutNode[]):Map<string,Box> => {
