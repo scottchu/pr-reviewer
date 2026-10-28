@@ -51,3 +51,22 @@ test('Markdown native hunks produce one visible file-scoped Change with all evid
   assert.ok(graph.relations.some(edge => edge.from === group.id && edge.relation === 'located_in'));
   assert.equal(JSON.stringify(facts).includes('documentPath'), false);
 });
+
+
+test('every pinned Markdown hunk matches exact Git blob text and source hash', async () => {
+  const {prepareSourceFacts} = await import('../prepare-source-facts.ts');
+  const {execFileSync} = await import('node:child_process');
+  const facts = await prepareSourceFacts('scottchu/pr-reviewer', 'b096826e31c0927190806de91ed70b8b64aa93d8', 'e3b270e5f49a9215452b0b86702946043e979059');
+  const documents = facts.files.filter(file => /\.md$/i.test(file.path));
+  assert.equal(documents.length, 20);
+  for (const document of documents) {
+    const hunks = nativeDocumentHunks(document);
+    assert.ok(hunks.length > 0);
+    for (const hunk of hunks) for (const witness of [hunk.before, hunk.after]) {
+      if (!witness) continue;
+      const bytes = execFileSync('git', ['show', witness.commit + ':' + witness.path], {encoding: 'utf8'});
+      assert.equal(sourceHash(bytes), witness.contentHash);
+      assert.equal(bytes.split(/(?<=\n)/).slice(witness.startLine - 1, witness.endLine).join(''), witness.text);
+    }
+  }
+});
