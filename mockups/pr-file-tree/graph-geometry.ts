@@ -4,6 +4,7 @@ export type Box = Point & Readonly<{width:number;height:number}>;
 export type LayoutNode = Readonly<{id:string;parentId?:string;position:Point;measured?:{width?:number;height?:number};style?:Readonly<{width?:unknown;height?:unknown;opacity?:unknown}>}>;
 export type Link = Readonly<{id:string;source:string;target:string}>;
 export type Side = 'left'|'right'|'top'|'bottom';
+export const groupInterior = { padding: 20, top: 80 } as const;
 export const dimensions = (node:LayoutNode) => ({width:Number(node.style?.width ?? node.measured?.width ?? 300),height:Number(node.style?.height ?? node.measured?.height ?? 90)});
 const ranks = (ids:readonly string[],links:readonly Link[]) => {
  const values=new Map(ids.map(id=>[id,0]));const degree=new Map(ids.map(id=>[id,0]));
@@ -13,10 +14,10 @@ const ranks = (ids:readonly string[],links:readonly Link[]) => {
  for(let i=0;i<queue.length;i++){const id=queue[i]!;for(const edge of relevant.filter(edge=>edge.source===id)){values.set(edge.target,Math.max(values.get(edge.target)!,values.get(id)!+1));degree.set(edge.target,degree.get(edge.target)!-1);if(degree.get(edge.target)===0)queue.push(edge.target);}}
  return values;
 };
-export const initialLayout = <T extends LayoutNode>(input:readonly T[],links:readonly Link[],focus='change',bands?:ReadonlyMap<string,number>):T[] => {
+export const initialLayout = <T extends LayoutNode>(input:readonly T[],links:readonly Link[],focus='change',bands?:ReadonlyMap<string,number>,headers:Readonly<Record<string,number>>={}):T[] => {
  const nodes=input.map(node=>({...node,position:{...node.position},style:{...node.style,opacity:1}}));
  for(const group of nodes.filter(node=>nodes.some(child=>child.parentId===node.id))){
-  const children=nodes.filter(node=>node.parentId===group.id);const rank=ranks(children.map(node=>node.id),links);let y=80;let width=600;
+  const children=nodes.filter(node=>node.parentId===group.id);const rank=ranks(children.map(node=>node.id),links);let y=headers[group.id]??groupInterior.top;let width=600;
   const rows=[...new Set(rank.values())].sort((a,b)=>a-b).map(value=>children.filter(node=>rank.get(node.id)===value));
   for(const row of rows)width=Math.max(width,row.reduce((sum,node)=>sum+dimensions(node).width,0)+(row.length-1)*120+64);
   for(const row of rows){let x=(width-row.reduce((sum,node)=>sum+dimensions(node).width,0)-(row.length-1)*120)/2;for(const child of row){child.position={x,y};x+=dimensions(child).width+120;}y+=Math.max(...row.map(node=>dimensions(node).height))+140;}

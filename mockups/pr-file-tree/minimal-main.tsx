@@ -8,9 +8,10 @@ import { sourceGraph, visibleSourceGraph, allEntities, allRelations } from './so
 import type { GraphEntity, GraphRelation } from './minimal-graph.ts';
 import { cardRows, edgeRows, omittedStructuralEdge } from './minimal-projection.ts';
 import { readingBands, iconFor, iconPaths } from './entity-presentation.ts';
+import { childContentBounds } from './graph-bounds.ts';
 import { beginsRouteDrag, keyboardDelta, movedNodePosition } from './gesture-policy.ts';
 import { projectionRoutes, liveProjectionRoutes } from './projection-routes.ts';
-import { initialLayout, curve, type Point, type Routed, type Side } from './graph-geometry.ts';
+import { initialLayout, curve, groupInterior, type Point, type Routed, type Side } from './graph-geometry.ts';
 const useCoarseInput = () => {
     const [coarse, setCoarse] = useState(() => matchMedia('(pointer: coarse)').matches);
     useEffect(() => {
@@ -32,6 +33,7 @@ type EntityNode = Node<{
     unitCount?: number;
     onExpand?: (id: string, hide?: boolean) => void;
     onReflow?: () => void;
+    onHeaderMeasure: (id: string, clearance: number) => void;
     onMoveStart: () => void;
     onMoveEnd: () => void;
     onMove: (id: string, delta: Point) => void;
@@ -105,12 +107,24 @@ const Entity = React.memo(({ data }: NodeProps<EntityNode>) => {
   </details>}
  </article>;
 });
-const GraphBoundary = React.memo(({ data }: NodeProps<EntityNode>) => <>
+const GraphBoundary = React.memo(({ data }: NodeProps<EntityNode>) => {
+    const heading = useRef<HTMLHeadingElement>(null);
+    useLayoutEffect(() => {
+        const element = heading.current;
+        if (!element) return;
+        const measure = () => data.onHeaderMeasure(data.entity.id, Math.max(groupInterior.top, Math.ceil(element.offsetTop + element.offsetHeight + groupInterior.padding)));
+        measure();
+        const observer = new ResizeObserver(measure);
+        observer.observe(element);
+        return () => observer.disconnect();
+    }, [data.entity.id, data.onHeaderMeasure]);
+    return <>
  <Ports />
  <section className="minimal-change-graph" aria-label={String(data.entity.data.name) + ' graph'}>
-  <NodeDragHandle data={data}/><h2><EntityIcon entity={data.entity}/><span>{String(data.entity.data.name)}</span></h2>
+  <NodeDragHandle data={data}/><h2 ref={heading}><EntityIcon entity={data.entity}/><span>{String(data.entity.data.name)}</span></h2>
  </section>
-</>);
+</>;
+});
 const Relation = React.memo((props: EdgeProps<RelationEdge>) => {
     const { getZoom } = useReactFlow();
     const labelRef = useRef<HTMLDivElement>(null);
@@ -153,7 +167,8 @@ const Relation = React.memo((props: EdgeProps<RelationEdge>) => {
 });
 const nodeTypes = { entity: Entity, graph: GraphBoundary };
 const edgeTypes = { relation: Relation };
-const InitialLayout = ({ apply, links, revision }: {
+const InitialLayout = ({ apply, links, revision, headers }: {
+    headers: Readonly<Record<string, number>>;
     apply: (nodes: EntityNode[]) => void;
     links: readonly {
         id: string;
@@ -173,11 +188,11 @@ const InitialLayout = ({ apply, links, revision }: {
             second = requestAnimationFrame(() => {
                 applied.current = revision;
                 const focus = allEntities().find(entity => entity.id === 'review-file')?.id ?? allEntities().find(entity => bands.get(entity.id) === 0)?.id ?? 'pr25';
-                apply(initialLayout(getNodes(), links, focus, bands));
+                apply(initialLayout(getNodes(), links, focus, bands, headers));
             });
         });
         return () => { cancelAnimationFrame(first); cancelAnimationFrame(second); };
-    }, [initialized, getNodes, apply, links, revision]);
+    }, [initialized, getNodes, apply, links, revision, headers]);
     return null;
 };
 const App = () => {
@@ -185,6 +200,8 @@ const App = () => {
     useEffect(() => installPageGestureBoundary(document.documentElement), []);
     const [limits, setLimits] = useState<Record<string, number>>({});
     const [geometryRevision, setGeometryRevision] = useState(0);
+    const [headerClearances, setHeaderClearances] = useState<Record<string, number>>({});
+    const onHeaderMeasure = useCallback((id: string, clearance: number) => setHeaderClearances(previous => (previous[id] ?? groupInterior.top) === clearance ? previous : { ...previous, [id]: clearance }), []);
     const view = useMemo(() => visibleSourceGraph(limits), [limits]);
     const relations = useMemo(() => view.relations.filter(edge => !omittedStructuralEdge(edge, allEntities())), [view]);
     const links = useMemo(() => relations.map(edge => ({
@@ -209,11 +226,11 @@ const App = () => {
     }, []);
     const endMove = useCallback(() => { movementRef.current = null; setMovement(null); }, []);
     const moveNode = useCallback((id: string, delta: Point) => {
-        const position = movedNodePosition((movementRef.current ?? latest.current).nodes, id, delta);
+        const position = movedNodePosition((movementRef.current ?? latest.current).nodes, id, delta, headerClearances);
         if (!position) return;
         manualPositions.current[id] = position;
         setNodes(previous => previous.map(node => node.id === id ? { ...node, position } : node));
-    }, [setNodes]);
+    }, [setNodes, headerClearances]);
     const onExpand = useCallback((id: string, hide = false) => setLimits(previous => ({ ...previous, [id]: hide ? 0 : (previous[id] ?? 0) + 20 })), []);
     const onReflow = useCallback(() => setGeometryRevision(value => value + 1), []);
     useEffect(() => {
@@ -226,7 +243,7 @@ const App = () => {
                 const group = Boolean(entity.nodes && entity.edges);
                 return {
                     id: entity.id, type: group ? 'graph' : 'entity', data: {
-                        entity, limit: limits[entity.id] ?? 0, unitCount: sourceGraph.fileUnits[entity.id]?.length ?? 0, onExpand, onReflow, onMoveStart: beginMove, onMoveEnd: endMove, onMove: moveNode
+                        entity, limit: limits[entity.id] ?? 0, unitCount: sourceGraph.fileUnits[entity.id]?.length ?? 0, onExpand, onReflow, onHeaderMeasure, onMoveStart: beginMove, onMoveEnd: endMove, onMove: moveNode
                     },
                     position: known?.position ?? { x: 0, y: 0 }, draggable: !coarse, ...(parent ? { parentId: parent.id, extent: 'parent' as const } : {}),
                     ...(known?.measured ? { measured: known.measured } : {}), style: {
@@ -235,11 +252,19 @@ const App = () => {
                 };
             });
         });
-    }, [view, limits, coarse, beginMove, endMove, moveNode, onExpand, onReflow, setNodes]);
+    }, [view, limits, coarse, beginMove, endMove, moveNode, onExpand, onReflow, onHeaderMeasure, setNodes]);
     const apply = useCallback((laidOut: EntityNode[]) => {
-        setNodes(laidOut.map(node => manualPositions.current[node.id] ? { ...node, position: manualPositions.current[node.id]! } : node));
+        const positioned = laidOut.map(node => manualPositions.current[node.id] ? { ...node, position: manualPositions.current[node.id]! } : node);
+        const bounded = positioned.map(node => {
+            const bounds = childContentBounds(positioned, node.id, headerClearances);
+            if (!bounds) return node;
+            const position = movedNodePosition(positioned, node.id, { x: 0, y: 0 }, headerClearances)!;
+            if (manualPositions.current[node.id]) manualPositions.current[node.id] = position;
+            return { ...node, position, extent: [[bounds.min.x, bounds.min.y], [bounds.max.x, bounds.max.y]] as [[number, number], [number, number]] };
+        });
+        setNodes(bounded);
         setReady(true);
-    }, [setNodes]);
+    }, [setNodes, headerClearances]);
     const changes: typeof onNodesChange = useCallback(next => {
         for (const change of next)
             if (change.type === 'position' && change.position && change.dragging !== undefined)
@@ -268,7 +293,7 @@ const App = () => {
             return [];
         if (!placements)
             return [];
-        const routes = liveProjectionRoutes(nodes, links, placements, manual);
+        const routes = liveProjectionRoutes(nodes, links, placements, manual, sizes);
         return relations.map(relation => {
             const routed = routes.get(relation.id)!;
             const prior = edgeCache.current.get(relation.id);
@@ -282,13 +307,13 @@ const App = () => {
             edgeCache.current.set(relation.id, edge);
             return edge;
         });
-    }, [ready, placements, nodes, links, manual, relations, coarse, beginMove, endMove, onBend, onMeasure]);
-    const revision = JSON.stringify(limits) + ':' + geometryRevision + ':' + coarse;
+    }, [ready, placements, nodes, links, manual, sizes, relations, coarse, beginMove, endMove, onBend, onMeasure]);
+    const revision = JSON.stringify(limits) + ':' + geometryRevision + ':' + coarse + ':' + JSON.stringify(headerClearances);
     return <><header className="minimal-header"><h1>PR25 · Changes and evidence</h1><p>Files, code changes, tests and their source context</p></header>
   <main className={coarse ? 'coarse-input' : undefined} aria-label="PR25 source comparison graph"><ReactFlow<EntityNode, RelationEdge> nodes={nodes} onNodesChange={changes} onNodeDragStart={beginMove} onNodeDragStop={endMove} edges={edges} nodeTypes={nodeTypes} edgeTypes={edgeTypes} defaultViewport={{
         x: 20, y: 35, zoom: 1
     }} minZoom={0.25} maxZoom={2} panOnScroll panOnScrollMode={PanOnScrollMode.Free} zoomOnScroll={false} zoomOnPinch nodesConnectable={false} nodesDraggable elementsSelectable={false} proOptions={{ hideAttribution: true }}>
-   <InitialLayout apply={apply} links={links} revision={revision}/><Background color="#29333b" gap={24} size={1}/>
+   <InitialLayout apply={apply} links={links} revision={revision} headers={headerClearances}/><Background color="#29333b" gap={24} size={1}/>
   </ReactFlow></main></>;
 };
 const root = document.getElementById('root');

@@ -16,7 +16,7 @@ test('touch strokes and label bodies pan; the designated label handle alone owns
 
 test('explicit node handles preserve parent bounds and immutable gesture origins', () => {
     const nodes = [{ id: 'group', position: { x: 10, y: 10 }, style: { width: 800, height: 500 } }, { id: 'child', parentId: 'group', position: { x: 50, y: 50 }, measured: { width: 300, height: 100 } }];
-    assert.deepEqual(movedNodePosition(nodes, 'child', { x: 900, y: -100 }), { x: 500, y: 0 });
+    assert.deepEqual(movedNodePosition(nodes, 'child', { x: 900, y: -100 }), { x: 480, y: 80 });
     assert.deepEqual(movedNodePosition(nodes, 'group', { x: -100, y: 20 }), { x: -90, y: 30 });
     assert.deepEqual(nodes[1]!.position, { x: 50, y: 50 });
     assert.equal(movedNodePosition(nodes, 'missing', { x: 10, y: 10 }), undefined);
