@@ -230,7 +230,7 @@ const App = () => {
                     },
                     position: known?.position ?? { x: 0, y: 0 }, draggable: !coarse, ...(parent ? { parentId: parent.id, extent: 'parent' as const } : {}),
                     ...(known?.measured ? { measured: known.measured } : {}), style: {
-                        ...known?.style, opacity: known ? 1 : 0, ...(group ? { width: known?.style?.width ?? 800, height: known?.style?.height ?? 520 } : {})
+                        ...known?.style, pointerEvents: 'all', opacity: known ? 1 : 0, ...(group ? { width: known?.style?.width ?? 800, height: known?.style?.height ?? 520 } : {})
                     }
                 };
             });
