@@ -3,6 +3,7 @@ import { createHash } from 'node:crypto';
 import { fileURLToPath } from 'node:url';
 import { compileSourceGraph, type FactDocument } from './compile-source-graph.ts';
 import type { GraphEntity, GraphRelation } from './minimal-graph.ts';
+import {scopedEditComposition, type EditComposition} from './edit-composition.ts';
 import {nativeDocumentHunks} from './native-document-comparison.ts';
 import explanations from './graph-explanations.json' with { type: 'json' };
 const hash = (bytes: string | Buffer) => createHash('sha256').update(bytes).digest('hex');
@@ -125,6 +126,19 @@ export const prepareAppGraph = (facts: FactDocument, inputHash: string) => {
         const file = witness ? paths.get(witness.anchor.path) : occurrence?.path ? paths.get(occurrence.path) : undefined;
         return file ? [[entity.id, file]] : [];
     }));
+    const decorateEdits = (entity: GraphEntity): GraphEntity => {
+        if (!entity.data.comparisonStatus) return entity;
+        const composition = (entity.data.editComposition as EditComposition | undefined) ?? scopedEditComposition(entity, facts);
+        const children = entity.nodes?.map(child => child.kind === 'evidence' ? {...child, data: {...child.data, editComposition: composition}} : decorateEdits(child));
+        if (entity.kind === 'change' && children && !children.some(child => child.kind === 'evidence') && composition.hunks.length) {
+            const id = entity.id + ':edit-evidence';
+            children.push({id, kind: 'evidence', data: {name: 'Scoped source edits',
+                comparisonStatus: entity.data.comparisonStatus, editComposition: composition,
+                nativeHunks: composition.hunks, comparisonBasis: 'Exact native rows intersecting source ranges'}});
+            groupFor.set(id, entity.id);
+        }
+        return {...entity, data: {...entity.data, editComposition: composition}, ...(children ? {nodes: children} : {})};
+    };
     const compact = (entity: GraphEntity): GraphEntity => {
         const { sourceWitnesses, ...data } = entity.data;
         const witnesses = sourceWitnesses as {
@@ -139,13 +153,13 @@ export const prepareAppGraph = (facts: FactDocument, inputHash: string) => {
         };
     };
     return {
-        id: compiled.id, kind: 'graph', entities: [...entities.filter(entity => !grouped.has(entity.id)), ...groups, ...acceptedExplanations].map(compact), relations,
+        id: compiled.id, kind: 'graph', entities: [...entities.filter(entity => !grouped.has(entity.id)), ...groups, ...acceptedExplanations].map(decorateEdits).map(compact), relations,
         fileUnits: compiled.fileUnits, ownerByUnit, groupFor: Object.fromEntries(groupFor), initialVisible: [...initial],
         unresolved: compiled.unresolved.map(row => ({
             path: row.path, id: row.occurrence.id, kind: row.occurrence.kind, name: row.occurrence.name, anchor: row.occurrence.anchor, sourceTextHash: hash(row.occurrence.sourceText), reason: row.reason
         })),
         provenance: {
-            ...compiled.provenance, inputArtifactHash: inputHash, compilerHash: hash(readFileSync(new URL('./compile-source-graph.ts', import.meta.url))), appCompilerHash: hash(readFileSync(new URL('./prepare-app-graph.ts', import.meta.url))), explanationHash: hash(readFileSync(new URL('./graph-explanations.json', import.meta.url))), documentCompilerHash: hash(readFileSync(new URL('./native-document-comparison.ts', import.meta.url)))
+            ...compiled.provenance, inputArtifactHash: inputHash, compilerHash: hash(readFileSync(new URL('./compile-source-graph.ts', import.meta.url))), appCompilerHash: hash(readFileSync(new URL('./prepare-app-graph.ts', import.meta.url))), explanationHash: hash(readFileSync(new URL('./graph-explanations.json', import.meta.url))), documentCompilerHash: hash(readFileSync(new URL('./native-document-comparison.ts', import.meta.url))), editCompilerHash: hash(readFileSync(new URL('./edit-composition.ts', import.meta.url)))
         }
     };
 };

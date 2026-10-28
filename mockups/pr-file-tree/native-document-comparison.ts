@@ -5,8 +5,12 @@ export type DocumentWitness = Readonly<{
   side: 'base' | 'head'; commit: string; path: string; contentHash: string;
   startLine: number; endLine: number; text: string;
 }>;
+export type NativeEditRow = Readonly<{
+  kind: 'add' | 'remove' | 'context'; text: string;
+  beforeLine: number | null; afterLine: number | null;
+}>;
 export type NativeDocumentHunk = Readonly<{
-  index: number; header: string;
+  index: number; header: string; rows: readonly NativeEditRow[];
   before: DocumentWitness | null; after: DocumentWitness | null;
 }>;
 type ChangedFile = FactDocument['files'][number];
@@ -26,6 +30,7 @@ export const nativeDocumentHunks = (file: ChangedFile): readonly NativeDocumentH
     const beforeStart = Number(match[1]), beforeCount = Number(match[2] ?? 1);
     const afterStart = Number(match[3]), afterCount = Number(match[4] ?? 1);
     const before: string[] = [], after: string[] = [];
+    const rows: NativeEditRow[] = [];
     let previous: string | undefined;
     while (cursor < lines.length && !lines[cursor]!.startsWith('@@ ')) {
       const line = lines[cursor++]!;
@@ -34,6 +39,8 @@ export const nativeDocumentHunks = (file: ChangedFile): readonly NativeDocumentH
           if (!output.length) throw new Error('document_patch_newline_marker_invalid');
           output[output.length - 1] = output.at(-1)!.slice(0, -1);
         }
+        const last = rows.at(-1);
+        if (last) rows[rows.length - 1] = {...last, text: last.text.slice(0, -1)};
         continue;
       }
       const prefix = line[0];
@@ -42,6 +49,9 @@ export const nativeDocumentHunks = (file: ChangedFile): readonly NativeDocumentH
         throw new Error('document_patch_row_invalid');
       }
       const text = line.slice(1) + '\n';
+      rows.push({kind: prefix === '+' ? 'add' : prefix === '-' ? 'remove' : 'context', text,
+        beforeLine: prefix === '+' ? null : beforeStart + before.length,
+        afterLine: prefix === '-' ? null : afterStart + after.length});
       if (prefix !== '+') before.push(text);
       if (prefix !== '-') after.push(text);
       previous = prefix;
@@ -56,7 +66,7 @@ export const nativeDocumentHunks = (file: ChangedFile): readonly NativeDocumentH
       return {side, commit: source.commit, path: file.path, contentHash: source.contentHash,
         startLine, endLine: startLine + count - 1, text: rows.join('')};
     };
-    hunks.push({index: hunks.length + 1, header,
+    hunks.push({index: hunks.length + 1, header, rows,
       before: witness('base', beforeStart, beforeCount, before),
       after: witness('head', afterStart, afterCount, after)});
   }

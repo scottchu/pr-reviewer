@@ -1,3 +1,4 @@
+import type {EditComposition} from './edit-composition.ts';
 import type { CallProjectionEvidence } from './call-projection.ts';
 import type { GraphEntity, GraphRelation } from './minimal-graph.ts';
 export type CardRows = Readonly<{
@@ -34,9 +35,22 @@ const contentRows = (entity: GraphEntity): CardRows => {
         default: return { title: text(data.name) || text(data.label), rows: text(data.value) ? [text(data.value)] : [] };
     }
 };
+export const presentationStatus = (entity: GraphEntity): string | undefined => {
+    const composition = entity.data.editComposition as EditComposition | undefined;
+    return composition ? composition.status === 'unresolved' ? undefined : composition.status :
+        typeof entity.data.comparisonStatus === 'string' ? entity.data.comparisonStatus : undefined;
+};
+export const editPreview = (composition: EditComposition) => ({
+    removed: composition.rows.filter(row => row.kind === 'remove').slice(0, 4),
+    added: composition.rows.filter(row => row.kind === 'add').slice(0, 4),
+});
+export const editCaption = (composition: EditComposition): string => composition.status === 'unresolved'
+    ? 'Scoped source edits unresolved'
+    : 'Scoped ' + composition.scope + ' edits: +' + composition.added + ' / −' + composition.removed;
 export const cardRows = (entity: GraphEntity): CardRows => {
     const content = contentRows(entity);
-    const status = text(entity.data.comparisonStatus);
+    const composition = entity.data.editComposition as EditComposition | undefined;
+    const status = composition ? editCaption(composition) : text(entity.data.comparisonStatus);
     return { ...content, rows: status ? [status, ...content.rows] : content.rows };
 };
 export const edgeRows = (edge: GraphRelation): CardRows => {

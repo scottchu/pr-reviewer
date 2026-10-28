@@ -7,7 +7,8 @@ import { installPageGestureBoundary } from './page-gestures.ts';
 import { sourceGraph, visibleSourceGraph, allEntities, allRelations } from './source-graph.ts';
 import type { GraphEntity, GraphRelation } from './minimal-graph.ts';
 import type {NativeDocumentHunk, DocumentWitness} from './native-document-comparison.ts';
-import { cardRows, edgeRows, omittedStructuralEdge } from './minimal-projection.ts';
+import type {EditComposition} from './edit-composition.ts';
+import { cardRows, edgeRows, omittedStructuralEdge, presentationStatus, editCaption, editPreview } from './minimal-projection.ts';
 import { readingBands, filePaths, documentPaths, iconFor, iconPaths } from './entity-presentation.ts';
 import { childContentBounds } from './graph-bounds.ts';
 import { beginsRouteDrag, keyboardDelta, movedNodePosition } from './gesture-policy.ts';
@@ -93,37 +94,57 @@ const NodeDragHandle = ({ data }: { data: EntityNode['data'] }) => {
             event.preventDefault(); event.stopPropagation(); data.onMoveStart(); data.onMove(data.entity.id, delta); data.onMoveEnd();
         }}>⠿</button>;
 };
-const DocumentSide = ({label, witness, preview = false}: {
-    label: 'Before' | 'After'; witness: DocumentWitness | null; preview?: boolean;
+const DocumentSide = ({label, witness, hunk}: {
+    label: 'Before' | 'After'; witness: DocumentWitness | null; hunk: NativeDocumentHunk;
 }) => <section className={'document-side version-' + label.toLowerCase()}>
-    <h3>{label}{witness ? ' · ' + witness.commit.slice(0, 7) + ' L' + witness.startLine + '–' + witness.endLine : ' · absent in this hunk'}</h3>
+    <h3>{label}{witness ? ' · ' + witness.commit.slice(0, 7) + ' L' + witness.startLine + '–' + witness.endLine : ' · absent in this scope'}</h3>
     {witness && <>
-        {!preview && <p className="document-provenance">{witness.path}<br />{witness.commit}<br />SHA256 {witness.contentHash}</p>}
-        <pre>{witness.text}</pre>
+        <p className="document-provenance">{witness.path}<br />{witness.commit}<br />SHA256 {witness.contentHash}</p>
+        <pre>{hunk.rows.filter(row => (label === 'Before' ? row.beforeLine : row.afterLine) !== null)
+            .map((row, index) => <span key={index} data-edit-kind={row.kind} className={'native-row-' + row.kind}>{row.text}</span>)}</pre>
     </>}
 </section>;
-const DocumentEvidence = ({hunks, onReflow}: {hunks: readonly NativeDocumentHunk[]; onReflow: (() => void) | undefined}) => <>
-    <div className="document-excerpt nodrag nopan nowheel" tabIndex={0} aria-label="First native hunk excerpt">
-        {hunks[0] ? <><DocumentSide label="Before" witness={hunks[0].before} preview /><DocumentSide label="After" witness={hunks[0].after} preview /></> : <p>No textual hunks in the pinned patch.</p>}
-    </div>
+const EditPreview = ({composition}: {composition: EditComposition}) => {
+    const preview = editPreview(composition);
+    return <div className="edit-preview nodrag nopan" aria-label="Scoped removed and added source preview">
+        {(['remove', 'add'] as const).map(kind => {
+            const rows = kind === 'remove' ? preview.removed : preview.added;
+            const side = composition.hunks.map(hunk => kind === 'remove' ? hunk.before : hunk.after).find(Boolean);
+            return <section key={kind} className={'edit-preview-pane preview-' + kind}>
+                <h3>{kind === 'remove' ? 'Removed −' + composition.removed : 'Added +' + composition.added}</h3>
+                <p>{kind === 'remove' ? 'Before' : 'After'}{side ? ' · ' + side.commit.slice(0, 7) : ''}</p>
+                <div className="edit-preview-rows nowheel" tabIndex={0} aria-label={kind === 'remove' ? 'Removed source rows' : 'Added source rows'}>
+                    {rows.length ? rows.map((row, index) => <div key={index} className="edit-preview-row" data-edit-kind={row.kind}>
+                        <span className="edit-line">L{kind === 'remove' ? row.beforeLine : row.afterLine}</span><code>{row.text}</code>
+                    </div>) : <p>No {kind === 'remove' ? 'removed' : 'added'} rows in this scope.</p>}
+                </div>
+                {rows.length > 0 && <p>First {rows.length} source rows · all evidence below</p>}
+            </section>;
+        })}
+    </div>;
+};
+const DocumentEvidence = ({hunks, composition, onReflow}: {
+    hunks: readonly NativeDocumentHunk[]; composition: EditComposition | undefined; onReflow: (() => void) | undefined;
+}) => <>
+    {composition && composition.status !== 'unresolved' ? <EditPreview composition={composition}/> : <p>Scoped source edits unresolved.</p>}
     {hunks.length > 0 && <details className="document-details nodrag nopan" onToggle={onReflow}>
         <summary>Read all {hunks.length} native hunks and source identities</summary>
         <div className="document-reading nowheel" tabIndex={0} aria-label="All native document hunks">
             {hunks.map(hunk => <section key={hunk.index} data-native-hunk={hunk.index}>
                 <h3>Hunk {hunk.index} · {hunk.header}</h3>
-                <DocumentSide label="Before" witness={hunk.before} /><DocumentSide label="After" witness={hunk.after} />
+                <DocumentSide label="Before" witness={hunk.before} hunk={hunk}/><DocumentSide label="After" witness={hunk.after} hunk={hunk}/>
             </section>)}
         </div>
     </details>}
 </>;
 const Entity = React.memo(({ data }: NodeProps<EntityNode>) => {
     const card = cardRows(data.entity);
-    const status = data.entity.data.comparisonStatus;
+    const status = presentationStatus(data.entity);
     const hunks = data.entity.data.nativeHunks as readonly NativeDocumentHunk[] | undefined;
     return <article className={'minimal-entity' + (hunks ? ' native-document-evidence' : '') + (typeof status === 'string' ? ' status-' + status.replaceAll(' ', '-') : '')}>
   <Ports /><NodeDragHandle data={data}/>
   <h2><EntityIcon entity={data.entity}/><span>{card.title}</span></h2>
-  {hunks && <DocumentEvidence hunks={hunks} onReflow={data.onReflow}/>}
+  {hunks && <DocumentEvidence hunks={hunks} composition={data.entity.data.editComposition as EditComposition | undefined} onReflow={data.onReflow}/>}
   {card.rows.map((row, index) => <p key={index}>{row}</p>)}
   {data.entity.kind === 'file' && Boolean(data.unitCount) && <div className="file-unit-actions nodrag nopan">
    {(!data.limit || data.limit < (data.unitCount ?? 0)) && <button onClick={() => data.onExpand?.(data.entity.id)}>{data.limit ? 'Show more source units' : 'Show source units'}</button>}
@@ -148,8 +169,8 @@ const GraphBoundary = React.memo(({ data }: NodeProps<EntityNode>) => {
     }, [data.entity.id, data.onHeaderMeasure]);
     return <>
  <Ports />
- <section className={'minimal-change-graph' + (typeof data.entity.data.comparisonStatus === 'string' ? ' status-' + data.entity.data.comparisonStatus.replaceAll(' ', '-') : '')} aria-label={String(data.entity.data.name) + ' graph'}>
-  <NodeDragHandle data={data}/><h2 ref={heading}><EntityIcon entity={data.entity}/><span>{String(data.entity.data.name)}</span></h2>
+ <section className={'minimal-change-graph' + (presentationStatus(data.entity) ? ' status-' + presentationStatus(data.entity)!.replaceAll(' ', '-') : '')} aria-label={String(data.entity.data.name) + ' graph'}>
+  <NodeDragHandle data={data}/><h2 ref={heading}><EntityIcon entity={data.entity}/><span>{String(data.entity.data.name)}{data.entity.data.editComposition ? <small className="group-edit-caption">{editCaption(data.entity.data.editComposition as EditComposition)}</small> : null}</span></h2>
  </section>
 </>;
 });
