@@ -25,7 +25,9 @@ for (const width of [1440, 390]) {
         expect(heavy).toBeLessThan(wrapperCount);
         // Closed native readers do not mount full hunk rows or source identities.
         expect(await page.locator('details:not([open]) .document-reading').count()).toBe(0);
-        const wrapper = page.locator('.react-flow__node').filter({has: page.getByRole('button', {name: 'Show source units', exact: true})}).first();
+        const {sourceGraph, visibleSourceGraph} = await import('../source-graph.ts');
+        const fileId = Object.entries(sourceGraph.fileUnits).find(([, units]) => units.length > 0)![0];
+        const wrapper = page.locator(`.react-flow__node[data-id=${JSON.stringify(fileId)}]`);
         await frame(page, wrapper);
         const before = await camera(page);
         await wrapper.getByRole('button', {name: 'Show source units', exact: true}).click();
@@ -35,7 +37,8 @@ for (const width of [1440, 390]) {
         if (await more.count()) {await more.click(); expect(await camera(page)).toBe(before);}
         await wrapper.getByRole('button', {name: 'Hide source units', exact: true}).click();
         expect(await camera(page)).toBe(before);
-        const sourceNode = page.locator('.react-flow__node').filter({has: page.locator('summary').filter({hasText: /^View source changes$/})}).first();
+        const sourceEntity = visibleSourceGraph({}).nodes.find(entity => ['function', 'test'].includes(entity.kind) && Boolean(entity.data.editComposition))!;
+        const sourceNode = page.locator(`.react-flow__node[data-id=${JSON.stringify(sourceEntity.id)}]`);
         await frame(page, sourceNode);
         const summary = sourceNode.locator('summary').filter({hasText: /^View source changes$/});
         await summary.click();
