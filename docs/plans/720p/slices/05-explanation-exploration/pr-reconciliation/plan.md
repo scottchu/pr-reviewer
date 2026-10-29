@@ -22,7 +22,7 @@ Counts cover every path changed by each PR against its own original base, compar
 
 | PR and pinned head | Blob audit against baseline | Disposition after reconciliation publication |
 |---|---|---|
-| [26](https://github.com/scottchu/pr-reviewer/pull/26), `cc50132dab411a78141de0121dc8a42a5a9709be` | 15 docs: 1 identical, 14 later/different, none absent | Superseded design proposal. Retain source identity, explicit connected reading, drafts/return and missing-reference limits; current minimum entry supersedes old mandatory panel composition. Close without merging. |
+| [26](https://github.com/scottchu/pr-reviewer/pull/26), `cc50132dab411a78141de0121dc8a42a5a9709be` | 15 docs: 1 identical, 14 later/different, none absent | Superseded design proposal. Retain source identity, explicit connected reading, drafts/return and the subsequently recovered original-reference evidence; current minimum entry supersedes old mandatory panel composition. Close without merging. |
 | [27](https://github.com/scottchu/pr-reviewer/pull/27), `53b33801f668a96d2bf8393741e64f1826f8dd33` | 12 paths: 6 identical, 5 later/different, 1 historical receipt absent | Covered SDK migration. Close without merging; preserve the historical receipt link below. |
 | [29](https://github.com/scottchu/pr-reviewer/pull/29), `245879aa8006ac576827cd7147cfa0c505d05cc2` | 31 paths: 8 identical docs, 5 evolved docs, 18 preview-source paths absent | Superseded fixture preview stacked on #26. Retain immutable source and goals; do not import it as production or mark it adopted. Close before #26, retaining branches. |
 

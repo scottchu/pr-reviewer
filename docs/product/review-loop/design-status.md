@@ -27,7 +27,7 @@ The enduring journey remains: understand motivation → inspect system Before/Af
 | Participants | Attach the initiating existing session; distinguish notification, turn start and meaningful answer | SDK transport compatibility is present. Native attachment, automatic wake/steering and meaningful replies require independent host evidence; no simulated preview supplies it. |
 | Import/history | Preserve immutable source identities and actual admission/job/history outcomes | Existing domain/runtime capabilities remain. Preview jobs and current-entry controls require separate integration evidence, not a claim that all import backends are absent. |
 | Tests | Separate declared test source from qualification, execution and exact-head results | Existing execution contracts remain. Preview runs/results are simulations; current-entry integration needs real attributable outcomes. |
-| Reading quality | An unfamiliar reviewer can explain change, evidence, uncertainty and next question | Full journey understanding, original-reference reconciliation and physical-device acceptance remain open. Historical missing reference images remain unresolved. |
+| Reading quality | An unfamiliar reviewer can explain change, evidence, uncertainty and next question | Full journey understanding and physical-device acceptance remain open. The October 23 original references were subsequently recovered and directly viewed; the [reference evidence](../../plans/720p/slices/05-explanation-exploration/canvas-reference-evidence.md) preserves that correction rather than reopening the earlier missing-image gap. |
 
 ## Earlier composition and preview status
 
