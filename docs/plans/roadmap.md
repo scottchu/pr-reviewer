@@ -119,3 +119,6 @@ Current bounded continuity work (2026-10-28): [720p source-comparison V35](720p/
 
 
 Current bounded performance work (2026-10-28): [720p viewport scene delivery](720p/slices/05-explanation-exploration/viewport-scene/plan.md) implements the accepted worker-driven viewport direction while preserving the current graph, evidence and interaction. Network asset partitioning, alternate rendering engines and changed zoom-summary composition remain later choices.
+
+
+Current bounded reading refinement (2026-10-29): [V37 filter](720p/slices/05-explanation-exploration/change-filter/plan.md) adds a stateful changes-only floating control and one-hop context limit. It preserves existing source/viewport boundaries and does not restore superseded panels or close whole-round comprehension gates.

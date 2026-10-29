@@ -64,3 +64,8 @@ All mixed groups retain raw minus/plus evidence in the default bounded compariso
 ### Compact semantic defaults after V32 presentation rejection
 
 Date:2026-10-28. V33 supersedes default raw +/- Evidence-card insertion and repeated diagnostic counts inside code/test comparison groups. Default request/helper/test groups contain their semantic children only. Existing Function/Test cards offer an initially closed View source changes disclosure using the retained native reader and existing measured reflow/bounds owner. Closing restores the compact presentation; no new panel, graph card or source identity is introduced. Default statuses remain concise and evidence-backed; raw counts stay inside explicit reading. Preserve the separately requested20document comparisons, full four-removed-action evidence, unchanged classification and shared relationship explanations/provenance, path lanes and interaction ownership. Prior engineering PASS did not establish acceptance of the rejected V32 presentation; actual browser checks remain separate.
+
+
+## V37 explicit floating-filter exception
+
+Date:2026-10-29. The user explicitly restores a floating toolbar only for the stateful changes-only filter. This supersedes the current minimum no-toolbar restriction for this one control. Existing semantic status/evidence, full working geometry, camera/manual/readers and graph gesture owners remain protected; see [filter contract](pr-file-tree-first.md#changes-only-floating-graph-control). No legacy panels or additional actions are restored.

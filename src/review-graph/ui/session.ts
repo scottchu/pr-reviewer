@@ -4,14 +4,20 @@ import {experienceService} from '../experience/service.ts';
 import {collectEntities} from '../domain/validation.ts';
 import {edgeRows} from './content.ts';
 import {projectExperience} from './projection.ts';
+import {projectChangeFilter} from './change-filter.ts';
 import type {GraphSessionUI} from './types.ts';
 
 const sessionFor = (state: ExperienceState, layoutRelations: GraphSessionUI['layoutRelations']): GraphSessionUI => {
+    const view = projectExperience(state);
     return {
         comparisonId: state.comparisonId,
-        view: projectExperience(state),
+        view,
         layoutRelations,
         limits: state.limits,
+        filter: projectChangeFilter(view, state.changesOnly),
+        setChangesOnly: enabled => sessionFor(experienceService.handleIntent(state, {
+            type: 'set-changes-only', comparisonId: state.comparisonId, enabled,
+        }).state, layoutRelations),
         expand: (fileId, hide) => sessionFor(experienceService.handleIntent(state, {
             type: 'show-source-units', comparisonId: state.comparisonId, fileId, hide,
         }).state, layoutRelations),

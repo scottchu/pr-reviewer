@@ -6,11 +6,21 @@ export const openComparison = (comparison: SourceGraph): ExperienceState => {
     const identity = [comparison.provenance.repository, comparison.provenance.base, comparison.provenance.head];
     if (identity.some(value => typeof value !== 'string' || !value))
         throw new Error('comparison_identity_unavailable');
-    return { comparison, comparisonId: JSON.stringify(identity), limits: {}, sourceDisclosure: {}, inspection: null, revision: 0 };
+    return { comparison, comparisonId: JSON.stringify(identity), limits: {}, sourceDisclosure: {}, inspection: null, changesOnly: false, revision: 0 };
 };
 export const handleIntent = (state: ExperienceState, intent: ExperienceIntent): IntentResult => {
     if (intent.comparisonId !== state.comparisonId)
         return { accepted: false, state, reason: 'stale_comparison_intent' };
+    if (intent.type === 'set-changes-only') {
+        return {
+            accepted: true,
+            state: state.changesOnly === intent.enabled ? state : {
+                ...state,
+                changesOnly: intent.enabled,
+                revision: state.revision + 1,
+            },
+        };
+    }
     const entities = collectEntities(state.comparison.entities);
     if (intent.type === 'show-source-units') {
         if (!entities.some(entity => entity.id === intent.fileId && entity.kind === 'file'))

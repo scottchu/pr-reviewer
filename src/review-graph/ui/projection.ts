@@ -38,6 +38,7 @@ const createProjector = (comparison: SourceGraph) => {
     const content = new WeakMap<GraphEntity, UIEntity['ui']>();
     const entities = new WeakMap<GraphEntity, UIEntity>();
     const relations = new WeakMap<GraphRelation, GraphView['relations'][number]>();
+    const views = new WeakMap<ExperienceState['limits'], WeakMap<ExperienceState['sourceDisclosure'], GraphView>>();
     const present = (entity: GraphEntity, state: ExperienceState): UIEntity => {
         let base = content.get(entity);
         if (!base) {
@@ -72,8 +73,15 @@ const createProjector = (comparison: SourceGraph) => {
         return result;
     };
     return (state: ExperienceState): GraphView => {
+        let disclosures = views.get(state.limits);
+        if (!disclosures) {
+            disclosures = new WeakMap();
+            views.set(state.limits, disclosures);
+        }
+        const knownView = disclosures.get(state.sourceDisclosure);
+        if (knownView) return knownView;
         const view = visibleGraph(comparison, state.limits);
-        return {
+        const result = {
             nodes: view.nodes.map(entity => present(entity, state)),
             relations: view.relations.map(edge => {
                 const known = relations.get(edge);
@@ -83,6 +91,8 @@ const createProjector = (comparison: SourceGraph) => {
             }),
             entities: registry.map(entity => present(entity, state)),
         };
+        disclosures.set(state.sourceDisclosure, result);
+        return result;
     };
 };
 

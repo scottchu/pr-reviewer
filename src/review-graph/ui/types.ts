@@ -36,8 +36,17 @@ export type GraphSessionUI = Readonly<{
     view: GraphView;
     layoutRelations: readonly UIRelation[];
     limits: Readonly<Record<string, number>>;
+    filter: GraphFilterUI;
+    setChangesOnly: (enabled: boolean) => GraphSessionUI;
     expand: (id: string, hide: boolean) => GraphSessionUI;
     inspect: (id: string, open: boolean) => GraphSessionUI;
+}>;
+
+/** Semantic eligibility over the full current view; independent of geometry and viewport. */
+export type GraphFilterUI = Readonly<{
+    changesOnly: boolean;
+    nodeIds: readonly string[];
+    relationIds: readonly string[];
 }>;
 
 /** Serializable presentation geometry only; no domain objects or UI callbacks. */

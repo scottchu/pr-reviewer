@@ -5,6 +5,7 @@ export type ExperienceState = Readonly<{
     limits: Readonly<Record<string, number>>;
     sourceDisclosure: Readonly<Record<string, boolean>>;
     inspection: string | null;
+    changesOnly: boolean;
     revision: number;
 }>;
 export type ExperienceIntent = Readonly<{
@@ -17,6 +18,9 @@ export type ExperienceIntent = Readonly<{
     type: 'source-disclosure';
     entityId: string;
     open: boolean;
+}> | Readonly<{
+    type: 'set-changes-only';
+    enabled: boolean;
 }> | Readonly<{
     type: 'return-to-graph';
 }>);

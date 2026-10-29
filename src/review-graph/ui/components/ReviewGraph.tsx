@@ -10,13 +10,14 @@ import { readingBands, filePaths, documentPaths, iconPaths } from '../entity-pre
 import { childContentBounds } from '../graph-bounds.ts';
 import { beginsRouteDrag, keyboardDelta, movedNodePosition } from '../gesture-policy.ts';
 import { projectionRoutes, liveProjectionRoutes } from '../projection-routes.ts';
-import {createReaderStateCache} from '../reader-state.ts';
+import {createReaderStateCache, retainedReaderPins} from '../reader-state.ts';
 import type {ReaderIdentityUI} from '../types.ts';
 import {sceneGeometry} from '../scene-geometry.ts';
 import {ViewportScene} from './viewport-scene.tsx';
-import {sceneMembership, type ScenePinsUI} from '../scene-membership.ts';
+import {filterSceneMembership, sceneMembership, type ScenePinsUI} from '../scene-membership.ts';
 import type {SceneSelectionUI} from '../types.ts';
 import { initialLayout, curve, dimensions, groupInterior, type Point, type Routed, type Side } from '../graph-geometry.ts';
+import {withMeasuredGeometry} from '../layout-measurements.ts';
 
 export const mountReviewGraph = (root:HTMLElement,initialSession:GraphSessionUI) => {
 const initial = initialSession.view;
@@ -43,6 +44,7 @@ const position = (side: Side) => ({
 type EntityNode = Node<{
     entity: GraphEntity;
     renderContent?: boolean;
+    measureOnly?: boolean;
     limit?: number;
     unitCount?: number;
     onExpand?: (id: string, hide?: boolean) => void;
@@ -57,6 +59,7 @@ type RelationEdge = Edge<{
     relation: GraphRelation;
     routed: Routed;
     coarse: boolean;
+    measureOnly?: boolean;
     onMoveStart: () => void;
     onMoveEnd: () => void;
     onBend: (id: string, offset: Point | undefined) => void;
@@ -160,7 +163,13 @@ const NativeSourceDetails = ({identity, summary, children, onReflow, className =
     identity: ReaderIdentityUI; summary: string; children: () => React.ReactNode; onReflow: (() => void) | undefined; className?: string;
 }) => {
     const [open, setOpen] = useState(() => readerStates.read(identity).open);
-    return <details className={className} open={open} onClickCapture={event => captureReaderScrolls(identity.entityId, event.currentTarget)} onToggle={event => {readerStates.disclose(identity, event.currentTarget.open); setOpen(event.currentTarget.open); onReflow?.();}}>
+    return <details className={className} open={open} onClickCapture={event => captureReaderScrolls(identity.entityId, event.currentTarget)} onToggle={event => {
+        const next = event.currentTarget.open;
+        if (next === open) return;
+        readerStates.disclose(identity, next);
+        setOpen(next);
+        onReflow?.();
+    }}>
         <summary>{summary}</summary>{open && children()}
     </details>;
 };
@@ -178,12 +187,17 @@ const Entity = React.memo(({ data }: NodeProps<EntityNode>) => {
     const status = data.entity.ui.status;
     const hunks = data.entity.ui.inlineSourceReading ? data.entity.ui.sourceReading?.hunks : undefined;
     const reading = data.entity.ui.sourceOpen || data.entity.ui.inlineSourceReading ? data.entity.ui.sourceReading : undefined;
-    return <article className={'minimal-entity' + (hunks ? ' native-document-evidence' : '') + (typeof status === 'string' ? ' status-' + status.replaceAll(' ', '-') : '')}>
+    return <article inert={data.measureOnly || undefined} aria-hidden={data.measureOnly || undefined} className={'minimal-entity' + (hunks ? ' native-document-evidence' : '') + (typeof status === 'string' ? ' status-' + status.replaceAll(' ', '-') : '')}>
   <Ports /><NodeDragHandle data={data}/>
   <h2><EntityIcon entity={data.entity}/><span>{card.title}</span></h2>
   {hunks && <DocumentEvidence identity={{entityId: data.entity.id, kind: 'inline-hunks'}} hunks={hunks} reading={reading} onReflow={data.onReflow}/>}
   {card.rows.map((row, index) => <p key={index}>{row}</p>)}
-  {data.entity.ui.sourceControl && <details className="document-details nodrag nopan" open={data.entity.ui.sourceOpen} onClickCapture={event => captureReaderScrolls(data.entity.id, event.currentTarget)} onToggle={event => {data.onInspect?.(data.entity.id,event.currentTarget.open);data.onReflow?.();}}>
+  {data.entity.ui.sourceControl && <details className="document-details nodrag nopan" open={data.entity.ui.sourceOpen} onClickCapture={event => captureReaderScrolls(data.entity.id, event.currentTarget)} onToggle={event => {
+      const next = event.currentTarget.open;
+      if (next === data.entity.ui.sourceOpen) return;
+      data.onInspect?.(data.entity.id, next);
+      data.onReflow?.();
+  }}>
     <summary>View source changes</summary>
     {data.entity.ui.sourceOpen && reading && <><p>{reading.caption}</p>
     <DocumentEvidence identity={{entityId: data.entity.id, kind: 'source-hunks'}} hunks={reading.hunks} reading={reading} onReflow={data.onReflow}/></>}
@@ -211,7 +225,7 @@ const GraphBoundary = React.memo(({ data }: NodeProps<EntityNode>) => {
     if (data.renderContent === false) return <Ports/>;
     return <>
  <Ports />
- <section className={'minimal-change-graph' + (data.entity.ui.status ? ' status-' + data.entity.ui.status!.replaceAll(' ', '-') : '')} aria-label={data.entity.ui.card.title + ' graph'}>
+ <section inert={data.measureOnly || undefined} aria-hidden={data.measureOnly || undefined} className={'minimal-change-graph' + (data.entity.ui.status ? ' status-' + data.entity.ui.status!.replaceAll(' ', '-') : '')} aria-label={data.entity.ui.card.title + ' graph'}>
   <NodeDragHandle data={data}/><h2 ref={heading}><EntityIcon entity={data.entity}/><span>{data.entity.ui.card.title}</span></h2>
  </section>
 </>;
@@ -254,11 +268,38 @@ const Relation = React.memo((props: EdgeProps<RelationEdge>) => {
         event.stopPropagation();
         data.onBend(props.id, { x: data.routed.offset.x + delta[0]!, y: data.routed.offset.y + delta[1]! });
     } };
-    return <><g data-route-id={props.id} className={'minimal-route nodrag' + (data.coarse ? '' : ' nopan')} role="button" tabIndex={0} aria-label={'Move ' + card.title + ' route'} onPointerDown={begin} onPointerMove={move} onPointerUp={end} onPointerCancel={end} onKeyDown={key}><BaseEdge id={props.id} path={route.path} interactionWidth={24} {...(props.markerEnd ? { markerEnd: props.markerEnd } : {})}/></g><EdgeLabelRenderer><div ref={labelRef} className={'minimal-edge-card version-' + data.relation.version + ' nodrag' + (data.coarse ? '' : ' nopan')} data-relation={data.relation.relation} data-edge-id={props.id} role={data.coarse ? undefined : 'button'} tabIndex={data.coarse ? -1 : 0} aria-label={'Move ' + card.title + ' label and route'} onPointerDown={begin} onPointerMove={move} onPointerUp={end} onPointerCancel={end} onKeyDown={key} style={{ transform: 'translate(-50%, -50%) translate(' + route.label.x + 'px, ' + route.label.y + 'px)' }}><span className="graph-drag-handle nodrag nopan" role="button" tabIndex={0} aria-label={'Move ' + card.title + ' label and route'} onKeyDown={key}>⠿</span><div className="edge-main-row">{data.relation.version !== 'comparison' && <span className="version-tag">{data.relation.version === 'before' ? 'Before' : 'After'}</span>}{card.title && <span>{card.title}</span>}{data.relation.relation === 'located_in' && card.rows.map(row => <span key={row}>{row}</span>)}</div>{data.relation.relation !== 'located_in' && card.rows.map((row, index) => <p key={index}>{row}</p>)}</div></EdgeLabelRenderer></>;
+    const measurementStyle = data.measureOnly ? {visibility: 'hidden' as const, pointerEvents: 'none' as const} : {};
+    return <>
+        <g data-route-id={props.id} className={'minimal-route nodrag' + (data.coarse ? '' : ' nopan')}
+            role="button" tabIndex={data.measureOnly ? -1 : 0} aria-hidden={data.measureOnly || undefined}
+            aria-label={'Move ' + card.title + ' route'} style={measurementStyle}
+            onPointerDown={begin} onPointerMove={move} onPointerUp={end} onPointerCancel={end} onKeyDown={key}>
+            <BaseEdge id={props.id} path={route.path} interactionWidth={24} {...(props.markerEnd ? {markerEnd: props.markerEnd} : {})}/>
+        </g>
+        <EdgeLabelRenderer>
+            <div ref={labelRef} className={'minimal-edge-card version-' + data.relation.version + ' nodrag' + (data.coarse ? '' : ' nopan')}
+                data-relation={data.relation.relation} data-edge-id={props.id}
+                inert={data.measureOnly || undefined} aria-hidden={data.measureOnly || undefined}
+                role={data.coarse ? undefined : 'button'} tabIndex={data.coarse || data.measureOnly ? -1 : 0}
+                aria-label={'Move ' + card.title + ' label and route'}
+                onPointerDown={begin} onPointerMove={move} onPointerUp={end} onPointerCancel={end} onKeyDown={key}
+                style={{...measurementStyle, transform: 'translate(-50%, -50%) translate(' + route.label.x + 'px, ' + route.label.y + 'px)'}}>
+                <span className="graph-drag-handle nodrag nopan" role="button" tabIndex={data.measureOnly ? -1 : 0}
+                    aria-label={'Move ' + card.title + ' label and route'} onKeyDown={key}>⠿</span>
+                <div className="edge-main-row">
+                    {data.relation.version !== 'comparison' && <span className="version-tag">{data.relation.version === 'before' ? 'Before' : 'After'}</span>}
+                    {card.title && <span>{card.title}</span>}
+                    {data.relation.relation === 'located_in' && card.rows.map(row => <span key={row}>{row}</span>)}
+                </div>
+                {data.relation.relation !== 'located_in' && card.rows.map((row, index) => <p key={index}>{row}</p>)}
+            </div>
+        </EdgeLabelRenderer>
+    </>;
 });
 const nodeTypes = { entity: Entity, graph: GraphBoundary };
 const edgeTypes = { relation: Relation };
-const InitialLayout = ({ apply, links, revision, headers }: {
+const InitialLayout = ({ nodes, apply, links, revision, headers }: {
+    nodes: readonly EntityNode[];
     headers: Readonly<Record<string, number>>;
     apply: (nodes: EntityNode[]) => void;
     links: readonly {
@@ -279,11 +320,11 @@ const InitialLayout = ({ apply, links, revision, headers }: {
             second = requestAnimationFrame(() => {
                 applied.current = revision;
                 const focus = allEntities().find(entity => entity.kind === 'review')?.id ?? 'pr25';
-                apply(initialLayout(getNodes(), links, focus, bands, headers, paths, documents));
+                apply(initialLayout(withMeasuredGeometry(nodes, getNodes()), links, focus, bands, headers, paths, documents));
             });
         });
         return () => { cancelAnimationFrame(first); cancelAnimationFrame(second); };
-    }, [initialized, getNodes, apply, links, revision, headers]);
+    }, [initialized, nodes, getNodes, apply, links, revision, headers]);
     return null;
 };
 const App = () => {
@@ -417,34 +458,72 @@ const App = () => {
         return sceneGeometry({comparison: experience.comparisonId, revision: ++sceneSequence.current}, nodes,
             edges.map(edge => ({id: edge.id, source: edge.source, target: edge.target, routed: edge.data!.routed})), sizes);
     }, [ready, movement, layoutRevision, revision, nodes, view.nodes, edges, sizes, experience.comparisonId]);
-    const membership = useMemo(() => sceneMembership(scene, selection, pins, view.nodes.filter(entity => entity.ui.sourceOpen).map(entity => entity.id)), [scene, selection, pins, view.nodes]);
+    const membership = useMemo(() => sceneMembership(scene, selection, pins, retainedReaderPins(view.nodes, limits, readerStates)), [scene, selection, pins, view.nodes, limits, geometryRevision, experience.filter]);
+    const semanticNodes = useMemo(() => new Set(experience.filter.nodeIds), [experience.filter]);
+    const semanticRoutes = useMemo(() => new Set(experience.filter.relationIds), [experience.filter]);
+    const filteredMembership = useMemo(() => filterSceneMembership(experience.filter, membership), [experience.filter, membership]);
     const renderedCache = useRef(new Map<string, {source: EntityNode; rendered: EntityNode}>());
     const renderedNodes = useMemo(() => {
-        const visible = membership?.nodes;
         const next = new Map<string, {source: EntityNode; rendered: EntityNode}>();
         const result = nodes.map(node => {
-            const content = !visible || visible.has(node.id);
+            // Bootstrap measures the full model before either mask removes content.
+            // Excluded cards can measure, but cannot paint, focus or receive input.
+            const eligible = semanticNodes.has(node.id);
+            const content = !scene || filteredMembership.nodes.has(node.id);
+            const measureOnly = !eligible && !scene;
             const prior = renderedCache.current.get(node.id);
-            const rendered = content ? node : prior?.source === node && prior.rendered.data.renderContent === false ? prior.rendered : {
-                ...node, data: {...node.data, renderContent: false}, style: {...node.style, ...dimensions(node)}
-            };
+            let rendered = node;
+            if (!content || !eligible) {
+                const reusable = prior?.source === node
+                    && prior.rendered.focusable === eligible
+                    && prior.rendered.data.renderContent === content
+                    && prior.rendered.data.measureOnly === measureOnly;
+                rendered = reusable ? prior.rendered : {
+                    ...node,
+                    focusable: eligible,
+                    draggable: eligible && (node.draggable ?? true),
+                    data: {...node.data, renderContent: content, measureOnly},
+                    style: {
+                        ...node.style,
+                        ...(!content ? dimensions(node) : {}),
+                        ...(!eligible ? {visibility: 'hidden' as const, pointerEvents: 'none' as const} : {}),
+                    },
+                };
+            }
             next.set(node.id, {source: node, rendered});
             return rendered;
         });
         renderedCache.current = next;
         return result;
-    }, [nodes, membership]);
+    }, [nodes, scene, semanticNodes, filteredMembership]);
     const renderedEdges = useMemo(() => {
-        if (!membership) return edges;
-        const ids = membership.routes;
-        return edges.filter(edge => ids.has(edge.id));
-    }, [edges, membership]);
+        if (scene) return edges.filter(edge => filteredMembership.routes.has(edge.id));
+        // Labels must measure before scene readiness even when the filter is already on.
+        return edges.map(edge => semanticRoutes.has(edge.id) ? edge : {
+            ...edge,
+            focusable: false,
+            style: {...edge.style, visibility: 'hidden' as const, pointerEvents: 'none' as const},
+            data: {...edge.data!, measureOnly: true},
+        });
+    }, [edges, scene, filteredMembership, semanticRoutes]);
     return <><header className="minimal-header"><h1>PR25 · Changes and evidence</h1><p>Files, code changes, tests and their source context</p></header>
-  <main data-scene-mode={membership ? 'selected' : 'full'} className={coarse ? 'coarse-input' : undefined} aria-label="PR25 source comparison graph"><ReactFlow<EntityNode, RelationEdge> nodes={renderedNodes} onNodesChange={changes} onNodeDragStart={beginMove} onNodeDragStop={endMove} edges={renderedEdges} nodeTypes={nodeTypes} edgeTypes={edgeTypes} defaultViewport={{
+  <main data-scene-mode={membership ? 'selected' : 'full'} data-changes-only={experience.filter.changesOnly} className={coarse ? 'coarse-input' : undefined} aria-label="PR25 source comparison graph"><ReactFlow<EntityNode, RelationEdge> nodes={renderedNodes} onNodesChange={changes} onNodeDragStart={beginMove} onNodeDragStop={endMove} edges={renderedEdges} nodeTypes={nodeTypes} edgeTypes={edgeTypes} defaultViewport={{
         x: 20, y: 35, zoom: 1
     }} minZoom={0.25} maxZoom={2} panOnScroll panOnScrollMode={PanOnScrollMode.Free} zoomOnScroll={false} zoomOnPinch nodesConnectable={false} nodesDraggable elementsSelectable={false} proOptions={{ hideAttribution: true }}>
-   <ViewportScene scene={scene} publish={setSelection} pinsChanged={pinsChanged}/><InitialLayout apply={apply} links={links} revision={revision} headers={headerClearances}/><Background color="#29333b" gap={24} size={1}/>
-  </ReactFlow></main></>;
+   <ViewportScene scene={scene} publish={setSelection} pinsChanged={pinsChanged}/><InitialLayout nodes={nodes} apply={apply} links={links} revision={revision} headers={headerClearances}/><Background color="#29333b" gap={24} size={1}/>
+  </ReactFlow>
+  <div className="minimal-graph-toolbar nodrag nopan nowheel" role="toolbar" aria-label="Graph view"
+      onPointerDown={event => event.stopPropagation()} onClick={event => event.stopPropagation()}
+      onWheel={event => event.stopPropagation()} onKeyDown={event => event.stopPropagation()}>
+      <button type="button" aria-pressed={experience.filter.changesOnly}
+          onClick={() => setExperience(previous => previous.setChangesOnly(!previous.filter.changesOnly))}>
+          <svg viewBox="0 0 20 20" aria-hidden="true" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M3 5h14M5.5 10h9M8 15h4"/>
+          </svg>
+          Changes only
+      </button>
+  </div>
+  </main></>;
 };
 createRoot(root).render(<App />);
 };
