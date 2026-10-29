@@ -1,5 +1,7 @@
 # Slice05: follow an explanation and explore
 
+[Policy edge cleanup](policy-edge-cleanup/plan.md) (2026-10-29): accepted deletion of unsupported title-selected verification; preserve factual assertions/source, draft PR only, no merge/deploy authority.
+
 [PR reconciliation](pr-reconciliation/plan.md) (2026-10-29) preserves older design/preview goals and evidence while retiring stale PRs. Future integration uses the [current design status](../../../../product/review-loop/design-status.md), not old preview dispatch/readiness.
 
 Date: 2026-10-25.

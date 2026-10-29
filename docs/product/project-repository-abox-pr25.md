@@ -174,7 +174,6 @@ flowchart LR
   end
   gatewayFile["tests/gateway.test.ts · change"]
   policy["Local-owner HTTP policy · source-declared expectation"]
-  gatewayTest -->|"verifies_policy · source assertions"| policy
   gatewayTest -->|"located_in · H90–114"| gatewayFile
   gatewayAssertion -->|"located_in · H99–103,105–109,110–112"| gatewayFile
   change -.->|"related_policy · inference, not call"| policy
@@ -198,3 +197,7 @@ Current generated candidate boundary: the deterministic pinned Git/AST pipeline 
 Actual Test contains Assertion ownership comes from generated binding/owner facts: paired ownership retains both source witnesses, while head-only ownership is After. Visible Tests retain their Assertions independently of File pagination. File source-unit expansion changes only projection membership. It does not create direct test-verifies-function/assertion-target relationships, parameterized execution instances, TestRun/PASS or all-function coverage. The unchanged application credential assertion remains the precise418source subject documented above; indirect source relevance remains distinct from a verification target.
 
 Attributed Reason/Goal, behavior summaries and prepared policy Claims remain a separate localized explanation layer. The earlier request-centered examples are not a whole-PR explanatory account merely because native File membership is complete. Whole-comparison File inventory, supported parsing/correspondence/binding, unsupported/unpaired facts, prepared semantic context and runtime unknowns must remain separately assessable. Local source integration is observed; actual preview usability and unfamiliar-reviewer acceptance require their own checks and are not implied by this pipeline description.
+
+### Gateway policy edge correction — 2026-10-29
+
+The current ABox retains gateway Test → contains → Assertion and their exact source locations, plus the separately attributed Change → related_policy context. The earlier gateway `verifies_policy` arrow is removed: its title-selected preparation did not resolve a policy clause. Source at Head tests/gateway.test.ts L89 names runtime.md without a precise clause identity. The literal comment and policy documentation remain; no substitute semantic edge or PASS/TestRun is inferred.
