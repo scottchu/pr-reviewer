@@ -79,6 +79,7 @@ const relationMeanings: Readonly<Record<string, string>> = {
     changes: 'Native diff records edits in this file', constructs: 'Source constructs this header property',
     contains: 'Source contains this member', contains_call: 'Source body contains this callsite',
     calls: 'Source call to the target declaration', verifies: 'Prepared source assertion concerns this behavior',
+    // Retained pre-cleanup graphs only; current preparation never emits this kind.
     verifies_policy: 'Prepared source assertions concern HTTP policy',
     motivated_by: 'Prepared source-derived rationale', intended_to_achieve: 'Prepared intended outcome',
     impedes: 'Prepared inferred obstacle', related_policy: 'Prepared shared policy inference',

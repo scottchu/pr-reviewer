@@ -128,13 +128,6 @@ export const prepareAppGraph = (facts: FactDocument, inputHash: string, compiled
     for (const edge of attribution.edges)
         if (valid.has(edge.from) && valid.has(edge.to))
             relations.push(edge as GraphRelation);
-    const gateway = namedTests.find(test => String(test.data.name).includes('single local owner reads and writes without a Bearer'));
-    if (gateway && acceptedExplanations.some(node=>node.id==='owner-http-policy'))
-        relations.push({
-            id: gateway.id + ':verifies-policy', from: gateway.id, to: 'owner-http-policy', version: 'after', relation: 'verifies_policy', data: {
-                basis: 'Prepared source assertion policy context, not direct client/helper coverage or execution', certainty: 'prepared source interpretation', sourceEvidence: gateway.data.occurrences
-            }
-        });
     const ownerByUnit = Object.fromEntries(entities.filter(entity => entity.kind !== 'file' && entity.kind !== 'review').flatMap(entity => {
         const witness = (entity.data.sourceWitnesses as {
             anchor: {

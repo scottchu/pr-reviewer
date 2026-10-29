@@ -1,5 +1,7 @@
 # Test / policy relation: decision analysis only
 
+> Decision update (2026-10-29): Scott accepted removing unsupported title-selected generation without replacement, preserving assertions/source evidence. The [cleanup packet](../policy-edge-cleanup/plan.md) supersedes the pending-decision status below; the original issue2 candidate did not implement this cleanup.
+
 Date: 2026-10-29. No issue1 application/model change is authorized by this packet. Test passing belongs to MR CI or a future execution/action projection; no CI ingestion, test rerun or execution redesign is included here.
 
 ## Current source and model

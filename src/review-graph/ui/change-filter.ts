@@ -1,6 +1,7 @@
 import type {GraphFilterUI, GraphView} from './types.ts';
 
 const changed = new Set(['add', 'remove', 'change']);
+// Include retired verifies_policy only for reading retained pre-cleanup graphs.
 const explanatory = new Set([
     'calls', 'contains_call', 'constructs', 'verifies', 'verifies_policy',
     'motivated_by', 'intended_to_achieve', 'impedes', 'related_policy',

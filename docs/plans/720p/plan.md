@@ -1,5 +1,7 @@
 # 720p: understand the whole PR
 
+[Policy edge cleanup](slices/05-explanation-exploration/policy-edge-cleanup/plan.md) (2026-10-29): accepted deletion of unsupported title-selected verification; preserve factual assertions/source, draft PR only, no merge/deploy authority.
+
 [PR reconciliation](slices/05-explanation-exploration/pr-reconciliation/plan.md): retire covered SDK and superseded preview/design PRs while retaining wider-product gaps; documentation-only, no new application acceptance.
 
 Date of latest experience correction: 2026-10-25.
