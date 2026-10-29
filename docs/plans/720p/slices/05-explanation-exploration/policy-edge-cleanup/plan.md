@@ -1,7 +1,7 @@
 # Remove unsupported prepared policy verification
 
 Date: 2026-10-29.
-Status: scoped implementation and local checks passed; independent source review and draft publication pending. Browser and own-PR graph gates remain unrun/blocked.
+Status: scoped implementation, local checks and independent source review passed; [draft PR41](https://github.com/scottchu/pr-reviewer/pull/41) published. Browser and own-PR graph gates remain unrun/blocked; no merge or deployment.
 Parent: [slice05](../plan.md), [720p round](../../../plan.md).
 Owner: root, sole product writer. Branch: `remove-title-selected-policy-edge`.
 Baseline: main `66a5033886feb29fa8807d46655d696ce9da5bb1`, including merged PR39 and PR40. The incoming handoff's draft/main status was stale; remote merge readback and clean main establish this baseline. The separate header occurrence correction is protected.
@@ -31,3 +31,9 @@ Assign a fresh reviewer after a committed candidate. Read-only scope: verify P1â
 ## Verification and remaining gates
 
 Implementation/self-check evidence is in [the evidence receipt](evidence.md). Raw baseline/delta and check logs remain ignored under `.decompozr/flow/run/policy-edge-cleanup/`; portable results and findings will be reconciled here. Draft publication is the authorized endpoint, not delivery acceptance. Required owner next step after handoff is review and a separate merge/deploy decision. Actual own-PR graph intake currently lacks a supported comparison selector; no fixture replacement or fake source identity may bypass that limit.
+
+## Handoff result
+
+Application/tests candidate55b24ff implements P1â€“P3; [evidence](evidence.md) records P4 local checks and its separate browser limitations. [Independent review](review.md) passes source correctness without claiming graph comprehension. DraftPR41 is the P5 publication endpoint. Main remains66a5033 and the running production build remains outside this task. The previous merge of39/40 is baseline history, not permission to merge this cleanup.
+
+Next owner step: review the draft and separately authorize any merge/deployment; before claiming full acceptance, resolve supported browser access and supported own-PR graph intake, then use a fresh graph-first reviewer. No source-selector, fixture-swap or runtime workaround is included. The isolated worktree, existing dependency links and ignored build/baseline/check receipts are retained for that review/recovery. Successor work consumes the updated source-pipeline/TBox/ABox/semantic/filter contracts, not the superseded pending-policy decision. Full source/interpretation separation beyond this specific unsupported relation remains outside this slice.
