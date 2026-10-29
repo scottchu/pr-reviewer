@@ -25,3 +25,11 @@ Reviewer other than executor: read-only after candidate is committed. Inspect ac
 ## Status
 
 Documentation/plan prepared. Implementation, checks and candidate UI pending. Existing live service remains2598a80 at HTTPS8478/backend57943; publication/deployment requires the owner's separate authority. Preserve worktree for handoff/review.
+
+## Candidate engineering checkpoint
+
+Docs-first baseline packet committed b99b236. Three new regressions first failed on the bare header title; scoped projection now passes them. Generic inline-to-helper case preserves a helper function whose syntax still contains Authorization, proving that source construction removal does not require system-wide absence. PR25 default card uses its existing exact witness and separate After call; Domain source/model/compiler is unchanged. A legacy test prohibiting card-level scope was superseded by this accepted correction. Frozen source-pipeline oracle remains unchanged; its presentation comparison substitutes only header-value's exact old card, while independent tests assert the new card. Canonical entities/relations/facts and all other projected fields still match the frozen oracle.
+
+Initial root strict/boundary check and minimum strict TypeScript pass. Production Vite build passes using --configLoader native and a task-owned output. The default loader attempted its copied absolute .vite-temp dependency symlink and hit filesystem EPERM; native config loading avoids that external cache write. Task-only preview57945 requires normal host escalation for loopback listen and is running independently of live57943. No security or live service changes.
+
+[Issue1 analysis](policy-analysis.md) records actual prepared relation/code and three proposals; no test/policy code change. Updated full suite and actual candidate UI checks in progress.
