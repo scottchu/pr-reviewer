@@ -153,3 +153,27 @@ test('comparison-lifetime projection reuses unaffected UI identities and prepare
     assert.equal(opened.entities[0]!.ui.sourceReading,reading);assert.equal(first.entities[0]!.ui.sourceReading,reading);assert.equal(rowReads,2);
     const session=createGraphSession(graph);assert.equal(session.layoutRelations,session.inspect('a',true).layoutRelations);
 });
+
+test('reader state survives lazy body recreation and outer closure without merging panes/entities or retaining DOM',async()=>{
+    const {createReaderStateCache}=await import('../../../src/review-graph/ui/reader-state.ts');
+    const cache=createReaderStateCache(['function','document']);
+    const inner={entityId:'function',kind:'source-hunks'} as const;
+    const removed={entityId:'function',kind:'removed-preview'} as const;
+    const added={entityId:'function',kind:'added-preview'} as const;
+    const inline={entityId:'document',kind:'inline-hunks'} as const;
+    const initial=cache.read(inner);
+    cache.disclose(inner,true);cache.capture(inner,{scrollTop:155,scrollLeft:92});
+    cache.capture(removed,{scrollTop:31,scrollLeft:51});cache.capture(added,{scrollTop:47,scrollLeft:81});
+    // Closing the inner body discards its DOM, but not its own saved position.
+    cache.disclose(inner,false);const reopenedBody={scrollTop:0,scrollLeft:0};cache.disclose(inner,true);cache.restore(inner,reopenedBody);
+    assert.deepEqual(reopenedBody,{scrollTop:155,scrollLeft:92});
+    // The outer reader's lifetime ends. A new component reads this same identity.
+    assert.equal(cache.read(inner).open,true);
+    const newRemoved={scrollTop:0,scrollLeft:0},newAdded={scrollTop:0,scrollLeft:0};cache.restore(removed,newRemoved);cache.restore(added,newAdded);
+    assert.deepEqual(newRemoved,{scrollTop:31,scrollLeft:51});assert.deepEqual(newAdded,{scrollTop:47,scrollLeft:81});
+    assert.deepEqual(cache.read(inline),{open:false,scrollTop:0,scrollLeft:0});
+    assert.deepEqual(initial,{open:false,scrollTop:0,scrollLeft:0},'prior immutable snapshots stay unchanged');
+    cache.capture(inner,{scrollTop:NaN,scrollLeft:0});assert.equal(cache.read(inner).scrollTop,155);
+    const unknown={entityId:'unbounded-other-entity',kind:'source-hunks'} as const;cache.disclose(unknown,true);cache.capture(unknown,{scrollTop:1,scrollLeft:1});assert.deepEqual(cache.read(unknown),initial);
+    const nextComparison=createReaderStateCache(['function']);assert.deepEqual(nextComparison.read(inner),initial);
+});

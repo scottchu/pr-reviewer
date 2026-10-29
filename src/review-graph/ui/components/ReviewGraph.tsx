@@ -10,6 +10,8 @@ import { readingBands, filePaths, documentPaths, iconPaths } from '../entity-pre
 import { childContentBounds } from '../graph-bounds.ts';
 import { beginsRouteDrag, keyboardDelta, movedNodePosition } from '../gesture-policy.ts';
 import { projectionRoutes, liveProjectionRoutes } from '../projection-routes.ts';
+import {createReaderStateCache} from '../reader-state.ts';
+import type {ReaderIdentityUI} from '../types.ts';
 import {sceneGeometry} from '../scene-geometry.ts';
 import {ViewportScene} from './viewport-scene.tsx';
 import {sceneMembership, type ScenePinsUI} from '../scene-membership.ts';
@@ -20,6 +22,7 @@ export const mountReviewGraph = (root:HTMLElement,initialSession:GraphSessionUI)
 const initial = initialSession.view;
 const allEntities=()=>initial.entities;
 const allRelations=()=>initialSession.layoutRelations;
+const readerStates = createReaderStateCache(initial.entities.map(entity => entity.id));
 const useCoarseInput = () => {
     const [coarse, setCoarse] = useState(() => matchMedia('(pointer: coarse)').matches);
     useEffect(() => {
@@ -113,34 +116,60 @@ const DocumentSide = ({label, witness, hunk}: {
             .map((row, index) => <span key={index} data-edit-kind={row.kind} className={'native-row-' + row.kind}>{row.text}</span>)}</pre>
     </>}
 </section>;
-const EditPreview = ({reading}: {reading:SourceReadingUI}) => <div className="edit-preview nodrag nopan" aria-label="Scoped removed and added source preview">
+const captureReaderScrolls = (entityId: string, container: HTMLElement) => {
+    for (const element of container.querySelectorAll<HTMLElement>('[data-reader-kind]'))
+        if (element.getClientRects().length) readerStates.capture({entityId, kind: element.dataset.readerKind as ReaderIdentityUI['kind']}, element);
+};
+const useReaderScroll = (identity: ReaderIdentityUI) => {
+    const ref = useRef<HTMLDivElement>(null);
+    useLayoutEffect(() => {
+        const element = ref.current;
+        if (!element) return;
+        readerStates.restore(identity, element);
+        // A closed native ancestor can report zero scroll. Preserve the last visible
+        // position rather than overwriting it during close-triggered cleanup.
+        return () => {if (element.getClientRects().length) readerStates.capture(identity, element);};
+    }, [identity.entityId, identity.kind]);
+    return {ref, onScroll: (event: React.UIEvent<HTMLDivElement>) => {
+        if (event.currentTarget.getClientRects().length) readerStates.capture(identity, event.currentTarget);
+    }};
+};
+const PreviewRows = ({entityId, pane}: {entityId: string; pane: SourceReadingUI['panes'][number]}) => {
+    const scroll = useReaderScroll({entityId, kind: pane.kind === 'remove' ? 'removed-preview' : 'added-preview'});
+    return <div {...scroll} data-reader-kind={pane.kind === 'remove' ? 'removed-preview' : 'added-preview'} className="edit-preview-rows nowheel" tabIndex={0} aria-label={pane.kind==='remove'?'Removed source rows':'Added source rows'}>
+        {pane.rows.length?pane.rows.map((row,index)=><div key={index} className="edit-preview-row" data-edit-kind={row.kind}><span className="edit-line">L{row.line}</span><code>{row.text}</code></div>):<p>{pane.emptyLabel}</p>}
+    </div>;
+};
+const NativeHunkRows = ({identity, hunks}: {identity: ReaderIdentityUI; hunks: readonly SourceHunkUI[]}) => {
+    const scroll = useReaderScroll(identity);
+    return <div {...scroll} data-reader-kind={identity.kind} className="document-reading nowheel" tabIndex={0} aria-label="All native document hunks">
+        {hunks.map(hunk => <section key={hunk.index} data-native-hunk={hunk.index}>
+            <h3>Hunk {hunk.index} · {hunk.header}</h3>
+            <DocumentSide label="Before" witness={hunk.before} hunk={hunk}/><DocumentSide label="After" witness={hunk.after} hunk={hunk}/>
+        </section>)}
+    </div>;
+};
+const EditPreview = ({reading, entityId}: {reading:SourceReadingUI; entityId: string}) => <div className="edit-preview nodrag nopan" aria-label="Scoped removed and added source preview">
     {reading.panes.map(pane=><section key={pane.kind} className={'edit-preview-pane preview-'+pane.kind}>
         <h3>{pane.title}</h3><p>{pane.versionLabel}</p>
-        <div className="edit-preview-rows nowheel" tabIndex={0} aria-label={pane.kind==='remove'?'Removed source rows':'Added source rows'}>
-            {pane.rows.length?pane.rows.map((row,index)=><div key={index} className="edit-preview-row" data-edit-kind={row.kind}><span className="edit-line">L{row.line}</span><code>{row.text}</code></div>):<p>{pane.emptyLabel}</p>}
-        </div>
+        <PreviewRows entityId={entityId} pane={pane}/>
         {pane.rows.length>0&&<p>{pane.footer}</p>}
     </section>)}
 </div>;
-const NativeSourceDetails = ({summary, children, onReflow, className = 'document-details nodrag nopan'}: {
-    summary: string; children: () => React.ReactNode; onReflow: (() => void) | undefined; className?: string;
+const NativeSourceDetails = ({identity, summary, children, onReflow, className = 'document-details nodrag nopan'}: {
+    identity: ReaderIdentityUI; summary: string; children: () => React.ReactNode; onReflow: (() => void) | undefined; className?: string;
 }) => {
-    const [open, setOpen] = useState(false);
-    return <details className={className} onToggle={event => {setOpen(event.currentTarget.open); onReflow?.();}}>
+    const [open, setOpen] = useState(() => readerStates.read(identity).open);
+    return <details className={className} open={open} onClickCapture={event => captureReaderScrolls(identity.entityId, event.currentTarget)} onToggle={event => {readerStates.disclose(identity, event.currentTarget.open); setOpen(event.currentTarget.open); onReflow?.();}}>
         <summary>{summary}</summary>{open && children()}
     </details>;
 };
-const DocumentEvidence = ({hunks, reading, onReflow}: {
-    hunks: readonly SourceHunkUI[]; reading: SourceReadingUI | undefined; onReflow: (() => void) | undefined;
+const DocumentEvidence = ({identity, hunks, reading, onReflow}: {
+    identity: ReaderIdentityUI; hunks: readonly SourceHunkUI[]; reading: SourceReadingUI | undefined; onReflow: (() => void) | undefined;
 }) => <>
-    {reading?.available ? <EditPreview reading={reading}/> : <p>Scoped source edits unresolved.</p>}
-    {hunks.length > 0 && <NativeSourceDetails summary={'Read all ' + hunks.length + ' native hunks and source identities'} onReflow={onReflow}>{() =>
-        <div className="document-reading nowheel" tabIndex={0} aria-label="All native document hunks">
-            {hunks.map(hunk => <section key={hunk.index} data-native-hunk={hunk.index}>
-                <h3>Hunk {hunk.index} · {hunk.header}</h3>
-                <DocumentSide label="Before" witness={hunk.before} hunk={hunk}/><DocumentSide label="After" witness={hunk.after} hunk={hunk}/>
-            </section>)}
-        </div>
+    {reading?.available ? <EditPreview entityId={identity.entityId} reading={reading}/> : <p>Scoped source edits unresolved.</p>}
+    {hunks.length > 0 && <NativeSourceDetails identity={identity} summary={'Read all ' + hunks.length + ' native hunks and source identities'} onReflow={onReflow}>{() =>
+        <NativeHunkRows identity={identity} hunks={hunks}/>
     }</NativeSourceDetails>}
 </>;
 const Entity = React.memo(({ data }: NodeProps<EntityNode>) => {
@@ -152,18 +181,18 @@ const Entity = React.memo(({ data }: NodeProps<EntityNode>) => {
     return <article className={'minimal-entity' + (hunks ? ' native-document-evidence' : '') + (typeof status === 'string' ? ' status-' + status.replaceAll(' ', '-') : '')}>
   <Ports /><NodeDragHandle data={data}/>
   <h2><EntityIcon entity={data.entity}/><span>{card.title}</span></h2>
-  {hunks && <DocumentEvidence hunks={hunks} reading={reading} onReflow={data.onReflow}/>}
+  {hunks && <DocumentEvidence identity={{entityId: data.entity.id, kind: 'inline-hunks'}} hunks={hunks} reading={reading} onReflow={data.onReflow}/>}
   {card.rows.map((row, index) => <p key={index}>{row}</p>)}
-  {data.entity.ui.sourceControl && <details className="document-details nodrag nopan" open={data.entity.ui.sourceOpen} onToggle={event => {data.onInspect?.(data.entity.id,event.currentTarget.open);data.onReflow?.();}}>
+  {data.entity.ui.sourceControl && <details className="document-details nodrag nopan" open={data.entity.ui.sourceOpen} onClickCapture={event => captureReaderScrolls(data.entity.id, event.currentTarget)} onToggle={event => {data.onInspect?.(data.entity.id,event.currentTarget.open);data.onReflow?.();}}>
     <summary>View source changes</summary>
     {data.entity.ui.sourceOpen && reading && <><p>{reading.caption}</p>
-    <DocumentEvidence hunks={reading.hunks} reading={reading} onReflow={data.onReflow}/></>}
+    <DocumentEvidence identity={{entityId: data.entity.id, kind: 'source-hunks'}} hunks={reading.hunks} reading={reading} onReflow={data.onReflow}/></>}
   </details>}
   {data.entity.ui.fileControl && Boolean(data.unitCount) && <div className="file-unit-actions nodrag nopan">
    {(!data.limit || data.limit < (data.unitCount ?? 0)) && <button onClick={() => data.onExpand?.(data.entity.id)}>{data.limit ? 'Show more source units' : 'Show source units'}</button>}
    {Boolean(data.limit) && <button onClick={() => data.onExpand?.(data.entity.id, true)}>Hide source units</button>}
   </div>}
-  {data.entity.kind === 'file' && Boolean(data.limit) && data.entity.ui.unpairedRows.length > 0 && <NativeSourceDetails className="unpaired-source nodrag nopan" summary="Source without an established counterpart" onReflow={data.onReflow}>{() =>
+  {data.entity.kind === 'file' && Boolean(data.limit) && data.entity.ui.unpairedRows.length > 0 && <NativeSourceDetails identity={{entityId: data.entity.id, kind: 'unpaired-source'}} className="unpaired-source nodrag nopan" summary="Source without an established counterpart" onReflow={data.onReflow}>{() =>
    data.entity.ui.unpairedRows.map((row,index) => <p key={index}>{row}</p>)}
   </NativeSourceDetails>}
  </article>;

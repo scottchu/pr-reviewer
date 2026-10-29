@@ -59,3 +59,14 @@ export type SceneWorkerOutputUI =
     (SceneIdentityUI & Readonly<{type: 'ready'}>) |
     Readonly<{type: 'selection'; selection: SceneSelectionUI}> |
     Readonly<{type: 'error'; message: string}>;
+
+export type ReaderKindUI = 'inline-hunks' | 'source-hunks' | 'removed-preview' | 'added-preview' | 'unpaired-source';
+export type ReaderIdentityUI = Readonly<{entityId: string; kind: ReaderKindUI}>;
+export type ReaderStateUI = Readonly<{open: boolean; scrollTop: number; scrollLeft: number}>;
+export type ReaderScrollUI = Pick<ReaderStateUI, 'scrollTop' | 'scrollLeft'>;
+export type ReaderStateCacheUI = Readonly<{
+    read: (identity: ReaderIdentityUI) => ReaderStateUI;
+    disclose: (identity: ReaderIdentityUI, open: boolean) => void;
+    capture: (identity: ReaderIdentityUI, scroll: ReaderScrollUI) => void;
+    restore: (identity: ReaderIdentityUI, target: {scrollTop: number; scrollLeft: number}) => void;
+}>;

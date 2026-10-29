@@ -130,3 +130,37 @@ test('touch canvas pan and pinch remain local while worker queries are pending',
     await expect.poll(zoom).toBeGreaterThan(beforeZoom);expect(await page.evaluate(()=>visualViewport?.scale)).toBe(pageScale);
     await context.close();
 });
+
+test('lazy source readers restore inner disclosure and reader/pane scroll after close and reopen', async ({page}) => {
+    const {createGraphSession} = await import('../../../src/review-graph/ui/session.ts');
+    const {sourceGraph} = await import('../source-graph.ts');
+    const entity = createGraphSession(sourceGraph).view.nodes.filter(node => node.ui.sourceControl && node.ui.sourceReading?.hunks.length)
+        .sort((a,b) => b.ui.sourceReading!.hunks.reduce((n,h)=>n+h.rows.length,0)-a.ui.sourceReading!.hunks.reduce((n,h)=>n+h.rows.length,0))[0]!;
+    await page.goto(target);
+    const node=page.locator(`.react-flow__node[data-id=${JSON.stringify(entity.id)}]`);
+    await frame(page,node);
+    const outer=node.locator('article > details.document-details');
+    const outerSummary=outer.locator(':scope > summary');
+    await outerSummary.click();
+    const inner=outer.locator('details.document-details');
+    const innerSummary=inner.locator(':scope > summary');
+    await innerSummary.click();
+    const reader=node.locator('.document-reading');
+    const scroll=(locator:Locator)=>locator.evaluate(element=>({scrollTop:element.scrollTop,scrollLeft:element.scrollLeft}));
+    await reader.evaluate(element=>{element.scrollTop=130;element.scrollLeft=17;});
+    await expect.poll(async()=>(await scroll(reader)).scrollTop).toBeGreaterThan(0);
+    const readerPosition=await scroll(reader),text=await reader.innerText();
+    const panes=node.locator('.edit-preview-rows');
+    await panes.evaluateAll(elements=>{elements.forEach((element,i)=>{element.scrollTop=41+i*11;element.scrollLeft=13+i*7;});});
+    const panePositions=await panes.evaluateAll(elements=>elements.map(element=>({scrollTop:element.scrollTop,scrollLeft:element.scrollLeft})));
+    // Inner close discards only heavy rows, then restores the exact native position.
+    await innerSummary.click();await expect(reader).toHaveCount(0);
+    await innerSummary.click();await expect(inner).toHaveAttribute('open','');
+    await expect.poll(()=>scroll(reader)).toEqual(readerPosition);expect(await reader.innerText()).toBe(text);
+    // Outer close destroys DocumentEvidence; the new inner component must still open.
+    await outerSummary.click();await expect(node.locator('.edit-preview-rows,.document-reading')).toHaveCount(0);
+    await outerSummary.click();await expect(outer).toHaveAttribute('open','');await expect(inner).toHaveAttribute('open','');
+    await expect.poll(()=>scroll(reader)).toEqual(readerPosition);
+    await expect.poll(()=>panes.evaluateAll(elements=>elements.map(element=>({scrollTop:element.scrollTop,scrollLeft:element.scrollLeft})))).toEqual(panePositions);
+    expect(await reader.innerText()).toBe(text);
+});
