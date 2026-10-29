@@ -181,5 +181,68 @@ for (const fallback of [false, true]) {
         await button.click();
         await expect(button).toHaveAttribute('aria-pressed', 'false');
         expect(await transforms(page)).toEqual(positions);
+        // Regression: aria-off/unchanged coordinates alone missed masked layout input.
+        await frame(page, wrapper(page, unchanged.id));
+        await expect(wrapper(page, unchanged.id).locator('.minimal-entity')).toBeVisible();
+        expect(await wrapper(page, unchanged.id).evaluate(element => ({
+            visibility: (element as HTMLElement).style.visibility,
+            pointerEvents: (element as HTMLElement).style.pointerEvents,
+        }))).toEqual({visibility: '', pointerEvents: 'all'});
     });
 }
+
+test('disclosure and expansion reflow while filtered restore real unchanged cards on off', async ({page}) => {
+    await page.goto(target);
+    const graph = page.getByRole('main');
+    await expect(graph).toHaveAttribute('data-scene-mode', 'selected');
+    const button = page.getByRole('button', {name: 'Changes only', exact: true});
+    await button.click();
+    const changed = session.view.nodes.find(node => node.ui.sourceControl && node.ui.status === 'change')!;
+    const source = wrapper(page, changed.id);
+    await frame(page, source);
+    await source.locator('article > details > summary').click();
+    await expect(source.locator('article > details')).toHaveAttribute('open', '');
+    await expect(graph).toHaveAttribute('data-scene-mode', 'selected');
+    const fileId = Object.entries(sourceGraph.fileUnits).find(([, units]) => units.length > 0)![0];
+    const file = wrapper(page, fileId);
+    await frame(page, file);
+    await file.getByRole('button', {name: 'Show source units', exact: true}).click();
+    await expect(file.getByRole('button', {name: 'Hide source units'})).toBeVisible();
+    await expect(graph).toHaveAttribute('data-scene-mode', 'selected');
+    const settled = await transforms(page);
+    const before = await camera(page);
+    await button.click();
+    await expect(button).toHaveAttribute('aria-pressed', 'false');
+    expect(await transforms(page)).toEqual(settled);
+    expect(await camera(page)).toBe(before);
+    const unchanged = session.view.nodes.find(node => node.kind === 'test' && node.ui.card.title.includes('disposed'))!;
+    const restored = wrapper(page, unchanged.id);
+    await frame(page, restored);
+    await expect(restored.locator('.minimal-entity')).toBeVisible();
+    expect(await restored.evaluate(element => getComputedStyle(element).visibility)).toBe('visible');
+    await restored.locator('article > details > summary').click();
+    await expect(restored.locator('article > details')).toHaveAttribute('open', '');
+    await expect(source.locator('article > details')).toHaveAttribute('open', '');
+});
+
+test('a spatially culled card can return after source reflow with filter off', async ({page}) => {
+    await page.goto(target);
+    const graph = page.getByRole('main');
+    await expect(graph).toHaveAttribute('data-scene-mode', 'selected');
+    const unchanged = session.view.nodes.find(node => node.kind === 'test' && node.ui.card.title.includes('disposed'))!;
+    const node = wrapper(page, unchanged.id);
+    await frame(page, node);
+    await expect(node.locator('.minimal-entity')).toBeVisible();
+    await page.mouse.move(1430, 800);
+    await page.mouse.wheel(100000, 100000);
+    await expect(node.locator('.minimal-entity')).toHaveCount(0);
+    const changed = session.view.nodes.find(entity => entity.ui.sourceControl && entity.ui.status === 'change')!;
+    const source = wrapper(page, changed.id);
+    await frame(page, source);
+    await source.locator('article > details > summary').click();
+    await expect(source.locator('article > details')).toHaveAttribute('open', '');
+    await expect(graph).toHaveAttribute('data-scene-mode', 'selected');
+    await frame(page, node);
+    await expect(node.locator('.minimal-entity')).toBeVisible();
+    expect(await node.evaluate(element => getComputedStyle(element).visibility)).toBe('visible');
+});

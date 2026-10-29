@@ -17,6 +17,7 @@ import {ViewportScene} from './viewport-scene.tsx';
 import {filterSceneMembership, sceneMembership, type ScenePinsUI} from '../scene-membership.ts';
 import type {SceneSelectionUI} from '../types.ts';
 import { initialLayout, curve, dimensions, groupInterior, type Point, type Routed, type Side } from '../graph-geometry.ts';
+import {withMeasuredGeometry} from '../layout-measurements.ts';
 
 export const mountReviewGraph = (root:HTMLElement,initialSession:GraphSessionUI) => {
 const initial = initialSession.view;
@@ -297,7 +298,8 @@ const Relation = React.memo((props: EdgeProps<RelationEdge>) => {
 });
 const nodeTypes = { entity: Entity, graph: GraphBoundary };
 const edgeTypes = { relation: Relation };
-const InitialLayout = ({ apply, links, revision, headers }: {
+const InitialLayout = ({ nodes, apply, links, revision, headers }: {
+    nodes: readonly EntityNode[];
     headers: Readonly<Record<string, number>>;
     apply: (nodes: EntityNode[]) => void;
     links: readonly {
@@ -318,11 +320,11 @@ const InitialLayout = ({ apply, links, revision, headers }: {
             second = requestAnimationFrame(() => {
                 applied.current = revision;
                 const focus = allEntities().find(entity => entity.kind === 'review')?.id ?? 'pr25';
-                apply(initialLayout(getNodes(), links, focus, bands, headers, paths, documents));
+                apply(initialLayout(withMeasuredGeometry(nodes, getNodes()), links, focus, bands, headers, paths, documents));
             });
         });
         return () => { cancelAnimationFrame(first); cancelAnimationFrame(second); };
-    }, [initialized, getNodes, apply, links, revision, headers]);
+    }, [initialized, nodes, getNodes, apply, links, revision, headers]);
     return null;
 };
 const App = () => {
@@ -508,7 +510,7 @@ const App = () => {
   <main data-scene-mode={membership ? 'selected' : 'full'} data-changes-only={experience.filter.changesOnly} className={coarse ? 'coarse-input' : undefined} aria-label="PR25 source comparison graph"><ReactFlow<EntityNode, RelationEdge> nodes={renderedNodes} onNodesChange={changes} onNodeDragStart={beginMove} onNodeDragStop={endMove} edges={renderedEdges} nodeTypes={nodeTypes} edgeTypes={edgeTypes} defaultViewport={{
         x: 20, y: 35, zoom: 1
     }} minZoom={0.25} maxZoom={2} panOnScroll panOnScrollMode={PanOnScrollMode.Free} zoomOnScroll={false} zoomOnPinch nodesConnectable={false} nodesDraggable elementsSelectable={false} proOptions={{ hideAttribution: true }}>
-   <ViewportScene scene={scene} publish={setSelection} pinsChanged={pinsChanged}/><InitialLayout apply={apply} links={links} revision={revision} headers={headerClearances}/><Background color="#29333b" gap={24} size={1}/>
+   <ViewportScene scene={scene} publish={setSelection} pinsChanged={pinsChanged}/><InitialLayout nodes={nodes} apply={apply} links={links} revision={revision} headers={headerClearances}/><Background color="#29333b" gap={24} size={1}/>
   </ReactFlow>
   <div className="minimal-graph-toolbar nodrag nopan nowheel" role="toolbar" aria-label="Graph view"
       onPointerDown={event => event.stopPropagation()} onClick={event => event.stopPropagation()}

@@ -7,6 +7,8 @@ import type {GraphEntity, GraphRelation, SourceGraph} from '../../../src/review-
 import {sourceGraph} from '../source-graph.ts';
 import {filterSceneMembership, sceneMembership} from '../../../src/review-graph/ui/scene-membership.ts';
 import {createReaderStateCache, retainedReaderPins} from '../../../src/review-graph/ui/reader-state.ts';
+import {withMeasuredGeometry} from '../../../src/review-graph/ui/layout-measurements.ts';
+import {initialLayout} from '../../../src/review-graph/ui/graph-geometry.ts';
 
 const entity = (id: string, status?: string, kind = 'function'): GraphEntity => ({
     id, kind, data: {name: id, ...(status ? {comparisonStatus: status} : {})},
@@ -143,6 +145,55 @@ test('semantically hidden offscreen native readers retain cache pins and reopen 
     cache.restore(native, recreated);
     assert.deepEqual(recreated, {scrollTop: 137, scrollLeft: 21});
     assert.equal(cache.read(native).open, true);
+});
+
+for (const scenario of ['early on before first layout', 'reflow while on', 'offscreen viewport cull before reflow']) {
+    test(`layout retains full-model ownership after ${scenario} and off/visible`, () => {
+        const reflow = scenario !== 'early on before first layout';
+        const full = [
+            {id: 'changed', position: {x: 0, y: 0}, data: {subject: 'changed'}, draggable: true, focusable: true, style: {opacity: 0, color: 'original'}},
+            {id: 'unchanged', position: {x: 0, y: 0}, data: {subject: 'unchanged'}, draggable: true, focusable: true, style: {opacity: 0, color: 'original'}},
+        ];
+        const first = reflow ? initialLayout(withMeasuredGeometry(full, [
+            {id: 'changed', measured: {width: 301, height: 91}},
+            {id: 'unchanged', measured: {width: 302, height: 92}},
+        ]), [], 'changed') : full;
+        const before = JSON.stringify(first);
+        // Independent observed-store fixture, deliberately hostile beyond dimensions.
+        const renderedStore = first.map(node => ({
+            ...node, position: {x: -10000, y: -10000},
+            measured: {width: reflow ? 411 : 311, height: reflow ? 191 : 101},
+            data: {...node.data, renderContent: false, measureOnly: true},
+            draggable: false, focusable: false,
+            style: {...node.style, ...(scenario.startsWith('offscreen') ? {} : {visibility: 'hidden', pointerEvents: 'none'}), width: 99999},
+        }));
+        const measured = withMeasuredGeometry(first, renderedStore);
+        const settled = initialLayout(measured, [], 'changed');
+        const restored = settled.find(node => node.id === 'unchanged')!;
+        assert.deepEqual(restored.data, {subject: 'unchanged'});
+        assert.equal(restored.draggable, true);
+        assert.equal(restored.focusable, true);
+        assert.deepEqual(restored.style, {opacity: 1, color: 'original'});
+        assert.deepEqual(restored.measured, {width: reflow ? 411 : 311, height: reflow ? 191 : 101});
+        assert.deepEqual(restored.position, {x: 0, y: reflow ? 371 : 281});
+        assert.equal(measured[1]!.data, first[1]!.data);
+        assert.equal(measured[1]!.style, first[1]!.style);
+        assert.equal(JSON.stringify(first), before);
+        assert.equal('measureOnly' in restored.data, false);
+        assert.equal('renderContent' in restored.data, false);
+    });
+}
+
+test('measurement import matches exact full-model IDs and rejects invalid dimensions and foreign subjects', () => {
+    const full = [{id: 'a', position: {x: 2, y: 3}, measured: {width: 50, height: 60}}];
+    const result = withMeasuredGeometry(full, [
+        {id: 'a', measured: {width: NaN, height: -1}},
+        {id: 'foreign', measured: {width: 100, height: 200}},
+    ]);
+    assert.deepEqual(result, full);
+    assert.equal(result[0], full[0]);
+    const partial = withMeasuredGeometry(full, [{id: 'a', measured: {width: 75, height: Infinity}}]);
+    assert.deepEqual(partial, [{id: 'a', position: {x: 2, y: 3}, measured: {width: 75, height: 60}}]);
 });
 
 test('pinned PR25 no-change disposed-read test/assertions/contains disappear and exact canonical account returns', () => {
