@@ -1,5 +1,7 @@
 # Product roadmap
 
+[Current canvas design status](../product/review-loop/design-status.md) and [PR reconciliation](720p/slices/05-explanation-exploration/pr-reconciliation/plan.md) record the latest minimum-entry precedence and retained wider-product goals (2026-10-29); historical freezes/readiness below do not override later explicit scopes.
+
 **Direction:** Accepted progressive delivery: 480p → 720p → 1080p → 4K
 
 **Plan status:** First runnable milestone merged; autonomous delivery through 1080p active under the [current execution plan](delivery-through-1080p.md). Full round acceptance remains incomplete.

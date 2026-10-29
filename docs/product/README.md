@@ -1,5 +1,7 @@
 # Product knowledge
 
+[Current canvas design status](review-loop/design-status.md): current-entry precedence, retained goals and explicit preview/integration limits.
+
 This is the durable product specification: what PR Reviewer does, why, and how its responsibilities and behavior fit together. A fresh agent should be able to derive the accepted delivered behavior from this knowledge, without reconstructing old execution plans or chat.
 
 - [Vision](vision.md): purpose and the experience of understanding a PR.

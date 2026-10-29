@@ -1,5 +1,7 @@
 # Canvas workspace and contextual panels
 
+> Current-entry precedence (2026-10-29): [design status](design-status.md) distinguishes the delivered minimum graph from this wider canvas proposal. Retain its source/evidence, anchor, draft and return requirements; older panel defaults are not current-entry implementation instructions. Historical status/evidence below is preserved.
+
 Date: 2026-10-24. Status: accepted user composition, with explicit proposed interaction defaults for the next reviewed mock. No new implementation, physical-device validation or unfamiliar-reviewer acceptance is claimed.
 
 The goal is to understand a whole PR, investigate its evidence and ask a precise question without losing the map or the question. The latest user direction is: no top-down page; context in an open left panel; detailed explanation in a right slide-on panel; comments in a bottom slide-up panel; gesture zoom in the main window. This supersedes older inline-thread and long-explanation placement. It does not supersede [whole-PR membership](../pr25-whole-change-graph.md), exact source identity or [comment anchors](canvas-comments.md).

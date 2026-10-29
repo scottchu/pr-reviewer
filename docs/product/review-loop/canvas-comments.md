@@ -1,5 +1,7 @@
 # Anchored comments in the canvas
 
+> Current-entry precedence (2026-10-29): [design status](design-status.md) distinguishes the delivered minimum graph from this wider canvas proposal. Retain its source/evidence, anchor, draft and return requirements; older panel defaults are not current-entry implementation instructions. Historical status/evidence below is preserved.
+
 Current composition follows [canvas panels](canvas-panels.md): floating markers remain anchor-adjacent; full thread and composer slide up from the bottom. Earlier inline-thread geometry is superseded. Selection, detail target and draft anchor remain independent.
 
 **Decision date:** 2026-10-24

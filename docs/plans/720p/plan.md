@@ -1,5 +1,7 @@
 # 720p: understand the whole PR
 
+[PR reconciliation](slices/05-explanation-exploration/pr-reconciliation/plan.md): retire covered SDK and superseded preview/design PRs while retaining wider-product gaps; documentation-only, no new application acceptance.
+
 Date of latest experience correction: 2026-10-25.
 Status: current root/reader corrections and one evidence-backed change consequence have bounded source/actual-UI closure at application61125a4; see [slice05 closure/continuation](slices/05-explanation-exploration/reviews/reading-journey-v1.md#revision18-bounded-closure-and-active-continuation). Existing approvals now resume Story offscreen attention/original-frame Return and meaningful attached-owner question/answer/exact reading Return. Complete impact coverage and unfamiliar full-journey/human/automatic-native acceptance remain open; historical milestones below do not complete this latest whole journey.
 

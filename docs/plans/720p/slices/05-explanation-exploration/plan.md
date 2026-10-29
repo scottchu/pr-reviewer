@@ -1,5 +1,7 @@
 # Slice05: follow an explanation and explore
 
+[PR reconciliation](pr-reconciliation/plan.md) (2026-10-29) preserves older design/preview goals and evidence while retiring stale PRs. Future integration uses the [current design status](../../../../product/review-loop/design-status.md), not old preview dispatch/readiness.
+
 Date: 2026-10-25.
 Status: active; root/reader and one impact example are bounded-reviewed; real meaningfully anchored question/reply plus inner-answer/outerStory Return are source/actualUI verified at34f9a59. Desktop top-call-context framing is author-verified for a fixed recheck; mobile same-canvas v2 proposal awaits explicit adoption. See [current reading-journey handoff](reviews/reading-journey-v1.md#revision21-fixed-candidate-handoff). This is source-informed own-PR dogfood, not unfamiliar whole-journey/human acceptance.
 

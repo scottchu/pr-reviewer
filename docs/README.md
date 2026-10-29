@@ -1,5 +1,7 @@
 # Documentation map
 
+[Current canvas design status](product/review-loop/design-status.md): current minimum entry, retained wider-product goals and superseded preview composition.
+
 | Area | Purpose | Start here |
 |---|---|---|
 | Product knowledge | What the product is and how it behaves: user stories, UX, architecture, interfaces and design decisions. Durable source for reimplementation. | [Product index](product/README.md) |
