@@ -1,7 +1,7 @@
 # Remove unsupported prepared policy verification
 
 Date: 2026-10-29.
-Status: accepted cleanup, implementation pending.
+Status: scoped implementation and local checks passed; independent source review and draft publication pending. Browser and own-PR graph gates remain unrun/blocked.
 Parent: [slice05](../plan.md), [720p round](../../../plan.md).
 Owner: root, sole product writer. Branch: `remove-title-selected-policy-edge`.
 Baseline: main `66a5033886feb29fa8807d46655d696ce9da5bb1`, including merged PR39 and PR40. The incoming handoff's draft/main status was stale; remote merge readback and clean main establish this baseline. The separate header occurrence correction is protected.
@@ -30,4 +30,4 @@ Assign a fresh reviewer after a committed candidate. Read-only scope: verify P1â
 
 ## Verification and remaining gates
 
-Pending implementation. Raw baseline/delta and check logs remain ignored under `.decompozr/flow/run/policy-edge-cleanup/`; portable results and findings will be reconciled here. Draft publication is the authorized endpoint, not delivery acceptance. Required owner next step after handoff is review and a separate merge/deploy decision. Actual own-PR graph intake currently lacks a supported comparison selector; no fixture replacement or fake source identity may bypass that limit.
+Implementation/self-check evidence is in [the evidence receipt](evidence.md). Raw baseline/delta and check logs remain ignored under `.decompozr/flow/run/policy-edge-cleanup/`; portable results and findings will be reconciled here. Draft publication is the authorized endpoint, not delivery acceptance. Required owner next step after handoff is review and a separate merge/deploy decision. Actual own-PR graph intake currently lacks a supported comparison selector; no fixture replacement or fake source identity may bypass that limit.

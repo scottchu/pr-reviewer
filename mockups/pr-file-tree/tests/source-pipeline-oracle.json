@@ -15,5 +15,144 @@
   "facts": "cf36e1500745c1c0445778dfd2dbeac87874aa85654a2e3996953dcd9427d9d8",
   "canonical": "4a180c01a200d5612ce3f3eb2bb265a14efd9c423c6ceea1d90484bc536c9ea3",
   "projection": "ee5055a6d19b1cce66cb086c0dd4ffcdc71c10935e947c578e30c7a9da1c4507",
-  "compiled": "42cd40ca2c93a23598fafded1eda53579bb729cd8bf6c4f19bab630a73cb81e8"
+  "compiled": "42cd40ca2c93a23598fafded1eda53579bb729cd8bf6c4f19bab630a73cb81e8",
+  "policyEdgeRemoval": {
+    "revision": 2,
+    "baseline": "66a5033886feb29fa8807d46655d696ce9da5bb1",
+    "canonical": "5006ce9a1ce9f8b693c6b52657d3e10f4166a860e808598972f1656f5419176a",
+    "projection": "806ca97ecfa188ef686d6948adfa467efd3e51f6790129602bb7886a1bd2b03e",
+    "canonicalIndex": 6935,
+    "relation": {
+      "id": "unit:b0d9aa89a529131430ad18d6bb441c4f6a8f71dfc1d2a7a12269f4fe35507d72:verifies-policy",
+      "from": "unit:b0d9aa89a529131430ad18d6bb441c4f6a8f71dfc1d2a7a12269f4fe35507d72",
+      "to": "owner-http-policy",
+      "version": "after",
+      "relation": "verifies_policy",
+      "data": {
+        "basis": "Prepared source assertion policy context, not direct client/helper coverage or execution",
+        "certainty": "prepared source interpretation",
+        "sourceEvidence": [
+          {
+            "canonicalId": "cc3c08556030b281715422da01dcdaccf8c414004c8e66fa183ff66ed6ba7df3",
+            "anchor": {
+              "repository": "scottchu/pr-reviewer",
+              "side": "head",
+              "commit": "e3b270e5f49a9215452b0b86702946043e979059",
+              "path": "tests/gateway.test.ts",
+              "contentHash": "13e7db6e38670e876795a150587bb6e5a441548915fb37f67ff0a80563953158",
+              "start": 5816,
+              "end": 9025,
+              "startLine": 90,
+              "endLine": 114
+            }
+          }
+        ]
+      }
+    },
+    "projectionIndexes": [
+      251,
+      324,
+      345,
+      251
+    ],
+    "ui": {
+      "title": "verifies policy",
+      "explanation": "Prepared source assertions concern HTTP policy",
+      "scope": [
+        "Prepared policy context",
+        "Not client helper coverage or goal proof"
+      ],
+      "provenance": [
+        "After e3b270e · tests/gateway.test.ts · L90–114"
+      ],
+      "rows": [
+        "Prepared source assertions concern HTTP policy",
+        "Prepared policy context",
+        "Not client helper coverage or goal proof",
+        "After e3b270e · tests/gateway.test.ts · L90–114"
+      ]
+    },
+    "legacy": {
+      "baseline": "1160a687bf392b5c07bb6e81f6b61d1e469d37aa",
+      "digest": "28cac43aa6ffd442f7a55c539c21afc348fb90a9a236f5e5ca2c4507e3bf45e3",
+      "index": 8,
+      "relation": {
+        "id": "gateway-test:verifies-policy",
+        "from": "gateway-owner-policy-test",
+        "to": "owner-http-policy",
+        "version": "after",
+        "relation": "verifies_policy",
+        "data": {
+          "basis": "Verifies server single-local-owner HTTP policy, shares requirement with client change; does not call client request/helper and does not prove goal completion. Added test definition/TestChange, no Run/PASS.",
+          "sourceEvidence": [
+            {
+              "commit": "e3b270e5f49a9215452b0b86702946043e979059",
+              "side": "head",
+              "path": "tests/gateway.test.ts",
+              "gitBlob": "22f79df9411da14d219f2ee72626334a1c2be400",
+              "sourceSha256": "13e7db6e38670e876795a150587bb6e5a441548915fb37f67ff0a80563953158",
+              "startLine": 97,
+              "endLine": 97,
+              "startUtf16": 6774,
+              "endUtf16": 7146,
+              "textSha256": "cb83149bf45fbf80e246c7efc047da73fead064a5366858b7090ebf20c9bb523",
+              "text": " const call=async(path:string,body?:unknown,authorization?:string)=>{const response=await fetch(`http://127.0.0.1:${port}${path}`,{headers:{'Content-Type':'application/json',...(authorization?{Authorization:authorization}:{})},...(body?{method:'POST',body:JSON.stringify(body)}:{})});return {status:response.status,body:await response.json() as Record<string,unknown>};};\n",
+              "repository": "scottchu/pr-reviewer",
+              "origin": "pinned_git",
+              "retainedSnapshotAdmission": "not established for this supplementary source"
+            },
+            {
+              "commit": "e3b270e5f49a9215452b0b86702946043e979059",
+              "side": "head",
+              "path": "tests/gateway.test.ts",
+              "gitBlob": "22f79df9411da14d219f2ee72626334a1c2be400",
+              "sourceSha256": "13e7db6e38670e876795a150587bb6e5a441548915fb37f67ff0a80563953158",
+              "startLine": 99,
+              "endLine": 103,
+              "startUtf16": 7152,
+              "endUtf16": 7633,
+              "textSha256": "ad22642c86256a3badb96a7cda410b92bff9437d376c1f3ed00f0f9c78a0f5ce",
+              "text": "  assert.deepEqual((await call('/api/self')).body,{kind:'user',actorId:'local-user'});\n  assert.equal((await call('/api/reviews')).status,200);assert.equal((await call('/api/reviews/r')).status,200);\n  assert.equal((await call('/api/analysis?reviewId=r&snapshotId=local-source')).status,200);\n  assert.equal((await call('/api/story?reviewId=r&snapshotId=local-source')).status,200);\n  assert.equal((await call('/api/story/context?reviewId=r&snapshotId=local-source')).status,200);\n",
+              "repository": "scottchu/pr-reviewer",
+              "origin": "pinned_git",
+              "retainedSnapshotAdmission": "not established for this supplementary source"
+            },
+            {
+              "commit": "e3b270e5f49a9215452b0b86702946043e979059",
+              "side": "head",
+              "path": "tests/gateway.test.ts",
+              "gitBlob": "22f79df9411da14d219f2ee72626334a1c2be400",
+              "sourceSha256": "13e7db6e38670e876795a150587bb6e5a441548915fb37f67ff0a80563953158",
+              "startLine": 105,
+              "endLine": 109,
+              "startUtf16": 7782,
+              "endUtf16": 8512,
+              "textSha256": "3d85edec170d0117491314ba4fceb0d1b5bd73d336ef76fe2f87047b83554f29",
+              "text": "  assert.equal((await call('/api/imports/commands',{type:'RequestImport',commandId:'new-owner-import',path:'/local/locator'})).body.state,'applied');\n  const command={type:'AskQuestion',commandId:'local-owner-question',reviewId:'r',anchor:{snapshotId:'local-source',path:'value.ts',side:'head',startLine:1,endLine:1},text:'Saved without a login'};\n  const receipt=await call('/api/commands',command);assert.equal(receipt.status,200);assert.equal(receipt.body.state,'applied');assert.equal(receipt.body.actorId,'local-user');\n  assert.deepEqual((await call('/api/commands',command)).body,receipt.body);\n  const readback=await call('/api/reviews/r');assert.equal((readback.body.questions as {text:string}[])[0]?.text,command.text);\n",
+              "repository": "scottchu/pr-reviewer",
+              "origin": "pinned_git",
+              "retainedSnapshotAdmission": "not established for this supplementary source"
+            },
+            {
+              "commit": "e3b270e5f49a9215452b0b86702946043e979059",
+              "side": "head",
+              "path": "tests/gateway.test.ts",
+              "gitBlob": "22f79df9411da14d219f2ee72626334a1c2be400",
+              "sourceSha256": "13e7db6e38670e876795a150587bb6e5a441548915fb37f67ff0a80563953158",
+              "startLine": 110,
+              "endLine": 112,
+              "startUtf16": 8512,
+              "endUtf16": 8934,
+              "textSha256": "44b275b45673c9720da6557dd4f75dadc0ea1966941d03a92b0670a8869f1dba",
+              "text": "  for(const authorization of ['Bearer wrong','Basic anything','Bearer '])assert.equal((await call('/api/reviews/r',undefined,authorization)).status,401);\n  const connection=store.registerConnection({kind:'user',actorId:'local-user'},{host:'codex',sessionId:'original',connectionId:'original-connection',corroborated:true});\n  assert.equal((await call('/api/reviews/r',undefined,`Bearer ${connection.token}`)).status,401);\n",
+              "repository": "scottchu/pr-reviewer",
+              "origin": "pinned_git",
+              "retainedSnapshotAdmission": "not established for this supplementary source"
+            }
+          ],
+          "execution": "not run"
+        }
+      }
+    }
+  }
 }
