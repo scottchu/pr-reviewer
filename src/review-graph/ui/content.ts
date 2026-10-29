@@ -1,11 +1,22 @@
 import type {EditComposition} from '../domain/edit-composition.ts';
 import {relationshipProvenance} from './relationship-evidence.ts';
-import type { GraphEntity, GraphRelation } from '../domain/types.ts';
+import type { GraphEntity, GraphRelation, SourceAnchor } from '../domain/types.ts';
 export type CardRows = Readonly<{
     title: string;
     rows: readonly string[];
 }>;
 const text = (value: unknown) => typeof value === 'string' ? value : '';
+const constructionLocations = (entity: GraphEntity): readonly string[] => {
+    const witnesses = entity.data.sourceWitnesses as readonly {anchor: SourceAnchor}[] | undefined;
+    const locations = (witnesses ?? []).flatMap(({anchor}) => {
+        if (!anchor || !['base', 'head'].includes(anchor.side) || !anchor.commit || !anchor.path ||
+            !Number.isInteger(anchor.startLine) || anchor.startLine < 1 || !Number.isInteger(anchor.endLine) || anchor.endLine < anchor.startLine)
+            return [];
+        return [(anchor.side === 'base' ? 'Before' : 'After') + ' ' + anchor.commit.slice(0, 7) + ' · ' + anchor.path + ' · L' +
+            anchor.startLine + (anchor.endLine === anchor.startLine ? '' : '–' + anchor.endLine)];
+    });
+    return locations.length ? locations : ['Source occurrence identity unavailable'];
+};
 const assertionText = (value: string) => {
     if (value.includes('Local access token') && value.includes('toHaveCount(0)'))
         return 'No local access token field';
@@ -21,7 +32,11 @@ const contentRows = (entity: GraphEntity): CardRows => {
         case 'review': return { title: text(data.name), rows: [] };
         case 'callsite': return { title: text(data.value) || text(data.name), rows: [] };
         case 'function': return { title: text(data.name), rows: data.comparisonStatus === 'no change' ? ['Source-body equality, not behavior equivalence'] : [] };
-        case 'header': return { title: 'Authorization', rows: [text(data.value).replace(/^Authorization:\s*/, '')] };
+        case 'header': return {
+            title: 'Authorization property construction',
+            rows: [text(data.value).replace(/^Authorization:\s*/, ''),
+                text(data.statusScope) || 'Direct headers.Authorization construction only', ...constructionLocations(entity)],
+        };
         case 'file': return { title: text(data.path), rows: [] };
         case 'test': return { title: text(data.name), rows: [...(Array.isArray(data.variants) ? [String(data.variants.length) + ' parameter variants'] : []), ...(text(data.scope) ? [text(data.scope)] : [])] };
         case 'behavior': return { title: text(data.name), rows: Array.isArray(data.value) ? data.value.map(String) : [] };
@@ -51,7 +66,8 @@ export const cardRows = (entity: GraphEntity): CardRows => {
     const content = contentRows(entity);
     const composition = entity.data.editComposition as EditComposition | undefined;
     const status = composition ? composition.status : text(entity.data.comparisonStatus);
-    return { ...content, rows: status ? [status, ...content.rows] : content.rows };
+    const statusLabel = entity.kind === 'header' && status === 'remove' ? 'Removed source occurrence' : status;
+    return { ...content, rows: statusLabel ? [statusLabel, ...content.rows] : content.rows };
 };
 export type RelationRows = CardRows & Readonly<{
     explanation: string; scope: readonly string[]; provenance: readonly string[];

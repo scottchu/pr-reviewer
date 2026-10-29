@@ -99,9 +99,11 @@ test('unchanged locations retain both witness records without merging unsupporte
  assert.equal(allRelations().filter(edge=>edge.from==='owner-journey-test'&&edge.relation==='located_in').length,2);
 });
 
-test('removed Authorization relationship scope belongs to its edge, not its entity card',async()=>{
+test('removed Authorization construction is named on its card and keeps its scoped edge',async()=>{
  const header=allEntities().find(entity=>entity.id==='header-value')!;assert.equal(header.data.comparisonStatus,'remove');
- assert.match(String(header.data.statusScope),/explicit-credential helper still produces/);assert.doesNotMatch(cardRows(header).rows.join(' '),/direct request construction only/i);
+ assert.match(String(header.data.statusScope),/explicit-credential helper still produces/);
+ assert.equal(cardRows(header).title,'Authorization property construction');
+ assert.equal(cardRows(header).rows[0],'Removed source occurrence');
  const generated = await import('../source-graph.ts');
  const edge = generated.allRelations().find(edge => edge.from === 'request' && edge.to === 'header-value' && edge.relation === 'constructs')!;
  assert.match(edgeRows(edge).rows.join(' '), /Direct request construction only/);

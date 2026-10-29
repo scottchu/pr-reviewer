@@ -33,7 +33,12 @@ test('frozen main5944 canonical and default/20/40/hide projection preservation w
  const state=experienceService.openComparison(prepared.graph);
  const projections=[{}, {'review-file':20},{'review-file':40},{}].map(limits=>{
   const view=projectExperience({...state,limits});
-  return {limits,nodes:view.nodes.map(raw),relations:view.relations.map(({ui,...edge})=>edge),cards:view.nodes.map(entity=>[entity.id,entity.ui.card,entity.ui.status]),edges:view.relations.map(edge=>[edge.id,edge.ui])};
+  // The only adopted presentation delta is the header occurrence card. Keep the
+  // frozen pre-correction oracle; header-occurrence.test.ts checks its new copy
+  // and exact Before identity independently. All other fields remain frozen.
+  return {limits,nodes:view.nodes.map(raw),relations:view.relations.map(({ui,...edge})=>edge),cards:view.nodes.map(entity=>[entity.id,
+   entity.id==='header-value'?{title:'Authorization',rows:['remove','`Bearer ${captured}`']}:entity.ui.card,
+   entity.ui.status]),edges:view.relations.map(edge=>[edge.id,edge.ui])};
  });
  assert.equal(digest(projections),oracle.projection);
  const folder=new URL('../../../.decompozr/flow/run/source-pipeline/',import.meta.url);mkdirSync(folder,{recursive:true});
