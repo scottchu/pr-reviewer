@@ -32,9 +32,30 @@ export type SourceReadingUI=Readonly<{caption:string;available:boolean;hunks:rea
 export type SourceWitnessUI = DocumentWitness;
 export type SourceHunkUI = NativeDocumentHunk;
 export type GraphSessionUI = Readonly<{
+    comparisonId: string;
     view: GraphView;
     layoutRelations: readonly UIRelation[];
     limits: Readonly<Record<string, number>>;
     expand: (id: string, hide: boolean) => GraphSessionUI;
     inspect: (id: string, open: boolean) => GraphSessionUI;
 }>;
+
+/** Serializable presentation geometry only; no domain objects or UI callbacks. */
+export type SceneBoxUI = Readonly<{x: number; y: number; width: number; height: number}>;
+export type SceneIdentityUI = Readonly<{comparison: string; revision: number}>;
+export type SceneNodeUI = Readonly<{id: string; parentId?: string; bounds: SceneBoxUI}>;
+export type SceneRouteUI = Readonly<{id: string; source: string; target: string; bounds: SceneBoxUI; labelBounds: SceneBoxUI}>;
+export type SceneSnapshotUI = SceneIdentityUI & Readonly<{nodes: readonly SceneNodeUI[]; routes: readonly SceneRouteUI[]}>;
+export type ViewportQueryUI = SceneIdentityUI & Readonly<{
+    request: number; x: number; y: number; zoom: number; width: number; height: number;
+    pixelRatio: number; overscan: number; pinnedNodes: readonly string[]; pinnedRoutes: readonly string[];
+}>;
+export type SceneSelectionUI = SceneIdentityUI & Readonly<{
+    request: number; coverage: SceneBoxUI; nodeIds: readonly string[]; metadataNodeIds: readonly string[];
+    routeIds: readonly string[]; visited: number; visitedBranches: number;
+}>;
+export type SceneWorkerInputUI = Readonly<{type: 'replace'; scene: SceneSnapshotUI}> | Readonly<{type: 'query'; query: ViewportQueryUI}>;
+export type SceneWorkerOutputUI =
+    (SceneIdentityUI & Readonly<{type: 'ready'}>) |
+    Readonly<{type: 'selection'; selection: SceneSelectionUI}> |
+    Readonly<{type: 'error'; message: string}>;

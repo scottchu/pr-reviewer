@@ -2,7 +2,7 @@ import { defineConfig } from '@playwright/test';
 
 export default defineConfig({
   testDir: './tests',
-  testMatch: 'minimal-browser.spec.ts',
+  testMatch: ['minimal-browser.spec.ts', 'viewport-browser.spec.ts'],
   workers: 1,
   reporter: 'list',
   outputDir: '/tmp/pr-reviewer-reading-journey-evidence/minimum-graph/playwright',

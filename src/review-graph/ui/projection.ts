@@ -1,5 +1,5 @@
 import type {EditComposition} from '../domain/edit-composition.ts';
-import type {GraphEntity, NativeDocumentHunk} from '../domain/types.ts';
+import type {GraphEntity, GraphRelation, SourceGraph, NativeDocumentHunk} from '../domain/types.ts';
 import type {ExperienceState} from '../experience/types.ts';
 import {collectEntities} from '../domain/validation.ts';
 import {visibleGraph} from './visibility.ts';
@@ -32,32 +32,62 @@ export const projectSourceReading = (
     };
 };
 
-export const projectExperience = (state: ExperienceState): GraphView => {
-    const registry = collectEntities(state.comparison.entities);
-    const present = (entity: GraphEntity): UIEntity => {
-        const {nodes, ...identity} = entity;
-        return {
-            ...identity,
-            ui: {
-                card: cardRows(entity),
-                status: presentationStatus(entity),
-                icon: iconFor(entity),
+const projectors = new WeakMap<SourceGraph, (state: ExperienceState) => GraphView>();
+const createProjector = (comparison: SourceGraph) => {
+    const registry = collectEntities(comparison.entities);
+    const content = new WeakMap<GraphEntity, UIEntity['ui']>();
+    const entities = new WeakMap<GraphEntity, UIEntity>();
+    const relations = new WeakMap<GraphRelation, GraphView['relations'][number]>();
+    const present = (entity: GraphEntity, state: ExperienceState): UIEntity => {
+        let base = content.get(entity);
+        if (!base) {
+            let reading: SourceReadingUI | undefined, prepared = false;
+            base = {
+                card: cardRows(entity), status: presentationStatus(entity), icon: iconFor(entity),
                 sourceControl: ['function', 'test'].includes(entity.kind) && Boolean(entity.data.editComposition),
-                sourceOpen: state.sourceDisclosure[entity.id] ?? false,
-                fileControl: entity.kind === 'file',
+                sourceOpen: false, fileControl: entity.kind === 'file',
                 inlineSourceReading: Boolean(entity.data.nativeHunks),
-                unitCount: state.comparison.fileUnits[entity.id]?.length ?? 0,
-                unpairedRows: state.comparison.unresolved.filter(row => row.path === entity.data.path).map(row =>
+                unitCount: comparison.fileUnits[entity.id]?.length ?? 0,
+                unpairedRows: comparison.unresolved.filter(row => row.path === entity.data.path).map(row =>
                     (row.anchor.side === 'base' ? 'Before' : 'After') + ' L' + row.anchor.startLine + '–' + row.anchor.endLine + ' · ' + row.name),
-                sourceReading: projectSourceReading(entity.data.editComposition as EditComposition | undefined, entity.data.nativeHunks as readonly NativeDocumentHunk[] | undefined),
-            },
-            ...(nodes ? {nodes: nodes.map(present)} : {}),
+                get sourceReading() {
+                    if (!prepared) {
+                        reading = projectSourceReading(entity.data.editComposition as EditComposition | undefined, entity.data.nativeHunks as readonly NativeDocumentHunk[] | undefined);
+                        prepared = true;
+                    }
+                    return reading;
+                },
+            };
+            content.set(entity, base);
+        }
+        const children = entity.nodes?.map(child => present(child, state));
+        const open = state.sourceDisclosure[entity.id] ?? false;
+        const known = entities.get(entity);
+        if (known && known.ui.sourceOpen === open && (!children || children.every((child, i) => known.nodes?.[i] === child))) return known;
+        const {nodes: _nodes, ...identity} = entity;
+        // A descriptor preserves demand-driven source projection when disclosure changes.
+        const ui = open ? Object.defineProperties({}, {...Object.getOwnPropertyDescriptors(base), sourceOpen: {enumerable: true, value: true}}) as UIEntity['ui'] : base;
+        const result: UIEntity = {...identity, ui, ...(children ? {nodes: children} : {})};
+        entities.set(entity, result);
+        return result;
+    };
+    return (state: ExperienceState): GraphView => {
+        const view = visibleGraph(comparison, state.limits);
+        return {
+            nodes: view.nodes.map(entity => present(entity, state)),
+            relations: view.relations.map(edge => {
+                const known = relations.get(edge);
+                if (known) return known;
+                const result = {...edge, ui: edgeRows(edge, registry)};
+                relations.set(edge, result); return result;
+            }),
+            entities: registry.map(entity => present(entity, state)),
         };
     };
-    const view = visibleGraph(state.comparison, state.limits);
-    return {
-        nodes: view.nodes.map(present),
-        relations: view.relations.map(edge => ({...edge, ui: edgeRows(edge, registry)})),
-        entities: registry.map(present),
-    };
+};
+
+export const projectExperience = (state: ExperienceState): GraphView => {
+    let project = projectors.get(state.comparison);
+    if (!project) {project = createProjector(state.comparison); projectors.set(state.comparison, project);}
+    return project(state);
 };
