@@ -1,4 +1,4 @@
-import type {ReaderIdentityUI, ReaderKindUI, ReaderStateUI, ReaderStateCacheUI} from './types.ts';
+import type {ReaderIdentityUI, ReaderKindUI, ReaderStateUI, ReaderStateCacheUI, UIEntity} from './types.ts';
 const empty: ReaderStateUI = Object.freeze({open: false, scrollTop: 0, scrollLeft: 0});
 const kinds = new Set<ReaderKindUI>(['inline-hunks', 'source-hunks', 'removed-preview', 'added-preview', 'unpaired-source']);
 
@@ -25,3 +25,14 @@ export const createReaderStateCache = (entityIds: readonly string[]): ReaderStat
         },
     };
 };
+
+/** Native open readers retain their pins even while a semantic mask discards their DOM. */
+export const retainedReaderPins = (
+    entities: readonly UIEntity[],
+    limits: Readonly<Record<string, number>>,
+    cache: ReaderStateCacheUI,
+): readonly string[] => entities.filter(entity => entity.ui.sourceOpen
+    || (entity.ui.inlineSourceReading && cache.read({entityId: entity.id, kind: 'inline-hunks'}).open)
+    || (entity.ui.fileControl && Boolean(limits[entity.id]) && entity.ui.unpairedRows.length > 0
+        && cache.read({entityId: entity.id, kind: 'unpaired-source'}).open))
+    .map(entity => entity.id);
