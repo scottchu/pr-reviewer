@@ -1,5 +1,7 @@
 # Separate subsystem mockups, one review canvas
 
+> Archive reconciliation (2026-10-29): this is retained fixture-preview history, not an active assignment or current production deployment. See the [reconciliation receipt](pr-reconciliation/plan.md) for immutable source and [current design status](../../../../product/review-loop/design-status.md) for retained goals and current-entry precedence. Old process/route instructions below are historical and were not revalidated.
+
 **Decision date:** 2026-10-24
 
 **Direction:** Accepted user request: design each user-facing system through a separate inspectable interactive mockup

@@ -1,5 +1,7 @@
 # Subsystem preview handoff v1
 
+> Archive reconciliation (2026-10-29): this is retained fixture-preview history, not an active assignment or current production deployment. See the [reconciliation receipt](pr-reconciliation/plan.md) for immutable source and [current design status](../../../../product/review-loop/design-status.md) for retained goals and current-entry precedence. Old process/route instructions below are historical and were not revalidated.
+
 Date: 2026-10-24
 Role: implementation delivery and exact independent-review packet
 Status: clean local candidate; whole-preview review, human layout adoption and production integration required separately

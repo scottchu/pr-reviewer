@@ -1,5 +1,7 @@
 # Read source inside the review canvas
 
+> Current-entry precedence (2026-10-29): [design status](design-status.md) distinguishes the delivered minimum graph from this wider canvas proposal. Retain its source/evidence, anchor, draft and return requirements; older panel defaults are not current-entry implementation instructions. Historical status/evidence below is preserved.
+
 Composition is governed by [canvas panels](canvas-panels.md): viewport-filling graph, default open left context, right explanation and bottom discussion, independent targets and no outer page scroll. Actual diff remains inside the graph.
 
 **Decision date:** 2026-10-24
