@@ -246,3 +246,70 @@ test('a spatially culled card can return after source reflow with filter off', a
     await expect(node.locator('.minimal-entity')).toBeVisible();
     expect(await node.evaluate(element => getComputedStyle(element).visibility)).toBe('visible');
 });
+
+for (const width of [1440, 390]) {
+    test(`icon toolbar moves independently and stays in resized bounds at ${width}`, async ({browser}) => {
+        const context = await browser.newContext({viewport: {width, height: 900}, hasTouch: width === 390, isMobile: width === 390});
+        const page = await context.newPage();
+        await page.goto(target);
+        const toolbar = page.getByRole('toolbar', {name: 'Graph view'});
+        const grip = page.getByRole('button', {name: 'Move toolbar', exact: true});
+        const filter = page.getByRole('button', {name: 'Changes only', exact: true});
+        await expect(grip).toBeVisible();
+        expect((await toolbar.innerText()).trim()).toBe('');
+        await expect(filter).toHaveAttribute('title', 'Changes only');
+        await expect(grip).toHaveAttribute('title', /Move toolbar/);
+        const originalCamera = await camera(page);
+        const before = (await toolbar.boundingBox())!;
+        const handle = (await grip.boundingBox())!;
+        const start = {x: handle.x + handle.width / 2, y: handle.y + handle.height / 2};
+        if (width === 390) {
+            const cdp = await context.newCDPSession(page);
+            await cdp.send('Input.dispatchTouchEvent', {type: 'touchStart', touchPoints: [start]});
+            await cdp.send('Input.dispatchTouchEvent', {type: 'touchMove', touchPoints: [{x: start.x - 100, y: start.y - 120}]});
+            await cdp.send('Input.dispatchTouchEvent', {type: 'touchEnd', touchPoints: []});
+            await cdp.detach();
+        } else {
+            await page.mouse.move(start.x, start.y); await page.mouse.down();
+            await page.mouse.move(start.x - 100, start.y - 120, {steps: 8}); await page.mouse.up();
+        }
+        await expect.poll(async () => Math.abs((await toolbar.boundingBox())!.x - before.x)).toBeGreaterThan(60);
+        await expect(filter).toHaveAttribute('aria-pressed', 'false');
+        expect(await camera(page)).toBe(originalCamera);
+        const moved = (await toolbar.boundingBox())!;
+        await grip.focus(); await grip.press('ArrowRight');
+        await expect.poll(async () => (await toolbar.boundingBox())!.x).toBeCloseTo(moved.x + 10, 0);
+        const keyed = (await toolbar.boundingBox())!;
+        await filter.click(); await expect(filter).toHaveAttribute('aria-pressed', 'true');
+        expect((await toolbar.boundingBox())!.x).toBeCloseTo(keyed.x, 0);
+        expect((await toolbar.boundingBox())!.y).toBeCloseTo(keyed.y, 0);
+        expect(await camera(page)).toBe(originalCamera);
+        await page.setViewportSize({width: 320, height: 600});
+        await expect.poll(async () => {
+            const box = (await toolbar.boundingBox())!, layer = (await page.locator('.minimal-toolbar-layer').boundingBox())!;
+            return box.x >= layer.x - 1 && box.y >= layer.y - 1 && box.x + box.width <= layer.x + layer.width + 1 && box.y + box.height <= layer.y + layer.height + 1;
+        }).toBe(true);
+        await expect(filter).toHaveAttribute('aria-pressed', 'true');
+        await context.close();
+    });
+}
+
+test('toolbar pointer cancellation releases capture without activating the filter', async ({page}) => {
+    await page.goto(target);
+    const grip = page.getByRole('button', {name: 'Move toolbar', exact: true});
+    const toolbar = page.getByRole('toolbar', {name: 'Graph view'});
+    await grip.evaluate(element => element.addEventListener('pointerdown', event => element.setAttribute('data-test-pointer', String((event as PointerEvent).pointerId)), {once: true}));
+    const box = (await grip.boundingBox())!;
+    await page.mouse.move(box.x + box.width / 2, box.y + box.height / 2); await page.mouse.down();
+    await page.mouse.move(box.x + box.width / 2 + 30, box.y + box.height / 2 - 30);
+    await expect(grip).toHaveAttribute('data-dragging', 'true');
+    const pointerId = Number(await grip.getAttribute('data-test-pointer'));
+    await grip.dispatchEvent('pointercancel', {pointerId});
+    await expect(grip).toHaveAttribute('data-dragging', 'false');
+    expect(await grip.evaluate((element, id) => element.hasPointerCapture(id), pointerId)).toBe(false);
+    const stopped = (await toolbar.boundingBox())!;
+    await page.mouse.move(40, 120); await page.mouse.up();
+    expect((await toolbar.boundingBox())!.x).toBeCloseTo(stopped.x, 0);
+    expect((await toolbar.boundingBox())!.y).toBeCloseTo(stopped.y, 0);
+    await expect(page.getByRole('button', {name: 'Changes only', exact: true})).toHaveAttribute('aria-pressed', 'false');
+});

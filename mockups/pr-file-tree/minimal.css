@@ -6,8 +6,11 @@ body { background: #171d22; color: #e2e8ed; font-family: system-ui, sans-serif; 
 .minimal-header h1 { margin: 0 0 5px; font-size: 18px; font-weight: 600; }
 .minimal-header p { margin: 0; color: #afbfcc; font-size: 12px; }
 main { position: relative; flex: 1; min-height: 0; }
-.minimal-graph-toolbar { position: absolute; z-index: 5; left: 50%; bottom: calc(16px + env(safe-area-inset-bottom, 0px)); transform: translateX(-50%); max-width: calc(100% - 28px); padding: 4px; background: #171d22; border: 1px solid #718694; border-radius: 10px; }
-.minimal-graph-toolbar button { display: flex; align-items: center; justify-content: center; gap: 9px; min-height: 44px; padding: 10px 14px; border: 0; border-radius: 6px; background: transparent; color: #e2e8ed; font: inherit; font-size: 13px; font-weight: 500; white-space: nowrap; cursor: pointer; touch-action: manipulation; user-select: none; }
+.minimal-toolbar-layer { position: absolute; z-index: 5; top: calc(12px + env(safe-area-inset-top, 0px)); right: calc(12px + env(safe-area-inset-right, 0px)); bottom: calc(16px + env(safe-area-inset-bottom, 0px)); left: calc(12px + env(safe-area-inset-left, 0px)); pointer-events: none; }
+.minimal-graph-toolbar { position: absolute; display: flex; gap: 4px; left: 50%; bottom: 0; transform: translateX(-50%); max-width: 100%; padding: 4px; background: #171d22; border: 1px solid #718694; border-radius: 10px; pointer-events: auto; }
+.minimal-graph-toolbar button { display: flex; align-items: center; justify-content: center; width: 44px; min-width: 44px; min-height: 44px; padding: 10px; border: 0; border-radius: 6px; background: transparent; color: #e2e8ed; font: inherit; cursor: pointer; touch-action: manipulation; user-select: none; }
+.minimal-graph-toolbar .toolbar-grip { touch-action: none; cursor: grab; }
+.minimal-graph-toolbar .toolbar-grip[data-dragging="true"] { cursor: grabbing; }
 .minimal-graph-toolbar button svg { width: 20px; height: 20px; flex: none; }
 .minimal-graph-toolbar button:hover { background: #3b454e; }
 .minimal-graph-toolbar button[aria-pressed="true"] { background: #bed8ed; color: #171d22; }

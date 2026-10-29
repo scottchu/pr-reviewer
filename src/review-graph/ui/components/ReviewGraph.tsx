@@ -18,6 +18,7 @@ import {filterSceneMembership, sceneMembership, type ScenePinsUI} from '../scene
 import type {SceneSelectionUI} from '../types.ts';
 import { initialLayout, curve, dimensions, groupInterior, type Point, type Routed, type Side } from '../graph-geometry.ts';
 import {withMeasuredGeometry} from '../layout-measurements.ts';
+import {GraphToolbar} from './GraphToolbar.tsx';
 
 export const mountReviewGraph = (root:HTMLElement,initialSession:GraphSessionUI) => {
 const initial = initialSession.view;
@@ -512,17 +513,7 @@ const App = () => {
     }} minZoom={0.25} maxZoom={2} panOnScroll panOnScrollMode={PanOnScrollMode.Free} zoomOnScroll={false} zoomOnPinch nodesConnectable={false} nodesDraggable elementsSelectable={false} proOptions={{ hideAttribution: true }}>
    <ViewportScene scene={scene} publish={setSelection} pinsChanged={pinsChanged}/><InitialLayout nodes={nodes} apply={apply} links={links} revision={revision} headers={headerClearances}/><Background color="#29333b" gap={24} size={1}/>
   </ReactFlow>
-  <div className="minimal-graph-toolbar nodrag nopan nowheel" role="toolbar" aria-label="Graph view"
-      onPointerDown={event => event.stopPropagation()} onClick={event => event.stopPropagation()}
-      onWheel={event => event.stopPropagation()} onKeyDown={event => event.stopPropagation()}>
-      <button type="button" aria-pressed={experience.filter.changesOnly}
-          onClick={() => setExperience(previous => previous.setChangesOnly(!previous.filter.changesOnly))}>
-          <svg viewBox="0 0 20 20" aria-hidden="true" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
-              <path d="M3 5h14M5.5 10h9M8 15h4"/>
-          </svg>
-          Changes only
-      </button>
-  </div>
+  <GraphToolbar filter={experience.filter} onToggle={() => setExperience(previous => previous.setChangesOnly(!previous.filter.changesOnly))}/>
   </main></>;
 };
 createRoot(root).render(<App />);
