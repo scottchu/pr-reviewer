@@ -18,3 +18,4 @@ Keep related delivery material together. Each round lives under `docs/plans/<rou
 - [Protected product invariants](product/protected-invariants.md): authoritative preservation/status register; every bounded change declares allowed seams and protected behavior.
 
 - [Source understanding pipeline](product/source-pipeline.md): accepted read/parse/extraction/enrichment direction, proposed module boundaries and independent correctness tests.
+- [Viewport graph presentation](product/viewport-scene.md): adopted worker/indexed viewport selection, UI ownership, failure behavior and qualified performance acceptance.

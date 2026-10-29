@@ -116,3 +116,6 @@ Every new PR/MR follows [graph-first understanding review](../rules/graph-first-
 
 
 Current bounded continuity work (2026-10-28): [720p source-comparison V35](720p/slices/05-explanation-exploration/semantic-graph-recovery.md#v35-adopted-experiencedomain-refactor) implements the adopted Experience/Domain/UI Projection architecture and independent extraction/projection verification with UI preservation and existing-target deployment. This is refactoring within the current slice, not acceptance of720p/1080p, arbitrary-PR extraction or restored owner/native integration.
+
+
+Current bounded performance work (2026-10-28): [720p viewport scene delivery](720p/slices/05-explanation-exploration/viewport-scene/plan.md) implements the accepted worker-driven viewport direction while preserving the current graph, evidence and interaction. Network asset partitioning, alternate rendering engines and changed zoom-summary composition remain later choices.

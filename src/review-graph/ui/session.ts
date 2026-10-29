@@ -6,20 +6,23 @@ import {edgeRows} from './content.ts';
 import {projectExperience} from './projection.ts';
 import type {GraphSessionUI} from './types.ts';
 
-const sessionFor = (state: ExperienceState): GraphSessionUI => {
-    const registry = collectEntities(state.comparison.entities);
+const sessionFor = (state: ExperienceState, layoutRelations: GraphSessionUI['layoutRelations']): GraphSessionUI => {
     return {
+        comparisonId: state.comparisonId,
         view: projectExperience(state),
-        layoutRelations: state.comparison.relations.map(edge => ({...edge, ui: edgeRows(edge, registry)})),
+        layoutRelations,
         limits: state.limits,
         expand: (fileId, hide) => sessionFor(experienceService.handleIntent(state, {
             type: 'show-source-units', comparisonId: state.comparisonId, fileId, hide,
-        }).state),
+        }).state, layoutRelations),
         inspect: (entityId, open) => sessionFor(experienceService.handleIntent(state, {
             type: 'source-disclosure', comparisonId: state.comparisonId, entityId, open,
-        }).state),
+        }).state, layoutRelations),
     };
 };
 
-export const createGraphSession = (comparison: SourceGraph): GraphSessionUI =>
-    sessionFor(experienceService.openComparison(comparison));
+export const createGraphSession = (comparison: SourceGraph): GraphSessionUI => {
+    const registry = collectEntities(comparison.entities);
+    const layoutRelations = comparison.relations.map(edge => ({...edge, ui: edgeRows(edge, registry)}));
+    return sessionFor(experienceService.openComparison(comparison), layoutRelations);
+};
