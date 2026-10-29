@@ -100,3 +100,6 @@ Date:2026-10-28. User authorizes the adopted [viewport worker delivery](slices/0
 ## Changes-only graph control
 
 Date:2026-10-29. User requests a stateful changes-only floating toolbar; [V37 packet](slices/05-explanation-exploration/change-filter/plan.md) owns bounded delivery and the [durable contract](../../product/pr-file-tree-first.md#changes-only-floating-graph-control) supersedes the no-toolbar minimum only for this control. Keep reversible full geometry, UI state/evidence and viewport worker behavior.
+
+
+V38 correction (2026-10-29): [draggable icon toolbar](slices/05-explanation-exploration/toolbar-refinement/plan.md) addresses explicit user feedback on V37: separate grip movement, bounds and icon-only accessible controls. Filter/geometry semantics remain unchanged.
