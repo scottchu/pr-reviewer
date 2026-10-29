@@ -95,3 +95,8 @@ Sequence: freeze semantic/default-and-expanded projection oracles and independen
 ## Viewport scene performance delivery
 
 Date:2026-10-28. User authorizes the adopted [viewport worker delivery](slices/05-explanation-exploration/viewport-scene/plan.md), based on deployed main664616c. The [durable specification](../../product/viewport-scene.md) owns UI/worker boundaries, measured-layout preservation, correctness and qualified performance acceptance. Baseline → indexed worker/viewport → incremental source preparation → independent review → existing-target main deployment. This does not close whole-round understanding or native-host gates.
+
+
+## Changes-only graph control
+
+Date:2026-10-29. User requests a stateful changes-only floating toolbar; [V37 packet](slices/05-explanation-exploration/change-filter/plan.md) owns bounded delivery and the [durable contract](../../product/pr-file-tree-first.md#changes-only-floating-graph-control) supersedes the no-toolbar minimum only for this control. Keep reversible full geometry, UI state/evidence and viewport worker behavior.
