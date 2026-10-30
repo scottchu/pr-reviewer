@@ -26,12 +26,23 @@ export const prepareReviewComparison = async (repository: string, base: string, 
             sources = snapshot.sources;
             return snapshot;
         }, parse: domainService.parseSnapshot, extract: extractPreparedComparison, enrich: source => prepareAttribution(source.facts, source.comparison, sources) });
-    return assemblePreparedResult(result, inputHash);
+    return assemblePreparedResult(result, inputHash, sources);
 };
-export const assemblePreparedResult = (result: PipelineResult<AttributedEnrichment>, inputHash: (facts: FactDocument) => string) => {
+export const assemblePreparedResult = (result: PipelineResult<AttributedEnrichment>, inputHash: (facts: FactDocument) => string, sources?: readonly SourceInput[]) => {
     if (result.status === 'failed' && (!result.source || result.stage !== 'enrich'))
         throw result.error;
     const source = result.status === 'ready' ? result.source : result.source!;
     const attribution = result.status === 'ready' ? result.enrichment : { nodes: [], edges: [] };
-    return { facts: source.facts, graph: prepareAppGraph(source.facts, inputHash(source.facts), source.comparison, attribution, source.nativeDiffs, source.editCompositions), enrichmentStatus: result.status === 'ready' ? 'ready' as const : 'unavailable' as const,nativeDiagnostics:source.nativeDiagnostics };
+    const assembled = prepareAppGraph(source.facts, inputHash(source.facts), source.comparison, attribution,
+        source.nativeDiffs, source.editCompositions, sources);
+    const graph = result.status === 'failed' ? {...assembled, provenance: {
+        ...assembled.provenance,
+        enrichmentFailure: result.error instanceof Error ? result.error.message : String(result.error),
+    }} : assembled;
+    return {
+        facts: source.facts,
+        graph,
+        enrichmentStatus: result.status === 'ready' && !graph.provenance.enrichmentFailure ? 'ready' as const : 'unavailable' as const,
+        nativeDiagnostics: source.nativeDiagnostics,
+    };
 };

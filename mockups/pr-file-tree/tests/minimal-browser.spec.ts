@@ -166,7 +166,7 @@ for (const width of [1440, 390]) {
     const summary = card.locator('summary');
     const camera = await page.locator('.react-flow__viewport').getAttribute('style');
     await summary.focus(); await summary.press('Enter');
-    const reading = card.locator('[aria-label="All native document hunks"]');
+    const reading = card.locator('[aria-label="All native source hunks"]');
     await expect(reading).toBeVisible();
     const hunks = evidence.data.nativeHunks as {before: {text:string; contentHash:string} | null; after: {text:string; contentHash:string} | null}[];
     await expect(card.locator('[data-native-hunk]')).toHaveCount(hunks.length);

@@ -251,7 +251,7 @@ export const compileSourceGraph = (facts: FactDocument, aliases:PreparationAlias
         const from = occurrenceIds.get(unit.ownerId!), to = occurrenceIds.get(unit.id);
         if (from && to)
             relations.push({
-                id: 'constructs:' + from + ':' + to, from, to, version: version(unit.anchor.side), relation: 'constructs', data: {
+                id: 'constructs:' + from + ':' + to + ':' + version(unit.anchor.side), from, to, version: version(unit.anchor.side), relation: 'constructs', data: {
                     sourceEvidence: unit.anchor, comparisonStatus: entities.find(entity => entity.id === to)?.data.comparisonStatus, scope: aliases.headerScope?.(from) ?? 'Direct headers.Authorization construction only',
                     scopeLimit: 'Not global header removal'
                 }

@@ -32,7 +32,7 @@ for (const width of [1440, 390]) {
         await node.locator('summary').first().click();
         await expect(node.getByLabel('Added source rows', {exact: true})).toContainText('single local owner');
         await node.locator('summary').filter({hasText: /^Read all /}).click();
-        await expect(node.getByLabel('All native document hunks', {exact: true})).toContainText('assert.equal');
+        await expect(node.getByLabel('All native source hunks', {exact: true})).toContainText('assert.equal');
         await node.locator('summary').filter({hasText: /^Read all /}).click();
         await expect(node).toContainText('After · e3b270e');
         await node.locator('summary').first().click();

@@ -12,13 +12,19 @@
             "path": "src/application/review.ts",
             "side": "base",
             "startLine": 29,
-            "endLine": 29
+            "endLine": 29,
+            "repository": "scottchu/pr-reviewer",
+            "commit": "b096826e31c0927190806de91ed70b8b64aa93d8",
+            "contentHash": "7953f0b8486ae475717bdc749e23a31f12351f41c11a473280de9a2420265477"
           },
           {
             "path": "src/application/local-access.ts",
             "side": "head",
             "startLine": 3,
-            "endLine": 3
+            "endLine": 3,
+            "repository": "scottchu/pr-reviewer",
+            "commit": "e3b270e5f49a9215452b0b86702946043e979059",
+            "contentHash": "811735e3599292c54af870134345249deed32f1d9b9705f8ca18fd086225d59d"
           }
         ]
       }
@@ -34,7 +40,10 @@
             "path": "docs/product/review-loop/runtime.md",
             "side": "head",
             "startLine": 22,
-            "endLine": 26
+            "endLine": 26,
+            "repository": "scottchu/pr-reviewer",
+            "commit": "e3b270e5f49a9215452b0b86702946043e979059",
+            "contentHash": "b5b390e291929162a7c8cd0225ddfae19651e3e335ccd3bfb73c3474c5744abd"
           }
         ]
       }
@@ -47,7 +56,27 @@
         "value": [
           "Owner requests without Authorization; invalid explicit credentials rejected"
         ],
-        "basis": "Prepared source-declared HTTP policy expectation, not execution"
+        "basis": "Prepared source-declared HTTP policy expectation, not execution",
+        "sourceRefs": [
+          {
+            "path": "docs/product/review-loop/runtime.md",
+            "side": "head",
+            "startLine": 22,
+            "endLine": 28,
+            "repository": "scottchu/pr-reviewer",
+            "commit": "e3b270e5f49a9215452b0b86702946043e979059",
+            "contentHash": "b5b390e291929162a7c8cd0225ddfae19651e3e335ccd3bfb73c3474c5744abd"
+          },
+          {
+            "path": "tests/gateway.test.ts",
+            "side": "head",
+            "startLine": 99,
+            "endLine": 112,
+            "repository": "scottchu/pr-reviewer",
+            "commit": "e3b270e5f49a9215452b0b86702946043e979059",
+            "contentHash": "13e7db6e38670e876795a150587bb6e5a441548915fb37f67ff0a80563953158"
+          }
+        ]
       }
     }
   ],

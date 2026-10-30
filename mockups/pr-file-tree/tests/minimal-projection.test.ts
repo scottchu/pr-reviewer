@@ -55,7 +55,8 @@ test('kind-driven rows keep short commit/range and clearly describe unexecuted a
   assert.match(edgeRows(before, allEntities()).explanation, /Source occurrence/);
   const assertions = allEntities().find(entity => entity.id === 'new-test-assertions');
   assert.ok(assertions);
-  assert.match(cardRows(assertions).rows.join(' '), /Asserts API requests/);
+  assert.match(cardRows(assertions).rows.join(' '), /expect\(ownerRequests\.every/);
+  assert.doesNotMatch(cardRows(assertions).rows.join(' '), /Asserts API requests/);
   assert.doesNotMatch(cardRows(assertions).rows.join(' '), /Observed API requests/);
 });
 

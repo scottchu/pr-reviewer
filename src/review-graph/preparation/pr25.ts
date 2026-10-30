@@ -11,20 +11,46 @@ import type {AttributedEnrichment} from '../enrich/attributed.ts';
 import explanations from './graph-explanations.json' with { type: 'json' };
 const hash = (bytes: string | Buffer) => createHash('sha256').update(bytes).digest('hex');
 export const selectPreparedTests=(entities:readonly GraphEntity[])=>entities.filter(entity=>entity.kind==='test'&&(String(entity.data.name).includes('disposed ignored-abort read settles')||String(entity.data.name).includes('single local owner reads and writes without a Bearer')||String(entity.data.name).startsWith('01-A/C/F/G controlled host')));
-export const prepareAttribution=(facts:FactDocument,compiled:CompiledSourceGraph,sources?:readonly SourceInput[]):AttributedEnrichment=>{
- const namedTests=selectPreparedTests(compiled.entities);
- const nodes=explanations.nodes.filter(entity=>entity.id!=='owner-http-policy'||namedTests.some(test=>String(test.data.name).includes('single local owner')));
- const groupSubjects=new Map(compiled.entities.filter(entity=>['function','test'].includes(entity.kind)&&['change','add','remove'].includes(String(entity.data.comparisonStatus))).map(entity=>[entity.id==='request'?'change':'change:'+entity.id,entity.id]));
- const valid=new Set([...compiled.entities.map(entity=>entity.id),...groupSubjects.keys(),...nodes.map(node=>node.id)]);
- const edges=explanations.edges.filter(edge=>valid.has(edge.from)&&valid.has(edge.to)) as GraphRelation[];
- admitAttributedEnrichment(facts,compiled.entities,{nodes,edges:edges.map(edge=>({...edge,from:groupSubjects.get(edge.from)??edge.from,to:groupSubjects.get(edge.to)??edge.to}))},sources);
- return {nodes,edges};
+export const prepareAttribution = (
+    facts: FactDocument,
+    compiled: CompiledSourceGraph,
+    sources?: readonly SourceInput[],
+): AttributedEnrichment => {
+    const namedTests = selectPreparedTests(compiled.entities);
+    const nodes = explanations.nodes.filter(entity => entity.id !== 'owner-http-policy' ||
+        namedTests.some(test => String(test.data.name).includes('single local owner')));
+    const groupSubjects = compiled.entities.filter(entity => ['function', 'test'].includes(entity.kind) &&
+        ['change', 'add', 'remove'].includes(String(entity.data.comparisonStatus))).map(entity => ({
+            id: entity.id === 'request' ? 'change' : 'change:' + entity.id,
+            kind: 'change',
+            data: {},
+        }));
+    const valid = new Set([...compiled.entities.map(entity => entity.id),
+        ...groupSubjects.map(entity => entity.id), ...nodes.map(node => node.id)]);
+    const edges = explanations.edges.filter(edge => valid.has(edge.from) && valid.has(edge.to)) as GraphRelation[];
+    return admitAttributedEnrichment(facts, [...compiled.entities, ...groupSubjects], {nodes, edges}, sources);
 };
-export const prepareAppGraph = (facts: FactDocument, inputHash: string, compiledInput?: CompiledSourceGraph, attributionInput?:AttributedEnrichment,nativeDiffs?:ReadonlyMap<string,readonly import('../domain/types.ts').NativeDocumentHunk[]>,editCompositions?:ReadonlyMap<string,EditComposition>) => {
-    const compiled = compiledInput ?? domainService.compare(facts,pr25Aliases);
-    let attributionFailure:string|undefined;
-    let attribution=attributionInput;
-    if(!attribution){try{attribution=prepareAttribution(facts,compiled);}catch(error){attribution={nodes:[],edges:[]};attributionFailure=error instanceof Error?error.message:String(error);}}
+
+export const prepareAppGraph = (
+    facts: FactDocument,
+    inputHash: string,
+    compiledInput?: CompiledSourceGraph,
+    attributionInput?: AttributedEnrichment,
+    nativeDiffs?: ReadonlyMap<string, readonly import('../domain/types.ts').NativeDocumentHunk[]>,
+    editCompositions?: ReadonlyMap<string, EditComposition>,
+    sources?: readonly SourceInput[],
+) => {
+    const compiled = compiledInput ?? domainService.compare(facts, pr25Aliases);
+    let attributionFailure: string | undefined;
+    let attribution = attributionInput;
+    if (!attribution) {
+        try {
+            attribution = prepareAttribution(facts, compiled, sources);
+        } catch (error) {
+            attribution = {nodes: [], edges: []};
+            attributionFailure = error instanceof Error ? error.message : String(error);
+        }
+    }
 
     const entities = [...compiled.entities];
     const relations = [...compiled.relations];
@@ -122,6 +148,12 @@ export const prepareAppGraph = (facts: FactDocument, inputHash: string, compiled
             initial.add(group);
     }
     const valid = new Set(flat.map(entity => entity.id));
+    try {
+        admitAttributedEnrichment(facts, [...entities.filter(entity => !grouped.has(entity.id)), ...groups], attribution, sources);
+    } catch (error) {
+        attributionFailure = error instanceof Error ? error.message : String(error);
+        attribution = {nodes: [], edges: []};
+    }
     const acceptedExplanations = attribution.nodes;
     for (const node of acceptedExplanations)
         valid.add(node.id);
@@ -159,7 +191,7 @@ export const prepareAppGraph = (facts: FactDocument, inputHash: string, compiled
                     })) } : {}) }, ...(entity.nodes ? { nodes: entity.nodes.map(compact) } : {})
         };
     };
-    return {
+    const graph = {
         id: compiled.id, kind: 'graph', entities: [...entities.filter(entity => !grouped.has(entity.id)), ...groups, ...acceptedExplanations].map(decorateEdits).map(compact), relations,
         fileUnits: compiled.fileUnits, ownerByUnit, groupFor: Object.fromEntries(groupFor), initialVisible: [...initial],
         unresolved: compiled.unresolved.map(row => ({
@@ -169,4 +201,6 @@ export const prepareAppGraph = (facts: FactDocument, inputHash: string, compiled
             ...compiled.provenance, ...(attributionFailure?{enrichmentFailure:attributionFailure}:{}), inputArtifactHash: inputHash, compilerHash: hash(readFileSync(new URL('../domain/comparison.ts', import.meta.url))), appCompilerHash: hash(readFileSync(new URL('./pr25.ts', import.meta.url))), explanationHash: hash(readFileSync(new URL('./graph-explanations.json', import.meta.url))), documentCompilerHash: hash(readFileSync(new URL('../parse/native-diff.ts', import.meta.url))), editCompilerHash: hash(readFileSync(new URL('../domain/edit-composition.ts', import.meta.url)))
         }
     };
+    domainService.validateGraph(graph.entities, graph.relations);
+    return graph;
 };

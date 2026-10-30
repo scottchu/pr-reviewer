@@ -2,7 +2,7 @@
 
 Date: 2026-10-30.
 Request revision: raw-projection-correctness-R1.
-Status: docs accepted; implementation pending.
+Status: implemented; local checks passed; independent source review and PR delivery pending.
 Parent: [720p round](../../../plan.md), [explanation/exploration slice](../plan.md).
 Specification: [raw projection correctness](../../../../../product/raw-projection-correctness.md), [source pipeline](../../../../../product/source-pipeline.md), [TBox](../../../../../product/project-repository-tbox.md).
 
@@ -31,4 +31,12 @@ Assign a fresh reviewer other than implementer after candidate commit/build/PR a
 
 ## Progress and evidence
 
-Docs-first milestone pending commit. Tests/build/review/PR pending. Live endpoint retains baseline; no deployment claim. Temporary artifacts will be retained under ignored .decompozr/flow/run/raw-projection-correctness with owner/status metadata. No old artifact is cleaned up. No whole-round acceptance claimed.
+Docs-first milestone committed as b89b323. Implementation/local tests/build passed as recorded below; independent review and PR readback pending. Live endpoint retains baseline; no deployment claim. Temporary artifacts will be retained under ignored .decompozr/flow/run/raw-projection-correctness with owner/status metadata. No old artifact is cleaned up. No whole-round acceptance claimed.
+
+## Local verification checkpoint
+
+Docs-first commit: b89b323. R1 repairs implemented. Declared npm run test:reading-journey: 176/176 PASS, including eight focused raw-correctness cases. npm run check (root strict TypeScript and subsystem boundaries): PASS. Minimum graph strict TypeScript: PASS. Vite native-loader production build: PASS; existing large-bundle warning retained. Frozen source/canonical/default/20/40/hide oracle uses explicit inverse normalization only for versioned constructs IDs, qualified interpretation refs and verbatim assertion rows; all other fields remain frozen. Historical fixture is retained, not blindly regenerated.
+
+Supported CUA getBrowser({id: iab}) still returned The browser access host is unavailable. New CSS File disclosure/close/reopen React E2E is registered in the minimum-graph suite but UNRUN; no alternate browser route used. Source/pure checks establish all 684 native edited rows are exposed by File UI Types; they do not establish actual React interaction. Own-correction-PR graph intake remains blocked by fixed PR25/no selector. Live endpoint remains the old deployed candidate; no restart, deployment or merge performed.
+
+Independent source-review dispatch: requested gpt-6.1-sol / high, fresh context. Rationale: bounded multi-layer correctness review with negative evidence/assembly cases and no visual implementation work. Escalate only for unresolved source/identity/admission correctness. Read-only packet R1; source review is explicitly narrower than blocked graph-first understanding. Candidate commit and PR will be pinned in the dispatch and reconciliation below.
