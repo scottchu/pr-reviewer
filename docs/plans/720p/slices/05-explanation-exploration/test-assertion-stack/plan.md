@@ -2,7 +2,7 @@
 
 Date: 2026-10-30.
 Revision: test-assertion-stack-R1.
-Status: implemented and locally checked; independent review/PR pending; actual browser unavailable.
+Status: implemented, locally checked and independently source-reviewed; draft PR43 published; actual browser acceptance blocked.
 Parent: [720p](../../../plan.md), [explanation/exploration](../plan.md).
 Specification: [Test and Assertion arrangement](../../../../../product/pr-file-tree-first.md#test-and-assertion-vertical-arrangement--2026-10-30).
 
@@ -27,3 +27,7 @@ Docs-first commit7301808. Implemented UI-only ownership families and measured ve
 Normal graph suite181/181 PASS; five new focused tests PASS, covering typed ownership, grouped measured bounds/reflow, unchanged root stacks, ambiguous/mixed negatives and pinned PR25 immutability. Root/minimum strict TypeScript, subsystem boundaries and production build PASS. Canonical graph bytes exactly equal deployed fbe175c (SHA256946b1c59ebde5dd8f5f3eeb2fc5f99fc7e3d6e4b4b3d5d9c9303e699ccb08a2a). Design detector reports no findings; it is not visual approval. Desktop/390 React source-disclosure reflow E2E is registered but UNRUN: supported CUA getBrowser({id:iab}) returned The browser access host is unavailable. No alternative browser route used.
 
 Independent source-review selection: fresh gpt-6.1-sol/medium for bounded pure geometry, ownership and measured-footprint checks; escalate only on an unresolved correctness issue. Exact candidate/PR pinned at dispatch. Source review does not satisfy graph-first/actual UI acceptance. Live endpoint remains fbe175c, and this packet claims no merge/deployment.
+
+## Review and publication reconciliation
+
+[PR43](https://github.com/scottchu/pr-reviewer/pull/43) contains the product candidatec9dc4eb and browser-test correction53cb2df. [Independent source review](review.md) is PASS at53cb2df after resolving one asynchronous-reflow test issue; targeted9/9 passed. Owner normal suite181/181 and required local checks pass. Final documentation commits record evidence separately from the product/build identity. S1–S4 are verified within source/geometry scope; actual browser/dogfood/graph-first gates stay open. No direct successor is declared ready. Parent plans link here, and durable arrangement semantics are in the product specification.
