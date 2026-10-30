@@ -109,3 +109,5 @@ Date:2026-10-29. User requests a stateful changes-only floating toolbar; [V37 pa
 V38 correction (2026-10-29): [draggable icon toolbar](slices/05-explanation-exploration/toolbar-refinement/plan.md) addresses explicit user feedback on V37: separate grip movement, bounds and icon-only accessible controls. Filter/geometry semantics remain unchanged.
 
 2026-10-29 bounded factual-source correction: [header occurrence packet](slices/05-explanation-exploration/header-occurrence/plan.md) fixes card-level removal scope while preserving exact Domain identities and the separate After call. Test/policy semantics are analysis-only; live deployment is outside this delegation's authority.
+
+2026-10-30: [Raw projection correctness repair](slices/05-explanation-exploration/raw-projection-correctness/plan.md) owns the docs-first factual integrity fixes. Raw projection only; no UX feature expansion or completion inferred from local checks.

@@ -119,3 +119,7 @@ In the default callable reading projection, a uniquely supported Function contai
 ## Retired prepared policy relation — 2026-10-29
 
 The lowest-level graph does not synthesize Test `verifies_policy` from a test title or whole-test assertion interpretation. Preserve exact Test `contains` Assertion and source witnesses. A document mention without a resolved precise clause remains source text, not verification. No automatic replacement relation or execution result is introduced. Historical snapshots may retain this relation for compatible reading only; separately attributed `related_policy` and intent relations are outside this cleanup. See [source pipeline](source-pipeline.md#unsupported-policy-verification-cleanup--2026-10-29).
+
+## Raw projection integrity — 2026-10-30
+
+Apply the [raw projection correctness contract](raw-projection-correctness.md) to existing vocabulary: unique relation identities per version, unchanged logical entity identities, exact native source disclosure and explicit source-qualified interpretation. The existing admitted interpretation predicates have fixed endpoint kinds; presentation is not permission to infer new facts. No new ontology kind, predicate or reasoner is introduced.

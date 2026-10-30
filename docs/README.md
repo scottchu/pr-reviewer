@@ -21,3 +21,5 @@ Keep related delivery material together. Each round lives under `docs/plans/<rou
 
 - [Source understanding pipeline](product/source-pipeline.md): accepted read/parse/extraction/enrichment direction, proposed module boundaries and independent correctness tests.
 - [Viewport graph presentation](product/viewport-scene.md): adopted worker/indexed viewport selection, UI ownership, failure behavior and qualified performance acceptance.
+
+- [Raw projection correctness](product/raw-projection-correctness.md): source/fact/interpretation boundaries, unique relations and complete native evidence disclosure.
