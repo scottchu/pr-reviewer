@@ -150,3 +150,5 @@ Controlling2026-10-26: [graph-first recovery](semantic-graph-recovery.md) and [r
 2026-10-30: [Raw projection correctness repair](raw-projection-correctness/plan.md) owns the docs-first factual integrity fixes. Raw projection only; no UX feature expansion or completion inferred from local checks.
 
 2026-10-30: [Test above Assertions](test-assertion-stack/plan.md) is a narrow automatic-layout correction; ontology and other presentation remain unchanged.
+
+2026-10-30: [Measured label overlap repair](label-overlap/plan.md) records user screenshots invalidating automatic-layout visual acceptance and the corrected joint geometry contract.
