@@ -280,7 +280,7 @@ const Relation = React.memo((props: EdgeProps<RelationEdge>) => {
         </g>
         <EdgeLabelRenderer>
             <div ref={labelRef} className={'minimal-edge-card version-' + data.relation.version + ' nodrag' + (data.coarse ? '' : ' nopan')}
-                data-relation={data.relation.relation} data-edge-id={props.id}
+                data-placement-state={data.routed.placementBlocked ? 'blocked' : 'placed'} data-relation={data.relation.relation} data-edge-id={props.id}
                 inert={data.measureOnly || undefined} aria-hidden={data.measureOnly || undefined}
                 role={data.coarse ? undefined : 'button'} tabIndex={data.coarse || data.measureOnly ? -1 : 0}
                 aria-label={'Move ' + card.title + ' label and route'}
@@ -300,9 +300,11 @@ const Relation = React.memo((props: EdgeProps<RelationEdge>) => {
 });
 const nodeTypes = { entity: Entity, graph: GraphBoundary };
 const edgeTypes = { relation: Relation };
-const InitialLayout = ({ nodes, apply, links, revision, headers }: {
+const InitialLayout = ({ nodes, apply, links, revision, headers, labelSizes, manualChildren }: {
     nodes: readonly EntityNode[];
     headers: Readonly<Record<string, number>>;
+    labelSizes: Readonly<Record<string, {width: number; height: number}>>;
+    manualChildren: Readonly<Record<string, Point>>;
     apply: (nodes: EntityNode[]) => void;
     links: readonly {
         id: string;
@@ -322,11 +324,11 @@ const InitialLayout = ({ nodes, apply, links, revision, headers }: {
             second = requestAnimationFrame(() => {
                 applied.current = revision;
                 const focus = allEntities().find(entity => entity.kind === 'review')?.id ?? 'pr25';
-                apply(initialLayout(withMeasuredGeometry(nodes, getNodes()), links, focus, bands, headers, paths, documents, testFamilies));
+                apply(initialLayout(withMeasuredGeometry(nodes, getNodes()), links, focus, bands, headers, paths, documents, testFamilies, labelSizes, manualChildren));
             });
         });
         return () => { cancelAnimationFrame(first); cancelAnimationFrame(second); };
-    }, [initialized, nodes, getNodes, apply, links, revision, headers]);
+    }, [initialized, nodes, getNodes, apply, links, revision, headers, labelSizes, manualChildren]);
     return null;
 };
 const App = () => {
@@ -345,7 +347,6 @@ const App = () => {
     const [nodes, setNodes, onNodesChange] = useNodesState<EntityNode>([]);
     const [ready, setReady] = useState(false);
     const [layoutRevision, setLayoutRevision] = useState('');
-    const revision = JSON.stringify(limits) + ':' + geometryRevision + ':' + coarse + ':' + JSON.stringify(headerClearances);
     const [selection, setSelection] = useState<SceneSelectionUI | null>(null);
     const [pins, setPins] = useState<ScenePinsUI>({nodes: [], routes: []});
     const pinsChanged = useCallback((next: ScenePinsUI) => setPins(previous =>
@@ -356,6 +357,9 @@ const App = () => {
         width: number;
         height: number;
     }>>({});
+    const revision = useMemo(() => JSON.stringify(limits) + ':' + geometryRevision + ':' + coarse + ':' +
+        JSON.stringify(headerClearances) + ':' + JSON.stringify(sizes),
+        [limits, geometryRevision, coarse, headerClearances, sizes]);
     type Movement = { nodes: readonly EntityNode[]; manual: Record<string, Point> };
     const latest = useRef<Movement>({ nodes, manual });
     const movementRef = useRef<Movement | null>(null);
@@ -365,7 +369,7 @@ const App = () => {
         movementRef.current = latest.current;
         setMovement(latest.current);
     }, []);
-    const endMove = useCallback(() => { movementRef.current = null; setMovement(null); }, []);
+    const endMove = useCallback(() => { movementRef.current = null; setMovement(null); setGeometryRevision(value => value + 1); }, []);
     const moveNode = useCallback((id: string, delta: Point) => {
         const position = movedNodePosition((movementRef.current ?? latest.current).nodes, id, delta, headerClearances);
         if (!position) return;
@@ -414,6 +418,10 @@ const App = () => {
                 manualPositions.current[change.id] = change.position;
         const relevant = next.filter(change => change.type !== 'dimensions' || nodes.find(node => node.id === change.id)?.measured?.width !== change.dimensions?.width || nodes.find(node => node.id === change.id)?.measured?.height !== change.dimensions?.height);
         if (relevant.length) onNodesChange(relevant);
+        if (relevant.some(change => change.type === 'dimensions' && change.dimensions &&
+            change.dimensions.width > 0 && change.dimensions.height > 0)) {
+            setGeometryRevision(value => value + 1);
+        }
     }, [onNodesChange, nodes]);
     const onBend = useCallback((id: string, offset: Point | undefined) => setManual(previous => {
         const next = { ...previous };
@@ -429,15 +437,15 @@ const App = () => {
     }) => setSizes(previous => previous[id]?.width === size.width && previous[id]?.height === size.height ? previous : { ...previous, [id]: size }), []);
     const placementNodes = movement?.nodes ?? nodes;
     const placementManual = movement?.manual ?? manual;
-    const placements = useMemo(() => ready ? projectionRoutes(placementNodes, view.nodes, links, sizes, placementManual) : null,
-        [ready, placementNodes, view.nodes, links, sizes, placementManual]);
+    const placements = useMemo(() => ready ? projectionRoutes(placementNodes, view.nodes, links, sizes, placementManual, headerClearances) : null,
+        [ready, placementNodes, view.nodes, links, sizes, placementManual, headerClearances]);
     const edgeCache = useRef(new Map<string, RelationEdge>());
     const edges = useMemo<RelationEdge[]>(() => {
         if (!ready)
             return [];
         if (!placements)
             return [];
-        const routes = liveProjectionRoutes(nodes, links, placements, manual, sizes);
+        const routes = liveProjectionRoutes(nodes, links, placements, manual, sizes, Boolean(movement));
         return relations.map(relation => {
             const routed = routes.get(relation.id)!;
             const prior = edgeCache.current.get(relation.id);
@@ -451,7 +459,7 @@ const App = () => {
             edgeCache.current.set(relation.id, edge);
             return edge;
         });
-    }, [ready, placements, nodes, links, manual, sizes, relations, coarse, beginMove, endMove, onBend, onMeasure]);
+    }, [ready, placements, nodes, links, manual, sizes, relations, coarse, movement, beginMove, endMove, onBend, onMeasure]);
     const sceneSequence = useRef(0);
     const scene = useMemo(() => {
         if (!ready || movement || layoutRevision !== revision || nodes.length !== view.nodes.length ||
@@ -512,7 +520,7 @@ const App = () => {
   <main data-scene-mode={membership ? 'selected' : 'full'} data-changes-only={experience.filter.changesOnly} className={coarse ? 'coarse-input' : undefined} aria-label="PR25 source comparison graph"><ReactFlow<EntityNode, RelationEdge> nodes={renderedNodes} onNodesChange={changes} onNodeDragStart={beginMove} onNodeDragStop={endMove} edges={renderedEdges} nodeTypes={nodeTypes} edgeTypes={edgeTypes} defaultViewport={{
         x: 20, y: 35, zoom: 1
     }} minZoom={0.25} maxZoom={2} panOnScroll panOnScrollMode={PanOnScrollMode.Free} zoomOnScroll={false} zoomOnPinch nodesConnectable={false} nodesDraggable elementsSelectable={false} proOptions={{ hideAttribution: true }}>
-   <ViewportScene scene={scene} publish={setSelection} pinsChanged={pinsChanged}/><InitialLayout nodes={nodes} apply={apply} links={links} revision={revision} headers={headerClearances}/><Background color="#29333b" gap={24} size={1}/>
+   <ViewportScene scene={scene} publish={setSelection} pinsChanged={pinsChanged}/><InitialLayout nodes={nodes} apply={apply} links={links} revision={revision} headers={headerClearances} labelSizes={sizes} manualChildren={manualPositions.current}/><Background color="#29333b" gap={24} size={1}/>
   </ReactFlow>
   <GraphToolbar filter={experience.filter} onToggle={() => setExperience(previous => previous.setChangesOnly(!previous.filter.changesOnly))}/>
   </main></>;

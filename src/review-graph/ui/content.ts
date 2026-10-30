@@ -33,7 +33,7 @@ const contentRows = (entity: GraphEntity): CardRows => {
         case 'behavior': return { title: text(data.name), rows: Array.isArray(data.value) ? data.value.map(String) : [] };
         case 'assertion': return {
             title: text(data.name),
-            rows: [...(Array.isArray(data.value) ? data.value.map(String) : []),],
+            rows: Array.isArray(data.value) ? data.value.map(String).filter(value => value !== text(data.name)) : [],
         };
         case 'source_step': return { title: text(data.name).replace(/^Before:\s*/, ''), rows: ['Source step · not an assertion'] };
         case 'reason': return { title: text(data.name), rows: [] };

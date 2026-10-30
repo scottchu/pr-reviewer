@@ -113,3 +113,5 @@ V38 correction (2026-10-29): [draggable icon toolbar](slices/05-explanation-expl
 2026-10-30: [Raw projection correctness repair](slices/05-explanation-exploration/raw-projection-correctness/plan.md) owns the docs-first factual integrity fixes. Raw projection only; no UX feature expansion or completion inferred from local checks.
 
 2026-10-30: [Test above Assertions](slices/05-explanation-exploration/test-assertion-stack/plan.md) is a narrow automatic-layout correction; ontology and other presentation remain unchanged.
+
+2026-10-30: [Measured label overlap repair](slices/05-explanation-exploration/label-overlap/plan.md) records user screenshots invalidating automatic-layout visual acceptance and the corrected joint geometry contract.

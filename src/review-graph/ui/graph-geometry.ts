@@ -69,6 +69,51 @@ const testStacks = (
  return stacks;
 };
 
+export type LabelSize = Readonly<{width: number; height: number}>;
+export type InternalLabelPlan = Readonly<{
+ groupId: string;
+ width: number;
+ height: number;
+ labels: ReadonlyMap<string, Point>;
+}>;
+
+/** Allocate real label rectangles beside content before root columns are placed. */
+export const internalLabelPlans = (
+ nodes: readonly LayoutNode[], links: readonly Link[],
+ sizes: Readonly<Record<string, LabelSize>>, headers: Readonly<Record<string, number>> = {},
+): readonly InternalLabelPlan[] => {
+ const byId = new Map(nodes.map(node => [node.id, node]));
+ const plans: InternalLabelPlan[] = [];
+ for (const group of nodes.filter(node => nodes.some(child => child.parentId === node.id))) {
+  const children = nodes.filter(node => node.parentId === group.id);
+  const internal = links.filter(link => byId.get(link.source)?.parentId === group.id &&
+   byId.get(link.target)?.parentId === group.id);
+  if (!internal.length) continue;
+  const contentRight = Math.max(...children.map(child => child.position.x + dimensions(child).width));
+  const contentBottom = Math.max(...children.map(child => child.position.y + dimensions(child).height));
+  const laneLeft = contentRight + 24;
+  let bottom = headers[group.id] ?? groupInterior.top;
+  let right = laneLeft;
+  const labels = new Map<string, Point>();
+  const ordered = internal.map((link, index) => ({link, index})).sort((a, b) => {
+   const first = byId.get(a.link.target)!, second = byId.get(b.link.target)!;
+   return first.position.y - second.position.y || first.position.x - second.position.x || a.index - b.index;
+  });
+  for (const {link} of ordered) {
+   const target = byId.get(link.target)!;
+   const size = sizes[link.id] ?? {width: 240, height: 75};
+   const y = Math.max(target.position.y + dimensions(target).height / 2, bottom + 24 + size.height / 2);
+   labels.set(link.id, {x: laneLeft + size.width / 2, y});
+   bottom = y + size.height / 2;
+   right = Math.max(right, laneLeft + size.width);
+  }
+  plans.push({groupId: group.id, labels,
+   width: Math.max(dimensions(group).width, right + groupInterior.padding),
+   height: Math.max(dimensions(group).height, contentBottom + groupInterior.padding, bottom + groupInterior.padding)});
+ }
+ return plans;
+};
+
 export const initialLayout = <T extends LayoutNode>(
  input: readonly T[],
  links: readonly Link[],
@@ -78,6 +123,8 @@ export const initialLayout = <T extends LayoutNode>(
  paths: ReadonlyMap<string, string> = new Map(),
  documents: ReadonlyMap<string, string> = new Map(),
  testFamilies: ReadonlyMap<string, readonly string[]> = new Map(),
+ labelSizes: Readonly<Record<string, LabelSize>> = {},
+ manualChildren: Readonly<Record<string, Point>> = {},
 ): T[] => {
  const nodes = input.map(node => ({...node, position: {...node.position}, style: {...node.style, opacity: 1}}));
  for (const group of nodes.filter(node => nodes.some(child => child.parentId === node.id))) {
@@ -106,6 +153,13 @@ export const initialLayout = <T extends LayoutNode>(
    y += Math.max(...row.map(node => dimensions(node).height)) + rowGap;
   }
   group.style = {...group.style, width, height: y - 100 + 40};
+ }
+ for (const child of nodes.filter(node => node.parentId && manualChildren[node.id])) {
+  child.position = {...manualChildren[child.id]!};
+ }
+ for (const plan of internalLabelPlans(nodes, links, labelSizes, headers)) {
+  const group = nodes.find(node => node.id === plan.groupId)!;
+  group.style = {...group.style, width: plan.width, height: plan.height};
  }
  const roots = nodes.filter(node => !node.parentId);
  const rootStacks = testStacks(roots, testFamilies);
@@ -165,7 +219,7 @@ export const sides = (source:Box,target:Box):[Side,Side] => {const dx=target.x+t
 export const port = (box:Box,side:Side):Point => {const fraction=0.5;return {x:side==='left'?box.x:side==='right'?box.x+box.width:box.x+box.width*fraction,y:side==='top'?box.y:side==='bottom'?box.y+box.height:box.y+box.height*fraction};};
 export const curve = (start:Point,end:Point,offset:Point) => {const middle={x:(start.x+end.x)/2+offset.x,y:(start.y+end.y)/2+offset.y};const control={x:2*middle.x-(start.x+end.x)/2,y:2*middle.y-(start.y+end.y)/2};const at=(t:number):Point=>({x:(1-t)**2*start.x+2*(1-t)*t*control.x+t*t*end.x,y:(1-t)**2*start.y+2*(1-t)*t*control.y+t*t*end.y});return {path:'M'+start.x+','+start.y+' Q'+control.x+','+control.y+' '+end.x+','+end.y,label:middle,at};};
 const overlaps=(a:Box,b:Box)=>Math.min(a.x+a.width,b.x+b.width)>Math.max(a.x,b.x)&&Math.min(a.y+a.height,b.y+b.height)>Math.max(a.y,b.y);
-export type Routed = Readonly<{sourceSide:Side;targetSide:Side;offset:Point;label:Point}>;
+export type Routed = Readonly<{sourceSide:Side;targetSide:Side;offset:Point;label:Point;placementBlocked?:true}>;
 export const automaticRoutes = (nodes:readonly LayoutNode[],links:readonly Link[],sizes:Readonly<Record<string,{width:number;height:number}>>,manual:Readonly<Record<string,Point>>):Map<string,Routed> => {
  const boxes=absoluteBoxes(nodes);const obstacles=nodes.filter(node=>!nodes.some(child=>child.parentId===node.id)).map(node=>boxes.get(node.id)!);const groups=nodes.filter(node=>nodes.some(child=>child.parentId===node.id)).map(node=>boxes.get(node.id)!);
  const obstacleIndex=boxCollisions();for(const box of obstacles)obstacleIndex.add(box);const reserved=boxCollisions();const priorPoints=pointCollisions();const output=new Map<string,Routed>();
