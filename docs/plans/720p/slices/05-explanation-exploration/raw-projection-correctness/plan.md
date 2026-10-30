@@ -2,7 +2,7 @@
 
 Date: 2026-10-30.
 Request revision: raw-projection-correctness-R1.
-Status: implemented; local checks passed; independent source review and PR delivery pending.
+Status: implemented, locally verified and independently source-reviewed; draft PR published; actual UI/dogfood acceptance blocked.
 Parent: [720p round](../../../plan.md), [explanation/exploration slice](../plan.md).
 Specification: [raw projection correctness](../../../../../product/raw-projection-correctness.md), [source pipeline](../../../../../product/source-pipeline.md), [TBox](../../../../../product/project-repository-tbox.md).
 
@@ -40,3 +40,9 @@ Docs-first commit: b89b323. R1 repairs implemented. Declared npm run test:readin
 Supported CUA getBrowser({id: iab}) still returned The browser access host is unavailable. New CSS File disclosure/close/reopen React E2E is registered in the minimum-graph suite but UNRUN; no alternate browser route used. Source/pure checks establish all 684 native edited rows are exposed by File UI Types; they do not establish actual React interaction. Own-correction-PR graph intake remains blocked by fixed PR25/no selector. Live endpoint remains the old deployed candidate; no restart, deployment or merge performed.
 
 Independent source-review dispatch: requested gpt-6.1-sol / high, fresh context. Rationale: bounded multi-layer correctness review with negative evidence/assembly cases and no visual implementation work. Escalate only for unresolved source/identity/admission correctness. Read-only packet R1; source review is explicitly narrower than blocked graph-first understanding. Candidate commit and PR will be pinned in the dispatch and reconciliation below.
+
+## Final source-review and publication reconciliation
+
+Product candidate: 0811d73a61b40c43f857747e0ba49e5c3acaaae2. Draft [PR42](https://github.com/scottchu/pr-reviewer/pull/42), base2638d159d7ed5f6faed1e8da0423e446e902df63, remote product head read back as0811d73. No hosted status checks reported (empty rollup), not a CI pass. [Independent review](review.md) records SOURCE PASS and the resolved source-edge collision finding; final independent targeted checks18/18, owner normal suite176/176. A1–A5 and A6 source scope verified; actual React/browser, graph-first, own-correction-PR and device gates remain unrun.
+
+Documentation reconciliation commits after the product pin change the PR head, not the reviewed product build. Durable raw-projection and TBox/source-pipeline contracts preserve all repaired behavior, evidence responsibilities and limits. Parent round/slice link to this packet; no dependent successor is declared ready. Current fixed PR25 intake and unavailable browser require a future authorized verification step, not a new UX feature in this repair. Retain this task worktree/build/logs for open review and recovery; preserve all old worktrees/handoffs. Git push initially hit unavailable keychain credentials; publication succeeded with the existing gh credential helper scoped to that command, without persistent credential/config changes.
