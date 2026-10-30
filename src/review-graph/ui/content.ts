@@ -17,15 +17,6 @@ const constructionLocations = (entity: GraphEntity): readonly string[] => {
     });
     return locations.length ? locations : ['Source occurrence identity unavailable'];
 };
-const assertionText = (value: string) => {
-    if (value.includes('Local access token') && value.includes('toHaveCount(0)'))
-        return 'No local access token field';
-    if (value.includes('Log out') && value.includes('toHaveCount(0)'))
-        return 'No Log out button';
-    if (value.includes('ownerRequests.every'))
-        return 'Asserts API requests omit Authorization';
-    return value;
-};
 const contentRows = (entity: GraphEntity): CardRows => {
     const { kind, data } = entity;
     switch (kind) {
@@ -41,8 +32,8 @@ const contentRows = (entity: GraphEntity): CardRows => {
         case 'test': return { title: text(data.name), rows: [...(Array.isArray(data.variants) ? [String(data.variants.length) + ' parameter variants'] : []), ...(text(data.scope) ? [text(data.scope)] : [])] };
         case 'behavior': return { title: text(data.name), rows: Array.isArray(data.value) ? data.value.map(String) : [] };
         case 'assertion': return {
-            title: text(data.name).replace(/^After:\s*/, ''),
-            rows: [...(Array.isArray(data.value) ? data.value.map(value => assertionText(String(value))) : []),],
+            title: text(data.name),
+            rows: [...(Array.isArray(data.value) ? data.value.map(String) : []),],
         };
         case 'source_step': return { title: text(data.name).replace(/^Before:\s*/, ''), rows: ['Source step · not an assertion'] };
         case 'reason': return { title: text(data.name), rows: [] };

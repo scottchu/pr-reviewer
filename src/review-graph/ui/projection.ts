@@ -45,7 +45,8 @@ const createProjector = (comparison: SourceGraph) => {
             let reading: SourceReadingUI | undefined, prepared = false;
             base = {
                 card: cardRows(entity), status: presentationStatus(entity), icon: iconFor(entity),
-                sourceControl: ['function', 'test'].includes(entity.kind) && Boolean(entity.data.editComposition),
+                sourceControl: (['function', 'test'].includes(entity.kind) ||
+                    (entity.kind === 'file' && entity.data.comparisonStatus !== 'no change')) && Boolean(entity.data.editComposition),
                 sourceOpen: false, fileControl: entity.kind === 'file',
                 inlineSourceReading: Boolean(entity.data.nativeHunks),
                 unitCount: comparison.fileUnits[entity.id]?.length ?? 0,

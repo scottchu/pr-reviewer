@@ -13,7 +13,37 @@ const stable=(value:unknown):unknown=>Array.isArray(value)?value.map(stable):val
 const sha=(bytes:string|Uint8Array)=>createHash('sha256').update(bytes).digest('hex');
 const digest=(value:unknown)=>sha(JSON.stringify(stable(value)));
 
-test('frozen canonical and default/20/40/hide projection with one explicit retired-policy-edge delta',async()=>{
+// Undo only the accepted R1 deltas when comparing against the retained historical
+// oracle. New correctness tests independently require the corrected values.
+const historicalProjection = (value: unknown): unknown => {
+ if (typeof value === 'string') return value.startsWith('constructs:') ? value.replace(/:(before|after)$/, '') : value;
+ if (Array.isArray(value)) return value.map(historicalProjection);
+ if (!value || typeof value !== 'object') return value;
+ const output: Record<string, unknown> = Object.fromEntries(Object.entries(value).map(([key, item]) => [key, historicalProjection(item)]));
+ const data = output.data as Record<string, unknown> | undefined;
+ if (data && ['reason', 'goal'].includes(String(output.id)) && Array.isArray(data.sourceRefs)) {
+  data.sourceRefs = data.sourceRefs.map(ref => {
+   const {repository, commit, contentHash, ...original} = ref as Record<string, unknown>;
+   return original;
+  });
+ }
+ if (data && output.id === 'owner-http-policy') delete data.sourceRefs;
+ const oldAssertions: Readonly<Record<string, string>> = {
+  "expect(page.getByLabel('Local access token')).toHaveCount(0)": 'No local access token field',
+  "expect(page.getByRole('button',{name:'Log out',exact:true})).toHaveCount(0)": 'No Log out button',
+  "expect(ownerRequests.every(value=>value==='')).toBe(true)": 'Asserts API requests omit Authorization',
+ };
+ if (typeof output.title === 'string' && oldAssertions[output.title] && Array.isArray(output.rows)) {
+  output.rows = output.rows.map(row => typeof row === 'string' ? oldAssertions[row] ?? row : row);
+ }
+ if (output.title === 'related policy' && Array.isArray(output.provenance)) {
+  output.provenance = ['Source provenance unavailable'];
+  output.rows = [output.explanation, ...(output.scope as readonly string[]), 'Source provenance unavailable'];
+ }
+ return output;
+};
+
+test('frozen source/canonical/projection with explicit policy cleanup and raw correctness deltas',async()=>{
  const prepared=await prepareReviewComparison('scottchu/pr-reviewer','b096826e31c0927190806de91ed70b8b64aa93d8','e3b270e5f49a9215452b0b86702946043e979059',facts=>sha(JSON.stringify(facts)));
  const bytes=JSON.stringify(prepared.facts);
  assert.equal(prepared.graph.provenance.inputArtifactHash,sha(bytes));
@@ -23,8 +53,8 @@ test('frozen canonical and default/20/40/hide projection with one explicit retir
  const compiled=JSON.parse(JSON.stringify(domainService.compare(prepared.facts,pr25Aliases)));
  // The full source-fact equality check above establishes this exact code-provenance dependency.
  compiled.provenance.producer.sourceHashes=oracle.sourceProducerHashes;
- assert.equal(digest(compiled),oracle.compiled,'all prepared IDs/references/correspondence must stay equal');
- const canonical=JSON.parse(JSON.stringify(prepared.graph));
+ assert.equal(digest(historicalProjection(compiled)),oracle.compiled,'all prepared IDs/references/correspondence must stay equal');
+ const canonical=JSON.parse(JSON.stringify(historicalProjection(prepared.graph)));
  for(const key of oracle.excludedGraphModuleHashes)delete canonical.provenance[key];
  delete canonical.provenance.producer.sourceHashes;
  // Replace artifact identity only AFTER checking its full raw bytes and every non-producer fact.
@@ -33,7 +63,7 @@ test('frozen canonical and default/20/40/hide projection with one explicit retir
  assert.equal(retired.revision,2);
  assert.equal(retired.relation.relation,'verifies_policy');
  assert.equal(canonical.relations.some((edge:{relation:string})=>edge.relation==='verifies_policy'),false);
- assert.equal(digest(canonical),retired.canonical,'only the approved edge removal may change the canonical graph');
+ assert.equal(digest(canonical),retired.canonical,'only documented relation identity and attributed-reference deltas accompany the retired edge removal');
  // Restore the exact frozen edge at its original slot to prove every other field
  // still equals the original full-graph oracle, rather than ignoring edge kinds.
  canonical.relations.splice(retired.canonicalIndex,0,retired.relation);
@@ -49,8 +79,8 @@ test('frozen canonical and default/20/40/hide projection with one explicit retir
    entity.id==='header-value'?{title:'Authorization',rows:['remove','`Bearer ${captured}`']}:entity.ui.card,
    entity.ui.status]),edges:view.relations.map(edge=>[edge.id,edge.ui])};
  });
- assert.equal(digest(projections),retired.projection,'all remaining projection fields and source controls remain frozen');
- const restored=JSON.parse(JSON.stringify(projections));
+ assert.equal(digest(historicalProjection(projections)),retired.projection,'all remaining projection fields and source controls remain frozen');
+ const restored=JSON.parse(JSON.stringify(historicalProjection(projections)));
  for(const [index,view] of restored.entries()){
   view.relations.splice(retired.projectionIndexes[index],0,retired.relation);
   view.edges.splice(retired.projectionIndexes[index],0,[retired.relation.id,retired.ui]);

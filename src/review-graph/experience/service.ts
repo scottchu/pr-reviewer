@@ -28,7 +28,8 @@ export const handleIntent = (state: ExperienceState, intent: ExperienceIntent): 
         return { accepted: true, state: { ...state, limits: { ...state.limits, [intent.fileId]: intent.hide ? 0 : (state.limits[intent.fileId] ?? 0) + 20 }, revision: state.revision + 1 } };
     }
     if (intent.type === 'source-disclosure') {
-        if (!entities.some(entity => entity.id === intent.entityId && ['function', 'test'].includes(entity.kind) && entity.data.editComposition))
+        if (!entities.some(entity => entity.id === intent.entityId && (['function', 'test'].includes(entity.kind) ||
+                (entity.kind === 'file' && entity.data.comparisonStatus !== 'no change')) && entity.data.editComposition))
             return { accepted: false, state, reason: 'source_inspection_unavailable' };
         return { accepted: true, state: { ...state, sourceDisclosure: { ...state.sourceDisclosure, [intent.entityId]: intent.open }, inspection: intent.open ? intent.entityId : state.inspection === intent.entityId ? null : state.inspection, revision: state.revision + 1 } };
     }

@@ -146,7 +146,7 @@ const PreviewRows = ({entityId, pane}: {entityId: string; pane: SourceReadingUI[
 };
 const NativeHunkRows = ({identity, hunks}: {identity: ReaderIdentityUI; hunks: readonly SourceHunkUI[]}) => {
     const scroll = useReaderScroll(identity);
-    return <div {...scroll} data-reader-kind={identity.kind} className="document-reading nowheel" tabIndex={0} aria-label="All native document hunks">
+    return <div {...scroll} data-reader-kind={identity.kind} className="document-reading nowheel" tabIndex={0} aria-label="All native source hunks">
         {hunks.map(hunk => <section key={hunk.index} data-native-hunk={hunk.index}>
             <h3>Hunk {hunk.index} · {hunk.header}</h3>
             <DocumentSide label="Before" witness={hunk.before} hunk={hunk}/><DocumentSide label="After" witness={hunk.after} hunk={hunk}/>

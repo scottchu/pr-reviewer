@@ -72,7 +72,7 @@ test('enrichment failure leaves source graph usable and forbidden claims cannot 
  domainService.validateGraph(restored.graph.entities,restored.graph.relations);
  assert.ok(restored.graph.entities.some(entity=>entity.kind==='file'));
  assert.equal(JSON.stringify(extracted.facts),before);
- const claim:GraphEntity={id:'reason',kind:'reason',data:{basis:'manual',sourceRefs:[{path:source.path,side:'head',commit:source.commit,contentHash:source.contentHash,startLine:1,endLine:1}]}};
+ const claim:GraphEntity={id:'reason',kind:'reason',data:{basis:'manual',sourceRefs:[{repository:source.repository,path:source.path,side:'head',commit:source.commit,contentHash:source.contentHash,startLine:1,endLine:1}]}};
  assert.equal(domainService.validateEnrichment(extracted.facts,extracted.comparison.entities,{nodes:[claim],edges:[]},[source]).nodes[0],claim);
  assert.throws(()=>domainService.validateEnrichment(extracted.facts,[],{nodes:[{...claim,nodes:[{id:'invented',kind:'function',data:{}}]}],edges:[]}),/nested_payload/);
  assert.throws(()=>domainService.validateEnrichment(extracted.facts,[],{nodes:[{...claim,edges:[{id:'fake',from:'x',to:'y',version:'after',relation:'calls',data:{}}]}],edges:[]}),/nested_payload/);
