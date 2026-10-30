@@ -76,7 +76,11 @@ test('frozen source/canonical/projection with explicit policy cleanup and raw co
   // frozen pre-correction oracle; header-occurrence.test.ts checks its new copy
   // and exact Before identity independently. All other fields remain frozen.
   return {limits,nodes:view.nodes.map(raw),relations:view.relations.map(({ui,...edge})=>edge),cards:view.nodes.map(entity=>[entity.id,
-   entity.id==='header-value'?{title:'Authorization',rows:['remove','`Bearer ${captured}`']}:entity.ui.card,
+   entity.id==='header-value'?{title:'Authorization',rows:['remove','`Bearer ${captured}`']}:
+   entity.kind==='assertion' && Array.isArray(entity.data.value) ? {...entity.ui.card,
+    // Invert only the accepted exact title/value duplicate removal. Distinct rows
+    // and canonical source fields remain under the original frozen oracle.
+    rows:[...entity.ui.card.rows,...entity.data.value.map(String).filter(value=>value===entity.ui.card.title)]} : entity.ui.card,
    entity.ui.status]),edges:view.relations.map(edge=>[edge.id,edge.ui])};
  });
  assert.equal(digest(historicalProjection(projections)),retired.projection,'all remaining projection fields and source controls remain frozen');

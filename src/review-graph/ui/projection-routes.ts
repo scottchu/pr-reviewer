@@ -1,3 +1,4 @@
+import {placeRelationLabels} from './label-placement.ts';
 import { clearExternalLabel, constrainInternalLabel } from './graph-bounds.ts';
 import { absoluteBoxes, sides, port, curve, automaticRoutes, type LayoutNode, type Link, type Point } from './graph-geometry.ts';
 
@@ -7,13 +8,14 @@ export const projectionRoutes = (
     links: readonly Link[],
     sizes: Readonly<Record<string, { width: number; height: number }>>,
     manual: Readonly<Record<string, Point>>,
+    headers: Readonly<Record<string, number>> = {},
 ) => {
     const currentIds = new Set(nodes.map(node => node.id));
     if (nodes.length !== projectedNodes.length
         || currentIds.size !== nodes.length
         || projectedNodes.some(node => !currentIds.has(node.id)))
         return null;
-    return automaticRoutes(nodes, links, sizes, manual);
+    return placeRelationLabels(nodes, links, automaticRoutes(nodes, links, sizes, manual), sizes, manual, headers);
 };
 
 // During a gesture, keep placement decisions stable while endpoints and a manual bend follow input.
@@ -42,6 +44,6 @@ export const liveProjectionRoutes = (
         const same = placement.sourceSide === sourceSide && placement.targetSide === targetSide
             && placement.offset.x === offset.x && placement.offset.y === offset.y
             && placement.label.x === label.x && placement.label.y === label.y;
-        return [link.id, same ? placement : { sourceSide, targetSide, offset, label }] as const;
+        return [link.id, same ? placement : { ...placement, sourceSide, targetSide, offset, label }] as const;
     }));
 };

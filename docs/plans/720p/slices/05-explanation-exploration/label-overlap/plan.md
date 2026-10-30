@@ -2,7 +2,7 @@
 
 Date: 2026-10-30.
 Revision: label-overlap-R1.
-Status: docs-first correction; implementation pending.
+Status: implemented; local checks passed; independent source review and actual browser acceptance pending.
 Parent: [720p](../../../plan.md), [explanation/exploration](../plan.md).
 Specification: [measured label ownership](../../../../../product/pr-file-tree-first.md#measured-label-ownership-and-single-assertion-text--2026-10-30).
 
@@ -23,3 +23,11 @@ After committed candidate/build, assign independent read-only source review unde
 ## Evidence and disposition
 
 Implementation/tests/build/review/PR pending. Preserve user attachments outside Git, task artifacts in ignored .decompozr/flow/run/label-overlap, and old handoffs/worktrees. Actual repaired pixels/interaction, unfamiliar review and device acceptance remain open. No successor is declared ready.
+
+## Engineering checkpoint
+
+Docs-first commit6a55728. Exact-equal Assertion value rows are suppressed only when the verbatim heading already presents them; distinct source strings and canonical fields are unchanged. Internal label slots use measured widths/heights and expand group capacity before root columns. External final placement applies boundaries and shared leaf/label obstacles together, with a bounded event-boundary search and guaranteed exterior fallback on the unbounded canvas. Impossible internal geometry retains its relation with an observable blocked placement marker, never an overlap-free success claim. This marker is diagnostic DOM metadata, not a new user feature. Active manual bends/positions are retained; source disclosure, positive node/label measurement changes and movement completion trigger the existing bounded reflow owner.
+
+Normal graph suite186/186 PASS, including five screenshot-derived/large-label/resize/impossible-space/actual-topology regressions. The pinned topology check uses explicitly declared420x230stress label measurements, not actual browser dimensions. Dense27-Assertion scenarios and final live-route constraints have zero label/card and label/label intersections in those checks; label midpoint remains on its own curve. Canonical graph bytes exactly match deployedfb42899: SHA256946b1c59ebde5dd8f5f3eeb2fc5f99fc7e3d6e4b4b3d5d9c9303e699ccb08a2a. Root/minimum strict TypeScript, subsystem boundaries and build pass. Historical oracle inversely restores only removed exact duplicate display rows; all other canonical/projection fields stay frozen.
+
+Independent source-review selection: fresh gpt-6.1-sol/high, justified by coupled measured-layout/routing/lifecycle correctness and screenshot-proven prior failure. Escalate unresolved capacity/state/geometry defects; do not substitute source checks for actual pixels. Supported CUA still reports The browser access host is unavailable. Authored desktop/390 font-ready, duplicate-text, final visible rectangles and disclosure/reflow E2E is UNRUN. The screenshot failure is observed; repaired visual acceptance is still unverified. No live deployment/merge performed.

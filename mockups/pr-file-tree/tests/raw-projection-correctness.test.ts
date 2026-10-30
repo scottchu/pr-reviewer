@@ -128,7 +128,7 @@ test('A4: policy remains attributed, source-backed context without manufactured 
 test('A5: Assertion source remains verbatim even when substring matches an old paraphrase', () => {
     const value = "expect(ownerRequests.every(value=>value==='')).toBe(true)";
     const card = cardRows({id: 'assertion', kind: 'assertion', data: {name: value, value: [value]}});
-    assert.deepEqual(card, {title: value, rows: [value]});
+    assert.deepEqual(card, {title: value, rows: []});
 });
 
 test('A3: assembly admission failure is unavailable, with a source-only result and retained reason', () => {
