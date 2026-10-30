@@ -2,7 +2,7 @@
 
 Date: 2026-10-30.
 Revision: label-overlap-R1.
-Status: implemented; local checks passed; independent source review and actual browser acceptance pending.
+Status: implemented, locally checked and independently source-reviewed; draft PR44 published; actual repaired pixels unverified.
 Parent: [720p](../../../plan.md), [explanation/exploration](../plan.md).
 Specification: [measured label ownership](../../../../../product/pr-file-tree-first.md#measured-label-ownership-and-single-assertion-text--2026-10-30).
 
@@ -31,3 +31,7 @@ Docs-first commit6a55728. Exact-equal Assertion value rows are suppressed only w
 Normal graph suite186/186 PASS, including five screenshot-derived/large-label/resize/impossible-space/actual-topology regressions. The pinned topology check uses explicitly declared420x230stress label measurements, not actual browser dimensions. Dense27-Assertion scenarios and final live-route constraints have zero label/card and label/label intersections in those checks; label midpoint remains on its own curve. Canonical graph bytes exactly match deployedfb42899: SHA256946b1c59ebde5dd8f5f3eeb2fc5f99fc7e3d6e4b4b3d5d9c9303e699ccb08a2a. Root/minimum strict TypeScript, subsystem boundaries and build pass. Historical oracle inversely restores only removed exact duplicate display rows; all other canonical/projection fields stay frozen.
 
 Independent source-review selection: fresh gpt-6.1-sol/high, justified by coupled measured-layout/routing/lifecycle correctness and screenshot-proven prior failure. Escalate unresolved capacity/state/geometry defects; do not substitute source checks for actual pixels. Supported CUA still reports The browser access host is unavailable. Authored desktop/390 font-ready, duplicate-text, final visible rectangles and disclosure/reflow E2E is UNRUN. The screenshot failure is observed; repaired visual acceptance is still unverified. No live deployment/merge performed.
+
+## Final review/publication reconciliation
+
+Product candidateb5d4bae resolves the independent review's settled manual/header regression; [review record](review.md) is SOURCE PASS with17/17 independent targeted checks. Owner final normal suite187/187, strict types/boundaries/build PASS. [PR44](https://github.com/scottchu/pr-reviewer/pull/44) is draft; no hosted check is reported, not a CI pass. Documentation-only reconciliation heads differ from the reviewed product pin. L1–L4 are supported within source/declared-geometry scope; actual screenshot/React/browser acceptance remains unrun. No dependent successor is ready, no merge/deployment authorized by this repair. The owning product contract is reconciled, with parent plans linked and all old state retained.
