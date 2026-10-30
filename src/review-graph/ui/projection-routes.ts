@@ -25,7 +25,11 @@ export const liveProjectionRoutes = (
     placements: ReadonlyMap<string, import('./graph-geometry.ts').Routed>,
     manual: Readonly<Record<string, Point>>,
     sizes: Readonly<Record<string, { width: number; height: number }>> = {},
+    moving = true,
 ) => {
+    // Shared placement has already reserved final header/boundary/collision-safe
+    // rectangles. Only an active gesture may follow raw input from that snapshot.
+    if (!moving) return placements;
     const boxes = absoluteBoxes(nodes);
     const groups = nodes.filter(node => nodes.some(child => child.parentId === node.id)).map(node => boxes.get(node.id)!);
     const byId = new Map(nodes.map(node => [node.id, node]));

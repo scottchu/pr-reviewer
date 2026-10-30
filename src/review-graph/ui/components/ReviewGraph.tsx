@@ -445,7 +445,7 @@ const App = () => {
             return [];
         if (!placements)
             return [];
-        const routes = liveProjectionRoutes(nodes, links, placements, manual, sizes);
+        const routes = liveProjectionRoutes(nodes, links, placements, manual, sizes, Boolean(movement));
         return relations.map(relation => {
             const routed = routes.get(relation.id)!;
             const prior = edgeCache.current.get(relation.id);
@@ -459,7 +459,7 @@ const App = () => {
             edgeCache.current.set(relation.id, edge);
             return edge;
         });
-    }, [ready, placements, nodes, links, manual, sizes, relations, coarse, beginMove, endMove, onBend, onMeasure]);
+    }, [ready, placements, nodes, links, manual, sizes, relations, coarse, movement, beginMove, endMove, onBend, onMeasure]);
     const sceneSequence = useRef(0);
     const scene = useMemo(() => {
         if (!ready || movement || layoutRevision !== revision || nodes.length !== view.nodes.length ||

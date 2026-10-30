@@ -20,7 +20,7 @@ const bands = new Map(input.map(value => [value.id, value.id === 'review' ? -1 :
 
 const check = (nodes: readonly LayoutNode[], measured: typeof sizes) => {
     const routes = projectionRoutes(nodes, nodes, links, measured, {})!;
-    const final = liveProjectionRoutes(nodes, links, routes, {}, measured);
+    const final = liveProjectionRoutes(nodes, links, routes, {}, measured, false);
     const boxes = absoluteBoxes(nodes), labels: Box[] = [];
     for (const edge of links) {
         const route = final.get(edge.id)!;
@@ -73,7 +73,7 @@ test('L2/L3: actual pinned topology has no final label/card or label/label overl
     const nodes = initialLayout(input, edges, 'pr25', readingBands(view.entities, graph.relations), {},
         filePaths(view.entities), documentPaths(view.entities), testAssertionFamilies(view.entities, graph.relations), measured);
     const placements = projectionRoutes(nodes, nodes, edges, measured, {})!;
-    const final = liveProjectionRoutes(nodes, edges, placements, {}, measured);
+    const final = liveProjectionRoutes(nodes, edges, placements, {}, measured, false);
     const boxes = absoluteBoxes(nodes), labels: Box[] = [];
     for (const edge of edges) {
         const route = final.get(edge.id)!;
@@ -96,4 +96,20 @@ test('L4: impossible fixed internal space is explicit and never deletes the rela
     const routes = projectionRoutes(nodes, nodes, edges, {relation: {width: 280, height: 160}}, {})!;
     assert.equal(routes.size, 1);
     assert.equal(routes.get('relation')!.placementBlocked, true);
+});
+
+test('L4: settled manual labels keep the measured-header rectangle reserved by shared placement', () => {
+    const nodes = [node('group'), node('test', 'group'), node('a', 'group'), node('b', 'group'), node('file')];
+    const edges = [{id: 'manual', source: 'test', target: 'a'}, {id: 'auto', source: 'test', target: 'b'}, {id: 'external', source: 'b', target: 'file'}];
+    const measured = Object.fromEntries(edges.map(edge => [edge.id, {width: 400, height: 200}]));
+    const headers = {group: 300};
+    const laidOut = initialLayout(nodes, edges, 'group', undefined, headers, new Map(), new Map(), new Map([['test', ['a', 'b']]]), measured);
+    const boxes = absoluteBoxes(laidOut);
+    const start = port(boxes.get('test')!, 'bottom'), end = port(boxes.get('a')!, 'top');
+    const manual = {manual: {x: 700 - (start.x + end.x) / 2, y: 180 - (start.y + end.y) / 2}};
+    const placements = projectionRoutes(laidOut, laidOut, edges, measured, manual, headers)!;
+    const final = liveProjectionRoutes(laidOut, edges, placements, manual, measured, false);
+    assert.equal(final, placements);
+    assert.ok(final.get('manual')!.label.y - 100 >= boxes.get('group')!.y + 300);
+    assert.equal(final.get('manual')!.placementBlocked, undefined);
 });
