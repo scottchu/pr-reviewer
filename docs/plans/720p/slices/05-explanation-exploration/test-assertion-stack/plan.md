@@ -2,7 +2,7 @@
 
 Date: 2026-10-30.
 Revision: test-assertion-stack-R1.
-Status: docs-first; implementation pending.
+Status: implemented and locally checked; independent review/PR pending; actual browser unavailable.
 Parent: [720p](../../../plan.md), [explanation/exploration](../plan.md).
 Specification: [Test and Assertion arrangement](../../../../../product/pr-file-tree-first.md#test-and-assertion-vertical-arrangement--2026-10-30).
 
@@ -19,3 +19,11 @@ After committed candidate/build/PR, assign a fresh source reviewer under project
 ## Status and remaining gates
 
 Implementation/tests/build/review/PR pending. Existing deployed version remains fbe175c. Actual browser, own-PR graph-first and device evidence remain open. Task-owned ignored .decompozr/flow/run/test-assertion-stack retains logs/build/recovery; preserve previous worktrees and handoffs.
+
+## Candidate verification checkpoint
+
+Docs-first commit7301808. Implemented UI-only ownership families and measured vertical layout for grouped and unchanged root Tests. Assertions indent24units; existing140-unit row clearance remains, with a320-unit relation-label gutter. Root stacks are footprint calculations only, never new nodes or parent identities. Missing/ambiguous ownership and mixed groups keep generic layout; a hidden second owner also prevents guessing. Existing manual-position application is unchanged.
+
+Normal graph suite181/181 PASS; five new focused tests PASS, covering typed ownership, grouped measured bounds/reflow, unchanged root stacks, ambiguous/mixed negatives and pinned PR25 immutability. Root/minimum strict TypeScript, subsystem boundaries and production build PASS. Canonical graph bytes exactly equal deployed fbe175c (SHA256946b1c59ebde5dd8f5f3eeb2fc5f99fc7e3d6e4b4b3d5d9c9303e699ccb08a2a). Design detector reports no findings; it is not visual approval. Desktop/390 React source-disclosure reflow E2E is registered but UNRUN: supported CUA getBrowser({id:iab}) returned The browser access host is unavailable. No alternative browser route used.
+
+Independent source-review selection: fresh gpt-6.1-sol/medium for bounded pure geometry, ownership and measured-footprint checks; escalate only on an unresolved correctness issue. Exact candidate/PR pinned at dispatch. Source review does not satisfy graph-first/actual UI acceptance. Live endpoint remains fbe175c, and this packet claims no merge/deployment.

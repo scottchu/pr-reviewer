@@ -29,26 +29,111 @@ export const compareFilePaths = (left: string, right: string): number => {
 const fileIndent = (id: string, paths: ReadonlyMap<string, string>): number =>
  paths.has(id) ? (paths.get(id)!.split('/').length - 1) * 24 : 0;
 
-export const initialLayout = <T extends LayoutNode>(input:readonly T[],links:readonly Link[],focus='change',bands?:ReadonlyMap<string,number>,headers:Readonly<Record<string,number>>={},paths:ReadonlyMap<string,string>=new Map(),documents:ReadonlyMap<string,string>=new Map()):T[] => {
- const nodes=input.map(node=>({...node,position:{...node.position},style:{...node.style,opacity:1}}));
- for(const group of nodes.filter(node=>nodes.some(child=>child.parentId===node.id))){
-  const children=nodes.filter(node=>node.parentId===group.id);const rank=ranks(children.map(node=>node.id),links);let y=headers[group.id]??groupInterior.top;let width=600;
-  const rows=[...new Set(rank.values())].sort((a,b)=>a-b).map(value=>children.filter(node=>rank.get(node.id)===value));
-  for(const row of rows)width=Math.max(width,row.reduce((sum,node)=>sum+dimensions(node).width,0)+(row.length-1)*120+64);
-  for(const row of rows){let x=(width-row.reduce((sum,node)=>sum+dimensions(node).width,0)-(row.length-1)*120)/2;for(const child of row){child.position={x,y};x+=dimensions(child).width+120;}y+=Math.max(...row.map(node=>dimensions(node).height))+140;}
-  group.style={...group.style,width,height:y-100+40};
+const assertionIndent = 24;
+const rowGap = 140;
+const relationGutter = 320;
+type TestStack = Readonly<{
+ members: readonly LayoutNode[];
+ offsets: ReadonlyMap<string, Point>;
+ width: number;
+ height: number;
+}>;
+
+/** A stack is presentation geometry, never a new semantic parent or node. */
+const testStacks = (
+ siblings: readonly LayoutNode[],
+ families: ReadonlyMap<string, readonly string[]>,
+): ReadonlyMap<string, TestStack> => {
+ const byId = new Map(siblings.map(node => [node.id, node]));
+ const candidates = [...families].filter(([id]) => byId.has(id)).map(([id, assertions]) =>
+  [id, assertions.filter(assertion => byId.has(assertion))] as const);
+ const owners = new Map<string, number>();
+ for (const assertions of families.values()) {
+  for (const id of new Set(assertions)) owners.set(id, (owners.get(id) ?? 0) + 1);
  }
- const rootOf=(id:string):string=>nodes.find(node=>node.id===id)?.parentId??id;
- const roots=nodes.filter(node=>!node.parentId);const rootLinks=links.map(edge=>({...edge,source:rootOf(edge.source),target:rootOf(edge.target)}));const levels=bands ? new Map(roots.map(node => [node.id, bands.get(node.id) ?? 1])) : ranks(roots.map(node=>node.id),rootLinks);
- const columns=[...new Set(levels.values())].sort((a,b)=>a-b);let x=0;const xs=new Map<number,number>();
- for(const level of columns){xs.set(level,x);x+=Math.max(...roots.filter(node=>levels.get(node.id)===level).map(node=>dimensions(node).width+fileIndent(node.id,paths)))+300;}
- const focusX=xs.get(levels.get(focus)??0)??0;
- const documentHeight = Math.max(0, ...columns.map(level => {
-  const column = roots.filter(node => levels.get(node.id) === level && documents.has(node.id));
-  return column.reduce((height, node) => height + dimensions(node).height + 180, 0);
- }));
+ const stacks = new Map<string, TestStack>();
+ for (const [id, assertions] of candidates) {
+  if (!assertions.length || assertions.some(assertion => owners.get(assertion) !== 1)) continue;
+  const members = [byId.get(id)!, ...assertions.map(assertion => byId.get(assertion)!)];
+  const offsets = new Map<string, Point>();
+  let y = 0;
+  let width = 0;
+  for (const [index, member] of members.entries()) {
+   const x = index === 0 ? 0 : assertionIndent;
+   offsets.set(member.id, {x, y});
+   width = Math.max(width, x + dimensions(member).width);
+   y += dimensions(member).height + rowGap;
+  }
+  stacks.set(id, {members, offsets, width: width + relationGutter, height: y - rowGap});
+ }
+ return stacks;
+};
+
+export const initialLayout = <T extends LayoutNode>(
+ input: readonly T[],
+ links: readonly Link[],
+ focus = 'change',
+ bands?: ReadonlyMap<string, number>,
+ headers: Readonly<Record<string, number>> = {},
+ paths: ReadonlyMap<string, string> = new Map(),
+ documents: ReadonlyMap<string, string> = new Map(),
+ testFamilies: ReadonlyMap<string, readonly string[]> = new Map(),
+): T[] => {
+ const nodes = input.map(node => ({...node, position: {...node.position}, style: {...node.style, opacity: 1}}));
+ for (const group of nodes.filter(node => nodes.some(child => child.parentId === node.id))) {
+  const children = nodes.filter(node => node.parentId === group.id);
+  const stacks = testStacks(children, testFamilies);
+  const stack = stacks.size === 1 ? [...stacks.values()][0] : undefined;
+  if (stack && stack.members.length === children.length) {
+   const top = headers[group.id] ?? groupInterior.top;
+   for (const child of children) {
+    const offset = stack.offsets.get(child.id)!;
+    child.position = {x: groupInterior.padding + offset.x, y: top + offset.y};
+   }
+   group.style = {...group.style, width: Math.max(600, stack.width + groupInterior.padding * 2),
+    height: top + stack.height + groupInterior.padding};
+   continue;
+  }
+  const rank = ranks(children.map(node => node.id), links);
+  let y = headers[group.id] ?? groupInterior.top;
+  let width = 600;
+  const rows = [...new Set(rank.values())].sort((a, b) => a - b)
+   .map(value => children.filter(node => rank.get(node.id) === value));
+  for (const row of rows) width = Math.max(width, row.reduce((sum, node) => sum + dimensions(node).width, 0) + (row.length - 1) * 120 + 64);
+  for (const row of rows) {
+   let x = (width - row.reduce((sum, node) => sum + dimensions(node).width, 0) - (row.length - 1) * 120) / 2;
+   for (const child of row) { child.position = {x, y}; x += dimensions(child).width + 120; }
+   y += Math.max(...row.map(node => dimensions(node).height)) + rowGap;
+  }
+  group.style = {...group.style, width, height: y - 100 + 40};
+ }
+ const roots = nodes.filter(node => !node.parentId);
+ const rootStacks = testStacks(roots, testFamilies);
+ const assertionOwners = new Map([...rootStacks].flatMap(([id, stack]) =>
+  stack.members.slice(1).map(member => [member.id, id] as const)));
+ const entries = roots.filter(node => !assertionOwners.has(node.id));
+ const rootOf = (id: string): string => {
+  const root = nodes.find(node => node.id === id)?.parentId ?? id;
+  return assertionOwners.get(root) ?? root;
+ };
+ const rootLinks = links.map(edge => ({...edge, source: rootOf(edge.source), target: rootOf(edge.target)}));
+ const levels = bands ? new Map(entries.map(node => [node.id, bands.get(node.id) ?? 1])) :
+  ranks(entries.map(node => node.id), rootLinks);
+ const footprint = (node: LayoutNode) => rootStacks.get(node.id) ?? dimensions(node);
+ const columns = [...new Set(levels.values())].sort((a, b) => a - b);
+ let x = 0;
+ const xs = new Map<number, number>();
  for (const level of columns) {
-  const column = roots.filter(node => levels.get(node.id) === level).sort((a, b) => {
+  xs.set(level, x);
+  x += Math.max(...entries.filter(node => levels.get(node.id) === level)
+   .map(node => footprint(node).width + fileIndent(node.id, paths))) + 300;
+ }
+ const focusX = xs.get(levels.get(focus) ?? 0) ?? 0;
+ const documentHeight = Math.max(0, ...columns.map(level => entries
+  .filter(node => levels.get(node.id) === level && documents.has(node.id))
+  .reduce((height, node) => height + footprint(node).height + 180, 0)));
+ for (const level of columns) {
+  const column = entries.filter(node => levels.get(node.id) === level).sort((a, b) => {
    const aPath = paths.get(a.id) ?? documents.get(a.id);
    const bPath = paths.get(b.id) ?? documents.get(b.id);
    if (aPath !== undefined && bPath !== undefined) return compareFilePaths(aPath, bPath);
@@ -59,8 +144,16 @@ export const initialLayout = <T extends LayoutNode>(input:readonly T[],links:rea
   for (const node of column) {
    const document = documents.has(node.id);
    node.position = {x: xs.get(level)! - focusX + fileIndent(node.id, paths), y: document ? documentY : codeY};
-   if (document) documentY += dimensions(node).height + 180;
-   else codeY += dimensions(node).height + 180;
+   const stack = rootStacks.get(node.id);
+   if (stack) {
+    for (const member of stack.members.slice(1)) {
+     const assertion = nodes.find(value => value.id === member.id)!;
+     const offset = stack.offsets.get(member.id)!;
+     assertion.position = {x: node.position.x + offset.x, y: node.position.y + offset.y};
+    }
+   }
+   if (document) documentY += footprint(node).height + 180;
+   else codeY += footprint(node).height + 180;
   }
  }
  return nodes as T[];

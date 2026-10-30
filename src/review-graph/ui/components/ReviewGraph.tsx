@@ -6,7 +6,7 @@ import '../../../../mockups/pr-file-tree/minimal.css';
 import { installPageGestureBoundary } from '../page-gestures.ts';
 import type {UIEntity as GraphEntity, UIRelation as GraphRelation,SourceReadingUI, GraphSessionUI, SourceHunkUI, SourceWitnessUI} from '../types.ts';
 import { omittedStructuralEdge } from '../content.ts';
-import { readingBands, filePaths, documentPaths, iconPaths } from '../entity-presentation.ts';
+import { readingBands, filePaths, documentPaths, testAssertionFamilies, iconPaths } from '../entity-presentation.ts';
 import { childContentBounds } from '../graph-bounds.ts';
 import { beginsRouteDrag, keyboardDelta, movedNodePosition } from '../gesture-policy.ts';
 import { projectionRoutes, liveProjectionRoutes } from '../projection-routes.ts';
@@ -38,6 +38,7 @@ const useCoarseInput = () => {
 const bands = readingBands(allEntities(), allRelations());
 const paths = filePaths(allEntities());
 const documents = documentPaths(allEntities());
+const testFamilies = testAssertionFamilies(allEntities(), allRelations());
 const directions: readonly Side[] = ['left', 'right', 'top', 'bottom'];
 const position = (side: Side) => ({
     left: Position.Left, right: Position.Right, top: Position.Top, bottom: Position.Bottom
@@ -321,7 +322,7 @@ const InitialLayout = ({ nodes, apply, links, revision, headers }: {
             second = requestAnimationFrame(() => {
                 applied.current = revision;
                 const focus = allEntities().find(entity => entity.kind === 'review')?.id ?? 'pr25';
-                apply(initialLayout(withMeasuredGeometry(nodes, getNodes()), links, focus, bands, headers, paths, documents));
+                apply(initialLayout(withMeasuredGeometry(nodes, getNodes()), links, focus, bands, headers, paths, documents, testFamilies));
             });
         });
         return () => { cancelAnimationFrame(first); cancelAnimationFrame(second); };
