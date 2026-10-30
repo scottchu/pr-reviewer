@@ -148,3 +148,5 @@ Latest live correction: [Revision26 receipt](reviews/reading-journey-v1.md) pins
 Controlling2026-10-26: [graph-first recovery](semantic-graph-recovery.md) and [reflection](reviews/reflection-recovery-2026-10-26.md) supersede earlier candidate readiness. Product7ce22b7 and product/test/runtime/data work are frozen. Only docs/model reconciliation is active; source/actual/fresh-docs acceptance remains incomplete. Prior bounded outcomes remain evidence, not current blanket acceptance.
 
 2026-10-30: [Raw projection correctness repair](raw-projection-correctness/plan.md) owns the docs-first factual integrity fixes. Raw projection only; no UX feature expansion or completion inferred from local checks.
+
+2026-10-30: [Test above Assertions](test-assertion-stack/plan.md) is a narrow automatic-layout correction; ontology and other presentation remain unchanged.

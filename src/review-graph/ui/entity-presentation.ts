@@ -54,3 +54,20 @@ export const iconPaths: Readonly<Record<string, readonly string[]>> = {
   goal: ['M5 22V2l14 3-14 6'],
   behavior: ['M4 12h7M11 12l5-7h5M11 12l5 7h5'],
 };
+
+/** Layout-only families from established ownership; relation order is retained. */
+export const testAssertionFamilies = (
+  entities: readonly GraphEntity[],
+  relations: readonly GraphRelation[],
+): ReadonlyMap<string, readonly string[]> => {
+  const byId = new Map(entities.map(entity => [entity.id, entity]));
+  const families = new Map<string, string[]>();
+  for (const relation of relations) {
+    if (relation.relation !== 'contains' || byId.get(relation.from)?.kind !== 'test' ||
+        byId.get(relation.to)?.kind !== 'assertion') continue;
+    const assertions = families.get(relation.from) ?? [];
+    if (!assertions.includes(relation.to)) assertions.push(relation.to);
+    families.set(relation.from, assertions);
+  }
+  return families;
+};
