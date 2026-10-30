@@ -30,6 +30,7 @@ export const validateEnrichment = (
     source: readonly GraphEntity[],
     candidate: AttributedEnrichment,
     sources?: readonly SourceInput[],
+    sourceRelations: readonly GraphRelation[] = [],
 ): AttributedEnrichment => {
     const existing = new Map(collectEntities(source).map(entity => [entity.id, entity]));
     const permittedKinds = new Set(['reason', 'goal', 'behavior']);
@@ -72,6 +73,6 @@ export const validateEnrichment = (
             throw new Error('enrichment_relation_without_attribution');
         }
     }
-    validateGraph([...source, ...candidate.nodes], candidate.edges);
+    validateGraph([...source, ...candidate.nodes], [...sourceRelations, ...candidate.edges]);
     return candidate;
 };

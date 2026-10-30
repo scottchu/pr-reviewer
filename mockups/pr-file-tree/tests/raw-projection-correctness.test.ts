@@ -101,6 +101,8 @@ test('A3: attributed interpretation requires evidence and the declared endpoint 
         assert.throws(() => validateEnrichment(facts, [change, file], {nodes: [reason], edges: [{...edge, relation}]}, [source]), /enrichment_relation/);
     }
     assert.throws(() => validateEnrichment(facts, [change, file], {nodes: [reason], edges: [edge, edge]}, [source]), /relation_identity/);
+    const sourceRelation: GraphRelation = {id: edge.id, from: 'change', to: 'file', relation: 'located_in', version: 'comparison', data: {}};
+    assert.throws(() => validateEnrichment(facts, [change, file], {nodes: [reason], edges: [edge]}, [source], [sourceRelation]), /relation_identity/);
     assert.throws(() => validateEnrichment(facts, [change, file], {nodes: [reason], edges: [edge]}, [{...source, content: 'other bytes'}]), /enrichment_source/);
 
 });

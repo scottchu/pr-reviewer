@@ -28,7 +28,7 @@ export const prepareAttribution = (
     const valid = new Set([...compiled.entities.map(entity => entity.id),
         ...groupSubjects.map(entity => entity.id), ...nodes.map(node => node.id)]);
     const edges = explanations.edges.filter(edge => valid.has(edge.from) && valid.has(edge.to)) as GraphRelation[];
-    return admitAttributedEnrichment(facts, [...compiled.entities, ...groupSubjects], {nodes, edges}, sources);
+    return admitAttributedEnrichment(facts, [...compiled.entities, ...groupSubjects], {nodes, edges}, sources, compiled.relations);
 };
 
 export const prepareAppGraph = (
@@ -149,7 +149,7 @@ export const prepareAppGraph = (
     }
     const valid = new Set(flat.map(entity => entity.id));
     try {
-        admitAttributedEnrichment(facts, [...entities.filter(entity => !grouped.has(entity.id)), ...groups], attribution, sources);
+        admitAttributedEnrichment(facts, [...entities.filter(entity => !grouped.has(entity.id)), ...groups], attribution, sources, relations);
     } catch (error) {
         attributionFailure = error instanceof Error ? error.message : String(error);
         attribution = {nodes: [], edges: []};

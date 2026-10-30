@@ -21,7 +21,8 @@ for (const width of [1440, 390]) {
     test(`raw CSS native evidence uses existing File disclosure at ${width}`, async ({page}) => {
         await page.setViewportSize({width, height: 900});
         await page.goto(target);
-        const file = page.locator('.react-flow__node').filter({has: page.getByRole('heading', {name: 'src/ui/style.css', exact: true})});
+        const file = page.locator('.react-flow__node[data-id="file:1708c8aaff8f501e656c6be562dd01087ffc46279cf69f73e0bf6657b5a79544"]');
+        await expect(file).toBeAttached();
         await frame(page, file);
         const disclosure = file.getByText('View source changes', {exact: true});
         await disclosure.click();
