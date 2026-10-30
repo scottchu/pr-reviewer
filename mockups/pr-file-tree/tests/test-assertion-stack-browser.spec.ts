@@ -24,16 +24,24 @@ for (const width of [1440, 390]) {
         const second = node('unit:4a7ff26fbe288fde3b1b2ab6b75b15edef959964f0dda3fd57cd3c76455aa6b0');
         await frame(page, subject);
         const positions = async () => {
-            const t = (await subject.boundingBox())!, a = (await first.boundingBox())!, b = (await second.boundingBox())!;
-            expect(a.x).toBeGreaterThan(t.x);
-            expect(Math.abs(a.x - b.x)).toBeLessThan(1);
-            expect(a.y).toBeGreaterThanOrEqual(t.y + t.height);
-            expect(b.y).toBeGreaterThanOrEqual(a.y + a.height);
+            await expect.poll(async () => {
+                const t = await subject.boundingBox(), a = await first.boundingBox(), b = await second.boundingBox();
+                return Boolean(t && a && b && a.x > t.x && Math.abs(a.x - b.x) < 1 &&
+                    a.y >= t.y + t.height && b.y >= a.y + a.height);
+            }).toBe(true);
         };
         await positions();
+        const details = subject.locator('details').first();
+        const closedHeight = (await subject.boundingBox())!.height;
         await subject.getByText('View source changes', {exact: true}).click();
+        await expect(details).toHaveAttribute('open', '');
+        await expect(subject.getByLabel('Removed source rows', {exact: true})).toBeAttached();
+        await expect.poll(async () => (await subject.boundingBox())!.height).toBeGreaterThan(closedHeight);
         await positions();
+        const openHeight = (await subject.boundingBox())!.height;
         await subject.getByText('View source changes', {exact: true}).click();
+        await expect(details).not.toHaveAttribute('open');
+        await expect.poll(async () => (await subject.boundingBox())!.height).toBeLessThan(openHeight);
         await positions();
     });
 }
