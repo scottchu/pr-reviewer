@@ -27,7 +27,9 @@ export const createPreviewServer = (directory: string): Server => {
     visit(resolve(directory));
     return createServer((request, response) => {
         if (request.method !== 'GET' && request.method !== 'HEAD') {response.writeHead(405, {Allow: 'GET, HEAD'}); response.end(); return;}
-        const path = new URL(request.url ?? '/', 'http://127.0.0.1').pathname;
+        let path: string;
+        try {path = new URL(request.url ?? '/', 'http://127.0.0.1').pathname;}
+        catch {response.writeHead(400); response.end(); return;}
         const file = files.get(path === '/' ? '/index.html' : path);
         if (!file) {response.writeHead(404); response.end(); return;}
         const compressed = acceptsGzip(String(request.headers['accept-encoding'] ?? ''));
