@@ -23,6 +23,7 @@ import {GraphToolbar} from './GraphToolbar.tsx';
 export type ReviewGraphPresentationOptions = Readonly<{
     renderChangeBody?: (entity: GraphEntity, onReflow: () => void) => React.ReactNode;
     initialFocusId?: string;
+    readerPins?: readonly string[];
 }>;
 
 export const mountReviewGraph = (root:HTMLElement,initialSession:GraphSessionUI, presentation: ReviewGraphPresentationOptions = {}) => {
@@ -496,7 +497,7 @@ const App = () => {
         return sceneGeometry({comparison: experience.comparisonId, revision: ++sceneSequence.current}, nodes,
             edges.map(edge => ({id: edge.id, source: edge.source, target: edge.target, routed: edge.data!.routed})), sizes);
     }, [ready, movement, layoutRevision, revision, nodes, view.nodes, edges, sizes, experience.comparisonId]);
-    const membership = useMemo(() => sceneMembership(scene, selection, pins, retainedReaderPins(view.nodes, limits, readerStates)), [scene, selection, pins, view.nodes, limits, geometryRevision, experience.filter]);
+    const membership = useMemo(() => sceneMembership(scene, selection, pins, [...retainedReaderPins(view.nodes, limits, readerStates), ...(presentation.readerPins ?? [])]), [scene, selection, pins, view.nodes, limits, geometryRevision, experience.filter]);
     const semanticNodes = useMemo(() => new Set(experience.filter.nodeIds), [experience.filter]);
     const semanticRoutes = useMemo(() => new Set(experience.filter.relationIds), [experience.filter]);
     const filteredMembership = useMemo(() => filterSceneMembership(experience.filter, membership), [experience.filter, membership]);

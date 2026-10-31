@@ -4,6 +4,8 @@ import React from 'react';
 import {renderToStaticMarkup} from 'react-dom/server';
 import {createServer} from 'vite';
 import ts from 'typescript-analysis';
+import {createComposedPresentationState} from './presentation-state.ts';
+import {sceneMembership, filterSceneMembership} from '../../src/review-graph/ui/scene-membership.ts';
 import fullSource from '../pr-file-tree/full-source.json' with {type: 'json'};
 
 // Source/SSR checks only; these are not browser or unfamiliar-reviewer acceptance.
@@ -47,12 +49,32 @@ test('complete graph preview composes real tests and the existing highlighted re
                 assert.ok(calls.includes(reference.line));
             }
         }
-        const markup = renderToStaticMarkup(React.createElement(component.ComposedChange, {entity: sample.sampleChange, onReflow: () => {}}));
+        const markup = renderToStaticMarkup(React.createElement(component.ComposedChange, {entity: sample.sampleChange, onReflow: () => {}, state: createComposedPresentationState()}));
         assert.ok(markup.indexOf('aria-label="Explaining"') < markup.indexOf('aria-label="Diff"'));
         assert.ok(markup.indexOf('aria-label="Diff"') < markup.indexOf('aria-label="Tests"'));
         for (const testEntity of sample.sampleTests) assert.ok(markup.includes(`data-test-id="${testEntity.id}"`));
         assert.equal((markup.match(/data-assertion-id=/g) ?? []).length, 29);
         assert.ok(markup.includes('syntax-keyword') && markup.includes('syntax-string'));
+        const cache = createComposedPresentationState();
+        const added = sample.sampleTests.find(test => test.data.comparisonStatus === 'add')!;
+        cache.saveTest(added.id, {open: true, selectedId: added.id});
+        const readerId = sample.sourceFocus(added, 'test').id;
+        cache.saveReader(readerId, {mode: 'split', reading: {active: 0, top: 173, horizontal: {[-1]: 7}, mode: 'split', folds: ['retained-context'], focusId: readerId}});
+        const reconstruct = () => renderToStaticMarkup(React.createElement(component.ComposedChange, {entity: sample.sampleChange, onReflow: () => {}, state: cache}));
+        const firstMount = reconstruct();
+        const remount = reconstruct();
+        assert.ok(firstMount.includes(`data-test-id="${added.id}" open=""`));
+        assert.ok(remount.includes(`data-test-id="${added.id}" open=""`));
+        assert.ok(remount.includes('aria-pressed="true">Split</button>'));
+        assert.ok(remount.includes('Test source'));
+        assert.equal(cache.reader(readerId).reading?.top, 173);
+        assert.equal(cache.reader(readerId).reading?.horizontal[-1], 7);
+        assert.deepEqual(cache.reader(readerId).reading?.folds, ['retained-context']);
+        const comparison = {comparison: session.comparisonId, revision: 1};
+        const membership = sceneMembership(comparison, {...comparison, request: 1, coverage: {x: 0, y: 0, width: 1, height: 1}, nodeIds: [], metadataNodeIds: [], routeIds: [], visited: 0, visitedBranches: 0}, {nodes: [], routes: []}, [sample.sampleChange.id]);
+        assert.ok(membership?.nodes.has(sample.sampleChange.id));
+        assert.ok(filterSceneMembership({changesOnly: true, nodeIds: [], relationIds: []}, membership).nodes.size === 0);
+
         for (const mode of ['unified', 'split'] as const) {
             for (const focus of [sample.sourceFocus(sample.gatewayFunction), ...sample.sampleTests.map(test => sample.sourceFocus(test, 'test'))]) {
                 const sourceMarkup = renderToStaticMarkup(React.createElement(diff.FileDiffBody, {
