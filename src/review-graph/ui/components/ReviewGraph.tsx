@@ -230,7 +230,7 @@ const GraphBoundary = React.memo(({ data }: NodeProps<EntityNode>) => {
             const body = composedBody.current;
             const end = Math.max(element.offsetTop + element.offsetHeight, body ? body.offsetTop + body.offsetHeight : 0);
             const clearance = Math.max(groupInterior.top, Math.ceil(end + groupInterior.padding));
-            if (data.entity.id === presentation.initialFocusId) presentation.diagnostic?.({stage: 'header', clearance});
+            if (data.entity.id === presentation.initialFocusId || presentation.readerPins?.includes(data.entity.id)) presentation.diagnostic?.({stage: 'header', clearance});
             data.onHeaderMeasure(data.entity.id, clearance);
         };
         measure();

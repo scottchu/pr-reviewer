@@ -45,7 +45,7 @@ export const createPreviewServer = (directory: string): Server => {
                     const value = input as Record<string, unknown>;
                     if (typeof value.stage !== 'string' || !['module','session','mounted','layout','header','reflow','camera','heartbeat','error','rejection'].includes(value.stage)) throw new Error('stage');
                     const output: Record<string, string | number> = {stage: value.stage};
-                    const numbers = ['sequence','elapsed','nodes','entities','edges','passes','elements','width','height','clearance','zoom','x','y'];
+                    const numbers = ['stageCount','sequence','elapsed','nodes','entities','edges','passes','elements','width','height','clearance','zoom','x','y'];
                     for (const key of numbers) if (typeof value[key] === 'number' && Number.isFinite(value[key]) && Math.abs(value[key]) <= 10000000) output[key] = value[key];
                     if ((value.stage === 'error' || value.stage === 'rejection') && typeof value.message === 'string') output.message = value.message.slice(0, 300);
                     process.stdout.write('PREVIEW_DIAGNOSTIC ' + JSON.stringify(output) + '\n');

@@ -1,10 +1,14 @@
 export type PreviewDiagnostic = Readonly<{stage: string; [key: string]: string | number}>;
 let sequence = 0;
 const maximum = 40;
+const counts = new Map<string, number>();
 /** Same-origin, bounded diagnostic events for this isolated preview; never source/user data. */
 export const reportPreviewDiagnostic = (value: PreviewDiagnostic): void => {
     if (sequence >= maximum) return;
-    const event = {...value, sequence: ++sequence, elapsed: Math.round(performance.now())};
+    const count = (counts.get(value.stage) ?? 0) + 1; counts.set(value.stage, count);
+    if (['layout', 'header', 'reflow'].includes(value.stage) && (count > 128 || (count & (count - 1)) !== 0)) return;
+    if (['error', 'rejection'].includes(value.stage) && count > 2) return;
+    const event = {...value, stageCount: count, sequence: ++sequence, elapsed: Math.round(performance.now())};
     const endpoint = new URL('./__preview-diagnostics', document.baseURI);
     const body = new Blob([JSON.stringify(event)], {type: 'application/json'});
     navigator.sendBeacon(endpoint, body);
