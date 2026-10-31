@@ -35,3 +35,16 @@ Order the Change-centered reading unit as Explaining, Diff, Tests. Explaining of
 The card is a projection over existing graph identities, not a new ownership relation or a change in canonical ontology. Shared tests or interpretations can appear in several cards. No related test is invented to fill the Tests area, and grouping several edits by behavioral purpose remains an interpretation requiring support. Test execution is not authorized or implemented by clicking a test in this design preview.
 
 For the current real PR25 example, show a local source-backed explanation of the removed headers-object entry and preserve purpose/context as unestablished. No relevant-test association has been established by this preview preparation; the Changed and Unchanged test areas must expose that gap rather than invent counts, test names, coverage, policy verification or execution results.
+
+## Whole-graph and shared-reader correction
+
+Date: 2026-10-31.
+Status: user correction to the preview scope.
+
+The standalone single-card sketch did not validate composed projection across the whole graph. Its hand-written plain code rendering also dropped the established syntax highlighting. The request() example without prepared relevant tests was an unsuitable positive example for the selected Explaining/Diff/Tests design; empty test areas did not exercise the requested journey. Preserve these as failed preview choices, not accepted behavior.
+
+Use the existing complete PR25 graph/session and renderer in a separate candidate preview. Preserve canonical entity/relation identities, path ordering, graph navigation and all unrelated node presentations. An optional presentation-only Change-body renderer may enrich a selected existing Change boundary; it is inactive for the normal product entry. Measure the composed header so nested source nodes and relation labels are placed below it. Do not replace the graph with the card or add a parallel graph model.
+
+Use the existing FileDiffBody reader and its SyntaxCode/token pipeline and established source styles for both code and test readers in Unified and Split modes. Do not reconstruct a plain pre reader, duplicate syntax palettes or silently remove highlighting in a mockup. Preserve pinned path/side/line coordinates so the token/source equality guard can work.
+
+The representative change is createGateway() in src/server/public.ts. Its pinned tests/gateway.test.ts contains a directly imported createGateway call within one added Test (16 Assertions) and two unchanged Tests (6 and 7 Assertions). Source call locations and declaration import establish a static source association, not runtime coverage or a verifies_policy edge. Expose Test then Assertions and open the same shared source reader on selection. The tests remain source/not-run until separately obtained execution evidence exists. Explanation must remain a bounded source account; purpose/context not supported by supplied sources stays unknown.
