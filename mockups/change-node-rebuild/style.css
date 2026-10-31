@@ -1,0 +1,9 @@
+:root { color-scheme: dark; font-family: system-ui, sans-serif; background: #182126; color: #e1e8ec; }
+body { margin: 0; }
+main { max-width: 42rem; margin: 0 auto; padding: 2rem 1.25rem; padding-bottom: max(2rem, env(safe-area-inset-bottom)); }
+h1 { font-size: 1.75rem; line-height: 1.2; }
+p { line-height: 1.6; }
+.eyebrow { color: #afc3ce; }
+#status { padding: 1rem 0; border-block: 1px solid #51616a; font-weight: 600; }
+button { font: inherit; color: inherit; background: #293c46; border: 1px solid #9eb4c0; border-radius: .35rem; padding: .75rem 1rem; min-height: 44px; }
+button:focus-visible { outline: 2px solid #c4e7fc; outline-offset: 3px; }
