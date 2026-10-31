@@ -21,3 +21,7 @@ Use the already declared installed dependencies; no installation is needed in th
 Build output is ignored under `.decompozr/flow/run/change-node-preview/build`. Serve that built directory using the owned loopback preview runtime; the retained private Tailscale path forwards to it. Do not point the production preview at a task branch or edit its existing build. Keep the previous standalone preview available as task-local rollback until the new candidate is verified.
 
 Static source and SSR checks are not actual browser, graph-first comprehension or physical-device acceptance. Those remain explicitly unrun when the supported browser host is unavailable.
+
+## Preview transport
+
+The retained build can be served by the existing Node runtime with `node --experimental-strip-types mockups/change-node-preview/serve.ts <absolute-build-directory>`. It binds only127.0.0.1:57944 and negotiates gzip while preserving exact identity bytes, MIME types and Vary headers. Transport self-check: `node --experimental-strip-types --test mockups/change-node-preview/transport.test.ts`. No route change or public exposure is needed. Large-JavaScript interrupted transfers were observed, but successful compressed byte delivery alone does not prove the reported mobile blank page is fixed.
