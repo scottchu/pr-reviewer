@@ -192,12 +192,6 @@ const DocumentEvidence = ({identity, hunks, reading, onReflow}: {
         <NativeHunkRows identity={identity} hunks={hunks}/>
     }</NativeSourceDetails>}
 </>;
-const CardSourceRows = ({entity}: {entity: GraphEntity}) => {
-    const scroll = useReaderScroll({entityId: entity.id, kind: 'card-source'});
-    return <div {...scroll} data-reader-kind="card-source" className="bounded-card-source nodrag nopan nowheel" tabIndex={0} aria-label={entity.ui.card.title + ' complete source'}>
-        {entity.ui.card.rows.map((row, index) => <p key={index}>{row}</p>)}
-    </div>;
-};
 const Entity = React.memo(({ data }: NodeProps<EntityNode>) => {
     if (data.renderContent === false) return <Ports/>;
     const card = data.entity.ui.card;
@@ -208,7 +202,7 @@ const Entity = React.memo(({ data }: NodeProps<EntityNode>) => {
   <Ports /><NodeDragHandle data={data}/>
   <h2><EntityIcon entity={data.entity}/><span>{card.title}</span></h2>
   {hunks && <DocumentEvidence identity={{entityId: data.entity.id, kind: 'inline-hunks'}} hunks={hunks} reading={reading} onReflow={data.onReflow}/>}
-  {data.entity.kind === 'function' ? <CardSourceRows entity={data.entity}/> : card.rows.map((row, index) => <p key={index}>{row}</p>)}
+  {card.rows.map((row, index) => <p key={index}>{row}</p>)}
   {data.entity.ui.sourceControl && <details className="document-details nodrag nopan" open={data.entity.ui.sourceOpen} onClickCapture={event => captureReaderScrolls(data.entity.id, event.currentTarget)} onToggle={event => {
       const next = event.currentTarget.open;
       if (next === data.entity.ui.sourceOpen) return;

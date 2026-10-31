@@ -1,6 +1,6 @@
 import type {ReaderIdentityUI, ReaderKindUI, ReaderStateUI, ReaderStateCacheUI, UIEntity} from './types.ts';
 const empty: ReaderStateUI = Object.freeze({open: false, scrollTop: 0, scrollLeft: 0});
-const kinds = new Set<ReaderKindUI>(['inline-hunks', 'source-hunks', 'removed-preview', 'added-preview', 'unpaired-source', 'card-source']);
+const kinds = new Set<ReaderKindUI>(['inline-hunks', 'source-hunks', 'removed-preview', 'added-preview', 'unpaired-source']);
 
 /** Small presentation values only, bounded by known entities × fixed reader kinds. */
 export const createReaderStateCache = (entityIds: readonly string[]): ReaderStateCacheUI => {

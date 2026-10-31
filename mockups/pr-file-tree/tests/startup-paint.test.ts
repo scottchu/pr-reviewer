@@ -2,7 +2,6 @@ import {test} from 'node:test';
 import assert from 'node:assert/strict';
 import {graphPaintState} from '../../../src/review-graph/ui/paint-state.ts';
 import {createViewportWorker, type SceneWorkerPort} from '../../../src/review-graph/integration/viewport-worker.ts';
-import {createReaderStateCache} from '../../../src/review-graph/ui/reader-state.ts';
 import type {SceneWorkerOutputUI} from '../../../src/review-graph/ui/types.ts';
 
 const filter = {changesOnly: false, nodeIds: ['visible', 'reader', 'offscreen', 'new'], relationIds: ['edge', 'hidden-edge']};
@@ -39,12 +38,4 @@ test('worker failure notification is once-only, disposed-safe and leaves origina
     const live = createViewportWorker(() => port, () => publications++, 2000, () => failures++);
     const error = listeners.get('error')!;error({} as MessageEvent<SceneWorkerOutputUI>);error({} as MessageEvent<SceneWorkerOutputUI>);
     assert.equal(failures, 2);assert.equal(publications, 0);live.dispose();
-});
-test('bounded raw source retains canonical reader scroll without accepting unknown identities', () => {
-    const state = createReaderStateCache(['function-before', 'function-after']);
-    state.capture({entityId: 'function-before', kind: 'card-source'}, {scrollTop: 1435, scrollLeft: 4});
-    const pane = {scrollTop: 0, scrollLeft: 0};state.restore({entityId: 'function-before', kind: 'card-source'}, pane);
-    assert.deepEqual(pane, {scrollTop: 1435, scrollLeft: 4});
-    state.capture({entityId: 'unknown', kind: 'card-source'}, {scrollTop: 22, scrollLeft: 0});
-    assert.equal(state.read({entityId: 'unknown', kind: 'card-source'}).scrollTop, 0);
 });
