@@ -355,7 +355,7 @@ const InitialPresentationFocus = ({ready, clearance}: {ready: boolean; clearance
     const initialized = useNodesInitialized();
     const {getNodes, setViewport} = useReactFlow();
     const applied = useRef(false);
-    useEffect(() => {
+    useLayoutEffect(() => {
         if (!presentation.initialFocusId || !ready || !initialized || clearance <= groupInterior.top || applied.current) return;
         const node = getNodes().find(value => value.id === presentation.initialFocusId);
         if (!node) return;
