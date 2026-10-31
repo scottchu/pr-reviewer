@@ -152,3 +152,7 @@ Controlling2026-10-26: [graph-first recovery](semantic-graph-recovery.md) and [r
 2026-10-30: [Test above Assertions](test-assertion-stack/plan.md) is a narrow automatic-layout correction; ontology and other presentation remain unchanged.
 
 2026-10-30: [Measured label overlap repair](label-overlap/plan.md) records user screenshots invalidating automatic-layout visual acceptance and the corrected joint geometry contract.
+
+## Change-node design preview — 2026-10-31
+
+[Bounded preview packet](change-node-preview/plan.md): source-first, standalone design sketch after verified clean/merged main baseline. No product endpoint or renderer change; actual browser and independent comprehension gates remain open.

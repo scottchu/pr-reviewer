@@ -23,3 +23,5 @@ Keep related delivery material together. Each round lives under `docs/plans/<rou
 - [Viewport graph presentation](product/viewport-scene.md): adopted worker/indexed viewport selection, UI ownership, failure behavior and qualified performance acceptance.
 
 - [Raw projection correctness](product/raw-projection-correctness.md): source/fact/interpretation boundaries, unique relations and complete native evidence disclosure.
+
+- [Change-node projection study](product/change-node-projection.md): reader goal, context/fact/interpretation boundaries, parked Z-axis concept and proposed standalone preview.
