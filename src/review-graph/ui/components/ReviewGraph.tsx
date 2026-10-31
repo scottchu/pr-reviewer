@@ -20,7 +20,12 @@ import { initialLayout, curve, dimensions, groupInterior, type Point, type Route
 import {withMeasuredGeometry} from '../layout-measurements.ts';
 import {GraphToolbar} from './GraphToolbar.tsx';
 
-export const mountReviewGraph = (root:HTMLElement,initialSession:GraphSessionUI) => {
+export type ReviewGraphPresentationOptions = Readonly<{
+    renderChangeBody?: (entity: GraphEntity, onReflow: () => void) => React.ReactNode;
+    initialFocusId?: string;
+}>;
+
+export const mountReviewGraph = (root:HTMLElement,initialSession:GraphSessionUI, presentation: ReviewGraphPresentationOptions = {}) => {
 const initial = initialSession.view;
 const allEntities=()=>initial.entities;
 const allRelations=()=>initialSession.layoutRelations;
@@ -215,13 +220,19 @@ const Entity = React.memo(({ data }: NodeProps<EntityNode>) => {
 });
 const GraphBoundary = React.memo(({ data }: NodeProps<EntityNode>) => {
     const heading = useRef<HTMLHeadingElement>(null);
+    const composedBody = useRef<HTMLDivElement>(null);
     useLayoutEffect(() => {
         const element = heading.current;
         if (!element) return;
-        const measure = () => data.onHeaderMeasure(data.entity.id, Math.max(groupInterior.top, Math.ceil(element.offsetTop + element.offsetHeight + groupInterior.padding)));
+        const measure = () => {
+            const body = composedBody.current;
+            const end = Math.max(element.offsetTop + element.offsetHeight, body ? body.offsetTop + body.offsetHeight : 0);
+            data.onHeaderMeasure(data.entity.id, Math.max(groupInterior.top, Math.ceil(end + groupInterior.padding)));
+        };
         measure();
         const observer = new ResizeObserver(measure);
         observer.observe(element);
+        if (composedBody.current) observer.observe(composedBody.current);
         return () => observer.disconnect();
     }, [data.entity.id, data.onHeaderMeasure, data.renderContent]);
     if (data.renderContent === false) return <Ports/>;
@@ -229,6 +240,9 @@ const GraphBoundary = React.memo(({ data }: NodeProps<EntityNode>) => {
  <Ports />
  <section inert={data.measureOnly || undefined} aria-hidden={data.measureOnly || undefined} className={'minimal-change-graph' + (data.entity.ui.status ? ' status-' + data.entity.ui.status!.replaceAll(' ', '-') : '')} aria-label={data.entity.ui.card.title + ' graph'}>
   <NodeDragHandle data={data}/><h2 ref={heading}><EntityIcon entity={data.entity}/><span>{data.entity.ui.card.title}</span></h2>
+  {presentation.renderChangeBody && <div ref={composedBody} className="composed-change-body nodrag nopan" onClick={event => event.stopPropagation()}>
+      {presentation.renderChangeBody(data.entity, data.onReflow ?? (() => {}))}
+  </div>}
  </section>
 </>;
 });
@@ -329,6 +343,20 @@ const InitialLayout = ({ nodes, apply, links, revision, headers, labelSizes, man
         });
         return () => { cancelAnimationFrame(first); cancelAnimationFrame(second); };
     }, [initialized, nodes, getNodes, apply, links, revision, headers, labelSizes, manualChildren]);
+    return null;
+};
+const InitialPresentationFocus = ({ready, clearance}: {ready: boolean; clearance: number}) => {
+    const initialized = useNodesInitialized();
+    const {getNodes, setViewport} = useReactFlow();
+    const applied = useRef(false);
+    useEffect(() => {
+        if (!presentation.initialFocusId || !ready || !initialized || clearance <= groupInterior.top || applied.current) return;
+        const node = getNodes().find(value => value.id === presentation.initialFocusId);
+        if (!node) return;
+        applied.current = true;
+        const zoom = Math.max(.25, Math.min(1, (window.innerWidth - 40) / Number(node.style?.width ?? 800)));
+        void setViewport({x: 20 - node.position.x * zoom, y: 80 - node.position.y * zoom, zoom});
+    }, [ready, initialized, clearance, getNodes, setViewport]);
     return null;
 };
 const App = () => {
@@ -520,7 +548,7 @@ const App = () => {
   <main data-scene-mode={membership ? 'selected' : 'full'} data-changes-only={experience.filter.changesOnly} className={coarse ? 'coarse-input' : undefined} aria-label="PR25 source comparison graph"><ReactFlow<EntityNode, RelationEdge> nodes={renderedNodes} onNodesChange={changes} onNodeDragStart={beginMove} onNodeDragStop={endMove} edges={renderedEdges} nodeTypes={nodeTypes} edgeTypes={edgeTypes} defaultViewport={{
         x: 20, y: 35, zoom: 1
     }} minZoom={0.25} maxZoom={2} panOnScroll panOnScrollMode={PanOnScrollMode.Free} zoomOnScroll={false} zoomOnPinch nodesConnectable={false} nodesDraggable elementsSelectable={false} proOptions={{ hideAttribution: true }}>
-   <ViewportScene scene={scene} publish={setSelection} pinsChanged={pinsChanged}/><InitialLayout nodes={nodes} apply={apply} links={links} revision={revision} headers={headerClearances} labelSizes={sizes} manualChildren={manualPositions.current}/><Background color="#29333b" gap={24} size={1}/>
+   <InitialPresentationFocus ready={ready} clearance={headerClearances[presentation.initialFocusId ?? ''] ?? 0}/><ViewportScene scene={scene} publish={setSelection} pinsChanged={pinsChanged}/><InitialLayout nodes={nodes} apply={apply} links={links} revision={revision} headers={headerClearances} labelSizes={sizes} manualChildren={manualPositions.current}/><Background color="#29333b" gap={24} size={1}/>
   </ReactFlow>
   <GraphToolbar filter={experience.filter} onToggle={() => setExperience(previous => previous.setChangesOnly(!previous.filter.changesOnly))}/>
   </main></>;
