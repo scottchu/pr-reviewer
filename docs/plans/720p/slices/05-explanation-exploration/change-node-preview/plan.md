@@ -29,3 +29,15 @@ Own-PR task: inspect this preview's real PR and explain the documentation/previe
 ## Delivery and preservation
 
 Publish source/spec via task PR; no merge of this new proposal or replacement of the production endpoint is inferred from the earlier request to ensure the existing baseline is on main. Retain preview source, local operational artifacts and all previous handoffs. Record preview URL, committed source, self-check outcomes and remaining browser/review/adoption gates here. The goal is design review, not application slice completion.
+
+## Observed preview evidence
+
+Date: 2026-10-31.
+Source candidate: fb12d68f1659fd86f511c42325a5da6f1df1a257 (the later evidence-only commit does not change the HTML).
+Preview: http://127.0.0.1:57944/; loopback-only static server, retained for user design review. The existing product endpoint and deployed source are unchanged by this task.
+
+Self-check PASS: both decoded source-witness blocks exactly match the retained pinned PR25 hunk; removal-only summary, internal anchors, native disclosure, document links and no-script boundary checked; git diff whitespace check passed. HTTP 200 response matches the committed preview HTML byte-for-byte (SHA256 a1c24dfaf7c42c9ad361d13edee549bbf00f928e8d5084dc9379d52dddc38d1f). No application test suite was rerun because no application/graph code or dependencies changed.
+
+A separately generated collapsed-state design image was visually inspected and is available to the user inline. It is artwork, not a browser screenshot or evidence that the HTML has rendered correctly. Actual supported-browser availability probe still reports “The browser access host is unavailable.” Actual native disclosure/link interaction, candidate UI graph-first review, own-preview-PR intake, unfamiliar comprehension and physical-device acceptance are UNRUN. No alternate browser-control route was used.
+
+Outcome: source-backed design preview prepared and locally served; adoption and actual UI acceptance remain open. The reviewer should judge whether the node makes the source removal and its limits understandable, rather than accepting raw entity counts or HTTP delivery as understanding. Preserve the source worktree/server for that review; do not clean up active preview or existing deployment/rollback evidence.
