@@ -24,3 +24,14 @@ The user requested graph layers, not three reading columns. A subsequent Z-axis 
 The [preview plan](../plans/720p/slices/05-explanation-exploration/change-node-preview/plan.md) owns the bounded source and reading task. A standalone, dependency-free HTML/CSS sketch is inspectable without changing the application or existing endpoint. Native disclosure exposes both witnesses. Presentation uses existing source facts; the sketch is not a second graph implementation or importer.
 
 Success for design discussion: the reviewer can name the source edit, read the changed line without duplication, inspect both witnesses, and distinguish the local edit from any broader intent or runtime conclusion. Actual supported-browser reading, own-preview-PR graph intake and unfamiliar-reviewer comprehension remain separate gates. File/HTTP checks establish delivery of the sketch only.
+
+## Top-down card revision
+
+Date: 2026-10-31.
+Status: user-selected design direction for the standalone preview, not product implementation adoption.
+
+Order the Change-centered reading unit as Explaining, Diff, Tests. Explaining offers an attributed, evidence-linked reading and explicitly separates source observations from purpose, assumptions, contradictions and unknowns; its first position must not turn it into a verdict. Diff provides Unified and Split source views so the reading can be challenged. Tests projects source-backed relevant Test identities, with changed/unchanged source status and Test above Assertions. Unchanged does not mean passed, adequate or behaviorally stable; changed code and tests can agree on undesired behavior.
+
+The card is a projection over existing graph identities, not a new ownership relation or a change in canonical ontology. Shared tests or interpretations can appear in several cards. No related test is invented to fill the Tests area, and grouping several edits by behavioral purpose remains an interpretation requiring support. Test execution is not authorized or implemented by clicking a test in this design preview.
+
+For the current real PR25 example, show a local source-backed explanation of the removed headers-object entry and preserve purpose/context as unestablished. No relevant-test association has been established by this preview preparation; the Changed and Unchanged test areas must expose that gap rather than invent counts, test names, coverage, policy verification or execution results.
