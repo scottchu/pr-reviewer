@@ -12,7 +12,7 @@ export const SharedReader = ({path, focus, label, state}: {path: string; focus: 
     const reading = useRef<FileReading | undefined>(state.reader(identity).reading);
     const [inspected, setInspected] = useState<SourceRelation | null>(() => state.reader(identity).inspected);
     const save = useCallback((value: FileReading) => {
-        if (!host.current?.getClientRects().length) return;
+        if (!host.current?.getClientRects().length || host.current.closest('[inert],[aria-hidden="true"]')) return;
         reading.current = value; state.saveReader(identity, {reading: value});
     }, [state, identity]);
     const changeMode = (value: DiffMode) => {state.saveReader(identity, {mode: value}); setMode(value);};

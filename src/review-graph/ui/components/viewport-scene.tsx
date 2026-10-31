@@ -17,16 +17,17 @@ export const currentScenePins = (root: HTMLElement): ScenePinsUI => {
     for (const details of root.querySelectorAll('details[open]')) collect(details);
     return {nodes: [...nodes].sort(), routes: [...routes].sort()};
 };
-export const ViewportScene = ({scene, publish, pinsChanged}: {
+export const ViewportScene = ({scene, publish, pinsChanged, onFailure}: {
     scene: SceneSnapshotUI | null;
     publish: (selection: SceneSelectionUI | null) => void;
     pinsChanged: (pins: ScenePinsUI) => void;
+    onFailure?: () => void;
 }) => {
     const {getViewport} = useReactFlow();
     const bridge = useRef<ReturnType<typeof createViewportWorker> | null>(null);
     const activeScene = useRef(scene), request = useRef(0);
-    const callbacks = useRef({publish, pinsChanged});
-    callbacks.current = {publish, pinsChanged};
+    const callbacks = useRef({publish, pinsChanged, onFailure});
+    callbacks.current = {publish, pinsChanged, onFailure};
     const root = useRef<HTMLElement | null>(null);
     const livePins = useRef<ScenePinsUI>({nodes: [], routes: []});
     const query = () => {
@@ -50,7 +51,7 @@ export const ViewportScene = ({scene, publish, pinsChanged}: {
             livePins.current = pins;
             callbacks.current.pinsChanged(pins);
             callbacks.current.publish(selection ? {...selection, nodeIds: [...new Set([...selection.nodeIds, ...pins.nodes])], routeIds: [...new Set([...selection.routeIds, ...pins.routes])]} : null);
-        });
+        }, 2000, () => callbacks.current.onFailure?.());
         bridge.current = owner;
         if (activeScene.current) {owner.replace(activeScene.current); latestQuery.current();}
         const pins = () => {livePins.current = currentScenePins(element); callbacks.current.pinsChanged(livePins.current); latestQuery.current();};

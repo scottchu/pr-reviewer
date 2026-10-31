@@ -124,3 +124,8 @@ main { position: relative; flex: 1; min-height: 0; }
 .native-row-remove { background:#fae5e4; color:#642b29; }
 .native-row-add { background:#e3f3e8; color:#25543a; }
 .native-row-context { background:transparent; color:inherit; }
+
+/* Full source stays available without an unbounded source-card surface. */
+.bounded-card-source { max-height: 320px; overflow: auto; overscroll-behavior: contain; touch-action: pan-y; scrollbar-color: #718694 #1d2830; }
+.bounded-card-source p { white-space: pre-wrap; }
+.bounded-card-source:focus-visible { outline: 2px solid #bed8ed; outline-offset: 3px; }

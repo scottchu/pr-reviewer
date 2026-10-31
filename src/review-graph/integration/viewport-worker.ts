@@ -16,6 +16,7 @@ export const createViewportWorker = (
     createPort: () => SceneWorkerPort,
     publish: (selection: SceneSelectionUI | null) => void,
     timeoutMs = 2000,
+    onFailure: () => void = () => {},
 ) => {
     let port: SceneWorkerPort | undefined, disposed = false, failed = false;
     let scene: SceneSnapshotUI | undefined, loaded: SceneSnapshotUI | undefined;
@@ -37,7 +38,7 @@ export const createViewportWorker = (
         port.removeEventListener('message', receive); port.removeEventListener('error', fail); port.removeEventListener('messageerror', fail);
         port.terminate(); port = undefined;
     };
-    const fail = () => {failed = true; pending = undefined; loaded = undefined; detach(); emit(null);};
+    const fail = () => {if (disposed || failed) return; failed = true; pending = undefined; loaded = undefined; detach(); emit(null); onFailure();};
     const pump = () => {
         if (!port || disposed || failed || pending || !scene) return;
         let next: Pending | undefined;

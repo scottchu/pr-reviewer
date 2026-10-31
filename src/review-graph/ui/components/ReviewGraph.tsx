@@ -14,10 +14,11 @@ import {createReaderStateCache, retainedReaderPins} from '../reader-state.ts';
 import type {ReaderIdentityUI} from '../types.ts';
 import {sceneGeometry} from '../scene-geometry.ts';
 import {ViewportScene} from './viewport-scene.tsx';
-import {filterSceneMembership, sceneMembership, type ScenePinsUI} from '../scene-membership.ts';
+import {sceneMembership, type ScenePinsUI} from '../scene-membership.ts';
 import type {SceneSelectionUI} from '../types.ts';
 import { initialLayout, curve, dimensions, groupInterior, type Point, type Routed, type Side } from '../graph-geometry.ts';
 import {withMeasuredGeometry} from '../layout-measurements.ts';
+import {graphPaintState, type RetainedPaint} from '../paint-state.ts';
 import {GraphToolbar} from './GraphToolbar.tsx';
 
 export type ReviewGraphPresentationOptions = Readonly<{
@@ -128,9 +129,10 @@ const DocumentSide = ({label, witness, hunk}: {
             .map((row, index) => <span key={index} data-edit-kind={row.kind} className={'native-row-' + row.kind}>{row.text}</span>)}</pre>
     </>}
 </section>;
+const visibleReader = (element: HTMLElement) => element.getClientRects().length > 0 && !element.closest('[inert],[aria-hidden="true"]');
 const captureReaderScrolls = (entityId: string, container: HTMLElement) => {
     for (const element of container.querySelectorAll<HTMLElement>('[data-reader-kind]'))
-        if (element.getClientRects().length) readerStates.capture({entityId, kind: element.dataset.readerKind as ReaderIdentityUI['kind']}, element);
+        if (visibleReader(element)) readerStates.capture({entityId, kind: element.dataset.readerKind as ReaderIdentityUI['kind']}, element);
 };
 const useReaderScroll = (identity: ReaderIdentityUI) => {
     const ref = useRef<HTMLDivElement>(null);
@@ -140,10 +142,10 @@ const useReaderScroll = (identity: ReaderIdentityUI) => {
         readerStates.restore(identity, element);
         // A closed native ancestor can report zero scroll. Preserve the last visible
         // position rather than overwriting it during close-triggered cleanup.
-        return () => {if (element.getClientRects().length) readerStates.capture(identity, element);};
+        return () => {if (visibleReader(element)) readerStates.capture(identity, element);};
     }, [identity.entityId, identity.kind]);
     return {ref, onScroll: (event: React.UIEvent<HTMLDivElement>) => {
-        if (event.currentTarget.getClientRects().length) readerStates.capture(identity, event.currentTarget);
+        if (visibleReader(event.currentTarget)) readerStates.capture(identity, event.currentTarget);
     }};
 };
 const PreviewRows = ({entityId, pane}: {entityId: string; pane: SourceReadingUI['panes'][number]}) => {
@@ -190,6 +192,12 @@ const DocumentEvidence = ({identity, hunks, reading, onReflow}: {
         <NativeHunkRows identity={identity} hunks={hunks}/>
     }</NativeSourceDetails>}
 </>;
+const CardSourceRows = ({entity}: {entity: GraphEntity}) => {
+    const scroll = useReaderScroll({entityId: entity.id, kind: 'card-source'});
+    return <div {...scroll} data-reader-kind="card-source" className="bounded-card-source nodrag nopan nowheel" tabIndex={0} aria-label={entity.ui.card.title + ' complete source'}>
+        {entity.ui.card.rows.map((row, index) => <p key={index}>{row}</p>)}
+    </div>;
+};
 const Entity = React.memo(({ data }: NodeProps<EntityNode>) => {
     if (data.renderContent === false) return <Ports/>;
     const card = data.entity.ui.card;
@@ -200,7 +208,7 @@ const Entity = React.memo(({ data }: NodeProps<EntityNode>) => {
   <Ports /><NodeDragHandle data={data}/>
   <h2><EntityIcon entity={data.entity}/><span>{card.title}</span></h2>
   {hunks && <DocumentEvidence identity={{entityId: data.entity.id, kind: 'inline-hunks'}} hunks={hunks} reading={reading} onReflow={data.onReflow}/>}
-  {card.rows.map((row, index) => <p key={index}>{row}</p>)}
+  {data.entity.kind === 'function' ? <CardSourceRows entity={data.entity}/> : card.rows.map((row, index) => <p key={index}>{row}</p>)}
   {data.entity.ui.sourceControl && <details className="document-details nodrag nopan" open={data.entity.ui.sourceOpen} onClickCapture={event => captureReaderScrolls(data.entity.id, event.currentTarget)} onToggle={event => {
       const next = event.currentTarget.open;
       if (next === data.entity.ui.sourceOpen) return;
@@ -383,6 +391,13 @@ const App = () => {
     const [ready, setReady] = useState(false);
     const [layoutRevision, setLayoutRevision] = useState('');
     const [selection, setSelection] = useState<SceneSelectionUI | null>(null);
+    const [workerFailed, setWorkerFailed] = useState(false);
+    const retainedPaint = useRef<RetainedPaint | null>(null);
+    const acceptSelection = useCallback((value: SceneSelectionUI | null) => {
+        if (value) presentation.diagnostic?.({stage: 'selection', nodes: value.nodeIds.length, edges: value.routeIds.length, revision: value.revision});
+        setSelection(value);
+    }, []);
+    const workerFailure = useCallback(() => {presentation.diagnostic?.({stage: 'worker-failure'}); setWorkerFailed(true);}, []);
     const [pins, setPins] = useState<ScenePinsUI>({nodes: [], routes: []});
     const pinsChanged = useCallback((next: ScenePinsUI) => setPins(previous =>
         JSON.stringify(previous) === JSON.stringify(next) ? previous : next), []);
@@ -505,9 +520,13 @@ const App = () => {
             edges.map(edge => ({id: edge.id, source: edge.source, target: edge.target, routed: edge.data!.routed})), sizes);
     }, [ready, movement, layoutRevision, revision, nodes, view.nodes, edges, sizes, experience.comparisonId]);
     const membership = useMemo(() => sceneMembership(scene, selection, pins, [...retainedReaderPins(view.nodes, limits, readerStates), ...(presentation.readerPins ?? [])]), [scene, selection, pins, view.nodes, limits, geometryRevision, experience.filter]);
+    const paint = useMemo(() => graphPaintState(experience.comparisonId, experience.filter, membership,
+        retainedPaint.current, pins, presentation.readerPins ?? [], workerFailed && Boolean(scene)),
+        [experience.comparisonId, experience.filter, membership, pins, scene, workerFailed]);
+    useLayoutEffect(() => {
+        if (membership || (workerFailed && scene)) retainedPaint.current = {comparison: experience.comparisonId, nodes: paint.nodes, routes: paint.routes};
+    }, [membership, workerFailed, scene, experience.comparisonId, paint]);
     const semanticNodes = useMemo(() => new Set(experience.filter.nodeIds), [experience.filter]);
-    const semanticRoutes = useMemo(() => new Set(experience.filter.relationIds), [experience.filter]);
-    const filteredMembership = useMemo(() => filterSceneMembership(experience.filter, membership), [experience.filter, membership]);
     const renderedCache = useRef(new Map<string, {source: EntityNode; rendered: EntityNode}>());
     const renderedNodes = useMemo(() => {
         const next = new Map<string, {source: EntityNode; rendered: EntityNode}>();
@@ -515,24 +534,25 @@ const App = () => {
             // Bootstrap measures the full model before either mask removes content.
             // Excluded cards can measure, but cannot paint, focus or receive input.
             const eligible = semanticNodes.has(node.id);
-            const content = !scene || filteredMembership.nodes.has(node.id);
-            const measureOnly = !eligible && !scene;
+            const content = !scene || paint.nodes.has(node.id);
+            const painted = eligible && paint.nodes.has(node.id);
+            const measureOnly = !painted;
             const prior = renderedCache.current.get(node.id);
             let rendered = node;
-            if (!content || !eligible) {
+            if (!content || !painted) {
                 const reusable = prior?.source === node
-                    && prior.rendered.focusable === eligible
+                    && prior.rendered.focusable === painted
                     && prior.rendered.data.renderContent === content
                     && prior.rendered.data.measureOnly === measureOnly;
                 rendered = reusable ? prior.rendered : {
                     ...node,
-                    focusable: eligible,
-                    draggable: eligible && (node.draggable ?? true),
+                    focusable: painted,
+                    draggable: painted && (node.draggable ?? true),
                     data: {...node.data, renderContent: content, measureOnly},
                     style: {
                         ...node.style,
                         ...(!content ? dimensions(node) : {}),
-                        ...(!eligible ? {visibility: 'hidden' as const, pointerEvents: 'none' as const} : {}),
+                        ...(!painted ? {visibility: 'hidden' as const, pointerEvents: 'none' as const} : {}),
                     },
                 };
             }
@@ -541,22 +561,20 @@ const App = () => {
         });
         renderedCache.current = next;
         return result;
-    }, [nodes, scene, semanticNodes, filteredMembership]);
+    }, [nodes, scene, semanticNodes, paint]);
     const renderedEdges = useMemo(() => {
-        if (scene) return edges.filter(edge => filteredMembership.routes.has(edge.id));
-        // Labels must measure before scene readiness even when the filter is already on.
-        return edges.map(edge => semanticRoutes.has(edge.id) ? edge : {
-            ...edge,
-            focusable: false,
+        const measured = scene ? edges.filter(edge => paint.routes.has(edge.id)) : edges;
+        return measured.map(edge => paint.routes.has(edge.id) ? edge : {
+            ...edge, focusable: false,
             style: {...edge.style, visibility: 'hidden' as const, pointerEvents: 'none' as const},
             data: {...edge.data!, measureOnly: true},
         });
-    }, [edges, scene, filteredMembership, semanticRoutes]);
+    }, [edges, scene, paint]);
     return <><header className="minimal-header"><h1>PR25 · Changes and evidence</h1><p>Files, code changes, tests and their source context</p></header>
-  <main data-scene-mode={membership ? 'selected' : 'full'} data-changes-only={experience.filter.changesOnly} className={coarse ? 'coarse-input' : undefined} aria-label="PR25 source comparison graph"><ReactFlow<EntityNode, RelationEdge> nodes={renderedNodes} onNodesChange={changes} onNodeDragStart={beginMove} onNodeDragStop={endMove} edges={renderedEdges} nodeTypes={nodeTypes} edgeTypes={edgeTypes} defaultViewport={{
+  <main aria-busy={!paint.established} data-scene-mode={membership ? 'selected' : 'full'} data-changes-only={experience.filter.changesOnly} className={coarse ? 'coarse-input' : undefined} aria-label="PR25 source comparison graph"><ReactFlow<EntityNode, RelationEdge> nodes={renderedNodes} onNodesChange={changes} onNodeDragStart={beginMove} onNodeDragStop={endMove} edges={renderedEdges} nodeTypes={nodeTypes} edgeTypes={edgeTypes} defaultViewport={{
         x: 20, y: 35, zoom: 1
     }} minZoom={0.25} maxZoom={2} panOnScroll panOnScrollMode={PanOnScrollMode.Free} zoomOnScroll={false} zoomOnPinch nodesConnectable={false} nodesDraggable elementsSelectable={false} proOptions={{ hideAttribution: true }}>
-   <InitialPresentationFocus ready={ready} clearance={headerClearances[presentation.initialFocusId ?? ''] ?? 0}/><ViewportScene scene={scene} publish={setSelection} pinsChanged={pinsChanged}/><InitialLayout nodes={nodes} apply={apply} links={links} revision={revision} headers={headerClearances} labelSizes={sizes} manualChildren={manualPositions.current}/><Background color="#29333b" gap={24} size={1}/>
+   <InitialPresentationFocus ready={ready && paint.established && paint.nodes.has(presentation.initialFocusId ?? '')} clearance={headerClearances[presentation.initialFocusId ?? ''] ?? 0}/><ViewportScene scene={scene} publish={acceptSelection} pinsChanged={pinsChanged} onFailure={workerFailure}/><InitialLayout nodes={nodes} apply={apply} links={links} revision={revision} headers={headerClearances} labelSizes={sizes} manualChildren={manualPositions.current}/><Background color="#29333b" gap={24} size={1}/>
   </ReactFlow>
   <GraphToolbar filter={experience.filter} onToggle={() => setExperience(previous => previous.setChangesOnly(!previous.filter.changesOnly))}/>
   </main></>;
