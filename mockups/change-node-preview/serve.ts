@@ -26,10 +26,35 @@ export const createPreviewServer = (directory: string): Server => {
     };
     visit(resolve(directory));
     return createServer((request, response) => {
-        if (request.method !== 'GET' && request.method !== 'HEAD') {response.writeHead(405, {Allow: 'GET, HEAD'}); response.end(); return;}
         let path: string;
         try {path = new URL(request.url ?? '/', 'http://127.0.0.1').pathname;}
         catch {response.writeHead(400); response.end(); return;}
+        if (request.method === 'POST' && path === '/__preview-diagnostics') {
+            let bytes = 0; const chunks: Buffer[] = [];
+            request.on('data', (chunk: Buffer) => {
+                if (bytes > 4096) return;
+                bytes += chunk.length;
+                if (bytes > 4096) {response.writeHead(413); response.end(); request.destroy(); return;}
+                chunks.push(chunk);
+            });
+            request.on('end', () => {
+                if (bytes > 4096) return;
+                try {
+                    const input: unknown = JSON.parse(Buffer.concat(chunks).toString('utf8'));
+                    if (!input || typeof input !== 'object' || Array.isArray(input)) throw new Error('shape');
+                    const value = input as Record<string, unknown>;
+                    if (typeof value.stage !== 'string' || !['module','session','mounted','layout','header','reflow','camera','heartbeat','error','rejection'].includes(value.stage)) throw new Error('stage');
+                    const output: Record<string, string | number> = {stage: value.stage};
+                    const numbers = ['sequence','elapsed','nodes','entities','edges','passes','elements','width','height','clearance','zoom','x','y'];
+                    for (const key of numbers) if (typeof value[key] === 'number' && Number.isFinite(value[key]) && Math.abs(value[key]) <= 10000000) output[key] = value[key];
+                    if ((value.stage === 'error' || value.stage === 'rejection') && typeof value.message === 'string') output.message = value.message.slice(0, 300);
+                    process.stdout.write('PREVIEW_DIAGNOSTIC ' + JSON.stringify(output) + '\n');
+                    response.writeHead(204); response.end();
+                } catch {response.writeHead(400); response.end();}
+            });
+            return;
+        }
+        if (request.method !== 'GET' && request.method !== 'HEAD') {response.writeHead(405, {Allow: 'GET, HEAD'}); response.end(); return;}
         const file = files.get(path === '/' ? '/index.html' : path);
         if (!file) {response.writeHead(404); response.end(); return;}
         const compressed = acceptsGzip(String(request.headers['accept-encoding'] ?? ''));

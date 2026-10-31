@@ -24,6 +24,7 @@ export type ReviewGraphPresentationOptions = Readonly<{
     renderChangeBody?: (entity: GraphEntity, onReflow: () => void) => React.ReactNode;
     initialFocusId?: string;
     readerPins?: readonly string[];
+    diagnostic?: (event: Readonly<{stage: string; [key: string]: string | number}>) => void;
 }>;
 
 export const mountReviewGraph = (root:HTMLElement,initialSession:GraphSessionUI, presentation: ReviewGraphPresentationOptions = {}) => {
@@ -228,7 +229,9 @@ const GraphBoundary = React.memo(({ data }: NodeProps<EntityNode>) => {
         const measure = () => {
             const body = composedBody.current;
             const end = Math.max(element.offsetTop + element.offsetHeight, body ? body.offsetTop + body.offsetHeight : 0);
-            data.onHeaderMeasure(data.entity.id, Math.max(groupInterior.top, Math.ceil(end + groupInterior.padding)));
+            const clearance = Math.max(groupInterior.top, Math.ceil(end + groupInterior.padding));
+            if (data.entity.id === presentation.initialFocusId) presentation.diagnostic?.({stage: 'header', clearance});
+            data.onHeaderMeasure(data.entity.id, clearance);
         };
         measure();
         const observer = new ResizeObserver(measure);
@@ -356,12 +359,15 @@ const InitialPresentationFocus = ({ready, clearance}: {ready: boolean; clearance
         if (!node) return;
         applied.current = true;
         const zoom = Math.max(.25, Math.min(1, (window.innerWidth - 40) / Number(node.style?.width ?? 800)));
+        presentation.diagnostic?.({stage: 'camera', x: node.position.x, y: node.position.y, zoom, width: Number(node.style?.width ?? 800), clearance});
         void setViewport({x: 20 - node.position.x * zoom, y: 80 - node.position.y * zoom, zoom});
     }, [ready, initialized, clearance, getNodes, setViewport]);
     return null;
 };
 const App = () => {
     const coarse = useCoarseInput();
+    const layoutPasses = useRef(0);
+    useEffect(() => {presentation.diagnostic?.({stage: 'mounted'});}, []);
     useEffect(() => installPageGestureBoundary(document.documentElement), []);
     const [experience, setExperience] = useState<GraphSessionUI>(() => initialSession);
     const limits = experience.limits;
@@ -407,7 +413,7 @@ const App = () => {
     }, [setNodes, headerClearances]);
     const onExpand = useCallback((id: string, hide = false) => setExperience(previous => previous.expand(id,hide)), []);
     const onInspect = useCallback((id:string,open:boolean)=>setExperience(previous=>previous.inspect(id,open)),[]);
-    const onReflow = useCallback(() => setGeometryRevision(value => value + 1), []);
+    const onReflow = useCallback(() => {presentation.diagnostic?.({stage: 'reflow'}); setGeometryRevision(value => value + 1);}, []);
     useEffect(() => {
         setReady(false);
         setNodes(previous => {
@@ -437,6 +443,7 @@ const App = () => {
             if (manualPositions.current[node.id]) manualPositions.current[node.id] = position;
             return { ...node, position, extent: [[bounds.min.x, bounds.min.y], [bounds.max.x, bounds.max.y]] as [[number, number], [number, number]] };
         });
+        presentation.diagnostic?.({stage: 'layout', passes: ++layoutPasses.current, nodes: bounded.length, width: Math.max(0, ...bounded.map(node => Number(node.style?.width ?? node.measured?.width ?? 0))), height: Math.max(0, ...bounded.map(node => Number(node.style?.height ?? node.measured?.height ?? 0)))});
         setNodes(bounded);
         setReady(true);
         setLayoutRevision(revision);
