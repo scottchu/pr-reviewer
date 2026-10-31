@@ -1,3 +1,4 @@
+import { observeGeometry } from '../../src/review-graph/ui/geometry-observer.ts';
 import { focusedComparison } from './comparison-selection.ts';
 import { SyntaxCode } from './syntax-code.tsx';
 import React, { useRef, useState, useLayoutEffect, useMemo } from 'react';
@@ -282,16 +283,17 @@ export const FileDiffBody = ({ file, mode, fullscreen, width, onExplain, activeR
     const pane = horizontal.current;
     const pre = content.current;
     if (!pane || !pre) return;
+    let measuredWidth: number | undefined;
     const measure = () => {
-      pane.style.setProperty('--split-viewport-width', `${pane.clientWidth}px`);
+      const nextWidth = pane.clientWidth;
+      if (measuredWidth === nextWidth) return;
+      measuredWidth = nextWidth;
+      pane.style.setProperty('--split-viewport-width', `${nextWidth}px`);
       pre.style.width = '100%';
       pane.scrollLeft = 0;
       pane.style.setProperty('--source-offset', `${pane.scrollLeft}px`);
     };
-    measure();
-    const observer = new ResizeObserver(measure);
-    observer.observe(pane);
-    return () => observer.disconnect();
+    return observeGeometry([pane], measure);
   }, [mode, file.path, folds, width, segments]);
   const renderRows = (rows: SourceRow[], hunk: number | null) => {
     let assigned = false;

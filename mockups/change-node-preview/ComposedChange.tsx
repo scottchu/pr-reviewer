@@ -1,4 +1,4 @@
-import React, {useCallback, useLayoutEffect, useRef, useState} from 'react';
+import React, {useCallback, useRef, useState} from 'react';
 import {FileDiffBody, fileDiffs, type DiffMode, type SourceRelation} from '../pr-file-tree/file-diff.tsx';
 import type {FileReading, ReadingFocus} from '../pr-file-tree/reading.ts';
 import type {ComposedPresentationState} from './presentation-state.ts';
@@ -53,10 +53,8 @@ const TestProjection = ({test, onReflow, state}: {test: GraphEntity; onReflow: (
     </details>;
 };
 export const ComposedChange = ({entity, onReflow, state}: {entity: GraphEntity; onReflow: () => void; state: ComposedPresentationState}) => {
-    const ref = useRef<HTMLDivElement>(null);
-    useLayoutEffect(() => {const el = ref.current; if (!el) return; const observer = new ResizeObserver(onReflow); observer.observe(el); return () => observer.disconnect();}, [onReflow]);
     if (entity.id !== sampleChange.id) return null;
-    return <div ref={ref} className="composed-change" data-composed-change={entity.id}>
+    return <div className="composed-change" data-composed-change={entity.id}>
         <p className="composed-source-caption">Whole PR25 graph · composed projection preview · same canonical identities</p>
         <section aria-label="Explaining"><h3>Explaining</h3>
             <p>The gateway source distinguishes a missing Authorization value from explicitly supplied credentials. Compare the local-owner branch with the explicit credential checks, then inspect the added and unchanged gateway Tests.</p>

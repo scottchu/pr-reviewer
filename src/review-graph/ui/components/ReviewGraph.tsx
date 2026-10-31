@@ -19,6 +19,7 @@ import type {SceneSelectionUI} from '../types.ts';
 import { initialLayout, curve, dimensions, groupInterior, type Point, type Routed, type Side } from '../graph-geometry.ts';
 import {withMeasuredGeometry} from '../layout-measurements.ts';
 import {graphPaintState, type RetainedPaint} from '../paint-state.ts';
+import {createMeasurementScheduler, observeGeometry} from '../geometry-observer.ts';
 import {GraphToolbar} from './GraphToolbar.tsx';
 
 export type ReviewGraphPresentationOptions = Readonly<{
@@ -235,11 +236,7 @@ const GraphBoundary = React.memo(({ data }: NodeProps<EntityNode>) => {
             if (data.entity.id === presentation.initialFocusId || presentation.readerPins?.includes(data.entity.id)) presentation.diagnostic?.({stage: 'header', clearance});
             data.onHeaderMeasure(data.entity.id, clearance);
         };
-        measure();
-        const observer = new ResizeObserver(measure);
-        observer.observe(element);
-        if (composedBody.current) observer.observe(composedBody.current);
-        return () => observer.disconnect();
+        return observeGeometry([element, ...(composedBody.current ? [composedBody.current] : [])], measure);
     }, [data.entity.id, data.onHeaderMeasure, data.renderContent]);
     if (data.renderContent === false) return <Ports/>;
     return <>
@@ -264,7 +261,7 @@ const Relation = React.memo((props: EdgeProps<RelationEdge>) => {
     } | null>(null);
     const data = props.data;
     useLayoutEffect(() => { const element = labelRef.current; if (!element || !data)
-        return; const measure = () => data.onMeasure(props.id, { width: element.offsetWidth, height: element.offsetHeight }); measure(); const observer = new ResizeObserver(measure); observer.observe(element); return () => observer.disconnect(); }, [props.id, data?.onMeasure]);
+        return; const measure = () => { if (element.offsetWidth > 0 && element.offsetHeight > 0) data.onMeasure(props.id, { width: element.offsetWidth, height: element.offsetHeight }); }; return observeGeometry([element], measure); }, [props.id, data?.onMeasure]);
     if (!data)
         return null;
     const route = curve({ x: props.sourceX, y: props.sourceY }, { x: props.targetX, y: props.targetY }, data.routed.offset);
@@ -422,7 +419,13 @@ const App = () => {
     }, [setNodes, headerClearances]);
     const onExpand = useCallback((id: string, hide = false) => setExperience(previous => previous.expand(id,hide)), []);
     const onInspect = useCallback((id:string,open:boolean)=>setExperience(previous=>previous.inspect(id,open)),[]);
-    const onReflow = useCallback(() => {presentation.diagnostic?.({stage: 'reflow'}); setGeometryRevision(value => value + 1);}, []);
+    const reflowScheduler = useRef<ReturnType<typeof createMeasurementScheduler> | null>(null);
+    useLayoutEffect(() => {
+        const scheduler = createMeasurementScheduler(() => {presentation.diagnostic?.({stage: 'reflow'}); setGeometryRevision(value => value + 1);});
+        reflowScheduler.current = scheduler;
+        return () => { scheduler.dispose(); reflowScheduler.current = null; };
+    }, []);
+    const onReflow = useCallback(() => reflowScheduler.current?.schedule(), []);
     useEffect(() => {
         setReady(false);
         setNodes(previous => {
@@ -457,17 +460,33 @@ const App = () => {
         setReady(true);
         setLayoutRevision(revision);
     }, [setNodes, headerClearances, revision]);
+    type DimensionChange = Extract<Parameters<typeof onNodesChange>[0][number], {type: 'dimensions'}>;
+    const pendingDimensions = useRef(new Map<string, DimensionChange>());
+    const dimensionScheduler = useRef<ReturnType<typeof createMeasurementScheduler> | null>(null);
+    useLayoutEffect(() => {
+        const scheduler = createMeasurementScheduler(() => {
+            const current = new Map(latest.current.nodes.map(node => [node.id, node]));
+            const relevant = [...pendingDimensions.current.values()].filter(change => {
+                const node = current.get(change.id);
+                return node && change.dimensions && change.dimensions.width > 0 && change.dimensions.height > 0 &&
+                    (node.measured?.width !== change.dimensions.width || node.measured?.height !== change.dimensions.height);
+            });
+            pendingDimensions.current.clear();
+            if (relevant.length) { onNodesChange(relevant); onReflow(); }
+        });
+        dimensionScheduler.current = scheduler;
+        return () => { scheduler.dispose(); pendingDimensions.current.clear(); dimensionScheduler.current = null; };
+    }, [onNodesChange, onReflow]);
     const changes: typeof onNodesChange = useCallback(next => {
-        for (const change of next)
+        for (const change of next) {
             if (change.type === 'position' && change.position && change.dragging !== undefined)
                 manualPositions.current[change.id] = change.position;
-        const relevant = next.filter(change => change.type !== 'dimensions' || nodes.find(node => node.id === change.id)?.measured?.width !== change.dimensions?.width || nodes.find(node => node.id === change.id)?.measured?.height !== change.dimensions?.height);
-        if (relevant.length) onNodesChange(relevant);
-        if (relevant.some(change => change.type === 'dimensions' && change.dimensions &&
-            change.dimensions.width > 0 && change.dimensions.height > 0)) {
-            setGeometryRevision(value => value + 1);
+            if (change.type === 'dimensions') pendingDimensions.current.set(change.id, change);
         }
-    }, [onNodesChange, nodes]);
+        const immediate = next.filter(change => change.type !== 'dimensions');
+        if (immediate.length) onNodesChange(immediate);
+        if (pendingDimensions.current.size) dimensionScheduler.current?.schedule();
+    }, [onNodesChange]);
     const onBend = useCallback((id: string, offset: Point | undefined) => setManual(previous => {
         const next = { ...previous };
         if (offset)
