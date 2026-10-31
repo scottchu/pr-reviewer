@@ -42,3 +42,7 @@ Independent checks: remaining3 startup-paint tests pass, plus prior11 viewport/s
 ## ResizeObserver delivery follow-up
 
 At c6047ceec0f2d8d6d922ce710f4a533da568995c independent scoped SOURCE PASS confirms custom observer callbacks schedule measurements, controlled ReactFlow dimension changes queue latest per ID outside delivery, removed/nonpositive measurements are ignored and non-dimension changes remain immediate. Duplicate composed-body observation is removed; unchanged reader width writes are guarded. Independent16 observer/startup/viewport tests, source/SSR1 and strict preview types pass. Root affected suite194/194 and exact24 asset checks pass. ReactFlow's framework-owned internal updates remain synchronous. Actual error elimination, stable mobile interaction, initial paint, own-PR reading and unfamiliar comprehension remain unverified; source review does not establish WebKit recovery.
+
+## Stage0 rebuild review
+
+R9 actual user traces still show the delivery-loop error and repeat startup; previous source PASS did not establish recovery. Independent review initially requested changes because Vite inserted a conditional MutationObserver modulepreload polyfill. At fb9f773150570d583857c9db2a3a75c1d3d7cb7b, SOURCE PASS confirms the corrected3219-byte build excludes React, graph, workers, observers and preload code. Independent probe3/3, transport1/1 and strict stage0 types passed; root additionally checked corrected types/build and12 exact served asset responses. Stage0 runtime/device acceptance is pending, and no later stage is accepted or unlocked.
