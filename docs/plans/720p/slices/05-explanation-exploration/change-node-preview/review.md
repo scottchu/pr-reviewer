@@ -32,3 +32,9 @@ At3ffea3746daf2a6d9b78bac2854e9b34109a5e4c the diagnostic seam received scoped S
 ## Edge-animation control
 
 Independent source comparison confirmed the preview's global old stylesheet adds a240ms SVG d transition absent from the baseline minimum entry. A preview-only later transition:none rule restores baseline edge behavior and preserves shared reader/syntax styling. This is a source-confirmed side-effect correction and an isolated rendering control, not evidence that WebKit performed that transition or that it caused the crash. Root verified unchanged built JS/worker content hashes and the final overriding CSS rule.
+
+## Bootstrap paint follow-up
+
+R8 source review at9c0f437 passed pending/retained/semantic paint, explicit worker-failure fallback, hidden measurable/inert DOM and one-shot prepared camera. The generic source bound was then withdrawn because6904px was group geometry and did not justify changing the selected function reader. Narrowed fb46432 SOURCE PASS preserved original readers and the paint correction. Atc86da0d30892ebe93e6827ff523442fdba7a1648, independent SOURCE PASS confirmed the optional camera's layout-phase publication while retaining readiness/target/one-shot guards; the normal entry supplies no camera override.
+
+Independent checks: remaining3 startup-paint tests pass, plus prior11 viewport/state tests, strict preview types and source/SSR/transport2. Root final run192/192, root TypeScript/boundaries and build pass. These are source checks; actual initial paint, worker-failure UI and Safari stability remain unverified. Source PASS does not establish recovery or default-homepage deployment.
