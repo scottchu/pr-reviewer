@@ -83,3 +83,11 @@ The reading order is Explaining, Diff, Tests. Explain the selected source observ
 ## Minimal graph interaction study
 
 After the one-edit card, test the same projection as one existing canonical Change node with no edges before increasing graph complexity. The node has an explicit drag handle; its scrollable reading body owns text selection, keyboard/disclosure/source controls and wheel/touch reading. The graph background owns navigation. Uncontrolled framework node measurement avoids application measurement-to-layout feedback; no automatic camera or full-graph layout/culling is needed for this study. Preserve the document-flow card as a comparison entry. This validates an interaction hypothesis only; card-local Unified/Split placement and graph composition are still prototype choices, not adopted product design.
+
+## Capture scope in the complete graph (2026-11-02 correction)
+
+A change capture is a local presentation of one changed Function/Test subject within the larger graph. The surrounding graph, other changes, files, documents and relationships remain part of the screen. A standalone page or one-node canvas is insufficient design acceptance. Optimize captures for simultaneous graph reading, not full-page consumption.
+
+Each Test is one change/readable source unit with its own diff. Assertion edits are line changes inside it; contains facts do not require independent Assertion graph nodes or a dumped list. Remove the earlier automatic Test/Assertion/unchanged collapse hierarchy and Read Test source step. Source identity/revision and line-edit dimensions should be composed without becoming redundant nested cards. PR identity stays at graph level. Compact captures begin with the actual change/subject, not implementation labels.
+
+The position and necessity of Explaining is a design question under iteration, not a fixed first section. Available documents/intent may be supplied by graph context; any explanation still needs attributed evidence and explicit limits. Compare in-graph visual options before adopting a local layout. Retain existing prototype artifacts and verification limits while the redesign is selected and implemented.
