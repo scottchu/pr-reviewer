@@ -7,3 +7,13 @@ p { line-height: 1.6; }
 #status { padding: 1rem 0; border-block: 1px solid #51616a; font-weight: 600; }
 button { font: inherit; color: inherit; background: #293c46; border: 1px solid #9eb4c0; border-radius: .35rem; padding: .75rem 1rem; min-height: 44px; }
 button:focus-visible { outline: 2px solid #c4e7fc; outline-offset: 3px; }
+
+.change-card { border: 1px solid #51616a; border-radius: .5rem; padding: 1.25rem; margin-block: 1.5rem; background: #22323b; }
+.change-card h2 { margin: .4rem 0 1rem; font-size: 1.4rem; line-height: 1.3; overflow-wrap: anywhere; }
+.source-path, .source-id { overflow-wrap: anywhere; }
+.witnesses { border-block: 1px solid #51616a; padding-block: .75rem; }
+.witnesses > div { margin-block: .5rem; }
+dt { color: #afc3ce; }
+dd { margin: .25rem 0 0; }
+summary { cursor: pointer; padding-block: .75rem; min-height: 24px; }
+.response-check { margin-top: 1.25rem; }

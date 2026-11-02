@@ -1,0 +1,44 @@
+{
+  "graphSha256": "946b1c59ebde5dd8f5f3eeb2fc5f99fc7e3d6e4b4b3d5d9c9303e699ccb08a2a",
+  "repository": "scottchu/pr-reviewer",
+  "base": "b096826e31c0927190806de91ed70b8b64aa93d8",
+  "head": "e3b270e5f49a9215452b0b86702946043e979059",
+  "id": "change:unit:afc8550b00b30a9b14329f2c8de60288a39d7576a157baef11a8b978eec7b275",
+  "kind": "change",
+  "name": "createGateway() change",
+  "status": "change",
+  "added": 13,
+  "removed": 10,
+  "witnesses": [
+    {
+      "id": "a73669ad55d705594899a864dc9aee45d763ed03b5746d2b083c73fe23c3fe19",
+      "anchor": {
+        "repository": "scottchu/pr-reviewer",
+        "side": "base",
+        "commit": "b096826e31c0927190806de91ed70b8b64aa93d8",
+        "path": "src/server/public.ts",
+        "contentHash": "2bd6f01a2dd416ad1d95993d4fb14b79c56b46a6ce7b8dafb4e1d050a5a48964",
+        "start": 1734,
+        "end": 11651,
+        "startLine": 38,
+        "endLine": 270
+      },
+      "sourceTextHash": "675c003c04b384b3e399d1c127b8e95f72f7891dd6a97209611dcc2c0787a9f6"
+    },
+    {
+      "id": "9aa8e1d17058ba804929035127ae18fcf8241aee2293de456aea367ac7217939",
+      "anchor": {
+        "repository": "scottchu/pr-reviewer",
+        "side": "head",
+        "commit": "e3b270e5f49a9215452b0b86702946043e979059",
+        "path": "src/server/public.ts",
+        "contentHash": "20c22563be7da4c385eda772d5840d55f0993ddeebd85718b3605cddb76a0b0e",
+        "start": 1734,
+        "end": 11776,
+        "startLine": 38,
+        "endLine": 273
+      },
+      "sourceTextHash": "6e1605dded8192b1e382eeb9cc89e5a4c87bfa90e96f5471cf397ab45f830fb4"
+    }
+  ]
+}

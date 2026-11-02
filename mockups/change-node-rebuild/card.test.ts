@@ -1,0 +1,49 @@
+import {test} from 'node:test';
+import assert from 'node:assert/strict';
+import {createHash} from 'node:crypto';
+import {readFileSync} from 'node:fs';
+import {createServer} from 'vite';
+import React from 'react';
+import {renderToStaticMarkup} from 'react-dom/server';
+import sample from './change-sample.json' with {type: 'json'};
+import fullSource from '../pr-file-tree/full-source.json' with {type: 'json'};
+
+// Source/SSR checks only. Device event/scroll/stability acceptance is separate.
+test('card witnesses retain exact pinned source hashes and coordinates', () => {
+    assert.equal(sample.id, 'change:unit:afc8550b00b30a9b14329f2c8de60288a39d7576a157baef11a8b978eec7b275');
+    assert.equal(sample.graphSha256, '946b1c59ebde5dd8f5f3eeb2fc5f99fc7e3d6e4b4b3d5d9c9303e699ccb08a2a');
+    assert.deepEqual(sample.witnesses.map(value => value.anchor.side), ['base', 'head']);
+    for (const witness of sample.witnesses) {
+        const anchor = witness.anchor;
+        const file = fullSource.files.find(value => value.path === anchor.path);
+        assert.ok(file);
+        const text = anchor.side === 'base' ? file.before : file.after;
+        assert.ok(text);
+        assert.equal(anchor.repository, sample.repository);
+        assert.equal(anchor.commit, anchor.side === 'base' ? sample.base : sample.head);
+        assert.equal(createHash('sha256').update(text).digest('hex'), anchor.contentHash);
+        assert.equal(createHash('sha256').update(text.slice(anchor.start, anchor.end)).digest('hex'), witness.sourceTextHash);
+        assert.equal(text.slice(0, anchor.start).split('\n').length, anchor.startLine);
+        assert.equal(text.slice(0, anchor.end - 1).split('\n').length, anchor.endLine);
+    }
+});
+
+test('React card shows one canonical change and both witnesses without loading the graph or plain code reader', async () => {
+    const server = await createServer({configFile: false, root: process.cwd(), server: {middlewareMode: true, hmr: false}, optimizeDeps: {noDiscovery: true}});
+    try {
+        const {ChangeCard} = await server.ssrLoadModule('/mockups/change-node-rebuild/ChangeCard.tsx');
+        const markup = renderToStaticMarkup(React.createElement(ChangeCard));
+        assert.equal((markup.match(/<article/g) ?? []).length, 1);
+        assert.ok(markup.includes(sample.id));
+        assert.ok(markup.includes('createGateway() change'));
+        assert.ok(markup.includes('13 added'));
+        assert.ok(markup.includes('10 removed'));
+        for (const witness of sample.witnesses) assert.ok(markup.includes(witness.anchor.commit));
+        assert.ok(markup.includes('No intent or runtime conclusion'));
+        assert.ok(markup.includes('Check card response'));
+        assert.ok(!markup.includes('<pre'));
+        assert.ok(!markup.includes('<svg'));
+        const imports = readFileSync('mockups/change-node-rebuild/ChangeCard.tsx', 'utf8');
+        assert.ok(!/source-graph|file-diff|xyflow|ResizeObserver|Worker/.test(imports));
+    } finally {await server.close();}
+});
