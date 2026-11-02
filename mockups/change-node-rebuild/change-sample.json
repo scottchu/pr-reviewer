@@ -40,5 +40,31 @@
       },
       "sourceTextHash": "6e1605dded8192b1e382eeb9cc89e5a4c87bfa90e96f5471cf397ab45f830fb4"
     }
-  ]
+  ],
+  "selection": {
+    "title": "Use local-owner access when Authorization is absent",
+    "before": [
+      {
+        "startLine": 61,
+        "endLine": 64
+      }
+    ],
+    "after": [
+      {
+        "startLine": 61,
+        "endLine": 67
+      }
+    ],
+    "nativeHunkIndex": 0,
+    "added": 5,
+    "removed": 2
+  },
+  "context": {
+    "path": "docs/product/review-loop/runtime.md",
+    "commit": "e3b270e5f49a9215452b0b86702946043e979059",
+    "startLine": 22,
+    "endLine": 26,
+    "sourceText": "After both listeners are ready, `runtime.json` records source commit and dirty-state disclosure, PID/start identity and loopback addresses. Open its UI URL directly: review, retained snapshot history and graph load without login, token entry or credential paste. The browser sends ordinary owner requests without Authorization. Runtime startup does not create or read `local-user.json`; any existing credential file and credential rows remain preserved.\n\nThe single-user gateway derives `{kind: \"user\", actorId: \"local-user\"}` for requests without Authorization. It supplies trusted local-owner access through storage interfaces for story, semantic and import operations, including durable job ownership, without exposing or manufacturing a browser credential. Retained owner jobs remain visible and actionable even when originally created under an older owner credential. Explicit Bearer requests continue to resolve their actual stored bootstrap/agent identity; malformed, unknown and stale credentials cannot fall back to local-owner access. Attachment, initiating-session, generation and scoped reply checks remain operational routing requirements.\n\nThis is a single local-owner policy behind the established loopback/Host/private tailnet boundary. It makes no Tailscale identity or multi-user authorization claim and adds no login replacement. Private drafts/recovery use a stable origin-and-local-owner scope. Preserve older credential-scoped recovery records; never silently retarget an unresolved command or require credential re-entry. An incompatible old private record stays blocked with an explicit legacy-recovery message; authoritative saved history is still loaded.",
+    "blobHash": "e9f7aa41d52e5002305394ff9fb92f71a516083c"
+  }
 }

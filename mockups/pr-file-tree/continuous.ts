@@ -126,3 +126,15 @@ export const scopeTestSegments = (segments: readonly Segment[], scope: FunctionC
     ] : [];
   });
 };
+
+/** Opt-in strict range projection. The original native hunk identity/index stays intact. */
+export const scopeSelectionSegments = (segments: readonly Segment[], scope: FunctionContext): Segment[] => {
+  const within = (side: 'before' | 'after', line: number) => scope[side].some(range => line >= range.startLine && line <= range.endLine);
+  return segments.flatMap(segment => {
+    const rows = segment.rows.filter(row =>
+      (row.beforeLine !== null || row.afterLine !== null) &&
+      (row.beforeLine === null || within('before', row.beforeLine)) &&
+      (row.afterLine === null || within('after', row.afterLine)));
+    return rows.length ? [{...segment, kind: segment.kind === 'hunk' ? 'hunk' as const : 'context' as const, rows, label: 'Selected source range'}] : [];
+  });
+};

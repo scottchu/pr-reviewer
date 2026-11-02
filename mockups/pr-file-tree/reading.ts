@@ -35,5 +35,5 @@ export type ReadingFocus = {
   }[];
   preferredSide: 'before' | 'after';
   revealSide?: boolean;
-  scope?: 'test';
+  scope?: 'test' | 'selection';
 };

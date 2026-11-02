@@ -8,7 +8,7 @@ let sequence = 0;
 let failures = 0;
 const report = (stage: 'module' | 'mounted' | 'heartbeat' | 'error' | 'rejection', message?: string) => {
     if (sequence >= 24) return;
-    const value = {stage, revision: 2, sequence: ++sequence, elapsed: Math.round(performance.now()), elements: document.getElementsByTagName('*').length,
+    const value = {stage, revision: 3, sequence: ++sequence, elapsed: Math.round(performance.now()), elements: document.getElementsByTagName('*').length,
         ...(message === undefined ? {} : {message: message.slice(0, 300)})};
     navigator.sendBeacon(new URL('./__preview-diagnostics', document.baseURI), new Blob([JSON.stringify(value)], {type: 'application/json'}));
 };
@@ -25,7 +25,10 @@ const probe = startBaselineProbe({now: () => performance.now(), schedule: (callb
 const fail = (stage: 'error' | 'rejection', message: string) => {
     if (++failures > 2) return;
     probe.fail();
-    status.textContent = 'A script error was captured. This stage failed.';
+    status.classList.remove('runtime-status');
+    status.removeAttribute('aria-hidden');
+    status.setAttribute('role', 'alert');
+    status.textContent = 'The preview encountered an error. The failure was recorded.';
     report(stage, message);
 };
 window.addEventListener('error', event => fail('error', event.message));

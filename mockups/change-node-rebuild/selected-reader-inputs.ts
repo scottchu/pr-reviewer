@@ -8,10 +8,11 @@ import syntax from '../pr-file-tree/syntax.json' with {type: 'json'};
 
 // Build/SSR only: unchanged projections of existing fixtures, never a browser import.
 export const selectedPath = 'src/server/public.ts';
-export const selectedDiffs = {...diffs, files: diffs.files.filter(file => file.path === selectedPath)};
-export const selectedSource = {...source, files: source.files.filter(file => file.path === selectedPath)};
-export const selectedContext = {...context, files: context.files.filter(file => file.path === selectedPath)};
-export const selectedSyntax = Object.fromEntries(Object.entries(syntax).filter(([key]) => key === selectedPath + ':before' || key === selectedPath + ':after'));
+export const selectedPaths = [selectedPath, 'tests/gateway.test.ts'];
+export const selectedDiffs = {...diffs, files: diffs.files.filter(file => selectedPaths.includes(file.path))};
+export const selectedSource = {...source, files: source.files.filter(file => selectedPaths.includes(file.path))};
+export const selectedContext = {...context, files: context.files.filter(file => selectedPaths.includes(file.path))};
+export const selectedSyntax = Object.fromEntries(Object.entries(syntax).filter(([key]) => selectedPaths.some(path => key === path + ':before' || key === path + ':after')));
 const directory = fileURLToPath(new URL('../pr-file-tree/', import.meta.url));
 const inputs = new Map<string, unknown>([
     [resolve(directory, 'diffs.json'), selectedDiffs],

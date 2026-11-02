@@ -37,13 +37,20 @@ test('React card shows one canonical change and both witnesses and the shared hi
         assert.equal((markup.match(/<article/g) ?? []).length, 1);
         assert.ok(markup.includes(sample.id));
         assert.ok(markup.includes('createGateway() change'));
-        assert.ok(markup.includes('13 added'));
-        assert.ok(markup.includes('10 removed'));
+        assert.ok(markup.includes('5 added'));
+        assert.ok(markup.includes('2 removed'));
         for (const witness of sample.witnesses) assert.ok(markup.includes(witness.anchor.commit));
-        assert.ok(markup.includes('No intent or runtime conclusion'));
-        assert.ok(markup.includes('Check card response'));
+        assert.ok(markup.includes('Review question.'));
+        assert.ok(markup.includes('pinned runtime specification'));
+        assert.ok(!markup.includes('Check card response'));
+        assert.ok(markup.indexOf('aria-label="Explaining"') < markup.indexOf('aria-label="Diff"'));
+        assert.ok(markup.indexOf('aria-label="Diff"') < markup.indexOf('aria-label="Tests"'));
         assert.ok(markup.includes('syntax-keyword'));
         assert.ok(markup.includes('Pinned diff for src/server/public.ts'));
+        assert.equal((markup.match(/data-test-id=/g) ?? []).length, 3);
+        assert.equal((markup.match(/data-assertion-id=/g) ?? []).length, 29);
+        assert.ok(!markup.includes('<details open'));
+        assert.ok(!markup.includes('13 added'));
         const imports = readFileSync('mockups/change-node-rebuild/ChangeCard.tsx', 'utf8');
         assert.ok(!/source-graph|xyflow|ResizeObserver|Worker/.test(imports));
     } finally {await server.close();}
