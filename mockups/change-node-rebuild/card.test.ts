@@ -43,7 +43,7 @@ test('React card shows one canonical change and both witnesses and the shared hi
         assert.ok(markup.includes('No intent or runtime conclusion'));
         assert.ok(markup.includes('Check card response'));
         assert.ok(markup.includes('syntax-keyword'));
-        assert.ok(markup.includes('Pinned diff for src/server/public.ts')); 
+        assert.ok(markup.includes('Pinned diff for src/server/public.ts'));
         const imports = readFileSync('mockups/change-node-rebuild/ChangeCard.tsx', 'utf8');
         assert.ok(!/source-graph|xyflow|ResizeObserver|Worker/.test(imports));
     } finally {await server.close();}

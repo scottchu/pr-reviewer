@@ -19,3 +19,10 @@ test('added access source has distinct real keywords, strings and comments witho
   for (const kind of ['keyword', 'string', 'comment', 'plain']) assert.ok(kinds.has(kind));
   assert.deepEqual(syntaxLine('src/storage/access.ts', 'before', null, ''), [{ kind: 'plain', text: '' }]);
 });
+
+test('prepared gateway tokens keep comment and keyword classifications after template interpolation', () => {
+  const path = 'src/server/public.ts';
+  const lines = fullSource.files.find(file => file.path === path)!.after!.split('\n');
+  assert.ok(syntaxLine(path, 'after', 64, lines[63]!).some(token => token.kind === 'comment' && token.text.startsWith('// Network reachability')));
+  assert.ok(syntaxLine(path, 'after', 66, lines[65]!).some(token => token.kind === 'keyword' && token.text === 'const'));
+});
