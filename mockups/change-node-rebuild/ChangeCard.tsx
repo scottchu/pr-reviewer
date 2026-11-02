@@ -1,7 +1,8 @@
 import React, {useEffect, useState} from 'react';
+import {SharedDiff} from './SharedDiff.tsx';
 import sample from './change-sample.json' with {type: 'json'};
 
-/** Presentation of one retained canonical Change; later reader/graph stages are absent. */
+/** Presentation of one retained canonical Change; the shared reader is enabled; test/graph stages remain absent. */
 export const ChangeCard = ({onMounted}: {onMounted?: () => void}) => {
     useEffect(() => {onMounted?.();}, [onMounted]);
     const [responses, setResponses] = useState(0);
@@ -19,6 +20,7 @@ export const ChangeCard = ({onMounted}: {onMounted?: () => void}) => {
             <p>Repository: {sample.repository}</p>
             {sample.witnesses.map(witness => <p key={witness.id}>{witness.anchor.side === 'base' ? 'Before' : 'After'} commit: <span className="source-id">{witness.anchor.commit}</span></p>)}
         </details>
+        <SharedDiff/>
         <div className="response-check"><button type="button" onClick={() => setResponses(value => value + 1)}>Check card response</button>
             <p role="status">Card responses: {responses}</p></div>
     </article>;

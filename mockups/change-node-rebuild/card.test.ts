@@ -3,6 +3,7 @@ import assert from 'node:assert/strict';
 import {createHash} from 'node:crypto';
 import {readFileSync} from 'node:fs';
 import {createServer} from 'vite';
+import {selectedReaderInputs} from './selected-reader-inputs.ts';
 import React from 'react';
 import {renderToStaticMarkup} from 'react-dom/server';
 import sample from './change-sample.json' with {type: 'json'};
@@ -28,8 +29,8 @@ test('card witnesses retain exact pinned source hashes and coordinates', () => {
     }
 });
 
-test('React card shows one canonical change and both witnesses without loading the graph or plain code reader', async () => {
-    const server = await createServer({configFile: false, root: process.cwd(), server: {middlewareMode: true, hmr: false}, optimizeDeps: {noDiscovery: true}});
+test('React card shows one canonical change and both witnesses and the shared highlighted diff without loading the graph', async () => {
+    const server = await createServer({configFile: false, root: process.cwd(), plugins: [selectedReaderInputs()], server: {middlewareMode: true, hmr: false}, optimizeDeps: {noDiscovery: true}});
     try {
         const {ChangeCard} = await server.ssrLoadModule('/mockups/change-node-rebuild/ChangeCard.tsx');
         const markup = renderToStaticMarkup(React.createElement(ChangeCard));
@@ -41,9 +42,9 @@ test('React card shows one canonical change and both witnesses without loading t
         for (const witness of sample.witnesses) assert.ok(markup.includes(witness.anchor.commit));
         assert.ok(markup.includes('No intent or runtime conclusion'));
         assert.ok(markup.includes('Check card response'));
-        assert.ok(!markup.includes('<pre'));
-        assert.ok(!markup.includes('<svg'));
+        assert.ok(markup.includes('syntax-keyword'));
+        assert.ok(markup.includes('Pinned diff for src/server/public.ts')); 
         const imports = readFileSync('mockups/change-node-rebuild/ChangeCard.tsx', 'utf8');
-        assert.ok(!/source-graph|file-diff|xyflow|ResizeObserver|Worker/.test(imports));
+        assert.ok(!/source-graph|xyflow|ResizeObserver|Worker/.test(imports));
     } finally {await server.close();}
 });

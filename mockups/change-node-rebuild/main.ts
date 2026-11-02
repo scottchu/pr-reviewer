@@ -8,18 +8,18 @@ let sequence = 0;
 let failures = 0;
 const report = (stage: 'module' | 'mounted' | 'heartbeat' | 'error' | 'rejection', message?: string) => {
     if (sequence >= 24) return;
-    const value = {stage, revision: 1, sequence: ++sequence, elapsed: Math.round(performance.now()), elements: document.getElementsByTagName('*').length,
+    const value = {stage, revision: 2, sequence: ++sequence, elapsed: Math.round(performance.now()), elements: document.getElementsByTagName('*').length,
         ...(message === undefined ? {} : {message: message.slice(0, 300)})};
     navigator.sendBeacon(new URL('./__preview-diagnostics', document.baseURI), new Blob([JSON.stringify(value)], {type: 'application/json'}));
 };
 const status = document.getElementById('status');
 const host = document.getElementById('card-root');
-if (!status || !host) throw new Error('stage1_markup_missing');
+if (!status || !host) throw new Error('stage2_markup_missing');
 report('module');
 const probe = startBaselineProbe({now: () => performance.now(), schedule: (callback, delay) => window.setTimeout(callback, delay), cancel: id => window.clearTimeout(id)}, sample => {
     status.textContent = sample.status === 'error' ? 'A script error was captured. This stage failed.' :
         sample.status === 'elapsed' ? '30 seconds elapsed. Visual and device acceptance remain separate.' :
-        `React card running: ${Math.floor(sample.elapsed / 1000)} / 30 seconds`;
+        `Shared diff running: ${Math.floor(sample.elapsed / 1000)} / 30 seconds`;
     if (sample.status !== 'error') report('heartbeat');
 });
 const fail = (stage: 'error' | 'rejection', message: string) => {

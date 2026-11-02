@@ -1,0 +1,38 @@
+@import './syntax-colors.css';
+/* Reader-only layout. The rebuild does not import the old global graph/page stylesheet. */
+.stage2-reader { position: relative; min-width: 0; max-width: 100%; background: #1a2227; border: 1px solid #51616a; border-radius: .35rem; }
+.stage2-reader *, .stage2-reader *::before { box-sizing: border-box; }
+.stage2-reader .reader-modes { display: flex; gap: .5rem; padding: .5rem; border-bottom: 1px solid #51616a; }
+.stage2-reader .reader-modes button[aria-pressed=true] { background: #b7d3e7; color: #15232b; }
+.stage2-reader .continuous-reader { position: relative; height: 400px; max-height: 65vh; min-height: 240px; overflow: auto; margin-left: 28px; width: calc(100% - 28px); padding-bottom: 1rem; scroll-padding-top: 36px; touch-action: pan-y; }
+.stage2-reader .continuous-version-header { position: sticky; top: 0; z-index: 3; display: flex; gap: .3rem; justify-content: space-between; align-items: center; min-height: 32px; background: #293943; color: #bfd3df; font: 10px/20px system-ui; }
+.stage2-reader .continuous-version-header button { padding: 0; min-width: 32px; min-height: 32px; }
+.stage2-reader .coordinate-headings { display: inline-flex; width: 85px; flex: none; font-size: 9px; }
+.stage2-reader .coordinate-headings span { width: 32px; text-align: center; }
+.stage2-reader .version-hashes { overflow-wrap: anywhere; font-size: 9px; }
+.stage2-reader .continuous-comparison { width: 100%; overflow-x: hidden; }
+.stage2-reader pre { position: relative; min-width: 0; width: 100%; max-width: 100%; margin: 0; white-space: normal; }
+.stage2-reader code { display: block; font: 12px/22px ui-monospace, SFMono-Regular, Menlo, monospace; }
+.stage2-reader .continuous-hunk, .stage2-reader .context-fold, .stage2-reader .required-function-context, .stage2-reader .unified-row { display: block; }
+.stage2-reader .paired-row { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); align-items: stretch; }
+.stage2-reader .diff-side { min-width: 0; overflow: hidden; }
+.stage2-reader .diff-line { display: grid; grid-template-columns: 39px minmax(0, 1fr); min-width: 0; height: 100%; min-height: 22px; }
+.stage2-reader .unified-row .diff-line { grid-template-columns: 85px minmax(0, 1fr); }
+.stage2-reader .source-code { display: block; min-width: 0; white-space: pre-wrap; overflow-wrap: anywhere; }
+.stage2-reader .diff-line::before { content: attr(data-line) ' ' attr(data-mark); color: #b8c9d3; font-size: 10px; white-space: pre; padding-left: 3px; }
+.stage2-reader .unified-row .diff-line::before { display: none; }
+.stage2-reader .unified-gutter { display: inline-flex; color: #b8c9d3; font-size: 10px; }
+.stage2-reader .unified-gutter .before-number, .stage2-reader .unified-gutter .after-number { width: 32px; text-align: center; }
+.stage2-reader .unified-gutter .change-glyph { width: 21px; text-align: center; }
+.stage2-reader .diff-line.removed { background: #493039; }
+.stage2-reader .diff-line.added { background: #234333; }
+.stage2-reader .continuous-hunk.active .diff-line.removed, .stage2-reader .continuous-hunk.active .diff-line.added { box-shadow: inset 2px 0 #bad7e8; }
+.stage2-reader .unified-column-heading, .stage2-reader .split-column-heading { display: grid; background: #253640; color: #b8c9d3; font: 10px/22px system-ui; }
+.stage2-reader .unified-column-heading { grid-template-columns: 32px 32px; }
+.stage2-reader .split-column-heading { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); }
+.stage2-reader .fold-control { display: block; width: 100%; min-width: 0; padding: .25rem; min-height: 32px; text-align: left; white-space: normal; font: 11px/20px system-ui; color: #a7c6d9; background: #253640; border: 1px solid #425968; border-radius: 0; }
+.stage2-reader .continuous-rail { position: absolute; top: 62px; bottom: 0; left: 0; width: 28px; overflow-y: auto; background: #202b32; --change-marker-step: 44px; }
+.stage2-reader .change-dot { position: absolute; left: 0; width: 28px; min-width: 28px; min-height: 32px; padding: 0; border: 0; background: transparent; }
+.stage2-reader .change-dot span { display: block; width: 7px; height: 7px; margin: auto; background: #b8c9d3; border-radius: 50%; }
+.stage2-reader .change-dot[aria-current] { outline: 1px solid #b8c9d3; outline-offset: -3px; }
+.stage2-reader button:focus-visible, .stage2-reader .continuous-reader:focus-visible { outline: 2px solid #c4e7fc; outline-offset: -2px; }
