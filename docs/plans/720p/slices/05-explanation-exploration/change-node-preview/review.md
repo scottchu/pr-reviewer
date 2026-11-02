@@ -46,3 +46,7 @@ At c6047ceec0f2d8d6d922ce710f4a533da568995c independent scoped SOURCE PASS confi
 ## Stage0 rebuild review
 
 R9 actual user traces still show the delivery-loop error and repeat startup; previous source PASS did not establish recovery. Independent review initially requested changes because Vite inserted a conditional MutationObserver modulepreload polyfill. At fb9f773150570d583857c9db2a3a75c1d3d7cb7b, SOURCE PASS confirms the corrected3219-byte build excludes React, graph, workers, observers and preload code. Independent probe3/3, transport1/1 and strict stage0 types passed; root additionally checked corrected types/build and12 exact served asset responses. Stage0 runtime/device acceptance is pending, and no later stage is accepted or unlocked.
+
+## Stage1 React card review
+
+Independent SOURCE PASS at23cce4aa5c5fa1c76bf214b91f27040ffa79ce7e verifies the small projection against the retained canonical graph (same source hash/ID/status/13added/10removed/two full witnesses).6 focused tests and strict stage1 types pass independently. The225979-byte build excludes the graph fixture/shared reader/XYFlow/worker/observer. The actual-journey E2E definition and its new ignored artifact paths were reviewed but not executed. Root exact served readback12/12 and root/config preservation establish delivery only. Actual React event/disclosure/scroll/stability is pending; stage2 cannot start from source PASS alone.
