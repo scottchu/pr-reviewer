@@ -10,3 +10,6 @@ dist/
 /mockups/pr-file-tree/public/elk-v25/
 
 /mockups/pr-file-tree/generated-source-graph.json
+
+# Local preview execution evidence and logs.
+/artifacts/
