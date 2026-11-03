@@ -1,9 +1,10 @@
+import './test-edit-code.css';
 import React from 'react';
 import {SyntaxCode} from './SyntaxCode.tsx';
 import type {SourceEditNodeUI, SourceSyntaxUI} from '../types.ts';
 
 export const SourceEditCode = ({edit, syntax, ...scroll}: {edit: SourceEditNodeUI; syntax?: SourceSyntaxUI | undefined} & Pick<React.ComponentProps<'div'>, 'ref' | 'onScroll'>) =>
-    <div {...scroll} className="source-edit-code source-code nodrag nopan nowheel" data-reader-kind="source-edit"
+    <div {...scroll} className="test-source-edit-code source-code nodrag nopan nowheel" data-reader-kind="source-edit"
         tabIndex={0} aria-label={edit.kind === 'remove' ? 'Removed code' : 'Added code'}>
         {edit.rows.map((row, index) => {
             const ending = row.text.endsWith('\r\n') ? '\r\n' : row.text.endsWith('\n') ? '\n' : '';

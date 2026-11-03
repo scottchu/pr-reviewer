@@ -2,7 +2,7 @@ import type {NativeDocumentHunk, DocumentWitness} from '../domain/types.ts';
 import type { GraphEntity, GraphRelation } from '../domain/types.ts';
 import type { CardRows, RelationRows } from './content.ts';
 export type EntityPresentation = Readonly<{
-    changeSource?: Readonly<{subjectId: string; subjectKind: string}>;
+    testCodeSource?: boolean;
     sourceEdit?: SourceEditNodeUI;
     card: CardRows;
     status: string | undefined;
@@ -20,7 +20,7 @@ export type UIEntity = Omit<GraphEntity, 'nodes'> & Readonly<{
     nodes?: readonly UIEntity[];
 }>;
 export type UIRelation = GraphRelation & Readonly<{
-    ui: RelationRows & Readonly<{sourceEndpoints?: Readonly<{from: string; to: string}>}>;
+    ui: RelationRows;
 }>;
 export type GraphView = Readonly<{
     nodes: readonly UIEntity[];

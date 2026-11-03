@@ -1,6 +1,5 @@
 import React from 'react';
 import type {SourceSyntaxUI} from '../types.ts';
-import './source-syntax.css';
 
 export const SyntaxCode = ({path, side, line, text, syntax}: {
     path: string; side: 'before' | 'after'; line: number | null; text: string; syntax?: SourceSyntaxUI | undefined;

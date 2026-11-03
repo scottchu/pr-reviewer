@@ -4,7 +4,7 @@ import { ReactFlow, Background, BaseEdge, EdgeLabelRenderer, Handle, Position, M
 import '@xyflow/react/dist/style.css';
 import '../../../../mockups/pr-file-tree/minimal.css';
 import { installPageGestureBoundary } from '../page-gestures.ts';
-import type {UIEntity as GraphEntity, UIRelation as GraphRelation,SourceReadingUI, GraphSessionUI, SourceHunkUI, SourceWitnessUI, SourceSyntaxUI} from '../types.ts';
+import type {UIEntity as GraphEntity, UIRelation as GraphRelation,SourceReadingUI, GraphSessionUI, SourceHunkUI, SourceWitnessUI} from '../types.ts';
 import { omittedStructuralEdge } from '../content.ts';
 import { readingBands, filePaths, documentPaths, testAssertionFamilies, iconPaths } from '../entity-presentation.ts';
 import { childContentBounds } from '../graph-bounds.ts';
@@ -21,8 +21,9 @@ import {withMeasuredGeometry} from '../layout-measurements.ts';
 import {graphPaintState, type RetainedPaint} from '../paint-state.ts';
 import {GraphToolbar} from './GraphToolbar.tsx';
 import {SourceEditCode} from './SourceEditCode.tsx';
+import type {SourceSyntaxUI} from '../types.ts';
 
-export const mountReviewGraph = (root:HTMLElement,initialSession:GraphSessionUI, syntax?: SourceSyntaxUI) => {
+export const mountReviewGraph = (root:HTMLElement,initialSession:GraphSessionUI, testSyntax?: SourceSyntaxUI) => {
 const initial = initialSession.view;
 const allEntities=()=>initial.entities;
 const allRelations=()=>initialSession.layoutRelations;
@@ -163,9 +164,9 @@ const EditPreview = ({reading, entityId}: {reading:SourceReadingUI; entityId: st
         {pane.rows.length>0&&<p>{pane.footer}</p>}
     </section>)}
 </div>;
-const CodeNode = ({entity}: {entity: GraphEntity}) => {
+const TestCodeNode = ({entity}: {entity: GraphEntity}) => {
     const scroll = useReaderScroll({entityId: entity.id, kind: 'source-edit'});
-    return entity.ui.sourceEdit ? <SourceEditCode edit={entity.ui.sourceEdit} syntax={syntax} {...scroll}/> : null;
+    return entity.ui.sourceEdit ? <SourceEditCode edit={entity.ui.sourceEdit} syntax={testSyntax} {...scroll}/> : null;
 };
 const NativeSourceDetails = ({identity, summary, children, onReflow, className = 'document-details nodrag nopan'}: {
     identity: ReaderIdentityUI; summary: string; children: () => React.ReactNode; onReflow: (() => void) | undefined; className?: string;
@@ -195,12 +196,12 @@ const Entity = React.memo(({ data }: NodeProps<EntityNode>) => {
     const status = data.entity.ui.status;
     const hunks = data.entity.ui.inlineSourceReading ? data.entity.ui.sourceReading?.hunks : undefined;
     const reading = data.entity.ui.sourceOpen || data.entity.ui.inlineSourceReading ? data.entity.ui.sourceReading : undefined;
-    return <article inert={data.measureOnly || undefined} aria-hidden={data.measureOnly || undefined} className={'minimal-entity' + (data.entity.ui.sourceEdit ? ' source-edit-node' : '') + (hunks ? ' native-document-evidence' : '') + (typeof status === 'string' ? ' status-' + status.replaceAll(' ', '-') : '')}>
+    return <article inert={data.measureOnly || undefined} aria-hidden={data.measureOnly || undefined} className={'minimal-entity' + (data.entity.ui.sourceEdit ? ' test-source-edit-node' : '') + (hunks ? ' native-document-evidence' : '') + (typeof status === 'string' ? ' status-' + status.replaceAll(' ', '-') : '')}>
   <Ports /><NodeDragHandle data={data}/>
   <h2><EntityIcon entity={data.entity}/><span>{card.title}</span></h2>
   {hunks && <DocumentEvidence identity={{entityId: data.entity.id, kind: 'inline-hunks'}} hunks={hunks} reading={reading} onReflow={data.onReflow}/>}
   {card.rows.map((row, index) => <p key={index}>{row}</p>)}
-  {data.entity.ui.sourceEdit && <CodeNode entity={data.entity}/>}
+  {data.entity.ui.sourceEdit && <TestCodeNode entity={data.entity}/>}
   {data.entity.ui.sourceControl && <details className="document-details nodrag nopan" open={data.entity.ui.sourceOpen} onClickCapture={event => captureReaderScrolls(data.entity.id, event.currentTarget)} onToggle={event => {
       const next = event.currentTarget.open;
       if (next === data.entity.ui.sourceOpen) return;
@@ -209,7 +210,9 @@ const Entity = React.memo(({ data }: NodeProps<EntityNode>) => {
   }}>
     <summary>View source changes</summary>
     {data.entity.ui.sourceOpen && reading && <><p>{reading.caption}</p>
-    <DocumentEvidence identity={{entityId: data.entity.id, kind: 'source-hunks'}} hunks={reading.hunks} reading={reading} onReflow={data.onReflow}/></>}
+    {data.entity.ui.testCodeSource
+        ? <NativeHunkRows identity={{entityId: data.entity.id, kind: 'source-hunks'}} hunks={reading.hunks}/>
+        : <DocumentEvidence identity={{entityId: data.entity.id, kind: 'source-hunks'}} hunks={reading.hunks} reading={reading} onReflow={data.onReflow}/>}</>}
   </details>}
   {data.entity.ui.fileControl && Boolean(data.unitCount) && <div className="file-unit-actions nodrag nopan">
    {(!data.limit || data.limit < (data.unitCount ?? 0)) && <button onClick={() => data.onExpand?.(data.entity.id)}>{data.limit ? 'Show more source units' : 'Show source units'}</button>}
@@ -221,7 +224,7 @@ const Entity = React.memo(({ data }: NodeProps<EntityNode>) => {
  </article>;
 });
 const GraphBoundary = React.memo(({ data }: NodeProps<EntityNode>) => {
-    const heading = useRef<HTMLDivElement>(null);
+    const heading = useRef<HTMLHeadingElement>(null);
     useLayoutEffect(() => {
         const element = heading.current;
         if (!element) return;
@@ -235,19 +238,7 @@ const GraphBoundary = React.memo(({ data }: NodeProps<EntityNode>) => {
     return <>
  <Ports />
  <section inert={data.measureOnly || undefined} aria-hidden={data.measureOnly || undefined} className={'minimal-change-graph' + (data.entity.ui.status ? ' status-' + data.entity.ui.status!.replaceAll(' ', '-') : '')} aria-label={data.entity.ui.card.title + ' graph'}>
-  <NodeDragHandle data={data}/><div ref={heading} className="change-group-header"><h2><EntityIcon entity={data.entity}/><span>{data.entity.ui.card.title}</span></h2>
-  {data.entity.ui.changeSource && <details className="document-details nodrag nopan" open={data.entity.ui.sourceOpen}
-      onClickCapture={event => captureReaderScrolls(data.entity.id, event.currentTarget)}
-      onToggle={event => {
-          const next = event.currentTarget.open;
-          if (next === data.entity.ui.sourceOpen) return;
-          data.onInspect?.(data.entity.id, next);
-          data.onReflow?.();
-      }}>
-      <summary>Source hunks and identities</summary>
-      {data.entity.ui.sourceOpen && data.entity.ui.sourceReading && <NativeHunkRows identity={{entityId: data.entity.id, kind: 'source-hunks'}} hunks={data.entity.ui.sourceReading.hunks}/>}
-  </details>}
-  </div>
+  <NodeDragHandle data={data}/><h2 ref={heading}><EntityIcon entity={data.entity}/><span>{data.entity.ui.card.title}</span></h2>
  </section>
 </>;
 });
