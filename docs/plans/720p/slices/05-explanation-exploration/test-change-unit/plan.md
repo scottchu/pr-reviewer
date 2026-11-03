@@ -18,6 +18,14 @@ Independent-review handoff v3: first attempt exact actual candidate UI through s
 
 Acceptance: original request group, request node, Authorization node and every existing edge remain unchanged; the reported Test keeps its source/edge anchor and gains exactly two literal code nodes containing 4 removed/8 added rows. Zero Assertion cards return. Canonical source/graph stays equal. Strict types, graph/markup regressions and independent source review precede delivery through the existing PR/merge/main-build/endpoint path. Reuse the existing endpoint and standing delivery authority; preserve actual browser/phone/own-PR/unfamiliar-reviewer gaps.
 
+### R3 verification record
+
+Candidate `6b7e532`: 199/199 graph tests PASS; strict root/minimum TypeScript and subsystem boundaries PASS; production build PASS with the existing large resident graph warning (main asset about 21.4 MB). The new Test-only syntax preparation leaves the existing full-reader syntax index untouched. Request group markup, baseline CSS and full syntax index are byte-identical to a08fa42. The independently frozen default view retains all 147 non-Test nodes and all 136 existing relations; transition tests preserve original nodes/edge identity, data and labels through pagination/filter/disclosure/hide. A declared synthetic layout keeps request/Authorization/helper bounds unchanged; this is not a browser-pixel claim.
+
+Fresh independent reviewer `test_only_boundary_review` returned source PASS with no concrete defect: direct comparison against a08fa42 across 97 files and 1,582 states, including 265,108 original-node and 248,542 relation comparisons. All 43 Test code nodes/138 physical rows match native coordinates, witnesses and independently classified source tokens. It independently ran the six focused source/markup tests and checked code identity and both scroll-cache axes. The reported Test retains its original anchor plus Removed−4/Added+8; no Assertion inventory is restored. Canonical graph hash remains 946b1c59ebde5dd8f5f3eeb2fc5f99fc7e3d6e4b4b3d5d9c9303e699ccb08a2a.
+
+Actual candidate UI/graph-first review remains UNRUN. Fresh supported CUA returned `Browsers: Error: The browser access host is unavailable`; no alternate browser-control route was used. Native scrolling, touch and unfamiliar-reader understanding remain unverified. Exact merged-main build/runtime/served bytes and rollback are recorded separately in the ignored deployment receipt. R3's source boundary is verified; no prior rejected normal-change design is reinstated.
+
 ## Historical R2 handoff v2 — rejected scope
 
 
