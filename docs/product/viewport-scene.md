@@ -1,5 +1,16 @@
 # Viewport-driven graph presentation
 
+## First-load paint correction
+
+Date: 2026-11-03.
+Status: accepted requirement; delivery and actual browser verification are tracked separately.
+
+Cold-start measurement is not permission to show an unfinished graph. Mount full content invisibly and inertly so node, group-header and relation-label dimensions remain measurable. Paint only after a complete measured layout and a matching spatial selection exist. Do not use a fixed delay or remove the graph from layout with `display: none`.
+
+While reflow, movement or a replacement selection is pending, retain the last established paint membership for the same comparison, intersected with current semantic eligibility and current reader/focus pins. Never restore every node simply because a scene or worker response is temporarily absent. A new comparison cannot reuse that membership. Explicit worker failure may use the existing full-render fallback only once complete geometry exists; pending work alone is not failure. Measurement-only nodes and labels cannot accept focus or interaction.
+
+This corrects the older statements below that geometry invalidation immediately restores full rendering. Source identities, actual code/diff content, normal change structure, extraction, colors and camera behavior are unchanged. The reported phone screenshot shows overlapping cold-start content; the source defect is reproducible through the paint-state transition contract. Source tests and served-byte identity do not establish the absence of a visual flash on a physical device.
+
 Status: adopted bounded implementation. Date: 2026-10-28.
 
 ## Reader outcome and scope
