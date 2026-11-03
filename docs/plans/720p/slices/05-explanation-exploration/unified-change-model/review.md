@@ -37,3 +37,10 @@ Consolidated correction: all malformed native-shape cases are covered in the sha
 
 
 The consolidated independent reviewer reran 214/214 tests and closed the row-shape findings. Its final consumer probe found that an available model could still be overridden by a separately copied document nativeHunks field. Correct both available and unavailable paths to use the validated evidence owner, and add the explicit available-model tampering regression before final source approval. Real PR25 source remains unchanged.
+
+
+## Final source verdict
+
+Final reviewed source: 5a56ef18da5a1da41822da97c64a3fe1570eee99. Independent source verdict: PASS, no remaining material findings; C1–C5 supported. Independent checks: 214/214 on dff5aaf and 18/18 affected final-source tests. Root's full final suite:215/215. Every originally reported malformed-absence/native-row/markup/reader-bypass case is closed.
+
+Root then reran the actual final candidate's File/Function/Test source open/return routes and Test directed topology. Active JS identity:index-V3OPAjLL.js; exact side rows4/8 and both arrows passed. Presentation verdict and all remaining gates above are unchanged. A later documentation-only reconciliation commit contains this record; source acceptance remains explicitly pinned to5a56ef1 until the merged build/endpoint is read back.
