@@ -157,3 +157,15 @@ test('C4: rejected native evidence cannot leak through card labels, filter seeds
  }
  assert.equal(subject.data.editComposition.status,'no change','original source payload must remain untouched');
 });
+
+
+test('C4: available model evidence cannot be overridden by independent document-frame nativeHunks',()=>{
+ const forged=composition.hunks.map(h=>({...h,after:{...h.after!,text:'FORGED\n'}}));
+ const graph={...fixture([]),entities:[file,{id:'doc-frame',kind:'change',data:{name:'document change',documentPath:path,comparisonStatus:'change',nativeHunks:forged},nodes:[{id:'document-evidence',kind:'evidence',data:{nativeHunks:forged,editComposition:composition}}]}]};
+ const view=createGraphSession(graph).view;
+ for(const id of ['file','doc-frame','document-evidence']){
+  const reading=view.entities.find(e=>e.id===id)!.ui.sourceReading!;
+  assert.equal(reading.available,true);assert.deepEqual(reading.hunks,composition.hunks);assert.equal(reading.hunks[0]!.after!.text,'new\n');
+ }
+ assert.equal(graph.entities[1]!.data.nativeHunks,forged,'the original evidence object is preserved but cannot override validated owner evidence');
+});

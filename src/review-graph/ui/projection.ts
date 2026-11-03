@@ -46,7 +46,9 @@ const createProjector = (comparison: SourceGraph) => {
             let reading: SourceReadingUI | undefined, prepared = false;
             const composition=sourceComparisonFor(state.comparison,entity);
             const presentation=composition?{...entity,data:{...entity.data,editComposition:composition}}:entity;
-            const nativeHunks=composition?.status==='unresolved'?undefined:entity.data.nativeHunks as readonly NativeDocumentHunk[]|undefined;
+            const nativeHunks=entity.data.nativeHunks
+                ? composition ? composition.status==='unresolved'?undefined:composition.hunks : entity.data.nativeHunks as readonly NativeDocumentHunk[]
+                : undefined;
             base = {
                 card: cardRows(presentation), status: presentationStatus(presentation), icon: iconFor(entity),
                 sourceControl: (['function', 'test'].includes(entity.kind) ||

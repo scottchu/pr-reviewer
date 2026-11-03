@@ -34,3 +34,6 @@ Own implementation PR intake remains blocked by fixed PR25 bootstrap/no selector
 
 
 Consolidated correction: all malformed native-shape cases are covered in the shared validator, and validated Domain compositions now gate card/filter status and retained document evidence as well as source readers. The later consumer finding is a verification of shared ownership, not a new UX. Latest complete local suite is 214/214, superseding earlier 210/211/212 runs; independent correction verdict remains pending.
+
+
+The consolidated independent reviewer reran 214/214 tests and closed the row-shape findings. Its final consumer probe found that an available model could still be overridden by a separately copied document nativeHunks field. Correct both available and unavailable paths to use the validated evidence owner, and add the explicit available-model tampering regression before final source approval. Real PR25 source remains unchanged.
