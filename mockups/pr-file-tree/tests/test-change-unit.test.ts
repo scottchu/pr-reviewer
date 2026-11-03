@@ -20,8 +20,8 @@ test('reported Test stays one normal source unit without Assertion canvas nodes 
         const assertionIds = new Set(registry.filter(entity => entity.kind === 'assertion').map(entity => entity.id));
         assert.ok(state.view.relations.every(edge => !assertionIds.has(edge.from) && !assertionIds.has(edge.to)));
         assert.ok(state.view.relations.every(edge => ids.has(edge.from) && ids.has(edge.to)));
-        assert.equal(state.view.nodes.filter(entity => entity.id === reportedTest).length, 1);
-        assert.ok(state.view.nodes.find(entity => entity.id === 'change:' + reportedTest)?.nodes?.some(entity => entity.id === reportedTest));
+        assert.equal(state.view.nodes.filter(entity => entity.id === reportedTest).length, 0);
+        assert.deepEqual(state.view.nodes.find(entity => entity.id === 'change:' + reportedTest)?.nodes?.map(entity => entity.ui.sourceEdit?.kind), ['remove', 'add']);
     }
     assert.equal(JSON.stringify(sourceGraph), before);
     assert.ok(sourceGraph.relations.some(edge => edge.from === reportedTest && edge.relation === 'contains'));
@@ -44,20 +44,22 @@ test('file pagination counts coherent Test/function units, never hidden assertio
 test('whole-Test exact edits and normal Function change source controls survive the simpler graph', () => {
     const original = registry.find(entity => entity.id === reportedTest)!;
     const session = createGraphSession(sourceGraph).inspect(reportedTest, true);
-    const testUnit = session.view.nodes.find(entity => entity.id === reportedTest)!;
+    const testUnit = session.view.entities.find(entity => entity.id === reportedTest)!;
+    const group = session.view.nodes.find(entity => entity.id === 'change:' + reportedTest)!;
+    assert.equal(group.ui.sourceOpen, true);
     assert.equal(testUnit.kind, 'test');
     assert.equal(testUnit.ui.sourceControl, true);
     assert.equal(testUnit.ui.sourceOpen, true);
     assert.equal(testUnit.data.editComposition, original.data.editComposition);
     assert.equal(testUnit.data.sourceWitnesses, original.data.sourceWitnesses);
-    const reading = testUnit.ui.sourceReading!;
+    const reading = group.ui.sourceReading!;
     assert.equal(reading.available, true);
     assert.match(reading.caption, /8/);
     assert.match(reading.caption, /4/);
     assert.ok(reading.hunks.some(hunk => hunk.rows.some(row => row.text.includes('ownerRequests'))));
-    const normal = session.view.nodes.find(entity => entity.id === 'request')!;
+    const normal = session.view.entities.find(entity => entity.id === 'request')!;
     assert.equal(normal.ui.sourceControl, true);
-    assert.ok(session.view.nodes.find(entity => entity.id === 'change')?.nodes?.some(child => child.id === 'header-value'));
-    assert.ok(session.view.relations.some(edge => edge.from === 'request' && edge.to === 'header-value' && edge.relation === 'constructs'));
-    assert.ok(session.view.relations.some(edge => edge.from === 'request' && edge.to === 'helper' && edge.relation === 'calls'));
+    assert.deepEqual(session.view.nodes.find(entity => entity.id === 'change')?.nodes?.map(child => child.ui.sourceEdit?.kind), ['remove', 'add']);
+    assert.ok(sourceGraph.relations.some(edge => edge.from === 'request' && edge.to === 'header-value' && edge.relation === 'constructs'));
+    assert.ok(session.view.relations.some(edge => edge.ui.sourceEndpoints?.from === 'request' && edge.ui.sourceEndpoints.to === 'helper' && edge.relation === 'calls'));
 });

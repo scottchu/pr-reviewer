@@ -1,10 +1,24 @@
 # Read a Test as one normal source change
 
 Date: 2026-11-03.
-Request revision: test-change-unit-R1.
+Request revision: test-change-unit-R2.
 Parent: [Explanation exploration](../plan.md).
 Product source: [Normal Test change](../../../../../product/pr-file-tree-first.md#test-is-one-normal-source-change-unit--2026-11-03).
-Status: implementation/local verification and independent source review passed; merge/deployment pending. Existing root serves merged main `250c19acfe47b6a7090faac258789151ce6eb051` with PR46's first-load paint correction; it still has the rejected Assertion inventory.
+Status: R1 was merged/deployed as `a08fa42`, but the user's actual screenshot disproves its claimed structural consistency. R2 implementation in progress; root still serves `a08fa426e22ef947bac2459f56c2d6d3664c341a`.
+
+## R2 accepted correction and handoff v2
+
+The user explicitly requires actual Removed and Added code nodes, the same structure for Test and normal changes, merge and deployment to the existing endpoint, followed by verification. R1 only removed Assertion cards and left the Test's edits inside a nested summary-card diff. Its source PASS did not establish the requested graph structure.
+
+Owner: root, sole writer in isolated `fix-change-code-nodes`, base `a08fa42`. Replace resolved changed Function/Test group contents with the nonempty Removed/Added code nodes. Keep the canonical group ID and source identity; name the source unit at the group once. Do not retain a redundant inner Test/Function summary card or the extracted header card as a substitute for actual edits. Primary code is immediately present, all edited rows are exact, shared syntax colors are reused, and optional native-hunk/source evidence stays at group level. Addition-only/removal-only and unchanged/unresolved scopes remain honest. No assertions, per-line change entities, execution/coverage claim, dependency or endpoint expansion.
+
+UI-only endpoint mapping attaches existing external relations to their owning group, retaining original endpoint identity and complete evidence in named UI metadata; omit internal collapsed self-loops. Canonical graph/source oracles remain unchanged. Implement this as a named UI projection shared by Function and Test, not conditional Test markup or domain fact rewriting.
+
+Independent-review handoff v2: first attempt the exact actual candidate graph through supported CUA and freeze that account before source; record the host error if unavailable, without a fallback browser route. Then review all removed/added rows, group child structure, native source/scroll ownership, syntax preservation, stable UI identity, relation endpoint provenance, filtering, pagination and fallback scopes. Root alone writes and deploys. The review must explicitly check the user's screenshot distinction, not merely the absence of Assertions.
+
+Acceptance: reported Test has exactly Removed−4 and Added+8 code children; request uses the same code-node implementation with its exact −1/+1 rows; no inner Test/request summary or header substitute. Every code row/witness matches canonical composition; external calls/source locations remain evidenced and connected; no canonical facts/IDs change. Addition-only groups create no Removed node. Source controls, changes-only, Show/Hide, measured layout, hidden bootstrap and retained paint remain intact. Run strict types, graph regressions, independent source review, build exact merged-main, deploy original `:8478/` with rollback, and compare served HTML/JS/CSS/worker/fonts. Actual pixels, physical phone/touch, own-PR intake and unfamiliar-reviewer gates remain separate.
+
+R2 source findings: actual React markup exposed the old lexical scanner classifying the Test's `const` and following code as one string after a template literal. Reuse the already retained lexical classifier correction with the existing declared TypeScript-analysis dependency and regenerate only its exact-text syntax index. Promote the existing shared syntax component/colors into the owning UI boundary and supply the prepared syntax lookup from the entry point; application UI must not import prototype policy or a runtime parser. Preserve all source text and colors as separate assertions; markup is not browser-pixel acceptance.
 
 ## Intended outcome and observed gap
 
