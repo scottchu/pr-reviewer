@@ -1,4 +1,4 @@
-import {changeForSubject, changeSourceComparison} from '../domain/change-model.ts';
+import {sourceComparisonFor} from '../domain/change-model.ts';
 import type {EditComposition} from '../domain/edit-composition.ts';
 import type {GraphEntity, GraphRelation, SourceGraph, NativeDocumentHunk} from '../domain/types.ts';
 import type {ExperienceState} from '../experience/types.ts';
@@ -44,21 +44,21 @@ const createProjector = (comparison: SourceGraph) => {
         let base = content.get(entity);
         if (!base) {
             let reading: SourceReadingUI | undefined, prepared = false;
+            const composition=sourceComparisonFor(state.comparison,entity);
+            const presentation=composition?{...entity,data:{...entity.data,editComposition:composition}}:entity;
+            const nativeHunks=composition?.status==='unresolved'?undefined:entity.data.nativeHunks as readonly NativeDocumentHunk[]|undefined;
             base = {
-                card: cardRows(entity), status: presentationStatus(entity), icon: iconFor(entity),
+                card: cardRows(presentation), status: presentationStatus(presentation), icon: iconFor(entity),
                 sourceControl: (['function', 'test'].includes(entity.kind) ||
                     (entity.kind === 'file' && entity.data.comparisonStatus !== 'no change')) && Boolean(entity.data.editComposition),
                 sourceOpen: false, fileControl: entity.kind === 'file',
-                inlineSourceReading: Boolean(entity.data.nativeHunks),
+                inlineSourceReading: Boolean(nativeHunks),
                 unitCount: sourceReadingUnits(comparison)[entity.id]?.length ?? 0,
                 unpairedRows: comparison.unresolved.filter(row => row.path === entity.data.path).map(row =>
                     (row.anchor.side === 'base' ? 'Before' : 'After') + ' L' + row.anchor.startLine + '–' + row.anchor.endLine + ' · ' + row.name),
                 get sourceReading() {
                     if (!prepared) {
-                        const change=changeForSubject(state.changeModel,entity.id)??state.changeModel.changes.find(c=>c.id===entity.id);
-                        const comparison=change?changeSourceComparison(state.comparison,change):
-                            (['file','function','test'].includes(entity.kind)&&['add','remove','change'].includes(String(entity.data.comparisonStatus))?undefined:entity.data.editComposition as EditComposition|undefined);
-                        reading = projectSourceReading(comparison, entity.data.nativeHunks as readonly NativeDocumentHunk[] | undefined);
+                        reading = projectSourceReading(composition, nativeHunks);
                         prepared = true;
                     }
                     return reading;

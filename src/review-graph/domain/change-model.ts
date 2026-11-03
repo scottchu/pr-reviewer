@@ -37,10 +37,11 @@ const nativeEvidence = (subject:GraphEntity, before:ChangeOccurrence, after:Chan
     if(c.scope!==scope)return unavailable('Native edit scope mismatch');
     const removed:ChangeRowReference[]=[],added:ChangeRowReference[]=[];
     let previousHunk=0;
-    const lastLine={base:0,head:0};
+    const lastLine={base:0,head:0},terminal={base:false,head:false};
     const witnesses=(subject.data.sourceWitnesses ?? []) as readonly Witness[];
     for(const hunk of c.hunks){
-        if(!positive(hunk.index)||hunk.index<=previousHunk)return unavailable('Native hunk index invalid');previousHunk=hunk.index;
+        if(!positive(hunk.index)||hunk.index<=previousHunk||(scope==='file'&&hunk.index!==previousHunk+1))return unavailable('Native hunk index invalid');previousHunk=hunk.index;
+        if(!hunk.rows.length||(scope==='file'&&!hunk.rows.some(row=>row.kind!=='context')))return unavailable('Empty or unedited native hunk');
         const header=/^@@ -(\d+)(?:,(\d+))? \+(\d+)(?:,(\d+))? @@/.exec(hunk.header);
         if(!header)return unavailable('Native hunk header invalid');
         for(const side of ['base','head'] as const){
@@ -50,6 +51,8 @@ const nativeEvidence = (subject:GraphEntity, before:ChangeOccurrence, after:Chan
                 if(witness||(scope==='file'&&Number(header[side==='base'?2:4]??1)!==0))return unavailable('Native witness/header without source rows');
                 continue;
             }
+            if(terminal[side]||ownRows.some((row,i)=>!row.text.length||(i<ownRows.length-1&&!row.text.endsWith('\n'))))return unavailable('Native physical newline invalid');
+            terminal[side]=!ownRows.at(-1)!.text.endsWith('\n');
             const lines=ownRows.map(row=>side==='base'?row.beforeLine!:row.afterLine!);
             const start=Number(header[side==='base'?1:3]),count=Number(header[side==='base'?2:4]??1);
             if(!witness||occurrence.presence!=='present'||occurrence.source!=='available'||witness.side!==side||
@@ -66,7 +69,8 @@ const nativeEvidence = (subject:GraphEntity, before:ChangeOccurrence, after:Chan
         for(const [rowIndex,row] of hunk.rows.entries()){
             if(!['context','add','remove'].includes(row.kind)||row.text.replace(/\n$/, '').includes('\n')||
                 (row.kind==='remove'&&row.afterLine!==null)||(row.kind==='add'&&row.beforeLine!==null)||
-                (row.beforeLine===null&&row.afterLine===null))return unavailable('Native physical row invalid');
+                (row.beforeLine===null&&row.afterLine===null)||
+                (scope==='file'&&row.kind==='context'&&(row.beforeLine===null||row.afterLine===null)))return unavailable('Native physical row invalid');
             if(row.kind==='context')continue;
             const side=row.kind==='remove'?'base':'head',occurrence=side==='base'?before:after;
             const witness=side==='base'?hunk.before:hunk.after,line=side==='base'?row.beforeLine:row.afterLine;
@@ -78,6 +82,8 @@ const nativeEvidence = (subject:GraphEntity, before:ChangeOccurrence, after:Chan
         }
     }
     if(removed.length!==c.removed||added.length!==c.added||removed.length+added.length===0)return unavailable('Native edit counts unavailable or inconsistent');
+    const nativeStatus=added.length?(removed.length?'change':'add'):'remove';
+    if(c.status!==nativeStatus)return unavailable('Native edit status/count mismatch');
     const rows=c.hunks.flatMap(h=>h.rows);
     if(canonical(rows)!==canonical(c.rows))return unavailable('Native row order mismatch');
     return {ownerId:subject.id,scope,status:'available',removed,added};
@@ -159,7 +165,23 @@ export const resolveChangeEvidence = (graph:SourceGraph,change:SourceChange):Cha
     const result={composition,removed:rows(change.evidence.removed,'base'),added:rows(change.evidence.added,'head')};evidenceCache.set(change,result);return result;
 };
 
-/** Shared source-reader value. Unavailable evidence remains explicit, never empty success. */
-export const changeSourceComparison = (graph:SourceGraph,change:SourceChange):EditComposition =>
-    resolveChangeEvidence(graph,change)?.composition ?? {status:'unresolved',scope:change.subject.kind==='file'?'file':'source unit',
-        added:0,removed:0,rows:[],hunks:[],reason:change.evidence.status==='unavailable'?change.evidence.reason:'Native evidence unavailable'};
+/** Shared source-reader value; status lookup does not eagerly map every native row. */
+export const changeSourceComparison = (graph:SourceGraph,change:SourceChange):EditComposition => {
+    const expected=changeForSubject(loadChangeModel(graph),change.subject.id);
+    if(!expected||canonical(expected)!==canonical(change))throw new Error('change_model_evidence_reference_invalid');
+    return change.evidence.status==='available'
+        ? registry(graph).find(entity=>entity.id===change.evidence.ownerId)!.data.editComposition as EditComposition
+        : unresolvedComparison(change.subject.kind==='file'?'file':'source unit',change.evidence.reason);
+};
+const unresolvedComparison=(scope:EditComposition['scope'],reason:string):EditComposition=>({status:'unresolved',scope,added:0,removed:0,rows:[],hunks:[],reason});
+
+/** Source subjects and retained Change frames share validated native status/evidence. */
+export const sourceComparisonFor=(graph:SourceGraph,entity:GraphEntity):EditComposition|undefined=>{
+    const model=loadChangeModel(graph);
+    const documentParent=entity.kind==='evidence'?registry(graph).find(parent=>parent.kind==='change'&&parent.data.documentPath&&parent.nodes?.some(child=>child.id===entity.id)):undefined;
+    const change=changeForSubject(model,entity.id)??model.changes.find(item=>item.id===(documentParent?.id??entity.id));
+    if(change)return changeSourceComparison(graph,change);
+    if(documentParent||entity.kind==='change'||(subjects.has(entity.kind)&&changed.has(String(entity.data.comparisonStatus))))
+        return unresolvedComparison(entity.kind==='file'||entity.data.documentPath?'file':'source unit','Qualified Change account unavailable');
+    return entity.data.editComposition as EditComposition|undefined;
+};

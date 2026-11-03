@@ -116,3 +116,44 @@ test('C2 review regressions: missing tree entry cannot contain present blob meta
  const context:EditComposition={...composition,removed:0,rows:contextRows,hunks:[{index:1,header:'@@ -1 +1,2 @@',before:{...witness('base'),startLine:1,endLine:1,text:'context\n',contentHash:'wrong-context-hash'},after:{...witness('head'),startLine:1,endLine:2,text:'context\nnew\n'},rows:contextRows}]};
  const input={...fixture([]),entities:[{...file,data:{...file.data,editComposition:context}}]};assert.equal(loadChangeModel(input).changes[0]!.evidence.status,'unavailable');
 });
+
+
+test('C2 review regression: whole File context cannot hide a removal by losing its opposite coordinate',()=>{
+ const rows=[{kind:'context',text:'same\n',beforeLine:1,afterLine:1},{kind:'context',text:'old\n',beforeLine:2,afterLine:null},{kind:'add',text:'new\n',beforeLine:null,afterLine:2}] as const;
+ const edited:EditComposition={status:'add',scope:'file',removed:0,added:1,rows,hunks:[{index:1,header:'@@ -1,2 +1,2 @@',before:{...witness('base'),startLine:1,endLine:2,text:'same\nold\n'},after:{...witness('head'),startLine:1,endLine:2,text:'same\nnew\n'},rows}]};
+ const graph={...fixture([]),entities:[{...file,data:{...file.data,editComposition:edited}}]};
+ const change=loadChangeModel(graph).changes[0]!;assert.equal(change.evidence.status,'unavailable');assert.equal(resolveChangeEvidence(graph,change),undefined);
+});
+
+test('C2 review regressions: native status, ordinals, physical newline and full hunk shape fail closed',()=>{
+ const check=(edit:EditComposition)=>{
+  const graph={...fixture([]),entities:[{...file,data:{...file.data,editComposition:edit}}]};
+  assert.equal(loadChangeModel(graph).changes[0]!.evidence.status,'unavailable');
+ };
+ check({...composition,status:'no change'});
+ check({...composition,hunks:composition.hunks.map(h=>({...h,index:99}))});
+ const physical=[{kind:'remove',text:'old',beforeLine:1,afterLine:null},{kind:'remove',text:'tail\n',beforeLine:2,afterLine:null},{kind:'add',text:'new\n',beforeLine:null,afterLine:1}] as const;
+ check({...composition,removed:2,rows:physical,hunks:[{index:1,header:'@@ -1,2 +1 @@',rows:physical,before:{...witness('base'),startLine:1,endLine:2,text:'oldtail\n'},after:{...witness('head'),startLine:1,endLine:1}}]});
+ const empty=[{kind:'remove',text:'',beforeLine:2,afterLine:null},{kind:'add',text:'new\n',beforeLine:null,afterLine:2}] as const;
+ check({...composition,rows:empty,hunks:[{...composition.hunks[0]!,rows:empty,before:{...witness('base'),text:''}}]});
+ check({...composition,hunks:[{index:1,header:'@@ -0,0 +0,0 @@',rows:[],before:null,after:null},{...composition.hunks[0]!,index:2}]});
+ const context=[{kind:'context',text:'context\n',beforeLine:1,afterLine:1}] as const;
+ check({...composition,rows:[...context,...composition.rows],hunks:[{index:1,header:'@@ -1 +1 @@',rows:context,before:{...witness('base'),startLine:1,endLine:1,text:'context\n'},after:{...witness('head'),startLine:1,endLine:1,text:'context\n'}},{...composition.hunks[0]!,index:2}]});
+ // A final source-side row may omit LF; logical status remains distinct from native category.
+ const finalRows=composition.rows.map(r=>({...r,text:r.text.trimEnd()})),final={...composition,rows:finalRows,hunks:composition.hunks.map(h=>({...h,rows:finalRows,before:{...h.before!,text:'old'},after:{...h.after!,text:'new'}}))};
+ const graph={...fixture([]),entities:[{...file,data:{...file.data,editComposition:final}}]};assert.equal(loadChangeModel(graph).changes[0]!.evidence.status,'available');
+});
+
+test('C4: rejected native evidence cannot leak through card labels, filter seeds or retained document frames',()=>{
+ const subject={...file,data:{...file.data,editComposition:{...composition,status:'no change'}}};
+ const graph={...fixture([]),entities:[subject,{id:'doc-frame',kind:'change',data:{name:'document change',documentPath:path,comparisonStatus:'change',editComposition:composition,nativeHunks:composition.hunks},nodes:[{id:'document-evidence',kind:'evidence',data:{nativeHunks:composition.hunks,editComposition:composition}}]}]};
+ const session=createGraphSession(graph);
+ for(const id of ['file','doc-frame','document-evidence']){
+  const entity=session.view.entities.find(e=>e.id===id)!;
+  assert.equal(entity.ui.status,undefined);assert.ok(entity.ui.card.rows.includes('unresolved'));
+  assert.equal(entity.ui.sourceReading!.available,false);assert.deepEqual(entity.ui.sourceReading!.hunks,[]);
+  assert.equal(entity.ui.inlineSourceReading,false);
+  assert.ok(!session.setChangesOnly(true).filter.nodeIds.includes(id));
+ }
+ assert.equal(subject.data.editComposition.status,'no change','original source payload must remain untouched');
+});

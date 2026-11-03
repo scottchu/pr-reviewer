@@ -1,6 +1,10 @@
 # Shared Change independent review
 
-Date: 2026-11-03. Implementation candidate: 6c94b0f4f0ab6ed1b22f5b7f46dc4accc4c466b5. Reviewed target: [PR25](https://github.com/scottchu/pr-reviewer/pull/25), base b096826e31c0927190806de91ed70b8b64aa93d8, head e3b270e5f49a9215452b0b86702946043e979059. Parent: [U1 plan](plan.md).
+Date: 2026-11-03.
+
+Implementation candidate: 6c94b0f4f0ab6ed1b22f5b7f46dc4accc4c466b5.
+
+Reviewed target: [PR25](https://github.com/scottchu/pr-reviewer/pull/25), base b096826e31c0927190806de91ed70b8b64aa93d8, head e3b270e5f49a9215452b0b86702946043e979059. Parent: [U1 plan](plan.md).
 
 ## Frozen graph-first account
 
@@ -27,3 +31,6 @@ Correction: strengthen maintained contract and shared Domain validation, add exp
 ## Remaining gates
 
 Own implementation PR intake remains blocked by fixed PR25 bootstrap/no selector; it is not passed by this supplemental existing-PR run. Independent human comprehension, physical device/touch and broad mobile reliability are unrun. Docs-only independent readiness audit closed the normal-Test-contract/UTF-16 findings and confirmed the qualified row-reference/known-presence delta; it does not establish implementation or runtime acceptance.
+
+
+Consolidated correction: all malformed native-shape cases are covered in the shared validator, and validated Domain compositions now gate card/filter status and retained document evidence as well as source readers. The later consumer finding is a verification of shared ownership, not a new UX. Latest complete local suite is 214/214, superseding earlier 210/211/212 runs; independent correction verdict remains pending.

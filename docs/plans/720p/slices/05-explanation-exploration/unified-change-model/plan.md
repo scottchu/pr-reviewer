@@ -1,6 +1,10 @@
 # Unified source Change model
 
-Date:2026-11-03. Packet revision:U1. Status: local implementation and source verification; independent candidate review and delivery pending.
+Date: 2026-11-03.
+
+Packet revision: U1.
+
+Status: local implementation and source verification; corrected-candidate review and delivery pending.
 Parent: [slice05](../plan.md), [720p round](../../../plan.md), [roadmap](../../../../roadmap.md).
 Authoritative source: [shared Change](../../../../../product/source-change-model.md), [TBox](../../../../../product/project-repository-tbox.md), [pipeline](../../../../../product/source-pipeline.md), [invariants](../../../../../product/protected-invariants.md).
 
@@ -54,3 +58,12 @@ Self-checking: 210 graph/source tests passed, including independently authored s
 
 
 Independent source review found two C2 validation gaps before delivery: contradictory present-blob metadata could accompany a retained checked-missing record, and monotone but nonconsecutive physical row coordinates/context witnesses were not fully rejected. The maintained contract was strengthened first. Correct the shared validator and independently reproduce both negatives, preserving the existing producer payload and request graph. A renamed connector markup assertion also remained stale after the earlier 210-test run; final full-suite evidence must supersede that historical run.
+
+
+## Consolidated review correction
+
+The row-shape review also requires whole-File two-sided context, nonempty physical rows with correct final-newline placement, native-category/count agreement, contiguous full-File ordinals and edited nonempty full hunks; unit crops retain their legitimate original ordinals/context fragments. Domain lookup now supplies the same validated source composition to card status, filter seeds, subject readers and retained document frames/evidence children. Rejected source evidence cannot fall through to raw nativeHunks or a false no-change label. Original entity data remains unchanged; row arrays are not mapped merely to calculate card status.
+
+The incomplete synthetic UI oracle now explicitly expects unresolved evidence. Semantic-filter fixtures were separated from source-admission fixtures: ordinary context seeds use callsite kind and the File seed has actual qualified native evidence; coordinate-only parents no longer impersonate ontology Change accounts. The legacy policy relation remains fully readable, but its intentionally unqualified Test cannot seed the changes-only filter. These narrow test corrections do not regenerate the original source or request oracles.
+
+Latest self-checking: 214/214 graph/source tests pass; minimum TypeScript passes. Direct baseline readback verifies original entities, relations, fileUnits, ownerByUnit, groupFor, initialVisible and unresolved fields equal deployed44743c8; only typed model/provenance additions differ. Fresh model has 50 File/28 Function/24 Test accounts, no diagnostics or unavailable evidence on pinned PR25. Consolidated independent source review and exact final candidate/browser/deployment readback remain pending.
