@@ -1,5 +1,9 @@
 # Change-centered PR behavior workspace
 
+## Test is one normal source change unit — 2026-11-03
+
+A Test is one whole source-definition reading unit. Its assertion edits stay native line edits inside that Test; canonical assertion/contains/location evidence remains retained but no automatic assertion-card/label inventory is drawn. The current accepted projection keeps Test on top and its nonempty Removed/Added code sides below, Removed left and Added right, with one directed bottom-to-top ownership connection per real side. Source disclosure/return and exact native witnesses remain. This supersedes every earlier visible-Assertion-stack/default-semantic-children instruction in this document; those paragraphs describe rejected historical projections, not current acceptance. File/Function/Test share the Change domain model below; preserving request's existing semantic context is a separately protected presentation constraint.
+
 ## Shared Change domain model — latest correction, 2026-11-03
 
 Use the [one source Change model](source-change-model.md) for File, Function and Test. Preserve the delivered request/context graph and current Test-top/edit-row layout. Replace Test-only native-edit construction with a generic projection from domain-owned Change evidence. Different retained reading presentations do not imply different ontology models. File and unit evidence scopes remain explicit and non-additive. No new UX or redesign of request() is authorized.
