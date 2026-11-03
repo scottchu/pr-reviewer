@@ -12,7 +12,7 @@ const before='before-commit', after='after-commit', path='tests/example.ts';
 const witness = (side:'base'|'head') => ({side,commit:side==='base'?before:after,path,contentHash:side+'-hash',startLine:2,endLine:2,text:side==='base'?'old\n':'new\n'} as const);
 const composition:EditComposition={status:'change',scope:'file',removed:1,added:1,
  rows:[{kind:'remove',text:'old\n',beforeLine:2,afterLine:null},{kind:'add',text:'new\n',beforeLine:null,afterLine:2}],
- hunks:[{index:1,header:'@@ -1,3 +1,3 @@',before:witness('base'),after:witness('head'),rows:[{kind:'remove',text:'old\n',beforeLine:2,afterLine:null},{kind:'add',text:'new\n',beforeLine:null,afterLine:2}]}]};
+ hunks:[{index:1,header:'@@ -2 +2 @@',before:witness('base'),after:witness('head'),rows:[{kind:'remove',text:'old\n',beforeLine:2,afterLine:null},{kind:'add',text:'new\n',beforeLine:null,afterLine:2}]}]};
 const file:GraphEntity={id:'file',kind:'file',data:{path,repository:'repo',comparisonStatus:'change',comparisonBasis:'Pinned native diff',sourceEvidence:[{side:'base',commit:before,available:true,contentHash:'base-hash',objectId:'base-blob'},{side:'head',commit:after,available:true,contentHash:'head-hash',objectId:'head-blob'}],editComposition:composition}};
 const unit=(kind:'function'|'test',status='change'):GraphEntity=>({id:kind,kind,data:{name:kind,comparisonStatus:status,comparisonBasis:'Admitted exact source correspondence',sourceWitnesses:(['base','head'] as const).filter(side=>status!=='add'||side==='head').filter(side=>status!=='remove'||side==='base').map(side=>({id:kind+'-'+side,sourceTextHash:side+'-text',anchor:{repository:'repo',side,commit:side==='base'?before:after,path,contentHash:side+'-hash',start:0,end:20,startLine:1,endLine:3} satisfies SourceAnchor})),editComposition:{...composition,scope:'source unit'}}});
 const fixture=(extra:readonly GraphEntity[]=[unit('function'),unit('test')]):SourceGraph=>({entities:[file,...extra],relations:[],fileUnits:{file:extra.map(n=>n.id)},groupFor:{function:'existing-function-change',test:'existing-test-change'},initialVisible:['file'],unresolved:[],provenance:{repository:'repo',base:before,head:after}});
@@ -55,7 +55,7 @@ test('C1/C2: addition/removal/unchanged and unavailable native text use the same
   let subject=kind==='file'?file:unit(kind,status);
   const rows=composition.rows.filter(row=>row.kind===editKind);
   const edit:EditComposition={...composition,scope:kind==='file'?'file':'source unit',status,added:status==='add'?1:0,removed:status==='remove'?1:0,rows:status==='no change'?[]:rows,
-   hunks:status==='no change'?[]:composition.hunks.map(h=>({...h,rows,before:side==='head'?null:h.before,after:side==='base'?null:h.after}))};
+   hunks:status==='no change'?[]:composition.hunks.map(h=>({...h,header:kind==='file'?(status==='add'?'@@ -0,0 +2 @@':'@@ -2 +0,0 @@'):h.header,rows,before:side==='head'?null:h.before,after:side==='base'?null:h.after}))};
   subject={...subject,data:{...subject.data,comparisonStatus:status,editComposition:edit,...(kind==='file'?{sourceEvidence:(file.data.sourceEvidence as {side:string;commit:string}[]).map(s=>status==='no change'||s.side===side?s:{side:s.side,commit:s.commit,available:false})}:{})}};
   const graph=kind==='file'?fixture([]):fixture([subject]);const input=kind==='file'?{...graph,entities:[subject]}:graph;
   const change=changeForSubject(loadChangeModel(input),subject.id);
@@ -101,4 +101,18 @@ test('C4: fresh typed registry is consumed by Experience and every File Function
  const next=experienceService.handleIntent(state,{type:'source-disclosure',comparisonId:state.comparisonId,entityId:'test',open:true}).state;
  assert.equal(next.changeModel,state.changeModel);
  const fresh=createGraphSession(graph);assert.equal(fresh.comparisonId,state.comparisonId);
+});
+
+
+test('C2 review regressions: missing tree entry cannot contain present blob metadata and physical/context rows must be qualified',()=>{
+ for(const key of ['objectId','mode','type','contentHash','disposition']){
+  const subject={...file,data:{...file.data,comparisonStatus:'add',sourceEvidence:[{side:'base',commit:before,available:false,[key]:'contradictory-present-record'},{side:'head',commit:after,available:true,contentHash:'head-hash'}]}};
+  const graph={...fixture([]),entities:[subject]},model=buildChangeModel(graph);assert.equal(model.changes.length,0);assert.ok(model.diagnostics.some(d=>d.reason==='Checked absence unsupported'));
+ }
+ const rows=[{kind:'remove',text:'old\n',beforeLine:1,afterLine:null},{kind:'remove',text:'later\n',beforeLine:9,afterLine:null},{kind:'add',text:'new\n',beforeLine:null,afterLine:2}] as const;
+ const gap={...composition,removed:2,rows,hunks:[{index:1,header:'@@ -1,2 +2 @@',before:{...witness('base'),startLine:1,endLine:9,text:'old\nlater\n'},after:witness('head'),rows}]};
+ const graph={...fixture([]),entities:[{...file,data:{...file.data,editComposition:gap}}]};assert.equal(loadChangeModel(graph).changes[0]!.evidence.status,'unavailable');
+ const contextRows=[{kind:'context',text:'context\n',beforeLine:1,afterLine:1},{kind:'add',text:'new\n',beforeLine:null,afterLine:2}] as const;
+ const context:EditComposition={...composition,removed:0,rows:contextRows,hunks:[{index:1,header:'@@ -1 +1,2 @@',before:{...witness('base'),startLine:1,endLine:1,text:'context\n',contentHash:'wrong-context-hash'},after:{...witness('head'),startLine:1,endLine:2,text:'context\nnew\n'},rows:contextRows}]};
+ const input={...fixture([]),entities:[{...file,data:{...file.data,editComposition:context}}]};assert.equal(loadChangeModel(input).changes[0]!.evidence.status,'unavailable');
 });

@@ -29,7 +29,7 @@ const canonical = (v:unknown):string => JSON.stringify(v,(_key,value:unknown) =>
 const registries = new WeakMap<SourceGraph,readonly GraphEntity[]>();
 const registry = (graph:SourceGraph) => {let known=registries.get(graph);if(!known){known=collectEntities(graph.entities);registries.set(graph,known);}return known;};
 
-const nativeEvidence = (subject:GraphEntity, before:ChangeOccurrence, after:ChangeOccurrence):NativeChangeEvidence => {
+const nativeEvidence = (subject:GraphEntity, before:ChangeOccurrence, after:ChangeOccurrence, comparison:SourceChange['comparison'], path:string):NativeChangeEvidence => {
     const scope=subject.kind==='file'?'file':'source unit';
     const unavailable=(reason:string):NativeChangeEvidence=>({ownerId:subject.id,scope,status:'unavailable',reason});
     const c=subject.data.editComposition as EditComposition|undefined;
@@ -37,20 +37,36 @@ const nativeEvidence = (subject:GraphEntity, before:ChangeOccurrence, after:Chan
     if(c.scope!==scope)return unavailable('Native edit scope mismatch');
     const removed:ChangeRowReference[]=[],added:ChangeRowReference[]=[];
     let previousHunk=0;
+    const lastLine={base:0,head:0};
     const witnesses=(subject.data.sourceWitnesses ?? []) as readonly Witness[];
     for(const hunk of c.hunks){
         if(!positive(hunk.index)||hunk.index<=previousHunk)return unavailable('Native hunk index invalid');previousHunk=hunk.index;
+        const header=/^@@ -(\d+)(?:,(\d+))? \+(\d+)(?:,(\d+))? @@/.exec(hunk.header);
+        if(!header)return unavailable('Native hunk header invalid');
         for(const side of ['base','head'] as const){
-            const witness=side==='base'?hunk.before:hunk.after;
+            const witness=side==='base'?hunk.before:hunk.after,occurrence=side==='base'?before:after;
             const ownRows=hunk.rows.filter(row=>(side==='base'?row.beforeLine:row.afterLine)!==null);
-            if(witness&&(witness.text!==ownRows.map(row=>row.text).join('')||!ownRows.length||
-                witness.startLine!==(side==='base'?ownRows[0]!.beforeLine:ownRows[0]!.afterLine)||
-                witness.endLine!==(side==='base'?ownRows.at(-1)!.beforeLine:ownRows.at(-1)!.afterLine)))return unavailable('Native witness text/range mismatch');
+            if(!ownRows.length){
+                if(witness||(scope==='file'&&Number(header[side==='base'?2:4]??1)!==0))return unavailable('Native witness/header without source rows');
+                continue;
+            }
             const lines=ownRows.map(row=>side==='base'?row.beforeLine!:row.afterLine!);
-            if(lines.some((line,i)=>!positive(line)||(i>0&&line<=lines[i-1]!)))return unavailable('Native source row order invalid');
+            const start=Number(header[side==='base'?1:3]),count=Number(header[side==='base'?2:4]??1);
+            if(!witness||occurrence.presence!=='present'||occurrence.source!=='available'||witness.side!==side||
+                witness.commit!==(side==='base'?comparison.base:comparison.head)||witness.path!==path||witness.contentHash!==occurrence.contentHash||
+                witness.text!==ownRows.map(row=>row.text).join('')||witness.startLine!==lines[0]||witness.endLine!==lines.at(-1))
+                return unavailable('Native witness identity/text/range mismatch');
+            if(lines.some((line,i)=>!positive(line)||(i>0&&line!==lines[i-1]!+1))||lines[0]!<=lastLine[side])return unavailable('Native physical source row order invalid');
+            if(!positive(start)||!positive(count)||lines[0]!<start||lines.at(-1)!>=start+count||
+                (scope==='file'&&(lines.length!==count||lines[0]!==start)))return unavailable('Native header source range mismatch');
+            lastLine[side]=lines.at(-1)!;
+            if(subject.kind!=='file'&&lines.some(line=>!witnesses.some(w=>w.anchor.side===side&&line>=w.anchor.startLine&&line<=w.anchor.endLine)))
+                return unavailable('Native context row outside subject');
         }
         for(const [rowIndex,row] of hunk.rows.entries()){
-            if(!['context','add','remove'].includes(row.kind))return unavailable('Native edit kind invalid');
+            if(!['context','add','remove'].includes(row.kind)||row.text.replace(/\n$/, '').includes('\n')||
+                (row.kind==='remove'&&row.afterLine!==null)||(row.kind==='add'&&row.beforeLine!==null)||
+                (row.beforeLine===null&&row.afterLine===null))return unavailable('Native physical row invalid');
             if(row.kind==='context')continue;
             const side=row.kind==='remove'?'base':'head',occurrence=side==='base'?before:after;
             const witness=side==='base'?hunk.before:hunk.after,line=side==='base'?row.beforeLine:row.afterLine;
@@ -81,6 +97,9 @@ export const buildChangeModel = (graph:SourceGraph):ChangeModel => {
         const file=subject.kind==='file'?subject:files.find(f=>f.data.path===path);
         if(!file||typeof path!=='string'){diagnostics.push({subjectId:subject.id,reason:'Owning File unavailable'});continue;}
         const sides=(file.data.sourceEvidence ?? []) as readonly SourceSide[];
+        if(file.data.repository!==comparison.repository||['base','head'].some(side=>sides.filter(record=>record.side===side).length!==1)){
+            diagnostics.push({subjectId:subject.id,reason:'Qualified File side identity invalid'});continue;
+        }
         const status=subject.data.comparisonStatus as SourceChange['status'],basis=String(subject.data.comparisonBasis??'');
         let invalid:string|undefined;
         const occurrence=(side:'base'|'head'):ChangeOccurrence=>{
@@ -88,7 +107,8 @@ export const buildChangeModel = (graph:SourceGraph):ChangeModel => {
             const selected=witnesses.filter(w=>w.anchor.side===side);
             const absent=(status==='add'&&side==='base')||(status==='remove'&&side==='head');
             if(absent){
-                if(!basis||selected.length||(subject.kind==='file'&&(!record||record.commit!==commit||record.available))){invalid='Checked absence unsupported';return {side,presence:'unavailable',reason:invalid};}
+                if(!basis||selected.length||(subject.kind==='file'&&(!record||record.commit!==commit||record.available!==false||
+                    Object.keys(record).some(key=>!['side','commit','available'].includes(key))))){invalid='Checked absence unsupported';return {side,presence:'unavailable',reason:invalid};}
                 return {side,presence:'absent',basis};
             }
             if(!record||record.commit!==commit){invalid='Pinned File occurrence unavailable';return {side,presence:'unavailable',reason:invalid};}
@@ -105,7 +125,7 @@ export const buildChangeModel = (graph:SourceGraph):ChangeModel => {
         const frame=subject.kind==='file'?all.find(e=>e.kind==='change'&&e.data.documentPath===path)?.id:graph.groupFor[subject.id];
         const id=frame??'change:'+subject.id;
         if(changes.some(c=>c.id===id)){diagnostics.push({subjectId:subject.id,reason:'Change identity collision'});continue;}
-        const evidence=nativeEvidence(subject,before,after);
+        const evidence=nativeEvidence(subject,before,after,comparison,path);
         if(evidence.status==='available'){
             const c=subject.data.editComposition as EditComposition;
             if(c.hunks.some(h=>[h.before,h.after].some(w=>w&&(w.path!==path||w.commit!==(w.side==='base'?comparison.base:comparison.head))))){diagnostics.push({subjectId:subject.id,reason:'Native source identity mismatch'});continue;}

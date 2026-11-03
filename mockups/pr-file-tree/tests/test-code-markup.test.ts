@@ -32,7 +32,7 @@ test('actual React Test connector renders directed SVG path and endpoints withou
         const {ChangeEditConnection} = await server.ssrLoadModule('/src/review-graph/ui/components/ChangeEditConnection.tsx');
         const path = 'M300,200 Q400,300 500,400';
         const html = renderToStaticMarkup(React.createElement(ChangeEditConnection, {id: 'edit-route', source: 'test', target: 'removed', path, markerEnd: 'url(#arrow)', measureOnly: false}));
-        assert.match(html, /data-test-edit-source="test"/); assert.match(html, /data-test-edit-target="removed"/);
+        assert.match(html, /data-change-edit-source="test"/); assert.match(html, /data-change-edit-target="removed"/);
         assert.match(html, /data-source-port="bottom"/); assert.match(html, /data-target-port="top"/);
         assert.ok(html.includes('d="' + path + '"')); assert.match(html, /marker-end="url\(#arrow\)"/);
         assert.ok(!html.includes('minimal-edge-card')); assert.ok(!html.includes('aria-hidden="true"'));
