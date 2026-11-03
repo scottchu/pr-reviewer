@@ -17,25 +17,19 @@ const frame = async (page: Page, node: Locator) => {
 };
 
 for (const width of [1440, 390]) {
-    test(`removed construction and independent After source at ${width}`, async ({page}) => {
-        await page.setViewportSize({width, height: 900});
-        await page.goto(target);
-        const header = page.locator('.react-flow__node[data-id="header-value"]');
-        await frame(page, header);
-        await expect(header.getByRole('heading', {name: 'Authorization property construction', exact: true})).toBeVisible();
-        await expect(header).toContainText('Removed source occurrence');
-        await expect(header).toContainText('Direct request construction only');
-        await expect(header).toContainText('Before b096826 · src/application/review.ts · L29');
-        await expect(header).not.toContainText(/helper (?:returns|produces)|globally removed/i);
-        const request = page.locator('.react-flow__node[data-id="request"]');
-        await frame(page, request);
-        await request.locator('summary').first().click();
-        await expect(request.getByLabel('Removed source rows', {exact: true})).toContainText('Authorization:');
-        await expect(request.getByLabel('Added source rows', {exact: true})).toContainText('accessHeaders(captured)');
-        await expect(request).toContainText('Before · b096826');
-        await expect(request).toContainText('After · e3b270e');
-        await request.locator('summary').first().click();
-        await frame(page, header);
-        await expect(header).toContainText('Removed source occurrence');
+    test(`literal removed construction and independent added source at ${width}`, async ({page}) => {
+        await page.setViewportSize({width, height: 900}); await page.goto(target);
+        await expect(page.locator('.react-flow__node[data-id="header-value"]')).toHaveCount(0);
+        const removed = page.locator('.react-flow__node[data-id="ui-source-edit:change:remove"]');
+        await frame(page, removed);
+        await expect(removed.getByLabel('Removed code', {exact: true})).toContainText('Authorization:');
+        await expect(removed).toContainText('Before b096826');
+        const added = page.locator('.react-flow__node[data-id="ui-source-edit:change:add"]');
+        await frame(page, added);
+        await expect(added.getByLabel('Added code', {exact: true})).toContainText('accessHeaders(captured)');
+        await expect(added).toContainText('After e3b270e');
+        const helper = page.locator('.react-flow__node[data-id="ui-source-edit:change:helper:add"]');
+        await frame(page, helper);
+        await expect(helper.getByLabel('Added code', {exact: true})).toContainText('Authorization');
     });
 }

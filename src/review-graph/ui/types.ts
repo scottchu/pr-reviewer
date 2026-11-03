@@ -2,6 +2,8 @@ import type {NativeDocumentHunk, DocumentWitness} from '../domain/types.ts';
 import type { GraphEntity, GraphRelation } from '../domain/types.ts';
 import type { CardRows, RelationRows } from './content.ts';
 export type EntityPresentation = Readonly<{
+    changeSource?: Readonly<{subjectId: string; subjectKind: string}>;
+    sourceEdit?: SourceEditNodeUI;
     card: CardRows;
     status: string | undefined;
     icon: string;
@@ -18,7 +20,7 @@ export type UIEntity = Omit<GraphEntity, 'nodes'> & Readonly<{
     nodes?: readonly UIEntity[];
 }>;
 export type UIRelation = GraphRelation & Readonly<{
-    ui: RelationRows;
+    ui: RelationRows & Readonly<{sourceEndpoints?: Readonly<{from: string; to: string}>}>;
 }>;
 export type GraphView = Readonly<{
     nodes: readonly UIEntity[];
@@ -30,6 +32,11 @@ export type SourceEditPaneUI=Readonly<{kind:'remove'|'add';title:string;versionL
 export type SourceReadingUI=Readonly<{caption:string;available:boolean;hunks:readonly NativeDocumentHunk[];panes:readonly SourceEditPaneUI[]}>;
 
 export type SourceWitnessUI = DocumentWitness;
+export type SourceEditNodeUI = Readonly<{
+    kind: 'remove' | 'add'; subjectId: string; groupId: string;
+    rows: readonly Readonly<{line: number; text: string; hunkIndex: number; witness: DocumentWitness}>[];
+}>;
+export type SourceSyntaxUI = (path: string, side: 'before' | 'after', line: number | null, text: string) => readonly Readonly<{kind: string; text: string}>[];
 export type SourceHunkUI = NativeDocumentHunk;
 export type GraphSessionUI = Readonly<{
     comparisonId: string;
@@ -69,7 +76,7 @@ export type SceneWorkerOutputUI =
     Readonly<{type: 'selection'; selection: SceneSelectionUI}> |
     Readonly<{type: 'error'; message: string}>;
 
-export type ReaderKindUI = 'inline-hunks' | 'source-hunks' | 'removed-preview' | 'added-preview' | 'unpaired-source';
+export type ReaderKindUI = 'inline-hunks' | 'source-hunks' | 'removed-preview' | 'added-preview' | 'unpaired-source' | 'source-edit';
 export type ReaderIdentityUI = Readonly<{entityId: string; kind: ReaderKindUI}>;
 export type ReaderStateUI = Readonly<{open: boolean; scrollTop: number; scrollLeft: number}>;
 export type ReaderScrollUI = Pick<ReaderStateUI, 'scrollTop' | 'scrollLeft'>;

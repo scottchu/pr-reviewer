@@ -5,10 +5,11 @@ import {collectEntities} from '../domain/validation.ts';
 import {edgeRows} from './content.ts';
 import {projectExperience} from './projection.ts';
 import {projectChangeFilter} from './change-filter.ts';
+import {projectChangeCode} from './change-code.ts';
 import type {GraphSessionUI} from './types.ts';
 
 const sessionFor = (state: ExperienceState, layoutRelations: GraphSessionUI['layoutRelations']): GraphSessionUI => {
-    const view = projectExperience(state);
+    const view = projectChangeCode(projectExperience(state));
     return {
         comparisonId: state.comparisonId,
         view,
@@ -22,7 +23,8 @@ const sessionFor = (state: ExperienceState, layoutRelations: GraphSessionUI['lay
             type: 'show-source-units', comparisonId: state.comparisonId, fileId, hide,
         }).state, layoutRelations),
         inspect: (entityId, open) => sessionFor(experienceService.handleIntent(state, {
-            type: 'source-disclosure', comparisonId: state.comparisonId, entityId, open,
+            type: 'source-disclosure', comparisonId: state.comparisonId,
+            entityId: view.entities.find(entity => entity.id === entityId)?.ui.changeSource?.subjectId ?? entityId, open,
         }).state, layoutRelations),
     };
 };

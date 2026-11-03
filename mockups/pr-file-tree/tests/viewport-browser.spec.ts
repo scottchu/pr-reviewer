@@ -37,7 +37,7 @@ for (const width of [1440, 390]) {
         if (await more.count()) {await more.click(); expect(await camera(page)).toBe(before);}
         await wrapper.getByRole('button', {name: 'Hide source units', exact: true}).click();
         expect(await camera(page)).toBe(before);
-        const sourceEntity = visibleSourceGraph({}).nodes.find(entity => ['function', 'test'].includes(entity.kind) && Boolean(entity.data.editComposition))!;
+        const sourceEntity = visibleSourceGraph({}).nodes.find(entity => entity.kind === 'file' && entity.data.comparisonStatus !== 'no change' && Boolean(entity.data.editComposition))!;
         const sourceNode = page.locator(`.react-flow__node[data-id=${JSON.stringify(sourceEntity.id)}]`);
         await frame(page, sourceNode);
         const summary = sourceNode.locator('summary').filter({hasText: /^View source changes$/});
@@ -134,7 +134,7 @@ test('touch canvas pan and pinch remain local while worker queries are pending',
 test('lazy source readers restore inner disclosure and reader/pane scroll after close and reopen', async ({page}) => {
     const {createGraphSession} = await import('../../../src/review-graph/ui/session.ts');
     const {sourceGraph} = await import('../source-graph.ts');
-    const entity = createGraphSession(sourceGraph).view.nodes.filter(node => node.ui.sourceControl && node.ui.sourceReading?.hunks.length)
+    const entity = createGraphSession(sourceGraph).view.nodes.filter(node => node.kind === 'file' && node.ui.sourceControl && node.ui.sourceReading?.hunks.length)
         .sort((a,b) => b.ui.sourceReading!.hunks.reduce((n,h)=>n+h.rows.length,0)-a.ui.sourceReading!.hunks.reduce((n,h)=>n+h.rows.length,0))[0]!;
     await page.goto(target);
     const node=page.locator(`.react-flow__node[data-id=${JSON.stringify(entity.id)}]`);
