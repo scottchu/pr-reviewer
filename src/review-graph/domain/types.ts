@@ -53,6 +53,7 @@ export type GraphRelation = Readonly<{
     data: Readonly<Record<string, unknown>>;
 }>;
 export type SourceGraph = Readonly<{
+    changeModel?: import('./change-model.ts').ChangeModel;
     entities: readonly GraphEntity[];
     relations: readonly GraphRelation[];
     fileUnits: Readonly<Record<string, readonly string[]>>;

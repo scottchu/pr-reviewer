@@ -2,7 +2,7 @@ import type {NativeDocumentHunk, DocumentWitness} from '../domain/types.ts';
 import type { GraphEntity, GraphRelation } from '../domain/types.ts';
 import type { CardRows, RelationRows } from './content.ts';
 export type EntityPresentation = Readonly<{
-    testCodeSource?: boolean;
+    changeEvidenceSource?: boolean;
     sourceEdit?: SourceEditNodeUI;
     card: CardRows;
     status: string | undefined;
@@ -21,10 +21,10 @@ export type UIEntity = Omit<GraphEntity, 'nodes'> & Readonly<{
 }>;
 export type UIRelation = GraphRelation & Readonly<{
     ui: RelationRows;
-    testEditConnector?: true;
+    changeEditConnector?: true;
 }>;
 export type GraphView = Readonly<{
-    testEditConnections?: readonly UIRelation[];
+    changeEditConnections?: readonly UIRelation[];
     nodes: readonly UIEntity[];
     relations: readonly UIRelation[];
     entities: readonly UIEntity[];
@@ -35,7 +35,7 @@ export type SourceReadingUI=Readonly<{caption:string;available:boolean;hunks:rea
 
 export type SourceWitnessUI = DocumentWitness;
 export type SourceEditNodeUI = Readonly<{
-    kind: 'remove' | 'add'; subjectId: string; groupId: string;
+    kind: 'remove' | 'add'; changeId: string; subjectId: string; groupId: string;
     rows: readonly Readonly<{line: number; text: string; hunkIndex: number; witness: DocumentWitness}>[];
 }>;
 export type SourceSyntaxUI = (path: string, side: 'before' | 'after', line: number | null, text: string) => readonly Readonly<{kind: string; text: string}>[];

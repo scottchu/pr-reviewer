@@ -21,10 +21,10 @@ import {withMeasuredGeometry} from '../layout-measurements.ts';
 import {graphPaintState, type RetainedPaint} from '../paint-state.ts';
 import {GraphToolbar} from './GraphToolbar.tsx';
 import {SourceEditCode} from './SourceEditCode.tsx';
-import {TestEditConnection} from './TestEditConnection.tsx';
+import {ChangeEditConnection} from './ChangeEditConnection.tsx';
 import type {SourceSyntaxUI} from '../types.ts';
 
-export const mountReviewGraph = (root:HTMLElement,initialSession:GraphSessionUI, testSyntax?: SourceSyntaxUI) => {
+export const mountReviewGraph = (root:HTMLElement,initialSession:GraphSessionUI, editSyntax?: SourceSyntaxUI) => {
 const initial = initialSession.view;
 const allEntities=()=>initial.entities;
 const allRelations=()=>initialSession.layoutRelations;
@@ -165,9 +165,9 @@ const EditPreview = ({reading, entityId}: {reading:SourceReadingUI; entityId: st
         {pane.rows.length>0&&<p>{pane.footer}</p>}
     </section>)}
 </div>;
-const TestCodeNode = ({entity}: {entity: GraphEntity}) => {
+const ChangeCodeNode = ({entity}: {entity: GraphEntity}) => {
     const scroll = useReaderScroll({entityId: entity.id, kind: 'source-edit'});
-    return entity.ui.sourceEdit ? <SourceEditCode edit={entity.ui.sourceEdit} syntax={testSyntax} {...scroll}/> : null;
+    return entity.ui.sourceEdit ? <SourceEditCode edit={entity.ui.sourceEdit} syntax={editSyntax} {...scroll}/> : null;
 };
 const NativeSourceDetails = ({identity, summary, children, onReflow, className = 'document-details nodrag nopan'}: {
     identity: ReaderIdentityUI; summary: string; children: () => React.ReactNode; onReflow: (() => void) | undefined; className?: string;
@@ -197,12 +197,12 @@ const Entity = React.memo(({ data }: NodeProps<EntityNode>) => {
     const status = data.entity.ui.status;
     const hunks = data.entity.ui.inlineSourceReading ? data.entity.ui.sourceReading?.hunks : undefined;
     const reading = data.entity.ui.sourceOpen || data.entity.ui.inlineSourceReading ? data.entity.ui.sourceReading : undefined;
-    return <article inert={data.measureOnly || undefined} aria-hidden={data.measureOnly || undefined} className={'minimal-entity' + (data.entity.ui.sourceEdit ? ' test-source-edit-node' : '') + (hunks ? ' native-document-evidence' : '') + (typeof status === 'string' ? ' status-' + status.replaceAll(' ', '-') : '')}>
+    return <article inert={data.measureOnly || undefined} aria-hidden={data.measureOnly || undefined} className={'minimal-entity' + (data.entity.ui.sourceEdit ? ' change-source-edit-node' : '') + (hunks ? ' native-document-evidence' : '') + (typeof status === 'string' ? ' status-' + status.replaceAll(' ', '-') : '')}>
   <Ports /><NodeDragHandle data={data}/>
   <h2><EntityIcon entity={data.entity}/><span>{card.title}</span></h2>
   {hunks && <DocumentEvidence identity={{entityId: data.entity.id, kind: 'inline-hunks'}} hunks={hunks} reading={reading} onReflow={data.onReflow}/>}
   {card.rows.map((row, index) => <p key={index}>{row}</p>)}
-  {data.entity.ui.sourceEdit && <TestCodeNode entity={data.entity}/>}
+  {data.entity.ui.sourceEdit && <ChangeCodeNode entity={data.entity}/>}
   {data.entity.ui.sourceControl && <details className="document-details nodrag nopan" open={data.entity.ui.sourceOpen} onClickCapture={event => captureReaderScrolls(data.entity.id, event.currentTarget)} onToggle={event => {
       const next = event.currentTarget.open;
       if (next === data.entity.ui.sourceOpen) return;
@@ -211,7 +211,7 @@ const Entity = React.memo(({ data }: NodeProps<EntityNode>) => {
   }}>
     <summary>View source changes</summary>
     {data.entity.ui.sourceOpen && reading && <><p>{reading.caption}</p>
-    {data.entity.ui.testCodeSource
+    {data.entity.ui.changeEvidenceSource
         ? <NativeHunkRows identity={{entityId: data.entity.id, kind: 'source-hunks'}} hunks={reading.hunks}/>
         : <DocumentEvidence identity={{entityId: data.entity.id, kind: 'source-hunks'}} hunks={reading.hunks} reading={reading} onReflow={data.onReflow}/>}</>}
   </details>}
@@ -254,7 +254,7 @@ const Relation = React.memo((props: EdgeProps<RelationEdge>) => {
         zoom: number;
     } | null>(null);
     const data = props.data;
-    useLayoutEffect(() => { const element = labelRef.current; if (!data) return; if (data.relation.testEditConnector) { data.onMeasure(props.id, {width: 0, height: 0}); return; } if (!element)
+    useLayoutEffect(() => { const element = labelRef.current; if (!data) return; if (data.relation.changeEditConnector) { data.onMeasure(props.id, {width: 0, height: 0}); return; } if (!element)
         return; const measure = () => data.onMeasure(props.id, { width: element.offsetWidth, height: element.offsetHeight }); measure(); const observer = new ResizeObserver(measure); observer.observe(element); return () => observer.disconnect(); }, [props.id, data?.onMeasure]);
     if (!data)
         return null;
@@ -282,7 +282,7 @@ const Relation = React.memo((props: EdgeProps<RelationEdge>) => {
         data.onBend(props.id, { x: data.routed.offset.x + delta[0]!, y: data.routed.offset.y + delta[1]! });
     } };
     const measurementStyle = data.measureOnly ? {visibility: 'hidden' as const, pointerEvents: 'none' as const} : {};
-    if (data.relation.testEditConnector) return <TestEditConnection id={props.id}
+    if (data.relation.changeEditConnector) return <ChangeEditConnection id={props.id}
         source={data.relation.from} target={data.relation.to} path={route.path}
         markerEnd={props.markerEnd} measureOnly={Boolean(data.measureOnly)}/>;
     return <>
@@ -354,9 +354,9 @@ const App = () => {
     const [headerClearances, setHeaderClearances] = useState<Record<string, number>>({});
     const onHeaderMeasure = useCallback((id: string, clearance: number) => setHeaderClearances(previous => (previous[id] ?? groupInterior.top) === clearance ? previous : { ...previous, [id]: clearance }), []);
     const view = experience.view;
-    const relations = useMemo(() => [...view.relations.filter(edge => !omittedStructuralEdge(edge, allEntities())), ...(view.testEditConnections ?? [])], [view]);
+    const relations = useMemo(() => [...view.relations.filter(edge => !omittedStructuralEdge(edge, allEntities())), ...(view.changeEditConnections ?? [])], [view]);
     const links = useMemo(() => relations.map(edge => ({
-        id: edge.id, source: edge.from, target: edge.to, ...(edge.testEditConnector ? {labelFree: true as const} : {})
+        id: edge.id, source: edge.from, target: edge.to, ...(edge.changeEditConnector ? {labelFree: true as const} : {})
     })), [relations]);
     const [nodes, setNodes, onNodesChange] = useNodesState<EntityNode>([]);
     const [ready, setReady] = useState(false);

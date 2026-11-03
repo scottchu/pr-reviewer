@@ -219,6 +219,6 @@ test('pinned no-change Test filters independently of retained non-rendered asser
     const off = on.setChangesOnly(false);
     assert.equal(off.view, full.view);
     assert.deepEqual(off.filter.nodeIds, full.view.nodes.map(node => node.id));
-    assert.deepEqual(off.filter.relationIds, [...full.view.relations, ...(full.view.testEditConnections ?? [])].map(edge => edge.id));
+    assert.deepEqual(off.filter.relationIds, [...full.view.relations, ...(full.view.changeEditConnections ?? [])].map(edge => edge.id));
     assert.equal(digest(), before);
 });

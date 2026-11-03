@@ -14,3 +14,5 @@ dist/
 
 # Local execution evidence and logs.
 /artifacts/
+
+mockups/pr-file-tree/change-edit-syntax.json

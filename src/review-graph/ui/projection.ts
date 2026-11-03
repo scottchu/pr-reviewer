@@ -1,3 +1,4 @@
+import {changeForSubject, changeSourceComparison} from '../domain/change-model.ts';
 import type {EditComposition} from '../domain/edit-composition.ts';
 import type {GraphEntity, GraphRelation, SourceGraph, NativeDocumentHunk} from '../domain/types.ts';
 import type {ExperienceState} from '../experience/types.ts';
@@ -54,7 +55,10 @@ const createProjector = (comparison: SourceGraph) => {
                     (row.anchor.side === 'base' ? 'Before' : 'After') + ' L' + row.anchor.startLine + '–' + row.anchor.endLine + ' · ' + row.name),
                 get sourceReading() {
                     if (!prepared) {
-                        reading = projectSourceReading(entity.data.editComposition as EditComposition | undefined, entity.data.nativeHunks as readonly NativeDocumentHunk[] | undefined);
+                        const change=changeForSubject(state.changeModel,entity.id)??state.changeModel.changes.find(c=>c.id===entity.id);
+                        const comparison=change?changeSourceComparison(state.comparison,change):
+                            (['file','function','test'].includes(entity.kind)&&['add','remove','change'].includes(String(entity.data.comparisonStatus))?undefined:entity.data.editComposition as EditComposition|undefined);
+                        reading = projectSourceReading(comparison, entity.data.nativeHunks as readonly NativeDocumentHunk[] | undefined);
                         prepared = true;
                     }
                     return reading;

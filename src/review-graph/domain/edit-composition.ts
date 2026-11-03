@@ -11,7 +11,7 @@ type Span = {side: 'base' | 'head'; path: string; commit: string; contentHash: s
 export const editCategory = (added: number, removed: number): EditComposition['status'] =>
   added > 0 ? removed > 0 ? 'change' : 'add' : removed > 0 ? 'remove' : 'no change';
 
-/** Presentation only. Canonical identity, presence and call admission never consume this result. */
+/** Native textual evidence only; logical identity, source presence and call admission remain independently evidenced. */
 export const scopedEditComposition = (entity: GraphEntity, facts: FactDocument, nativeDiffs?:ReadonlyMap<string,readonly NativeDocumentHunk[]>,nativeDiagnostics:readonly {fileId:string;reason:string}[]=[]): EditComposition => {
   const scope = entity.kind === 'file' || entity.data.documentPath ? 'file' : 'source unit';
   const unresolved = (reason: string): EditComposition => ({status: 'unresolved', scope, added: 0, removed: 0, rows: [], hunks: [], reason});

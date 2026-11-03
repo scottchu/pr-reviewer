@@ -198,9 +198,9 @@ export const prepareAppGraph = (
             path: row.path, id: row.occurrence.id, kind: row.occurrence.kind, name: row.occurrence.name, anchor: row.occurrence.anchor, sourceTextHash: hash(row.occurrence.sourceText), reason: row.reason
         })),
         provenance: {
-            ...compiled.provenance, ...(attributionFailure?{enrichmentFailure:attributionFailure}:{}), inputArtifactHash: inputHash, compilerHash: hash(readFileSync(new URL('../domain/comparison.ts', import.meta.url))), appCompilerHash: hash(readFileSync(new URL('./pr25.ts', import.meta.url))), explanationHash: hash(readFileSync(new URL('./graph-explanations.json', import.meta.url))), documentCompilerHash: hash(readFileSync(new URL('../parse/native-diff.ts', import.meta.url))), editCompilerHash: hash(readFileSync(new URL('../domain/edit-composition.ts', import.meta.url)))
+            ...compiled.provenance, ...(attributionFailure?{enrichmentFailure:attributionFailure}:{}), inputArtifactHash: inputHash, compilerHash: hash(readFileSync(new URL('../domain/comparison.ts', import.meta.url))), appCompilerHash: hash(readFileSync(new URL('./pr25.ts', import.meta.url))), changeModelCompilerHash: hash(readFileSync(new URL('../domain/change-model.ts', import.meta.url))), explanationHash: hash(readFileSync(new URL('./graph-explanations.json', import.meta.url))), documentCompilerHash: hash(readFileSync(new URL('../parse/native-diff.ts', import.meta.url))), editCompilerHash: hash(readFileSync(new URL('../domain/edit-composition.ts', import.meta.url)))
         }
     };
     domainService.validateGraph(graph.entities, graph.relations);
-    return graph;
+    return {...graph, changeModel: domainService.buildChangeModel(graph)};
 };

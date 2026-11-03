@@ -48,9 +48,9 @@ for (const width of [390, 1440]) test(`only Test gains actual code; request and 
             const actual = node(child.id); await frame(page, actual);
             const side = await worldBox(child.id); sides.push(side);
             expect(side.y).toBeGreaterThan(top.y + top.height);
-            const route = page.locator(`g[data-test-edit-target=${JSON.stringify(child.id)}]`);
+            const route = page.locator(`g[data-change-edit-target=${JSON.stringify(child.id)}]`);
             await expect(route).toHaveCount(1);
-            await expect(route).toHaveAttribute('data-test-edit-source', testId);
+            await expect(route).toHaveAttribute('data-change-edit-source', testId);
             await expect(route).toHaveAttribute('data-source-port', 'bottom');
             await expect(route).toHaveAttribute('data-target-port', 'top');
             await expect(route.locator('path.react-flow__edge-path')).toHaveAttribute('d', /^M.+ Q.+/);
@@ -58,7 +58,7 @@ for (const width of [390, 1440]) test(`only Test gains actual code; request and 
         }
         expect(sides[0]!.y).toBeCloseTo(sides[1]!.y, 0);
         expect(sides[0]!.x + sides[0]!.width).toBeLessThan(sides[1]!.x);
-        await expect(page.locator('.minimal-edge-card[data-relation="test_source_edit"]')).toHaveCount(0);
+        await expect(page.locator('.minimal-edge-card[data-relation="source_edit_evidence"]')).toHaveCount(0);
     };
     await checkTopology();
     for (const child of children) {

@@ -5,11 +5,11 @@ import {collectEntities} from '../domain/validation.ts';
 import {edgeRows} from './content.ts';
 import {projectExperience} from './projection.ts';
 import {projectChangeFilter} from './change-filter.ts';
-import {projectTestCode} from './test-code.ts';
+import {projectChangeEvidence} from './change-evidence.ts';
 import type {GraphSessionUI} from './types.ts';
 
 const sessionFor = (state: ExperienceState, layoutRelations: GraphSessionUI['layoutRelations']): GraphSessionUI => {
-    const view = projectTestCode(projectExperience(state));
+    const view = projectChangeEvidence(projectExperience(state),state.comparison,state.changeModel);
     return {
         comparisonId: state.comparisonId,
         view,

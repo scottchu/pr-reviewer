@@ -9,7 +9,7 @@ const explanatory = new Set([
 
 /** One-hop context is calculated from the original changed seeds, never a growing frontier. */
 export const projectChangeFilter = (view: GraphView, changesOnly: boolean): GraphFilterUI => {
-    const relations = [...view.relations, ...(view.testEditConnections ?? [])];
+    const relations = [...view.relations, ...(view.changeEditConnections ?? [])];
     if (!changesOnly) {
         return {
             changesOnly,

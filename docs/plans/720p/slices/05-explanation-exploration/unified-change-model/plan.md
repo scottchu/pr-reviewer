@@ -1,6 +1,6 @@
 # Unified source Change model
 
-Date:2026-11-03. Packet revision:U1. Status: docs-first; implementation authorized, acceptance pending.
+Date:2026-11-03. Packet revision:U1. Status: local implementation and source verification; independent candidate review and delivery pending.
 Parent: [slice05](../plan.md), [720p round](../../../plan.md), [roadmap](../../../../roadmap.md).
 Authoritative source: [shared Change](../../../../../product/source-change-model.md), [TBox](../../../../../product/project-repository-tbox.md), [pipeline](../../../../../product/source-pipeline.md), [invariants](../../../../../product/protected-invariants.md).
 
@@ -42,3 +42,12 @@ A fresh docs-only rebuild-readiness audit reads maintained product docs for the 
 ## Docs-readiness reconciliation U1
 
 Fresh docs-only review found a broken current-Test contract anchor and contradictory retained Assertion-stack instructions, plus an incorrect byte-offset description. Corrected before derived implementation: the actual normal-Test heading now defines latest precedence; assertion inventory is superseded; source anchors retain zero-based UTF-16 start/exclusive end and line coordinates, with byte/hash identity separate. Native edit refs explicitly identify immutable payload owner/hunk/row/side-line. File absence and unit absence have distinct admitted evidence requirements without creating different Change models.
+
+Implementation finding: synchronous Domain/Experience code is consumed by the browser, so native-reference validation must not import Node crypto/parser/provider modules. Qualified immutable owner/File/side/full-source hash and native coordinates bind rows; exact source-byte validation remains with the producer. Do not add a second row-hash authority or runtime crypto dependency. The older UI oracle had an intentionally incomplete synthetic unit with an added count but zero rows and no source identity; that input now abstains from source-reading evidence rather than falsely claiming available edits. Real request and frozen original graph remain under unchanged preservation checks.
+
+
+## Local evidence U1
+
+Domain now owns one versioned Change registry and resolver for all three subject kinds. Fresh preparation records the Change compiler hash and emits 50 File, 28 Function and 24 Test accounts on pinned PR25. Experience retains that registry across disclosure/visibility; all three source readers use it. Generic edit-evidence projection replaces Test-only compilation, with the accepted Test-only edit-card reading policy retained explicitly. The registry stores qualified references only; canonical entities and relations remain unchanged.
+
+Self-checking: 210 graph/source tests passed, including independently authored shared-contract/negative fixtures, known-present unavailable source, owning-File overlap, all three UI readers and frozen original source/request/context oracles. Root subsystem type/boundary checks passed; final minimum types/build and actual candidate UI review remain pending. These counts establish neither unfamiliar-human understanding nor own-PR graph intake. Docs-only independent audit closed the corrected Test-contract/UTF-16 findings; its verdict is limited to reconstructible maintained knowledge, not running implementation.
