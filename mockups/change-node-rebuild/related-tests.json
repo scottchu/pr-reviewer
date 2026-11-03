@@ -1,0 +1,1696 @@
+{
+  "parentChangeId": "change:unit:afc8550b00b30a9b14329f2c8de60288a39d7576a157baef11a8b978eec7b275",
+  "graphSha256": "946b1c59ebde5dd8f5f3eeb2fc5f99fc7e3d6e4b4b3d5d9c9303e699ccb08a2a",
+  "association": "Direct imported createGateway call in the Test source; not selected-branch coverage or execution",
+  "tests": [
+    {
+      "id": "unit:9ffcde535781ff7d3f8b431fd66c8c431984ea7b33b37b579c7269e449712366",
+      "name": "authenticated HTTP owner/bootstrap/agent boundary and managed shutdown",
+      "status": "no change",
+      "occurrences": [
+        {
+          "canonicalId": "91c11b4b98b14f002a08c683f200d3bf3b3dc74e94c7b90f2c0b85053e443f7f",
+          "anchor": {
+            "repository": "scottchu/pr-reviewer",
+            "side": "base",
+            "commit": "b096826e31c0927190806de91ed70b8b64aa93d8",
+            "path": "tests/gateway.test.ts",
+            "contentHash": "21df294a4bcbdeadcabb3a0767e252fdaef5fe2fc371ea63bb3ab62071cb97d3",
+            "start": 345,
+            "end": 2452,
+            "startLine": 9,
+            "endLine": 75
+          }
+        },
+        {
+          "canonicalId": "dea5fb9bb69a465bc10bb350024ddf486ec0900d9c5749ce83ea339f0c78b08a",
+          "anchor": {
+            "repository": "scottchu/pr-reviewer",
+            "side": "head",
+            "commit": "e3b270e5f49a9215452b0b86702946043e979059",
+            "path": "tests/gateway.test.ts",
+            "contentHash": "13e7db6e38670e876795a150587bb6e5a441548915fb37f67ff0a80563953158",
+            "start": 345,
+            "end": 2452,
+            "startLine": 9,
+            "endLine": 75
+          }
+        }
+      ],
+      "directReferences": [
+        {
+          "side": "base",
+          "commit": "b096826e31c0927190806de91ed70b8b64aa93d8",
+          "path": "tests/gateway.test.ts",
+          "line": 22
+        },
+        {
+          "side": "head",
+          "commit": "e3b270e5f49a9215452b0b86702946043e979059",
+          "path": "tests/gateway.test.ts",
+          "line": 22
+        }
+      ],
+      "assertions": [
+        {
+          "id": "unit:b9763ab9d014eb2800cbc3fefb28c33287def6154830d07198d9533cc33d8e05",
+          "name": "assert.equal((await call(\"/api/reviews\", \"wrong\")).status, 401)",
+          "occurrences": [
+            {
+              "canonicalId": "48369f87ff52deee996bdeee4abb10454dee74c077f514b2b72740666373a762",
+              "anchor": {
+                "repository": "scottchu/pr-reviewer",
+                "side": "base",
+                "commit": "b096826e31c0927190806de91ed70b8b64aa93d8",
+                "path": "tests/gateway.test.ts",
+                "contentHash": "21df294a4bcbdeadcabb3a0767e252fdaef5fe2fc371ea63bb3ab62071cb97d3",
+                "start": 1353,
+                "end": 1416,
+                "startLine": 41,
+                "endLine": 41
+              }
+            },
+            {
+              "canonicalId": "5e819336aebb0ef0488a742ee9d7f6c64b12355069a1c43e980850584df39340",
+              "anchor": {
+                "repository": "scottchu/pr-reviewer",
+                "side": "head",
+                "commit": "e3b270e5f49a9215452b0b86702946043e979059",
+                "path": "tests/gateway.test.ts",
+                "contentHash": "13e7db6e38670e876795a150587bb6e5a441548915fb37f67ff0a80563953158",
+                "start": 1353,
+                "end": 1416,
+                "startLine": 41,
+                "endLine": 41
+              }
+            }
+          ],
+          "contains": {
+            "id": "unit:9ffcde535781ff7d3f8b431fd66c8c431984ea7b33b37b579c7269e449712366:contains:unit:b9763ab9d014eb2800cbc3fefb28c33287def6154830d07198d9533cc33d8e05",
+            "from": "unit:9ffcde535781ff7d3f8b431fd66c8c431984ea7b33b37b579c7269e449712366",
+            "to": "unit:b9763ab9d014eb2800cbc3fefb28c33287def6154830d07198d9533cc33d8e05",
+            "version": "comparison",
+            "relation": "contains",
+            "data": {
+              "comparisonStatus": "no change",
+              "sourceEvidence": [
+                {
+                  "repository": "scottchu/pr-reviewer",
+                  "side": "base",
+                  "commit": "b096826e31c0927190806de91ed70b8b64aa93d8",
+                  "path": "tests/gateway.test.ts",
+                  "contentHash": "21df294a4bcbdeadcabb3a0767e252fdaef5fe2fc371ea63bb3ab62071cb97d3",
+                  "start": 1353,
+                  "end": 1416,
+                  "startLine": 41,
+                  "endLine": 41
+                },
+                {
+                  "repository": "scottchu/pr-reviewer",
+                  "side": "head",
+                  "commit": "e3b270e5f49a9215452b0b86702946043e979059",
+                  "path": "tests/gateway.test.ts",
+                  "contentHash": "13e7db6e38670e876795a150587bb6e5a441548915fb37f67ff0a80563953158",
+                  "start": 1353,
+                  "end": 1416,
+                  "startLine": 41,
+                  "endLine": 41
+                }
+              ]
+            }
+          }
+        },
+        {
+          "id": "unit:1fe05785c2d4bf067f4d3f42b813360e149e02e44fba8bc1a853680db38935c0",
+          "name": "assert.equal((await call(\"/api/reviews/r\", bootstrap)).status, 401)",
+          "occurrences": [
+            {
+              "canonicalId": "f69cc143d8780b536edb7e74fceb1696b6c4085bccfe81ae8666512eb38be7c2",
+              "anchor": {
+                "repository": "scottchu/pr-reviewer",
+                "side": "base",
+                "commit": "b096826e31c0927190806de91ed70b8b64aa93d8",
+                "path": "tests/gateway.test.ts",
+                "contentHash": "21df294a4bcbdeadcabb3a0767e252fdaef5fe2fc371ea63bb3ab62071cb97d3",
+                "start": 1649,
+                "end": 1716,
+                "startLine": 49,
+                "endLine": 49
+              }
+            },
+            {
+              "canonicalId": "5b513fb722e85ce9272a5814d00485abf71f6a65cba2e814b8ed9ee8b15449fe",
+              "anchor": {
+                "repository": "scottchu/pr-reviewer",
+                "side": "head",
+                "commit": "e3b270e5f49a9215452b0b86702946043e979059",
+                "path": "tests/gateway.test.ts",
+                "contentHash": "13e7db6e38670e876795a150587bb6e5a441548915fb37f67ff0a80563953158",
+                "start": 1649,
+                "end": 1716,
+                "startLine": 49,
+                "endLine": 49
+              }
+            }
+          ],
+          "contains": {
+            "id": "unit:9ffcde535781ff7d3f8b431fd66c8c431984ea7b33b37b579c7269e449712366:contains:unit:1fe05785c2d4bf067f4d3f42b813360e149e02e44fba8bc1a853680db38935c0",
+            "from": "unit:9ffcde535781ff7d3f8b431fd66c8c431984ea7b33b37b579c7269e449712366",
+            "to": "unit:1fe05785c2d4bf067f4d3f42b813360e149e02e44fba8bc1a853680db38935c0",
+            "version": "comparison",
+            "relation": "contains",
+            "data": {
+              "comparisonStatus": "no change",
+              "sourceEvidence": [
+                {
+                  "repository": "scottchu/pr-reviewer",
+                  "side": "base",
+                  "commit": "b096826e31c0927190806de91ed70b8b64aa93d8",
+                  "path": "tests/gateway.test.ts",
+                  "contentHash": "21df294a4bcbdeadcabb3a0767e252fdaef5fe2fc371ea63bb3ab62071cb97d3",
+                  "start": 1649,
+                  "end": 1716,
+                  "startLine": 49,
+                  "endLine": 49
+                },
+                {
+                  "repository": "scottchu/pr-reviewer",
+                  "side": "head",
+                  "commit": "e3b270e5f49a9215452b0b86702946043e979059",
+                  "path": "tests/gateway.test.ts",
+                  "contentHash": "13e7db6e38670e876795a150587bb6e5a441548915fb37f67ff0a80563953158",
+                  "start": 1649,
+                  "end": 1716,
+                  "startLine": 49,
+                  "endLine": 49
+                }
+              ]
+            }
+          }
+        },
+        {
+          "id": "unit:ef08b2290ae130378e1cc70621603644fd1ac7bc4d5c5e97c8692868170add5e",
+          "name": "assert.equal(attached.status, 200)",
+          "occurrences": [
+            {
+              "canonicalId": "2362ac7caec0157e3b4c74276f8fc70ff233aba9d184597c972c60bc54c066db",
+              "anchor": {
+                "repository": "scottchu/pr-reviewer",
+                "side": "base",
+                "commit": "b096826e31c0927190806de91ed70b8b64aa93d8",
+                "path": "tests/gateway.test.ts",
+                "contentHash": "21df294a4bcbdeadcabb3a0767e252fdaef5fe2fc371ea63bb3ab62071cb97d3",
+                "start": 2023,
+                "end": 2057,
+                "startLine": 60,
+                "endLine": 60
+              }
+            },
+            {
+              "canonicalId": "c3588fa6885302a942a24bb4e0511a1cabe475c5139ee063fce5ed53bce49cdf",
+              "anchor": {
+                "repository": "scottchu/pr-reviewer",
+                "side": "head",
+                "commit": "e3b270e5f49a9215452b0b86702946043e979059",
+                "path": "tests/gateway.test.ts",
+                "contentHash": "13e7db6e38670e876795a150587bb6e5a441548915fb37f67ff0a80563953158",
+                "start": 2023,
+                "end": 2057,
+                "startLine": 60,
+                "endLine": 60
+              }
+            }
+          ],
+          "contains": {
+            "id": "unit:9ffcde535781ff7d3f8b431fd66c8c431984ea7b33b37b579c7269e449712366:contains:unit:ef08b2290ae130378e1cc70621603644fd1ac7bc4d5c5e97c8692868170add5e",
+            "from": "unit:9ffcde535781ff7d3f8b431fd66c8c431984ea7b33b37b579c7269e449712366",
+            "to": "unit:ef08b2290ae130378e1cc70621603644fd1ac7bc4d5c5e97c8692868170add5e",
+            "version": "comparison",
+            "relation": "contains",
+            "data": {
+              "comparisonStatus": "no change",
+              "sourceEvidence": [
+                {
+                  "repository": "scottchu/pr-reviewer",
+                  "side": "base",
+                  "commit": "b096826e31c0927190806de91ed70b8b64aa93d8",
+                  "path": "tests/gateway.test.ts",
+                  "contentHash": "21df294a4bcbdeadcabb3a0767e252fdaef5fe2fc371ea63bb3ab62071cb97d3",
+                  "start": 2023,
+                  "end": 2057,
+                  "startLine": 60,
+                  "endLine": 60
+                },
+                {
+                  "repository": "scottchu/pr-reviewer",
+                  "side": "head",
+                  "commit": "e3b270e5f49a9215452b0b86702946043e979059",
+                  "path": "tests/gateway.test.ts",
+                  "contentHash": "13e7db6e38670e876795a150587bb6e5a441548915fb37f67ff0a80563953158",
+                  "start": 2023,
+                  "end": 2057,
+                  "startLine": 60,
+                  "endLine": 60
+                }
+              ]
+            }
+          }
+        },
+        {
+          "id": "unit:b8325e8d6e45abce5bc84f3331be177c8198f45f2976af0d52c5467dc79d0d1b",
+          "name": "assert.equal(\n      (await call(\"/api/reviews/r\", String(attached.body.token))).status,\n      200,\n    )",
+          "occurrences": [
+            {
+              "canonicalId": "497b43512990ac6076155d4c32d792849d52b15426193a256452fea82e602010",
+              "anchor": {
+                "repository": "scottchu/pr-reviewer",
+                "side": "base",
+                "commit": "b096826e31c0927190806de91ed70b8b64aa93d8",
+                "path": "tests/gateway.test.ts",
+                "contentHash": "21df294a4bcbdeadcabb3a0767e252fdaef5fe2fc371ea63bb3ab62071cb97d3",
+                "start": 2063,
+                "end": 2167,
+                "startLine": 61,
+                "endLine": 64
+              }
+            },
+            {
+              "canonicalId": "ed21bfa20bc8e2c21e9dc7035a9519405ca227d050967f86eeae3b49cfb9355b",
+              "anchor": {
+                "repository": "scottchu/pr-reviewer",
+                "side": "head",
+                "commit": "e3b270e5f49a9215452b0b86702946043e979059",
+                "path": "tests/gateway.test.ts",
+                "contentHash": "13e7db6e38670e876795a150587bb6e5a441548915fb37f67ff0a80563953158",
+                "start": 2063,
+                "end": 2167,
+                "startLine": 61,
+                "endLine": 64
+              }
+            }
+          ],
+          "contains": {
+            "id": "unit:9ffcde535781ff7d3f8b431fd66c8c431984ea7b33b37b579c7269e449712366:contains:unit:b8325e8d6e45abce5bc84f3331be177c8198f45f2976af0d52c5467dc79d0d1b",
+            "from": "unit:9ffcde535781ff7d3f8b431fd66c8c431984ea7b33b37b579c7269e449712366",
+            "to": "unit:b8325e8d6e45abce5bc84f3331be177c8198f45f2976af0d52c5467dc79d0d1b",
+            "version": "comparison",
+            "relation": "contains",
+            "data": {
+              "comparisonStatus": "no change",
+              "sourceEvidence": [
+                {
+                  "repository": "scottchu/pr-reviewer",
+                  "side": "base",
+                  "commit": "b096826e31c0927190806de91ed70b8b64aa93d8",
+                  "path": "tests/gateway.test.ts",
+                  "contentHash": "21df294a4bcbdeadcabb3a0767e252fdaef5fe2fc371ea63bb3ab62071cb97d3",
+                  "start": 2063,
+                  "end": 2167,
+                  "startLine": 61,
+                  "endLine": 64
+                },
+                {
+                  "repository": "scottchu/pr-reviewer",
+                  "side": "head",
+                  "commit": "e3b270e5f49a9215452b0b86702946043e979059",
+                  "path": "tests/gateway.test.ts",
+                  "contentHash": "13e7db6e38670e876795a150587bb6e5a441548915fb37f67ff0a80563953158",
+                  "start": 2063,
+                  "end": 2167,
+                  "startLine": 61,
+                  "endLine": 64
+                }
+              ]
+            }
+          }
+        },
+        {
+          "id": "unit:76c7a57d43656ad669f7761ad12fcaa4d2bb9c5aac296fd6224179a76a23eeee",
+          "name": "assert.equal(\n      (await call(\"/api/inbox?limit=1000\", String(attached.body.token))).status,\n      400,\n    )",
+          "occurrences": [
+            {
+              "canonicalId": "32be68b3d66ab7d80c9ab8d81bbc6ee69b69440dd91979bd34c97fc4c1eaec86",
+              "anchor": {
+                "repository": "scottchu/pr-reviewer",
+                "side": "base",
+                "commit": "b096826e31c0927190806de91ed70b8b64aa93d8",
+                "path": "tests/gateway.test.ts",
+                "contentHash": "21df294a4bcbdeadcabb3a0767e252fdaef5fe2fc371ea63bb3ab62071cb97d3",
+                "start": 2173,
+                "end": 2284,
+                "startLine": 65,
+                "endLine": 68
+              }
+            },
+            {
+              "canonicalId": "d3c68d78715148b9d345f791c77c88dcb929d191c033eb3525606eb82f3ac071",
+              "anchor": {
+                "repository": "scottchu/pr-reviewer",
+                "side": "head",
+                "commit": "e3b270e5f49a9215452b0b86702946043e979059",
+                "path": "tests/gateway.test.ts",
+                "contentHash": "13e7db6e38670e876795a150587bb6e5a441548915fb37f67ff0a80563953158",
+                "start": 2173,
+                "end": 2284,
+                "startLine": 65,
+                "endLine": 68
+              }
+            }
+          ],
+          "contains": {
+            "id": "unit:9ffcde535781ff7d3f8b431fd66c8c431984ea7b33b37b579c7269e449712366:contains:unit:76c7a57d43656ad669f7761ad12fcaa4d2bb9c5aac296fd6224179a76a23eeee",
+            "from": "unit:9ffcde535781ff7d3f8b431fd66c8c431984ea7b33b37b579c7269e449712366",
+            "to": "unit:76c7a57d43656ad669f7761ad12fcaa4d2bb9c5aac296fd6224179a76a23eeee",
+            "version": "comparison",
+            "relation": "contains",
+            "data": {
+              "comparisonStatus": "no change",
+              "sourceEvidence": [
+                {
+                  "repository": "scottchu/pr-reviewer",
+                  "side": "base",
+                  "commit": "b096826e31c0927190806de91ed70b8b64aa93d8",
+                  "path": "tests/gateway.test.ts",
+                  "contentHash": "21df294a4bcbdeadcabb3a0767e252fdaef5fe2fc371ea63bb3ab62071cb97d3",
+                  "start": 2173,
+                  "end": 2284,
+                  "startLine": 65,
+                  "endLine": 68
+                },
+                {
+                  "repository": "scottchu/pr-reviewer",
+                  "side": "head",
+                  "commit": "e3b270e5f49a9215452b0b86702946043e979059",
+                  "path": "tests/gateway.test.ts",
+                  "contentHash": "13e7db6e38670e876795a150587bb6e5a441548915fb37f67ff0a80563953158",
+                  "start": 2173,
+                  "end": 2284,
+                  "startLine": 65,
+                  "endLine": 68
+                }
+              ]
+            }
+          }
+        },
+        {
+          "id": "unit:ea3b3c49e920433c47deb5bea63af38e6e8b641c50e46f51f5aa95ab433fa945",
+          "name": "assert.deepEqual(gateway.diagnostics(), [])",
+          "occurrences": [
+            {
+              "canonicalId": "f1a0fa1d9aa4760e2ff1c7955e6bb0fade967c8eb51911afc1c3f7398e3d6d36",
+              "anchor": {
+                "repository": "scottchu/pr-reviewer",
+                "side": "base",
+                "commit": "b096826e31c0927190806de91ed70b8b64aa93d8",
+                "path": "tests/gateway.test.ts",
+                "contentHash": "21df294a4bcbdeadcabb3a0767e252fdaef5fe2fc371ea63bb3ab62071cb97d3",
+                "start": 2331,
+                "end": 2374,
+                "startLine": 71,
+                "endLine": 71
+              }
+            },
+            {
+              "canonicalId": "de83207c1c14441ca72508727f2e9bd29a9b5c2db58203f8f6ff98b0affae078",
+              "anchor": {
+                "repository": "scottchu/pr-reviewer",
+                "side": "head",
+                "commit": "e3b270e5f49a9215452b0b86702946043e979059",
+                "path": "tests/gateway.test.ts",
+                "contentHash": "13e7db6e38670e876795a150587bb6e5a441548915fb37f67ff0a80563953158",
+                "start": 2331,
+                "end": 2374,
+                "startLine": 71,
+                "endLine": 71
+              }
+            }
+          ],
+          "contains": {
+            "id": "unit:9ffcde535781ff7d3f8b431fd66c8c431984ea7b33b37b579c7269e449712366:contains:unit:ea3b3c49e920433c47deb5bea63af38e6e8b641c50e46f51f5aa95ab433fa945",
+            "from": "unit:9ffcde535781ff7d3f8b431fd66c8c431984ea7b33b37b579c7269e449712366",
+            "to": "unit:ea3b3c49e920433c47deb5bea63af38e6e8b641c50e46f51f5aa95ab433fa945",
+            "version": "comparison",
+            "relation": "contains",
+            "data": {
+              "comparisonStatus": "no change",
+              "sourceEvidence": [
+                {
+                  "repository": "scottchu/pr-reviewer",
+                  "side": "base",
+                  "commit": "b096826e31c0927190806de91ed70b8b64aa93d8",
+                  "path": "tests/gateway.test.ts",
+                  "contentHash": "21df294a4bcbdeadcabb3a0767e252fdaef5fe2fc371ea63bb3ab62071cb97d3",
+                  "start": 2331,
+                  "end": 2374,
+                  "startLine": 71,
+                  "endLine": 71
+                },
+                {
+                  "repository": "scottchu/pr-reviewer",
+                  "side": "head",
+                  "commit": "e3b270e5f49a9215452b0b86702946043e979059",
+                  "path": "tests/gateway.test.ts",
+                  "contentHash": "13e7db6e38670e876795a150587bb6e5a441548915fb37f67ff0a80563953158",
+                  "start": 2331,
+                  "end": 2374,
+                  "startLine": 71,
+                  "endLine": 71
+                }
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "id": "unit:a32dc8bd755e21903ee2ee2ef08c4aa93b87964203b62c456202003ebf4c0a3b",
+      "name": "history HTTP admits verified bounded large manifest, rejects oversized encoded request and preserves historical question source",
+      "status": "no change",
+      "occurrences": [
+        {
+          "canonicalId": "82a655b81db95eeb36647ddb3fb01238fd1bd61527111e87c970dac2b76671ea",
+          "anchor": {
+            "repository": "scottchu/pr-reviewer",
+            "side": "base",
+            "commit": "b096826e31c0927190806de91ed70b8b64aa93d8",
+            "path": "tests/gateway.test.ts",
+            "contentHash": "21df294a4bcbdeadcabb3a0767e252fdaef5fe2fc371ea63bb3ab62071cb97d3",
+            "start": 2455,
+            "end": 5737,
+            "startLine": 77,
+            "endLine": 87
+          }
+        },
+        {
+          "canonicalId": "b45d17eb357a2e035a38d177c3d971ea4c661eaae29282f0563942bd2c964bb2",
+          "anchor": {
+            "repository": "scottchu/pr-reviewer",
+            "side": "head",
+            "commit": "e3b270e5f49a9215452b0b86702946043e979059",
+            "path": "tests/gateway.test.ts",
+            "contentHash": "13e7db6e38670e876795a150587bb6e5a441548915fb37f67ff0a80563953158",
+            "start": 2455,
+            "end": 5737,
+            "startLine": 77,
+            "endLine": 87
+          }
+        }
+      ],
+      "directReferences": [
+        {
+          "side": "base",
+          "commit": "b096826e31c0927190806de91ed70b8b64aa93d8",
+          "path": "tests/gateway.test.ts",
+          "line": 81
+        },
+        {
+          "side": "head",
+          "commit": "e3b270e5f49a9215452b0b86702946043e979059",
+          "path": "tests/gateway.test.ts",
+          "line": 81
+        }
+      ],
+      "assertions": [
+        {
+          "id": "unit:c0d481e1f821d8d7a232b64e0153f97ce7d2d411eeaecc05e921f679fe6eb93f",
+          "name": "assert.equal(admitted.body.state,'applied')",
+          "occurrences": [
+            {
+              "canonicalId": "fbb7816220b63691f1332cf289182f39ae2ebc917189665edee7a110b227bff6",
+              "anchor": {
+                "repository": "scottchu/pr-reviewer",
+                "side": "base",
+                "commit": "b096826e31c0927190806de91ed70b8b64aa93d8",
+                "path": "tests/gateway.test.ts",
+                "contentHash": "21df294a4bcbdeadcabb3a0767e252fdaef5fe2fc371ea63bb3ab62071cb97d3",
+                "start": 4866,
+                "end": 4909,
+                "startLine": 84,
+                "endLine": 84
+              }
+            },
+            {
+              "canonicalId": "bf6555a26f936681923151df48c7389351a13e66ffe3a253c10b95d94071b223",
+              "anchor": {
+                "repository": "scottchu/pr-reviewer",
+                "side": "head",
+                "commit": "e3b270e5f49a9215452b0b86702946043e979059",
+                "path": "tests/gateway.test.ts",
+                "contentHash": "13e7db6e38670e876795a150587bb6e5a441548915fb37f67ff0a80563953158",
+                "start": 4866,
+                "end": 4909,
+                "startLine": 84,
+                "endLine": 84
+              }
+            }
+          ],
+          "contains": {
+            "id": "unit:a32dc8bd755e21903ee2ee2ef08c4aa93b87964203b62c456202003ebf4c0a3b:contains:unit:c0d481e1f821d8d7a232b64e0153f97ce7d2d411eeaecc05e921f679fe6eb93f",
+            "from": "unit:a32dc8bd755e21903ee2ee2ef08c4aa93b87964203b62c456202003ebf4c0a3b",
+            "to": "unit:c0d481e1f821d8d7a232b64e0153f97ce7d2d411eeaecc05e921f679fe6eb93f",
+            "version": "comparison",
+            "relation": "contains",
+            "data": {
+              "comparisonStatus": "no change",
+              "sourceEvidence": [
+                {
+                  "repository": "scottchu/pr-reviewer",
+                  "side": "base",
+                  "commit": "b096826e31c0927190806de91ed70b8b64aa93d8",
+                  "path": "tests/gateway.test.ts",
+                  "contentHash": "21df294a4bcbdeadcabb3a0767e252fdaef5fe2fc371ea63bb3ab62071cb97d3",
+                  "start": 4866,
+                  "end": 4909,
+                  "startLine": 84,
+                  "endLine": 84
+                },
+                {
+                  "repository": "scottchu/pr-reviewer",
+                  "side": "head",
+                  "commit": "e3b270e5f49a9215452b0b86702946043e979059",
+                  "path": "tests/gateway.test.ts",
+                  "contentHash": "13e7db6e38670e876795a150587bb6e5a441548915fb37f67ff0a80563953158",
+                  "start": 4866,
+                  "end": 4909,
+                  "startLine": 84,
+                  "endLine": 84
+                }
+              ]
+            }
+          }
+        },
+        {
+          "id": "unit:5bb80b30bfa645139b3323a6384fccde474383ebbce9b3f4ab15e8e9caff60fb",
+          "name": "assert.equal((await request(`/api/reviews/r?snapshotId=${old.snapshotId}`)).status,200)",
+          "occurrences": [
+            {
+              "canonicalId": "fccc52e19ae5b6c00cab19e97ea5e761b99e4524b4715877912263576010a56e",
+              "anchor": {
+                "repository": "scottchu/pr-reviewer",
+                "side": "base",
+                "commit": "b096826e31c0927190806de91ed70b8b64aa93d8",
+                "path": "tests/gateway.test.ts",
+                "contentHash": "21df294a4bcbdeadcabb3a0767e252fdaef5fe2fc371ea63bb3ab62071cb97d3",
+                "start": 4910,
+                "end": 4997,
+                "startLine": 84,
+                "endLine": 84
+              }
+            },
+            {
+              "canonicalId": "6d9fe2ea7675508f40b5c3cb095637317194b5eda76d9ab1232529bf3b735bac",
+              "anchor": {
+                "repository": "scottchu/pr-reviewer",
+                "side": "head",
+                "commit": "e3b270e5f49a9215452b0b86702946043e979059",
+                "path": "tests/gateway.test.ts",
+                "contentHash": "13e7db6e38670e876795a150587bb6e5a441548915fb37f67ff0a80563953158",
+                "start": 4910,
+                "end": 4997,
+                "startLine": 84,
+                "endLine": 84
+              }
+            }
+          ],
+          "contains": {
+            "id": "unit:a32dc8bd755e21903ee2ee2ef08c4aa93b87964203b62c456202003ebf4c0a3b:contains:unit:5bb80b30bfa645139b3323a6384fccde474383ebbce9b3f4ab15e8e9caff60fb",
+            "from": "unit:a32dc8bd755e21903ee2ee2ef08c4aa93b87964203b62c456202003ebf4c0a3b",
+            "to": "unit:5bb80b30bfa645139b3323a6384fccde474383ebbce9b3f4ab15e8e9caff60fb",
+            "version": "comparison",
+            "relation": "contains",
+            "data": {
+              "comparisonStatus": "no change",
+              "sourceEvidence": [
+                {
+                  "repository": "scottchu/pr-reviewer",
+                  "side": "base",
+                  "commit": "b096826e31c0927190806de91ed70b8b64aa93d8",
+                  "path": "tests/gateway.test.ts",
+                  "contentHash": "21df294a4bcbdeadcabb3a0767e252fdaef5fe2fc371ea63bb3ab62071cb97d3",
+                  "start": 4910,
+                  "end": 4997,
+                  "startLine": 84,
+                  "endLine": 84
+                },
+                {
+                  "repository": "scottchu/pr-reviewer",
+                  "side": "head",
+                  "commit": "e3b270e5f49a9215452b0b86702946043e979059",
+                  "path": "tests/gateway.test.ts",
+                  "contentHash": "13e7db6e38670e876795a150587bb6e5a441548915fb37f67ff0a80563953158",
+                  "start": 4910,
+                  "end": 4997,
+                  "startLine": 84,
+                  "endLine": 84
+                }
+              ]
+            }
+          }
+        },
+        {
+          "id": "unit:1bc2634fc0812e090f51271b7b3f39109ed65ad84d01c41860222d6af25fc325",
+          "name": "assert.equal((read.body.snapshot as {snapshotId:string}).snapshotId,old.snapshotId)",
+          "occurrences": [
+            {
+              "canonicalId": "4777472360efa5f927beb471af9959184624bac7b763bb6517e22bb2af21360a",
+              "anchor": {
+                "repository": "scottchu/pr-reviewer",
+                "side": "base",
+                "commit": "b096826e31c0927190806de91ed70b8b64aa93d8",
+                "path": "tests/gateway.test.ts",
+                "contentHash": "21df294a4bcbdeadcabb3a0767e252fdaef5fe2fc371ea63bb3ab62071cb97d3",
+                "start": 5090,
+                "end": 5173,
+                "startLine": 84,
+                "endLine": 84
+              }
+            },
+            {
+              "canonicalId": "8438269a9d81e5ed668cf427db1aa50159266da17a355bec7ef861f530326ac7",
+              "anchor": {
+                "repository": "scottchu/pr-reviewer",
+                "side": "head",
+                "commit": "e3b270e5f49a9215452b0b86702946043e979059",
+                "path": "tests/gateway.test.ts",
+                "contentHash": "13e7db6e38670e876795a150587bb6e5a441548915fb37f67ff0a80563953158",
+                "start": 5090,
+                "end": 5173,
+                "startLine": 84,
+                "endLine": 84
+              }
+            }
+          ],
+          "contains": {
+            "id": "unit:a32dc8bd755e21903ee2ee2ef08c4aa93b87964203b62c456202003ebf4c0a3b:contains:unit:1bc2634fc0812e090f51271b7b3f39109ed65ad84d01c41860222d6af25fc325",
+            "from": "unit:a32dc8bd755e21903ee2ee2ef08c4aa93b87964203b62c456202003ebf4c0a3b",
+            "to": "unit:1bc2634fc0812e090f51271b7b3f39109ed65ad84d01c41860222d6af25fc325",
+            "version": "comparison",
+            "relation": "contains",
+            "data": {
+              "comparisonStatus": "no change",
+              "sourceEvidence": [
+                {
+                  "repository": "scottchu/pr-reviewer",
+                  "side": "base",
+                  "commit": "b096826e31c0927190806de91ed70b8b64aa93d8",
+                  "path": "tests/gateway.test.ts",
+                  "contentHash": "21df294a4bcbdeadcabb3a0767e252fdaef5fe2fc371ea63bb3ab62071cb97d3",
+                  "start": 5090,
+                  "end": 5173,
+                  "startLine": 84,
+                  "endLine": 84
+                },
+                {
+                  "repository": "scottchu/pr-reviewer",
+                  "side": "head",
+                  "commit": "e3b270e5f49a9215452b0b86702946043e979059",
+                  "path": "tests/gateway.test.ts",
+                  "contentHash": "13e7db6e38670e876795a150587bb6e5a441548915fb37f67ff0a80563953158",
+                  "start": 5090,
+                  "end": 5173,
+                  "startLine": 84,
+                  "endLine": 84
+                }
+              ]
+            }
+          }
+        },
+        {
+          "id": "unit:4d570e226b724a9c36d1eda040af6c25195b88471a910c884f6a217e8e66d904",
+          "name": "assert.equal(oversized.status,400)",
+          "occurrences": [
+            {
+              "canonicalId": "8bc93844d75d866256715c5a9d26e34159491d9885ee03fbc41f1b9f15989e09",
+              "anchor": {
+                "repository": "scottchu/pr-reviewer",
+                "side": "base",
+                "commit": "b096826e31c0927190806de91ed70b8b64aa93d8",
+                "path": "tests/gateway.test.ts",
+                "contentHash": "21df294a4bcbdeadcabb3a0767e252fdaef5fe2fc371ea63bb3ab62071cb97d3",
+                "start": 5334,
+                "end": 5368,
+                "startLine": 85,
+                "endLine": 85
+              }
+            },
+            {
+              "canonicalId": "9c42474152d09483ab6e88c65fd0d523f01400fd109519884d75ebc93b3032d4",
+              "anchor": {
+                "repository": "scottchu/pr-reviewer",
+                "side": "head",
+                "commit": "e3b270e5f49a9215452b0b86702946043e979059",
+                "path": "tests/gateway.test.ts",
+                "contentHash": "13e7db6e38670e876795a150587bb6e5a441548915fb37f67ff0a80563953158",
+                "start": 5334,
+                "end": 5368,
+                "startLine": 85,
+                "endLine": 85
+              }
+            }
+          ],
+          "contains": {
+            "id": "unit:a32dc8bd755e21903ee2ee2ef08c4aa93b87964203b62c456202003ebf4c0a3b:contains:unit:4d570e226b724a9c36d1eda040af6c25195b88471a910c884f6a217e8e66d904",
+            "from": "unit:a32dc8bd755e21903ee2ee2ef08c4aa93b87964203b62c456202003ebf4c0a3b",
+            "to": "unit:4d570e226b724a9c36d1eda040af6c25195b88471a910c884f6a217e8e66d904",
+            "version": "comparison",
+            "relation": "contains",
+            "data": {
+              "comparisonStatus": "no change",
+              "sourceEvidence": [
+                {
+                  "repository": "scottchu/pr-reviewer",
+                  "side": "base",
+                  "commit": "b096826e31c0927190806de91ed70b8b64aa93d8",
+                  "path": "tests/gateway.test.ts",
+                  "contentHash": "21df294a4bcbdeadcabb3a0767e252fdaef5fe2fc371ea63bb3ab62071cb97d3",
+                  "start": 5334,
+                  "end": 5368,
+                  "startLine": 85,
+                  "endLine": 85
+                },
+                {
+                  "repository": "scottchu/pr-reviewer",
+                  "side": "head",
+                  "commit": "e3b270e5f49a9215452b0b86702946043e979059",
+                  "path": "tests/gateway.test.ts",
+                  "contentHash": "13e7db6e38670e876795a150587bb6e5a441548915fb37f67ff0a80563953158",
+                  "start": 5334,
+                  "end": 5368,
+                  "startLine": 85,
+                  "endLine": 85
+                }
+              ]
+            }
+          }
+        },
+        {
+          "id": "unit:13951534ef9cd58278b304ec011f73fe507f12833fcff6a417faba925535f0a5",
+          "name": "assert.equal(oversized.body.error,'invalid_request')",
+          "occurrences": [
+            {
+              "canonicalId": "7c0612b073f2e606b6287961fcc8cddb7292efd9307e776cf3bcf1959794e4fc",
+              "anchor": {
+                "repository": "scottchu/pr-reviewer",
+                "side": "base",
+                "commit": "b096826e31c0927190806de91ed70b8b64aa93d8",
+                "path": "tests/gateway.test.ts",
+                "contentHash": "21df294a4bcbdeadcabb3a0767e252fdaef5fe2fc371ea63bb3ab62071cb97d3",
+                "start": 5369,
+                "end": 5421,
+                "startLine": 85,
+                "endLine": 85
+              }
+            },
+            {
+              "canonicalId": "ea1678cbac12a06aef42dd6b039ab2c66c928fc839071038e47f1461474e5081",
+              "anchor": {
+                "repository": "scottchu/pr-reviewer",
+                "side": "head",
+                "commit": "e3b270e5f49a9215452b0b86702946043e979059",
+                "path": "tests/gateway.test.ts",
+                "contentHash": "13e7db6e38670e876795a150587bb6e5a441548915fb37f67ff0a80563953158",
+                "start": 5369,
+                "end": 5421,
+                "startLine": 85,
+                "endLine": 85
+              }
+            }
+          ],
+          "contains": {
+            "id": "unit:a32dc8bd755e21903ee2ee2ef08c4aa93b87964203b62c456202003ebf4c0a3b:contains:unit:13951534ef9cd58278b304ec011f73fe507f12833fcff6a417faba925535f0a5",
+            "from": "unit:a32dc8bd755e21903ee2ee2ef08c4aa93b87964203b62c456202003ebf4c0a3b",
+            "to": "unit:13951534ef9cd58278b304ec011f73fe507f12833fcff6a417faba925535f0a5",
+            "version": "comparison",
+            "relation": "contains",
+            "data": {
+              "comparisonStatus": "no change",
+              "sourceEvidence": [
+                {
+                  "repository": "scottchu/pr-reviewer",
+                  "side": "base",
+                  "commit": "b096826e31c0927190806de91ed70b8b64aa93d8",
+                  "path": "tests/gateway.test.ts",
+                  "contentHash": "21df294a4bcbdeadcabb3a0767e252fdaef5fe2fc371ea63bb3ab62071cb97d3",
+                  "start": 5369,
+                  "end": 5421,
+                  "startLine": 85,
+                  "endLine": 85
+                },
+                {
+                  "repository": "scottchu/pr-reviewer",
+                  "side": "head",
+                  "commit": "e3b270e5f49a9215452b0b86702946043e979059",
+                  "path": "tests/gateway.test.ts",
+                  "contentHash": "13e7db6e38670e876795a150587bb6e5a441548915fb37f67ff0a80563953158",
+                  "start": 5369,
+                  "end": 5421,
+                  "startLine": 85,
+                  "endLine": 85
+                }
+              ]
+            }
+          }
+        },
+        {
+          "id": "unit:dacb59c4f629fa99eef9440ba66c833aa0a83c963ef7cece92a7da0b7c77d628",
+          "name": "assert.equal(store.review(owner,'r').currentSnapshotId,next.snapshotId)",
+          "occurrences": [
+            {
+              "canonicalId": "2b9f8ed930cc31c0dd978695c5db2ce5688815f1cd64b6ebf3a76799263ea159",
+              "anchor": {
+                "repository": "scottchu/pr-reviewer",
+                "side": "base",
+                "commit": "b096826e31c0927190806de91ed70b8b64aa93d8",
+                "path": "tests/gateway.test.ts",
+                "contentHash": "21df294a4bcbdeadcabb3a0767e252fdaef5fe2fc371ea63bb3ab62071cb97d3",
+                "start": 5422,
+                "end": 5493,
+                "startLine": 85,
+                "endLine": 85
+              }
+            },
+            {
+              "canonicalId": "908cbce522fc8379e0a9d11a0f364b4a4adc0d4465d76a69875f1b70c4b3deb2",
+              "anchor": {
+                "repository": "scottchu/pr-reviewer",
+                "side": "head",
+                "commit": "e3b270e5f49a9215452b0b86702946043e979059",
+                "path": "tests/gateway.test.ts",
+                "contentHash": "13e7db6e38670e876795a150587bb6e5a441548915fb37f67ff0a80563953158",
+                "start": 5422,
+                "end": 5493,
+                "startLine": 85,
+                "endLine": 85
+              }
+            }
+          ],
+          "contains": {
+            "id": "unit:a32dc8bd755e21903ee2ee2ef08c4aa93b87964203b62c456202003ebf4c0a3b:contains:unit:dacb59c4f629fa99eef9440ba66c833aa0a83c963ef7cece92a7da0b7c77d628",
+            "from": "unit:a32dc8bd755e21903ee2ee2ef08c4aa93b87964203b62c456202003ebf4c0a3b",
+            "to": "unit:dacb59c4f629fa99eef9440ba66c833aa0a83c963ef7cece92a7da0b7c77d628",
+            "version": "comparison",
+            "relation": "contains",
+            "data": {
+              "comparisonStatus": "no change",
+              "sourceEvidence": [
+                {
+                  "repository": "scottchu/pr-reviewer",
+                  "side": "base",
+                  "commit": "b096826e31c0927190806de91ed70b8b64aa93d8",
+                  "path": "tests/gateway.test.ts",
+                  "contentHash": "21df294a4bcbdeadcabb3a0767e252fdaef5fe2fc371ea63bb3ab62071cb97d3",
+                  "start": 5422,
+                  "end": 5493,
+                  "startLine": 85,
+                  "endLine": 85
+                },
+                {
+                  "repository": "scottchu/pr-reviewer",
+                  "side": "head",
+                  "commit": "e3b270e5f49a9215452b0b86702946043e979059",
+                  "path": "tests/gateway.test.ts",
+                  "contentHash": "13e7db6e38670e876795a150587bb6e5a441548915fb37f67ff0a80563953158",
+                  "start": 5422,
+                  "end": 5493,
+                  "startLine": 85,
+                  "endLine": 85
+                }
+              ]
+            }
+          }
+        },
+        {
+          "id": "unit:5e0f0eba1808fd582c8c56f6b78ce16dc86f883dae0df885b836a563da6c3b4d",
+          "name": "assert.equal(store.review(owner,'r').snapshotSummaries?.length,2)",
+          "occurrences": [
+            {
+              "canonicalId": "775ca0831b2716ac0444f0f646cfbecd70abcbcf7980749f0c7497b2979121bb",
+              "anchor": {
+                "repository": "scottchu/pr-reviewer",
+                "side": "base",
+                "commit": "b096826e31c0927190806de91ed70b8b64aa93d8",
+                "path": "tests/gateway.test.ts",
+                "contentHash": "21df294a4bcbdeadcabb3a0767e252fdaef5fe2fc371ea63bb3ab62071cb97d3",
+                "start": 5494,
+                "end": 5559,
+                "startLine": 85,
+                "endLine": 85
+              }
+            },
+            {
+              "canonicalId": "adb06dc119fa4eb55297b92f3ed5dadbe097434d26e8b4ba37fe16c1430f678e",
+              "anchor": {
+                "repository": "scottchu/pr-reviewer",
+                "side": "head",
+                "commit": "e3b270e5f49a9215452b0b86702946043e979059",
+                "path": "tests/gateway.test.ts",
+                "contentHash": "13e7db6e38670e876795a150587bb6e5a441548915fb37f67ff0a80563953158",
+                "start": 5494,
+                "end": 5559,
+                "startLine": 85,
+                "endLine": 85
+              }
+            }
+          ],
+          "contains": {
+            "id": "unit:a32dc8bd755e21903ee2ee2ef08c4aa93b87964203b62c456202003ebf4c0a3b:contains:unit:5e0f0eba1808fd582c8c56f6b78ce16dc86f883dae0df885b836a563da6c3b4d",
+            "from": "unit:a32dc8bd755e21903ee2ee2ef08c4aa93b87964203b62c456202003ebf4c0a3b",
+            "to": "unit:5e0f0eba1808fd582c8c56f6b78ce16dc86f883dae0df885b836a563da6c3b4d",
+            "version": "comparison",
+            "relation": "contains",
+            "data": {
+              "comparisonStatus": "no change",
+              "sourceEvidence": [
+                {
+                  "repository": "scottchu/pr-reviewer",
+                  "side": "base",
+                  "commit": "b096826e31c0927190806de91ed70b8b64aa93d8",
+                  "path": "tests/gateway.test.ts",
+                  "contentHash": "21df294a4bcbdeadcabb3a0767e252fdaef5fe2fc371ea63bb3ab62071cb97d3",
+                  "start": 5494,
+                  "end": 5559,
+                  "startLine": 85,
+                  "endLine": 85
+                },
+                {
+                  "repository": "scottchu/pr-reviewer",
+                  "side": "head",
+                  "commit": "e3b270e5f49a9215452b0b86702946043e979059",
+                  "path": "tests/gateway.test.ts",
+                  "contentHash": "13e7db6e38670e876795a150587bb6e5a441548915fb37f67ff0a80563953158",
+                  "start": 5494,
+                  "end": 5559,
+                  "startLine": 85,
+                  "endLine": 85
+                }
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "id": "unit:b0d9aa89a529131430ad18d6bb441c4f6a8f71dfc1d2a7a12269f4fe35507d72",
+      "name": "single local owner reads and writes without a Bearer while explicit invalid credentials never escalate",
+      "status": "add",
+      "occurrences": [
+        {
+          "canonicalId": "cc3c08556030b281715422da01dcdaccf8c414004c8e66fa183ff66ed6ba7df3",
+          "anchor": {
+            "repository": "scottchu/pr-reviewer",
+            "side": "head",
+            "commit": "e3b270e5f49a9215452b0b86702946043e979059",
+            "path": "tests/gateway.test.ts",
+            "contentHash": "13e7db6e38670e876795a150587bb6e5a441548915fb37f67ff0a80563953158",
+            "start": 5816,
+            "end": 9025,
+            "startLine": 90,
+            "endLine": 114
+          }
+        }
+      ],
+      "directReferences": [
+        {
+          "side": "head",
+          "commit": "e3b270e5f49a9215452b0b86702946043e979059",
+          "path": "tests/gateway.test.ts",
+          "line": 96
+        }
+      ],
+      "assertions": [
+        {
+          "id": "unit:c7f5b9fcf2dc5deb2f096aa15e7d76702c582de0323b3bffa36cc0a9c81c6a3c",
+          "name": "assert.deepEqual((await call('/api/self')).body,{kind:'user',actorId:'local-user'})",
+          "occurrences": [
+            {
+              "canonicalId": "e634b4206beee0cccf3d6611e47bef732d40c5190dfc9e404f1e508d5ba1a4a7",
+              "anchor": {
+                "repository": "scottchu/pr-reviewer",
+                "side": "head",
+                "commit": "e3b270e5f49a9215452b0b86702946043e979059",
+                "path": "tests/gateway.test.ts",
+                "contentHash": "13e7db6e38670e876795a150587bb6e5a441548915fb37f67ff0a80563953158",
+                "start": 7154,
+                "end": 7237,
+                "startLine": 99,
+                "endLine": 99
+              }
+            }
+          ],
+          "contains": {
+            "id": "unit:b0d9aa89a529131430ad18d6bb441c4f6a8f71dfc1d2a7a12269f4fe35507d72:contains:unit:c7f5b9fcf2dc5deb2f096aa15e7d76702c582de0323b3bffa36cc0a9c81c6a3c",
+            "from": "unit:b0d9aa89a529131430ad18d6bb441c4f6a8f71dfc1d2a7a12269f4fe35507d72",
+            "to": "unit:c7f5b9fcf2dc5deb2f096aa15e7d76702c582de0323b3bffa36cc0a9c81c6a3c",
+            "version": "after",
+            "relation": "contains",
+            "data": {
+              "sourceEvidence": [
+                {
+                  "repository": "scottchu/pr-reviewer",
+                  "side": "head",
+                  "commit": "e3b270e5f49a9215452b0b86702946043e979059",
+                  "path": "tests/gateway.test.ts",
+                  "contentHash": "13e7db6e38670e876795a150587bb6e5a441548915fb37f67ff0a80563953158",
+                  "start": 7154,
+                  "end": 7237,
+                  "startLine": 99,
+                  "endLine": 99
+                }
+              ]
+            }
+          }
+        },
+        {
+          "id": "unit:6b4dccb52eb7a56ef6b851ccaeccf70b83afb7c563a1670001bfd59d6c273081",
+          "name": "assert.equal((await call('/api/reviews')).status,200)",
+          "occurrences": [
+            {
+              "canonicalId": "0b8d7f7d80bc4e1bd2e0e68e0df9a0637998f1db941110a33baecc9eab91cb93",
+              "anchor": {
+                "repository": "scottchu/pr-reviewer",
+                "side": "head",
+                "commit": "e3b270e5f49a9215452b0b86702946043e979059",
+                "path": "tests/gateway.test.ts",
+                "contentHash": "13e7db6e38670e876795a150587bb6e5a441548915fb37f67ff0a80563953158",
+                "start": 7241,
+                "end": 7294,
+                "startLine": 100,
+                "endLine": 100
+              }
+            }
+          ],
+          "contains": {
+            "id": "unit:b0d9aa89a529131430ad18d6bb441c4f6a8f71dfc1d2a7a12269f4fe35507d72:contains:unit:6b4dccb52eb7a56ef6b851ccaeccf70b83afb7c563a1670001bfd59d6c273081",
+            "from": "unit:b0d9aa89a529131430ad18d6bb441c4f6a8f71dfc1d2a7a12269f4fe35507d72",
+            "to": "unit:6b4dccb52eb7a56ef6b851ccaeccf70b83afb7c563a1670001bfd59d6c273081",
+            "version": "after",
+            "relation": "contains",
+            "data": {
+              "sourceEvidence": [
+                {
+                  "repository": "scottchu/pr-reviewer",
+                  "side": "head",
+                  "commit": "e3b270e5f49a9215452b0b86702946043e979059",
+                  "path": "tests/gateway.test.ts",
+                  "contentHash": "13e7db6e38670e876795a150587bb6e5a441548915fb37f67ff0a80563953158",
+                  "start": 7241,
+                  "end": 7294,
+                  "startLine": 100,
+                  "endLine": 100
+                }
+              ]
+            }
+          }
+        },
+        {
+          "id": "unit:fb9cbdc581addff0ddea871689d925029ca743c39d9512743e83282aaeea15de",
+          "name": "assert.equal((await call('/api/reviews/r')).status,200)",
+          "occurrences": [
+            {
+              "canonicalId": "93e07dea44342ef028e49e04d345421cdff695008dd0dab32e053265f8515b62",
+              "anchor": {
+                "repository": "scottchu/pr-reviewer",
+                "side": "head",
+                "commit": "e3b270e5f49a9215452b0b86702946043e979059",
+                "path": "tests/gateway.test.ts",
+                "contentHash": "13e7db6e38670e876795a150587bb6e5a441548915fb37f67ff0a80563953158",
+                "start": 7295,
+                "end": 7350,
+                "startLine": 100,
+                "endLine": 100
+              }
+            }
+          ],
+          "contains": {
+            "id": "unit:b0d9aa89a529131430ad18d6bb441c4f6a8f71dfc1d2a7a12269f4fe35507d72:contains:unit:fb9cbdc581addff0ddea871689d925029ca743c39d9512743e83282aaeea15de",
+            "from": "unit:b0d9aa89a529131430ad18d6bb441c4f6a8f71dfc1d2a7a12269f4fe35507d72",
+            "to": "unit:fb9cbdc581addff0ddea871689d925029ca743c39d9512743e83282aaeea15de",
+            "version": "after",
+            "relation": "contains",
+            "data": {
+              "sourceEvidence": [
+                {
+                  "repository": "scottchu/pr-reviewer",
+                  "side": "head",
+                  "commit": "e3b270e5f49a9215452b0b86702946043e979059",
+                  "path": "tests/gateway.test.ts",
+                  "contentHash": "13e7db6e38670e876795a150587bb6e5a441548915fb37f67ff0a80563953158",
+                  "start": 7295,
+                  "end": 7350,
+                  "startLine": 100,
+                  "endLine": 100
+                }
+              ]
+            }
+          }
+        },
+        {
+          "id": "unit:cde4fc845f43499a43bd66f220080071683eb933aa3b284a40da6e9e65058a13",
+          "name": "assert.equal((await call('/api/analysis?reviewId=r&snapshotId=local-source')).status,200)",
+          "occurrences": [
+            {
+              "canonicalId": "a4fe8f7db0672a7c7b1439450bcf4ca8d31eb9dacbf63841047681f8166894b3",
+              "anchor": {
+                "repository": "scottchu/pr-reviewer",
+                "side": "head",
+                "commit": "e3b270e5f49a9215452b0b86702946043e979059",
+                "path": "tests/gateway.test.ts",
+                "contentHash": "13e7db6e38670e876795a150587bb6e5a441548915fb37f67ff0a80563953158",
+                "start": 7354,
+                "end": 7443,
+                "startLine": 101,
+                "endLine": 101
+              }
+            }
+          ],
+          "contains": {
+            "id": "unit:b0d9aa89a529131430ad18d6bb441c4f6a8f71dfc1d2a7a12269f4fe35507d72:contains:unit:cde4fc845f43499a43bd66f220080071683eb933aa3b284a40da6e9e65058a13",
+            "from": "unit:b0d9aa89a529131430ad18d6bb441c4f6a8f71dfc1d2a7a12269f4fe35507d72",
+            "to": "unit:cde4fc845f43499a43bd66f220080071683eb933aa3b284a40da6e9e65058a13",
+            "version": "after",
+            "relation": "contains",
+            "data": {
+              "sourceEvidence": [
+                {
+                  "repository": "scottchu/pr-reviewer",
+                  "side": "head",
+                  "commit": "e3b270e5f49a9215452b0b86702946043e979059",
+                  "path": "tests/gateway.test.ts",
+                  "contentHash": "13e7db6e38670e876795a150587bb6e5a441548915fb37f67ff0a80563953158",
+                  "start": 7354,
+                  "end": 7443,
+                  "startLine": 101,
+                  "endLine": 101
+                }
+              ]
+            }
+          }
+        },
+        {
+          "id": "unit:0f1b567b696c7ecd5d0d7fe1c8f4c739569bdf80a98bd13b08e323c22c5d12ad",
+          "name": "assert.equal((await call('/api/story?reviewId=r&snapshotId=local-source')).status,200)",
+          "occurrences": [
+            {
+              "canonicalId": "717fd70c1e6aa4d2fb10caf066f2a64555943dac081fec68c096b71bad916a9b",
+              "anchor": {
+                "repository": "scottchu/pr-reviewer",
+                "side": "head",
+                "commit": "e3b270e5f49a9215452b0b86702946043e979059",
+                "path": "tests/gateway.test.ts",
+                "contentHash": "13e7db6e38670e876795a150587bb6e5a441548915fb37f67ff0a80563953158",
+                "start": 7447,
+                "end": 7533,
+                "startLine": 102,
+                "endLine": 102
+              }
+            }
+          ],
+          "contains": {
+            "id": "unit:b0d9aa89a529131430ad18d6bb441c4f6a8f71dfc1d2a7a12269f4fe35507d72:contains:unit:0f1b567b696c7ecd5d0d7fe1c8f4c739569bdf80a98bd13b08e323c22c5d12ad",
+            "from": "unit:b0d9aa89a529131430ad18d6bb441c4f6a8f71dfc1d2a7a12269f4fe35507d72",
+            "to": "unit:0f1b567b696c7ecd5d0d7fe1c8f4c739569bdf80a98bd13b08e323c22c5d12ad",
+            "version": "after",
+            "relation": "contains",
+            "data": {
+              "sourceEvidence": [
+                {
+                  "repository": "scottchu/pr-reviewer",
+                  "side": "head",
+                  "commit": "e3b270e5f49a9215452b0b86702946043e979059",
+                  "path": "tests/gateway.test.ts",
+                  "contentHash": "13e7db6e38670e876795a150587bb6e5a441548915fb37f67ff0a80563953158",
+                  "start": 7447,
+                  "end": 7533,
+                  "startLine": 102,
+                  "endLine": 102
+                }
+              ]
+            }
+          }
+        },
+        {
+          "id": "unit:4cfba442c85e280f0208c18cd7875efbf3c224d0e047096a9f1f992e8e8b3a4c",
+          "name": "assert.equal((await call('/api/story/context?reviewId=r&snapshotId=local-source')).status,200)",
+          "occurrences": [
+            {
+              "canonicalId": "17bb72c177933c3382cef07deebc110cc34b59effc81d57432033a4047796bf5",
+              "anchor": {
+                "repository": "scottchu/pr-reviewer",
+                "side": "head",
+                "commit": "e3b270e5f49a9215452b0b86702946043e979059",
+                "path": "tests/gateway.test.ts",
+                "contentHash": "13e7db6e38670e876795a150587bb6e5a441548915fb37f67ff0a80563953158",
+                "start": 7537,
+                "end": 7631,
+                "startLine": 103,
+                "endLine": 103
+              }
+            }
+          ],
+          "contains": {
+            "id": "unit:b0d9aa89a529131430ad18d6bb441c4f6a8f71dfc1d2a7a12269f4fe35507d72:contains:unit:4cfba442c85e280f0208c18cd7875efbf3c224d0e047096a9f1f992e8e8b3a4c",
+            "from": "unit:b0d9aa89a529131430ad18d6bb441c4f6a8f71dfc1d2a7a12269f4fe35507d72",
+            "to": "unit:4cfba442c85e280f0208c18cd7875efbf3c224d0e047096a9f1f992e8e8b3a4c",
+            "version": "after",
+            "relation": "contains",
+            "data": {
+              "sourceEvidence": [
+                {
+                  "repository": "scottchu/pr-reviewer",
+                  "side": "head",
+                  "commit": "e3b270e5f49a9215452b0b86702946043e979059",
+                  "path": "tests/gateway.test.ts",
+                  "contentHash": "13e7db6e38670e876795a150587bb6e5a441548915fb37f67ff0a80563953158",
+                  "start": 7537,
+                  "end": 7631,
+                  "startLine": 103,
+                  "endLine": 103
+                }
+              ]
+            }
+          }
+        },
+        {
+          "id": "unit:7a6e24706fa24b129feeba1c0d50ef3e2859865de1e65716d3de7bf5be46ab57",
+          "name": "assert.equal(jobs.status,200)",
+          "occurrences": [
+            {
+              "canonicalId": "fb9d95406a9a89da0bce8a710016d5b0a7021fb2c8553578200de09b93cdac89",
+              "anchor": {
+                "repository": "scottchu/pr-reviewer",
+                "side": "head",
+                "commit": "e3b270e5f49a9215452b0b86702946043e979059",
+                "path": "tests/gateway.test.ts",
+                "contentHash": "13e7db6e38670e876795a150587bb6e5a441548915fb37f67ff0a80563953158",
+                "start": 7673,
+                "end": 7702,
+                "startLine": 104,
+                "endLine": 104
+              }
+            }
+          ],
+          "contains": {
+            "id": "unit:b0d9aa89a529131430ad18d6bb441c4f6a8f71dfc1d2a7a12269f4fe35507d72:contains:unit:7a6e24706fa24b129feeba1c0d50ef3e2859865de1e65716d3de7bf5be46ab57",
+            "from": "unit:b0d9aa89a529131430ad18d6bb441c4f6a8f71dfc1d2a7a12269f4fe35507d72",
+            "to": "unit:7a6e24706fa24b129feeba1c0d50ef3e2859865de1e65716d3de7bf5be46ab57",
+            "version": "after",
+            "relation": "contains",
+            "data": {
+              "sourceEvidence": [
+                {
+                  "repository": "scottchu/pr-reviewer",
+                  "side": "head",
+                  "commit": "e3b270e5f49a9215452b0b86702946043e979059",
+                  "path": "tests/gateway.test.ts",
+                  "contentHash": "13e7db6e38670e876795a150587bb6e5a441548915fb37f67ff0a80563953158",
+                  "start": 7673,
+                  "end": 7702,
+                  "startLine": 104,
+                  "endLine": 104
+                }
+              ]
+            }
+          }
+        },
+        {
+          "id": "unit:161d6def9097924a79f94446b630f3cc75ab93d68b49c9245beaab194216d87f",
+          "name": "assert.ok(job.jobId)",
+          "occurrences": [
+            {
+              "canonicalId": "27edee29b3616101aa109f722054623c4911787a76dc75e7d50b27d406dce724",
+              "anchor": {
+                "repository": "scottchu/pr-reviewer",
+                "side": "head",
+                "commit": "e3b270e5f49a9215452b0b86702946043e979059",
+                "path": "tests/gateway.test.ts",
+                "contentHash": "13e7db6e38670e876795a150587bb6e5a441548915fb37f67ff0a80563953158",
+                "start": 7760,
+                "end": 7780,
+                "startLine": 104,
+                "endLine": 104
+              }
+            }
+          ],
+          "contains": {
+            "id": "unit:b0d9aa89a529131430ad18d6bb441c4f6a8f71dfc1d2a7a12269f4fe35507d72:contains:unit:161d6def9097924a79f94446b630f3cc75ab93d68b49c9245beaab194216d87f",
+            "from": "unit:b0d9aa89a529131430ad18d6bb441c4f6a8f71dfc1d2a7a12269f4fe35507d72",
+            "to": "unit:161d6def9097924a79f94446b630f3cc75ab93d68b49c9245beaab194216d87f",
+            "version": "after",
+            "relation": "contains",
+            "data": {
+              "sourceEvidence": [
+                {
+                  "repository": "scottchu/pr-reviewer",
+                  "side": "head",
+                  "commit": "e3b270e5f49a9215452b0b86702946043e979059",
+                  "path": "tests/gateway.test.ts",
+                  "contentHash": "13e7db6e38670e876795a150587bb6e5a441548915fb37f67ff0a80563953158",
+                  "start": 7760,
+                  "end": 7780,
+                  "startLine": 104,
+                  "endLine": 104
+                }
+              ]
+            }
+          }
+        },
+        {
+          "id": "unit:14ebe67adfba9842f01b673f98915f9a916bf5b585867d49912373226bb607c4",
+          "name": "assert.equal((await call('/api/imports/commands',{type:'RequestImport',commandId:'new-owner-import',path:'/local/locator'})).body.state,'applied')",
+          "occurrences": [
+            {
+              "canonicalId": "e6401f1a830044b6e5adbb0cc4503e23b3f128c7ec65c5022edf69deb4ab37e9",
+              "anchor": {
+                "repository": "scottchu/pr-reviewer",
+                "side": "head",
+                "commit": "e3b270e5f49a9215452b0b86702946043e979059",
+                "path": "tests/gateway.test.ts",
+                "contentHash": "13e7db6e38670e876795a150587bb6e5a441548915fb37f67ff0a80563953158",
+                "start": 7784,
+                "end": 7930,
+                "startLine": 105,
+                "endLine": 105
+              }
+            }
+          ],
+          "contains": {
+            "id": "unit:b0d9aa89a529131430ad18d6bb441c4f6a8f71dfc1d2a7a12269f4fe35507d72:contains:unit:14ebe67adfba9842f01b673f98915f9a916bf5b585867d49912373226bb607c4",
+            "from": "unit:b0d9aa89a529131430ad18d6bb441c4f6a8f71dfc1d2a7a12269f4fe35507d72",
+            "to": "unit:14ebe67adfba9842f01b673f98915f9a916bf5b585867d49912373226bb607c4",
+            "version": "after",
+            "relation": "contains",
+            "data": {
+              "sourceEvidence": [
+                {
+                  "repository": "scottchu/pr-reviewer",
+                  "side": "head",
+                  "commit": "e3b270e5f49a9215452b0b86702946043e979059",
+                  "path": "tests/gateway.test.ts",
+                  "contentHash": "13e7db6e38670e876795a150587bb6e5a441548915fb37f67ff0a80563953158",
+                  "start": 7784,
+                  "end": 7930,
+                  "startLine": 105,
+                  "endLine": 105
+                }
+              ]
+            }
+          }
+        },
+        {
+          "id": "unit:74c8c8b71e631ad5cbed1969b1eee287f4cba0117348d08ee17f82c1a83e1f41",
+          "name": "assert.equal(receipt.status,200)",
+          "occurrences": [
+            {
+              "canonicalId": "d2632cc6d3cf1e17bd4c17502510d38c927382af75c4674f5b0034094fbd84e3",
+              "anchor": {
+                "repository": "scottchu/pr-reviewer",
+                "side": "head",
+                "commit": "e3b270e5f49a9215452b0b86702946043e979059",
+                "path": "tests/gateway.test.ts",
+                "contentHash": "13e7db6e38670e876795a150587bb6e5a441548915fb37f67ff0a80563953158",
+                "start": 8182,
+                "end": 8214,
+                "startLine": 107,
+                "endLine": 107
+              }
+            }
+          ],
+          "contains": {
+            "id": "unit:b0d9aa89a529131430ad18d6bb441c4f6a8f71dfc1d2a7a12269f4fe35507d72:contains:unit:74c8c8b71e631ad5cbed1969b1eee287f4cba0117348d08ee17f82c1a83e1f41",
+            "from": "unit:b0d9aa89a529131430ad18d6bb441c4f6a8f71dfc1d2a7a12269f4fe35507d72",
+            "to": "unit:74c8c8b71e631ad5cbed1969b1eee287f4cba0117348d08ee17f82c1a83e1f41",
+            "version": "after",
+            "relation": "contains",
+            "data": {
+              "sourceEvidence": [
+                {
+                  "repository": "scottchu/pr-reviewer",
+                  "side": "head",
+                  "commit": "e3b270e5f49a9215452b0b86702946043e979059",
+                  "path": "tests/gateway.test.ts",
+                  "contentHash": "13e7db6e38670e876795a150587bb6e5a441548915fb37f67ff0a80563953158",
+                  "start": 8182,
+                  "end": 8214,
+                  "startLine": 107,
+                  "endLine": 107
+                }
+              ]
+            }
+          }
+        },
+        {
+          "id": "unit:92c7e9595eaafb6d463431b2d1d25e68c26789a807b715dadc6201be204fa694",
+          "name": "assert.equal(receipt.body.state,'applied')",
+          "occurrences": [
+            {
+              "canonicalId": "481bffaf325652a604db9ba62c0922643b2c1feece23acef4e6290a380a096df",
+              "anchor": {
+                "repository": "scottchu/pr-reviewer",
+                "side": "head",
+                "commit": "e3b270e5f49a9215452b0b86702946043e979059",
+                "path": "tests/gateway.test.ts",
+                "contentHash": "13e7db6e38670e876795a150587bb6e5a441548915fb37f67ff0a80563953158",
+                "start": 8215,
+                "end": 8257,
+                "startLine": 107,
+                "endLine": 107
+              }
+            }
+          ],
+          "contains": {
+            "id": "unit:b0d9aa89a529131430ad18d6bb441c4f6a8f71dfc1d2a7a12269f4fe35507d72:contains:unit:92c7e9595eaafb6d463431b2d1d25e68c26789a807b715dadc6201be204fa694",
+            "from": "unit:b0d9aa89a529131430ad18d6bb441c4f6a8f71dfc1d2a7a12269f4fe35507d72",
+            "to": "unit:92c7e9595eaafb6d463431b2d1d25e68c26789a807b715dadc6201be204fa694",
+            "version": "after",
+            "relation": "contains",
+            "data": {
+              "sourceEvidence": [
+                {
+                  "repository": "scottchu/pr-reviewer",
+                  "side": "head",
+                  "commit": "e3b270e5f49a9215452b0b86702946043e979059",
+                  "path": "tests/gateway.test.ts",
+                  "contentHash": "13e7db6e38670e876795a150587bb6e5a441548915fb37f67ff0a80563953158",
+                  "start": 8215,
+                  "end": 8257,
+                  "startLine": 107,
+                  "endLine": 107
+                }
+              ]
+            }
+          }
+        },
+        {
+          "id": "unit:42a86bc2ef3ac3b58cddc1211092d79e9604289f0ca3aad244b8d3435fbf416a",
+          "name": "assert.equal(receipt.body.actorId,'local-user')",
+          "occurrences": [
+            {
+              "canonicalId": "1d128b02e3b494f1e1a0c6d4f11653373a9eddb04fb5688155a56da00131aecd",
+              "anchor": {
+                "repository": "scottchu/pr-reviewer",
+                "side": "head",
+                "commit": "e3b270e5f49a9215452b0b86702946043e979059",
+                "path": "tests/gateway.test.ts",
+                "contentHash": "13e7db6e38670e876795a150587bb6e5a441548915fb37f67ff0a80563953158",
+                "start": 8258,
+                "end": 8305,
+                "startLine": 107,
+                "endLine": 107
+              }
+            }
+          ],
+          "contains": {
+            "id": "unit:b0d9aa89a529131430ad18d6bb441c4f6a8f71dfc1d2a7a12269f4fe35507d72:contains:unit:42a86bc2ef3ac3b58cddc1211092d79e9604289f0ca3aad244b8d3435fbf416a",
+            "from": "unit:b0d9aa89a529131430ad18d6bb441c4f6a8f71dfc1d2a7a12269f4fe35507d72",
+            "to": "unit:42a86bc2ef3ac3b58cddc1211092d79e9604289f0ca3aad244b8d3435fbf416a",
+            "version": "after",
+            "relation": "contains",
+            "data": {
+              "sourceEvidence": [
+                {
+                  "repository": "scottchu/pr-reviewer",
+                  "side": "head",
+                  "commit": "e3b270e5f49a9215452b0b86702946043e979059",
+                  "path": "tests/gateway.test.ts",
+                  "contentHash": "13e7db6e38670e876795a150587bb6e5a441548915fb37f67ff0a80563953158",
+                  "start": 8258,
+                  "end": 8305,
+                  "startLine": 107,
+                  "endLine": 107
+                }
+              ]
+            }
+          }
+        },
+        {
+          "id": "unit:a239567977390ce77dffc431d5eb5ea9a41e7654d7e7bfcb3cc3e89cdd6b0732",
+          "name": "assert.deepEqual((await call('/api/commands',command)).body,receipt.body)",
+          "occurrences": [
+            {
+              "canonicalId": "ca92197e3b3abb24946e558610f39e1896fef2430bd3b3258384b7c75d8ee58b",
+              "anchor": {
+                "repository": "scottchu/pr-reviewer",
+                "side": "head",
+                "commit": "e3b270e5f49a9215452b0b86702946043e979059",
+                "path": "tests/gateway.test.ts",
+                "contentHash": "13e7db6e38670e876795a150587bb6e5a441548915fb37f67ff0a80563953158",
+                "start": 8309,
+                "end": 8382,
+                "startLine": 108,
+                "endLine": 108
+              }
+            }
+          ],
+          "contains": {
+            "id": "unit:b0d9aa89a529131430ad18d6bb441c4f6a8f71dfc1d2a7a12269f4fe35507d72:contains:unit:a239567977390ce77dffc431d5eb5ea9a41e7654d7e7bfcb3cc3e89cdd6b0732",
+            "from": "unit:b0d9aa89a529131430ad18d6bb441c4f6a8f71dfc1d2a7a12269f4fe35507d72",
+            "to": "unit:a239567977390ce77dffc431d5eb5ea9a41e7654d7e7bfcb3cc3e89cdd6b0732",
+            "version": "after",
+            "relation": "contains",
+            "data": {
+              "sourceEvidence": [
+                {
+                  "repository": "scottchu/pr-reviewer",
+                  "side": "head",
+                  "commit": "e3b270e5f49a9215452b0b86702946043e979059",
+                  "path": "tests/gateway.test.ts",
+                  "contentHash": "13e7db6e38670e876795a150587bb6e5a441548915fb37f67ff0a80563953158",
+                  "start": 8309,
+                  "end": 8382,
+                  "startLine": 108,
+                  "endLine": 108
+                }
+              ]
+            }
+          }
+        },
+        {
+          "id": "unit:56dd688e60d7f5e410254876b28638f361dbceb36ad0a3e5930ad66984fa4a99",
+          "name": "assert.equal((readback.body.questions as {text:string}[])[0]?.text,command.text)",
+          "occurrences": [
+            {
+              "canonicalId": "c689eaf96cb2bd680ef058daaaca5bdbe3af621f52a6931b5c73e91c81d3736b",
+              "anchor": {
+                "repository": "scottchu/pr-reviewer",
+                "side": "head",
+                "commit": "e3b270e5f49a9215452b0b86702946043e979059",
+                "path": "tests/gateway.test.ts",
+                "contentHash": "13e7db6e38670e876795a150587bb6e5a441548915fb37f67ff0a80563953158",
+                "start": 8430,
+                "end": 8510,
+                "startLine": 109,
+                "endLine": 109
+              }
+            }
+          ],
+          "contains": {
+            "id": "unit:b0d9aa89a529131430ad18d6bb441c4f6a8f71dfc1d2a7a12269f4fe35507d72:contains:unit:56dd688e60d7f5e410254876b28638f361dbceb36ad0a3e5930ad66984fa4a99",
+            "from": "unit:b0d9aa89a529131430ad18d6bb441c4f6a8f71dfc1d2a7a12269f4fe35507d72",
+            "to": "unit:56dd688e60d7f5e410254876b28638f361dbceb36ad0a3e5930ad66984fa4a99",
+            "version": "after",
+            "relation": "contains",
+            "data": {
+              "sourceEvidence": [
+                {
+                  "repository": "scottchu/pr-reviewer",
+                  "side": "head",
+                  "commit": "e3b270e5f49a9215452b0b86702946043e979059",
+                  "path": "tests/gateway.test.ts",
+                  "contentHash": "13e7db6e38670e876795a150587bb6e5a441548915fb37f67ff0a80563953158",
+                  "start": 8430,
+                  "end": 8510,
+                  "startLine": 109,
+                  "endLine": 109
+                }
+              ]
+            }
+          }
+        },
+        {
+          "id": "unit:95e624947f11efbe5463d34c4e7ae83191ebace69302873e52d34fc42ccb07c9",
+          "name": "assert.equal((await call('/api/reviews/r',undefined,authorization)).status,401)",
+          "occurrences": [
+            {
+              "canonicalId": "c33d5658aef8deb48b275757f9d4d4a7615afa192e151e392de3bf7fb27a53ee",
+              "anchor": {
+                "repository": "scottchu/pr-reviewer",
+                "side": "head",
+                "commit": "e3b270e5f49a9215452b0b86702946043e979059",
+                "path": "tests/gateway.test.ts",
+                "contentHash": "13e7db6e38670e876795a150587bb6e5a441548915fb37f67ff0a80563953158",
+                "start": 8585,
+                "end": 8664,
+                "startLine": 110,
+                "endLine": 110
+              }
+            }
+          ],
+          "contains": {
+            "id": "unit:b0d9aa89a529131430ad18d6bb441c4f6a8f71dfc1d2a7a12269f4fe35507d72:contains:unit:95e624947f11efbe5463d34c4e7ae83191ebace69302873e52d34fc42ccb07c9",
+            "from": "unit:b0d9aa89a529131430ad18d6bb441c4f6a8f71dfc1d2a7a12269f4fe35507d72",
+            "to": "unit:95e624947f11efbe5463d34c4e7ae83191ebace69302873e52d34fc42ccb07c9",
+            "version": "after",
+            "relation": "contains",
+            "data": {
+              "sourceEvidence": [
+                {
+                  "repository": "scottchu/pr-reviewer",
+                  "side": "head",
+                  "commit": "e3b270e5f49a9215452b0b86702946043e979059",
+                  "path": "tests/gateway.test.ts",
+                  "contentHash": "13e7db6e38670e876795a150587bb6e5a441548915fb37f67ff0a80563953158",
+                  "start": 8585,
+                  "end": 8664,
+                  "startLine": 110,
+                  "endLine": 110
+                }
+              ]
+            }
+          }
+        },
+        {
+          "id": "unit:4b0e215d5c265457b7e9d5384f57ad57b4ee136babf31b6ee0ee5f847a834e62",
+          "name": "assert.equal((await call('/api/reviews/r',undefined,`Bearer ${connection.token}`)).status,401)",
+          "occurrences": [
+            {
+              "canonicalId": "69048e0512e3a34b225ab51423d9e70be91d4094ef0623b4147ad0d8d995e085",
+              "anchor": {
+                "repository": "scottchu/pr-reviewer",
+                "side": "head",
+                "commit": "e3b270e5f49a9215452b0b86702946043e979059",
+                "path": "tests/gateway.test.ts",
+                "contentHash": "13e7db6e38670e876795a150587bb6e5a441548915fb37f67ff0a80563953158",
+                "start": 8838,
+                "end": 8932,
+                "startLine": 112,
+                "endLine": 112
+              }
+            }
+          ],
+          "contains": {
+            "id": "unit:b0d9aa89a529131430ad18d6bb441c4f6a8f71dfc1d2a7a12269f4fe35507d72:contains:unit:4b0e215d5c265457b7e9d5384f57ad57b4ee136babf31b6ee0ee5f847a834e62",
+            "from": "unit:b0d9aa89a529131430ad18d6bb441c4f6a8f71dfc1d2a7a12269f4fe35507d72",
+            "to": "unit:4b0e215d5c265457b7e9d5384f57ad57b4ee136babf31b6ee0ee5f847a834e62",
+            "version": "after",
+            "relation": "contains",
+            "data": {
+              "sourceEvidence": [
+                {
+                  "repository": "scottchu/pr-reviewer",
+                  "side": "head",
+                  "commit": "e3b270e5f49a9215452b0b86702946043e979059",
+                  "path": "tests/gateway.test.ts",
+                  "contentHash": "13e7db6e38670e876795a150587bb6e5a441548915fb37f67ff0a80563953158",
+                  "start": 8838,
+                  "end": 8932,
+                  "startLine": 112,
+                  "endLine": 112
+                }
+              ]
+            }
+          }
+        }
+      ]
+    }
+  ]
+}

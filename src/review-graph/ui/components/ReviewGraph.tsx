@@ -14,13 +14,22 @@ import {createReaderStateCache, retainedReaderPins} from '../reader-state.ts';
 import type {ReaderIdentityUI} from '../types.ts';
 import {sceneGeometry} from '../scene-geometry.ts';
 import {ViewportScene} from './viewport-scene.tsx';
-import {filterSceneMembership, sceneMembership, type ScenePinsUI} from '../scene-membership.ts';
+import {sceneMembership, type ScenePinsUI} from '../scene-membership.ts';
 import type {SceneSelectionUI} from '../types.ts';
 import { initialLayout, curve, dimensions, groupInterior, type Point, type Routed, type Side } from '../graph-geometry.ts';
 import {withMeasuredGeometry} from '../layout-measurements.ts';
+import {graphPaintState, type RetainedPaint} from '../paint-state.ts';
+import {createMeasurementScheduler, observeGeometry} from '../geometry-observer.ts';
 import {GraphToolbar} from './GraphToolbar.tsx';
 
-export const mountReviewGraph = (root:HTMLElement,initialSession:GraphSessionUI) => {
+export type ReviewGraphPresentationOptions = Readonly<{
+    renderChangeBody?: (entity: GraphEntity, onReflow: () => void) => React.ReactNode;
+    initialFocusId?: string;
+    readerPins?: readonly string[];
+    diagnostic?: (event: Readonly<{stage: string; [key: string]: string | number}>) => void;
+}>;
+
+export const mountReviewGraph = (root:HTMLElement,initialSession:GraphSessionUI, presentation: ReviewGraphPresentationOptions = {}) => {
 const initial = initialSession.view;
 const allEntities=()=>initial.entities;
 const allRelations=()=>initialSession.layoutRelations;
@@ -121,9 +130,10 @@ const DocumentSide = ({label, witness, hunk}: {
             .map((row, index) => <span key={index} data-edit-kind={row.kind} className={'native-row-' + row.kind}>{row.text}</span>)}</pre>
     </>}
 </section>;
+const visibleReader = (element: HTMLElement) => element.getClientRects().length > 0 && !element.closest('[inert],[aria-hidden="true"]');
 const captureReaderScrolls = (entityId: string, container: HTMLElement) => {
     for (const element of container.querySelectorAll<HTMLElement>('[data-reader-kind]'))
-        if (element.getClientRects().length) readerStates.capture({entityId, kind: element.dataset.readerKind as ReaderIdentityUI['kind']}, element);
+        if (visibleReader(element)) readerStates.capture({entityId, kind: element.dataset.readerKind as ReaderIdentityUI['kind']}, element);
 };
 const useReaderScroll = (identity: ReaderIdentityUI) => {
     const ref = useRef<HTMLDivElement>(null);
@@ -133,10 +143,10 @@ const useReaderScroll = (identity: ReaderIdentityUI) => {
         readerStates.restore(identity, element);
         // A closed native ancestor can report zero scroll. Preserve the last visible
         // position rather than overwriting it during close-triggered cleanup.
-        return () => {if (element.getClientRects().length) readerStates.capture(identity, element);};
+        return () => {if (visibleReader(element)) readerStates.capture(identity, element);};
     }, [identity.entityId, identity.kind]);
     return {ref, onScroll: (event: React.UIEvent<HTMLDivElement>) => {
-        if (event.currentTarget.getClientRects().length) readerStates.capture(identity, event.currentTarget);
+        if (visibleReader(event.currentTarget)) readerStates.capture(identity, event.currentTarget);
     }};
 };
 const PreviewRows = ({entityId, pane}: {entityId: string; pane: SourceReadingUI['panes'][number]}) => {
@@ -215,20 +225,27 @@ const Entity = React.memo(({ data }: NodeProps<EntityNode>) => {
 });
 const GraphBoundary = React.memo(({ data }: NodeProps<EntityNode>) => {
     const heading = useRef<HTMLHeadingElement>(null);
+    const composedBody = useRef<HTMLDivElement>(null);
     useLayoutEffect(() => {
         const element = heading.current;
         if (!element) return;
-        const measure = () => data.onHeaderMeasure(data.entity.id, Math.max(groupInterior.top, Math.ceil(element.offsetTop + element.offsetHeight + groupInterior.padding)));
-        measure();
-        const observer = new ResizeObserver(measure);
-        observer.observe(element);
-        return () => observer.disconnect();
+        const measure = () => {
+            const body = composedBody.current;
+            const end = Math.max(element.offsetTop + element.offsetHeight, body ? body.offsetTop + body.offsetHeight : 0);
+            const clearance = Math.max(groupInterior.top, Math.ceil(end + groupInterior.padding));
+            if (data.entity.id === presentation.initialFocusId || presentation.readerPins?.includes(data.entity.id)) presentation.diagnostic?.({stage: 'header', clearance});
+            data.onHeaderMeasure(data.entity.id, clearance);
+        };
+        return observeGeometry([element, ...(composedBody.current ? [composedBody.current] : [])], measure);
     }, [data.entity.id, data.onHeaderMeasure, data.renderContent]);
     if (data.renderContent === false) return <Ports/>;
     return <>
  <Ports />
  <section inert={data.measureOnly || undefined} aria-hidden={data.measureOnly || undefined} className={'minimal-change-graph' + (data.entity.ui.status ? ' status-' + data.entity.ui.status!.replaceAll(' ', '-') : '')} aria-label={data.entity.ui.card.title + ' graph'}>
   <NodeDragHandle data={data}/><h2 ref={heading}><EntityIcon entity={data.entity}/><span>{data.entity.ui.card.title}</span></h2>
+  {presentation.renderChangeBody && <div ref={composedBody} className="composed-change-body nodrag nopan" onClick={event => event.stopPropagation()}>
+      {presentation.renderChangeBody(data.entity, data.onReflow ?? (() => {}))}
+  </div>}
  </section>
 </>;
 });
@@ -244,7 +261,7 @@ const Relation = React.memo((props: EdgeProps<RelationEdge>) => {
     } | null>(null);
     const data = props.data;
     useLayoutEffect(() => { const element = labelRef.current; if (!element || !data)
-        return; const measure = () => data.onMeasure(props.id, { width: element.offsetWidth, height: element.offsetHeight }); measure(); const observer = new ResizeObserver(measure); observer.observe(element); return () => observer.disconnect(); }, [props.id, data?.onMeasure]);
+        return; const measure = () => { if (element.offsetWidth > 0 && element.offsetHeight > 0) data.onMeasure(props.id, { width: element.offsetWidth, height: element.offsetHeight }); }; return observeGeometry([element], measure); }, [props.id, data?.onMeasure]);
     if (!data)
         return null;
     const route = curve({ x: props.sourceX, y: props.sourceY }, { x: props.targetX, y: props.targetY }, data.routed.offset);
@@ -331,8 +348,25 @@ const InitialLayout = ({ nodes, apply, links, revision, headers, labelSizes, man
     }, [initialized, nodes, getNodes, apply, links, revision, headers, labelSizes, manualChildren]);
     return null;
 };
+const InitialPresentationFocus = ({ready, clearance}: {ready: boolean; clearance: number}) => {
+    const initialized = useNodesInitialized();
+    const {getNodes, setViewport} = useReactFlow();
+    const applied = useRef(false);
+    useLayoutEffect(() => {
+        if (!presentation.initialFocusId || !ready || !initialized || clearance <= groupInterior.top || applied.current) return;
+        const node = getNodes().find(value => value.id === presentation.initialFocusId);
+        if (!node) return;
+        applied.current = true;
+        const zoom = Math.max(.25, Math.min(1, (window.innerWidth - 40) / Number(node.style?.width ?? 800)));
+        presentation.diagnostic?.({stage: 'camera', x: node.position.x, y: node.position.y, zoom, width: Number(node.style?.width ?? 800), clearance});
+        void setViewport({x: 20 - node.position.x * zoom, y: 80 - node.position.y * zoom, zoom});
+    }, [ready, initialized, clearance, getNodes, setViewport]);
+    return null;
+};
 const App = () => {
     const coarse = useCoarseInput();
+    const layoutPasses = useRef(0);
+    useEffect(() => {presentation.diagnostic?.({stage: 'mounted'});}, []);
     useEffect(() => installPageGestureBoundary(document.documentElement), []);
     const [experience, setExperience] = useState<GraphSessionUI>(() => initialSession);
     const limits = experience.limits;
@@ -348,6 +382,13 @@ const App = () => {
     const [ready, setReady] = useState(false);
     const [layoutRevision, setLayoutRevision] = useState('');
     const [selection, setSelection] = useState<SceneSelectionUI | null>(null);
+    const [workerFailed, setWorkerFailed] = useState(false);
+    const retainedPaint = useRef<RetainedPaint | null>(null);
+    const acceptSelection = useCallback((value: SceneSelectionUI | null) => {
+        if (value) presentation.diagnostic?.({stage: 'selection', nodes: value.nodeIds.length, edges: value.routeIds.length, revision: value.revision});
+        setSelection(value);
+    }, []);
+    const workerFailure = useCallback(() => {presentation.diagnostic?.({stage: 'worker-failure'}); setWorkerFailed(true);}, []);
     const [pins, setPins] = useState<ScenePinsUI>({nodes: [], routes: []});
     const pinsChanged = useCallback((next: ScenePinsUI) => setPins(previous =>
         JSON.stringify(previous) === JSON.stringify(next) ? previous : next), []);
@@ -378,7 +419,13 @@ const App = () => {
     }, [setNodes, headerClearances]);
     const onExpand = useCallback((id: string, hide = false) => setExperience(previous => previous.expand(id,hide)), []);
     const onInspect = useCallback((id:string,open:boolean)=>setExperience(previous=>previous.inspect(id,open)),[]);
-    const onReflow = useCallback(() => setGeometryRevision(value => value + 1), []);
+    const reflowScheduler = useRef<ReturnType<typeof createMeasurementScheduler> | null>(null);
+    useLayoutEffect(() => {
+        const scheduler = createMeasurementScheduler(() => {presentation.diagnostic?.({stage: 'reflow'}); setGeometryRevision(value => value + 1);});
+        reflowScheduler.current = scheduler;
+        return () => { scheduler.dispose(); reflowScheduler.current = null; };
+    }, []);
+    const onReflow = useCallback(() => reflowScheduler.current?.schedule(), []);
     useEffect(() => {
         setReady(false);
         setNodes(previous => {
@@ -408,21 +455,38 @@ const App = () => {
             if (manualPositions.current[node.id]) manualPositions.current[node.id] = position;
             return { ...node, position, extent: [[bounds.min.x, bounds.min.y], [bounds.max.x, bounds.max.y]] as [[number, number], [number, number]] };
         });
+        presentation.diagnostic?.({stage: 'layout', passes: ++layoutPasses.current, nodes: bounded.length, width: Math.max(0, ...bounded.map(node => Number(node.style?.width ?? node.measured?.width ?? 0))), height: Math.max(0, ...bounded.map(node => Number(node.style?.height ?? node.measured?.height ?? 0)))});
         setNodes(bounded);
         setReady(true);
         setLayoutRevision(revision);
     }, [setNodes, headerClearances, revision]);
+    type DimensionChange = Extract<Parameters<typeof onNodesChange>[0][number], {type: 'dimensions'}>;
+    const pendingDimensions = useRef(new Map<string, DimensionChange>());
+    const dimensionScheduler = useRef<ReturnType<typeof createMeasurementScheduler> | null>(null);
+    useLayoutEffect(() => {
+        const scheduler = createMeasurementScheduler(() => {
+            const current = new Map(latest.current.nodes.map(node => [node.id, node]));
+            const relevant = [...pendingDimensions.current.values()].filter(change => {
+                const node = current.get(change.id);
+                return node && change.dimensions && change.dimensions.width > 0 && change.dimensions.height > 0 &&
+                    (node.measured?.width !== change.dimensions.width || node.measured?.height !== change.dimensions.height);
+            });
+            pendingDimensions.current.clear();
+            if (relevant.length) { onNodesChange(relevant); onReflow(); }
+        });
+        dimensionScheduler.current = scheduler;
+        return () => { scheduler.dispose(); pendingDimensions.current.clear(); dimensionScheduler.current = null; };
+    }, [onNodesChange, onReflow]);
     const changes: typeof onNodesChange = useCallback(next => {
-        for (const change of next)
+        for (const change of next) {
             if (change.type === 'position' && change.position && change.dragging !== undefined)
                 manualPositions.current[change.id] = change.position;
-        const relevant = next.filter(change => change.type !== 'dimensions' || nodes.find(node => node.id === change.id)?.measured?.width !== change.dimensions?.width || nodes.find(node => node.id === change.id)?.measured?.height !== change.dimensions?.height);
-        if (relevant.length) onNodesChange(relevant);
-        if (relevant.some(change => change.type === 'dimensions' && change.dimensions &&
-            change.dimensions.width > 0 && change.dimensions.height > 0)) {
-            setGeometryRevision(value => value + 1);
+            if (change.type === 'dimensions') pendingDimensions.current.set(change.id, change);
         }
-    }, [onNodesChange, nodes]);
+        const immediate = next.filter(change => change.type !== 'dimensions');
+        if (immediate.length) onNodesChange(immediate);
+        if (pendingDimensions.current.size) dimensionScheduler.current?.schedule();
+    }, [onNodesChange]);
     const onBend = useCallback((id: string, offset: Point | undefined) => setManual(previous => {
         const next = { ...previous };
         if (offset)
@@ -468,10 +532,14 @@ const App = () => {
         return sceneGeometry({comparison: experience.comparisonId, revision: ++sceneSequence.current}, nodes,
             edges.map(edge => ({id: edge.id, source: edge.source, target: edge.target, routed: edge.data!.routed})), sizes);
     }, [ready, movement, layoutRevision, revision, nodes, view.nodes, edges, sizes, experience.comparisonId]);
-    const membership = useMemo(() => sceneMembership(scene, selection, pins, retainedReaderPins(view.nodes, limits, readerStates)), [scene, selection, pins, view.nodes, limits, geometryRevision, experience.filter]);
+    const membership = useMemo(() => sceneMembership(scene, selection, pins, [...retainedReaderPins(view.nodes, limits, readerStates), ...(presentation.readerPins ?? [])]), [scene, selection, pins, view.nodes, limits, geometryRevision, experience.filter]);
+    const paint = useMemo(() => graphPaintState(experience.comparisonId, experience.filter, membership,
+        retainedPaint.current, pins, presentation.readerPins ?? [], workerFailed && Boolean(scene)),
+        [experience.comparisonId, experience.filter, membership, pins, scene, workerFailed]);
+    useLayoutEffect(() => {
+        if (membership || (workerFailed && scene)) retainedPaint.current = {comparison: experience.comparisonId, nodes: paint.nodes, routes: paint.routes};
+    }, [membership, workerFailed, scene, experience.comparisonId, paint]);
     const semanticNodes = useMemo(() => new Set(experience.filter.nodeIds), [experience.filter]);
-    const semanticRoutes = useMemo(() => new Set(experience.filter.relationIds), [experience.filter]);
-    const filteredMembership = useMemo(() => filterSceneMembership(experience.filter, membership), [experience.filter, membership]);
     const renderedCache = useRef(new Map<string, {source: EntityNode; rendered: EntityNode}>());
     const renderedNodes = useMemo(() => {
         const next = new Map<string, {source: EntityNode; rendered: EntityNode}>();
@@ -479,24 +547,25 @@ const App = () => {
             // Bootstrap measures the full model before either mask removes content.
             // Excluded cards can measure, but cannot paint, focus or receive input.
             const eligible = semanticNodes.has(node.id);
-            const content = !scene || filteredMembership.nodes.has(node.id);
-            const measureOnly = !eligible && !scene;
+            const content = !scene || paint.nodes.has(node.id);
+            const painted = eligible && paint.nodes.has(node.id);
+            const measureOnly = !painted;
             const prior = renderedCache.current.get(node.id);
             let rendered = node;
-            if (!content || !eligible) {
+            if (!content || !painted) {
                 const reusable = prior?.source === node
-                    && prior.rendered.focusable === eligible
+                    && prior.rendered.focusable === painted
                     && prior.rendered.data.renderContent === content
                     && prior.rendered.data.measureOnly === measureOnly;
                 rendered = reusable ? prior.rendered : {
                     ...node,
-                    focusable: eligible,
-                    draggable: eligible && (node.draggable ?? true),
+                    focusable: painted,
+                    draggable: painted && (node.draggable ?? true),
                     data: {...node.data, renderContent: content, measureOnly},
                     style: {
                         ...node.style,
                         ...(!content ? dimensions(node) : {}),
-                        ...(!eligible ? {visibility: 'hidden' as const, pointerEvents: 'none' as const} : {}),
+                        ...(!painted ? {visibility: 'hidden' as const, pointerEvents: 'none' as const} : {}),
                     },
                 };
             }
@@ -505,22 +574,20 @@ const App = () => {
         });
         renderedCache.current = next;
         return result;
-    }, [nodes, scene, semanticNodes, filteredMembership]);
+    }, [nodes, scene, semanticNodes, paint]);
     const renderedEdges = useMemo(() => {
-        if (scene) return edges.filter(edge => filteredMembership.routes.has(edge.id));
-        // Labels must measure before scene readiness even when the filter is already on.
-        return edges.map(edge => semanticRoutes.has(edge.id) ? edge : {
-            ...edge,
-            focusable: false,
+        const measured = scene ? edges.filter(edge => paint.routes.has(edge.id)) : edges;
+        return measured.map(edge => paint.routes.has(edge.id) ? edge : {
+            ...edge, focusable: false,
             style: {...edge.style, visibility: 'hidden' as const, pointerEvents: 'none' as const},
             data: {...edge.data!, measureOnly: true},
         });
-    }, [edges, scene, filteredMembership, semanticRoutes]);
+    }, [edges, scene, paint]);
     return <><header className="minimal-header"><h1>PR25 · Changes and evidence</h1><p>Files, code changes, tests and their source context</p></header>
-  <main data-scene-mode={membership ? 'selected' : 'full'} data-changes-only={experience.filter.changesOnly} className={coarse ? 'coarse-input' : undefined} aria-label="PR25 source comparison graph"><ReactFlow<EntityNode, RelationEdge> nodes={renderedNodes} onNodesChange={changes} onNodeDragStart={beginMove} onNodeDragStop={endMove} edges={renderedEdges} nodeTypes={nodeTypes} edgeTypes={edgeTypes} defaultViewport={{
+  <main aria-busy={!paint.established} data-scene-mode={membership ? 'selected' : 'full'} data-changes-only={experience.filter.changesOnly} className={coarse ? 'coarse-input' : undefined} aria-label="PR25 source comparison graph"><ReactFlow<EntityNode, RelationEdge> nodes={renderedNodes} onNodesChange={changes} onNodeDragStart={beginMove} onNodeDragStop={endMove} edges={renderedEdges} nodeTypes={nodeTypes} edgeTypes={edgeTypes} defaultViewport={{
         x: 20, y: 35, zoom: 1
     }} minZoom={0.25} maxZoom={2} panOnScroll panOnScrollMode={PanOnScrollMode.Free} zoomOnScroll={false} zoomOnPinch nodesConnectable={false} nodesDraggable elementsSelectable={false} proOptions={{ hideAttribution: true }}>
-   <ViewportScene scene={scene} publish={setSelection} pinsChanged={pinsChanged}/><InitialLayout nodes={nodes} apply={apply} links={links} revision={revision} headers={headerClearances} labelSizes={sizes} manualChildren={manualPositions.current}/><Background color="#29333b" gap={24} size={1}/>
+   <InitialPresentationFocus ready={ready && paint.established && paint.nodes.has(presentation.initialFocusId ?? '')} clearance={headerClearances[presentation.initialFocusId ?? ''] ?? 0}/><ViewportScene scene={scene} publish={acceptSelection} pinsChanged={pinsChanged} onFailure={workerFailure}/><InitialLayout nodes={nodes} apply={apply} links={links} revision={revision} headers={headerClearances} labelSizes={sizes} manualChildren={manualPositions.current}/><Background color="#29333b" gap={24} size={1}/>
   </ReactFlow>
   <GraphToolbar filter={experience.filter} onToggle={() => setExperience(previous => previous.setChangesOnly(!previous.filter.changesOnly))}/>
   </main></>;

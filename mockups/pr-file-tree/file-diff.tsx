@@ -1,3 +1,4 @@
+import { observeGeometry } from '../../src/review-graph/ui/geometry-observer.ts';
 import { focusedComparison } from './comparison-selection.ts';
 import { SyntaxCode } from './syntax-code.tsx';
 import React, { useRef, useState, useLayoutEffect, useMemo } from 'react';
@@ -7,7 +8,7 @@ import fullSource from './full-source.json' with { type: 'json' };
 import functionContext from './function-context.json' with { type: 'json' };
 import { rowCoordinates } from './coordinates.ts';
 import { splitRows } from './change-rail.ts';
-import { continuousSegments, scopeTestSegments, visibleHunk, type SourceRow } from './continuous.ts';
+import { continuousSegments, scopeTestSegments, scopeSelectionSegments, visibleHunk, type SourceRow } from './continuous.ts';
 export type FileDiff = typeof diffs.files[number];
 export type DiffMode = 'unified' | 'split';
 export type SourceRelation = {
@@ -94,7 +95,7 @@ export const FileDiffBody = ({ file, mode, fullscreen, width, onExplain, activeR
         ...(required?.after ?? []), ...(focus?.after ?? [])
       ]
     });
-    return focus?.scope === 'test' ? scopeTestSegments(result, focus) : result;
+    return focus?.scope === 'selection' ? scopeSelectionSegments(result, focus) : focus?.scope === 'test' ? scopeTestSegments(result, focus) : result;
   }, [
     file, source, focus
   ]);
@@ -282,16 +283,17 @@ export const FileDiffBody = ({ file, mode, fullscreen, width, onExplain, activeR
     const pane = horizontal.current;
     const pre = content.current;
     if (!pane || !pre) return;
+    let measuredWidth: number | undefined;
     const measure = () => {
-      pane.style.setProperty('--split-viewport-width', `${pane.clientWidth}px`);
+      const nextWidth = pane.clientWidth;
+      if (measuredWidth === nextWidth) return;
+      measuredWidth = nextWidth;
+      pane.style.setProperty('--split-viewport-width', `${nextWidth}px`);
       pre.style.width = '100%';
       pane.scrollLeft = 0;
       pane.style.setProperty('--source-offset', `${pane.scrollLeft}px`);
     };
-    measure();
-    const observer = new ResizeObserver(measure);
-    observer.observe(pane);
-    return () => observer.disconnect();
+    return observeGeometry([pane], measure);
   }, [mode, file.path, folds, width, segments]);
   const renderRows = (rows: SourceRow[], hunk: number | null) => {
     let assigned = false;
@@ -347,7 +349,7 @@ export const FileDiffBody = ({ file, mode, fullscreen, width, onExplain, activeR
   };
   return <>
 
-    <nav
+    {focus?.scope !== 'selection' && <nav
       className={`change-rail continuous-rail ${fullscreen ? 'workspace-rail' : ''} nodrag nopan nowheel`}
       aria-label={`Changes in ${file.path}`}
       onClick={e => e.stopPropagation()}
@@ -374,7 +376,7 @@ export const FileDiffBody = ({ file, mode, fullscreen, width, onExplain, activeR
         </button>;
       })}
 
-    </nav>
+    </nav>}
 
     <div
       ref={body}
@@ -474,7 +476,7 @@ export const FileDiffBody = ({ file, mode, fullscreen, width, onExplain, activeR
 
         </button>}
 
-        <button
+        {focus?.scope !== 'selection' && <button
           disabled={visibleHunks.length === 0}
           aria-label="Explain current source comparison"
           title="Explain current source comparison"
@@ -484,7 +486,7 @@ export const FileDiffBody = ({ file, mode, fullscreen, width, onExplain, activeR
             index: active,
             side: focusSelection.current?.side ?? 'after'
           })}
-        >↔</button>
+        >↔</button>}
 
       </div>
 

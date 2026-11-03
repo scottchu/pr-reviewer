@@ -1,0 +1,1 @@
+{"extends":"../pr-file-tree/tsconfig.json","include":["./**/*.ts","./**/*.tsx","../pr-file-tree/assets.d.ts"]}

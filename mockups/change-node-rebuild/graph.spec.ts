@@ -1,0 +1,34 @@
+import {test,expect} from '@playwright/test';
+
+test('one graph card keeps source controls and reading separate from node/background gestures', async ({page}) => {
+    test.setTimeout(45000);
+    const errors: string[]=[];page.on('pageerror',error=>errors.push(error.message));
+    await page.goto('./graph.html?v=one-change');
+    const node = page.locator('.react-flow__node');
+    const viewport = page.locator('.react-flow__viewport');
+    await expect(node).toHaveCount(1);
+    await expect(page.getByRole('article')).toHaveCount(1);
+    await expect(page.locator('.react-flow__edge')).toHaveCount(0);
+    await expect(node).toBeVisible();
+    const nodeBefore = await node.getAttribute('style');
+    const viewportBefore = await viewport.getAttribute('style');
+    const code = page.getByRole('region',{name:'Diff',exact:true});
+    await code.getByRole('button',{name:'Split',exact:true}).click();
+    await expect(code.locator('.continuous-reader')).toHaveClass(/split/);
+    await code.locator('.continuous-reader').focus();
+    await code.locator('.continuous-reader').press('ArrowDown');
+    expect(await node.getAttribute('style')).toBe(nodeBefore);
+    expect(await viewport.getAttribute('style')).toBe(viewportBefore);
+    const handle = await node.locator('.graph-card-handle').boundingBox();expect(handle).not.toBeNull();
+    await page.mouse.move(handle!.x+20,handle!.y+12);await page.mouse.down();await page.mouse.move(handle!.x+50,handle!.y+32,{steps:5});await page.mouse.up();
+    await expect(node).not.toHaveAttribute('style',nodeBefore!);
+    await expect(code.getByRole('button',{name:'Split',exact:true})).toHaveAttribute('aria-pressed','true');
+    const canvas = await page.locator('.graph-probe-canvas').boundingBox();expect(canvas).not.toBeNull();
+    const x=canvas!.x+canvas!.width*.8,y=canvas!.y+canvas!.height-20;
+    await page.mouse.move(x,y);await page.mouse.down();await page.mouse.move(x-30,y-15,{steps:5});await page.mouse.up();
+    await expect(viewport).not.toHaveAttribute('style',viewportBefore!);
+    await page.getByRole('button',{name:'Fit View',exact:false}).click();
+    await expect(code.getByRole('button',{name:'Split',exact:true})).toHaveAttribute('aria-pressed','true');
+    await expect(page.locator('#status')).toContainText('30 seconds elapsed',{timeout:35000});
+    expect(errors).toEqual([]);
+});
