@@ -1,6 +1,14 @@
 # Change-centered PR behavior workspace
 
-## Test-only source edits — latest correction, 2026-11-03
+## Test edit topology — latest correction, 2026-11-03
+
+The Test is the reading anchor at the top of its existing change group. Its literal Removed and Added code nodes sit below it on one row, Removed left and Added right. Draw exactly one downward, directed presentation connection from that Test to each available edit side; no connection between the sides. Added-only and removed-only Tests have one side and one connection. These connections mean only “these native source edits belong to this Test”; they are UI composition, not new canonical relations, test coverage, runtime execution or policy verification. Keep exact source witnesses and shared syntax highlighting. No Assertion inventory or extra relationship explanation cards.
+
+Preserve request(), Authorization construction, helper, their groups and all original nodes/edges without retargeting, rewriting or changing their layout rules/styles. Test connectors must not participate in the existing relationship-label placement or reserve labels that disturb original routes. Use the measured Test and code rectangles to place the Test above both sides and connect its bottom port to their top ports. Group bounds contain every child below the measured header. Source disclosure reflows this same topology; filtering, pagination, scene selection and return keep connector identity and both endpoints coherent. Manual drag remains an explicit user override.
+
+Acceptance checks the actual structure, not existence alone: Test bottom < edit top; Removed right < Added left; group contains all children; connector endpoints are the Test and its exact native edit side with bottom-to-top ports; zero fabricated sides/dangling connections; the complete original non-Test node/edge baseline remains equal. Exercise both source-disclosure states and varied measured card sizes, then the actual candidate React journey and rendered routes when supported browser access exists. Source/synthetic/SSR tests and served asset identity cannot establish browser pixels or unfamiliar-reader comprehension.
+
+## Test-only source edits — preceding correction, 2026-11-03
 
 PR48's redesign of normal changes was rejected. The restored `a08fa42` presentation is the frozen baseline for request(), its group, Authorization construction, helper/call context, every existing node and every existing edge. Do not replace normal Function cards, group markup, source controls, styles, relation endpoints or evidence. This supersedes the earlier instruction to restructure every Function/Test change.
 

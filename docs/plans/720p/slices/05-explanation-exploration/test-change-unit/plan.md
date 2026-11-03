@@ -1,5 +1,18 @@
 # Read a Test as one normal source change
 
+## R4 — Test above connected native edit sides
+
+Status: implementation authorized; actual browser acceptance pending. Parent round/slice and prior evidence remain below. PR49 / main209e804 preserved source rows and existing normal graph, but the user screenshot demonstrates disconnected horizontal Test/edit siblings; R3 existence tests missed the required topology. This correction supersedes only that Test layout/connection behavior.
+
+Implementation handoff v4: root owns `fix-test-edit-topology` in `/Users/scottchu/.codex-workspaces/worktrees/pr-reviewer-test-edit-topology`. Ready inputs: committed209e804, exact native Test composition and R3 frozen a08fa42 normal-graph oracle. Allowed seams: Test edit UI connections, their measured layout/rendering/filter/scene integration, targeted tests and these docs. Keep all original canonical facts and relation objects, non-Test cards/edges, group markup/CSS/color index and request/Authorization/helper layout. No runtime dependency, preview redesign, assertion inventory, network/security change or old-worktree cleanup. User authorizes PR merge and deployment to the existing root endpoint with retained rollback.
+
+Acceptance T1: Test top, Removed/Added below on one row with correct ordering and nonoverlap across measured sizes and disclosure. T2: exactly one bottom-to-top directed presentation connector per real side, exact ownership and stable identity, no added canonical facts or relation-label cards. T3: retain original nodes, edge IDs/endpoints/data/labels and normal layout; exact code/witnesses remain. T4: pagination/filter/scene/return preserve endpoints and no assertion dump. T5: merge exact reviewed candidate, build remote-main, deploy existing8478/root, verify source/process/served bytes, and attempt supported actual-browser journey; unavailable pixels/touch/comprehension stay UNRUN.
+
+Execution: docs first; red topology tests; smallest Test-only projection/layout/route fix; strict types + graph regressions + SSR and authored React journey; fresh independent review; PR/merge/deploy. Stop for any normal-graph regression or fabricated source/meaning. Browser host failure blocks visual acceptance, not independently authorized source/deployment work.
+
+Independent-review handoff v4: fresh read-only reviewer (gpt-6.1-sol/high; geometry and boundary risk justify this capability; escalate if original route mutation cannot be resolved). First attempt exact candidate graph via supported CUA, freeze UI-only account before source; host failure stays UNRUN, no alternate browser-control route. Then independently review this committed packet/candidate against209e804 and a08fa42 oracle, reproduce T1–T4, inspect actual React ports/paths/scene admission and source bytes. Root alone writes/merges/deploys. Return concrete defects or source PASS, actual checks and unverified gates. An existence-only test is insufficient.
+
+
 Date: 2026-11-03.
 Request revision: test-change-unit-R3.
 Parent: [Explanation exploration](../plan.md).
