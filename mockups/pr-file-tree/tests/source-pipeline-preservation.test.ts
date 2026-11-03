@@ -83,14 +83,20 @@ test('frozen source/canonical/projection with explicit policy cleanup and raw co
     rows:[...entity.ui.card.rows,...entity.data.value.map(String).filter(value=>value===entity.ui.card.title)]} : entity.ui.card,
    entity.ui.status]),edges:view.relations.map(edge=>[edge.id,edge.ui])};
  });
- assert.equal(digest(historicalProjection(projections)),retired.projection,'all remaining projection fields and source controls remain frozen');
+ const readingDelta=oracle.testReadingUnitRemoval;
+ assert.equal(readingDelta.revision,1);
+ assert.equal(readingDelta.originalProjection,retired.projection);
+ // Derived independently from immutable main 250c19a, first matched to the old
+ // frozen oracle, then removing only Assertion nodes/children and incident edges.
+ // Source facts, compiled units and the entire canonical graph remain frozen above.
+ assert.equal(digest(historicalProjection(projections)),readingDelta.projection,'only Assertion reading inventory and incident labels change');
  const restored=JSON.parse(JSON.stringify(historicalProjection(projections)));
  for(const [index,view] of restored.entries()){
-  view.relations.splice(retired.projectionIndexes[index],0,retired.relation);
-  view.edges.splice(retired.projectionIndexes[index],0,[retired.relation.id,retired.ui]);
+  view.relations.splice(readingDelta.policyIndexes[index],0,retired.relation);
+  view.edges.splice(readingDelta.policyIndexes[index],0,[retired.relation.id,retired.ui]);
  }
- assert.equal(digest(restored),oracle.projection,'restoring the exact frozen projected edge recovers every old view');
- const folder=new URL('../../../.decompozr/flow/run/source-pipeline/',import.meta.url);mkdirSync(folder,{recursive:true});
+ assert.equal(digest(restored),readingDelta.restoredPolicyProjection,'restoring the exact historical policy edge preserves every remaining reading field');
+ const folder=new URL('../../../artifacts/test-change-unit/source-pipeline/',import.meta.url);mkdirSync(folder,{recursive:true});
  writeFileSync(new URL('fresh-source-facts.json',folder),bytes);
- writeFileSync(new URL('fresh-preservation-report.json',folder),JSON.stringify({baseline:oracle.baseline,rawArtifactHash:sha(bytes),originalRawArtifactHash:oracle.originalInputArtifactHash,sourceFactsEqual:true,compiledEqual:true,canonicalEqualExceptRetiredPolicyEdge:true,default20More40HideProjectionEqualExceptRetiredPolicyEdge:true,retiredRelation:retired.relation.id,oracleRevision:retired.revision},null,2));
+ writeFileSync(new URL('fresh-preservation-report.json',folder),JSON.stringify({baseline:oracle.baseline,rawArtifactHash:sha(bytes),originalRawArtifactHash:oracle.originalInputArtifactHash,sourceFactsEqual:true,compiledEqual:true,canonicalEqualExceptRetiredPolicyEdge:true,default20More40HideProjectionEqualExceptDeclaredReadingDeltas:true,assertionReadingInventoryRemoved:true,retiredRelation:retired.relation.id,oracleRevision:retired.revision},null,2));
 });

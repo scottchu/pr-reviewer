@@ -1,5 +1,13 @@
 # Change-centered PR behavior workspace
 
+## Test is one normal source-change unit — 2026-11-03
+
+The existing normal change graph is the reference, not a separate Test design. A Test uses the same change group, source-unit card and source-change reader as a Function. Its exact whole-Test source scope owns the line edits, including assertion edits. Keep the surrounding whole-PR graph and supported external relationships. Do not replace it with a standalone card/page or invent two Before/After entities.
+
+Assertions are source evidence inside the Test, not automatic canvas reading units. Do not mount individual Assertion nodes, Test-to-Assertion `contains` labels or their source-location labels in this reading graph, including after file expansion or changes-only toggles. A group's rendered children must exclude those cards too; hiding only the default inventory is insufficient. File source-unit counts and pagination count the remaining reading units rather than spending pages on hidden assertion lines. Existing extraction identities, exact assertion expressions, containment/location witnesses and statuses remain intact in canonical data; absence from the canvas does not delete facts or imply test execution.
+
+Use the existing Function/Test source disclosure and diff implementation, with exact rows and original source identities. No new collapse hierarchy, assertion list, count summary, interpretation card, coverage edge or PASS/TestRun inference is introduced. This supersedes the earlier Test-above-Assertions layout as the default reading experience; retained low-level layout tests and source facts do not authorize restoring that inventory.
+
 ## Adopted root relationship projection — latest user correction
 
 This section supersedes the root callable DAG and separate Before/After arrangements below. The user adopted revision-2 mockup and authorized implementation. The default root uses the SAME original file nodes: identical basename, Git status color, dimensions, expand action and continuous reader. Remove only directory nodes/containment from that default and arrange the same files using evidenced inter-file caller→callee relationships. File tree remains the explicit icon-switched alternate. No root function cards, side partitions, new group frames or inner-reader redesign. All50changed files retain their original identities and arbitrary entry.

@@ -2,7 +2,7 @@ import type {EditComposition} from '../domain/edit-composition.ts';
 import type {GraphEntity, GraphRelation, SourceGraph, NativeDocumentHunk} from '../domain/types.ts';
 import type {ExperienceState} from '../experience/types.ts';
 import {collectEntities} from '../domain/validation.ts';
-import {visibleGraph} from './visibility.ts';
+import {sourceReadingUnits, visibleGraph} from './visibility.ts';
 import {cardRows, edgeRows, presentationStatus, editPreview, editCaption} from './content.ts';
 import {iconFor} from './entity-presentation.ts';
 import type {GraphView, UIEntity, SourceReadingUI} from './types.ts';
@@ -49,7 +49,7 @@ const createProjector = (comparison: SourceGraph) => {
                     (entity.kind === 'file' && entity.data.comparisonStatus !== 'no change')) && Boolean(entity.data.editComposition),
                 sourceOpen: false, fileControl: entity.kind === 'file',
                 inlineSourceReading: Boolean(entity.data.nativeHunks),
-                unitCount: comparison.fileUnits[entity.id]?.length ?? 0,
+                unitCount: sourceReadingUnits(comparison)[entity.id]?.length ?? 0,
                 unpairedRows: comparison.unresolved.filter(row => row.path === entity.data.path).map(row =>
                     (row.anchor.side === 'base' ? 'Before' : 'After') + ' L' + row.anchor.startLine + '–' + row.anchor.endLine + ' · ' + row.name),
                 get sourceReading() {
@@ -62,7 +62,7 @@ const createProjector = (comparison: SourceGraph) => {
             };
             content.set(entity, base);
         }
-        const children = entity.nodes?.map(child => present(child, state));
+        const children = entity.nodes?.filter(child => child.kind !== 'assertion').map(child => present(child, state));
         const open = state.sourceDisclosure[entity.id] ?? false;
         const known = entities.get(entity);
         if (known && known.ui.sourceOpen === open && (!children || children.every((child, i) => known.nodes?.[i] === child))) return known;

@@ -154,5 +154,30 @@
         }
       }
     }
+  },
+  "testReadingUnitRemoval": {
+    "revision": 1,
+    "baseline": "250c19acfe47b6a7090faac258789151ce6eb051",
+    "originalProjection": "806ca97ecfa188ef686d6948adfa467efd3e51f6790129602bb7886a1bd2b03e",
+    "projection": "1611a88ff980b2a9ed2ea0ee361e2337852ec26893d620476827be00210085d2",
+    "restoredPolicyProjection": "82295739f4bb2aa1eb68d4703c106db48493ea750c01197924f8c185323a5b4b",
+    "removedNodesByView": [
+      58,
+      58,
+      58,
+      58
+    ],
+    "removedRelationsByView": [
+      116,
+      116,
+      116,
+      116
+    ],
+    "policyIndexes": [
+      135,
+      208,
+      229,
+      135
+    ]
   }
 }
