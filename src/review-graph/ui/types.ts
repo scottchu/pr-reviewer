@@ -21,8 +21,10 @@ export type UIEntity = Omit<GraphEntity, 'nodes'> & Readonly<{
 }>;
 export type UIRelation = GraphRelation & Readonly<{
     ui: RelationRows;
+    testEditConnector?: true;
 }>;
 export type GraphView = Readonly<{
+    testEditConnections?: readonly UIRelation[];
     nodes: readonly UIEntity[];
     relations: readonly UIRelation[];
     entities: readonly UIEntity[];

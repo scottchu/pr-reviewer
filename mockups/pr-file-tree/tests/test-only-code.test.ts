@@ -26,7 +26,7 @@ test('request/Authorization/helper and every existing edge stay at the independe
         const raw = projectExperience(state);
         for (const original of raw.nodes.filter(protectedNode)) assert.deepEqual(session.view.nodes.find(entity => entity.id === original.id), original, original.id);
         assert.deepEqual(session.view.relations, raw.relations, 'all IDs/endpoints/data/labels stay unchanged');
-        assert.deepEqual(session.filter.relationIds, projectChangeFilter(raw, state.changesOnly).relationIds);
+        assert.deepEqual(session.filter.relationIds.filter(id => !id.startsWith('ui-test-edit-connection:')), projectChangeFilter(raw, state.changesOnly).relationIds);
         assert.ok(session.view.nodes.some(entity => entity.id === 'request'));
         assert.ok(session.view.nodes.some(entity => entity.id === 'header-value'));
         assert.ok(session.view.relations.some(edge => edge.from === 'request' && edge.to === 'header-value' && edge.relation === 'constructs'));
@@ -65,7 +65,7 @@ test('synthetic Test-only room does not change request/Authorization/helper plac
             const parent = view.nodes.find(group => group.nodes?.some(child => child.id === entity.id));
             return {id: entity.id, position: {x: 0, y: 0}, measured: entity.ui.sourceEdit ? {width: 380, height: 200} : {width: 300, height: 100}, ...(parent ? {parentId: parent.id} : {})};
         });
-        return absoluteBoxes(initialLayout(nodes, view.relations.map(edge => ({id: edge.id, source: edge.from, target: edge.to})), 'pr25',
+        return absoluteBoxes(initialLayout(nodes, [...view.relations, ...(view.testEditConnections ?? [])].map(edge => ({id: edge.id, source: edge.from, target: edge.to, ...(edge.testEditConnector ? {labelFree: true as const} : {})})), 'pr25',
             readingBands(view.entities, sourceGraph.relations), {}, filePaths(view.entities), documentPaths(view.entities), testAssertionFamilies(view.entities, sourceGraph.relations)));
     };
     const before = layout(raw), after = layout(next);

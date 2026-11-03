@@ -9,17 +9,18 @@ const explanatory = new Set([
 
 /** One-hop context is calculated from the original changed seeds, never a growing frontier. */
 export const projectChangeFilter = (view: GraphView, changesOnly: boolean): GraphFilterUI => {
+    const relations = [...view.relations, ...(view.testEditConnections ?? [])];
     if (!changesOnly) {
         return {
             changesOnly,
             nodeIds: view.nodes.map(node => node.id),
-            relationIds: view.relations.map(edge => edge.id),
+            relationIds: relations.map(edge => edge.id),
         };
     }
     const candidates = new Map(view.nodes.map(node => [node.id, node]));
     const seeds = new Set(view.nodes.filter(node => changed.has(node.ui.status ?? '')).map(node => node.id));
     const included = new Set(seeds);
-    const eligible = view.relations.filter(edge => edge.data.comparisonStatus !== 'no change');
+    const eligible = relations.filter(edge => edge.data.comparisonStatus !== 'no change');
     for (const edge of eligible) {
         if (!explanatory.has(edge.relation)) continue;
         for (const [seed, context] of [[edge.from, edge.to], [edge.to, edge.from]] as const) {

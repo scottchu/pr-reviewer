@@ -24,3 +24,19 @@ test('Test-only React code markup renders every literal row, newline and syntax 
         }
     } finally {await server.close();}
 });
+
+
+test('actual React Test connector renders directed SVG path and endpoints without an explanation card', async () => {
+    const server = await createServer({configFile: false, optimizeDeps: {noDiscovery: true, include: []}, server: {middlewareMode: true, hmr: false}});
+    try {
+        const {TestEditConnection} = await server.ssrLoadModule('/src/review-graph/ui/components/TestEditConnection.tsx');
+        const path = 'M300,200 Q400,300 500,400';
+        const html = renderToStaticMarkup(React.createElement(TestEditConnection, {id: 'edit-route', source: 'test', target: 'removed', path, markerEnd: 'url(#arrow)', measureOnly: false}));
+        assert.match(html, /data-test-edit-source="test"/); assert.match(html, /data-test-edit-target="removed"/);
+        assert.match(html, /data-source-port="bottom"/); assert.match(html, /data-target-port="top"/);
+        assert.ok(html.includes('d="' + path + '"')); assert.match(html, /marker-end="url\(#arrow\)"/);
+        assert.ok(!html.includes('minimal-edge-card')); assert.ok(!html.includes('aria-hidden="true"'));
+        const hidden = renderToStaticMarkup(React.createElement(TestEditConnection, {id: 'edit-route', source: 'test', target: 'removed', path, markerEnd: undefined, measureOnly: true}));
+        assert.match(hidden, /aria-hidden="true"/); assert.match(hidden, /visibility:hidden/);
+    } finally {await server.close();}
+});

@@ -21,6 +21,7 @@ import {withMeasuredGeometry} from '../layout-measurements.ts';
 import {graphPaintState, type RetainedPaint} from '../paint-state.ts';
 import {GraphToolbar} from './GraphToolbar.tsx';
 import {SourceEditCode} from './SourceEditCode.tsx';
+import {TestEditConnection} from './TestEditConnection.tsx';
 import type {SourceSyntaxUI} from '../types.ts';
 
 export const mountReviewGraph = (root:HTMLElement,initialSession:GraphSessionUI, testSyntax?: SourceSyntaxUI) => {
@@ -253,7 +254,7 @@ const Relation = React.memo((props: EdgeProps<RelationEdge>) => {
         zoom: number;
     } | null>(null);
     const data = props.data;
-    useLayoutEffect(() => { const element = labelRef.current; if (!element || !data)
+    useLayoutEffect(() => { const element = labelRef.current; if (!data) return; if (data.relation.testEditConnector) { data.onMeasure(props.id, {width: 0, height: 0}); return; } if (!element)
         return; const measure = () => data.onMeasure(props.id, { width: element.offsetWidth, height: element.offsetHeight }); measure(); const observer = new ResizeObserver(measure); observer.observe(element); return () => observer.disconnect(); }, [props.id, data?.onMeasure]);
     if (!data)
         return null;
@@ -281,6 +282,9 @@ const Relation = React.memo((props: EdgeProps<RelationEdge>) => {
         data.onBend(props.id, { x: data.routed.offset.x + delta[0]!, y: data.routed.offset.y + delta[1]! });
     } };
     const measurementStyle = data.measureOnly ? {visibility: 'hidden' as const, pointerEvents: 'none' as const} : {};
+    if (data.relation.testEditConnector) return <TestEditConnection id={props.id}
+        source={data.relation.from} target={data.relation.to} path={route.path}
+        markerEnd={props.markerEnd} measureOnly={Boolean(data.measureOnly)}/>;
     return <>
         <g data-route-id={props.id} className={'minimal-route nodrag' + (data.coarse ? '' : ' nopan')}
             role="button" tabIndex={data.measureOnly ? -1 : 0} aria-hidden={data.measureOnly || undefined}
@@ -350,9 +354,9 @@ const App = () => {
     const [headerClearances, setHeaderClearances] = useState<Record<string, number>>({});
     const onHeaderMeasure = useCallback((id: string, clearance: number) => setHeaderClearances(previous => (previous[id] ?? groupInterior.top) === clearance ? previous : { ...previous, [id]: clearance }), []);
     const view = experience.view;
-    const relations = useMemo(() => view.relations.filter(edge => !omittedStructuralEdge(edge, allEntities())), [view]);
+    const relations = useMemo(() => [...view.relations.filter(edge => !omittedStructuralEdge(edge, allEntities())), ...(view.testEditConnections ?? [])], [view]);
     const links = useMemo(() => relations.map(edge => ({
-        id: edge.id, source: edge.from, target: edge.to
+        id: edge.id, source: edge.from, target: edge.to, ...(edge.testEditConnector ? {labelFree: true as const} : {})
     })), [relations]);
     const [nodes, setNodes, onNodesChange] = useNodesState<EntityNode>([]);
     const [ready, setReady] = useState(false);

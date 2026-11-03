@@ -1,5 +1,5 @@
 import type {EditComposition} from '../domain/edit-composition.ts';
-import type {GraphView, UIEntity, SourceEditNodeUI} from './types.ts';
+import type {GraphView, UIEntity, SourceEditNodeUI, UIRelation} from './types.ts';
 
 const views = new WeakMap<GraphView, GraphView>();
 const children = new WeakMap<UIEntity['data'], readonly UIEntity[]>();
@@ -70,6 +70,15 @@ export const projectTestCode = (view: GraphView): GraphView => {
         if (entities.has(edit.id)) throw new Error('ui_test_edit_identity_collision:' + edit.id);
         entities.set(edit.id, edit);
     }
-    const result = {nodes, relations: view.relations, entities: [...entities.values()]};
+    const visible = new Set(nodes.map(node => node.id));
+    const testEditConnections: UIRelation[] = [...additions.values()].flat().filter(edit => visible.has(edit.id) && visible.has(edit.ui.sourceEdit!.subjectId)).map(edit => ({
+        id: 'ui-test-edit-connection:' + edit.id,
+        from: edit.ui.sourceEdit!.subjectId, to: edit.id,
+        version: edit.ui.sourceEdit!.kind === 'remove' ? 'before' : 'after',
+        relation: 'test_source_edit', testEditConnector: true,
+        data: {comparisonStatus: 'change', projection: 'test-edit-composition'},
+        ui: {title: 'Test source edit', rows: [], explanation: 'Native source edits belonging to this Test', scope: [], provenance: []},
+    }));
+    const result = {nodes, relations: view.relations, testEditConnections, entities: [...entities.values()]};
     views.set(view, result); return result;
 };
