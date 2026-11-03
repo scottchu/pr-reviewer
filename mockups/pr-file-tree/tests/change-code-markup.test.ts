@@ -3,6 +3,7 @@ import assert from 'node:assert/strict';
 import React from 'react';
 import {renderToStaticMarkup} from 'react-dom/server';
 import {createServer} from 'vite';
+import {editSyntaxLine} from '../edit-syntax.ts';
 import {syntaxLine} from '../syntax.ts';
 import type {SourceSyntaxUI} from '../../../src/review-graph/ui/types.ts';
 import {sourceGraph} from '../source-graph.ts';
@@ -19,7 +20,7 @@ test('shared React source code markup contains all actual rows, coordinates and 
             (entity.id === 'change' || entity.ui.changeSource.subjectKind === 'test'));
         for (const group of groups) for (const child of group.nodes!) {
             const edit = child.ui.sourceEdit!;
-            const html = renderToStaticMarkup(React.createElement(SourceEditCode, {edit, syntax: syntaxLine}));
+            const html = renderToStaticMarkup(React.createElement(SourceEditCode, {edit, syntax: editSyntaxLine}));
             const rows = [...html.matchAll(/<code data-source-line="(\d+)" data-source-hunk="(\d+)">([\s\S]*?)<\/code>/g)];
             assert.equal(rows.length, edit.rows.length);
             for (const [index, row] of edit.rows.entries()) {
@@ -32,4 +33,14 @@ test('shared React source code markup contains all actual rows, coordinates and 
             if (edit.rows.some(row => row.text.includes('const '))) assert.match(html, /syntax-keyword/);
         }
     } finally {await server.close();}
+});
+
+test('compact colors cover every projected edited row with the same exact tokens as the full source reader', () => {
+    for (const entity of createGraphSession(sourceGraph).view.entities) for (const row of entity.ui.sourceEdit?.rows ?? []) {
+        const edit = entity.ui.sourceEdit!, side = edit.kind === 'remove' ? 'before' : 'after';
+        const text = row.text.replace(/\r?\n$/, '');
+        const actual = editSyntaxLine(row.witness.path, side, row.line, text);
+        assert.equal(actual.map(token => token.text).join(''), text);
+        assert.deepEqual(actual, syntaxLine(row.witness.path, side, row.line, text));
+    }
 });
