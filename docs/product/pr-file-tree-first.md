@@ -8,6 +8,8 @@ Preserve request(), Authorization construction, helper, their groups and all ori
 
 Acceptance checks the actual structure, not existence alone: Test bottom < edit top; Removed right < Added left; group contains all children; connector endpoints are the Test and its exact native edit side with bottom-to-top ports; zero fabricated sides/dangling connections; the complete original non-Test node/edge baseline remains equal. Exercise both source-disclosure states and varied measured card sizes, then the actual candidate React journey and rendered routes when supported browser access exists. Source/synthetic/SSR tests and served asset identity cannot establish browser pixels or unfamiliar-reader comprehension.
 
+Verification limit: source/model/React-markup checks support this topology and preservation contract, including measured-size/disclosure variations. They do not establish actual rendered usability. Supported browser access remains unavailable; physical touch, native scroll/return and unfamiliar-reader comprehension are open. Own-PR graph intake still has a fixed comparison and no selector.
+
 ## Test-only source edits — preceding correction, 2026-11-03
 
 PR48's redesign of normal changes was rejected. The restored `a08fa42` presentation is the frozen baseline for request(), its group, Authorization construction, helper/call context, every existing node and every existing edge. Do not replace normal Function cards, group markup, source controls, styles, relation endpoints or evidence. This supersedes the earlier instruction to restructure every Function/Test change.
