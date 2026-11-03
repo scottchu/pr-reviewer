@@ -10,16 +10,22 @@ import {createReaderStateCache, retainedReaderPins} from '../../../src/review-gr
 import {withMeasuredGeometry} from '../../../src/review-graph/ui/layout-measurements.ts';
 import {initialLayout} from '../../../src/review-graph/ui/graph-geometry.ts';
 
-const entity = (id: string, status?: string, kind = 'function'): GraphEntity => ({
+const entity = (id: string, status?: string, kind = 'callsite'): GraphEntity => ({
     id, kind, data: {name: id, ...(status ? {comparisonStatus: status} : {})},
 });
 const relation = (id: string, from: string, to: string, status?: string, kind = 'calls'): GraphRelation => ({
     id, from, to, relation: kind, version: 'comparison',
     data: status ? {comparisonStatus: status} : {},
 });
+// These are semantic filter fixtures, not source-correspondence fixtures. Ordinary
+// seeds use callsite context; the File seed supplies an admitted native comparison.
+// File/Function/Test admission and unavailable-source filtering have separate tests.
+const filterFile:GraphEntity={id:'file',kind:'file',data:{name:'file',path:'filter.ts',repository:'fixture/repo',comparisonStatus:'change',comparisonBasis:'Pinned native diff',
+ sourceEvidence:[{side:'base',commit:'a'.repeat(40),available:true,contentHash:'old'},{side:'head',commit:'b'.repeat(40),available:true,contentHash:'new'}],
+ editComposition:{status:'change',scope:'file',removed:1,added:1,rows:[{kind:'remove',text:'old\n',beforeLine:1,afterLine:null},{kind:'add',text:'new\n',beforeLine:null,afterLine:1}],hunks:[{index:1,header:'@@ -1 +1 @@',rows:[{kind:'remove',text:'old\n',beforeLine:1,afterLine:null},{kind:'add',text:'new\n',beforeLine:null,afterLine:1}],before:{side:'base',commit:'a'.repeat(40),path:'filter.ts',contentHash:'old',startLine:1,endLine:1,text:'old\n'},after:{side:'head',commit:'b'.repeat(40),path:'filter.ts',contentHash:'new',startLine:1,endLine:1,text:'new\n'}}]}}};
 const fixture: SourceGraph = {
     entities: [
-        entity('review', undefined, 'review'), entity('file', 'change', 'file'),
+        entity('review', undefined, 'review'), filterFile,
         {id: 'group', kind: 'change', data: {name: 'group'}, nodes: [entity('added', 'add')], edges: []},
         entity('removed', 'remove'), entity('modified', 'change'), entity('unchanged', 'no change'),
         entity('direct'), entity('second-hop'), entity('unrelated'), entity('file-neighbor'),
@@ -82,7 +88,7 @@ test('filter is scoped immutable intent, defaults off and preserves source expan
 test('no-change coordinate parents stay excluded while independently changed descendants survive', () => {
     const graph: SourceGraph = {...fixture, entities: [
         entity('review', undefined, 'review'),
-        {id: 'stable-group', kind: 'change', data: {comparisonStatus: 'no change'}, nodes: [entity('child', 'add')], edges: []},
+        {id: 'stable-group', kind: 'coordinate_group', data: {comparisonStatus: 'no change'}, nodes: [entity('child', 'add')], edges: []},
     ], initialVisible: ['review', 'stable-group'], relations: [], fileUnits: {}, groupFor: {child: 'stable-group'}};
     const session = createGraphSession(graph);
     assert.deepEqual(session.setChangesOnly(true).filter.nodeIds, ['review', 'child']);
@@ -108,7 +114,7 @@ test('viewport/focus/open-reader pins and worker fallback cannot expose semantic
 test('rapid filter intents retain source disclosure and do not demand lazy source bodies', () => {
     let reads = 0;
     const graph: SourceGraph = {...fixture, entities: [
-        {...entity('source', 'add'), data: {editComposition: {
+        {...entity('source', 'add', 'function'), data: {editComposition: {
             status: 'add', scope: 'unit', added: 1, removed: 0, hunks: [],
             get rows() { reads++; return []; },
         }}},
@@ -219,6 +225,6 @@ test('pinned no-change Test filters independently of retained non-rendered asser
     const off = on.setChangesOnly(false);
     assert.equal(off.view, full.view);
     assert.deepEqual(off.filter.nodeIds, full.view.nodes.map(node => node.id));
-    assert.deepEqual(off.filter.relationIds, [...full.view.relations, ...(full.view.testEditConnections ?? [])].map(edge => edge.id));
+    assert.deepEqual(off.filter.relationIds, [...full.view.relations, ...(full.view.changeEditConnections ?? [])].map(edge => edge.id));
     assert.equal(digest(), before);
 });

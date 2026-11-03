@@ -13,14 +13,14 @@ test('every Test owns one directed presentation connection per real edit side ac
     const sessions = [initial, initial.inspect(target, true), initial.setChangesOnly(true), initial.expand('application-test-file', false), initial.expand('application-test-file', false).expand('application-test-file', true)];
     for (const session of sessions) {
         const edits = session.view.nodes.filter(node => node.ui.sourceEdit);
-        const connections = session.view.testEditConnections ?? [];
+        const connections = session.view.changeEditConnections ?? [];
         assert.equal(connections.length, edits.length, 'code nodes must be connected, not merely present');
         assert.equal(new Set(connections.map(edge => edge.id)).size, connections.length);
         for (const node of edits) {
             const owned = connections.filter(edge => edge.to === node.id);
             assert.equal(owned.length, 1);
             assert.equal(owned[0]!.from, node.ui.sourceEdit!.subjectId);
-            assert.equal(owned[0]!.testEditConnector, true);
+            assert.equal(owned[0]!.changeEditConnector, true);
             assert.equal(owned[0]!.version, node.ui.sourceEdit!.kind === 'remove' ? 'before' : 'after');
             assert.ok(session.view.nodes.some(subject => subject.id === owned[0]!.from && subject.kind === 'test'));
             assert.ok(!session.view.relations.some(edge => edge.id === owned[0]!.id), 'presentation never enters canonical relations');
@@ -33,7 +33,7 @@ test('every Test owns one directed presentation connection per real edit side ac
 test('measured Test is above edit row; Removed left, Added right; bottom/top routes stay inside group and do not disturb original routes', () => {
     for (const open of [false, true]) for (const codeWidth of [300, 380, 540]) {
         const session = createGraphSession(sourceGraph).inspect(target, open), view = session.view;
-        const connections = view.testEditConnections ?? [];
+        const connections = view.changeEditConnections ?? [];
         assert.ok(connections.length > 0);
         const originals = view.relations.map(edge => ({id: edge.id, source: edge.from, target: edge.to}));
         const links = [...originals, ...connections.map(edge => ({id: edge.id, source: edge.from, target: edge.to, labelFree: true as const}))];

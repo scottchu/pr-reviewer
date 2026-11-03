@@ -1,3 +1,4 @@
+import {buildChangeModel, loadChangeModel, changeForSubject, resolveChangeEvidence, changeSourceComparison, sourceComparisonFor} from './change-model.ts';
 import { extractParsedSource } from './extraction/source-units.ts';
 import { compileSourceGraph } from './comparison.ts';
 import { scopedEditComposition } from './edit-composition.ts';
@@ -11,4 +12,4 @@ export const extractSnapshot = (parsed: ParsedSnapshot): FactDocument => {
     const units = parsed.sources.flatMap(extractParsedSource);
     return { ...snapshot, units, coverage: { ...snapshot.coverage, unresolvedAssertionPatterns: units.filter(unit => unit.diagnostic).map(unit => ({ anchor: unit.anchor, reason: unit.diagnostic })) } };
 };
-export const domainService = { parseSnapshot, extractSnapshot, extractSource: extractParsedSource, compare: compileSourceGraph, classifyEdits: scopedEditComposition, validateGraph, validateEnrichment } as const;
+export const domainService = { buildChangeModel, loadChangeModel, changeForSubject, resolveChangeEvidence, changeSourceComparison, sourceComparisonFor, parseSnapshot, extractSnapshot, extractSource: extractParsedSource, compare: compileSourceGraph, classifyEdits: scopedEditComposition, validateGraph, validateEnrichment } as const;

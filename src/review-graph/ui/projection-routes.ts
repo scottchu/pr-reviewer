@@ -17,7 +17,7 @@ export const projectionRoutes = (
         return null;
     const original = links.filter(link => !link.labelFree);
     const placed = placeRelationLabels(nodes, original, automaticRoutes(nodes, original, sizes, manual), sizes, manual, headers);
-    return withTestEditRoutes(nodes, links, placed);
+    return withChangeEditRoutes(nodes, links, placed);
 };
 
 // During a gesture, keep placement decisions stable while endpoints and a manual bend follow input.
@@ -35,7 +35,7 @@ export const liveProjectionRoutes = (
     const boxes = absoluteBoxes(nodes);
     const groups = nodes.filter(node => nodes.some(child => child.parentId === node.id)).map(node => boxes.get(node.id)!);
     const byId = new Map(nodes.map(node => [node.id, node]));
-    return withTestEditRoutes(nodes, links, new Map(links.filter(link => !link.labelFree).map(link => {
+    return withChangeEditRoutes(nodes, links, new Map(links.filter(link => !link.labelFree).map(link => {
         const placement = placements.get(link.id)!;
         const source = boxes.get(link.source)!;
         const target = boxes.get(link.target)!;
@@ -55,7 +55,7 @@ export const liveProjectionRoutes = (
 };
 
 /** Presentation-only ownership routes reserve no labels or obstacles for original relations. */
-const withTestEditRoutes = (
+const withChangeEditRoutes = (
     nodes: readonly LayoutNode[], links: readonly Link[],
     original: ReadonlyMap<string, import('./graph-geometry.ts').Routed>,
 ) => {

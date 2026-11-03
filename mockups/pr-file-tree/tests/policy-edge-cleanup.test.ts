@@ -111,6 +111,9 @@ test('retained pre-cleanup graphs remain readable without regenerating or promot
         {id: 'test', kind: 'test', data: {name: 'retained test', comparisonStatus: 'add'}},
         {id: 'policy', kind: 'behavior', data: {name: 'retained policy'}},
     ], relations: [retained], fileUnits: {}, groupFor: {}, initialVisible: ['test', 'policy'], unresolved: [], provenance: {repository: 'retained/repo', base: 'a'.repeat(40), head: 'b'.repeat(40)}}));
-    assert.deepEqual(projectChangeFilter(view, true).relationIds, [retained.id]);
+    // The retained relation remains readable, but this deliberately unqualified Test
+    // cannot become a changed seed under the shared source-evidence contract.
+    assert.deepEqual(projectChangeFilter(view, true).relationIds, []);
+    assert.equal(view.entities.find(entity=>entity.id==='test')!.ui.sourceReading!.available,false);
     assert.deepEqual(view.relations.map(({ui, ...edge}) => edge), [retained]);
 });

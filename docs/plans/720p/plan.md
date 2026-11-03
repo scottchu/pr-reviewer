@@ -1,5 +1,7 @@
 # 720p: understand the whole PR
 
+2026-11-03: active bounded correction: [one source Change model](slices/05-explanation-exploration/unified-change-model/plan.md); docs-first shared File/Function/Test ontology, protected normal graph, no UX expansion.
+
 [Policy edge cleanup](slices/05-explanation-exploration/policy-edge-cleanup/plan.md) (2026-10-29): accepted deletion of unsupported title-selected verification; preserve factual assertions/source, draft PR only, no merge/deploy authority.
 
 [PR reconciliation](slices/05-explanation-exploration/pr-reconciliation/plan.md): retire covered SDK and superseded preview/design PRs while retaining wider-product gaps; documentation-only, no new application acceptance.

@@ -55,6 +55,17 @@ test('frozen source/canonical/projection with explicit policy cleanup and raw co
  compiled.provenance.producer.sourceHashes=oracle.sourceProducerHashes;
  assert.equal(digest(historicalProjection(compiled)),oracle.compiled,'all prepared IDs/references/correspondence must stay equal');
  const canonical=JSON.parse(JSON.stringify(historicalProjection(prepared.graph)));
+ // U1 intentionally adds a typed Change registry. Verify it independently before
+ // removing only that additive field to compare every retained graph fact.
+ assert.equal(prepared.graph.changeModel.version,1);
+ assert.equal(prepared.graph.changeModel.changes.filter(c=>c.subject.kind==='file').length,50);
+ assert.equal(prepared.graph.changeModel.changes.filter(c=>c.subject.kind==='function').length,28);
+ assert.equal(prepared.graph.changeModel.changes.filter(c=>c.subject.kind==='test').length,24);
+ assert.deepEqual(prepared.graph.changeModel.diagnostics,[]);
+ domainService.loadChangeModel(prepared.graph);
+ delete canonical.changeModel;
+ assert.equal(prepared.graph.provenance.changeModelCompilerHash,sha(readFileSync(new URL('../../../src/review-graph/domain/change-model.ts',import.meta.url))));
+ delete canonical.provenance.changeModelCompilerHash;
  for(const key of oracle.excludedGraphModuleHashes)delete canonical.provenance[key];
  delete canonical.provenance.producer.sourceHashes;
  // Replace artifact identity only AFTER checking its full raw bytes and every non-producer fact.

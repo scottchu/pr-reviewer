@@ -17,11 +17,11 @@ const graph:SourceGraph={entities:[
  {id:'docs',kind:'change',data:{name:'docs change',documentPath:'docs/a.md'},nodes:[{id:'doc-evidence',kind:'evidence',data:{name:'Native comparison',nativeHunks:[]}}],edges:[]},
 ],relations:[],fileUnits:{file:['fn']},groupFor:{fn:'group'},initialVisible:['group','unknown','neutral','docs'],unresolved:[],provenance:{repository:'example/repo',base:'a'.repeat(40),head:'b'.repeat(40)}};
 
-test('independent UIType oracle preserves semantic defaults, scoped status and source controls',()=>{
+test('independent UIType oracle preserves semantic defaults/controls and abstains on unqualified native evidence',()=>{
  const state=experienceService.openComparison(graph),before=JSON.stringify(state);
  const view=projectExperience(state);
  assert.deepEqual(view.nodes.map(entity=>entity.id),['file','group','fn','unknown','neutral','docs','doc-evidence']);
- assert.deepEqual(view.nodes.find(entity=>entity.id==='fn')!.ui,{card:{title:'f()',rows:['add']},status:'add',icon:'function',sourceControl:true,sourceOpen:false,fileControl:false,inlineSourceReading:false,unitCount:0,unpairedRows:[],sourceReading:{caption:'Scoped source unit edits: +1 / −0',available:true,hunks:[],panes:[{kind:'remove',title:'Removed −0',versionLabel:'Before',emptyLabel:'No removed rows in this scope.',footer:'First 0 source rows · all evidence below',rows:[]},{kind:'add',title:'Added +1',versionLabel:'After',emptyLabel:'No added rows in this scope.',footer:'First 0 source rows · all evidence below',rows:[]}]}});
+ assert.deepEqual(view.nodes.find(entity=>entity.id==='fn')!.ui,{card:{title:'f()',rows:['unresolved']},status:undefined,icon:'function',sourceControl:true,sourceOpen:false,fileControl:false,inlineSourceReading:false,unitCount:0,unpairedRows:[],sourceReading:{caption:'Scoped source edits unresolved',available:false,hunks:[],panes:[{kind:'remove',title:'Removed −0',versionLabel:'Before',emptyLabel:'No removed rows in this scope.',footer:'First 0 source rows · all evidence below',rows:[]},{kind:'add',title:'Added +0',versionLabel:'After',emptyLabel:'No added rows in this scope.',footer:'First 0 source rows · all evidence below',rows:[]}]}});
  assert.deepEqual(view.nodes.find(entity=>entity.id==='neutral')!.ui.card,{title:'same()',rows:['no change','Source-body equality, not behavior equivalence']});
  assert.equal(view.nodes.find(entity=>entity.id==='unknown')!.ui.status,undefined);
  assert.deepEqual(view.nodes.find(entity=>entity.id==='group')!.nodes!.map(entity=>entity.id),['fn']);

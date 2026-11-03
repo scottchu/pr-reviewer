@@ -1,6 +1,7 @@
 import type { SourceGraph } from '../domain/types.ts';
 export type ExperienceState = Readonly<{
     comparison: SourceGraph;
+    changeModel: import('../domain/change-model.ts').ChangeModel;
     comparisonId: string;
     limits: Readonly<Record<string, number>>;
     sourceDisclosure: Readonly<Record<string, boolean>>;

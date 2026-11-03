@@ -1,3 +1,4 @@
+import {loadChangeModel} from '../domain/change-model.ts';
 import type { SourceGraph } from '../domain/types.ts';
 import { collectEntities, validateGraph } from '../domain/validation.ts';
 import type { ExperienceState, ExperienceIntent, IntentResult } from './types.ts';
@@ -6,7 +7,7 @@ export const openComparison = (comparison: SourceGraph): ExperienceState => {
     const identity = [comparison.provenance.repository, comparison.provenance.base, comparison.provenance.head];
     if (identity.some(value => typeof value !== 'string' || !value))
         throw new Error('comparison_identity_unavailable');
-    return { comparison, comparisonId: JSON.stringify(identity), limits: {}, sourceDisclosure: {}, inspection: null, changesOnly: false, revision: 0 };
+    return { comparison, changeModel:loadChangeModel(comparison), comparisonId: JSON.stringify(identity), limits: {}, sourceDisclosure: {}, inspection: null, changesOnly: false, revision: 0 };
 };
 export const handleIntent = (state: ExperienceState, intent: ExperienceIntent): IntentResult => {
     if (intent.comparisonId !== state.comparisonId)

@@ -26,7 +26,7 @@ test('request/Authorization/helper and every existing edge stay at the independe
         const raw = projectExperience(state);
         for (const original of raw.nodes.filter(protectedNode)) assert.deepEqual(session.view.nodes.find(entity => entity.id === original.id), original, original.id);
         assert.deepEqual(session.view.relations, raw.relations, 'all IDs/endpoints/data/labels stay unchanged');
-        assert.deepEqual(session.filter.relationIds.filter(id => !id.startsWith('ui-test-edit-connection:')), projectChangeFilter(raw, state.changesOnly).relationIds);
+        assert.deepEqual(session.filter.relationIds.filter(id => !id.startsWith('source-edit-connection:')), projectChangeFilter(raw, state.changesOnly).relationIds);
         assert.ok(session.view.nodes.some(entity => entity.id === 'request'));
         assert.ok(session.view.nodes.some(entity => entity.id === 'header-value'));
         assert.ok(session.view.relations.some(edge => edge.from === 'request' && edge.to === 'header-value' && edge.relation === 'constructs'));
@@ -65,7 +65,7 @@ test('synthetic Test-only room does not change request/Authorization/helper plac
             const parent = view.nodes.find(group => group.nodes?.some(child => child.id === entity.id));
             return {id: entity.id, position: {x: 0, y: 0}, measured: entity.ui.sourceEdit ? {width: 380, height: 200} : {width: 300, height: 100}, ...(parent ? {parentId: parent.id} : {})};
         });
-        return absoluteBoxes(initialLayout(nodes, [...view.relations, ...(view.testEditConnections ?? [])].map(edge => ({id: edge.id, source: edge.from, target: edge.to, ...(edge.testEditConnector ? {labelFree: true as const} : {})})), 'pr25',
+        return absoluteBoxes(initialLayout(nodes, [...view.relations, ...(view.changeEditConnections ?? [])].map(edge => ({id: edge.id, source: edge.from, target: edge.to, ...(edge.changeEditConnector ? {labelFree: true as const} : {})})), 'pr25',
             readingBands(view.entities, sourceGraph.relations), {}, filePaths(view.entities), documentPaths(view.entities), testAssertionFamilies(view.entities, sourceGraph.relations)));
     };
     const before = layout(raw), after = layout(next);
@@ -86,7 +86,7 @@ test('only Test groups gain literal code sides while keeping their original Test
         assert.deepEqual(edit.rows.map(row => row.text), composition.rows.filter(row => row.kind === edit.kind).map(row => row.text));
         assert.deepEqual(edit.rows.map(row => row.line), composition.rows.filter(row => row.kind === edit.kind).map(row => edit.kind === 'remove' ? row.beforeLine : row.afterLine));
     }
-    assert.equal(session.view.nodes.find(entity => entity.id === testId)?.ui.testCodeSource, true);
+    assert.equal(session.view.nodes.find(entity => entity.id === testId)?.ui.changeEvidenceSource, true);
     assert.ok(!session.view.nodes.some(entity => entity.kind === 'assertion'));
     assert.ok(session.view.entities.filter(entity => entity.ui.sourceEdit).every(entity =>
         collectEntities(sourceGraph.entities).find(source => source.id === entity.ui.sourceEdit!.subjectId)?.kind === 'test'));
@@ -95,7 +95,7 @@ test('only Test groups gain literal code sides while keeping their original Test
 
 test('added-only Test has no invented Removed side; code IDs and reader ownership survive disclosure', () => {
     const session = createGraphSession(sourceGraph);
-    const added = session.view.nodes.find(entity => entity.kind === 'test' && entity.ui.status === 'add' && entity.ui.testCodeSource)!;
+    const added = session.view.nodes.find(entity => entity.kind === 'test' && entity.ui.status === 'add' && entity.ui.changeEvidenceSource)!;
     assert.ok(added);
     const group = session.view.nodes.find(entity => entity.nodes?.some(child => child.id === added.id))!;
     assert.deepEqual(group.nodes!.filter(child => child.ui.sourceEdit).map(child => child.ui.sourceEdit!.kind), ['add']);
