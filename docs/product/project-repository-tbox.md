@@ -105,6 +105,8 @@ Tests must reveal association with supported changed AND unchanged code/behavior
 
 ## Structural source facts, explanations and absent execution
 
+Reading correction, 2026-11-03: canonical Test `contains` Assertion and Assertion `located_in` witnesses remain evidence. They do not require separate canvas cards. The [normal Test change reading contract](pr-file-tree-first.md#test-is-one-normal-source-change-unit--2026-11-03) keeps assertion line edits inside one whole-Test source reader and omits the automatic Assertion inventory and its relation labels from the reading graph. No ontology identities or evidence are removed.
+
 Accepted authority change2026-10-27: updating the application graph is authorized; the earlier no-app constraint applied to those earlier docs-only tasks, not this new work. Git/source-derived structural facts and separately attributed explanations must remain distinguishable. Deterministic extraction establishes pinned file diffs, exact source units/locations and supported syntactic/semantic relations; it cannot infer author goals, executed behavior or complete test coverage. Curated selection/identity decisions must be declared as such, never disguised as parser output.
 
 For the current test account use actual Test `contains` Assertion and Assertion `located_in` source, with the exact expected expression. The captured header expectation is not a direct verification of refresh/helper or a finalized assertion-target binding. Its supporting code call context is separately evidenced; do not generate an assertion→generic Behavior or direct Test→Function verification predicate to connect a picture. Existing policy/intent Claims may retain their supported scope and inference labels, not masquerade as mechanically extracted calls.

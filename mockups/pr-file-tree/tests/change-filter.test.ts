@@ -196,14 +196,15 @@ test('measurement import matches exact full-model IDs and rejects invalid dimens
     assert.deepEqual(partial, [{id: 'a', position: {x: 2, y: 3}, measured: {width: 75, height: 60}}]);
 });
 
-test('pinned PR25 no-change disposed-read test/assertions/contains disappear and exact canonical account returns', () => {
+test('pinned no-change Test filters independently of retained non-rendered assertion evidence', () => {
     const digest = () => createHash('sha256').update(JSON.stringify(sourceGraph)).digest('hex');
     const before = digest();
     const full = createGraphSession(sourceGraph);
     const target = full.view.nodes.find(node => node.kind === 'test' && node.ui.card.title.includes('disposed'));
     assert.ok(target, 'pinned disposed-read test is in the current view');
     assert.equal(target.ui.status, 'no change');
-    const contains = full.view.relations.filter(edge => edge.from === target.id && edge.relation === 'contains');
+    const contains = sourceGraph.relations.filter(edge => edge.from === target.id && edge.relation === 'contains');
+    assert.ok(!full.view.relations.some(edge => edge.from === target.id && edge.relation === 'contains'));
     assert.ok(contains.length > 0);
     const on = full.setChangesOnly(true);
     for (const id of [target.id, ...contains.map(edge => edge.to)]) {

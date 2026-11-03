@@ -1,5 +1,7 @@
 # Slice05: follow an explanation and explore
 
+2026-11-03: [Normal Test change reading unit](test-change-unit/plan.md) removes the rejected Assertion canvas inventory while preserving exact canonical evidence and the existing normal change reader.
+
 2026-11-03: [First-load paint repair](startup-paint/plan.md) isolates invisible measurement and retained paint from the unaccepted card experiments. Actual browser verification remains blocked by the supported host.
 
 [Policy edge cleanup](policy-edge-cleanup/plan.md) (2026-10-29): accepted deletion of unsupported title-selected verification; preserve factual assertions/source, draft PR only, no merge/deploy authority.
