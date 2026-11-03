@@ -27,7 +27,7 @@ const codeChildren = (group: UIEntity, subject: UIEntity): readonly UIEntity[] |
             JSON.stringify(composition.rows.filter(row => row.kind === kind).map(row => [row.text, kind === 'remove' ? row.beforeLine : row.afterLine]))) return;
         if (!rows.length) continue;
         const witness = rows[0]!.witness;
-        nodes.push({id: 'ui-source-edit:' + group.id + ':' + kind, kind: 'source_edit', data: {}, ui: {
+        nodes.push({id: 'ui-test-edit:' + group.id + ':' + kind, kind: 'source_edit', data: {}, ui: {
             card: {title: (kind === 'remove' ? 'Removed −' : 'Added +') + rows.length,
                 rows: [(kind === 'remove' ? 'Before ' : 'After ') + witness.commit.slice(0, 7) + ' · ' + witness.path]},
             status: kind, icon: 'evidence', sourceControl: false, sourceOpen: false,
@@ -40,44 +40,36 @@ const codeChildren = (group: UIEntity, subject: UIEntity): readonly UIEntity[] |
     return nodes;
 };
 
-export const projectChangeCode = (view: GraphView): GraphView => {
-    const known = views.get(view);
+const subjects = new WeakMap<UIEntity, UIEntity>();
+const testSource = (subject: UIEntity): UIEntity => {
+    const known = subjects.get(subject);
     if (known) return known;
-    const groups = new Map<string, UIEntity>(), owners = new Map<string, string>();
+    const ui = Object.defineProperties({}, {...Object.getOwnPropertyDescriptors(subject.ui),
+        testCodeSource: {enumerable: true, value: true},
+    }) as UIEntity['ui'];
+    const result = {...subject, ui}; subjects.set(subject, result); return result;
+};
+
+/** Test-only augmentation: every existing relationship and non-Test node survives. */
+export const projectTestCode = (view: GraphView): GraphView => {
+    const known = views.get(view); if (known) return known;
+    const replacements = new Map<string, UIEntity>(), additions = new Map<string, readonly UIEntity[]>();
     for (const group of view.entities.filter(entity => entity.kind === 'change' && entity.nodes)) {
-        const subjects = group.nodes!.filter(child => child.kind === 'function' || child.kind === 'test');
-        if (subjects.length !== 1) continue;
-        const subject = subjects[0]!, edits = codeChildren(group, subject);
+        const tests = group.nodes!.filter(child => child.kind === 'test');
+        if (tests.length !== 1) continue;
+        const subject = tests[0]!, edits = codeChildren(group, subject);
         if (!edits) continue;
-        // Preserve the lazy source-reader descriptor; disclosure still belongs to
-        // the original source subject in Experience Service.
-        const ui = Object.defineProperties({}, {
-            ...Object.getOwnPropertyDescriptors(group.ui),
-            sourceControl: {enumerable: true, value: true},
-            sourceOpen: {enumerable: true, value: subject.ui.sourceOpen},
-            changeSource: {enumerable: true, value: {subjectId: subject.id, subjectKind: subject.kind}},
-            sourceReading: {enumerable: true, get: () => subject.ui.sourceReading},
-        }) as UIEntity['ui'];
-        groups.set(group.id, {...group, ui, nodes: edits});
-        for (const child of group.nodes!) owners.set(child.id, group.id);
+        const source = testSource(subject);
+        replacements.set(subject.id, source);
+        replacements.set(group.id, {...group, nodes: [...group.nodes!.map(child => child.id === subject.id ? source : child), ...edits]});
+        additions.set(group.id, edits);
     }
-    const nodes = view.nodes.filter(entity => !owners.has(entity.id)).flatMap(entity => {
-        const group = groups.get(entity.id);
-        return group ? [group, ...group.nodes!] : [entity];
-    });
-    const relations = view.relations.flatMap(edge => {
-        const from = owners.get(edge.from) ?? edge.from, to = owners.get(edge.to) ?? edge.to;
-        if (from === to && edge.from !== edge.to) return [];
-        return from === edge.from && to === edge.to ? [edge] : [{...edge, from, to,
-            ui: {...edge.ui, sourceEndpoints: edge.ui.sourceEndpoints ?? {from: edge.from, to: edge.to}},
-        }];
-    });
-    const entities = new Map(view.entities.map(entity => [entity.id, groups.get(entity.id) ?? entity]));
-    for (const group of groups.values()) for (const child of group.nodes!) {
-        if (entities.has(child.id)) throw new Error('ui_source_edit_identity_collision:' + child.id);
-        entities.set(child.id, child);
+    const nodes = view.nodes.flatMap(entity => [replacements.get(entity.id) ?? entity, ...(additions.get(entity.id) ?? [])]);
+    const entities = new Map(view.entities.map(entity => [entity.id, replacements.get(entity.id) ?? entity]));
+    for (const edits of additions.values()) for (const edit of edits) {
+        if (entities.has(edit.id)) throw new Error('ui_test_edit_identity_collision:' + edit.id);
+        entities.set(edit.id, edit);
     }
-    const result = {nodes, relations, entities: [...entities.values()]};
-    views.set(view, result);
-    return result;
+    const result = {nodes, relations: view.relations, entities: [...entities.values()]};
+    views.set(view, result); return result;
 };

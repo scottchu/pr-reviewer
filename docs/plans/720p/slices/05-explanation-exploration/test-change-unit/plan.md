@@ -1,12 +1,25 @@
 # Read a Test as one normal source change
 
 Date: 2026-11-03.
-Request revision: test-change-unit-R2.
+Request revision: test-change-unit-R3.
 Parent: [Explanation exploration](../plan.md).
 Product source: [Normal Test change](../../../../../product/pr-file-tree-first.md#test-is-one-normal-source-change-unit--2026-11-03).
-Status: R1 was merged/deployed as `a08fa42`, but the user's actual screenshot disproves its claimed structural consistency. R2 implementation in progress; root still serves `a08fa426e22ef947bac2459f56c2d6d3664c341a`.
+Status: R2/PR48 was rejected and its deployment restored to a08fa42. R3 is Test-only, preserving the restored normal-change presentation. Git main still contains 7c82627; this candidate undoes the rejected non-Test changes before adding Test code sides.
 
-## R2 accepted correction and handoff v2
+## R3 implementation handoff v3
+
+Owner: root, sole writer in isolated fix-test-only-code-nodes. Latest instruction: fix only Test; keep request() and all existing nodes/edges unchanged; show actual removed/added Test code with no Assertion dump. Frozen presentation/source baseline: a08fa426e22ef947bac2459f56c2d6d3664c341a. PR base: 7c82627, whose broad normal-change redesign is rejected. Preserve all previous worktrees, commits, preview and rollback artifacts; no installation/network/security changes.
+
+Restore derived non-Test files to the a08fa42 behavior. Keep the original Test node and every existing relation unchanged as the source/edge anchor. Add nonempty Removed/Added UI code children to changed Test groups only. Preserve native line bytes and witnesses, shared syntax and bounded native scrolling. Only Test source reading suppresses the duplicate primary preview and opens native evidence directly; request retains its exact old reader and markup. Do not alter global group heading markup/CSS, normal Function nodes, header nodes or relationship endpoints.
+
+Write failing scope/row tests first. Compare the candidate against the unchanged baseline UI projection: request's complete group/children/incident relations must remain identical; all original relation objects/endpoints/data and all non-Test nodes must remain identical across default, pagination, filter, disclosure and hide. Verify literal Test−4/+8 code, no Assertion inventory, honest one-sided/unresolved scopes, source/scroll state and canonical graph equality. New artifacts belong in ignored artifacts/test-only-code/.
+
+Independent-review handoff v3: first attempt exact actual candidate UI through supported CUA, preserving the real blocker if unavailable; no alternate browser-control route. Then independently audit the Test-only boundary against a08fa42, exact request/Authorization/helper account, all original edges, native row/witness fidelity, code styles, Test source disclosure and restoration. Source/markup checks cannot establish actual pixels or unfamiliar-reader understanding. Root owns writes and endpoint delivery. Prior review receipts do not approve R3.
+
+Acceptance: original request group, request node, Authorization node and every existing edge remain unchanged; the reported Test keeps its source/edge anchor and gains exactly two literal code nodes containing 4 removed/8 added rows. Zero Assertion cards return. Canonical source/graph stays equal. Strict types, graph/markup regressions and independent source review precede delivery through the existing PR/merge/main-build/endpoint path. Reuse the existing endpoint and standing delivery authority; preserve actual browser/phone/own-PR/unfamiliar-reviewer gaps.
+
+## Historical R2 handoff v2 — rejected scope
+
 
 The user explicitly requires actual Removed and Added code nodes, the same structure for Test and normal changes, merge and deployment to the existing endpoint, followed by verification. R1 only removed Assertion cards and left the Test's edits inside a nested summary-card diff. Its source PASS did not establish the requested graph structure.
 

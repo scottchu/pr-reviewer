@@ -5,11 +5,11 @@ const testKinds = new Set(['test', 'assertion', 'source_step', 'absence']);
 
 /** Review leads; source-backed test files retain the rightmost path lane. */
 export const readingBands = (
-  entities: readonly (GraphEntity & {ui?: {changeSource?: {subjectKind: string}}})[],
+  entities: readonly GraphEntity[],
   relations: readonly GraphRelation[],
 ): ReadonlyMap<string, ReadingBand> => {
-  const isTest = (entity: GraphEntity & {ui?: {changeSource?: {subjectKind: string}}}): boolean =>
-    testKinds.has(entity.kind) || entity.ui?.changeSource?.subjectKind === 'test' || Boolean(entity.nodes?.some(isTest));
+  const isTest = (entity: GraphEntity): boolean =>
+    testKinds.has(entity.kind) || Boolean(entity.nodes?.some(isTest));
   const byId = new Map(entities.map(entity => [entity.id, entity]));
   const testFiles = new Set(relations.filter(relation => {
     const source = byId.get(relation.from);

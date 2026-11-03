@@ -10,7 +10,7 @@ dist/
 /mockups/pr-file-tree/public/elk-v25/
 
 /mockups/pr-file-tree/generated-source-graph.json
-/mockups/pr-file-tree/edit-syntax.json
+/mockups/pr-file-tree/test-edit-syntax.json
 
 # Local execution evidence and logs.
 /artifacts/
