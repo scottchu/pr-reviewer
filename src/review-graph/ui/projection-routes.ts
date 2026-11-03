@@ -15,7 +15,9 @@ export const projectionRoutes = (
         || currentIds.size !== nodes.length
         || projectedNodes.some(node => !currentIds.has(node.id)))
         return null;
-    return placeRelationLabels(nodes, links, automaticRoutes(nodes, links, sizes, manual), sizes, manual, headers);
+    const original = links.filter(link => !link.labelFree);
+    const placed = placeRelationLabels(nodes, original, automaticRoutes(nodes, original, sizes, manual), sizes, manual, headers);
+    return withTestEditRoutes(nodes, links, placed);
 };
 
 // During a gesture, keep placement decisions stable while endpoints and a manual bend follow input.
@@ -33,7 +35,7 @@ export const liveProjectionRoutes = (
     const boxes = absoluteBoxes(nodes);
     const groups = nodes.filter(node => nodes.some(child => child.parentId === node.id)).map(node => boxes.get(node.id)!);
     const byId = new Map(nodes.map(node => [node.id, node]));
-    return new Map(links.map(link => {
+    return withTestEditRoutes(nodes, links, new Map(links.filter(link => !link.labelFree).map(link => {
         const placement = placements.get(link.id)!;
         const source = boxes.get(link.source)!;
         const target = boxes.get(link.target)!;
@@ -49,5 +51,20 @@ export const liveProjectionRoutes = (
             && placement.offset.x === offset.x && placement.offset.y === offset.y
             && placement.label.x === label.x && placement.label.y === label.y;
         return [link.id, same ? placement : { ...placement, sourceSide, targetSide, offset, label }] as const;
-    }));
+    })));
+};
+
+/** Presentation-only ownership routes reserve no labels or obstacles for original relations. */
+const withTestEditRoutes = (
+    nodes: readonly LayoutNode[], links: readonly Link[],
+    original: ReadonlyMap<string, import('./graph-geometry.ts').Routed>,
+) => {
+    const boxes = absoluteBoxes(nodes), routes = new Map(original);
+    for (const link of links.filter(link => link.labelFree)) {
+        const source = boxes.get(link.source)!, target = boxes.get(link.target)!;
+        const offset = {x: 0, y: 0};
+        routes.set(link.id, {sourceSide: 'bottom', targetSide: 'top', offset,
+            label: curve(port(source, 'bottom'), port(target, 'top'), offset).label});
+    }
+    return routes;
 };

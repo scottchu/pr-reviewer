@@ -2,7 +2,7 @@ import { boxCollisions, pointCollisions } from './spatial-collisions.ts';
 export type Point = Readonly<{x:number;y:number}>;
 export type Box = Point & Readonly<{width:number;height:number}>;
 export type LayoutNode = Readonly<{id:string;parentId?:string;position:Point;measured?:{width?:number;height?:number};style?:Readonly<{width?:unknown;height?:unknown;opacity?:unknown}>}>;
-export type Link = Readonly<{id:string;source:string;target:string}>;
+export type Link = Readonly<{id:string;source:string;target:string;labelFree?:true}>;
 export type Side = 'left'|'right'|'top'|'bottom';
 export const groupInterior = { padding: 20, top: 80 } as const;
 export const dimensions = (node:LayoutNode) => ({width:Number(node.style?.width ?? node.measured?.width ?? 300),height:Number(node.style?.height ?? node.measured?.height ?? 90)});
@@ -86,7 +86,7 @@ export const internalLabelPlans = (
  const plans: InternalLabelPlan[] = [];
  for (const group of nodes.filter(node => nodes.some(child => child.parentId === node.id))) {
   const children = nodes.filter(node => node.parentId === group.id);
-  const internal = links.filter(link => byId.get(link.source)?.parentId === group.id &&
+  const internal = links.filter(link => !link.labelFree && byId.get(link.source)?.parentId === group.id &&
    byId.get(link.target)?.parentId === group.id);
   if (!internal.length) continue;
   const contentRight = Math.max(...children.map(child => child.position.x + dimensions(child).width));

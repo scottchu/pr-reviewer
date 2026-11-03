@@ -29,15 +29,49 @@ for (const width of [390, 1440]) test(`only Test gains actual code; request and 
     await frame(page, header); await expect(header).toContainText('Authorization property construction');
     const headerText = await header.innerText();
     const group = expected.nodes.find(entity => entity.id === 'change:' + testId)!;
-    for (const child of group.nodes!.filter(child => child.ui.sourceEdit)) {
+    const subject = node(testId);
+    const children = group.nodes!.filter(child => child.ui.sourceEdit);
+    const worldBox = async (id: string) => {
+        const bounds = (await node(id).boundingBox())!;
+        const transform = await page.locator('.react-flow__viewport').evaluate(element => {
+            const matrix = new DOMMatrix(getComputedStyle(element).transform);
+            return {x: matrix.e, y: matrix.f, zoom: matrix.a};
+        });
+        return {x: (bounds.x - transform.x) / transform.zoom, y: (bounds.y - transform.y) / transform.zoom,
+            width: bounds.width / transform.zoom, height: bounds.height / transform.zoom};
+    };
+    const checkTopology = async () => {
+        await frame(page, subject);
+        const top = await worldBox(testId);
+        const sides = [];
+        for (const child of children) {
+            const actual = node(child.id); await frame(page, actual);
+            const side = await worldBox(child.id); sides.push(side);
+            expect(side.y).toBeGreaterThan(top.y + top.height);
+            const route = page.locator(`g[data-test-edit-target=${JSON.stringify(child.id)}]`);
+            await expect(route).toHaveCount(1);
+            await expect(route).toHaveAttribute('data-test-edit-source', testId);
+            await expect(route).toHaveAttribute('data-source-port', 'bottom');
+            await expect(route).toHaveAttribute('data-target-port', 'top');
+            await expect(route.locator('path.react-flow__edge-path')).toHaveAttribute('d', /^M.+ Q.+/);
+            await expect(route.locator('path.react-flow__edge-path')).toHaveAttribute('marker-end', /.+/);
+        }
+        expect(sides[0]!.y).toBeCloseTo(sides[1]!.y, 0);
+        expect(sides[0]!.x + sides[0]!.width).toBeLessThan(sides[1]!.x);
+        await expect(page.locator('.minimal-edge-card[data-relation="test_source_edit"]')).toHaveCount(0);
+    };
+    await checkTopology();
+    for (const child of children) {
         const actual = node(child.id); await frame(page, actual);
         await expect(actual.getByLabel(child.ui.sourceEdit!.kind === 'remove' ? 'Removed code' : 'Added code', {exact: true})).toBeVisible();
         expect(await actual.locator('code[data-source-line]').allTextContents()).toEqual(child.ui.sourceEdit!.rows.map(row => row.text));
     }
-    const subject = node(testId); await frame(page, subject);
+    await frame(page, subject);
     await subject.getByText('View source changes', {exact: true}).click();
     await expect(subject.getByLabel('All native source hunks', {exact: true})).toBeVisible();
     await expect(subject.getByLabel('Scoped removed and added source preview', {exact: true})).toHaveCount(0);
+    await checkTopology();
+    await frame(page, subject);
     await subject.getByText('View source changes', {exact: true}).click();
     await frame(page, request); expect(await request.innerText()).toBe(requestText);
     await frame(page, header); expect(await header.innerText()).toBe(headerText);

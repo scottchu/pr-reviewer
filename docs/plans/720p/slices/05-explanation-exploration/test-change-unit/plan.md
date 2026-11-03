@@ -19,6 +19,8 @@ Parent: [Explanation exploration](../plan.md).
 Product source: [Normal Test change](../../../../../product/pr-file-tree-first.md#test-is-one-normal-source-change-unit--2026-11-03).
 Status: R2/PR48 was rejected and its deployment restored to a08fa42. R3 is Test-only, preserving the restored normal-change presentation. Git main still contains 7c82627; this candidate undoes the rejected non-Test changes before adding Test code sides.
 
+R4 implementation: Test edit composition now supplies a separate presentation-connection collection while original relation objects remain unchanged. Only visible code sides receive connections. Measured group ranks place Test above the edit row; label-free connections skip relationship label allocation and original route collision reservations, rendering bottom-to-top directed SVG paths. Source/markup tests first failed for missing connections, then passed for ownership/ordering/ports and scope. Supported browser attempt returned `The browser access host is unavailable`; no alternate control route used. Actual UI and independent comprehension remain UNRUN.
+
 ## R3 implementation handoff v3
 
 Owner: root, sole writer in isolated fix-test-only-code-nodes. Latest instruction: fix only Test; keep request() and all existing nodes/edges unchanged; show actual removed/added Test code with no Assertion dump. Frozen presentation/source baseline: a08fa426e22ef947bac2459f56c2d6d3664c341a. PR base: 7c82627, whose broad normal-change redesign is rejected. Preserve all previous worktrees, commits, preview and rollback artifacts; no installation/network/security changes.
