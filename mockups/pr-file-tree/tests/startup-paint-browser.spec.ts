@@ -9,7 +9,7 @@ for (const width of [390, 1440]) {
         const failures: string[] = [];
         page.on('pageerror', error => failures.push(error.message));
         await page.addInitScript(() => {
-            const samples: {busy: boolean; painted: number}[] = [];
+            const samples: {busy: boolean; painted: number; interactiveHiddenRoutes: number}[] = [];
             Object.assign(window, {startupPaintSamples: samples});
             const sample = () => {
                 const graph = document.querySelector('main[aria-label="PR25 source comparison graph"]');
@@ -19,7 +19,9 @@ for (const width of [390, 1440]) {
                             const style = getComputedStyle(element);
                             return style.visibility !== 'hidden' && style.display !== 'none' && style.opacity !== '0' && element.getClientRects().length > 0;
                         }).length;
-                    samples.push({busy: graph.getAttribute('aria-busy') === 'true', painted});
+                    const interactiveHiddenRoutes = [...graph.querySelectorAll('.minimal-route[aria-hidden="true"] .react-flow__edge-interaction')]
+                        .filter(element => getComputedStyle(element).pointerEvents !== 'none').length;
+                    samples.push({busy: graph.getAttribute('aria-busy') === 'true', painted, interactiveHiddenRoutes});
                 }
                 if (samples.length < 240) requestAnimationFrame(sample);
             };
@@ -29,9 +31,10 @@ for (const width of [390, 1440]) {
         const graph = page.locator('main[aria-label="PR25 source comparison graph"]');
         await expect(graph).toHaveAttribute('aria-busy', 'false', {timeout: 30000});
         await expect(graph).toHaveAttribute('data-scene-mode', 'selected');
-        const samples = await page.evaluate(() => (window as unknown as {startupPaintSamples: {busy: boolean; painted: number}[]}).startupPaintSamples);
+        const samples = await page.evaluate(() => (window as unknown as {startupPaintSamples: {busy: boolean; painted: number; interactiveHiddenRoutes: number}[]}).startupPaintSamples);
         expect(samples.some(sample => sample.busy)).toBe(true);
         expect(samples.filter(sample => sample.busy && sample.painted > 0)).toEqual([]);
+        expect(samples.filter(sample => sample.interactiveHiddenRoutes > 0)).toEqual([]);
         expect(failures).toEqual([]);
         await context.close();
     });
