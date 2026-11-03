@@ -1,0 +1,41 @@
+# One source Change model
+
+Date: 2026-11-03.
+Status: accepted ontology correction; implementation and delivery evidence are recorded separately.
+Parents: [ontology TBox](project-repository-tbox.md), [source pipeline](source-pipeline.md), [raw projection](raw-projection-correctness.md).
+
+## Reader outcome and scope
+
+A reviewer asks the same questions of a File, Function or Test change: which logical subject changed, which exact repository/base/head comparison supports that account, what existed on each side, and which native source rows were removed or added. File is the whole-file scope; Function and Test are source-unit scopes inside a File. A Test includes its assertion source. Assertion edits remain line edits inside that Test; canonical Test/assertion containment and witnesses remain available without a canvas inventory.
+
+There is one Change vocabulary and one typed domain contract, not FileChange/FunctionChange/TestChange variants with independently reconstructed meaning. File, Function and Test retain their distinct logical identities and intrinsic relationships. The common model does not require identical cards, erase semantic context or turn every smaller source expression into a Change.
+
+## Identity and relationships
+
+A Change is qualified by repository, pinned base/head comparison and its evidenced logical subject. It references exactly one File, Function or Test subject. That subject remains one logical entity across the comparison; Before and After are exact revision-specific occurrence evidence, not duplicated logical subjects. Reuse admitted source correspondence; never pair by display name. Keep existing request/function/Test/document Change IDs where already established. New whole-file accounts use deterministic IDs derived from their existing logical File IDs. IDs are unique within the comparison; the qualified identity includes the comparison, so identical display IDs in another comparison are not the same Change.
+
+Change hasSubject points to the existing logical subject. Change compares its Before/After occurrence evidence or checked absence. A source-unit Change records its owning logical File and, when admitted, the corresponding whole-file Change. This is scope/provenance, not a claim that one edit caused another. Existing PR changes File and PR hasChange relations retain their distinct meanings. A File contains declarations; a Change does not lexically contain another Change just because their source scopes overlap.
+
+Only admitted change/add/remove subjects receive a Change account. Unchanged definitions remain source context without fabricated Changes. Unresolved correspondence or native evidence is not an unchanged fact. A valid known source Change may retain unavailable native-text evidence, separately qualified; binary/unsupported/malformed evidence does not manufacture text or an empty edit side. Logical presence classification and native line edits remain distinct.
+
+## Shared evidence contract
+
+Every Change records its subject ID/kind, owning File ID, repository/base/head identity, admitted comparison classification and basis, Before/After occurrence references and native edit evidence reference. File occurrence evidence uses exact path/blob/content identity. Function/Test occurrence evidence additionally retains occurrence IDs and byte/line anchors. A missing side is checked absence only when the admitted source comparison establishes addition/removal; unavailable data remains unavailable.
+
+Native edit evidence references the same immutable prepared source owner and its native hunk/row coordinates. It does not copy source text into a second authoritative store or recalculate a diff in UI. The domain validates scope, side/commit/path/hash/range, exact removed/added counts, physical row coordinates and hunk witnesses. A shared domain resolver exposes literal side rows and full native evidence for any subject kind. Zero nonempty rows means no edit-side node, never invented code. A malformed declared model fails validation; legacy inputs without the model may be normalized once by the domain from their qualified immutable source evidence, without mutating retained graphs or guessing missing identities.
+
+File diff and unit diff are different scopes over the same native evidence. One physical row can appear in its File and Test/Function accounts; those views are not independent edits to sum. A unit's File-change reference makes this overlap explicit. Exact occurrence evidence is not proof of runtime behavior, test execution, coverage, policy verification or intent. Source-derived interpretations remain separately attributed Claims.
+
+## Ownership and persistence
+
+The Domain owns Change construction, validation, lookup and native-evidence resolution. Preparation emits a versioned normalized Change registry in the source comparison. Existing graph frames with Change IDs are presentations of those same accounts, not a second Change model. Preserve all original source entities, source witnesses and canonical relations. In particular, request(), its Change frame, Authorization construction, helper and every existing edge retain their exact IDs/data/endpoints/labels. The new registry adds typed references rather than rewriting these protected entities.
+
+Experience loads and scopes this shared model once per immutable comparison; disclosure/visibility intents do not reclassify changes. UI projection consumes domain-owned Change evidence for File, Function and Test readers. UI may choose an accepted reading presentation, but cannot construct its own Test-only edit model or admit canonical meaning from cards. Removed/Added evidence cards and their ownership arrows are generic projections of the same Change's native evidence, not new test/assertion/coverage facts. Existing normal request/context nodes and edges remain untouched; this correction does not authorize replacing them with generic code cards. Keep the current Test-top/edit-row reading and source disclosure while removing Test-specific evidence compilation.
+
+Do not duplicate full source bodies/hunks in the new registry: use stable owner/coordinate references into retained immutable source evidence. This avoids a second evidence authority and unnecessary resident payload growth. Source/projector caches remain comparison-scoped and keyed by immutable identity.
+
+## Acceptance and known limits
+
+Independently authored fixtures cover File/Function/Test changed, added, removed, unchanged and unavailable evidence. All three kinds go through the same constructors/resolver and preserve exact rows, sides and anchors. Negative fixtures reject mismatched subjects, comparison identities, row references, duplicate account IDs and fabricated absence. Real PR25 account checks establish the File-to-unit evidence/scope links without duplicate counting. Fresh preparation emits the model before UI; retained-source normalization is a compatibility path, not the only implementation.
+
+Preservation compares every pre-existing canonical entity and relation with main44743c8 and request's restored a08fa42 baseline. Typed Change metadata is additive; original source-graph/projection oracles must not be blindly regenerated. Existing request markup/styles/layout and semantic context remain equal. UI checks exercise the actual candidate graph, Test native edit sides and source open/close/return; a source-informed verifier additionally inspects the shared model. A fresh UI-first reviewer distinguishes what the unchanged presentation can show from what only source/model inspection establishes. Own-PR intake remains fixed PR25/no selector. Physical-device/touch and unfamiliar-human comprehension require separate evidence.

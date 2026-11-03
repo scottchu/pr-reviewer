@@ -1,5 +1,10 @@
 # Change-centered PR behavior workspace
 
+## Shared Change domain model — latest correction, 2026-11-03
+
+Use the [one source Change model](source-change-model.md) for File, Function and Test. Preserve the delivered request/context graph and current Test-top/edit-row layout. Replace Test-only native-edit construction with a generic projection from domain-owned Change evidence. Different retained reading presentations do not imply different ontology models. File and unit evidence scopes remain explicit and non-additive. No new UX or redesign of request() is authorized.
+
+
 ## Test edit topology — latest correction, 2026-11-03
 
 The Test is the reading anchor at the top of its existing change group. Its literal Removed and Added code nodes sit below it on one row, Removed left and Added right. Draw exactly one downward, directed presentation connection from that Test to each available edit side; no connection between the sides. Added-only and removed-only Tests have one side and one connection. These connections mean only “these native source edits belong to this Test”; they are UI composition, not new canonical relations, test coverage, runtime execution or policy verification. Keep exact source witnesses and shared syntax highlighting. No Assertion inventory or extra relationship explanation cards.

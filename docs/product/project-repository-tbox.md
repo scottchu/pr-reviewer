@@ -1,5 +1,10 @@
 # Project and repository TBox
 
+## Unified source Change — latest accepted correction
+
+2026-11-03: File, Function and Test changes share the [one source Change model](source-change-model.md). Change **hasSubject** one existing logical File/Function/Test, **compares** qualified Before/After occurrence evidence or checked absence, and references exact native edits at that subject's scope. Unit-to-File Change scope links expose shared evidence, not additional independent edits or causation. The domain owns one versioned typed model and evidence resolver; Test edit cards are consumers, not an ontology compiler. Keep all original request/context nodes and edges unchanged. This supersedes Test-only UI evidence construction without adding TestChange or changing TestRun/Claim semantics.
+
+
 Date: 2026-10-24. Status: accepted core distinctions with detailed conceptual vocabulary proposed. The user requested the TBox/ABox distinction and explicit project/repository representation. This is durable product knowledge, not a deployed formal schema. No RDF/OWL store, reasoner, dependency, migration or implementation is proposed.
 
 **TBox describes the kinds of things, typed relationships and constraints. ABox records particular things and supported statements about them.** “Repository contains revision-specific source” is vocabulary; “scottchu/pr-reviewer at e3b270e contains this accessHeaders occurrence” is an instance claim requiring evidence.

@@ -196,3 +196,7 @@ Retained pre-cleanup graphs may still contain the retired relation. Presentation
 ## Raw projection correction — 2026-10-30
 
 The [raw projection correctness contract](raw-projection-correctness.md) supersedes the earlier optional enrichment identity/range checks and Function/Test-only disclosure limits. It requires unique version-qualified relation IDs, complete native File disclosure, source-qualified typed interpretation admission at preparation and assembly, and verbatim assertion projection. This corrects factual/evidence integrity without adding UX features or widening semantic extraction claims.
+
+## Unified source Change ownership — 2026-11-03
+
+The [source Change contract](source-change-model.md) supersedes the presentation-only ownership of native edit comparison. Read/parse/extract and evidenced correspondence remain unchanged. Domain builds one qualified Change account for each admitted changed File/Function/Test and validates its exact occurrence/native-edit references. Preparation emits the versioned registry before UI. Experience loads it per comparison, including a conservative retained-input normalization path. File/Function/Test source readers and generic edit-evidence projection consume the same domain resolver; React formats no new source facts. Existing source entities/relations and request's semantic graph stay immutable. The registry references retained evidence rather than duplicating source bodies or native hunks.
