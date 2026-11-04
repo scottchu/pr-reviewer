@@ -27,3 +27,10 @@ After freezing, the reviewer compared pinned source: review.ts Head L1 imports a
 ## Limits
 
 This is an agent's mediated desktop graph-first account, not unfamiliar-human comprehension. Private candidate UI, source review, exact-main build/serve identity and live endpoint verification remain separate. Fixed PR25/no selector prevents own-correction-PR intake. Physical Safari/touch and broad mobile reliability are unrun. Existing graph navigation/readability limits beyond this bounded code correction remain open.
+
+
+## Final correction verdict
+
+Final source candidate:9ae6e25d99368e44244483f78efd2f7effc219ca. Independent source review: no remaining material findings,16/16 affected checks PASS. Root full222/222 and strict types/boundaries PASS. Actual corrected screenshots/DOM show request's decisive code without horizontal clipping, qualified cross-file target path/L3 with caller+callee provenance, and direction-qualified outgoing-call notices. Test's final predicate is readable through its existing bounded vertical pane. Independent reviewer closed the three material presentation findings; dense overview/navigation and narrow source disclosure remain known non-blocking friction for this bounded correction.
+
+Root then exercised actual File/request/Test source open/return and disclosure reflow, native scroll, Changes-only and File expand/Hide on the final candidate, preserving exact rows/refs/notices and no Assertion inventory. This is isolated desktop Chrome MCP self-checking, separately from independent source/graph understanding. Postmerge exact-main deployment/live readback remains the next gate, recorded in operational runtime evidence. This later reconciliation commit changes docs only; product source remains pinned9ae6e25 until merged build readback.

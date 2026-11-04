@@ -59,3 +59,14 @@ Material presentation findings: default code horizontally clipped the decisive A
 
 
 Corrected local evidence:222/222 graph/source tests PASS, root/subsystem/browser boundaries PASS and minimum TypeScript PASS. Target declaration witnesses are same-side/qualified/unambiguous, malformed call records abstain, and exact known native rows reject contradictory call text. Whole prepared graph bytes equal deployed a5ae769, including all entities, relations and comparison metadata. Source/relationship UI remains additive. Pending final committed candidate, actual wrap/target/notice/read/return measurements and independent correction verdict.
+
+
+## Final candidate reconciliation
+
+Source candidate:9ae6e25d99368e44244483f78efd2f7effc219ca. Root full222/222 graph/source tests PASS on committed source; strict root/minimum/browser boundaries PASS; production build PASS. Independent16 affected tests PASS and no remaining material source findings. Fresh docs-only initial/delta audit reports scoped rebuild-ready knowledge, without implementation/runtime claims.
+
+Actual isolated Mac mini Chrome MCP readback of final build (index-DLS5mOoa.js): request native1/1 rows soft-wrap without horizontal overflow, Before constructs binds header occurrence, After call names the exact helper declaration path/L3 and both full source identities. Controlled-host Test remains4/8 rows without assertion cards; its missing outgoing call is explicit. Existing vertical native-code scroll exposes its final predicate. Request/Test source open/close/return reflow keeps both code cards below their source with directed bottom→top connections. File source reader+4/−3 opens/returns. Changes-only filtering retains native rows/notice with zero Assertion nodes; application-Test File expansion and Hide return to the original node count with zero Assertion nodes. Browser console has no error/warning messages.
+
+Independent reviewer inspected final actual screenshots and closed code clipping, missing notice direction and callee-source inspectability findings. The first graph-only account remains frozen; pinned source comparison confirms its literal account, resolves import binding and preserves unknown runtime/Test coverage. All canonical prepared graph bytes remain equal deployeda5ae769. Original source/context identity/content/relations remain preserved; additive layout is the declared exception.
+
+Next: publish PR, merge via standing authority, fast-forward clean primary main, build exact remote-main and compare with the reviewed candidate, retain a5ae769 rollback, deploy only existing8478/root and verify12 loopback/HTTPS assets plus actual final paired reading. Runtime identity/readback lives in retained operational evidence after merge. No extra UX feature/analyzer is assigned; own-correction-PR selector, unfamiliar-human and physical-touch gates remain explicit and prevent full slice/round acceptance.
