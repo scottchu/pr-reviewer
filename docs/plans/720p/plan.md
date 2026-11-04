@@ -117,3 +117,5 @@ V38 correction (2026-10-29): [draggable icon toolbar](slices/05-explanation-expl
 2026-10-30: [Test above Assertions](slices/05-explanation-exploration/test-assertion-stack/plan.md) is a narrow automatic-layout correction; ontology and other presentation remain unchanged.
 
 2026-10-30: [Measured label overlap repair](slices/05-explanation-exploration/label-overlap/plan.md) records user screenshots invalidating automatic-layout visual acceptance and the corrected joint geometry contract.
+
+Code with source relationships correction: [paired reading C1](slices/05-explanation-exploration/code-relations/plan.md); native evidence, exact relationship anchors and unknown implementation links; previous visual freeze superseded only as declared.

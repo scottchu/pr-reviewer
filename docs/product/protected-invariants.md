@@ -73,3 +73,10 @@ Date:2026-10-29. The user explicitly restores a floating toolbar only for the st
 ### Unified Change model and frozen normal graph
 
 Date:2026-11-03. Accepted: [one Change model](source-change-model.md) covers File/Function/Test in Domain/Preparation/Experience; UI consumes shared exact evidence. Preserve every existing source entity/edge and request(), its Change frame, Authorization construction, helper, source controls, styles and route meanings against44743c8/a08fa42. Test-only evidence compilation is superseded, not these protected nodes. Unit/File overlap is shared source evidence, not independent changes to total. Assertion membership stays canonical without canvas inventory. New typed accounts do not authorize inferred execution, coverage, intent or relations. Engineering, actual candidate reading, own-PR intake, unfamiliar comprehension and physical-device acceptance remain distinct.
+
+
+## Code and relationship reading correction
+
+Date: 2026-11-04.
+
+The [paired code/relationship contract](code-relationship-projection.md) authorizes additive native code sides for existing Function/Test Change frames, exact source-relationship annotations and an explicit missing implementation-link notice. Preserve canonical source/entity/relation identities/data/endpoints and original context content. Necessary group/root reflow is allowed; complete normal-layout equality is superseded for this correction only. No source parser/binding inference or Test coverage edge is authorized.

@@ -4,6 +4,12 @@ Date: 2026-11-03.
 Status: accepted ontology correction; implementation and delivery evidence are recorded separately.
 Parents: [ontology TBox](project-repository-tbox.md), [source pipeline](source-pipeline.md), [raw projection](raw-projection-correctness.md).
 
+## Latest reading correction
+
+Date: 2026-11-04.
+
+The [code and source relationship contract](code-relationship-projection.md) supersedes the retained Test-only reading policy below. Existing Function and Test Change frames both expose actual native code and qualified relationship references; missing implementation relationships are explicit. Original canonical nodes/edges remain protected; additive code and necessary presentation reflow are authorized. No new analysis or inferred Test coverage is admitted.
+
 ## Reader outcome and scope
 
 A reviewer asks the same questions of a File, Function or Test change: which logical subject changed, which exact repository/base/head comparison supports that account, what existed on each side, and which native source rows were removed or added. File is the whole-file scope; Function and Test are source-unit scopes inside a File. A Test includes its assertion source. Assertion edits remain line edits inside that Test; canonical Test/assertion containment and witnesses remain available without a canvas inventory.
