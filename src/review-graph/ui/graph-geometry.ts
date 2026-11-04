@@ -129,6 +129,25 @@ export const initialLayout = <T extends LayoutNode>(
  const nodes = input.map(node => ({...node, position: {...node.position}, style: {...node.style, opacity: 1}}));
  for (const group of nodes.filter(node => nodes.some(child => child.parentId === node.id))) {
   const children = nodes.filter(node => node.parentId === group.id);
+  // Native evidence ownership is shared by all source-unit kinds. Keep source,
+  // literal edits and retained semantic context in separate top-down rows.
+  const ownership=links.filter(link=>link.labelFree&&children.some(child=>child.id===link.source)&&children.some(child=>child.id===link.target));
+  const anchors=new Set(ownership.map(link=>link.source));
+  if(ownership.length&&anchors.size===1){
+   const anchor=children.find(child=>child.id===[...anchors][0])!;
+   const edits=ownership.map(link=>children.find(child=>child.id===link.target)!);
+   const context=children.filter(child=>child!==anchor&&!edits.includes(child));
+   const rows=[[anchor],edits,...(context.length?[context]:[])];
+   const width=Math.max(600,...rows.map(row=>row.reduce((sum,node)=>sum+dimensions(node).width,0)+(row.length-1)*120+groupInterior.padding*2));
+   let y=headers[group.id]??groupInterior.top;
+   for(const row of rows){
+    let x=(width-row.reduce((sum,node)=>sum+dimensions(node).width,0)-(row.length-1)*120)/2;
+    for(const child of row){child.position={x,y};x+=dimensions(child).width+120;}
+    y+=Math.max(...row.map(node=>dimensions(node).height))+rowGap;
+   }
+   group.style={...group.style,width,height:y-rowGap+groupInterior.padding};
+   continue;
+  }
   const stacks = testStacks(children, testFamilies);
   const stack = stacks.size === 1 ? [...stacks.values()][0] : undefined;
   if (stack && stack.members.length === children.length) {

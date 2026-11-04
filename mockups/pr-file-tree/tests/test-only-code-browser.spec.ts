@@ -16,20 +16,29 @@ const frame = async (page: Page, node: Locator) => {
 };
 
 // Authored actual React journeys; execution requires the supported browser host.
-for (const width of [390, 1440]) test(`only Test gains actual code; request and Authorization survive at ${width}`, async ({page}) => {
+for (const width of [390, 1440]) test(`shared native code and source context survive at ${width}`, async ({page}) => {
     await page.setViewportSize({width, height: 900}); await page.goto(target);
     await expect(page.locator('main[aria-label="PR25 source comparison graph"]')).toHaveAttribute('aria-busy', 'false', {timeout: 30000});
     const node = (id: string) => page.locator(`.react-flow__node[data-id=${JSON.stringify(id)}]`);
     const request = node('request'), header = node('header-value');
     await frame(page, request); await expect(request.getByRole('heading')).toContainText('request()');
     const requestText = await request.innerText();
+    const requestEdits=expected.nodes.filter(entity=>entity.ui.sourceEdit?.subjectId==='request');
+    for(const edit of requestEdits){
+        const card=node(edit.id);await frame(page,card);
+        const reference=card.locator('[data-source-relationship]');await expect(reference).toHaveCount(1);
+        await expect(reference).toHaveAttribute('data-source-line',edit.ui.sourceEdit!.kind==='remove'?'29':'30');
+        await expect(reference).toHaveAttribute('data-target-id',edit.ui.sourceEdit!.kind==='remove'?'header-value':'helper');
+    }
+    await frame(page,request);
     await request.getByText('View source changes', {exact: true}).click();
-    await expect(request.getByLabel('Removed source rows', {exact: true})).toContainText('Authorization:');
+    await expect(request.getByLabel('All native source hunks', {exact: true})).toContainText('Authorization:');
     await request.getByText('View source changes', {exact: true}).click();
     await frame(page, header); await expect(header).toContainText('Authorization property construction');
     const headerText = await header.innerText();
     const group = expected.nodes.find(entity => entity.id === 'change:' + testId)!;
     const subject = node(testId);
+    await frame(page,subject);await expect(subject.locator('[data-source-relationship-status]')).toContainText('Implementation relationship not established');
     const children = group.nodes!.filter(child => child.ui.sourceEdit);
     const worldBox = async (id: string) => {
         const bounds = (await node(id).boundingBox())!;

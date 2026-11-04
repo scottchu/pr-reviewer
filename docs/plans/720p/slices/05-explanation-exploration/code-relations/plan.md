@@ -38,3 +38,14 @@ Root sole writer uses branch project-code-with-source-relations in /Users/scottc
 ## Independent-review handoff C1
 
 Fresh reviewer first reads actual candidate screenshots and requests mediated Chrome MCP navigation, without docs/diff/model/answer key. Task: explain the request() and controlled-host Test changes, locate supporting code/relationships, report unknowns and return. Freeze account and confidence. Then read this packet/spec and diff to check C1–C4, source qualification and preservation. Root alone controls shared candidate browser. No reviewer writes, no unsolicited redesign. Use gpt-6.1-sol/high for narrow source-identity/projection risk; escalate only concrete ambiguity affecting relationship truth or original source preservation. A separate fresh docs-only readiness audit assesses maintained product knowledge and this corrected boundary without plans/chat/code; distinguish its verdict from implementation and browser acceptance.
+
+
+## Source preparation and local evidence
+
+Fresh docs-only readiness audit found no material gaps in the maintained current-product/correction contract. Its verdict covers documentation only. Root implemented Domain references to existing calls/constructs, qualified caller/target/source witnesses and canonical three-relation callsite paths; native known-row call text and copied location evidence must agree. Type does not control code composition or manufacture unavailable links.
+
+The paired source check confirms request Removed29/Added30 with Before constructs/After calls; the real Test has native4/8 and no supplied resolved implementation call. Independent manual fixtures support both Function and Test with genuine qualified call evidence, plus File-scope provenance, so Test is not hard-coded to unknown. Negative fixtures cover side/commit/path/hash/range, ambiguous targets, unsupported name guesses and copied call/location contradictions. Existing source graph fields remain unchanged.
+
+Root self-checking:221/221 graph tests PASS; strict root/subsystem and minimum types PASS before the final markup/E2E assertion additions. Existing old visual-equality/Test-only assertions were replaced only for the declared additive geometry/UI fields; original source/context/card content and relationship identities remain checked against the unchanged frozen baseline. A test found registry children could bypass the existing callsite reduction during group replacement; this was fixed by preserving the visible projected group and its reduced children. No hidden callsite/Assertion inventory is reintroduced.
+
+Next gate: committed candidate/build and actual paired UI verification, then fresh independent graph-first/source review. Own-correction-PR intake/human/device gates remain unchanged and open.

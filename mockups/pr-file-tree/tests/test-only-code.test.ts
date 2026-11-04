@@ -16,7 +16,7 @@ import {readingBands, filePaths, documentPaths, testAssertionFamilies} from '../
 const testId = 'unit:120f56a58b1d4d8935c4a6e8aeb217c5cc80e65ab2f3a4ba32c4d0c3d9a4b21f';
 const sha = (value: unknown) => createHash('sha256').update(JSON.stringify(value)).digest('hex');
 
-test('request/Authorization/helper and every existing edge stay at the independently frozen a08fa42 baseline', () => {
+test('original request/Authorization/helper content and every existing edge retain the frozen a08fa42 facts through additive code presentation', () => {
     let state = experienceService.openComparison(sourceGraph), session = createGraphSession(sourceGraph);
     const protectedNode = (entity: typeof session.view.nodes[number]) => entity.kind !== 'test' && !entity.nodes?.some(child => child.kind === 'test');
     const baseline = projectExperience(state);
@@ -24,7 +24,12 @@ test('request/Authorization/helper and every existing edge stay at the independe
     assert.equal(sha(baseline.relations), '6557dc50f9bfe668d07fc72192bb4933772872869adb9e75cc64670bb80886fe');
     const check = () => {
         const raw = projectExperience(state);
-        for (const original of raw.nodes.filter(protectedNode)) assert.deepEqual(session.view.nodes.find(entity => entity.id === original.id), original, original.id);
+        const originalPresentation=(entity: typeof session.view.nodes[number]):unknown=>{
+            const {nodes,ui,...identity}=entity;
+            const {changeEvidenceSource,relationshipNotice,...originalUI}=ui;
+            return {...identity,ui:originalUI,...(nodes?{nodes:nodes.filter(child=>!child.ui.sourceEdit).map(originalPresentation)}:{})};
+        };
+        for (const original of raw.nodes.filter(protectedNode)) assert.deepEqual(originalPresentation(session.view.nodes.find(entity => entity.id === original.id)!), originalPresentation(original), original.id);
         assert.deepEqual(session.view.relations, raw.relations, 'all IDs/endpoints/data/labels stay unchanged');
         assert.deepEqual(session.filter.relationIds.filter(id => !id.startsWith('source-edit-connection:')), projectChangeFilter(raw, state.changesOnly).relationIds);
         assert.ok(session.view.nodes.some(entity => entity.id === 'request'));
@@ -58,7 +63,7 @@ test('request group markup, existing CSS and source-color index stay byte-identi
     assert.equal(digest(groupMarkup), 'df4e875e075d917c21054367c4277a9c02f36f6f4dbf262c20c4b89ec3b4a72c');
 });
 
-test('synthetic Test-only room does not change request/Authorization/helper placement or dimensions', () => {
+test('additive shared code reflows groups but preserves every original node and nongroup dimensions', () => {
     const raw = projectExperience(experienceService.openComparison(sourceGraph)), next = createGraphSession(sourceGraph).view;
     const layout = (view: typeof next) => {
         const nodes = view.nodes.map(entity => {
@@ -69,10 +74,14 @@ test('synthetic Test-only room does not change request/Authorization/helper plac
             readingBands(view.entities, sourceGraph.relations), {}, filePaths(view.entities), documentPaths(view.entities), testAssertionFamilies(view.entities, sourceGraph.relations)));
     };
     const before = layout(raw), after = layout(next);
-    for (const id of ['change', 'request', 'header-value', 'helper', 'change:helper']) assert.deepEqual(after.get(id), before.get(id), id);
+    for(const [id,box] of before){
+        assert.ok(after.has(id),id);
+        if(!raw.nodes.find(node=>node.id===id)!.nodes){assert.equal(after.get(id)!.width,box.width,id);assert.equal(after.get(id)!.height,box.height,id);}
+    }
+    for(const id of ['change','change:helper']){assert.ok(after.get(id)!.height>=before.get(id)!.height,id);assert.ok(after.get(id)!.width>=before.get(id)!.width,id);}
 });
 
-test('only Test groups gain literal code sides while keeping their original Test relationship anchor', () => {
+test('source-unit groups gain literal code sides while keeping their original relationship anchors', () => {
     const before = sha(sourceGraph), session = createGraphSession(sourceGraph);
     const group = session.view.nodes.find(entity => entity.id === 'change:' + testId)!;
     assert.ok(group.nodes?.some(entity => entity.id === testId));
@@ -89,7 +98,7 @@ test('only Test groups gain literal code sides while keeping their original Test
     assert.equal(session.view.nodes.find(entity => entity.id === testId)?.ui.changeEvidenceSource, true);
     assert.ok(!session.view.nodes.some(entity => entity.kind === 'assertion'));
     assert.ok(session.view.entities.filter(entity => entity.ui.sourceEdit).every(entity =>
-        collectEntities(sourceGraph.entities).find(source => source.id === entity.ui.sourceEdit!.subjectId)?.kind === 'test'));
+        ['function','test'].includes(collectEntities(sourceGraph.entities).find(source => source.id === entity.ui.sourceEdit!.subjectId)?.kind??'')));
     assert.equal(sha(sourceGraph), before);
 });
 
