@@ -38,7 +38,7 @@ for (const width of [390, 1440]) test(`shared native code and source context sur
     const headerText = await header.innerText();
     const group = expected.nodes.find(entity => entity.id === 'change:' + testId)!;
     const subject = node(testId);
-    await frame(page,subject);await expect(subject.locator('[data-source-relationship-status]')).toContainText('Implementation relationship not established');
+    await frame(page,subject);await expect(subject.locator('[data-source-relationship-status]')).toContainText('Outgoing call relationship not established');
     const children = group.nodes!.filter(child => child.ui.sourceEdit);
     const worldBox = async (id: string) => {
         const bounds = (await node(id).boundingBox())!;

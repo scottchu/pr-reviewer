@@ -20,8 +20,9 @@ export const SourceEditCode = ({edit, syntax, ...scroll}: {edit: SourceEditNodeU
     {edit.relationships?.map(({reference,line})=><p key={reference.id} className="source-edit-reference"
         data-source-relationship={reference.relation} data-source-line={line} data-source-side={reference.source.side}
         data-relation-ids={JSON.stringify(reference.relationIds)} data-target-id={reference.targetId}
-        title={reference.source.commit+' · '+reference.source.path+' · L'+reference.source.startLine+'–'+reference.source.endLine+' · SHA256 '+reference.source.contentHash}
+        title={reference.source.commit+' · '+reference.source.path+' · L'+reference.source.startLine+'–'+reference.source.endLine+' · SHA256 '+reference.source.contentHash+' → '+reference.targetSource.path+' · L'+reference.targetSource.startLine+' · '+reference.targetSource.commit+' · SHA256 '+reference.targetSource.contentHash}
         aria-label={(reference.source.side==='base'?'Before':'After')+' source '+reference.relation+' '+reference.targetLabel+' · L'+line+'; source evidence, not execution'}>
         {reference.source.side==='base'?'Before':'After'} · {reference.relation} → {reference.targetLabel} · L{line}
+        {reference.targetSource.path!==reference.source.path&&<span className="source-edit-target">{reference.targetSource.path} · L{reference.targetSource.startLine}</span>}
     </p>)}
     </>;

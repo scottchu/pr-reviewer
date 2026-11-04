@@ -49,3 +49,13 @@ The paired source check confirms request Removed29/Added30 with Before construct
 Root self-checking:221/221 graph tests PASS; strict root/subsystem and minimum types PASS before the final markup/E2E assertion additions. Existing old visual-equality/Test-only assertions were replaced only for the declared additive geometry/UI fields; original source/context/card content and relationship identities remain checked against the unchanged frozen baseline. A test found registry children could bypass the existing callsite reduction during group replacement; this was fixed by preserving the visible projected group and its reduced children. No hidden callsite/Assertion inventory is reintroduced.
 
 Next gate: committed candidate/build and actual paired UI verification, then fresh independent graph-first/source review. Own-correction-PR intake/human/device gates remain unchanged and open.
+
+
+## Actual candidate reading C1 and bounded correction
+
+Fresh graph-first reviewer froze an account from actual isolated Mac mini Chrome screenshots and requested UI drilldowns at source0dc9bc8 before reading source/spec/model. It correctly read request's exact1/1 replacement and conditional helper source, Test's4/8 source expectations and explicit unknown implementation link; it did not infer runtime/PASS/coverage. Confidence in target binding was qualified because exact binding proof was not displayed. Source and return were observed.
+
+Material presentation findings: default code horizontally clipped the decisive Authorization/accessHeaders and final Test predicate, requiring accessible text/source disclosure; generic helper absence wording looked inconsistent with an existing incoming call. Correct the shared native code style to soft-wrap physical rows without changing bytes/counts/syntax or adding controls; qualify the notice as outgoing call evidence. Cross-file relationship references also expose the already qualified target declaration path/line and full target provenance, rather than only a symbol name. This is the same fixed reading criterion, not a new analysis/UX feature. Source review and actual corrected-candidate readback must follow.
+
+
+Corrected local evidence:222/222 graph/source tests PASS, root/subsystem/browser boundaries PASS and minimum TypeScript PASS. Target declaration witnesses are same-side/qualified/unambiguous, malformed call records abstain, and exact known native rows reject contradictory call text. Whole prepared graph bytes equal deployed a5ae769, including all entities, relations and comparison metadata. Source/relationship UI remains additive. Pending final committed candidate, actual wrap/target/notice/read/return measurements and independent correction verdict.

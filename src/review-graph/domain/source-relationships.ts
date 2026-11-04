@@ -4,7 +4,7 @@ import {changeForSubject, loadChangeModel, changeSourceComparison, type SourceCh
 
 export type SourceRelationship = Readonly<{
     id: string; relation: 'calls' | 'constructs'; ownerId: string; targetId: string;
-    targetLabel: string; relationIds: readonly string[]; source: SourceAnchor;
+    targetLabel: string; targetSource: SourceAnchor; relationIds: readonly string[]; source: SourceAnchor;
 }>;
 export type ChangeRelationships = Readonly<{
     references: readonly SourceRelationship[];
@@ -12,10 +12,20 @@ export type ChangeRelationships = Readonly<{
 }>;
 type Witness = Readonly<{id: string; anchor: SourceAnchor}>;
 type Call = Readonly<{id: string; site: Readonly<{sourceText: string; anchor: SourceAnchor}>}>;
+const isWitness=(value:unknown):value is Witness=>{
+    if(!value||typeof value!=='object')return false;
+    const witness=value as Partial<Witness>;
+    return typeof witness.id==='string'&&Boolean(witness.id)&&Boolean(witness.anchor)&&typeof witness.anchor==='object';
+};
 const witnesses = (entity: GraphEntity): readonly Witness[] =>
-    Array.isArray(entity.data.sourceWitnesses) ? entity.data.sourceWitnesses as readonly Witness[] : [];
+    Array.isArray(entity.data.sourceWitnesses)&&entity.data.sourceWitnesses.every(isWitness) ? entity.data.sourceWitnesses : [];
+const isCall=(value:unknown):value is Call=>{
+    if(!value||typeof value!=='object')return false;
+    const call=value as Partial<Call>;
+    return typeof call.id==='string'&&Boolean(call.id)&&Boolean(call.site)&&typeof call.site?.sourceText==='string'&&Boolean(call.site.sourceText)&&Boolean(call.site.anchor);
+};
 const sourceCalls = (relation: GraphRelation): readonly Call[] =>
-    Array.isArray(relation.data.sourceCalls) ? relation.data.sourceCalls as readonly Call[] : [];
+    Array.isArray(relation.data.sourceCalls)&&relation.data.sourceCalls.every(isCall) ? relation.data.sourceCalls : [];
 const caches = new WeakMap<SourceGraph, Map<string, ChangeRelationships>>();
 const registries = new WeakMap<SourceGraph, readonly GraphEntity[]>();
 const registry = (graph: SourceGraph) => {
@@ -51,8 +61,10 @@ export const changeSourceRelationships = (graph: SourceGraph, change: SourceChan
         const sides=file?.data.sourceEvidence as readonly {side:string;commit:string;available:boolean;contentHash?:string}[]|undefined;
         return Boolean(Array.isArray(sides)&&sides.some(side=>side.side===a.side&&side.commit===a.commit&&side.available&&side.contentHash===a.contentHash));
     };
-    const qualifiedTarget = (target: GraphEntity, source: SourceAnchor) =>
-        witnesses(target).some(w=>w.id&&validAnchor(w.anchor)&&w.anchor.side===source.side);
+    const qualifiedTarget = (target: GraphEntity, source: SourceAnchor) => {
+        const selected=witnesses(target).filter(w=>w.id&&validAnchor(w.anchor)&&w.anchor.side===source.side);
+        return selected.length===1?selected[0]!.anchor:undefined;
+    };
     const owns = (owner: GraphEntity, source: SourceAnchor) => {
         if(!validAnchor(source))return false;
         if(change.subject.kind==='file')return owner.kind!=='file' && witnesses(owner).some(w=>validAnchor(w.anchor)&&contains(w.anchor,source)) &&
@@ -62,11 +74,12 @@ export const changeSourceRelationships = (graph: SourceGraph, change: SourceChan
     const temporal = (edge: GraphRelation, source: SourceAnchor) =>
         edge.version==='comparison'||edge.version===(source.side==='base'?'before':'after');
     const append = (edge: GraphRelation, owner: GraphEntity, target: GraphEntity, source: SourceAnchor, ids: readonly string[]) => {
-        if(!owns(owner,source)||!qualifiedTarget(target,source)||!temporal(edge,source))return;
+        const targetSource=qualifiedTarget(target,source);
+        if(!['function','test'].includes(owner.kind)||!owns(owner,source)||!targetSource||!temporal(edge,source))return;
         const id=JSON.stringify([edge.id,source.side,source.start,source.end]);
         if(references.some(ref=>ref.id===id))return;
         references.push({id,relation:edge.relation as 'calls'|'constructs',ownerId:owner.id,targetId:target.id,
-            targetLabel:typeof target.data.name==='string'?target.data.name:target.id,relationIds:ids,source});
+            targetLabel:typeof target.data.name==='string'?target.data.name:target.id,targetSource,relationIds:ids,source});
     };
     const native=changeSourceComparison(graph,change);
     const physicalRows=native.hunks.flatMap(hunk=>hunk.rows);

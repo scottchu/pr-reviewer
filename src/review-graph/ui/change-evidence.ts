@@ -8,7 +8,7 @@ const children=new WeakMap<SourceChange,readonly UIEntity[]>();
 const sources=new WeakMap<UIEntity,UIEntity>();
 const sourceAnchor=(subject:UIEntity,relationships:ChangeRelationships):UIEntity=>{
     const known=sources.get(subject);if(known)return known;
-    const ui=Object.defineProperties({}, {...Object.getOwnPropertyDescriptors(subject.ui),changeEvidenceSource:{enumerable:true,value:true},relationshipNotice:{enumerable:true,value:relationships.implementationLink==='not-established'?'Implementation relationship not established from the available source evidence.':undefined}}) as UIEntity['ui'];
+    const ui=Object.defineProperties({}, {...Object.getOwnPropertyDescriptors(subject.ui),changeEvidenceSource:{enumerable:true,value:true},relationshipNotice:{enumerable:true,value:relationships.implementationLink==='not-established'?'Outgoing call relationship not established from the available source evidence.':undefined}}) as UIEntity['ui'];
     const result={...subject,ui};sources.set(subject,result);return result;
 };
 const codeChildren=(comparison:SourceGraph,change:SourceChange,groupId:string):readonly UIEntity[]=>{

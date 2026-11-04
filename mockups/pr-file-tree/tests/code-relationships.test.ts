@@ -16,7 +16,7 @@ test('C1/C2: paired request code rows bind exact Before construction and After c
  assert.equal(account.implementationLink,'supplied');
  const construction=account.references.find(r=>r.relation==='constructs')!,call=account.references.find(r=>r.relation==='calls')!;
  assert.deepEqual([construction.source.side,construction.source.startLine,construction.targetId],['base',29,'header-value']);
- assert.deepEqual([call.source.side,call.source.startLine,call.targetId],['head',30,'helper']);assert.equal(call.relationIds.length,3);
+ assert.deepEqual([call.source.side,call.source.startLine,call.targetId],['head',30,'helper']);assert.equal(call.relationIds.length,3);assert.equal(call.targetSource.path,'src/application/local-access.ts');assert.equal(call.targetSource.startLine,3);assert.equal(call.targetSource.side,'head');
  for(const ref of account.references){assert.equal(ref.source.repository,change.comparison.repository);assert.equal(ref.source.commit,ref.source.side==='base'?change.comparison.base:change.comparison.head);for(const id of ref.relationIds)assert.ok(graph.relations.some(r=>r.id===id));}
  assert.ok(native.added[0]!.text.includes('accessHeaders(captured)'));assert.equal(hash(graph),before);
 });
@@ -88,4 +88,18 @@ test('C2: copied location/call text contradictions cannot override qualified nat
  const site=copied.entities.flatMap(n=>n.nodes??[]).find(n=>n.id==='site')!;
  const invalid={...copied,entities:copied.entities.map(n=>n.nodes?{...n,nodes:n.nodes.map(child=>child===site?{...child,data:{...child.data,value:'sameNameButDifferentSource()'}}:child)}:n)};
  assert.equal(changeSourceRelationships(invalid,changeForSubject(loadChangeModel(invalid),'subject')!).implementationLink,'not-established');
+});
+
+
+test('C2: callee identity is qualified and unambiguous; malformed call records cannot mint links',()=>{
+ for(const mutate of [(a:Record<string,unknown>)=>({...a,contentHash:'wrong'}),(a:Record<string,unknown>)=>({...a,side:'base',commit:'before'})]){
+  const g=relationshipFixture(),target=g.entities.find(n=>n.id==='target')!,ws=target.data.sourceWitnesses as {id:string;anchor:Record<string,unknown>}[];
+  const changed={...g,entities:g.entities.map(n=>n===target?{...n,data:{...n.data,sourceWitnesses:ws.map(w=>({...w,anchor:mutate(w.anchor)}))}}:n)};
+  assert.equal(changeSourceRelationships(changed,changeForSubject(loadChangeModel(changed),'subject')!).implementationLink,'not-established');
+ }
+ const g=relationshipFixture(),target=g.entities.find(n=>n.id==='target')!,ws=target.data.sourceWitnesses as {id:string;anchor:Record<string,unknown>}[];
+ const duplicate={...g,entities:g.entities.map(n=>n===target?{...n,data:{...n.data,sourceWitnesses:[...ws,{...ws[0]!,id:'other-target-occurrence'}]}}:n)};
+ assert.equal(changeSourceRelationships(duplicate,changeForSubject(loadChangeModel(duplicate),'subject')!).implementationLink,'not-established');
+ const malformed={...g,relations:g.relations.map(r=>r.relation==='calls'?{...r,data:{...r.data,sourceCalls:[null]}}:r)};
+ assert.equal(changeSourceRelationships(malformed,changeForSubject(loadChangeModel(malformed),'subject')!).implementationLink,'not-established');
 });
