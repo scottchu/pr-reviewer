@@ -8,7 +8,7 @@ import {createGraphSession} from '../../../src/review-graph/ui/session.ts';
 import {changeEditSyntaxLine} from '../change-edit-syntax.ts';
 import type {SourceEditNodeUI, SourceSyntaxUI} from '../../../src/review-graph/ui/types.ts';
 
-test('Test-only React code markup renders every literal row, newline and syntax span', async () => {
+test('shared React code markup renders every literal row, newline and syntax span', async () => {
     const server = await createServer({configFile: false, optimizeDeps: {noDiscovery: true, include: []}, server: {middlewareMode: true, hmr: false}});
     try {
         const {SourceEditCode} = await server.ssrLoadModule('/src/review-graph/ui/components/SourceEditCode.tsx') as {SourceEditCode: React.ComponentType<{edit: SourceEditNodeUI; syntax: SourceSyntaxUI}>};
@@ -19,6 +19,12 @@ test('Test-only React code markup renders every literal row, newline and syntax 
             for (const [index, row] of edit.rows.entries()) {
                 assert.equal(Number(rows[index]![1]), row.line); assert.equal(Number(rows[index]![2]), row.hunkIndex);
                 assert.equal(rows[index]![3]!.replace(/<[^>]*>/g, ''), renderToStaticMarkup(React.createElement('code', null, row.text)).slice(6, -7));
+            }
+            for(const {reference,line} of edit.relationships??[]){
+                assert.ok(html.includes('data-source-relationship="'+reference.relation+'"'));
+                assert.ok(html.includes('data-source-side="'+reference.source.side+'"'));
+                assert.ok(html.includes('data-target-id="'+reference.targetId+'"'));
+                assert.ok(html.includes(' · L'+line));assert.ok(html.includes(reference.source.contentHash));
             }
             if (edit.rows.some(row => row.text.includes('const '))) assert.match(html, /syntax-keyword/);
         }

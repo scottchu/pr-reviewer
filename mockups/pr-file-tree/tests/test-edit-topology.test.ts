@@ -8,7 +8,7 @@ import {readingBands, filePaths, documentPaths, testAssertionFamilies} from '../
 
 const target = 'unit:120f56a58b1d4d8935c4a6e8aeb217c5cc80e65ab2f3a4ba32c4d0c3d9a4b21f';
 
-test('every Test owns one directed presentation connection per real edit side across disclosure/filter/pagination', () => {
+test('every source-unit Change owns one directed presentation connection per real edit side across disclosure/filter/pagination', () => {
     const initial = createGraphSession(sourceGraph);
     const sessions = [initial, initial.inspect(target, true), initial.setChangesOnly(true), initial.expand('application-test-file', false), initial.expand('application-test-file', false).expand('application-test-file', true)];
     for (const session of sessions) {
@@ -22,7 +22,7 @@ test('every Test owns one directed presentation connection per real edit side ac
             assert.equal(owned[0]!.from, node.ui.sourceEdit!.subjectId);
             assert.equal(owned[0]!.changeEditConnector, true);
             assert.equal(owned[0]!.version, node.ui.sourceEdit!.kind === 'remove' ? 'before' : 'after');
-            assert.ok(session.view.nodes.some(subject => subject.id === owned[0]!.from && subject.kind === 'test'));
+            assert.ok(session.view.nodes.some(subject => subject.id === owned[0]!.from && ['function','test'].includes(subject.kind)));
             assert.ok(!session.view.relations.some(edge => edge.id === owned[0]!.id), 'presentation never enters canonical relations');
             assert.ok(session.filter.relationIds.includes(owned[0]!.id));
         }
@@ -30,7 +30,7 @@ test('every Test owns one directed presentation connection per real edit side ac
     }
 });
 
-test('measured Test is above edit row; Removed left, Added right; bottom/top routes stay inside group and do not disturb original routes', () => {
+test('measured source subject is above edit row; Removed left, Added right; bottom/top routes stay inside group and do not disturb original routes', () => {
     for (const open of [false, true]) for (const codeWidth of [300, 380, 540]) {
         const session = createGraphSession(sourceGraph).inspect(target, open), view = session.view;
         const connections = view.changeEditConnections ?? [];
@@ -46,7 +46,7 @@ test('measured Test is above edit row; Removed left, Added right; bottom/top rou
         const originalRoutes = projectionRoutes(laid, view.nodes, originals, {}, {}, headers)!;
         for (const edge of originals) assert.deepEqual(routes.get(edge.id), originalRoutes.get(edge.id), edge.id);
         for (const group of view.nodes.filter(node => node.nodes?.some(child => child.ui.sourceEdit))) {
-            const subject = group.nodes!.find(child => child.kind === 'test')!, top = boxes.get(subject.id)!, frame = boxes.get(group.id)!;
+            const subject = group.nodes!.find(child => child.ui.changeEvidenceSource)!, top = boxes.get(subject.id)!, frame = boxes.get(group.id)!;
             const edits = group.nodes!.filter(child => child.ui.sourceEdit), sides = edits.map(child => boxes.get(child.id)!);
             for (const [index, side] of sides.entries()) {
                 assert.ok(top.y + top.height < side.y, 'Test must be above its code');

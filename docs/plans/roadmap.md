@@ -126,3 +126,5 @@ Current bounded performance work (2026-10-28): [720p viewport scene delivery](72
 
 
 Current bounded reading refinement (2026-10-29): [V37 filter](720p/slices/05-explanation-exploration/change-filter/plan.md) adds a stateful changes-only floating control and one-hop context limit. It preserves existing source/viewport boundaries and does not restore superseded panels or close whole-round comprehension gates.
+
+Code with source relationships correction: [paired reading C1](720p/slices/05-explanation-exploration/code-relations/plan.md); native evidence, exact relationship anchors and unknown implementation links; previous visual freeze superseded only as declared.

@@ -25,3 +25,5 @@ Keep related delivery material together. Each round lives under `docs/plans/<rou
 - [Raw projection correctness](product/raw-projection-correctness.md): source/fact/interpretation boundaries, unique relations and complete native evidence disclosure.
 
 - [One source Change model](product/source-change-model.md): shared File/Function/Test comparison identity and native evidence, domain ownership and preserved normal graph.
+
+- [Code with source relationships](product/code-relationship-projection.md): paired Function/Test reading, exact native code and relationship references, and explicit unknown implementation links.

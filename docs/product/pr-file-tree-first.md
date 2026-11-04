@@ -1,5 +1,11 @@
 # Change-centered PR behavior workspace
 
+## Code and source relationships — current correction
+
+Date: 2026-11-04.
+
+Follow [code and source relationships](code-relationship-projection.md). Function and Test source-unit Changes both show literal native Removed/Added code and qualified relationship references. Preserve original canonical source/context nodes and edges. The earlier Test-only visual restriction and complete normal-layout freeze below are historical, superseded by this additive correction and required reflow. No Assertion inventory or invented implementation links return.
+
 ## Test is one normal source change unit — 2026-11-03
 
 A Test is one whole source-definition reading unit. Its assertion edits stay native line edits inside that Test; canonical assertion/contains/location evidence remains retained but no automatic assertion-card/label inventory is drawn. The current accepted projection keeps Test on top and its nonempty Removed/Added code sides below, Removed left and Added right, with one directed bottom-to-top ownership connection per real side. Source disclosure/return and exact native witnesses remain. This supersedes every earlier visible-Assertion-stack/default-semantic-children instruction in this document; those paragraphs describe rejected historical projections, not current acceptance. File/Function/Test share the Change domain model below; preserving request's existing semantic context is a separately protected presentation constraint.

@@ -158,3 +158,5 @@ Controlling2026-10-26: [graph-first recovery](semantic-graph-recovery.md) and [r
 2026-10-30: [Test above Assertions](test-assertion-stack/plan.md) is a narrow automatic-layout correction; ontology and other presentation remain unchanged.
 
 2026-10-30: [Measured label overlap repair](label-overlap/plan.md) records user screenshots invalidating automatic-layout visual acceptance and the corrected joint geometry contract.
+
+Code with source relationships correction: [paired reading C1](code-relations/plan.md); native evidence, exact relationship anchors and unknown implementation links; previous visual freeze superseded only as declared.

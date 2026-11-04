@@ -1,11 +1,15 @@
 .minimal-entity.change-source-edit-node { width: 380px; }
 .minimal-entity.change-source-edit-node > p { font-size: 11px; overflow-wrap: anywhere; }
 .change-source-edit-code { max-height: 320px; overflow: auto; padding: 10px; background: #17252d; color: #e0e8eb; border-radius: 4px; touch-action: pan-x pan-y; user-select: text; }
-.change-source-edit-code .source-edit-row { display: flex; min-height: 18px; width: max-content; min-width: 100%; font: 12px/18px ui-monospace, monospace; }
+.change-source-edit-code .source-edit-row { display: flex; min-height: 18px; width: 100%; min-width: 0; font: 12px/18px ui-monospace, monospace; }
 .change-source-edit-code .source-edit-line { flex: none; width: 46px; color: #93a8b4; user-select: none; }
-.change-source-edit-code code { display: block; white-space: pre; font: inherit; }
+.change-source-edit-code code { display: block; min-width: 0; flex: 1; white-space: pre-wrap; overflow-wrap: anywhere; font: inherit; }
 .change-source-edit-code .syntax-keyword { color: #d5b8f0; }
 .change-source-edit-code .syntax-string { color: #ead5a2; }
 .change-source-edit-code .syntax-comment { color: #b3c7d0; font-style: italic; }
 .change-source-edit-code .syntax-number { color: #a9d6ee; }
 .change-source-edit-code .syntax-plain { color: #e0e8eb; }
+
+.source-edit-reference, .source-relationship-notice { font-size: 11px; line-height: 1.5; color: inherit; overflow-wrap: anywhere; }
+
+.source-edit-target { display: block; }

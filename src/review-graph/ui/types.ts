@@ -1,8 +1,10 @@
+import type {SourceRelationship} from '../domain/source-relationships.ts';
 import type {NativeDocumentHunk, DocumentWitness} from '../domain/types.ts';
 import type { GraphEntity, GraphRelation } from '../domain/types.ts';
 import type { CardRows, RelationRows } from './content.ts';
 export type EntityPresentation = Readonly<{
     changeEvidenceSource?: boolean;
+    relationshipNotice?: string | undefined;
     sourceEdit?: SourceEditNodeUI;
     card: CardRows;
     status: string | undefined;
@@ -37,6 +39,7 @@ export type SourceWitnessUI = DocumentWitness;
 export type SourceEditNodeUI = Readonly<{
     kind: 'remove' | 'add'; changeId: string; subjectId: string; groupId: string;
     rows: readonly Readonly<{line: number; text: string; hunkIndex: number; witness: DocumentWitness}>[];
+    relationships?: readonly Readonly<{reference:SourceRelationship;line:number}>[];
 }>;
 export type SourceSyntaxUI = (path: string, side: 'before' | 'after', line: number | null, text: string) => readonly Readonly<{kind: string; text: string}>[];
 export type SourceHunkUI = NativeDocumentHunk;

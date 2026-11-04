@@ -202,6 +202,7 @@ const Entity = React.memo(({ data }: NodeProps<EntityNode>) => {
   <h2><EntityIcon entity={data.entity}/><span>{card.title}</span></h2>
   {hunks && <DocumentEvidence identity={{entityId: data.entity.id, kind: 'inline-hunks'}} hunks={hunks} reading={reading} onReflow={data.onReflow}/>}
   {card.rows.map((row, index) => <p key={index}>{row}</p>)}
+  {data.entity.ui.relationshipNotice && <p className="source-relationship-notice" data-source-relationship-status="not-established">{data.entity.ui.relationshipNotice}</p>}
   {data.entity.ui.sourceEdit && <ChangeCodeNode entity={data.entity}/>}
   {data.entity.ui.sourceControl && <details className="document-details nodrag nopan" open={data.entity.ui.sourceOpen} onClickCapture={event => captureReaderScrolls(data.entity.id, event.currentTarget)} onToggle={event => {
       const next = event.currentTarget.open;
